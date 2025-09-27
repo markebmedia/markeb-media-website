@@ -1,1 +1,11 @@
+# env files
+.env
+.env.*
+!.env.example
+
+# system/node
+.DS_Store
+node_modules/
+
+# vercel
 .vercel
