@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Markeb Media</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="website/assets/js/airtable.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #FF6B00, #FF8A33);
+            color: white;
+            padding: 40px 30px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .login-header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: white;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .login-subtitle {
+            opacity: 0.9;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .login-form {
+            padding: 40px 30px 30px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 4px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #6b7280;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #FF6B00;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #FF6B00;
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #FF6B00, #FF8A33);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.3);
+        }
+
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password a {
+            color: #FF6B00;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 15px;
+        }
+
+        .back-to-landing {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-to-landing a {
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-to-landing a:hover {
+            color: #FF6B00;
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            color: #6b7280;
+            margin-top: 10px;
+        }
+
+        /* Hide signup form initially */
+        .signup-form {
+            display: none;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 10px;
+            }
+
+            .login-header {
+                padding: 30px 20px 20px;
+            }
+
+            .login-form {
+                padding: 30px 20px 20px;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1 class="logo">MARKEB MEDIA</h1>
+            <p class="login-subtitle">Access your personalized dashboard</p>
+        </div>
+
+        <div class="login-form">
+            <!-- Tab Buttons -->
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="showLoginForm()">Login</button>
+                <button class="tab-button" onclick="showSignupForm()">Sign Up</button>
+            </div>
+
+            <!-- Error Message -->
+            <div class="error-message" id="errorMessage"></div>
+
+            <!-- Login Form -->
+            <form class="login-form-content" id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" name="password" required>
+                </div>
+                <button type="submit" class="login-button" id="loginButton">
+                    Sign In to Dashboard
+                </button>
+                <div class="forgot-password">
+                    <a href="#" onclick="handleForgotPassword()">Forgot your password?</a>
+                </div>
+            </form>
+
+            <!-- Signup Form -->
+            <form class="signup-form" id="signupForm" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email Address</label>
+                    <input type="email" id="signupEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupCompany">Estate Agency</label>
+                    <input type="text" id="signupCompany" name="company" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" name="password" required minlength="8">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                <button type="submit" class="login-button" id="signupButton">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="loading" id="loading">
+                Verifying your account...
+            </div>
+
+            <div class="divider">
+                <span>or</span>
+            </div>
+
+            <div class="back-to-landing">
+                <a href="index.html">← Back to landing page</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is already logged in on page load
+        window.addEventListener('load', function() {
+            if (typeof AirtableAPI !== 'undefined' && AirtableAPI.isUserLoggedIn()) {
+                window.location.href = 'website/dashboard.html';
+            }
+        });
+
+        // Tab switching
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('signupForm').style.display = 'none';
+            document.querySelectorAll('.tab-button')[0].classList.add('active');
+            document.querySelectorAll('.tab-button')[1].classList.remove('active');
+            hideError();
+        }
+
+        function showSignupForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+            document.querySelectorAll('.tab-button')[0].classList.remove('active');
+            document.querySelectorAll('.tab-button')[1].classList.add('active');
+            hideError();
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function showLoading() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('loginButton').disabled = true;
+            document.getElementById('signupButton').disabled = true;
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('loginButton').disabled = false;
+            document.getElementById('signupButton').disabled = false;
+        }
+
+        // Handle login with secure API
+        async function handleLogin(event) {
+            event.preventDefault();
+            hideError();
+            showLoading();
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Basic validation
+            if (!AirtableAPI.validateEmail(email)) {
+                showError('Please enter a valid email address.');
+                hideLoading();
+                return;
+            }
+
+            try {
+                const response = await AirtableAPI.authenticateUser(email, password);
+                
+                if (response.success) {
+                    AirtableAPI.storeUserSession(response.token, email);
+                    window.location.href = 'website/dashboard.html';
+                } else {
+                    showError(response.message || 'Invalid email or password. Please try again.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Connection error. Please check your internet and try again.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Handle signup with secure API
+        async function handleSignup(event) {
+            event.preventDefault();
+            hideError();
+
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const company = document.getElementById('signupCompany').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validation
+            if (!AirtableAPI.validateRequired(name)) {
+                showError('Full name is required.');
+                return;
+            }
+
+            if (!AirtableAPI.validateEmail(email)) {
+                showError('Please enter a valid email address.');
+                return;
+            }
+
+            if (!AirtableAPI.validateRequired(company)) {
+                showError('Estate agency name is required.');
+                return;
+            }
+
+            if (!AirtableAPI.validatePassword(password)) {
+                showError('Password must be at least 8 characters with letters and numbers.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showError('Passwords do not match.');
+                return;
+            }
+
+            showLoading();
+
+            const userData = {
+                name: name,
+                email: email,
+                company: company,
+                password: password
+            };
+
+            try {
+                const response = await AirtableAPI.createUser(userData);
+                
+                if (response.success) {
+                    AirtableAPI.storeUserSession(response.token, email);
+                    window.location.href = 'website/dashboard.html';
+                } else {
+                    showError(response.message || 'Failed to create account. Please try again.');
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                showError('Connection error. Please check your internet and try again.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Handle forgot password
+        function handleForgotPassword() {
+            const email = document.getElementById('loginEmail').value;
+            if (!email) {
+                showError('Please enter your email address first.');
+                return;
+            }
+            
+            if (!AirtableAPI.validateEmail(email)) {
+                showError('Please enter a valid email address.');
+                return;
+            }
+            
+            // Placeholder for password reset functionality
+            alert('Password reset functionality will be implemented. For now, please contact support at admin@markebmedia.com');
+        }
+    </script>
+</body>
+</html>

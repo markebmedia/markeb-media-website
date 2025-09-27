@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CopyRyta - AI Copywriting Assistant for Estate Agents</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: white;
+            color: #1F2E3C;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8533 100%);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .input-section, .output-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .input-section:hover, .output-section:hover {
+            border-color: #FF6B00;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #1F2E3C;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 25px;
+            background: #FF6B00;
+            border-radius: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1F2E3C;
+        }
+
+        .form-group select, .form-group textarea, .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group select:focus, .form-group textarea:focus, .form-group input:focus {
+            outline: none;
+            border-color: #FF6B00;
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-group input[type="number"] {
+            width: 48%;
+            display: inline-block;
+            margin-right: 4%;
+        }
+
+        .form-group input[type="number"]:last-child {
+            margin-right: 0;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8533 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.3);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 0, 0.4);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .output-area {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 300px;
+            font-size: 16px;
+            line-height: 1.7;
+            transition: all 0.3s ease;
+        }
+
+        .output-area:focus {
+            outline: none;
+            border-color: #FF6B00;
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .copy-btn, .edit-btn {
+            flex: 1;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .copy-btn {
+            background: #1F2E3C;
+            color: white;
+        }
+
+        .copy-btn:hover {
+            background: #2a3d4f;
+            transform: translateY(-1px);
+        }
+
+        .edit-btn {
+            background: transparent;
+            color: #FF6B00;
+            border: 2px solid #FF6B00;
+        }
+
+        .edit-btn:hover {
+            background: #FF6B00;
+            color: white;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #FF6B00;
+        }
+
+        .loading-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #FF6B00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 107, 0, 0.1);
+            color: #FF6B00;
+            border: 2px solid #FF6B00;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: #FF6B00;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: #FF6B00;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8533 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .back-btn {
+                position: static;
+                display: inline-block;
+                margin-bottom: 20px;
+            }
+
+            .form-group input[type="number"] {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>CopyRyta</h1>
+            <p>Your AI copywriting assistant for property descriptions and video scripts written in seconds.</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title">Property Details</h2>
+                
+                <div class="form-group">
+                    <label for="contentType">Content Type</label>
+                    <select id="contentType">
+                        <option value="property-description">Property Description</option>
+                        <option value="video-script">Video Script</option>
+                        <option value="social-media-post">Social Media Post</option>
+                        <option value="email-marketing">Email Marketing</option>
+                        <option value="brochure-copy">Brochure Copy</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="propertyType">Property Type</label>
+                    <select id="propertyType">
+                        <option value="house">House</option>
+                        <option value="flat">Flat/Apartment</option>
+                        <option value="bungalow">Bungalow</option>
+                        <option value="cottage">Cottage</option>
+                        <option value="townhouse">Townhouse</option>
+                        <option value="detached">Detached House</option>
+                        <option value="semi-detached">Semi-Detached House</option>
+                        <option value="terraced">Terraced House</option>
+                        <option value="commercial">Commercial Property</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="bedrooms">Bedrooms</label>
+                    <input type="number" id="bedrooms" min="0" max="20" placeholder="Number of bedrooms">
+                    <label for="bathrooms">Bathrooms</label>
+                    <input type="number" id="bathrooms" min="0" max="10" placeholder="Number of bathrooms">
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" placeholder="e.g. Hampstead, London or Manchester City Centre">
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input type="text" id="price" placeholder="e.g. £450,000 or £1,200 pcm">
+                </div>
+
+                <div class="form-group">
+                    <label for="tone">Writing Tone</label>
+                    <select id="tone">
+                        <option value="professional">Professional</option>
+                        <option value="luxury">Luxury/Premium</option>
+                        <option value="family-friendly">Family-Friendly</option>
+                        <option value="modern">Modern & Contemporary</option>
+                        <option value="cozy">Cozy & Welcoming</option>
+                        <option value="investment">Investment Focused</option>
+                        <option value="first-time-buyer">First-Time Buyer Friendly</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Key Features (Select all that apply)</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="garden" value="garden">
+                            <label for="garden">Garden</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="parking" value="parking">
+                            <label for="parking">Parking</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="garage" value="garage">
+                            <label for="garage">Garage</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="ensuite" value="ensuite">
+                            <label for="ensuite">En-suite</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="balcony" value="balcony">
+                            <label for="balcony">Balcony/Terrace</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="fireplace" value="fireplace">
+                            <label for="fireplace">Fireplace</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="newbuild" value="newbuild">
+                            <label for="newbuild">New Build</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="period" value="period">
+                            <label for="period">Period Features</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="transport" value="transport">
+                            <label for="transport">Good Transport Links</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="schools" value="schools">
+                            <label for="schools">Near Good Schools</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="additionalInfo">Additional Details</label>
+                    <textarea id="additionalInfo" placeholder="Any special features, recent renovations, local amenities, or unique selling points..."></textarea>
+                </div>
+
+                <button class="generate-btn" onclick="generateContent()">Ryte for me!</button>
+            </div>
+
+            <div class="output-section">
+                <h2 class="section-title">Generated Content</h2>
+                <div class="loading" id="loading">
+                    <div class="loading-text">Creating your perfect copy...</div>
+                    <div>Our AI is analyzing your property details and crafting compelling content</div>
+                </div>
+                <textarea class="output-area" id="outputArea" placeholder="Your AI-generated property copy will appear here..."></textarea>
+                <div class="action-buttons" id="actionButtons" style="display: none;">
+                    <button class="edit-btn" onclick="editContent()">Edit</button>
+                    <button class="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🏠</div>
+                <h3>Copywriting Assistant</h3>
+                <p>AI-powered descriptions that highlight key features and attract potential buyers or tenants.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎬</div>
+                <h3>Video Scripts</h3>
+                <p>Engaging scripts for property videos that showcase homes in the most compelling way.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Social Media Ready</h3>
+                <p>Perfect copy for Facebook, Instagram, and other platforms to maximize property exposure.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Instant Results</h3>
+                <p>Generate professional property copy in seconds, saving hours of writing time.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function generateContent() {
+            const contentType = document.getElementById('contentType').value;
+            const propertyType = document.getElementById('propertyType').value;
+            const bedrooms = document.getElementById('bedrooms').value;
+            const bathrooms = document.getElementById('bathrooms').value;
+            const location = document.getElementById('location').value;
+            const price = document.getElementById('price').value;
+            const tone = document.getElementById('tone').value;
+            const additionalInfo = document.getElementById('additionalInfo').value;
+            
+            // Get selected features
+            const features = [];
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                features.push(checkbox.value);
+            });
+            
+            const generateBtn = document.querySelector('.generate-btn');
+            const loading = document.getElementById('loading');
+            const outputArea = document.getElementById('outputArea');
+            const actionButtons = document.getElementById('actionButtons');
+
+            if (!location.trim()) {
+                alert('Please enter a location for your property.');
+                return;
+            }
+
+            // Show loading state
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+            loading.style.display = 'block';
+            outputArea.style.display = 'none';
+            actionButtons.style.display = 'none';
+
+            try {
+                // Simulate AI content generation (replace with actual API call)
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Generate property-specific content
+                const generatedContent = generatePropertyContent(
+                    contentType, propertyType, bedrooms, bathrooms, 
+                    location, price, tone, features, additionalInfo
+                );
+                
+                // Show generated content
+                outputArea.value = generatedContent;
+                outputArea.style.display = 'block';
+                actionButtons.style.display = 'flex';
+                
+            } catch (error) {
+                console.error('Error generating content:', error);
+                outputArea.value = 'Something went wrong. Please check your details and try again.';
+                outputArea.style.display = 'block';
+            } finally {
+                // Reset UI
+                loading.style.display = 'none';
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generate Copy';
+            }
+        }
+
+        function generatePropertyContent(type, propertyType, bedrooms, bathrooms, location, price, tone, features, additional) {
+            const bedroomText = bedrooms ? `${bedrooms} bedroom` : '';
+            const bathroomText = bathrooms ? `${bathrooms} bathroom` : '';
+            const priceText = price ? `Priced at ${price}` : '';
+            
+            const featureDescriptions = {
+                garden: 'private garden',
+                parking: 'dedicated parking',
+                garage: 'garage',
+                ensuite: 'en-suite bathroom',
+                balcony: 'balcony with stunning views',
+                fireplace: 'charming fireplace',
+                newbuild: 'brand new construction',
+                period: 'beautiful period features',
+                transport: 'excellent transport connections',
+                schools: 'proximity to outstanding schools'
+            };
+
+            const selectedFeatures = features.map(f => featureDescriptions[f]).filter(Boolean);
+            
+            const templates = {
+                'property-description': generatePropertyDescription(propertyType, bedroomText, bathroomText, location, priceText, tone, selectedFeatures, additional),
+                'video-script': generateVideoScript(propertyType, bedroomText, bathroomText, location, tone, selectedFeatures, additional),
+                'social-media-post': generateSocialPost(propertyType, bedroomText, location, priceText, selectedFeatures),
+                'email-marketing': generateEmailMarketing(propertyType, bedroomText, location, priceText, tone, selectedFeatures),
+                'brochure-copy': generateBrochureCopy(propertyType, bedroomText, bathroomText, location, priceText, tone, selectedFeatures, additional)
+            };
+
+            return templates[type] || templates['property-description'];
+        }
+
+        function generatePropertyDescription(propertyType, bedrooms, bathrooms, location, price, tone, features, additional) {
+            const toneStyles = {
+                'professional': 'This exceptional',
+                'luxury': 'This prestigious',
+                'family-friendly': 'This wonderful family',
+                'modern': 'This contemporary',
+                'cozy': 'This charming',
+                'investment': 'This excellent investment',
+                'first-time-buyer': 'This perfect starter'
+            };
+
+            const opener = toneStyles[tone] || 'This beautiful';
+            const featuresText = features.length > 0 ? `The property boasts ${features.join(', ')}.` : '';
+            
+            return `${opener} ${bedrooms} ${propertyType} in ${location} offers comfortable living in a sought-after location. ${price}
+
+The property features ${bathrooms} and has been well-maintained throughout. ${featuresText}
+
+${additional || 'Located in a desirable area with local amenities nearby, this property represents an excellent opportunity for both homeowners and investors alike.'}
+
+${tone === 'luxury' ? 'This is a rare opportunity to acquire a truly exceptional property.' : 'Viewing is highly recommended to fully appreciate what this property has to offer.'}
+
+Contact us today to arrange a viewing.`;
+        }
+
+        function generateVideoScript(propertyType, bedrooms, bathrooms, location, tone, features, additional) {
+            return `[INTRO - Property Exterior]
+Welcome to this ${tone === 'luxury' ? 'stunning' : 'beautiful'} ${bedrooms} ${propertyType} located in the heart of ${location}.
+
+[ENTRANCE/HALLWAY]
+As we step inside, you're immediately greeted by ${tone === 'modern' ? 'contemporary styling' : 'a warm and welcoming atmosphere'}.
+
+[LIVING AREAS]
+The spacious living areas are perfect for ${tone === 'family-friendly' ? 'family life and entertaining' : 'both relaxation and entertaining guests'}.
+
+[KITCHEN]
+The well-appointed kitchen offers everything you need for modern living.
+
+[BEDROOMS]
+${bedrooms ? `The ${bedrooms} provide comfortable accommodation with plenty of natural light.` : 'The bedrooms are well-proportioned with excellent natural light.'}
+
+[BATHROOMS]
+${bathrooms ? `The ${bathrooms} are beautifully finished and well-appointed.` : 'The bathroom facilities are modern and well-maintained.'}
+
+${features.length > 0 ? `[SPECIAL FEATURES]\nLet me show you some of the standout features - ${features.join(', ')}.` : ''}
+
+[OUTDOOR SPACE/CONCLUSION]
+${additional || 'This property truly offers everything you could want in a modern home.'}
+
+For more information or to arrange a viewing, contact our team today. Thank you for watching!
+
+[END SCREEN - Contact Details]`;
+        }
+
+        function generateSocialPost(propertyType, bedrooms, location, price, features) {
+            const hashtags = ['#PropertyForSale', '#EstateAgent', '#' + location.replace(/\s+/g, ''), '#Property', '#RealEstate'];
+            
+            return `🏠 NEW TO MARKET! 
+
+${bedrooms} ${propertyType} in ${location}
+${price}
+
+✨ Key Features:
+${features.map(f => `• ${f.charAt(0).toUpperCase() + f.slice(1)}`).join('\n') || '• Well-maintained throughout\n• Excellent location\n• Must be seen to be appreciated'}
+
+📞 Call us today to arrange your viewing!
+
+${hashtags.join(' ')}`;
+        }
+
+        function generateEmailMarketing(propertyType, bedrooms, location, price, tone, features) {
+            return `Subject: New ${bedrooms} ${propertyType} in ${location} - ${price}
+
+Dear [Client Name],
+
+I hope this email finds you well. I'm excited to share details of a ${tone === 'luxury' ? 'exceptional' : 'fantastic'} new property that has just come to market.
+
+🏠 PROPERTY HIGHLIGHTS:
+• ${bedrooms} ${propertyType}
+• Location: ${location}
+• Price: ${price}
+• ${features.join('\n• ') || 'Excellent condition throughout'}
+
+This property offers ${tone === 'family-friendly' ? 'the perfect environment for family living' : 'comfortable modern living'} in a highly sought-after location.
+
+Given the current market conditions and the property's excellent features, I expect significant interest from potential ${tone === 'investment' ? 'investors' : 'buyers'}.
+
+Would you like to arrange a viewing? I have availability this week and would be happy to show you around at your convenience.
+
+Please don't hesitate to contact me if you need any additional information.
+
+Best regards,
+[Your Name]
+[Your Contact Details]`;
+        }
+
+        function generateBrochureCopy(propertyType, bedrooms, bathrooms, location, price, tone, features, additional) {
+            return `${bedrooms.toUpperCase()} ${propertyType.toUpperCase()} - ${location.toUpperCase()}
+
+${price}
+
+PROPERTY OVERVIEW
+${tone === 'luxury' ? 'An exceptional opportunity to acquire' : 'We are delighted to present'} this ${bedrooms} ${propertyType} situated in the ${tone === 'luxury' ? 'prestigious' : 'popular'} location of ${location}.
+
+KEY FEATURES
+${features.map(f => `• ${f.charAt(0).toUpperCase() + f.slice(1)}`).join('\n') || '• Well-maintained throughout\n• Excellent location\n• Good local amenities'}
+
+ACCOMMODATION
+The property briefly comprises: entrance hall, reception room(s), kitchen, ${bedrooms}, ${bathrooms}, and all usual facilities.
+
+${additional || 'The property has been well-maintained by the current owners and viewing is essential to fully appreciate the accommodation on offer.'}
+
+LOCATION
+${location} offers excellent local amenities including shops, restaurants, and transport links to the surrounding areas.
+
+VIEWINGS
+Strictly by appointment through the selling agents.
+
+IMPORTANT NOTICE
+These particulars are believed to be accurate but all interested parties must satisfy themselves by inspection or otherwise as to their accuracy.
+
+For more information, please contact our sales team.`;
+        }
+
+        function copyToClipboard() {
+            const outputArea = document.getElementById('outputArea');
+            const copyBtn = document.querySelector('.copy-btn');
+            
+            outputArea.select();
+            document.execCommand('copy');
+            
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'Copied!';
+            copyBtn.style.background = '#28a745';
+            
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+                copyBtn.style.background = '#1F2E3C';
+            }, 2000);
+        }
+
+        function editContent() {
+            const outputArea = document.getElementById('outputArea');
+            outputArea.focus();
+            // Make the textarea editable if it isn't already
+            outputArea.readOnly = false;
+        }
+
+        // Auto-resize textarea
+        document.getElementById('outputArea').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.max(300, this.scrollHeight) + 'px';
+        });
+    </script>
+</body>
+</html>
