@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markeb Media - Premium Real Estate Media | UK</title>
+    <meta name="description" content="Professional real estate photography, videography & drone services in the UK. Premium media delivered within 48 hours with content tracking tools.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            overflow-x: hidden;
+            background: #ffffff;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #2563eb;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #2563eb;
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 2px;
+            background: #374151;
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            padding: 0 2rem;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.03)" points="0,0 1000,200 1000,1000 0,800"/></svg>');
+            background-size: cover;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero h1 {
+            font-size: 3.8rem;
+            margin-bottom: 1.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.4rem;
+            margin-bottom: 3rem;
+            opacity: 0.95;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-primary {
+            display: inline-block;
+            padding: 1.2rem 2.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #1e3a8a;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .cta-primary:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-secondary {
+            display: inline-block;
+            padding: 1.2rem 2.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            font-size: 1rem;
+        }
+
+        .cta-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Page Content */
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding: 120px 2rem 80px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #1a1a1a;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 4rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Services Grid */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            margin: 4rem 0;
+        }
+
+        .service-card {
+            background: white;
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .service-icon {
+            font-size: 2.8rem;
+            color: #2563eb;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+            font-weight: 700;
+        }
+
+        .service-card p {
+            color: #6b7280;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        /* Promise Section */
+        .promise-section {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 5rem 2rem;
+            margin: 4rem -2rem;
+            border-radius: 30px;
+            text-align: center;
+        }
+
+        .promise-badge {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .promise-title {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+            font-weight: 800;
+        }
+
+        .promise-text {
+            font-size: 1.1rem;
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Testimonials */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2.5rem;
+            margin: 4rem 0;
+        }
+
+        .testimonial-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .testimonial-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #374151;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .testimonial-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .testimonial-info h4 {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 0.2rem;
+        }
+
+        .testimonial-info p {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        /* About Content */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin: 4rem 0;
+        }
+
+        .about-text h2 {
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .about-text p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .feature-icon {
+            width: 24px;
+            height: 24px;
+            background: #2563eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .about-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Contact Form */
+        .contact-form {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.7rem;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 1.2rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Portfolio Grid */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2.5rem;
+            margin: 4rem 0;
+        }
+
+        .portfolio-item {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+        }
+
+        .portfolio-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .portfolio-image {
+            height: 280px;
+            background: linear-gradient(45deg, #1e3a8a, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .portfolio-content {
+            padding: 2rem;
+        }
+
+        .portfolio-content h3 {
+            margin-bottom: 0.8rem;
+            color: #1a1a1a;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .portfolio-content p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .hero-ctas {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .about-features {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page {
+                padding: 100px 1rem 60px;
+            }
+
+            .nav-container {
+                padding: 1rem;
+            }
+
+            .services-grid,
+            .testimonials-grid,
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .promise-section {
+                margin: 4rem -1rem;
+                padding: 3rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="#" class="logo">MARKEB MEDIA</a>
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-link active" data-page="hero">Home</a></li>
+                <li><a href="#" class="nav-link" data-page="services">Services</a></li>
+                <li><a href="#" class="nav-link" data-page="portfolio">Portfolio</a></li>
+                <li><a href="#" class="nav-link" data-page="about">About</a></li>
+                <li><a href="#" class="nav-link" data-page="contact">Contact</a></li>
+            </ul>
+            <div class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-clock"></i> 48-Hour Delivery Promise
+            </div>
+            <h1>Crafted to Attract Serious Sellers & Buyers</h1>
+            <p class="hero-subtitle">Premium photo and video designed to elevate your listings, impress vendors, and generate results — all delivered within 48 hours.</p>
+            <div class="hero-ctas">
+                <a href="#" class="cta-primary" data-page="services">View Our Services</a>
+                <a href="#" class="cta-secondary" data-page="contact">Get Quote</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Page -->
+    <div class="page" id="services">
+        <div class="container">
+            <h1 class="page-title">Our Services</h1>
+            <p class="page-subtitle">Professional real estate media services designed to help estate agents win more instructions and sell properties faster.</p>
+            
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3>Professional Photography</h3>
+                    <p>High-quality interior and exterior photography that showcases properties in their best light. HDR processing and professional editing included to make every listing stand out.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Property Videography</h3>
+                    <p>Cinematic property tours and promotional videos that engage potential buyers. Professional editing with music, titles, and smooth transitions to tell your property's story.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                    <h3>Drone Services</h3>
+                    <p>Stunning aerial photography and videography to showcase properties from unique perspectives. Perfect for showcasing gardens, locations, and property surroundings.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Content Tracking Tool</h3>
+                    <p>Real-time tracking of your media content performance and delivery status. Stay informed about project progress and impress clients with transparency.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <h3>Floor Plans</h3>
+                    <p>Professional 2D floor plans that help buyers understand property layouts. Clear, accurate measurements and professional presentation for all property types.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <h3>Virtual Tours</h3>
+                    <p>Immersive 360° virtual tours that allow potential buyers to explore properties remotely. Interactive navigation and professional presentation included.</p>
+                </div>
+            </div>
+
+            <div class="promise-section">
+                <div class="promise-badge">
+                    <i class="fas fa-clock"></i> 48-Hour Promise
+                </div>
+                <h2 class="promise-title">Delivered Within 48 Hours, Guaranteed</h2>
+                <p class="promise-text">We understand the fast-paced nature of the property market. That's why all our media services come with our industry-leading 48-hour delivery guarantee, ensuring you can list properties quickly and efficiently.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Page -->
+    <div class="page" id="portfolio">
+        <div class="container">
+            <h1 class="page-title">Our Work</h1>
+            <p class="page-subtitle">See how we've helped estate agents across the UK showcase properties and win more instructions.</p>
+            
+            <div class="portfolio-grid">
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <span><i class="fas fa-home"></i> Luxury Family Home</span>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Modern Family Home - Surrey</h3>
+                        <p>Complete photography and videography package including drone footage. Property sold within 2 weeks of listing with multiple offers above asking price.</p>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <span><i class="fas fa-building"></i> Commercial Property</span>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Commercial Development - London</h3>
+                        <p>Aerial drone photography and cinematic promotional video for a new commercial development. Used across all marketing channels and social media.</p>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <span><i class="fas fa-camera"></i> Interior Showcase</span>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>Period Property - Bath</h3>
+                        <p>Professional interior photography highlighting period features and character. Virtual tour created to showcase the property's unique charm and layout.</p>
+                    </div>
+                </div>
+                
+                <div class="portfolio-item">
+                    <div class="portfolio-image">
+                        <span><i class="fas fa-video"></i> Property Tour</span>
+                    </div>
+                    <div class="portfolio-content">
+                        <h3>New Build Development - Manchester</h3>
+                        <p>Comprehensive video tour of show home with professional editing and music. Used as the primary marketing tool for the entire development.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Page -->
+    <div class="page" id="about">
+        <div class="container">
+            <h1 class="page-title">About Markeb Media</h1>
+            <p class="page-subtitle">Specialists in real estate media across the UK, helping estate agents stand out and win more instructions.</p>
+            
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>Stand Out to Sellers. Win More Instructions.</h2>
+                    <p>Markeb Media specialises in premium real estate photography, videography, and drone services designed specifically for UK estate agents. We understand that in today's competitive property market, exceptional visual content is essential for attracting serious sellers and buyers.</p>
+                    
+                    <p>Our team combines technical expertise with creative vision to produce media that not only showcases properties beautifully but also helps estate agents differentiate themselves from competitors. With our industry-leading 48-hour delivery promise and real-time content tracking, we ensure you can respond quickly to market opportunities.</p>
+                    
+                    <div class="about-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span>48-Hour Delivery</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span>Content Tracking</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span>UK-Wide Coverage</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span>Professional Quality</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="about-image">
+                    <span><i class="fas fa-users"></i> Professional Media Team</span>
+                </div>
+            </div>
+
+            <!-- Testimonials -->
+            <h2 style="text-align: center; margin: 4rem 0 2rem; font-size: 2.2rem; color: #1a1a1a; font-weight: 800;">Why Estate Agents Trust Markeb Media</h2>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"I've had the pleasure of working with Mark and Kebin for some time now, and their level of service has been exceptional. They're always accommodating with appointments, and the quality of work they deliver is consistently fantastic. The turnaround is impressively quick — even faster than most. I highly recommend them!"</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">JG</div>
+                        <div class="testimonial-info">
+                            <h4>Jessica Grimes</h4>
+                            <p>Director</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"I've worked with Markeb Media for just over a year now, and they've always been top notch. Easy to work with, excellent communication, and the photography and media are outstanding. I look forward to many more years of working with this brilliant team."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">LH</div>
+                        <div class="testimonial-info">
+                            <h4>L. Hughes</h4>
+                            <p>Director, Hughes Estate Agents</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Page -->
+    <div class="page" id="contact">
+        <div class="container">
+            <h1 class="page-title">Get Your Quote</h1>
+            <p class="page-subtitle">Ready to elevate your property listings? Get in touch for a free quote and see how we can help you win more instructions.</p>
+            
+            <form class="contact-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name">Full Name *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="company">Estate Agency *</label>
+                        <input type="text" id="company" name="company" placeholder="Your agency name" required>
+                    </div>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="07xxx xxxxxx">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="location">Property Location</label>
+                    <input type="text" id="location" name="location" placeholder="City, County or Postcode">
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="service">Service Required *</label>
+                        <select id="service" name="service" required>
+                            <option value="">Select a service</option>
+                            <option value="photography">Photography Only</option>
+                            <option value="videography">Videography Only</option>
+                            <option value="drone">Drone Services Only</option>
+                            <option value="photo-video">Photography + Video</option>
+                            <option value="photo-drone">Photography + Drone</option>
+                            <option value="video-drone">Videography + Drone</option>
+                            <option value="full-package">Complete Package (Photo + Video + Drone)</option>
+                            <option value="virtual-tour">Virtual Tour</option>
+                            <option value="floor-plans">Floor Plans</option>
+                            <option value="custom">Custom Package</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="property-type">Property Type</label>
+                        <select id="property-type" name="property-type">
+                            <option value="">Select property type</option>
+                            <option value="residential">Residential House</option>
+                            <option value="apartment">Apartment/Flat</option>
+                            <option value="commercial">Commercial Property</option>
+                            <option value="new-build">New Build Development</option>
+                            <option value="period">Period Property</option>
+                            <option value="luxury">Luxury Property</option>
+                            <option value="land">Land/Plot</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="timeline">Required Timeline</label>
+                        <select id="timeline" name="timeline">
+                            <option value="">Select timeline</option>
+                            <option value="asap">ASAP (Within 24 hours)</option>
+                            <option value="48-hours">Within 48 hours</option>
+                            <option value="this-week">This week</option>
+                            <option value="next-week">Next week</option>
+                            <option value="flexible">Flexible</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="budget">Estimated Budget</label>
+                        <select id="budget" name="budget">
+                            <option value="">Select budget range</option>
+                            <option value="under-200">Under £200</option>
+                            <option value="200-400">£200 - £400</option>
+                            <option value="400-600">£400 - £600</option>
+                            <option value="600-1000">£600 - £1,000</option>
+                            <option value="1000-plus">£1,000+</option>
+                            <option value="discuss">Prefer to discuss</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="message">Additional Details</label>
+                    <textarea id="message" name="message" rows="5" placeholder="Tell us about the property, any specific requirements, access details, or questions you have..."></textarea>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer;">
+                        <input type="checkbox" id="tracking" name="tracking" style="width: auto;">
+                        I'd like to receive access to your content tracking tool
+                    </label>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer;">
+                        <input type="checkbox" id="marketing" name="marketing" style="width: auto;">
+                        I'd like to receive updates about your services and industry insights
+                    </label>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Get My Quote
+                </button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 3rem; padding: 2rem; background: #f8fafc; border-radius: 15px;">
+                <h3 style="margin-bottom: 1rem; color: #1a1a1a;">Need to speak to us directly?</h3>
+                <p style="color: #6b7280; margin-bottom: 1.5rem;">Call us for immediate assistance or urgent bookings</p>
+                <a href="tel:+447123456789" style="display: inline-block; background: #2563eb; color: white; padding: 1rem 2rem; border-radius: 10px; text-decoration: none; font-weight: 600; margin-right: 1rem;">
+                    <i class="fas fa-phone"></i> Call Now
+                </a>
+                <a href="mailto:hello@markebmedia.com" style="display: inline-block; background: white; color: #2563eb; padding: 1rem 2rem; border-radius: 10px; text-decoration: none; font-weight: 600; border: 2px solid #2563eb;">
+                    <i class="fas fa-envelope"></i> Email Us
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functionality
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pages = document.querySelectorAll('.page');
+        const hero = document.getElementById('hero');
+        const ctaButtons = document.querySelectorAll('[data-page]');
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navMenu = document.querySelector('.nav-menu');
+
+        function showPage(pageId) {
+            // Hide hero and all pages
+            hero.style.display = 'none';
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Show selected page
+            if (pageId === 'hero') {
+                hero.style.display = 'flex';
+            } else {
+                const targetPage = document.getElementById(pageId);
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                }
+            }
+            
+            // Update active nav link
+            navLinks.forEach(link => link.classList.remove('active'));
+            const activeLink = document.querySelector(`[data-page="${pageId}"]`);
+            if (activeLink && activeLink.classList.contains('nav-link')) {
+                activeLink.classList.add('active');
+            }
+
+            // Close mobile menu if open
+            navMenu.classList.remove('active');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Add click event listeners to all navigation and CTA elements
+        ctaButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageId = button.getAttribute('data-page');
+                showPage(pageId);
+            });
+        });
+
+        // Mobile menu toggle
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+
+        // Form submission
+        document.querySelector('.contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(e.target);
+            const name = formData.get('name');
+            const service = formData.get('service');
+            const timeline = formData.get('timeline');
+            
+            // Create success message
+            let message = `Thank you ${name}! We've received your request for ${service}`;
+            if (timeline && timeline !== '') {
+                const timelineText = timeline.replace('-', ' ');
+                message += ` with a timeline of ${timelineText}`;
+            }
+            message += `. We'll get back to you within 2 hours with a detailed quote and next steps.`;
+            
+            alert(message);
+            
+            // Reset form
+            e.target.reset();
+        });
+
+        // Smooth scrolling navbar effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('.nav');
+            if (window.scrollY > 50) {
+                nav.style.background = 'rgba(255, 255, 255, 0.98)';
+                nav.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+            } else {
+                nav.style.background = 'rgba(255, 255, 255, 0.95)';
+                nav.style.boxShadow = 'none';
+            }
+        });
+
+        // Add animation delays to service cards
+        document.addEventListener('DOMContentLoaded', () => {
+            const serviceCards = document.querySelectorAll('.service-card');
+            serviceCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.style.animation = 'fadeInUp 0.6s ease-out forwards';
+                card.style.opacity = '0';
+            });
+
+            const portfolioItems = document.querySelectorAll('.portfolio-item');
+            portfolioItems.forEach((item, index) => {
+                item.style.animationDelay = `${index * 0.15}s`;
+                item.style.animation = 'fadeInUp 0.6s ease-out forwards';
+                item.style.opacity = '0';
+            });
+        });
+
+        // Enhanced form validation
+        const form = document.querySelector('.contact-form');
+        const requiredFields = form.querySelectorAll('[required]');
+        
+        requiredFields.forEach(field => {
+            field.addEventListener('blur', () => {
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#ef4444';
+                } else {
+                    field.style.borderColor = '#10b981';
+                }
+            });
+            
+            field.addEventListener('input', () => {
+                if (field.value.trim()) {
+                    field.style.borderColor = '#10b981';
+                }
+            });
+        });
+
+        // Email validation
+        const emailField = document.getElementById('email');
+        emailField.addEventListener('blur', () => {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailField.value && !emailRegex.test(emailField.value)) {
+                emailField.style.borderColor = '#ef4444';
+            } else if (emailField.value) {
+                emailField.style.borderColor = '#10b981';
+            }
+        });
+    </script>
+</body>
+</html>
