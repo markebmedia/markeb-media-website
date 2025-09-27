@@ -1,8 +1,9 @@
 // Direct Airtable integration for immediate functionality
+// website/assets/js/airtable.js (frontend safe version)
 const AIRTABLE_CONFIG = {
-    baseId: 'appVzPU0icwL8H6aP',
-    apiKey: 'patW6qe0aSpVQu7tR.b2b99293a6ecfc74dd2b33097755635aa7b5b43e519542a8e131d24ce058a868',
-    tableName: 'Markeb Media Users'
+  baseId: 'appVzPU0icwL8H6aP',
+  tableName: 'Markeb Media Users'
+  // ❌ no apiKey here
 };
 
 // Create new user account
