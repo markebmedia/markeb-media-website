@@ -1,0 +1,29 @@
+{
+  "name": "markeb-media-website",
+  "version": "1.0.0",
+  "description": "Markeb Media - Real Estate Photography & Videography Platform",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Static site - no build needed'",
+    "start": "npx live-server .",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "real-estate",
+    "photography",
+    "videography",
+    "drone",
+    "property-marketing"
+  ],
+  "author": "Markeb Media",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  },
+  "dependencies": {
+    "airtable": "^0.12.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
