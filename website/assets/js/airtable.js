@@ -156,15 +156,13 @@ function validateSessionToken(token) {
         const tokenData = JSON.parse(atob(token));
         const now = Date.now();
 
-        // Check if token has expiry and is expired
         if (tokenData.expires && now > tokenData.expires) {
             return { valid: false, reason: 'Token expired' };
         }
 
-        // Check basic token age (fallback if no expires field)
         if (!tokenData.expires) {
             const tokenAge = now - tokenData.timestamp;
-            const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+            const maxAge = 24 * 60 * 60 * 1000;
 
             if (tokenAge > maxAge) {
                 return { valid: false, reason: 'Token expired' };
@@ -189,23 +187,11 @@ async function isUserLoggedIn() {
     const token = localStorage.getItem('userToken');
     if (!token) return false;
 
-    // First check token format locally
     const localValidation = validateSessionToken(token);
     if (!localValidation.valid) {
-        // Clean up invalid token
         clearUserSession();
         return false;
     }
-
-    // Then validate with backend (optional - for extra security)
-    // Uncomment below for server-side validation on every check
-    /*
-    const backendValidation = await validateTokenWithBackend(token);
-    if (!backendValidation.valid) {
-        clearUserSession();
-        return false;
-    }
-    */
 
     return true;
 }
@@ -217,7 +203,6 @@ function getCurrentUser() {
 
     const validation = validateSessionToken(token);
     if (!validation.valid) {
-        // Clean up invalid token
         clearUserSession();
         return null;
     }
@@ -229,8 +214,6 @@ function getCurrentUser() {
 function storeUserSession(token, email) {
     localStorage.setItem('userToken', token);
     localStorage.setItem('userEmail', email);
-    
-    // Optional: Store timestamp for local tracking
     localStorage.setItem('sessionTimestamp', Date.now().toString());
 }
 
@@ -245,14 +228,11 @@ function clearUserSession() {
 function logoutUser() {
     clearUserSession();
     
-    // Determine the correct redirect path based on current location
     const currentPath = window.location.pathname;
     
     if (currentPath.includes('/website/')) {
-        // Already in website folder, go up one level
         window.location.href = '../login.html';
     } else {
-        // At root level
         window.location.href = 'login.html';
     }
 }
@@ -290,7 +270,6 @@ function validateEmail(email) {
 }
 
 function validatePassword(password) {
-    // Minimum 8 characters, at least one letter and one number
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
     return passwordRegex.test(password);
 }
@@ -312,7 +291,7 @@ function handleApiError(error, fallbackMessage = 'An error occurred') {
     return fallbackMessage;
 }
 
-// Auto-refresh token before expiry (optional feature)
+// Auto-refresh token before expiry
 async function refreshTokenIfNeeded() {
     const token = localStorage.getItem('userToken');
     if (!token) return false;
@@ -321,15 +300,11 @@ async function refreshTokenIfNeeded() {
         const tokenData = JSON.parse(atob(token));
         const now = Date.now();
         
-        // Refresh if token expires in next 2 hours
         if (tokenData.expires && (tokenData.expires - now) < (2 * 60 * 60 * 1000)) {
             const currentUser = getCurrentUser();
             if (currentUser) {
-                // Re-validate with backend to get fresh token
                 const validation = await validateTokenWithBackend(token);
                 if (validation.valid) {
-                    // Token is still valid, backend might return a new one
-                    // This would need backend support for token refresh
                     console.log('Token refresh check completed');
                 }
             }
@@ -366,7 +341,6 @@ window.AirtableAPI = {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Markeb Media API client initialized');
     
-    // Optional: Auto-refresh token check
     if (getCurrentUser()) {
         refreshTokenIfNeeded();
     }

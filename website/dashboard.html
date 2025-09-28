@@ -2056,27 +2056,42 @@
             });
         });
 
-       // Load mock user data for testing
-document.addEventListener('DOMContentLoaded', function() {
-    // Set mock user data
-    const mockUser = {
-        name: 'Test User',
-        email: 'test@example.com',
-        company: 'Test Company'
-    };
 
-    document.getElementById('pageTitle').textContent = `Welcome back, ${mockUser.name}`;
-    document.getElementById('userName').textContent = mockUser.name;
-    document.getElementById('userEmail').textContent = mockUser.email;
-    
-    // Populate settings form
-    document.getElementById('settingsName').value = mockUser.name;
-    document.getElementById('settingsEmail').value = mockUser.email;
-    document.getElementById('settingsCompany').value = mockUser.company;
-    
-    // Set user avatar initial
-    document.getElementById('userAvatar').textContent = 'TU';
-    document.getElementById('memberSince').textContent = '2024';
+    // Check authentication and load user data
+document.addEventListener('DOMContentLoaded', function() {
+    // Require authentication
+    if (!AirtableAPI.requireAuthentication()) {
+        return;
+    }
+
+    // Load user data
+    const currentUser = AirtableAPI.getCurrentUser();
+    if (currentUser) {
+        document.getElementById('pageTitle').textContent = `Welcome back, ${currentUser.name}`;
+        document.getElementById('userName').textContent = currentUser.name;
+        document.getElementById('userEmail').textContent = currentUser.email;
+        
+        // Populate settings form
+        document.getElementById('settingsName').value = currentUser.name;
+        document.getElementById('settingsEmail').value = currentUser.email;
+        document.getElementById('settingsCompany').value = currentUser.company;
+        
+        // Set user avatar initial
+        const initials = currentUser.name.split(' ').map(name => name[0]).join('').toUpperCase();
+        document.getElementById('userAvatar').textContent = initials;
+        
+        // Get member since year from token
+        const token = localStorage.getItem('userToken');
+        if (token) {
+            try {
+                const tokenData = JSON.parse(atob(token));
+                const memberSince = new Date(tokenData.timestamp).getFullYear();
+                document.getElementById('memberSince').textContent = memberSince;
+            } catch (error) {
+                console.log('Could not parse token date');
+            }
+        }
+    }
 
     // Initialize file upload functionality
     initializeFileUpload();
