@@ -1,2850 +1,1012 @@
-</div>
-                </div>
-            </div>
-
-            <!-- Settings Section -->
-            <div id="settings" class="section">
-                <div class="settings-grid">
-                    <div class="settings-section">
-                        <h3 class="settings-title">Account Information</h3>
-                        <div class="form-group">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" class="form-input" id="settingsName" placeholder="Your full name">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" class="form-input" id="settingsEmail" placeholder="your@email.com" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Company Name</label>
-                            <input type="text" class="form-input" id="settingsCompany" placeholder="Your company">
-                        </div>
-                        <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
-                    </div>
-
-                    <div class="settings-section">
-                        <h3 class="settings-title">Preferences</h3>
-                        <div class="form-group">
-                            <label class="form-label">Preferred Contact Method</label>
-                            <select class="form-input">
-                                <option>Email</option>
-                                <option>Phone</option>
-                                <option>SMS</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Notifications</label>
-                            <div style="display: flex; gap: 16px; align-items: center;">
-                                <label style="display: flex; align-items: center; gap: 8px;">
-                                    <input type="checkbox" checked> Project updates
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 8px;">
-                                    <input type="checkbox" checked> Booking reminders
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Configuration - Replace with your actual credentials// Function to get user's bookings from Acuity via Netlify function
-        async function getAcuityBookings(userEmail) {
-            try {
-                const response = await fetch('/.netlify/functions/acuity-data', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ userEmail })
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Function error: ${response.status}`);
-                }
-                
-                return await response.json();
-            } catch (error) {
-                console.error('Error fetching Acuity data:', error);
-                handleAPIError(error, 'Acuity');
-                return {
-                    totalBookings: 0,
-                    totalInvestment: 0,
-                    appointments: []
-                };
-            }
-        }
-
-        // Function to get completed projects from Airtable via Netlify function
-        async function getCompletedProjects(userEmail) {
-            try {
-                const response = await fetch('/.netlify/functions/airtable-data', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ userEmail })
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Function error: ${response.status}`);
-                }
-                
-                return await response.json();
-            } catch (error) {
-                console.error('Error fetching Airtable data:', error);
-                handleAPIError(error, 'Airtable');
-                return {
-                    completedProjects: 0,
-                    totalProjects: 0,
-                    projects: []
-                };
-            }
-        }
-
-        // Function to get recent activity from both sources
-        async function getRecentActivity(userEmail) {
-            try {
-                const [acuityData, airtableData] = await Promise.all([
-                    getAcuityBookings(userEmail),
-                    getCompletedProjects(userEmail)
-                ]);
-
-                const activities = [];
-
-                // Add recent bookings from Acuity
-                acuityData.appointments
-                    .sort((a, b) => new Date(b.datetime) - new Date(a.datetime))
-                    .slice(0, 3)
-                    .forEach(appointment => {
-                        activities.push({
-                            icon: '📅',
-                            title: `Booking confirmed - ${appointment.type}`,
-                            time: new Date(appointment.datetime).toLocaleDateString(),
-                            type: 'booking'
-                        });
-                    });
-
-                // Add recent project updates from Airtable
-                airtableData.projects
-                    .filter(project => project.fields['Last Modified'])
-                    .sort((a, b) => new Date(b.fields['Last Modified']) - new Date(a.fields['Last Modified']))
-                    .slice(0, 3)
-                    .forEach(project => {
-                        const status = project.fields.Status;
-                        let icon = '📝';
-                        if (status === 'Ready for Delivery') icon = '✅';
-                        if (status === 'Editing') icon = '🎬';
-                        if (status === 'Quality Control') icon = '🔍';
-
-                        activities.push({
-                            icon: icon,
-                            title: `Project ${status.toLowerCase()} - ${project.fields['Service Type'] || 'Photography'}`,
-                            time: new Date(project.fields['Last Modified']).toLocaleDateString(),
-                            type: 'project'
-                        });
-                    });
-
-                // Sort all activities by date and return most recent 5
-                return activities
-                    .sort((a, b) => new Date(b.time) - new Date(a.time))
-                    .slice(0, 5);
-
-            } catch (error) {
-                console.error('Error fetching recent activity:', error);
-                return [];
-            }
-        }
-
-        // Main function to load all dashboard data
-        async function loadDashboardData() {
-            const currentUser = AirtableAPI.getCurrentUser();
-            if (!currentUser || !currentUser.email) {
-                console.error('No user email found');
-                return;
-            }
-
-            try {
-                // Show loading state
-                document.getElementById('totalBookings').textContent = '...';
-                document.getElementById('totalSpending').textContent = '...';
-                document.getElementById('completedProjects').textContent = '...';
-
-                // Fetch data from both APIs via Netlify functions
-                const [acuityData, airtableData] = await Promise.all([
-                    getAcuityBookings(currentUser.email),
-                    getCompletedProjects(currentUser.email)
-                ]);
-
-                // Update metrics
-                document.getElementById('totalBookings').textContent = acuityData.totalBookings;
-                document.getElementById('totalSpending').textContent = `£${acuityData.totalInvestment.toFixed(2)}`;
-                document.getElementById('completedProjects').textContent = airtableData.completedProjects;
-
-                // Update recent activity
-                const activities = await getRecentActivity(currentUser.email);
-                updateActivityList(activities);
-
-                console.log('Dashboard data loaded successfully');
-            } catch (error) {
-                console.error('Error loading dashboard data:', error);
-                
-                // Reset to default values on error
-                document.getElementById('totalBookings').textContent = '0';
-                document.getElementById('totalSpending').textContent = '£0';
-                document.getElementById('completedProjects').textContent = '0';
-            }
-        }
-
-        // Function to update the activity list in the dashboard
-        function updateActivityList(activities) {
-            const activityList = document.getElementById('activityList');
-            if (!activityList) return;
-
-            if (activities.length === 0) {
-                activityList.innerHTML = `
-                    <div class="activity-item">
-                        <div class="activity-icon">+</div>
-                        <div class="activity-content">
-                            <div class="activity-title">Welcome to Markeb Media!</div>
-                            <div class="activity-time">Book your first shoot to get started</div>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
-            activityList.innerHTML = activities.map(activity => `
-                <div class="activity-item">
-                    <div class="activity-icon">${activity.icon}</div>
-                    <div class="activity-content">
-                        <div class="activity-title">${activity.title}</div>
-                        <div class="activity-time">${activity.time}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Error handling for API failures
-        function handleAPIError(error, source) {
-            console.error(`${source} API Error:`, error);
-            
-            // Could show user-friendly error message
-            const errorMessage = document.createElement('div');
-            errorMessage.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #fee2e2;
-                color: #991b1b;
-                padding: 12px 16px;
-                border-radius: 8px;
-                border: 1px solid #fecaca;
-                z-index: 1000;
-                font-size: 14px;
-                max-width: 300px;
-            `;
-            errorMessage.textContent = `Unable to load ${source} data. Please check your connection.`;
-            
-            document.body.appendChild(errorMessage);
-            
-            // Remove error message after 5 seconds
-            setTimeout(() => {
-                if (errorMessage.parentNode) {
-                    errorMessage.parentNode.removeChild(errorMessage);
-                }
-            }, 5000);
-        }
-
-        // File Upload Variables
-        let trackingCodeDeadline = null;
-        let isExpired = false;
-        let selectedFiles = [];
-        const maxFileSize = 50 * 1024 * 1024; // 50MB
-
-        // Mobile sidebar functionality
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.querySelector('.mobile-overlay');
-            
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-        }
-
-        function closeSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.querySelector('.mobile-overlay');
-            
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
-        }
-
-        // Section navigation
-        function showSection(sectionName) {
-            // Hide all sections
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Show selected section
-            document.getElementById(sectionName).classList.add('active');
-            
-            // Update navigation
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            event.target.closest('.nav-item').classList.add('active');
-            
-            // Update page title
-            const titles = {
-                'dashboard': 'Dashboard',
-                'booking': 'Book Your Shoot',
-                'gallery': 'Gallery',
-                'copyryta': 'CopyRyta AI',
-                'tracking': 'Content Tracking',
-                'amend': 'Request Amendment',
-                'settings': 'Account Settings'
-            };
-            
-            const subtitles = {
-                'dashboard': "Here's what's happening with your projects",
-                'booking': 'Schedule your professional photography session',
-                'gallery': 'View and download your completed projects',
-                'copyryta': 'AI copywriting assistant for property descriptions',
-                'tracking': 'Track your visual marketing progress',
-                'amend': 'Request changes to your projects',
-                'settings': 'Manage your account and preferences'
-            };
-            
-            document.getElementById('pageTitle').textContent = titles[sectionName];
-            document.getElementById('pageSubtitle').textContent = subtitles[sectionName];
-            
-            // Close sidebar on mobile
-            if (window.innerWidth <= 1024) {
-                closeSidebar();
-            }
-        }
-
-        // Close sidebar when clicking nav items on mobile
-        document.addEventListener('DOMContentLoaded', function() {
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    if (window.innerWidth <= 1024) {
-                        closeSidebar();
-                    }
-                });
-            });
-        });
-
-        // Check authentication and load user data
-        document.addEventListener('DOMContentLoaded', function() {
-            // Require authentication
-            if (!AirtableAPI.requireAuthentication()) {
-                return;
-            }
-
-            // Load user data
-            const currentUser = AirtableAPI.getCurrentUser();
-            if (currentUser) {
-                document.getElementById('pageTitle').textContent = `Welcome back, ${currentUser.name}`;
-                document.getElementById('userName').textContent = currentUser.name;
-                document.getElementById('userEmail').textContent = currentUser.email;
-                
-                // Populate settings form
-                document.getElementById('settingsName').value = currentUser.name;
-                document.getElementById('settingsEmail').value = currentUser.email;
-                document.getElementById('settingsCompany').value = currentUser.company;
-                
-                // Set user avatar initial
-                const initials = currentUser.name.split(' ').map(name => name[0]).join('').toUpperCase();
-                document.getElementById('userAvatar').textContent = initials;
-                
-                // Get member since year from token
-                const token = localStorage.getItem('userToken');
-                if (token) {
-                    try {
-                        const tokenData = JSON.parse(atob(token));
-                        const memberSince = new Date(tokenData.timestamp).getFullYear();
-                        document.getElementById('memberSince').textContent = memberSince;
-                    } catch (error) {
-                        console.log('Could not parse token date');
-                    }
-                }
-                
-                // Load dashboard data with real API integration
-                loadDashboardData();
-            }
-
-            // Initialize file upload functionality
-            initializeFileUpload();
-            
-            // Refresh data every 5 minutes
-            setInterval(() => {
-                if (AirtableAPI.getCurrentUser()) {
-                    loadDashboardData();
-                }
-            }, 5 * 60 * 1000);
-        });
-
-        // Function to manually refresh dashboard data
-        function refreshDashboard() {
-            loadDashboardData();
-        }
-
-        // Tracking functionality
-        async function trackBooking() {
-            const trackingCode = document.getElementById("trackingInput").value.trim();
-            const resultDiv = document.getElementById("result");
-
-            if (!trackingCode) {
-                resultDiv.innerHTML = '<div class="warning-message">⚠️ Please enter your tracking code to continue.</div>';
-                return;
-            }
-
-            resultDiv.innerHTML = '<div class="spinner"></div>';
-
-            const token = AIRTABLE_CONFIG.apiKey;
-            const baseId = AIRTABLE_CONFIG.baseId;
-            const tableId = AIRTABLE_CONFIG.tableId;
-            
-            if (token === 'YOUR_AIRTABLE_API_KEY') {
-                resultDiv.innerHTML = '<div class="error-message">❌ Tracking service is currently being configured. Please try again later.</div>';
-                return;
-            }
-            
-            const url = `${AIRTABLE_CONFIG.baseUrl}/${baseId}/${tableId}?filterByFormula=${encodeURIComponent(`{Tracking Code}='${trackingCode}'`)}`;
-
-            try {
-                const response = await fetch(url, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-
-                const data = await response.json();
-
-                if (!data.records || data.records.length === 0) {
-                    resultDiv.innerHTML = '<div class="error-message">❗ No booking found with that tracking code. Please check your code and try again.</div>';
-                    return;
-                }
-
-                const record = data.records[0].fields;
-                const status = record["Status"] || "-";
-                const rawShootDate = record["Shoot Date"];
-                const customerName = record["Customer Name"] || "-";
-                const serviceType = record["Service Type"] || "-";
-                const projectAddress = record["Project Address"] || "-";
-                const deliveryLink = record["Delivery Link"];
-
-                const stages = ["Booked", "Editing", "Quality Control", "Ready for Delivery"];
-                const icons = ['📅', '🎬', '🔍', '✅'];
-                const currentStageIndex = stages.indexOf(status);
-                const progressPercentage = (currentStageIndex / (stages.length - 1)) * 80 + 10;
-
-                let formattedDate = "-";
-                let formattedDeadline = "-";
-                let deadlineHTML = "";
-
-                if (rawShootDate) {
-                    const shootDate = new Date(rawShootDate);
-                    const now = new Date();
-                    formattedDate = `${shootDate.getDate().toString().padStart(2, '0')}-${(shootDate.getMonth() + 1).toString().padStart(2, '0')}-${shootDate.getFullYear()}`;
-
-                    const deadlineStart = new Date(shootDate);
-                    deadlineStart.setDate(deadlineStart.getDate() + 1);
-                    deadlineStart.setHours(0, 0, 0, 0);
-
-                    const finalDeadline = new Date(deadlineStart.getTime() + (48 * 60 * 60 * 1000));
-                    formattedDeadline = `${finalDeadline.getDate().toString().padStart(2, '0')}-${(finalDeadline.getMonth() + 1).toString().padStart(2, '0')}-${finalDeadline.getFullYear()} ${finalDeadline.getHours().toString().padStart(2, '0')}:00`;
-
-                    if (now >= deadlineStart && (status === "Editing" || status === "Quality Control")) {
-                        const remainingMs = finalDeadline - now;
-                        const remainingHrs = Math.max(Math.floor(remainingMs / (1000 * 60 * 60)), 0);
-                        deadlineHTML = `
-                            <div class="deadline-alert">
-                                <div style="font-size: 1.2em; margin-bottom: 10px;">⏳ <strong>Delivery Timeline</strong></div>
-                                <div>Estimated completion: <strong>${remainingHrs} hours remaining</strong></div>
-                                <div>Expected delivery: <strong>${formattedDeadline}</strong></div>
-                            </div>
-                        `;
-                    }
-                }
-
-                const progressHTML = `
-                    <div class="progress-container">
-                        <div class="progress-line" style="width: ${progressPercentage}%;"></div>
-                        ${stages.map((stage, i) => `
-                            <div class="progress-step ${i <= currentStageIndex ? 'active' : ''}">
-                                <div class="icon">${icons[i]}</div>
-                                <div class="label">${stage}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-
-                const deliveryLinkHTML = (status === "Ready for Delivery" && deliveryLink)
-                    ? `<div class="delivery-link">
-                         <div style="font-size: 1.2em; margin-bottom: 10px;">🎉 <strong>Your Content is Ready!</strong></div>
-                         <a href="${deliveryLink}" target="_blank">📥 Download Your Files</a>
-                       </div>`
-                    : "";
-
-                resultDiv.innerHTML = `
-                    ${progressHTML}
-                    
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div><strong>🎯 Current Status:</strong></div>
-                            <div style="margin-top: 5px; color: #FF6B00; font-weight: 600;">${status}</div>
-                        </div>
-                        <div class="info-item">
-                            <div><strong>👤 Customer:</strong></div>
-                            <div style="margin-top: 5px;">${customerName}</div>
-                        </div>
-                        <div class="info-item">
-                            <div><strong>🏷️ Service Type:</strong></div>
-                            <div style="margin-top: 5px;">${serviceType}</div>
-                        </div>
-                        <div class="info-item">
-                            <div><strong>📅 Shoot Date:</strong></div>
-                            <div style="margin-top: 5px;">${formattedDate}</div>
-                        </div>
-                        <div class="info-item">
-                            <div><strong>📍 Project Address:</strong></div>
-                            <div style="margin-top: 5px;">${projectAddress}</div>
-                        </div>
-                    </div>
-                    
-                    ${deadlineHTML}
-                    ${deliveryLinkHTML}
-                    
-                    <div class="track-another">
-                        <a href="#" onclick="location.reload();">🔁 Track another project</a>
-                    </div>
-                `;
-            } catch (err) {
-                console.error(err);
-                resultDiv.innerHTML = '<div class="error-message">❌ There was an error retrieving your tracking info. Please try again later.</div>';
-            }
-        }
-
-        // File Upload Functionality
-        function initializeFileUpload() {
-            const fileUploadArea = document.getElementById('fileUploadArea');
-            const fileInput = document.getElementById('fileInput');
-            const browseButton = document.getElementById('browseButton');
-            const filePreview = document.getElementById('filePreview');
-            const uploadProgress = document.getElementById('uploadProgress');
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-
-            if (!fileUploadArea) return; // Only initialize if elements exist
-
-            // File upload event listeners
-            fileUploadArea.addEventListener('click', () => fileInput.click());
-            browseButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                fileInput.click();
-            });
-
-            fileInput.addEventListener('change', handleFileSelect);
-
-            // Drag and drop functionality
-            fileUploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                fileUploadArea.classList.add('dragover');
-            });
-
-            fileUploadArea.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                fileUploadArea.classList.remove('dragover');
-            });
-
-            fileUploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                fileUploadArea.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                handleFiles(files);
-            });
-        }
-
-        function handleFileSelect(e) {
-            handleFiles(e.target.files);
-        }
-
-        function handleFiles(files) {
-            for (let file of files) {
-                if (file.size > maxFileSize) {
-                    alert(`File "${file.name}" is too large. Maximum size is 50MB.`);
-                    continue;
-                }
-                
-                if (selectedFiles.find(f => f.name === file.name && f.size === file.size)) {
-                    alert(`File "${file.name}" is already selected.`);
-                    continue;
-                }
-
-                selectedFiles.push(file);
-            }
-            
-            updateFilePreview();
-            const fileInput = document.getElementById('fileInput');
-            if (fileInput) fileInput.value = ''; // Clear the input
-        }
-
-        function updateFilePreview() {
-            const filePreview = document.getElementById('filePreview');
-            if (!filePreview) return;
-
-            if (selectedFiles.length === 0) {
-                filePreview.style.display = 'none';
-                return;
-            }
-
-            filePreview.style.display = 'block';
-            filePreview.innerHTML = selectedFiles.map((file, index) => {
-                const fileType = getFileIcon(file.type);
-                const fileSize = formatFileSize(file.size);
-                
-                return `
-                    <div class="file-item">
-                        <div class="file-info">
-                            <div class="file-icon">${fileType}</div>
-                            <div class="file-details">
-                                <div class="file-name">${file.name}</div>
-                                <div class="file-size">${fileSize}</div>
-                            </div>
-                        </div>
-                        <button type="button" class="file-remove" onclick="removeFile(${index})">Remove</button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function removeFile(index) {
-            selectedFiles.splice(index, 1);
-            updateFilePreview();
-        }
-
-        function getFileIcon(fileType) {
-            if (fileType.startsWith('image/')) return '🖼️';
-            if (fileType.startsWith('video/')) return '🎥';
-            if (fileType.includes('pdf')) return '📄';
-            if (fileType.includes('word') || fileType.includes('document')) return '📝';
-            return '📎';
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // Amendment form functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Checkbox styling
-            document.querySelectorAll('.checkbox-item input').forEach(cb => {
-                cb.addEventListener('change', function() {
-                    this.closest('.checkbox-item').classList.toggle('checked', this.checked);
-                });
-            });
-
-            // Tracking code validation
-            const trackingCodeInput = document.querySelector('input[name="trackingCode"]');
-            if (trackingCodeInput) {
-                trackingCodeInput.addEventListener('blur', async function() {
-                    const code = this.value.trim();
-                    if (code && /^MK.*$/.test(code)) await checkTrackingCodeDeadline(code);
-                });
-            }
-
-            // Amendment form submission
-            const amendForm = document.getElementById('amendForm');
-            if (amendForm) {
-                amendForm.addEventListener('submit', handleAmendmentSubmission);
-            }
-        });
-
-        async function checkTrackingCodeDeadline(trackingCode) {
-            const statusDiv = document.getElementById('trackingStatus');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            if (!statusDiv || !submitBtn) return;
-            
-            statusDiv.className = 'tracking-status checking';
-            statusDiv.style.display = 'block';
-            statusDiv.textContent = '🔍 Checking amendment eligibility...';
-
-            try {
-                const res = await fetch('https://markeb-amend-api.onrender.com/api/check-deadline', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ trackingCode })
-                });
-                const data = await res.json();
-
-                if (!res.ok) {
-                    statusDiv.className = 'tracking-status error';
-                    statusDiv.textContent = '❌ ' + (data.message || 'Unable to verify tracking code');
-                    isExpired = true;
-                    submitBtn.disabled = true;
-                    submitBtn.textContent = '⚠️ Not Eligible';
-                    disableFormFields(true);
-                    return;
-                }
-
-                if (data.message && /No amendment deadline yet/i.test(data.message)) {
-                    isExpired = false;
-                    trackingCodeDeadline = null;
-                    statusDiv.style.display = 'none';
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Submit Amendment Request';
-                    disableFormFields(false);
-                    return;
-                }
-
-                if (data.deadlineDate) {
-                    trackingCodeDeadline = new Date(data.deadlineDate);
-                    if (data.isExpired) {
-                        isExpired = true;
-                        statusDiv.style.display = 'none';
-                        submitBtn.disabled = true;
-                        submitBtn.textContent = '⚠️ Amendment Window Expired';
-                        disableFormFields(true);
-                    } else {
-                        isExpired = false;
-                        statusDiv.style.display = 'none';
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Submit Amendment Request';
-                        disableFormFields(false);
-                    }
-                    return;
-                }
-
-                // fallback allow submit
-                isExpired = false;
-                statusDiv.style.display = 'none';
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit Amendment Request';
-                disableFormFields(false);
-
-            } catch (err) {
-                statusDiv.className = 'tracking-status error';
-                statusDiv.textContent = 'Network error. Please try again.';
-            }
-        }
-
-        function disableFormFields(disable) {
-            document.querySelectorAll('input,textarea,button').forEach(f => {
-                if (f.name === 'trackingCode') return;
-                f.disabled = disable;
-            });
-            document.querySelectorAll('.checkbox-item').forEach(i => {
-                i.style.opacity = disable ? '0.5' : '1';
-                i.style.pointerEvents = disable ? 'none' : 'auto';
-            });
-            
-            const fileUploadArea = document.getElementById('fileUploadArea');
-            if (fileUploadArea) {
-                fileUploadArea.style.pointerEvents = disable ? 'none' : 'auto';
-                fileUploadArea.style.opacity = disable ? '0.5' : '1';
-            }
-        }
-
-        async function uploadFiles() {
-            if (selectedFiles.length === 0) return [];
-
-            const uploadProgress = document.getElementById('uploadProgress');
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            
-            if (uploadProgress) uploadProgress.style.display = 'block';
-            
-            const uploadedFiles = [];
-
-            for (let i = 0; i < selectedFiles.length; i++) {
-                const file = selectedFiles[i];
-                const formData = new FormData();
-                formData.append('file', file);
-
-                try {
-                    const response = await fetch('https://markeb-amend-api.onrender.com/api/upload', {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        uploadedFiles.push({
-                            filename: file.name,
-                            url: result.url,
-                            size: file.size,
-                            type: file.type
-                        });
-                    } else {
-                        throw new Error(`Failed to upload ${file.name}`);
-                    }
-
-                    // Update progress
-                    const progress = ((i + 1) / selectedFiles.length) * 100;
-                    if (progressFill) progressFill.style.width = progress + '%';
-                    if (progressText) progressText.textContent = Math.round(progress) + '%';
-
-                } catch (error) {
-                    console.error(`Error uploading ${file.name}:`, error);
-                    throw error;
-                }
-            }
-
-            if (uploadProgress) uploadProgress.style.display = 'none';
-            return uploadedFiles;
-        }
-
-        async function handleAmendmentSubmission(e) {
-            e.preventDefault();
-            const form = e.target;
-            const btn = document.getElementById('submitBtn');
-            const msg = document.getElementById('responseMessage');
-            
-            if (!btn || !msg) return;
-            
-            if (isExpired) {
-                msg.style.display = 'block';
-                msg.className = 'response-message error';
-                msg.textContent = '❌ The amendment window for this tracking code has expired.';
-                return;
-            }
-            
-            const trackingValue = form.trackingCode.value.trim();
-            if (!/^MK.*$/.test(trackingValue)) {
-                alert('Tracking code must start with MK.');
-                form.trackingCode.focus();
-                return;
-            }
-            
-            const mediaTypes = Array.from(form.querySelectorAll('input[name="mediaType"]:checked')).map(cb => cb.value);
-            if (!mediaTypes || mediaTypes.length === 0) {
-                alert('Please select at least one item that needs adjusting.');
-                return;
-            }
-            
-            btn.disabled = true;
-            btn.textContent = '⏳ Submitting...';
-            msg.style.display = 'none';
-            
-            try {
-                // Upload files first if any are selected
-                let uploadedFiles = [];
-                if (selectedFiles.length > 0) {
-                    btn.textContent = '📤 Uploading files...';
-                    uploadedFiles = await uploadFiles();
-                }
-
-                const payload = {
-                    customerName: form.clientName.value.trim(),
-                    email: form.email.value.trim(),
-                    trackingCode: trackingValue,
-                    amendmentType: mediaTypes,
-                    amendmentDescription: form.amendDetails.value.trim(),
-                    attachments: uploadedFiles
-                };
-                
-                btn.textContent = '⏳ Submitting request...';
-                const res = await fetch('https://markeb-amend-api.onrender.com/api/amend', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const data = await res.json();
-                msg.style.display = 'block';
-                
-                if (res.ok) {
-                    msg.className = 'response-message success';
-                    msg.textContent = '✅ Thank you! Your amendment request has been submitted successfully. We\'ll get started on your changes right away.';
-                    form.reset();
-                    document.querySelectorAll('.checkbox-item').forEach(i => i.classList.remove('checked'));
-                    const trackingStatus = document.getElementById('trackingStatus');
-                    if (trackingStatus) trackingStatus.style.display = 'none';
-                    // Clear selected files
-                    selectedFiles = [];
-                    updateFilePreview();
-                } else {
-                    msg.className = 'response-message error';
-                    msg.textContent = '❌ ' + (data.message || 'Submission failed. Please try again.');
-                }
-            } catch (err) {
-                msg.style.display = 'block';
-                msg.className = 'response-message error';
-                msg.textContent = '❌ Network error. Please check your connection and try again.';
-            }
-            
-            btn.disabled = false;
-            btn.textContent = 'Submit Amendment Request';
-            msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        // Action functions
-        function openCopyryta() {
-            // Open the standalone CopyRyta page in a new tab
-            window.open('copyryta.html', '_blank');
-        }
-
-        function contactSupport() {
-            const currentUser = AirtableAPI.getCurrentUser();
-            const subject = 'Support Request from ' + (currentUser ? currentUser.name : 'Portal User');
-            const body = currentUser ? 
-                `Hi Markeb Media team,\n\nI need assistance with:\n\n[Please describe your question or issue]\n\nAccount: ${currentUser.email}\nCompany: ${currentUser.company}\n\nThanks!` :
-                `Hi Markeb Media team,\n\nI need assistance with:\n\n[Please describe your question or issue]\n\nThanks!`;
-            
-            const mailtoUrl = `mailto:hello@markebmedia.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.open(mailtoUrl, '_blank');
-        }
-
-        function saveSettings() {
-            const name = document.getElementById('settingsName').value;
-            const company = document.getElementById('settingsCompany').value;
-            
-            if (!name.trim() || !company.trim()) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-            
-            // TODO: Implement settings save to Airtable
-            alert('Settings saved successfully! (Feature coming soon)');
-        }
-
-        function logoutUser() {
-            if (confirm('Are you sure you want to logout?')) {
-                AirtableAPI.logoutUser();
-            }
-        }
-    </script>
-
-    <!-- Acuity Scheduling Embed Script -->
-    <script src="https://embed.acuityscheduling.com/js/embed.js" type="text/javascript"></script>
-</body>
-</html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal - Markeb Media</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="assets/js/airtable.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f8fafc;
-            color: #1e293b;
-            line-height: 1.6;
-        }
-
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 280px;
-            height: 100vh;
-            background: white;
-            border-right: 1px solid #e2e8f0;
-            padding: 32px 24px;
-            z-index: 100;
-            transform: translateX(0);
-            transition: transform 0.3s ease;
-        }
-
-        .mobile-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 99;
-        }
-
-        .mobile-toggle {
-            display: none;
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 101;
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 12px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 48px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            color: #64748b;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background: #f1f5f9;
-            color: #0f172a;
-        }
-
-        .nav-item.active {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .nav-icon {
-            width: 20px;
-            height: 20px;
-            font-size: 16px;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-        }
-
-        .main-content {
-            margin-left: 280px;
-            min-height: 100vh;
-        }
-
-        .header {
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 24px 32px;
-            display: flex;
-            justify-content: between;
-            align-items: center;
-        }
-
-        .header-left {
-            flex: 1;
-        }
-
-        .page-title {
-            font-size: 28px;
-            font-weight: 600;
-            color: #0f172a;
-            margin-bottom: 4px;
-        }
-
-        .page-subtitle {
-            color: #64748b;
-            font-size: 16px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 8px 16px;
-            background: #f8fafc;
-            border-radius: 8px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: #3b82f6;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        .user-details h4 {
-            font-size: 14px;
-            font-weight: 600;
-            color: #0f172a;
-        }
-
-        .user-details p {
-            font-size: 12px;
-            color: #64748b;
-        }
-
-        .content-area {
-            padding: 32px;
-        }
-
-        .section {
-            display: none;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .metric-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 24px;
-            transition: all 0.2s ease;
-        }
-
-        .metric-card:hover {
-            border-color: #cbd5e1;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        .metric-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .metric-icon {
-            width: 48px;
-            height: 48px;
-            background: #eff6ff;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .metric-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 4px;
-        }
-
-        .metric-label {
-            color: #64748b;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 32px;
-        }
-
-        .card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .card-header {
-            padding: 24px 24px 0;
-            border-bottom: 1px solid #f1f5f9;
-            margin-bottom: 24px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #0f172a;
-            margin-bottom: 8px;
-        }
-
-        .card-subtitle {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        .card-content {
-            padding: 0 24px 24px;
-        }
-
-        .activity-item {
-            display: flex;
-            gap: 16px;
-            padding: 16px 0;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            background: #f8fafc;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-
-        .activity-content {
-            flex: 1;
-        }
-
-        .activity-title {
-            font-weight: 500;
-            color: #0f172a;
-            margin-bottom: 4px;
-        }
-
-        .activity-time {
-            font-size: 13px;
-            color: #64748b;
-        }
-
-        .btn {
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: 500;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #475569;
-        }
-
-        .btn-secondary:hover {
-            background: #e2e8f0;
-        }
-
-        .action-grid {
-            display: grid;
-            gap: 12px;
-        }
-
-        .action-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px;
-            background: #f8fafc;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #0f172a;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .action-item:hover {
-            background: #f1f5f9;
-        }
-
-        .action-icon {
-            width: 36px;
-            height: 36px;
-            background: white;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-        }
-
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 24px;
-        }
-
-        .gallery-item {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: all 0.2s ease;
-        }
-
-        .gallery-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-        }
-
-        .gallery-image {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 48px;
-        }
-
-        .gallery-info {
-            padding: 20px;
-        }
-
-        .gallery-title {
-            font-weight: 600;
-            color: #0f172a;
-            margin-bottom: 8px;
-        }
-
-        .gallery-date {
-            color: #64748b;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-
-        .gallery-status {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status-completed {
-            background: #dcfce7;
-            color: #16a34a;
-        }
-
-        .status-processing {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .settings-grid {
-            display: grid;
-            gap: 24px;
-        }
-
-        .settings-section {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 24px;
-        }
-
-        .settings-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #0f172a;
-            margin-bottom: 16px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 8px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.2s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .copyryta-container {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 32px;
-            text-align: center;
-        }
-
-        .copyryta-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 16px;
-        }
-
-        .copyryta-description {
-            color: #64748b;
-            margin-bottom: 32px;
-            line-height: 1.6;
-        }
-
-        .copyryta-btn {
-            background: linear-gradient(135deg, #FF6B00 0%, #FF8533 100%);
-            color: white;
-            padding: 16px 32px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            display: inline-block;
-            transition: transform 0.2s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .copyryta-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .booking-container {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .booking-header {
-            padding: 24px;
-            border-bottom: 1px solid #e2e8f0;
-            background: #f8fafc;
-        }
-
-        .booking-title {
-            font-size: 24px;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 8px;
-        }
-
-        .booking-description {
-            color: #64748b;
-            line-height: 1.6;
-        }
-
-        .booking-iframe-container {
-            padding: 0;
-            background: white;
-        }
-
-        .booking-iframe {
-            width: 100%;
-            height: 800px;
-            border: none;
-            display: block;
-        }
-
-        /* Tracking Styles */
-        .tracker-wrapper {
-            font-family: 'Poppins', 'Segoe UI', 'Helvetica Neue', sans-serif;
-            text-align: center;
-            padding: 50px 30px;
-            background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
-            color: #4A6378;
-            border-radius: 24px;
-            max-width: 800px;
-            margin: 0 auto;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-            border: 2px solid #F1F5F9;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .tracker-wrapper::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #FF6B00, #FF8A33, #FF6B00);
-            background-size: 200% 100%;
-            animation: shimmer 3s ease-in-out infinite;
-        }
-
-        @keyframes shimmer {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        .tracker-title {
-            margin-bottom: 15px;
-            font-size: 2.4em;
-            font-weight: 800;
-            color: #1F2E3C;
-            position: relative;
-            z-index: 2;
-        }
-
-        .tracker-subtitle {
-            font-size: 1.2em;
-            color: #6B7280;
-            margin-bottom: 40px;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .input-container {
-            position: relative;
-            max-width: 450px;
-            margin: 0 auto 30px auto;
-        }
-
-        #trackingInput {
-            padding: 18px 24px;
-            width: 100%;
-            border: 2px solid #E5E7EB;
-            border-radius: 16px;
-            font-size: 1.1em;
-            color: #1F2E3C;
-            background: #FFFFFF;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-
-        #trackingInput:focus {
-            outline: none;
-            border-color: #FF6B00;
-            box-shadow: 0 6px 20px rgba(255, 107, 0, 0.15);
-            transform: translateY(-2px);
-        }
-
-        .track-button {
-            padding: 18px 40px;
-            background: linear-gradient(135deg, #FF6B00, #FF8A33);
-            color: #FFFFFF;
-            border: none;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 1.1em;
-            cursor: pointer;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(255, 107, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .track-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 107, 0, 0.4);
-        }
-
-        .track-button:active {
-            transform: translateY(-1px);
-        }
-
-        .result-container {
-            margin-top: 40px;
-        }
-
-        #result {
-            text-align: left;
-            font-size: 1.1em;
-            background: #FFFFFF;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
-            border: 1px solid #E5E7EB;
-            margin-top: 30px;
-        }
-
-        .progress-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 100%;
-            padding: 30px 10px;
-            margin: 30px auto;
-            position: relative;
-        }
-
-        .progress-container::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 10%;
-            right: 10%;
-            height: 4px;
-            background: #E5E7EB;
-            z-index: 0;
-            border-radius: 2px;
-            transform: translateY(-50%);
-        }
-
-        .progress-step {
-            z-index: 1;
-            flex: 1;
-            text-align: center;
-            position: relative;
-        }
-
-        .progress-step .icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: #E5E7EB;
-            margin: 0 auto;
-            font-size: 1.4em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            position: relative;
-            z-index: 1;
-            transition: all 0.3s ease;
-            border: 3px solid #FFFFFF;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-
-        .progress-step.active .icon {
-            background: linear-gradient(135deg, #FF6B00, #FF8A33);
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(255, 107, 0, 0.3);
-        }
-
-        .progress-step .label {
-            margin-top: 12px;
-            font-size: 0.9em;
-            color: #6B7280;
-            font-weight: 500;
-        }
-
-        .progress-step.active .label {
-            color: #1F2E3C;
-            font-weight: 700;
-        }
-
-        .progress-line {
-            position: absolute;
-            top: 50%;
-            left: 10%;
-            height: 4px;
-            background: linear-gradient(90deg, #FF6B00, #FF8A33);
-            border-radius: 2px;
-            z-index: 0;
-            transition: width 0.8s ease-in-out;
-            transform: translateY(-50%);
-            box-shadow: 0 2px 8px rgba(255, 107, 0, 0.2);
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 25px 0;
-        }
-
-        .info-item {
-            background: linear-gradient(135deg, #F8FAFC 0%, #FFFFFF 100%);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #E5E7EB;
-            transition: all 0.3s ease;
-        }
-
-        .info-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-        }
-
-        .info-item strong {
-            color: #1F2E3C;
-            font-weight: 700;
-        }
-
-        .deadline-alert {
-            background: linear-gradient(135deg, #FEF3C7 0%, #FCD34D 100%);
-            border: 2px solid #F59E0B;
-            border-radius: 16px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-            color: #92400E;
-            font-weight: 600;
-        }
-
-        .delivery-link {
-            background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
-            border: 2px solid #10B981;
-            border-radius: 16px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .delivery-link a {
-            color: #065F46;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1.1em;
-        }
-
-        .delivery-link a:hover {
-            text-decoration: underline;
-        }
-
-        .error-message {
-            background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
-            border: 2px solid #EF4444;
-            border-radius: 16px;
-            padding: 20px;
-            color: #991B1B;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .warning-message {
-            background: linear-gradient(135deg, #FEF3C7 0%, #FCD34D 100%);
-            border: 2px solid #F59E0B;
-            border-radius: 16px;
-            padding: 20px;
-            color: #92400E;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .spinner {
-            margin: 30px auto;
-            width: 50px;
-            height: 50px;
-            border: 4px solid #E5E7EB;
-            border-top: 4px solid #FF6B00;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .track-another {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #E5E7EB;
-            text-align: center;
-        }
-
-        .track-another a {
-            color: #4A6378;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .track-another a:hover {
-            color: #FF6B00;
-            text-decoration: underline;
-        }
-
-        /* Amend Request Styles */
-        .form-container {
-            font-family: 'Poppins', 'Segoe UI', 'Helvetica Neue', sans-serif;
-            max-width: 700px;
-            margin: 0 auto;
-            padding: 50px 40px;
-            background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
-            color: #4A6378;
-            border-radius: 24px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-            border: 2px solid #F1F5F9;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .form-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #FF6B00, #FF8A33, #FF6B00);
-            background-size: 200% 100%;
-            animation: shimmer 3s ease-in-out infinite;
-        }
-
-        .form-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .form-title {
-            font-size: 2.4em;
-            font-weight: 800;
-            color: #1F2E3C;
-            margin-bottom: 15px;
-        }
-
-        .form-subtitle {
-            font-size: 1.2em;
-            color: #6B7280;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-label {
-            font-weight: 700;
-            display: block;
-            margin-bottom: 8px;
-            color: #1F2E3C;
-            font-size: 1.05em;
-        }
-
-        .form-input, .form-textarea {
-            width: 100%;
-            padding: 16px 20px;
-            border: 2px solid #E5E7EB;
-            border-radius: 12px;
-            font-size: 1.05em;
-            color: #1F2E3C;
-            background: #FFFFFF;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 500;
-            transition: all .3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-
-        .form-input:focus, .form-textarea:focus {
-            outline: none;
-            border-color: #FF6B00;
-            box-shadow: 0 4px 15px rgba(255,107,0,0.15);
-            transform: translateY(-1px);
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        .checkbox-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px;
-        }
-
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background: #fff;
-            border: 2px solid #E5E7EB;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: .3s;
-        }
-
-        .checkbox-item:hover {
-            border-color: #FF6B00;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(255,107,0,0.1);
-        }
-
-        .checkbox-item input {
-            margin-right: 10px;
-            width: 18px;
-            height: 18px;
-            accent-color: #FF6B00;
-            cursor: pointer;
-        }
-
-        .checkbox-item input:checked + span {
-            color: #FF6B00;
-            font-weight: 600;
-        }
-
-        .checkbox-item.checked {
-            border-color: #FF6B00;
-            background: linear-gradient(135deg, rgba(255,107,0,0.05), rgba(255,138,51,0.05));
-        }
-
-        .submit-button {
-            background: linear-gradient(135deg, #FF6B00, #FF8A33);
-            color: #fff;
-            border: none;
-            padding: 18px 30px;
-            border-radius: 12px;
-            width: 100%;
-            font-weight: 700;
-            font-size: 1.1em;
-            margin-top: 30px;
-            cursor: pointer;
-            transition: .3s;
-            box-shadow: 0 6px 20px rgba(255,107,0,0.3);
-        }
-
-        .submit-button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255,107,0,0.4);
-        }
-
-        .submit-button:disabled {
-            opacity: .7;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .response-message {
-            margin-top: 25px;
-            text-align: center;
-            font-size: 1.05em;
-            font-weight: 600;
-            padding: 15px;
-            border-radius: 12px;
-            transition: .3s;
-        }
-
-        .response-message.success {
-            background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
-            color: #065F46;
-            border: 2px solid #10B981;
-        }
-
-        .response-message.error {
-            background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
-            color: #991B1B;
-            border: 2px solid #EF4444;
-        }
-
-        .info-box {
-            background: linear-gradient(135deg, #EBF4FF 0%, #DBEAFE 100%);
-            border: 2px solid #3B82F6;
-            border-radius: 16px;
-            padding: 25px;
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        .info-box h3 {
-            color: #1E40AF;
-            font-weight: 700;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-
-        .info-box p {
-            color: #1E3A8A;
-            font-weight: 500;
-            margin-bottom: 10px;
-            line-height: 1.6;
-        }
-
-        .info-box p:last-child {
-            margin-bottom: 0;
-        }
-
-        .highlight {
-            color: #FF6B00;
-            font-weight: 700;
-        }
-
-        .tracking-status {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            text-align: center;
-            display: none;
-        }
-
-        .tracking-status.checking {
-            background: linear-gradient(135deg, #E0E7FF 0%, #C7D2FE 100%);
-            color: #3730A3;
-            border: 2px solid #6366F1;
-        }
-
-        /* File Upload Styles */
-        .file-upload-area {
-            border: 2px dashed #E5E7EB;
-            border-radius: 12px;
-            padding: 30px 20px;
-            text-align: center;
-            background: #FAFAFA;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .file-upload-area:hover {
-            border-color: #FF6B00;
-            background: rgba(255, 107, 0, 0.02);
-        }
-
-        .file-upload-area.dragover {
-            border-color: #FF6B00;
-            background: rgba(255, 107, 0, 0.05);
-            transform: scale(1.02);
-        }
-
-        .file-upload-icon {
-            font-size: 3em;
-            color: #9CA3AF;
-            margin-bottom: 15px;
-            transition: color 0.3s ease;
-        }
-
-        .file-upload-area:hover .file-upload-icon,
-        .file-upload-area.dragover .file-upload-icon {
-            color: #FF6B00;
-        }
-
-        .file-upload-text {
-            font-size: 1.1em;
-            color: #6B7280;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .file-upload-subtext {
-            font-size: 0.9em;
-            color: #9CA3AF;
-            margin-bottom: 15px;
-        }
-
-        .file-upload-button {
-            background: linear-gradient(135deg, #FF6B00, #FF8A33);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(255, 107, 0, 0.2);
-        }
-
-        .file-upload-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(255, 107, 0, 0.3);
-        }
-
-        .file-preview {
-            margin-top: 20px;
-            display: none;
-        }
-
-        .file-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            background: white;
-            border: 2px solid #E5E7EB;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .file-item:hover {
-            border-color: #FF6B00;
-            box-shadow: 0 2px 8px rgba(255, 107, 0, 0.1);
-        }
-
-        .file-info {
-            display: flex;
-            align-items: center;
-            flex-grow: 1;
-        }
-
-        .file-icon {
-            font-size: 1.5em;
-            margin-right: 12px;
-            color: #FF6B00;
-        }
-
-        .file-details {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .file-name {
-            font-weight: 600;
-            color: #1F2E3C;
-            font-size: 0.95em;
-            word-break: break-word;
-        }
-
-        .file-size {
-            font-size: 0.8em;
-            color: #6B7280;
-        }
-
-        .file-remove {
-            background: #EF4444;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 6px 10px;
-            font-size: 0.8em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .file-remove:hover {
-            background: #DC2626;
-            transform: scale(1.05);
-        }
-
-        .upload-progress {
-            display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background: linear-gradient(135deg, #EBF4FF 0%, #DBEAFE 100%);
-            border: 2px solid #3B82F6;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #E5E7EB;
-            border-radius: 3px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #FF6B00, #FF8A33);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            
-            .mobile-toggle {
-                display: block;
-            }
-            
-            .mobile-overlay {
-                display: none;
-            }
-            
-            .mobile-overlay.active {
-                display: block;
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header {
-                padding-left: 80px;
-            }
-
-            .booking-iframe {
-                height: 600px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header {
-                padding: 16px 20px;
-                padding-left: 80px;
-                flex-direction: column;
-                gap: 16px;
-                text-align: center;
-            }
-            
-            .header-left {
-                order: 2;
-            }
-            
-            .header-right {
-                order: 1;
-            }
-            
-            .page-title {
-                font-size: 24px;
-            }
-            
-            .content-area {
-                padding: 20px;
-            }
-            
-            .metrics-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 16px;
-            }
-
-            .metric-card {
-                padding: 20px;
-            }
-
-            .metric-value {
-                font-size: 28px;
-            }
-
-            .metric-label {
-                font-size: 12px;
-            }
-
-            .card {
-                margin-bottom: 20px;
-            }
-
-            .card-header {
-                padding: 20px 20px 0;
-                margin-bottom: 20px;
-            }
-
-            .card-content {
-                padding: 0 20px 20px;
-            }
-
-            .action-item {
-                padding: 12px;
-            }
-
-            .action-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
-            }
-
-            .nav-item {
-                padding: 16px;
-                font-size: 16px;
-            }
-
-            .nav-icon {
-                width: 24px;
-                height: 24px;
-                font-size: 18px;
-            }
-
-            .user-info {
-                padding: 6px 12px;
-            }
-
-            .user-avatar {
-                width: 36px;
-                height: 36px;
-                font-size: 14px;
-            }
-
-            .user-details h4 {
-                font-size: 13px;
-            }
-
-            .user-details p {
-                font-size: 11px;
-            }
-
-            .gallery-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .booking-iframe {
-                height: 500px;
-            }
-
-            .booking-header {
-                padding: 20px;
-            }
-
-            .booking-title {
-                font-size: 20px;
-            }
-
-            .tracker-wrapper {
-                padding: 25px 20px;
-                margin: 10px auto;
-                max-width: 98%;
-                border-radius: 20px;
-            }
-
-            .tracker-title {
-                font-size: 2em;
-            }
-
-            .tracker-subtitle {
-                font-size: 1.1em;
-            }
-
-            .form-container {
-                padding: 25px 20px;
-                margin: 10px auto;
-                max-width: 98%;
-                border-radius: 20px;
-            }
-
-            .form-title {
-                font-size: 1.8em;
-            }
-
-            .form-subtitle {
-                font-size: 1em;
-            }
-
-            .checkbox-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                gap: 12px;
-            }
-
-            .checkbox-item {
-                padding: 12px;
-                font-size: 0.9em;
-            }
-
-            .info-box {
-                padding: 20px;
-            }
-
-            .file-upload-area {
-                padding: 20px 15px;
-            }
-
-            .file-upload-icon {
-                font-size: 2.5em;
-            }
-
-            .file-upload-text {
-                font-size: 1em;
-            }
-
-            .file-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .file-info {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .metric-card {
-                padding: 16px;
-                text-align: center;
-            }
-
-            .content-area {
-                padding: 16px;
-            }
-
-            .card-header {
-                padding: 16px 16px 0;
-                margin-bottom: 16px;
-            }
-
-            .card-content {
-                padding: 0 16px 16px;
-            }
-
-            .activity-item {
-                padding: 12px 0;
-            }
-
-            .activity-icon {
-                width: 36px;
-                height: 36px;
-            }
-
-            .page-title {
-                font-size: 20px;
-            }
-
-            .page-subtitle {
-                font-size: 14px;
-            }
-
-            .header {
-                padding: 12px 16px;
-                padding-left: 70px;
-            }
-
-            .mobile-toggle {
-                top: 15px;
-                left: 15px;
-                padding: 10px;
-            }
-
-            .booking-iframe {
-                height: 400px;
-            }
-
-            .tracker-wrapper {
-                padding: 20px 15px;
-                margin: 5px auto;
-                max-width: 99%;
-                border-radius: 16px;
-            }
-
-            .tracker-title {
-                font-size: 1.6em;
-                line-height: 1.2;
-            }
-
-            .tracker-subtitle {
-                font-size: 0.95em;
-                line-height: 1.4;
-            }
-
-            .form-container {
-                padding: 20px 15px;
-                margin: 5px auto;
-                max-width: 99%;
-                border-radius: 16px;
-            }
-
-            .form-title {
-                font-size: 1.6em;
-                line-height: 1.2;
-            }
-
-            .form-subtitle {
-                font-size: 0.95em;
-                line-height: 1.4;
-            }
-
-            .checkbox-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-
-            .checkbox-item {
-                padding: 10px;
-                font-size: 0.85em;
-            }
-
-            .form-input, .form-textarea {
-                padding: 14px 16px;
-                font-size: 1em;
-            }
-
-            .submit-button {
-                padding: 16px 20px;
-                font-size: 1em;
-            }
-
-            .info-box {
-                padding: 18px;
-            }
-
-            .info-box h3 {
-                font-size: 1.1em;
-            }
-
-            .info-box p {
-                font-size: 0.9em;
-            }
-
-            .file-upload-area {
-                padding: 20px 10px;
-            }
-
-            .file-upload-icon {
-                font-size: 2em;
-            }
-
-            .file-upload-text {
-                font-size: 0.95em;
-            }
-
-            .file-upload-subtext {
-                font-size: 0.85em;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal - Markeb Media</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <!-- Optional Airtable helper (if you have one) -->
+  <script src="assets/js/airtable.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+
+    .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: #fff; border-right: 1px solid #e2e8f0; padding: 32px 24px; z-index: 100; transform: translateX(0); transition: transform 0.3s ease; }
+    .mobile-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99; }
+    .mobile-toggle { display: none; position: fixed; top: 20px; left: 20px; z-index: 101; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+    .logo { margin-bottom: 48px; display: flex; align-items: center; }
+    .logo img { height: 40px; width: auto; }
+
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; color: #64748b; text-decoration: none; font-weight: 500; transition: all 0.2s ease; cursor: pointer; }
+    .nav-item:hover, .nav-item.active { background: #f1f5f9; color: #0f172a; }
+    .nav-item.active { background: #3b82f6; color: #fff; }
+    .nav-icon { width: 20px; height: 20px; font-size: 16px; text-align: center; display: flex; align-items: center; justify-content: center; line-height: 1; }
+
+    .main-content { margin-left: 280px; min-height: 100vh; width: calc(100vw - 280px); box-sizing: border-box; }
+
+    .header { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; }
+    .header-left { flex: 1; }
+    .page-title { font-size: 28px; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
+    .page-subtitle { color: #64748b; font-size: 16px; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .user-info { display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: #f8fafc; border-radius: 8px; }
+    .user-avatar { width: 40px; height: 40px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; }
+    .user-details h4 { font-size: 14px; font-weight: 600; color: #0f172a; }
+    .user-details p { font-size: 12px; color: #64748b; }
+
+    .content-area { padding: 32px; }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
+    .metric-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; transition: all 0.2s ease; }
+    .metric-card:hover { border-color: #cbd5e1; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .metric-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .metric-icon { width: 48px; height: 48px; background: #eff6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .metric-value { font-size: 32px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .metric-label { color: #64748b; font-size: 14px; font-weight: 500; }
+
+    .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+    .card-header { padding: 24px 24px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 24px; }
+    .card-title { font-size: 18px; font-weight: 600; color: #0f172a; margin-bottom: 8px; }
+    .card-subtitle { color: #64748b; font-size: 14px; }
+    .card-content { padding: 0 24px 24px; }
+
+    .activity-item { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid #f1f5f9; }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon { width: 40px; height: 40px; background: #f8fafc; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .activity-content { flex: 1; }
+    .activity-title { font-weight: 500; color: #0f172a; margin-bottom: 4px; }
+    .activity-time { font-size: 13px; color: #64748b; }
+
+    .btn { padding: 12px 20px; border-radius: 8px; font-weight: 500; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s ease; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary { background: #3b82f6; color: #fff; }
+    .btn-primary:hover { background: #2563eb; }
+
+    .action-grid { display: grid; gap: 12px; }
+    .action-item { display: flex; align-items: center; gap: 12px; padding: 16px; background: #f8fafc; border-radius: 8px; text-decoration: none; color: #0f172a; transition: all 0.2s ease; cursor: pointer; }
+    .action-item:hover { background: #f1f5f9; }
+    .action-icon { width: 36px; height: 36px; background: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 1000px; }
+    .settings-section { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; }
+    .settings-title { font-size: 18px; font-weight: 600; color: #0f172a; margin-bottom: 16px; }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-weight: 500; color: #374151; margin-bottom: 8px; }
+    .form-input { width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; transition: border-color 0.2s ease; }
+    .form-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+
+    .copyryta-container { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 32px; text-align: center; }
+    .copyryta-title { font-size: 24px; font-weight: 700; color: #0f172a; margin-bottom: 16px; }
+    .copyryta-description { color: #64748b; margin-bottom: 32px; line-height: 1.6; }
+    .copyryta-btn { background: linear-gradient(135deg, #FF6B00 0%, #FF8533 100%); color: #fff; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block; transition: transform 0.2s ease; border: none; cursor: pointer; }
+    .copyryta-btn:hover { transform: translateY(-2px); }
+
+    .booking-container { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+    .booking-header { padding: 24px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
+    .booking-title { font-size: 24px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+    .booking-description { color: #64748b; line-height: 1.6; }
+    .booking-iframe-container { padding: 0; background: #fff; }
+    .booking-iframe { width: 100%; height: 800px; border: none; display: block; }
+
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+    .gallery-item { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; transition: all 0.2s ease; }
+    .gallery-item:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+    .gallery-image { width: 100%; height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 48px; }
+    .gallery-info { padding: 20px; }
+    .gallery-title { font-weight: 600; color: #0f172a; margin-bottom: 8px; }
+    .gallery-date { color: #64748b; font-size: 14px; margin-bottom: 12px; }
+    .gallery-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .status-completed { background: #dcfce7; color: #16a34a; }
+    .status-processing { background: #fef3c7; color: #d97706; }
+
+    /* Tracking */
+    .tracker-wrapper { font-family: 'Poppins','Segoe UI','Helvetica Neue',sans-serif; text-align: center; padding: 50px 30px; background: linear-gradient(135deg,#fff 0%,#F8FAFC 100%); color: #4A6378; border-radius: 24px; max-width: 800px; margin: 0 auto; box-shadow: 0 15px 40px rgba(0,0,0,0.08); border: 2px solid #F1F5F9; position: relative; overflow: hidden; }
+    .tracker-wrapper::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg,#FF6B00,#FF8A33,#FF6B00); background-size: 200% 100%; animation: shimmer 3s ease-in-out infinite; }
+    @keyframes shimmer { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    .tracker-title { margin-bottom: 15px; font-size: 2.4em; font-weight: 800; color: #1F2E3C; position: relative; z-index: 2; }
+    .tracker-subtitle { font-size: 1.2em; color: #6B7280; margin-bottom: 40px; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .input-container { position: relative; max-width: 450px; margin: 0 auto 30px; }
+    #trackingInput { padding: 18px 24px; width: 100%; border: 2px solid #E5E7EB; border-radius: 16px; font-size: 1.1em; color: #1F2E3C; background: #fff; font-family: 'Poppins', sans-serif; font-weight: 500; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    #trackingInput:focus { outline: none; border-color: #FF6B00; box-shadow: 0 6px 20px rgba(255,107,0,0.15); transform: translateY(-2px); }
+    .track-button { padding: 18px 40px; background: linear-gradient(135deg,#FF6B00,#FF8A33); color: #fff; border: none; border-radius: 16px; font-weight: 700; font-size: 1.1em; cursor: pointer; font-family: 'Poppins', sans-serif; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(255,107,0,0.3); position: relative; overflow: hidden; }
+    .track-button:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(255,107,0,0.4); }
+    .result-container { margin-top: 40px; }
+    #result { text-align: left; font-size: 1.1em; background: #fff; border-radius: 20px; padding: 30px; box-shadow: 0 8px 25px rgba(0,0,0,0.06); border: 1px solid #E5E7EB; margin-top: 30px; }
+
+    .progress-container { display: flex; align-items: center; justify-content: space-between; max-width: 100%; padding: 30px 10px; margin: 30px auto; position: relative; }
+    .progress-container::before { content: ''; position: absolute; top: 50%; left: 10%; right: 10%; height: 4px; background: #E5E7EB; z-index: 0; border-radius: 2px; transform: translateY(-50%); }
+    .progress-step { z-index: 1; flex: 1; text-align: center; position: relative; }
+    .progress-step .icon { width: 50px; height: 50px; border-radius: 50%; background: #E5E7EB; margin: 0 auto; font-size: 1.4em; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; position: relative; z-index: 1; transition: all 0.3s ease; border: 3px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .progress-step.active .icon { background: linear-gradient(135deg,#FF6B00,#FF8A33); transform: scale(1.1); box-shadow: 0 6px 20px rgba(255,107,0,0.3); }
+    .progress-step .label { margin-top: 12px; font-size: 0.9em; color: #6B7280; font-weight: 500; }
+    .progress-step.active .label { color: #1F2E3C; font-weight: 700; }
+    .progress-line { position: absolute; top: 50%; left: 10%; height: 4px; background: linear-gradient(90deg,#FF6B00,#FF8A33); border-radius: 2px; z-index: 0; transition: width 0.8s ease-in-out; transform: translateY(-50%); box-shadow: 0 2px 8px rgba(255,107,0,0.2); }
+
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 25px 0; }
+    .info-item { background: linear-gradient(135deg,#F8FAFC 0%,#fff 100%); padding: 20px; border-radius: 12px; border: 1px solid #E5E7EB; transition: all 0.3s ease; }
+    .info-item:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+    .info-item strong { color: #1F2E3C; font-weight: 700; }
+    .deadline-alert { background: linear-gradient(135deg,#FEF3C7 0%,#FCD34D 100%); border: 2px solid #F59E0B; border-radius: 16px; padding: 20px; margin: 20px 0; text-align: center; color: #92400E; font-weight: 600; }
+    .delivery-link { background: linear-gradient(135deg,#D1FAE5 0%,#A7F3D0 100%); border: 2px solid #10B981; border-radius: 16px; padding: 20px; margin: 20px 0; text-align: center; }
+    .delivery-link a { color: #065F46; text-decoration: none; font-weight: 700; font-size: 1.1em; }
+    .delivery-link a:hover { text-decoration: underline; }
+    .error-message { background: linear-gradient(135deg,#FEE2E2 0%,#FECACA 100%); border: 2px solid #EF4444; border-radius: 16px; padding: 20px; color: #991B1B; font-weight: 600; text-align: center; }
+    .warning-message { background: linear-gradient(135deg,#FEF3C7 0%,#FCD34D 100%); border: 2px solid #F59E0B; border-radius: 16px; padding: 20px; color: #92400E; font-weight: 600; text-align: center; }
+    .spinner { margin: 30px auto; width: 50px; height: 50px; border: 4px solid #E5E7EB; border-top: 4px solid #FF6B00; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .track-another { margin-top: 30px; padding-top: 20px; border-top: 1px solid #E5E7EB; text-align: center; }
+    .track-another a { color: #4A6378; text-decoration: none; font-weight: 600; transition: all 0.3s ease; }
+    .track-another a:hover { color: #FF6B00; text-decoration: underline; }
+
+    /* Amendment Form */
+    .form-container { font-family: 'Poppins','Segoe UI','Helvetica Neue',sans-serif; max-width: 700px; margin: 0 auto; padding: 50px 40px; background: linear-gradient(135deg,#fff 0%,#F8FAFC 100%); color: #4A6378; border-radius: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.08); border: 2px solid #F1F5F9; position: relative; overflow: hidden; }
+    .form-container::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg,#FF6B00,#FF8A33,#FF6B00); background-size: 200% 100%; animation: shimmer 3s ease-in-out infinite; }
+    .form-header { text-align: center; margin-bottom: 40px; }
+    .form-title { font-size: 2.4em; font-weight: 800; color: #1F2E3C; margin-bottom: 15px; }
+    .form-subtitle { font-size: 1.2em; color: #6B7280; margin-bottom: 30px; }
+    .form-textarea { width: 100%; padding: 16px 20px; border: 2px solid #E5E7EB; border-radius: 12px; font-size: 1.05em; color: #1F2E3C; background: #fff; font-family: 'Poppins', sans-serif; font-weight: 500; transition: all .3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.04); resize: vertical; min-height: 120px; }
+    .form-textarea:focus { outline: none; border-color: #FF6B00; box-shadow: 0 4px 15px rgba(255,107,0,0.15); transform: translateY(-1px); }
+    .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; }
+    .checkbox-item { display: flex; align-items: center; padding: 15px; background: #fff; border: 2px solid #E5E7EB; border-radius: 12px; cursor: pointer; transition: .3s; }
+    .checkbox-item:hover { border-color: #FF6B00; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255,107,0,0.1); }
+    .checkbox-item input { margin-right: 10px; width: 18px; height: 18px; accent-color: #FF6B00; cursor: pointer; }
+    .checkbox-item input:checked + span { color: #FF6B00; font-weight: 600; }
+    .checkbox-item.checked { border-color: #FF6B00; background: linear-gradient(135deg, rgba(255,107,0,0.05), rgba(255,138,51,0.05)); }
+    .checkbox-label { font-weight: 500; }
+    .submit-button { background: linear-gradient(135deg,#FF6B00,#FF8A33); color: #fff; border: none; padding: 18px 30px; border-radius: 12px; width: 100%; font-weight: 700; font-size: 1.1em; margin-top: 30px; cursor: pointer; transition: .3s; box-shadow: 0 6px 20px rgba(255,107,0,0.3); }
+    .submit-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,107,0,0.4); }
+    .submit-button:disabled { opacity: .7; cursor: not-allowed; transform: none; }
+    .response-message { margin-top: 25px; text-align: center; font-size: 1.05em; font-weight: 600; padding: 15px; border-radius: 12px; transition: 0.3s; display: none; }
+    .response-message.success { background: linear-gradient(135deg,#D1FAE5 0%,#A7F3D0 100%); color: #065F46; border: 2px solid #10B981; display: block; }
+    .response-message.error { background: linear-gradient(135deg,#FEE2E2 0%,#FECACA 100%); color: #991B1B; border: 2px solid #EF4444; display: block; }
+    .info-box { background: linear-gradient(135deg,#EBF4FF 0%,#DBEAFE 100%); border: 2px solid #3B82F6; border-radius: 16px; padding: 25px; margin-top: 30px; text-align: center; }
+    .info-box h3 { color: #1E40AF; font-weight: 700; margin-bottom: 15px; font-size: 1.2em; }
+    .info-box p { color: #1E3A8A; font-weight: 500; margin-bottom: 10px; line-height: 1.6; }
+    .info-box .highlight { color: #FF6B00; font-weight: 700; }
+    .tracking-status { margin-top: 15px; padding: 12px; border-radius: 8px; font-weight: 600; text-align: center; display: none; }
+    .tracking-status.checking { background: linear-gradient(135deg,#E0E7FF 0%,#C7D2FE 100%); color: #3730A3; border: 2px solid #6366F1; display: block; }
+
+    /* File upload */
+    .file-upload-area { border: 2px dashed #E5E7EB; border-radius: 12px; padding: 30px 20px; text-align: center; background: #FAFAFA; transition: all 0.3s ease; cursor: pointer; position: relative; overflow: hidden; }
+    .file-upload-area:hover { border-color: #FF6B00; background: rgba(255,107,0,0.02); }
+    .file-upload-area.dragover { border-color: #FF6B00; background: rgba(255,107,0,0.05); transform: scale(1.02); }
+    .file-upload-icon { font-size: 3em; color: #9CA3AF; margin-bottom: 15px; transition: color 0.3s ease; }
+    .file-upload-area:hover .file-upload-icon, .file-upload-area.dragover .file-upload-icon { color: #FF6B00; }
+    .file-upload-text { font-size: 1.1em; color: #6B7280; font-weight: 600; margin-bottom: 8px; }
+    .file-upload-subtext { font-size: 0.9em; color: #9CA3AF; margin-bottom: 15px; }
+    .file-upload-button { background: linear-gradient(135deg,#FF6B00,#FF8A33); color: #fff; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95em; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(255,107,0,0.2); }
+    .file-upload-button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(255,107,0,0.3); }
+    .file-preview { margin-top: 20px; display: none; }
+    .file-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #fff; border: 2px solid #E5E7EB; border-radius: 8px; margin-bottom: 8px; transition: all 0.3s ease; }
+    .file-item:hover { border-color: #FF6B00; box-shadow: 0 2px 8px rgba(255,107,0,0.1); }
+    .file-info { display: flex; align-items: center; flex-grow: 1; }
+    .file-icon { font-size: 1.5em; margin-right: 12px; color: #FF6B00; }
+    .file-details { display: flex; flex-direction: column; }
+    .file-name { font-weight: 600; color: #1F2E3C; font-size: 0.95em; word-break: break-word; }
+    .file-size { font-size: 0.8em; color: #6B7280; }
+    .file-remove { background: #EF4444; color: #fff; border: none; border-radius: 6px; padding: 6px 10px; font-size: 0.8em; cursor: pointer; transition: all 0.3s ease; }
+    .file-remove:hover { background: #DC2626; transform: scale(1.05); }
+    .upload-progress { display: none; margin-top: 15px; padding: 15px; background: linear-gradient(135deg,#EBF4FF 0%,#DBEAFE 100%); border: 2px solid #3B82F6; border-radius: 8px; text-align: center; }
+    .progress-bar { width: 100%; height: 6px; background: #E5E7EB; border-radius: 3px; margin: 10px 0; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg,#FF6B00,#FF8A33); width: 0%; transition: width 0.3s ease; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .mobile-toggle { display: block; }
+      .mobile-overlay { display: none; }
+      .mobile-overlay.active { display: block; }
+      .main-content { margin-left: 0; width: 100%; }
+      .content-grid { grid-template-columns: 1fr; }
+      .header { padding-left: 80px; }
+      .booking-iframe { height: 600px; }
+    }
+    @media (max-width: 768px) {
+      .header { padding: 16px 20px; padding-left: 80px; flex-direction: column; gap: 16px; text-align: center; }
+      .header-left { order: 2; }
+      .header-right { order: 1; }
+      .page-title { font-size: 24px; }
+      .content-area { padding: 20px; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .metric-card { padding: 20px; }
+      .metric-value { font-size: 28px; }
+      .metric-label { font-size: 12px; }
+      .card { margin-bottom: 20px; }
+      .card-header { padding: 20px 20px 0; margin-bottom: 20px; }
+      .card-content { padding: 0 20px 20px; }
+      .action-item { padding: 12px; }
+      .action-icon { width: 32px; height: 32px; font-size: 14px; }
+      .nav-item { padding: 16px; font-size: 16px; }
+      .nav-icon { width: 24px; height: 24px; font-size: 18px; }
+      .user-info { padding: 6px 12px; }
+      .user-avatar { width: 36px; height: 36px; font-size: 14px; }
+      .user-details h4 { font-size: 13px; }
+      .user-details p { font-size: 11px; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .booking-iframe { height: 500px; }
+      .booking-header { padding: 20px; }
+      .booking-title { font-size: 20px; }
+      .tracker-wrapper { padding: 25px 20px; margin: 10px auto; max-width: 98%; border-radius: 20px; }
+      .tracker-title { font-size: 2em; }
+      .tracker-subtitle { font-size: 1.1em; }
+      .form-container { padding: 25px 20px; margin: 10px auto; max-width: 98%; border-radius: 20px; }
+      .form-title { font-size: 1.8em; }
+      .form-subtitle { font-size: 1em; }
+      .checkbox-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+      .checkbox-item { padding: 12px; font-size: 0.9em; }
+      .info-box { padding: 20px; }
+      .file-upload-area { padding: 20px 15px; }
+      .file-upload-icon { font-size: 2.5em; }
+      .file-upload-text { font-size: 1em; }
+      .file-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .file-info { width: 100%; }
+      .settings-grid { grid-template-columns: 1fr; gap: 20px; }
+    }
+    @media (max-width: 480px) {
+      .metrics-grid { grid-template-columns: 1fr; }
+      .metric-card { padding: 16px; text-align: center; }
+      .content-area { padding: 16px; }
+      .card-header { padding: 16px 16px 0; margin-bottom: 16px; }
+      .card-content { padding: 0 16px 16px; }
+      .activity-item { padding: 12px 0; }
+      .activity-icon { width: 36px; height: 36px; }
+      .page-title { font-size: 20px; }
+      .page-subtitle { font-size: 14px; }
+      .header { padding: 12px 16px; padding-left: 70px; }
+      .mobile-toggle { top: 15px; left: 15px; padding: 10px; }
+      .booking-iframe { height: 400px; }
+      .tracker-wrapper { padding: 20px 15px; margin: 5px auto; max-width: 99%; border-radius: 16px; }
+      .tracker-title { font-size: 1.6em; line-height: 1.2; }
+      .tracker-subtitle { font-size: 0.95em; line-height: 1.4; }
+      .form-container { padding: 20px 15px; margin: 5px auto; max-width: 99%; border-radius: 16px; }
+      .form-title { font-size: 1.6em; line-height: 1.2; }
+      .form-subtitle { font-size: 0.95em; line-height: 1.4; }
+      .checkbox-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .checkbox-item { padding: 10px; font-size: 0.85em; }
+      .form-input, .form-textarea { padding: 14px 16px; font-size: 1em; }
+      .submit-button { padding: 16px 20px; font-size: 1em; }
+      .info-box { padding: 18px; }
+      .info-box h3 { font-size: 1.1em; }
+      .info-box p { font-size: 0.9em; }
+      .file-upload-area { padding: 20px 10px; }
+      .file-upload-icon { font-size: 2em; }
+      .file-upload-text { font-size: 0.95em; }
+      .file-upload-subtext { font-size: 0.85em; }
+      .settings-grid { grid-template-columns: 1fr; gap: 16px; }
+    }
+  </style>
 </head>
 <body>
-    <!-- Mobile Toggle Button -->
-    <div class="mobile-toggle" onclick="toggleSidebar()">
-        <div style="width: 20px; height: 20px; display: flex; flex-direction: column; justify-content: space-between;">
-            <div style="width: 100%; height: 2px; background: #64748b;"></div>
-            <div style="width: 100%; height: 2px; background: #64748b;"></div>
-            <div style="width: 100%; height: 2px; background: #64748b;"></div>
+  <!-- Mobile Toggle Button -->
+  <div class="mobile-toggle" onclick="toggleSidebar()">
+    <div style="width: 20px; height: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+      <div style="width: 100%; height: 2px; background: #64748b;"></div>
+      <div style="width: 100%; height: 2px; background: #64748b;"></div>
+      <div style="width: 100%; height: 2px; background: #64748b;"></div>
+    </div>
+  </div>
+  <div class="mobile-overlay" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <img src="images/Markeb Media Logo (2).PNG" alt="Markeb Media" />
+    </div>
+    <nav>
+      <div class="nav-item active" data-target="dashboard" onclick="navClick(event)"><div class="nav-icon">●</div>Dashboard</div>
+      <div class="nav-item" data-target="booking" onclick="navClick(event)"><div class="nav-icon">+</div>Book Shoot</div>
+      <div class="nav-item" data-target="gallery" onclick="navClick(event)"><div class="nav-icon">□</div>Gallery</div>
+      <div class="nav-item" data-target="copyryta" onclick="navClick(event)"><div class="nav-icon">◇</div>CopyRyta AI</div>
+      <div class="nav-item" data-target="tracking" onclick="navClick(event)"><div class="nav-icon">▲</div>Content Tracking</div>
+      <div class="nav-item" data-target="amend" onclick="navClick(event)"><div class="nav-icon">△</div>Request Amendment</div>
+      <div class="nav-item" data-target="settings" onclick="navClick(event)"><div class="nav-icon">○</div>Settings</div>
+      <div class="nav-item" onclick="contactSupport()"><div class="nav-icon">?</div>Support</div>
+      <div class="nav-item" onclick="logoutUser()" style="margin-top: 40px; color: #ef4444;"><div class="nav-icon">←</div>Logout</div>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="header">
+      <div class="header-left">
+        <h1 class="page-title" id="pageTitle">Welcome back</h1>
+        <p class="page-subtitle" id="pageSubtitle">Here's what's happening with your projects</p>
+      </div>
+      <div class="header-right">
+        <div class="user-info">
+          <div class="user-avatar" id="userAvatar">M</div>
+          <div class="user-details">
+            <h4 id="userName">Loading...</h4>
+            <p id="userEmail">Loading...</p>
+          </div>
         </div>
+        <button class="btn btn-primary" id="authBtn" onclick="openAuthModal()">Sign in</button>
+      </div>
+    </div>
+      </div>
     </div>
 
-    <!-- Mobile Overlay -->
-    <div class="mobile-overlay" onclick="closeSidebar()"></div>
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo">
-    <img src="images/markeb-media-logo.png" alt="Markeb Media" style="height: 40px; width: auto;">
-</div>
-        
-        <nav>
-            <div class="nav-item active" onclick="showSection('dashboard')">
-    Dashboard
-</div>
+    <div class="content-area">
+      <!-- Dashboard -->
+      <div id="dashboard" class="section active">
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-header"><div class="metric-icon">■</div></div>
+            <div class="metric-value" id="totalBookings">0</div>
+            <div class="metric-label">Total Bookings</div>
           </div>
-<div class="nav-item" onclick="showSection('booking')">
-    Book Shoot
-</div>
-<div class="nav-item" onclick="showSection('gallery')">
-    Gallery
-</div>
-<div class="nav-item" onclick="showSection('copyryta')">
-    CopyRyta AI
-</div>
-<div class="nav-item" onclick="showSection('tracking')">
-    Content Tracking
-</div>
-<div class="nav-item" onclick="showSection('amend')">
-    Request Amendment
-</div>
-<div class="nav-item" onclick="showSection('settings')">
-    Settings
-</div>
-<div class="nav-item" onclick="contactSupport()">
-    Support
-</div>
-<div class="nav-item" onclick="logoutUser()" style="margin-top: 40px; color: #ef4444;">
-    Logout
-</div>
-</nav>
-</div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-left">
-                <h1 class="page-title" id="pageTitle">Welcome back</h1>
-                <p class="page-subtitle" id="pageSubtitle">Here's what's happening with your projects</p>
-            </div>
-            <div class="header-right">
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar">M</div>
-                    <div class="user-details">
-                        <h4 id="userName">Loading...</h4>
-                        <p id="userEmail">Loading...</p>
-                    </div>
-                </div>
-            </div>
+          <div class="metric-card">
+            <div class="metric-header"><div class="metric-icon">£</div></div>
+            <div class="metric-value" id="totalSpending">£0</div>
+            <div class="metric-label">Total Investment</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-header"><div class="metric-icon">✓</div></div>
+            <div class="metric-value" id="completedProjects">0</div>
+            <div class="metric-label">Completed Projects</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-header"><div class="metric-icon">#</div></div>
+            <div class="metric-value" id="memberSince">2024</div>
+            <div class="metric-label">Member Since</div>
+          </div>
         </div>
 
-        <!-- Content Area -->
-        <div class="content-area">
-            <!-- Dashboard Section -->
-            <div id="dashboard" class="section active">
-                <!-- Metrics Grid -->
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <div class="metric-icon">■</div>
-                        </div>
-                        <div class="metric-value" id="totalBookings">0</div>
-                        <div class="metric-label">Total Bookings</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <div class="metric-icon">£</div>
-                        </div>
-                        <div class="metric-value" id="totalSpending">£0</div>
-                        <div class="metric-label">Total Investment</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <div class="metric-icon">✓</div>
-                        </div>
-                        <div class="metric-value" id="completedProjects">0</div>
-                        <div class="metric-label">Completed Projects</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <div class="metric-icon">#</div>
-                        </div>
-                        <div class="metric-value" id="memberSince">2024</div>
-                        <div class="metric-label">Member Since</div>
-                    </div>
+        <div class="content-grid">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Recent Activity</h2>
+              <p class="card-subtitle">Your latest interactions and updates</p>
+            </div>
+            <div class="card-content">
+              <div id="activityList">
+                <div class="activity-item"><div class="activity-icon">+</div>
+                  <div class="activity-content"><div class="activity-title">Account created successfully</div><div class="activity-time">Welcome to Markeb Media</div></div>
                 </div>
-
-                <!-- Content Grid -->
-                <div class="content-grid">
-                    <!-- Recent Activity -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">Recent Activity</h2>
-                            <p class="card-subtitle">Your latest interactions and updates</p>
-                        </div>
-                        <div class="card-content">
-                            <div id="activityList">
-                                <div class="activity-item">
-                                    <div class="activity-icon">+</div>
-                                    <div class="activity-content">
-                                        <div class="activity-title">Account created successfully</div>
-                                        <div class="activity-time">Welcome to Markeb Media</div>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon">■</div>
-                                    <div class="activity-content">
-                                        <div class="activity-title">Dashboard accessed</div>
-                                        <div class="activity-time">Ready to book your first shoot</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">Quick Actions</h2>
-                            <p class="card-subtitle">Common tasks and shortcuts</p>
-                        </div>
-                        <div class="card-content">
-                            <div class="action-grid">
-                                <div class="action-item" onclick="showSection('booking')">
-                                    <div class="action-icon">+</div>
-                                    <div>
-                                        <div style="font-weight: 500;">Book New Shoot</div>
-                                        <div style="font-size: 12px; color: #64748b;">Schedule photos and videos</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="action-item" onclick="showSection('tracking')">
-                                    <div class="action-icon">▲</div>
-                                    <div>
-                                        <div style="font-weight: 500;">Track Content</div>
-                                        <div style="font-size: 12px; color: #64748b;">Monitor content progress</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="action-item" onclick="showSection('copyryta')">
-                                    <div class="action-icon">◇</div>
-                                    <div>
-                                        <div style="font-weight: 500;">CopyRyta AI</div>
-                                        <div style="font-size: 12px; color: #64748b;">AI copywriting tool</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="action-item" onclick="showSection('amend')">
-                                    <div class="action-icon">△</div>
-                                    <div>
-                                        <div style="font-weight: 500;">Request Amendment</div>
-                                        <div style="font-size: 12px; color: #64748b;">Make adjustments to your content</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="activity-item"><div class="activity-icon">■</div>
+                  <div class="activity-content"><div class="activity-title">Dashboard accessed</div><div class="activity-time">Ready to book your first shoot</div></div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Quick Actions</h2>
+              <p class="card-subtitle">Common tasks and shortcuts</p>
+            </div>
+            <div class="card-content">
+              <div class="action-grid">
+                <div class="action-item" onclick="showSection('booking')"><div class="action-icon">+</div><div><div style="font-weight:500;">Book New Shoot</div><div style="font-size:12px;color:#64748b;">Schedule photos and videos</div></div></div>
+                <div class="action-item" onclick="showSection('tracking')"><div class="action-icon">▲</div><div><div style="font-weight:500;">Track Content</div><div style="font-size:12px;color:#64748b;">Monitor content progress</div></div></div>
+                <div class="action-item" onclick="showSection('copyryta')"><div class="action-icon">◇</div><div><div style="font-weight:500;">CopyRyta AI</div><div style="font-size:12px;color:#64748b;">AI copywriting tool</div></div></div>
+                <div class="action-item" onclick="showSection('amend')"><div class="action-icon">△</div><div><div style="font-weight:500;">Request Amendment</div><div style="font-size:12px;color:#64748b;">Make adjustments to your content</div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking -->
+      <div id="booking" class="section">
+        <div class="booking-container">
+          <div class="booking-header">
+            <h2 class="booking-title">Book Your Shoot</h2>
+            <p class="booking-description">Schedule your professional shoots. Choose your preferred date and time, and we'll handle the rest.</p>
+          </div>
+          <div class="booking-iframe-container">
+            <iframe src="https://app.acuityscheduling.com/schedule.php?owner=32946394&ref=embedded_csp" title="Schedule Appointment" class="booking-iframe" frameborder="0" allow="payment"></iframe>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gallery -->
+      <div id="gallery" class="section">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Your Photo Gallery</h2>
+            <p class="card-subtitle">View and download your completed photography projects</p>
+          </div>
+          <div class="card-content">
+            <div class="gallery-grid" id="galleryGrid">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CopyRyta -->
+      <div id="copyryta" class="section">
+        <div class="copyryta-container">
+          <h2 class="copyryta-title">CopyRyta AI</h2>
+          <p class="copyryta-description">Your AI copywriting assistant for property descriptions and video scripts written in seconds. Generate compelling, professional copy that helps your listings stand out and sell faster.</p>
+          <button onclick="openCopyryta()" class="copyryta-btn">Launch CopyRyta AI</button>
+        </div>
+      </div>
+
+      <!-- Tracking -->
+      <div id="tracking" class="section">
+        <div class="tracker-wrapper">
+          <h2 class="tracker-title">Track Your Content</h2>
+          <p class="tracker-subtitle">Stay updated on your property marketing progress with real-time tracking</p>
+          <div class="input-container">
+            <input type="text" id="trackingInput" placeholder="Enter your tracking code" oninput="this.value=this.value.toUpperCase()" />
+          </div>
+          <button class="track-button" onclick="trackBooking()">Track Progress</button>
+          <div class="result-container"><div id="result"></div></div>
+        </div>
+      </div>
+
+      <!-- Amend -->
+      <div id="amend" class="section">
+        <div class="form-container">
+          <div class="form-header">
+            <h2 class="form-title">Request an Amendment</h2>
+            <p class="form-subtitle">We're here to help get things just right for your property marketing</p>
+          </div>
+          <form id="amendForm">
+            <div class="form-group">
+              <label class="form-label">Your Name</label>
+              <input type="text" name="clientName" required class="form-input" placeholder="Enter your full name" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Your Email</label>
+              <input type="email" name="email" required class="form-input" placeholder="your.email@example.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tracking Code</label>
+              <input type="text" name="trackingCode" required pattern="^MK.*$" title="Tracking code must start with MK." class="form-input" placeholder="MK..." oninput="this.value=this.value.toUpperCase()" />
+              <div id="trackingStatus" class="tracking-status"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">What needs adjusting?</label>
+              <div class="checkbox-grid">
+                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Photos" /><span class="checkbox-label">Photos</span></label>
+                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Video" /><span class="checkbox-label">Video</span></label>
+                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Drone" /><span class="checkbox-label">Drone</span></label>
+                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Captions" /><span class="checkbox-label">Captions</span></label>
+                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Other" /><span class="checkbox-label">Other</span></label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Details / Notes</label>
+              <textarea name="amendDetails" required class="form-textarea" placeholder="Please describe the specific changes you'd like us to make..."></textarea>
             </div>
 
-            <!-- Booking Section -->
-            <div id="booking" class="section">
-                <div class="booking-container">
-                    <div class="booking-header">
-                        <h2 class="booking-title">Book Your Shoot</h2>
-                        <p class="booking-description">
-                            Schedule your professional shoots. Choose your preferred date and time, and we'll handle the rest.
-                        </p>
-                    </div>
-                    <div class="booking-iframe-container">
-                        <iframe 
-                            src="https://app.acuityscheduling.com/schedule.php?owner=32946394&ref=embedded_csp" 
-                            title="Schedule Appointment" 
-                            class="booking-iframe"
-                            frameBorder="0" 
-                            allow="payment">
-                        </iframe>
-                    </div>
-                </div>
+            <!-- File Upload -->
+            <div class="form-group">
+              <label class="form-label">Reference Files (Optional)</label>
+              <div class="file-upload-area" id="fileUploadArea">
+                <div class="file-upload-icon">+</div>
+                <div class="file-upload-text">Drag & drop files here</div>
+                <div class="file-upload-subtext">or click to browse • Max 50MB per file • Images, PDFs, Videos supported</div>
+                <button type="button" class="file-upload-button" id="browseButton">Choose Files</button>
+                <input type="file" id="fileInput" style="display:none;" multiple accept="image/*,video/*,.pdf,.doc,.docx,.txt" />
+              </div>
+              <div class="file-preview" id="filePreview"></div>
+              <div class="upload-progress" id="uploadProgress">
+                <div>Uploading files...</div>
+                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                <div id="progressText">0%</div>
+              </div>
             </div>
 
-            <!-- Gallery Section -->
-            <div id="gallery" class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Your Photo Gallery</h2>
-                        <p class="card-subtitle">View and download your completed photography projects</p>
-                    </div>
-                    <div class="card-content">
-                        <div class="gallery-grid" id="galleryGrid">
-                            <div class="gallery-item">
-                                <div class="gallery-image">📷</div>
-                                <div class="gallery-info">
-                                    <div class="gallery-title">Welcome to your gallery</div>
-                                    <div class="gallery-date">Your completed projects will appear here</div>
-                                    <span class="gallery-status status-processing">Coming Soon</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <button id="submitBtn" type="submit" class="submit-button">Submit Amendment Request</button>
+          </form>
+          <div id="responseMessage" class="response-message"></div>
+          <div class="info-box">
+            <h3>Free Amendment Policy</h3>
+            <p>Each project comes with <span class="highlight">up to two free amendment requests</span> within <span class="highlight">7 days of delivery</span> using your tracking code.</p>
+            <p>Our team typically completes all amendments within <span class="highlight">24 hours</span>, so you can get on with what matters — without delays.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings (finished) -->
+      <div id="settings" class="section">
+        <div class="settings-grid">
+          <div class="settings-section">
+            <div class="settings-title">Profile</div>
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input id="settingsName" class="form-input" placeholder="Your name" />
             </div>
-
-            <!-- CopyRyta AI Section -->
-            <div id="copyryta" class="section">
-                <div class="copyryta-container">
-                    <h2 class="copyryta-title">CopyRyta AI</h2>
-                    <p class="copyryta-description">
-                        Your AI copywriting assistant for property descriptions and video scripts written in seconds. 
-                        Generate compelling, professional copy that helps your listings stand out and sell faster.
-                    </p>
-                    <button onclick="openCopyryta()" class="copyryta-btn">Launch CopyRyta AI</button>
-                </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input id="settingsEmail" type="email" class="form-input" placeholder="your@email.com" />
             </div>
+            <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+          </div>
 
-            <!-- Content Tracking Section -->
-            <div id="tracking" class="section">
-                <div class="tracker-wrapper">
-                    <h2 class="tracker-title">Track Your Content</h2>
-                    <p class="tracker-subtitle">Stay updated on your property marketing progress with real-time tracking</p>
-
-                    <div class="input-container">
-                        <input type="text" id="trackingInput" placeholder="Enter your tracking code" />
-                    </div>
-                  
-                    <button class="track-button" onclick="trackBooking()">
-                        🔍 Track Progress
-                    </button>
-
-                    <div class="result-container">
-                        <div id="result"></div>
-                    </div>
-                </div>
+          <div class="settings-section">
+            <div class="settings-title">Integrations</div>
+            <div class="form-group">
+              <label class="form-label">Tracking API URL</label>
+              <input id="settingsTrackingApi" class="form-input" placeholder="https://example.com/api/track" />
             </div>
+            <div class="form-group">
+              <label class="form-label">Amend API URL</label>
+              <input id="settingsAmendApi" class="form-input" placeholder="https://markeb-amend-api.vercel.app/api/amend" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Upload API URL (optional)</label>
+              <input id="settingsUploadApi" class="form-input" placeholder="https://example.com/api/upload" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Acuity Metrics API URL</label>
+              <input id="settingsAcuityApi" class="form-input" placeholder="https://yourdomain.com/api/get-appointments" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Projects API URL (Airtable)</label>
+              <input id="settingsProjectsApi" class="form-input" placeholder="https://yourdomain.com/api/get-projects" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Auth API URL (Netlify)</label>
+              <input id="settingsAuthApi" class="form-input" placeholder="https://yourdomain.netlify.app/.netlify/functions/auth" />
+            </div>
+            <button class="btn btn-primary" onclick="saveIntegrations()">Save Integrations</button>
+            <p id="integrationHint" style="margin-top:10px;color:#64748b;font-size:13px;">Hint: You can paste your Vercel endpoints here. They persist in this browser.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-            <!-- Request Amendment Section -->
-            <div id="amend" class="section">
-                <div class="form-container">
-                    <div class="form-header">
-                        <h2 class="form-title">🛠️ Request an Amendment</h2>
-                        <p class="form-subtitle">We're here to help get things just right for your property marketing</p>
-                    </div>
+  <script>
+    // ===== Config (persisted) =====
+    const cfg = {
+      get TRACKING_API_URL() { return localStorage.getItem('tracking_api_url') || ''; },
+      set TRACKING_API_URL(v) { localStorage.setItem('tracking_api_url', v || ''); },
+      get AMEND_API_URL() { return localStorage.getItem('amend_api_url') || 'https://markeb-amend-api.vercel.app/api/amend'; },
+      set AMEND_API_URL(v) { localStorage.setItem('amend_api_url', v || ''); },
+      get UPLOAD_API_URL() { return localStorage.getItem('upload_api_url') || ''; },
+      set UPLOAD_API_URL(v) { localStorage.setItem('upload_api_url', v || ''); },
+      get ACUITY_API_URL() { return localStorage.getItem('acuity_api_url') || ''; },
+      set ACUITY_API_URL(v) { localStorage.setItem('acuity_api_url', v || ''); },
+      get PROJECTS_API_URL() { return localStorage.getItem('projects_api_url') || ''; },
+      set PROJECTS_API_URL(v) { localStorage.setItem('projects_api_url', v || ''); },
+      get AUTH_API_URL() { return localStorage.getItem('auth_api_url') || ''; },
+      set AUTH_API_URL(v) { localStorage.setItem('auth_api_url', v || ''); }
+    };
 
-                    <form id="amendForm">
-                        <div class="form-group">
-                            <label class="form-label">Your Name</label>
-                            <input type="text" name="clientName" required class="form-input" placeholder="Enter your full name"/>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Your Email</label>
-                            <input type="email" name="email" required class="form-input" placeholder="your.email@example.com"/>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Tracking Code</label>
-                            <input type="text" name="trackingCode" required pattern="^MK.*$" title="Tracking code must start with MK." class="form-input" placeholder="MK..." oninput="this.value=this.value.toUpperCase()"/>
-                            <div id="trackingStatus" class="tracking-status"></div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">What needs adjusting?</label>
-                            <div class="checkbox-grid">
-                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Photos"/><span class="checkbox-label">📷 Photos</span></label>
-                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Video"/><span class="checkbox-label">🎥 Video</span></label>
-                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Drone"/><span class="checkbox-label">🚁 Drone</span></label>
-                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Captions"/><span class="checkbox-label">📝 Captions</span></label>
-                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Other"/><span class="checkbox-label">⚙️ Other</span></label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Details / Notes</label>
-                            <textarea name="amendDetails" required class="form-textarea" placeholder="Please describe the specific changes you'd like us to make..."></textarea>
-                        </div>
+    // ===== Responsive Nav =====
+    function toggleSidebar(){ document.querySelector('.sidebar').classList.toggle('open'); document.querySelector('.mobile-overlay').classList.toggle('active'); }
+    function closeSidebar(){ document.querySelector('.sidebar').classList.remove('open'); document.querySelector('.mobile-overlay').classList.remove('active'); }
+    function navClick(e){ const t=e.currentTarget; const id=t.dataset.target; document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active')); t.classList.add('active'); showSection(id); closeSidebar(); }
+    function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); const title = ({dashboard:'Dashboard', booking:'Book a Shoot', gallery:'Gallery', copyryta:'CopyRyta AI', tracking:'Content Tracking', amend:'Request Amendment', settings:'Settings'})[id] || 'Markeb Portal'; document.getElementById('pageTitle').textContent = title; document.getElementById('pageSubtitle').textContent = ({dashboard:"Here's what's happening with your projects", booking:'Choose a slot that suits you', gallery:'Your completed projects', copyryta:'AI copy that sells listings', tracking:'Live status for each job', amend:'Tell us what to tweak', settings:'Make it yours'})[id] || ''; }
 
-                        <!-- File Upload Section -->
-                        <div class="form-group">
-                            <label class="form-label">Reference Files (Optional)</label>
-                            <div class="file-upload-area" id="fileUploadArea">
-                                <div class="file-upload-icon">📎</div>
-                                <div class="file-upload-text">Drag & drop files here</div>
-                                <div class="file-upload-subtext">or click to browse • Max 50MB per file • Images, PDFs, Videos supported</div>
-                                <button type="button" class="file-upload-button" id="browseButton">Choose Files</button>
-                                <input type="file" id="fileInput" style="display: none;" multiple accept="image/*,video/*,.pdf,.doc,.docx,.txt">
-                            </div>
-                            <div class="file-preview" id="filePreview"></div>
-                            <div class="upload-progress" id="uploadProgress">
-                                <div>Uploading files...</div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" id="progressFill"></div>
-                                </div>
-                                <div id="progressText">0%</div>
-                            </div>
-                        </div>
+    // ===== User header (demo/local) =====
+    function loadProfile(){
+      // Prefer authenticated user when available
+      let user = {};
+      try{ user = JSON.parse(localStorage.getItem('session_user')||'{}'); }catch{}
+      const name = user.name || localStorage.getItem('user_name') || 'Markeb Client';
+      const email = user.email || localStorage.getItem('user_email') || 'client@markebmedia.com';
+      document.getElementById('userName').textContent = name;
+      document.getElementById('userEmail').textContent = email;
+      document.getElementById('userAvatar').textContent = (name[0]||'M').toUpperCase();
+      document.getElementById('settingsName').value = name;
+      document.getElementById('settingsEmail').value = email;
+      document.getElementById('settingsTrackingApi').value = cfg.TRACKING_API_URL;
+      document.getElementById('settingsAmendApi').value = cfg.AMEND_API_URL;
+      document.getElementById('settingsUploadApi').value = cfg.UPLOAD_API_URL;
+      document.getElementById('settingsAcuityApi').value = cfg.ACUITY_API_URL;
+      document.getElementById('settingsProjectsApi').value = cfg.PROJECTS_API_URL;
+      document.getElementById('settingsAuthApi').value = cfg.AUTH_API_URL;
+      const btn = document.getElementById('authBtn');
+      if(localStorage.getItem('session_token')){ btn.textContent='Sign out'; btn.onclick = logoutUser; } else { btn.textContent='Sign in'; btn.onclick = openAuthModal; }
+    }
+    function saveProfile(){ const name = document.getElementById('settingsName').value.trim(); const email = document.getElementById('settingsEmail').value.trim(); if(!name || !email){ alert('Please enter both name and email'); return; } localStorage.setItem('user_name', name); localStorage.setItem('user_email', email); loadProfile(); loadMetrics(); loadProjects(); loadProjects(); alert('Profile saved'); }
+    function saveIntegrations(){ cfg.TRACKING_API_URL = document.getElementById('settingsTrackingApi').value.trim(); cfg.AMEND_API_URL = document.getElementById('settingsAmendApi').value.trim() || 'https://markeb-amend-api.vercel.app/api/amend'; cfg.UPLOAD_API_URL = document.getElementById('settingsUploadApi').value.trim(); cfg.ACUITY_API_URL = document.getElementById('settingsAcuityApi').value.trim(); cfg.PROJECTS_API_URL = document.getElementById('settingsProjectsApi').value.trim(); cfg.AUTH_API_URL = document.getElementById('settingsAuthApi').value.trim(); loadMetrics(); loadProjects(); alert('Integration settings saved'); }
 
-                        <button id="submitBtn" type="submit" class="submit-button">Submit Amendment Request</button>
-                    </form>
-                    <div id="responseMessage" class="response-message" style="display:none;"></div>
-                    <div class="info-box">
-                        <h3>Free Amendment Policy</h3>
-                        <p>Each project comes with <span class="highlight">up to two free amendment requests</span> within <span class="highlight">7 days of delivery</span> using your tracking code.</p>
-                        <p>Our team typically completes all amendments within <span class="highlight">24 hours</span>, so you can get on with what matters — without delays.</p>
+    // ===== Support / Logout =====
+    function contactSupport(){ window.location.href = 'mailto:support@markebmedia.com?subject=Portal%20support'; }
+    function logoutUser(){ alert('For now, this just clears local session data.'); localStorage.clear(); loadProfile(); loadMetrics(); }
+
+    // ===== Gallery (placeholder) =====
+    const galleryGrid = () => {
+      const el = document.getElementById('galleryGrid');
+      if(!el) return;
+      el.innerHTML = '';
+      const items = JSON.parse(localStorage.getItem('gallery_items') || '[]');
+      if(items.length === 0){
+        const stub = document.createElement('div');
+        stub.className='gallery-item';
+        stub.innerHTML = `<div class="gallery-image">IMG</div>
+          <div class="gallery-info">
+            <div class="gallery-title">Welcome to your gallery</div>
+            <div class="gallery-date">Your completed projects will appear here</div>
+            <span class="gallery-status status-processing">Coming Soon</span>
+          </div>`;
+        el.appendChild(stub);
+      } else {
+        items.forEach(i=>{
+          const card = document.createElement('div');
+          card.className='gallery-item';
+          card.innerHTML = `<div class="gallery-image">IMG</div>
+            <div class="gallery-info">
+              <div class="gallery-title">${i.title}</div>
+              <div class="gallery-date">${i.date}</div>
+              <span class="gallery-status ${i.status==='Completed'?'status-completed':'status-processing'}">${i.status}</span>
+            </div>`;
+          el.appendChild(card);
+        });
+      }
+    };
+
+    // ===== Metrics (Acuity) =====
+    async function loadMetrics(){
+      const email = localStorage.getItem('user_email') || '';
+      const fmtGBP = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
+      const set = (id, val)=>{ const el = document.getElementById(id); if(el) el.textContent = val; };
+      set('totalBookings','0'); set('totalSpending', fmtGBP.format(0));
+      if(!cfg.ACUITY_API_URL || !email) return;
+      try{
+        const res = await fetch(cfg.ACUITY_API_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ userEmail: email }) });
+        if(!res.ok) throw new Error('Metrics API failed');
+        const data = await res.json();
+        const totalBookings = data.totalBookings || (data.appointments?.length||0);
+        const totalInvestment = (data.totalInvestment!=null) ? Number(data.totalInvestment) : (data.appointments||[]).reduce((s,a)=> s + (a.price? a.price/100 : 0), 0);
+        const completedFromAcuity = (data.appointments||[]).filter(a=> (a.status||'').toLowerCase()==='completed').length;
+        set('totalBookings', String(totalBookings));
+        set('totalSpending', fmtGBP.format(totalInvestment));
+        // Recent activity
+        const list = document.getElementById('activityList');
+        if(list && Array.isArray(data.appointments)){
+          list.innerHTML = '';
+          data.appointments.slice(0,5).forEach(apt=>{
+            const when = apt.datetime || apt.time || apt.date || apt.createdAt || '';
+            const title = apt.type || apt.appointmentType || 'Appointment';
+            const node = document.createElement('div');
+            node.className = 'activity-item';
+            node.innerHTML = `<div class="activity-icon">■</div>
+              <div class="activity-content">
+                <div class="activity-title">${title}</div>
+                <div class="activity-time">${when}</div>
+              </div>`;
+            list.appendChild(node);
+          });
+        }
+        // Stash a fallback completed count until Airtable loads
+        window._completedFromAcuity = completedFromAcuity;
+      } catch(err){ console.error(err); }
+    }
+
+    // ===== Projects (Airtable) =====
+    async function loadProjects(){
+      const email = localStorage.getItem('user_email') || '';
+      const set = (id, val)=>{ const el = document.getElementById(id); if(el) el.textContent = val; };
+      if(!cfg.PROJECTS_API_URL || !email){
+        if(typeof window._completedFromAcuity === 'number') set('completedProjects', String(window._completedFromAcuity));
+        return;
+      }
+      try{
+        const res = await fetch(cfg.PROJECTS_API_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ userEmail: email }) });
+        if(!res.ok) throw new Error('Projects API failed');
+        const data = await res.json();
+        const completed = Number(data.completedProjects || 0);
+        set('completedProjects', String(completed));
+        // Populate gallery from Airtable records
+        if(Array.isArray(data.projects)){
+          const el = document.getElementById('galleryGrid');
+          if(el){
+            el.innerHTML = '';
+            if(data.projects.length === 0){
+              const stub = document.createElement('div');
+              stub.className='gallery-item';
+              stub.innerHTML = `<div class="gallery-image">IMG</div>
+                <div class="gallery-info">
+                  <div class="gallery-title">No projects yet</div>
+                  <div class="gallery-date">Your completed projects will appear here</div>
+                  <span class="gallery-status status-processing">Coming Soon</span>
+                </div>`;
+              el.appendChild(stub);
+            } else {
+              data.projects.forEach(rec=>{
+                const f = rec.fields || {}; 
+                const title = f['Project Address'] || f['Title'] || 'Property';
+                const date = f['Shoot Date'] || f['Created'] || '';
+                const st = f['Status'] || '';
+                const statusClass = (st==='Ready for Delivery'||st==='Delivered') ? 'status-completed' : 'status-processing';
+                const card = document.createElement('div');
+                card.className='gallery-item';
+                card.innerHTML = `<div class="gallery-image">IMG</div>
+                  <div class="gallery-info">
+                    <div class="gallery-title">${title}</div>
+                    <div class="gallery-date">${date}</div>
+                    <span class="gallery-status ${statusClass}">${st||'In progress'}</span>
+                  </div>`;
+                el.appendChild(card);
+              });
+            }
+          }
+        }
+      } catch(err){ console.error(err); }
+    }
+
+    // ===== Tracking =====
+    async function trackBooking(){
+      const code = (document.getElementById('trackingInput').value || '').trim().toUpperCase();
+      const result = document.getElementById('result');
+      if(!code){ result.innerHTML = `<div class="warning-message">Please enter your tracking code.</div>`; return; }
+      result.innerHTML = `<div class="spinner"></div><div style="text-align:center;margin-top:10px;">Checking status for <strong>${code}</strong>...</div>`;
+      try{
+        let payloadData;
+        if(cfg.TRACKING_API_URL){
+          const res = await fetch(cfg.TRACKING_API_URL + (cfg.TRACKING_API_URL.includes('?')?'&':'?') + new URLSearchParams({ code }), { method:'GET' });
+          if(!res.ok) throw new Error('Tracking API error');
+          payloadData = await res.json();
+        } else {
+          // Fallback demo data
+          await new Promise(r=>setTimeout(r,800));
+          payloadData = {
+            code,
+            projectAddress: '123 Meadow Lane, Sheffield',
+            client: localStorage.getItem('user_name') || 'Markeb Client',
+            package: 'Photography + Drone',
+            status: 'Editing', // Drafted | Editing | QC | Ready
+            steps: ['Drafted','Editing','QC','Ready'],
+            currentStepIndex: 1,
+            deadline: new Date(Date.now()+36*3600*1000).toISOString(),
+            deliveryLink: ''
+          };
+        }
+        renderTracking(payloadData);
+      }catch(err){
+        console.error(err);
+        result.innerHTML = `<div class="error-message">We couldn't retrieve your status right now. Please try again or contact support.</div>`;
+      }
+    }
+
+    function renderTracking(data){
+      const { code, projectAddress, client, package:pkg, status, steps = ['Drafted','Editing','QC','Ready'], currentStepIndex = 0, deadline, deliveryLink } = data;
+      const linePercent = steps.length>1 ? (currentStepIndex/(steps.length-1))*80 + 10 : 10; // keep line within 10%-90%
+      const progressDots = steps.map((s,idx)=>`
+        <div class="progress-step ${idx<=currentStepIndex?'active':''}">
+          <div class="icon">${idx+1}</div>
+          <div class="label">${s}</div>
+        </div>`).join('');
+      const dl = deliveryLink ? `<div class="delivery-link">Your files are ready: <a href="${deliveryLink}" target="_blank" rel="noopener">Open delivery folder</a></div>` : '';
+      const deadlineHtml = deadline ? `<div class="deadline-alert">Estimated delivery by <strong>${new Date(deadline).toLocaleString()}</strong></div>` : '';
+
+      document.getElementById('result').innerHTML = `
+        <div class="info-grid">
+          <div class="info-item"><strong>Tracking Code:</strong><br>${code}</div>
+          <div class="info-item"><strong>Address:</strong><br>${projectAddress || '—'}</div>
+          <div class="info-item"><strong>Client:</strong><br>${client || '—'}</div>
+          <div class="info-item"><strong>Package:</strong><br>${pkg || '—'}</div>
+        </div>
+        <div class="progress-container">
+          <div class="progress-line" style="width:${linePercent}%"></div>
+          ${progressDots}
+        </div>
+        <div class="info-grid">
+          <div class="info-item"><strong>Status:</strong><br>${status || steps[currentStepIndex] || '—'}</div>
+          <div class="info-item"><strong>Step:</strong><br>${currentStepIndex+1} of ${steps.length}</div>
+        </div>
+        ${deadlineHtml}
+        ${dl}
+        <div class="track-another"><a href="#" onclick="document.getElementById('trackingInput').value=''; document.getElementById('result').innerHTML=''; return false;">Track another code</a></div>
+      `;
+    }
+
+    // ===== Amendment form =====
+    const fileState = { files: [] };
+
+    function setupFileUpload(){
+      const area = document.getElementById('fileUploadArea');
+      const input = document.getElementById('fileInput');
+      const browse = document.getElementById('browseButton');
+      const preview = document.getElementById('filePreview');
+
+      const addFiles = (list)=>{
+        for(const f of list){
+          if(f.size > 50*1024*1024){ alert(`${f.name} is over 50MB and was skipped.`); continue; }
+          fileState.files.push(f);
+        }
+        renderPreview();
+      };
+
+      area.addEventListener('dragover', e=>{ e.preventDefault(); area.classList.add('dragover'); });
+      area.addEventListener('dragleave', ()=> area.classList.remove('dragover'));
+      area.addEventListener('drop', e=>{ e.preventDefault(); area.classList.remove('dragover'); if(e.dataTransfer?.files?.length) addFiles(e.dataTransfer.files); });
+      area.addEventListener('click', ()=> input.click());
+      browse.addEventListener('click', ()=> input.click());
+      input.addEventListener('change', ()=> addFiles(input.files));
+
+      function renderPreview(){
+        preview.innerHTML='';
+        if(fileState.files.length===0){ preview.style.display='none'; return; }
+        preview.style.display='block';
+        fileState.files.forEach((f,idx)=>{
+          const item = document.createElement('div');
+          item.className='file-item';
+          item.innerHTML = `<div class="file-info"><div class="file-icon">📎</div><div class="file-details"><div class="file-name">${f.name}</div><div class="file-size">${(f.size/1024/1024).toFixed(2)} MB</div></div></div><button type="button" class="file-remove">Remove</button>`;
+          item.querySelector('.file-remove').addEventListener('click', ()=>{ fileState.files.splice(idx,1); renderPreview(); });
+          preview.appendChild(item);
+        });
+      }
+    }
+
+    async function uploadFilesIfAny(trackingCode){
+      const progress = document.getElementById('uploadProgress');
+      const fill = document.getElementById('progressFill');
+      const text = document.getElementById('progressText');
+      if(fileState.files.length===0) return [];
+      progress.style.display='block';
+
+      // If you have an upload API, use it; otherwise, simulate
+      if(cfg.UPLOAD_API_URL){
+        const urls = [];
+        let done=0;
+        for(const f of fileState.files){
+          const fd = new FormData();
+          fd.append('file', f);
+          fd.append('trackingCode', trackingCode);
+          const res = await fetch(cfg.UPLOAD_API_URL, { method:'POST', body: fd });
+          if(!res.ok) throw new Error('Upload failed');
+          const j = await res.json();
+          urls.push(j.url || j.link || '');
+          done++;
+          const pct = Math.round((done/fileState.files.length)*100);
+          fill.style.width = pct+'%'; text.textContent = pct+'%';
+        }
+        return urls;
+      } else {
+        // Simulate progress
+        for(let i=0;i<=100;i+=10){ await new Promise(r=>setTimeout(r,80)); fill.style.width=i+'%'; text.textContent=i+'%'; }
+        return fileState.files.map(f=>`reference:${encodeURIComponent(f.name)}`);
+      }
+    }
+
+    document.getElementById('amendForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      const msg = document.getElementById('responseMessage');
+      msg.className='response-message'; msg.style.display='none'; msg.textContent='';
+
+      const form = e.currentTarget;
+      const clientName = form.clientName.value.trim();
+      const email = form.email.value.trim();
+      const trackingCode = form.trackingCode.value.trim().toUpperCase();
+      const amendDetails = form.amendDetails.value.trim();
+      const mediaType = Array.from(form.querySelectorAll('input[name="mediaType"]:checked')).map(i=>i.value);
+
+      if(mediaType.length===0){ msg.textContent='Please select at least one media type.'; msg.classList.add('error'); return; }
+
+      btn.disabled = true; btn.textContent='Submitting...';
+      try{
+        const uploadLinks = await uploadFilesIfAny(trackingCode);
+        const payload = { customerName: clientName, email, trackingCode, amendmentType: mediaType, amendmentDescription: amendDetails + (uploadLinks.length?`\n\nReferences:\n${uploadLinks.join('\n')}`:'') };
+
+        if(!cfg.AMEND_API_URL){ throw new Error('AMEND_API_URL not configured'); }
+        const res = await fetch(cfg.AMEND_API_URL, { method:'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+        if(!res.ok){ const t = await res.text(); throw new Error('Server error: '+t); }
+        const j = await res.json();
+        msg.textContent = 'Amendment request submitted successfully. Reference: ' + (j.id || 'received');
+        msg.classList.add('success');
+        form.reset();
+        fileState.files = []; document.getElementById('filePreview').style.display='none'; document.getElementById('uploadProgress').style.display='none'; document.getElementById('progressFill').style.width='0%'; document.getElementById('progressText').textContent='0%';
+      }catch(err){
+        console.error(err);
+        msg.textContent = err.message || 'Something went wrong.';
+        msg.classList.add('error');
+      } finally {
+        btn.disabled = false; btn.textContent='Submit Amendment Request';
+      }
+    });
+
+    // ===== CopyRyta launcher =====
+    function openCopyryta(){ window.open('https://markebmedia.com/copyryta', '_blank'); }
+
+    // ===== Auth helpers =====
+    function openAuthModal(){ document.getElementById('authModal').style.display='flex'; document.getElementById('authError').style.display='none'; }
+    function closeAuthModal(){ document.getElementById('authModal').style.display='none'; }
+    function switchAuthTab(which){ document.getElementById('authError').style.display='none'; const login = document.getElementById('loginForm'); const reg = document.getElementById('registerForm'); if(which==='login'){ login.style.display='block'; reg.style.display='none'; } else { login.style.display='none'; reg.style.display='block'; } }
+
+    async function authLogin(email, password){
+      if(!cfg.AUTH_API_URL) throw new Error('Auth API not configured');
+      const res = await fetch(`${cfg.AUTH_API_URL}?action=login`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email, password }) });
+      const j = await res.json();
+      if(!res.ok || !j.success) throw new Error(j.message || 'Login failed');
+      localStorage.setItem('session_token', j.token);
+      localStorage.setItem('session_user', JSON.stringify(j.user));
+      // Sync profile fields too
+      localStorage.setItem('user_name', j.user.name || '');
+      localStorage.setItem('user_email', j.user.email || '');
+      return j.user;
+    }
+
+    async function authRegister(name, company, email, password){
+      if(!cfg.AUTH_API_URL) throw new Error('Auth API not configured');
+      const res = await fetch(`${cfg.AUTH_API_URL}?action=register`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, company, email, password }) });
+      const j = await res.json();
+      if(!res.ok || !j.success) throw new Error(j.message || 'Registration failed');
+      localStorage.setItem('session_token', j.token);
+      localStorage.setItem('session_user', JSON.stringify(j.user));
+      localStorage.setItem('user_name', j.user.name || '');
+      localStorage.setItem('user_email', j.user.email || '');
+      return j.user;
+    }
+
+    async function authValidate(){
+      const token = localStorage.getItem('session_token');
+      if(!token || !cfg.AUTH_API_URL) return false;
+      try{
+        const res = await fetch(`${cfg.AUTH_API_URL}?action=validateToken`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ token }) });
+        const j = await res.json();
+        if(res.ok && j.success && j.valid){
+          localStorage.setItem('session_user', JSON.stringify(j.user));
+          localStorage.setItem('user_name', j.user.name || '');
+          localStorage.setItem('user_email', j.user.email || '');
+          return true;
+        }
+      }catch(e){ console.warn('validate error', e); }
+      return false;
+    }
+
+    // Hook forms
+    document.addEventListener('submit', async (e)=>{
+      if(e.target && e.target.id==='loginForm'){
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const err = document.getElementById('authError'); err.style.display='none';
+        try{ await authLogin(email, password); closeAuthModal(); loadProfile(); loadMetrics(); loadProjects(); document.getElementById('authBtn').textContent='Sign out'; document.getElementById('authBtn').onclick = logoutUser; }
+        catch(ex){ err.textContent = ex.message || 'Login failed'; err.style.display='block'; }
+      }
+      if(e.target && e.target.id==='registerForm'){
+        e.preventDefault();
+        const name = document.getElementById('regName').value.trim();
+        const company = document.getElementById('regCompany').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const err = document.getElementById('authError'); err.style.display='none';
+        try{ await authRegister(name, company, email, password); closeAuthModal(); loadProfile(); loadMetrics(); loadProjects(); document.getElementById('authBtn').textContent='Sign out'; document.getElementById('authBtn').onclick = logoutUser; switchAuthTab('login'); }
+        catch(ex){ err.textContent = ex.message || 'Registration failed'; err.style.display='block'; }
+      }
+    });
+
+    // ===== Init =====
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      const valid = await authValidate();
+      loadProfile();
+      galleryGrid();
+      setupFileUpload();
+      loadMetrics();
+      loadProjects();
+    });
+  </script>
+  <!-- Auth Modal -->
+  <div id="authModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:200; align-items:center; justify-content:center;">
+    <div style="background:#fff; border:1px solid #e5e7eb; border-radius:12px; width:95%; max-width:480px; padding:24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="font-size:18px; font-weight:700;">Account</h3>
+        <button class="btn" onclick="closeAuthModal()">✕</button>
+      </div>
+      <div style="display:flex; gap:12px; margin-bottom:16px;">
+        <button class="btn btn-primary" onclick="switchAuthTab('login')" id="tabLogin">Login</button>
+        <button class="btn" onclick="switchAuthTab('register')" id="tabRegister">Register</button>
+      </div>
+      <div id="authError" style="display:none; margin-bottom:10px; color:#b91c1c; font-weight:600;"></div>
+      <form id="loginForm">
+        <div class="form-group"><label class="form-label">Email</label><input id="loginEmail" type="email" class="form-input" placeholder="you@example.com"></div>
+        <div class="form-group"><label class="form-label">Password</label><input id="loginPassword" type="password" class="form-input" placeholder="••••••••"></div>
+        <button type="submit" class="submit-button">Sign in</button>
+      </form>
+      <form id="registerForm" style="display:none;">
+        <div class="form-group"><label class="form-label">Name</label><input id="regName" class="form-input" placeholder="Your name"></div>
+        <div class="form-group"><label class="form-label">Company</label><input id="regCompany" class="form-input" placeholder="Your company"></div>
+        <div class="form-group"><label class="form-label">Email</label><input id="regEmail" type="email" class="form-input" placeholder="you@example.com"></div>
+        <div class="form-group"><label class="form-label">Password</label><input id="regPassword" type="password" class="form-input" placeholder="At least 8 characters"></div>
+        <button type="submit" class="submit-button">Create account</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
