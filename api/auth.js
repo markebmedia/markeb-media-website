@@ -14,20 +14,8 @@ export default async function handler(req, res) {
     });
     console.log('========================');
 
-    // Enable CORS for all domains in development, restrict in production
-    const allowedOrigins = [
-        'http://localhost:3000',
-        'http://localhost:8080',
-        'https://markeb-media-website.vercel.app',
-        'https://markebmedia.com',
-        'https://www.markebmedia.com'
-    ];
-    
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin) || process.env.NODE_ENV === 'development') {
-        res.setHeader('Access-Control-Allow-Origin', origin || '*');
-    }
-    
+    // Enable CORS
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -74,16 +62,15 @@ export default async function handler(req, res) {
 }
 
 // Hash password securely
-async function hashPassword(password) {
-    const crypto = await import('crypto');
-    // Add a salt for better security
+function hashPassword(password) {
+    const crypto = require('crypto');
     const salt = 'markeb_media_salt_2024';
     return crypto.createHash('sha256').update(password + salt).digest('hex');
 }
 
 // Verify password
-async function verifyPassword(password, hash) {
-    const passwordHash = await hashPassword(password);
+function verifyPassword(password, hash) {
+    const passwordHash = hashPassword(password);
     return passwordHash === hash;
 }
 
@@ -141,7 +128,7 @@ async function handleLogin(req, res) {
         }
 
         // Verify password
-        const passwordValid = await verifyPassword(password, storedHash);
+        const passwordValid = verifyPassword(password, storedHash);
 
         if (!passwordValid) {
             return res.status(401).json({ 
@@ -243,7 +230,7 @@ async function handleRegister(req, res) {
         }
 
         // Hash password
-        const hashedPassword = await hashPassword(password);
+        const hashedPassword = hashPassword(password);
 
         // Create user in Airtable
         const createUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}`;
