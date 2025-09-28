@@ -7,11 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="website/assets/js/airtable.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: 'Poppins', sans-serif;
@@ -35,8 +31,9 @@
             border: 1px solid #f1f5f9;
         }
 
+        /* BLUE header */
         .login-header {
-            background: linear-gradient(135deg, #FF6B00, #FF8A33);
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: white;
             padding: 40px 30px 30px;
             text-align: center;
@@ -54,22 +51,10 @@
             border-radius: 20px 20px 0 0;
         }
 
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 10px;
-            letter-spacing: -0.5px;
-        }
+        .logo { font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.5px; }
+        .login-subtitle { opacity: 0.9; font-size: 1rem; margin-bottom: 20px; }
 
-        .login-subtitle {
-            opacity: 0.9;
-            font-size: 1rem;
-            margin-bottom: 20px;
-        }
-
-        .login-form {
-            padding: 40px 30px 30px;
-        }
+        .login-form { padding: 40px 30px 30px; }
 
         .tab-buttons {
             display: flex;
@@ -91,23 +76,15 @@
             color: #6b7280;
         }
 
+        /* BLUE active tab */
         .tab-button.active {
             background: white;
-            color: #FF6B00;
+            color: #3b82f6;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #1F2E3C;
-            font-size: 0.9rem;
-        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #1F2E3C; font-size: 0.9rem; }
 
         .form-group input {
             width: 100%;
@@ -120,16 +97,18 @@
             color: #1F2E3C;
         }
 
+        /* BLUE focus ring */
         .form-group input:focus {
             outline: none;
-            border-color: #FF6B00;
-            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
 
+        /* BLUE button */
         .login-button {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, #FF6B00, #FF8A33);
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: white;
             border: none;
             border-radius: 12px;
@@ -142,73 +121,23 @@
 
         .login-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.35);
         }
 
-        .login-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
+        .login-button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        .forgot-password {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+        /* BLUE links */
+        .forgot-password { text-align: center; margin-bottom: 20px; }
+        .forgot-password a { color: #3b82f6; text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+        .forgot-password a:hover { text-decoration: underline; }
 
-        .forgot-password a {
-            color: #FF6B00;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
+        .divider { text-align: center; margin: 30px 0; position: relative; color: #9ca3af; font-size: 0.9rem; }
+        .divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: #e5e7eb; }
+        .divider span { background: white; padding: 0 15px; }
 
-        .forgot-password a:hover {
-            text-decoration: underline;
-        }
-
-        .divider {
-            text-align: center;
-            margin: 30px 0;
-            position: relative;
-            color: #9ca3af;
-            font-size: 0.9rem;
-        }
-
-        .divider::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #e5e7eb;
-        }
-
-        .divider span {
-            background: white;
-            padding: 0 15px;
-        }
-
-        .back-to-landing {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .back-to-landing a {
-            color: #1F2E3C;
-            text-decoration: none;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            opacity: 0.7;
-        }
-
-        .back-to-landing a:hover {
-            color: #FF6B00;
-            opacity: 1;
-        }
+        .back-to-landing { text-align: center; margin-top: 20px; }
+        .back-to-landing a { color: #1F2E3C; text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px; opacity: 0.7; }
+        .back-to-landing a:hover { color: #3b82f6; opacity: 1; }
 
         .error-message {
             background: #fef2f2;
@@ -220,34 +149,14 @@
             display: none;
         }
 
-        .loading {
-            display: none;
-            text-align: center;
-            color: #1F2E3C;
-            margin-top: 10px;
-            opacity: 0.7;
-        }
-
-        .signup-form {
-            display: none;
-        }
+        .loading { display: none; text-align: center; color: #1F2E3C; margin-top: 10px; opacity: 0.7; }
+        .signup-form { display: none; }
 
         @media (max-width: 480px) {
-            .login-container {
-                margin: 10px;
-            }
-
-            .login-header {
-                padding: 30px 20px 20px;
-            }
-
-            .login-form {
-                padding: 30px 20px 20px;
-            }
-
-            .logo {
-                font-size: 1.5rem;
-            }
+            .login-container { margin: 10px; }
+            .login-header { padding: 30px 20px 20px; }
+            .login-form { padding: 30px 20px 20px; }
+            .logo { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -275,9 +184,7 @@
                     <label for="loginPassword">Password</label>
                     <input type="password" id="loginPassword" name="password" required>
                 </div>
-                <button type="submit" class="login-button" id="loginButton">
-                    Sign In to Dashboard
-                </button>
+                <button type="submit" class="login-button" id="loginButton">Sign In to Dashboard</button>
                 <div class="forgot-password">
                     <a href="#" onclick="handleForgotPassword()">Forgot your password?</a>
                 </div>
@@ -304,18 +211,12 @@
                     <label for="confirmPassword">Confirm Password</label>
                     <input type="password" id="confirmPassword" name="confirmPassword" required>
                 </div>
-                <button type="submit" class="login-button" id="signupButton">
-                    Create Account
-                </button>
+                <button type="submit" class="login-button" id="signupButton">Create Account</button>
             </form>
 
-            <div class="loading" id="loading">
-                Verifying your account...
-            </div>
+            <div class="loading" id="loading">Verifying your account...</div>
 
-            <div class="divider">
-                <span>or</span>
-            </div>
+            <div class="divider"><span>or</span></div>
 
             <div class="back-to-landing">
                 <a href="index.html">← Back to landing page</a>
@@ -324,14 +225,12 @@
     </div>
 
     <script>
-        // Check if user is already logged in on page load
+        // If already logged in, bounce to dashboard
         window.addEventListener('load', async function() {
             if (typeof AirtableAPI !== 'undefined') {
                 try {
                     const isLoggedIn = await AirtableAPI.isUserLoggedIn();
-                    if (isLoggedIn) {
-                        window.location.href = 'website/dashboard.html';
-                    }
+                    if (isLoggedIn) window.location.href = 'website/dashboard.html';
                 } catch (error) {
                     console.log('Authentication check failed:', error);
                 }
@@ -360,9 +259,7 @@
             errorDiv.style.display = 'block';
         }
 
-        function hideError() {
-            document.getElementById('errorMessage').style.display = 'none';
-        }
+        function hideError() { document.getElementById('errorMessage').style.display = 'none'; }
 
         function showLoading() {
             document.getElementById('loading').style.display = 'block';
@@ -392,8 +289,9 @@
 
             try {
                 const response = await AirtableAPI.authenticateUser(email, password);
-                
                 if (response.success) {
+                    // mark action for dashboard greeting
+                    localStorage.setItem('auth_action','login');
                     AirtableAPI.storeUserSession(response.token, email);
                     window.location.href = 'website/dashboard.html';
                 } else {
@@ -417,44 +315,19 @@
             const password = document.getElementById('signupPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
-            if (!AirtableAPI.validateRequired(name)) {
-                showError('Full name is required.');
-                return;
-            }
-
-            if (!AirtableAPI.validateEmail(email)) {
-                showError('Please enter a valid email address.');
-                return;
-            }
-
-            if (!AirtableAPI.validateRequired(company)) {
-                showError('Company name is required.');
-                return;
-            }
-
-            if (!AirtableAPI.validatePassword(password)) {
-                showError('Password must be at least 8 characters with letters and numbers.');
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                showError('Passwords do not match.');
-                return;
-            }
+            if (!AirtableAPI.validateRequired(name)) { showError('Full name is required.'); return; }
+            if (!AirtableAPI.validateEmail(email)) { showError('Please enter a valid email address.'); return; }
+            if (!AirtableAPI.validateRequired(company)) { showError('Company name is required.'); return; }
+            if (!AirtableAPI.validatePassword(password)) { showError('Password must be at least 8 characters with letters and numbers.'); return; }
+            if (password !== confirmPassword) { showError('Passwords do not match.'); return; }
 
             showLoading();
 
-            const userData = {
-                name: name,
-                email: email,
-                company: company,
-                password: password
-            };
-
             try {
-                const response = await AirtableAPI.createUser(userData);
-                
+                const response = await AirtableAPI.createUser({ name, email, company, password });
                 if (response.success) {
+                    // mark action for dashboard greeting
+                    localStorage.setItem('auth_action','signup');
                     AirtableAPI.storeUserSession(response.token, email);
                     window.location.href = 'website/dashboard.html';
                 } else {
@@ -470,16 +343,8 @@
 
         function handleForgotPassword() {
             const email = document.getElementById('loginEmail').value;
-            if (!email) {
-                showError('Please enter your email address first.');
-                return;
-            }
-            
-            if (!AirtableAPI.validateEmail(email)) {
-                showError('Please enter a valid email address.');
-                return;
-            }
-            
+            if (!email) { showError('Please enter your email address first.'); return; }
+            if (!AirtableAPI.validateEmail(email)) { showError('Please enter a valid email address.'); return; }
             alert('Password reset functionality will be implemented. For now, please contact support at admin@markebmedia.com');
         }
     </script>
