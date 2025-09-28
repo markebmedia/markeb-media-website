@@ -50,64 +50,24 @@
     </div>
 
     <script>
-        // Configuration - Replace with your actual credentials
-        const ACUITY_CONFIG = {
-            userId: 'YOUR_ACUITY_USER_ID', // Replace with your Acuity User ID
-            apiKey: 'YOUR_ACUITY_API_KEY', // Replace with your Acuity API Key
-            baseUrl: 'https://acuityscheduling.com/api/v1'
-        };
-
-        const AIRTABLE_CONFIG = {
-            apiKey: 'YOUR_AIRTABLE_API_KEY', // Replace with your Airtable API key
-            baseId: 'appVzPU0icwL8H6aP', // Your existing base ID
-            tableId: 'tblRgcv7M9dUU3YuL', // Your Active Bookings table ID
-            baseUrl: 'https://api.airtable.com/v0'
-        };
-
-        // Utility function to create Basic Auth header for Acuity
-        function createAcuityAuthHeader() {
-            const credentials = btoa(`${ACUITY_CONFIG.userId}:${ACUITY_CONFIG.apiKey}`);
-            return `Basic ${credentials}`;
-        }
-
-        // Function to get user's bookings from Acuity Scheduling
+        // Configuration - Replace with your actual credentials// Function to get user's bookings from Acuity via Netlify function
         async function getAcuityBookings(userEmail) {
             try {
-                // First, get all appointments from Acuity
-                const response = await fetch(`${ACUITY_CONFIG.baseUrl}/appointments`, {
-                    method: 'GET',
+                const response = await fetch('/.netlify/functions/acuity-data', {
+                    method: 'POST',
                     headers: {
-                        'Authorization': createAcuityAuthHeader(),
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    body: JSON.stringify({ userEmail })
                 });
-
-                if (!response.ok) {
-                    throw new Error(`Acuity API error: ${response.status}`);
-                }
-
-                const appointments = await response.json();
                 
-                // Filter appointments by user email
-                const userAppointments = appointments.filter(appointment => 
-                    appointment.email && appointment.email.toLowerCase() === userEmail.toLowerCase()
-                );
-
-                // Calculate metrics
-                const totalBookings = userAppointments.length;
-                const totalInvestment = userAppointments.reduce((sum, appointment) => {
-                    // Acuity stores price in cents, convert to dollars
-                    const price = appointment.price ? parseFloat(appointment.price) / 100 : 0;
-                    return sum + price;
-                }, 0);
-
-                return {
-                    totalBookings,
-                    totalInvestment,
-                    appointments: userAppointments
-                };
+                if (!response.ok) {
+                    throw new Error(`Function error: ${response.status}`);
+                }
+                
+                return await response.json();
             } catch (error) {
-                console.error('Error fetching Acuity bookings:', error);
+                console.error('Error fetching Acuity data:', error);
                 handleAPIError(error, 'Acuity');
                 return {
                     totalBookings: 0,
@@ -117,41 +77,24 @@
             }
         }
 
-        // Function to get completed projects from Airtable
+        // Function to get completed projects from Airtable via Netlify function
         async function getCompletedProjects(userEmail) {
             try {
-                // Use filterByFormula to find records with the user's email
-                const filterFormula = encodeURIComponent(`{Customer Email} = '${userEmail}'`);
-                const url = `${AIRTABLE_CONFIG.baseUrl}/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableId}?filterByFormula=${filterFormula}`;
-
-                const response = await fetch(url, {
-                    method: 'GET',
+                const response = await fetch('/.netlify/functions/airtable-data', {
+                    method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    body: JSON.stringify({ userEmail })
                 });
-
+                
                 if (!response.ok) {
-                    throw new Error(`Airtable API error: ${response.status}`);
+                    throw new Error(`Function error: ${response.status}`);
                 }
-
-                const data = await response.json();
-                const records = data.records || [];
-
-                // Count completed projects (Status = "Ready for Delivery" or "Delivered")
-                const completedProjects = records.filter(record => {
-                    const status = record.fields.Status;
-                    return status === 'Ready for Delivery' || status === 'Delivered';
-                });
-
-                return {
-                    completedProjects: completedProjects.length,
-                    totalProjects: records.length,
-                    projects: records
-                };
+                
+                return await response.json();
             } catch (error) {
-                console.error('Error fetching Airtable projects:', error);
+                console.error('Error fetching Airtable data:', error);
                 handleAPIError(error, 'Airtable');
                 return {
                     completedProjects: 0,
@@ -229,7 +172,7 @@
                 document.getElementById('totalSpending').textContent = '...';
                 document.getElementById('completedProjects').textContent = '...';
 
-                // Fetch data from both APIs
+                // Fetch data from both APIs via Netlify functions
                 const [acuityData, airtableData] = await Promise.all([
                     getAcuityBookings(currentUser.email),
                     getCompletedProjects(currentUser.email)
@@ -760,7 +703,7 @@
                     trackingCodeDeadline = null;
                     statusDiv.style.display = 'none';
                     submitBtn.disabled = false;
-                    submitBtn.textContent = '📤 Submit Amendment Request';
+                    submitBtn.textContent = 'Submit Amendment Request';
                     disableFormFields(false);
                     return;
                 }
@@ -777,7 +720,7 @@
                         isExpired = false;
                         statusDiv.style.display = 'none';
                         submitBtn.disabled = false;
-                        submitBtn.textContent = '📤 Submit Amendment Request';
+                        submitBtn.textContent = 'Submit Amendment Request';
                         disableFormFields(false);
                     }
                     return;
@@ -787,12 +730,12 @@
                 isExpired = false;
                 statusDiv.style.display = 'none';
                 submitBtn.disabled = false;
-                submitBtn.textContent = '📤 Submit Amendment Request';
+                submitBtn.textContent = 'Submit Amendment Request';
                 disableFormFields(false);
 
             } catch (err) {
                 statusDiv.className = 'tracking-status error';
-                statusDiv.textContent = '❌ Network error. Please try again.';
+                statusDiv.textContent = 'Network error. Please try again.';
             }
         }
 
@@ -942,7 +885,7 @@
             }
             
             btn.disabled = false;
-            btn.textContent = '📤 Submit Amendment Request';
+            btn.textContent = 'Submit Amendment Request';
             msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
@@ -2599,47 +2542,41 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-        <div class="logo">Markeb Media</div>
+        <div class="logo">
+    <img src="images/markeb-media-logo.png" alt="Markeb Media" style="height: 40px; width: auto;">
+</div>
         
         <nav>
             <div class="nav-item active" onclick="showSection('dashboard')">
-                <span class="nav-icon">■</span>
-                Dashboard
-            </div>
-            <div class="nav-item" onclick="showSection('booking')">
-                <span class="nav-icon">+</span>
-                Book Shoot
-            </div>
-            <div class="nav-item" onclick="showSection('gallery')">
-                <span class="nav-icon">□</span>
-                Gallery
-            </div>
-            <div class="nav-item" onclick="showSection('copyryta')">
-                <span class="nav-icon">◇</span>
-                CopyRyta AI
-            </div>
-            <div class="nav-item" onclick="showSection('tracking')">
-                <span class="nav-icon">▲</span>
-                Content Tracking
-            </div>
-            <div class="nav-item" onclick="showSection('amend')">
-                <span class="nav-icon">△</span>
-                Request Amendment
-            </div>
-            <div class="nav-item" onclick="showSection('settings')">
-                <span class="nav-icon">○</span>
-                Settings
-            </div>
-            <div class="nav-item" onclick="contactSupport()">
-                <span class="nav-icon">?</span>
-                Support
-            </div>
-            <div class="nav-item" onclick="logoutUser()" style="margin-top: 40px; color: #ef4444;">
-                <span class="nav-icon">←</span>
-                Logout
-            </div>
-        </nav>
-    </div>
+    Dashboard
+</div>
+          </div>
+<div class="nav-item" onclick="showSection('booking')">
+    Book Shoot
+</div>
+<div class="nav-item" onclick="showSection('gallery')">
+    Gallery
+</div>
+<div class="nav-item" onclick="showSection('copyryta')">
+    CopyRyta AI
+</div>
+<div class="nav-item" onclick="showSection('tracking')">
+    Content Tracking
+</div>
+<div class="nav-item" onclick="showSection('amend')">
+    Request Amendment
+</div>
+<div class="nav-item" onclick="showSection('settings')">
+    Settings
+</div>
+<div class="nav-item" onclick="contactSupport()">
+    Support
+</div>
+<div class="nav-item" onclick="logoutUser()" style="margin-top: 40px; color: #ef4444;">
+    Logout
+</div>
+</nav>
+</div>
 
     <!-- Main Content -->
     <div class="main-content">
@@ -2747,7 +2684,7 @@
                                     <div class="action-icon">▲</div>
                                     <div>
                                         <div style="font-weight: 500;">Track Content</div>
-                                        <div style="font-size: 12px; color: #64748b;">Monitor project progress</div>
+                                        <div style="font-size: 12px; color: #64748b;">Monitor content progress</div>
                                     </div>
                                 </div>
                                 
@@ -2755,7 +2692,7 @@
                                     <div class="action-icon">◇</div>
                                     <div>
                                         <div style="font-weight: 500;">CopyRyta AI</div>
-                                        <div style="font-size: 12px; color: #64748b;">AI property description tool</div>
+                                        <div style="font-size: 12px; color: #64748b;">AI copywriting tool</div>
                                     </div>
                                 </div>
                                 
@@ -2763,7 +2700,7 @@
                                     <div class="action-icon">△</div>
                                     <div>
                                         <div style="font-weight: 500;">Request Amendment</div>
-                                        <div style="font-size: 12px; color: #64748b;">Make adjustments to projects</div>
+                                        <div style="font-size: 12px; color: #64748b;">Make adjustments to your content</div>
                                     </div>
                                 </div>
                             </div>
@@ -2776,9 +2713,9 @@
             <div id="booking" class="section">
                 <div class="booking-container">
                     <div class="booking-header">
-                        <h2 class="booking-title">Book Your Photo Shoot</h2>
+                        <h2 class="booking-title">Book Your Shoot</h2>
                         <p class="booking-description">
-                            Schedule your professional property photography session. Choose your preferred date and time, and we'll handle the rest.
+                            Schedule your professional shoots. Choose your preferred date and time, and we'll handle the rest.
                         </p>
                     </div>
                     <div class="booking-iframe-container">
@@ -2830,7 +2767,7 @@
             <!-- Content Tracking Section -->
             <div id="tracking" class="section">
                 <div class="tracker-wrapper">
-                    <h2 class="tracker-title">📱 Track Your Content</h2>
+                    <h2 class="tracker-title">Track Your Content</h2>
                     <p class="tracker-subtitle">Stay updated on your property marketing progress with real-time tracking</p>
 
                     <div class="input-container">
@@ -2904,10 +2841,10 @@
                             </div>
                         </div>
 
-                        <button id="submitBtn" type="submit" class="submit-button">📤 Submit Amendment Request</button>
+                        <button id="submitBtn" type="submit" class="submit-button">Submit Amendment Request</button>
                     </form>
                     <div id="responseMessage" class="response-message" style="display:none;"></div>
                     <div class="info-box">
-                        <h3>💎 Free Amendment Policy</h3>
+                        <h3>Free Amendment Policy</h3>
                         <p>Each project comes with <span class="highlight">up to two free amendment requests</span> within <span class="highlight">7 days of delivery</span> using your tracking code.</p>
                         <p>Our team typically completes all amendments within <span class="highlight">24 hours</span>, so you can get on with what matters — without delays.</p>
