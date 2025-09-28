@@ -1,91 +1,41 @@
-// Direct Airtable integration for immediate functionality
-// website/assets/js/airtable.js (frontend safe version)
-const AIRTABLE_CONFIG = {
-  baseId: 'appVzPU0icwL8H6aP',
-  tableName: 'Markeb Media Users'
-  // ❌ no apiKey here
-};
+// website/assets/js/airtable.js - Frontend API client
 
 // Create new user account
 async function createUser(userData) {
     try {
-        // Check if user already exists
-        const filterFormula = `{Email} = "${userData.email}"`;
-        const checkUrl = `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}?filterByFormula=${encodeURIComponent(filterFormula)}`;
-        
-        const checkResponse = await fetch(checkUrl, {
-            headers: {
-                'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`
-            }
-        });
-        
-        const checkResult = await checkResponse.json();
-        
-        if (checkResult.records && checkResult.records.length > 0) {
-            return { 
-                success: false, 
-                message: 'Account with this email already exists' 
-            };
-        }
-        
-        // Create user in Airtable
-        const createUrl = `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}`;
-        const createData = {
-            records: [{
-                fields: {
-                    'Name': userData.name,
-                    'Email': userData.email,
-                    'Company': userData.company,
-                    'Password Hash': btoa(userData.password + 'salt'), // Simple encoding
-                    'Created Date': new Date().toISOString().split('T')[0],
-                    'Account Status': 'Active'
-                }
-            }]
-        };
-        
-        const createResponse = await fetch(createUrl, {
+        const response = await fetch('/api/auth?action=register', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(createData)
-        });
-        
-        if (createResponse.ok) {
-            const result = await createResponse.json();
-            
-            // Generate session token
-            const sessionData = {
-                email: userData.email,
+            body: JSON.stringify({
                 name: userData.name,
+                email: userData.email,
                 company: userData.company,
-                timestamp: Date.now()
-            };
-            const token = btoa(JSON.stringify(sessionData));
-            
-            return { 
+                password: userData.password
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            return {
                 success: true,
-                token: token,
-                user: {
-                    name: userData.name,
-                    email: userData.email,
-                    company: userData.company
-                }
+                token: result.token,
+                user: result.user
             };
         } else {
-            const errorData = await createResponse.json();
-            return { 
-                success: false, 
-                message: 'Failed to create account: ' + (errorData.error?.message || 'Unknown error')
+            return {
+                success: false,
+                message: result.message || 'Registration failed'
             };
         }
-        
+
     } catch (error) {
         console.error('Registration error:', error);
-        return { 
-            success: false, 
-            message: 'Network error. Please check your connection and try again.' 
+        return {
+            success: false,
+            message: 'Network error. Please check your connection and try again.'
         };
     }
 }
@@ -93,67 +43,37 @@ async function createUser(userData) {
 // Authenticate user
 async function authenticateUser(email, password) {
     try {
-        const filterFormula = `{Email} = "${email}"`;
-        const url = `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}?filterByFormula=${encodeURIComponent(filterFormula)}`;
-        
-        const response = await fetch(url, {
+        const response = await fetch('/api/auth?action=login', {
+            method: 'POST',
             headers: {
-                'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`
-            }
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
         });
-        
+
         const result = await response.json();
-        
-        if (!result.records || result.records.length === 0) {
-            return { 
-                success: false, 
-                message: 'Invalid email or password' 
+
+        if (result.success) {
+            return {
+                success: true,
+                token: result.token,
+                user: result.user
+            };
+        } else {
+            return {
+                success: false,
+                message: result.message || 'Login failed'
             };
         }
-        
-        const user = result.records[0];
-        const storedHash = user.fields['Password Hash'];
-        const passwordHash = btoa(password + 'salt');
-        
-        if (passwordHash !== storedHash) {
-            return { 
-                success: false, 
-                message: 'Invalid email or password' 
-            };
-        }
-        
-        // Check account status
-        if (user.fields['Account Status'] !== 'Active') {
-            return { 
-                success: false, 
-                message: 'Account is not active' 
-            };
-        }
-        
-        // Generate session token
-        const sessionData = {
-            email: user.fields['Email'],
-            name: user.fields['Name'],
-            company: user.fields['Company'],
-            timestamp: Date.now()
-        };
-        const token = btoa(JSON.stringify(sessionData));
-        
-        return {
-            success: true,
-            token: token,
-            user: {
-                name: user.fields['Name'],
-                email: user.fields['Email'],
-                company: user.fields['Company']
-            }
-        };
-        
+
     } catch (error) {
         console.error('Login error:', error);
-        return { 
-            success: false, 
-            message: 'Network error. Please check your connection and try again.' 
+        return {
+            success: false,
+            message: 'Network error. Please check your connection and try again.'
         };
     }
 }
@@ -161,42 +81,71 @@ async function authenticateUser(email, password) {
 // Get user data
 async function getUserData(email) {
     try {
-        const filterFormula = `{Email} = "${email}"`;
-        const url = `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}?filterByFormula=${encodeURIComponent(filterFormula)}`;
-        
-        const response = await fetch(url, {
+        const response = await fetch('/api/auth?action=getUserData', {
+            method: 'POST',
             headers: {
-                'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`
-            }
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email
+            })
         });
-        
+
         const result = await response.json();
-        
-        if (!result.records || result.records.length === 0) {
-            return { 
-                success: false, 
-                message: 'User not found' 
+
+        if (result.success) {
+            return {
+                success: true,
+                userData: result.userData
+            };
+        } else {
+            return {
+                success: false,
+                message: result.message || 'Failed to load user data'
             };
         }
-        
-        const user = result.records[0];
-        
-        return {
-            success: true,
-            userData: {
-                name: user.fields['Name'],
-                email: user.fields['Email'],
-                company: user.fields['Company'],
-                createdDate: user.fields['Created Date'],
-                accountStatus: user.fields['Account Status']
-            }
-        };
-        
+
     } catch (error) {
         console.error('Get user data error:', error);
-        return { 
-            success: false, 
-            message: 'Failed to load user data' 
+        return {
+            success: false,
+            message: 'Failed to load user data'
+        };
+    }
+}
+
+// Validate session token with backend
+async function validateTokenWithBackend(token) {
+    try {
+        const response = await fetch('/api/auth?action=validateToken', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                token: token
+            })
+        });
+
+        const result = await response.json();
+
+        if (result.success && result.valid) {
+            return {
+                valid: true,
+                userData: result.user
+            };
+        } else {
+            return {
+                valid: false,
+                reason: result.message || 'Token invalid'
+            };
+        }
+
+    } catch (error) {
+        console.error('Token validation error:', error);
+        return {
+            valid: false,
+            reason: 'Network error'
         };
     }
 }
@@ -206,38 +155,57 @@ function validateSessionToken(token) {
     try {
         const tokenData = JSON.parse(atob(token));
         const now = Date.now();
-        const tokenAge = now - tokenData.timestamp;
-        const maxAge = 24 * 60 * 60 * 1000; // 24 hours
 
-        if (tokenAge > maxAge) {
+        // Check if token has expiry and is expired
+        if (tokenData.expires && now > tokenData.expires) {
             return { valid: false, reason: 'Token expired' };
         }
 
-        return { 
-            valid: true, 
+        // Check basic token age (fallback if no expires field)
+        if (!tokenData.expires) {
+            const tokenAge = now - tokenData.timestamp;
+            const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+
+            if (tokenAge > maxAge) {
+                return { valid: false, reason: 'Token expired' };
+            }
+        }
+
+        return {
+            valid: true,
             userData: {
                 email: tokenData.email,
                 name: tokenData.name,
-                company: tokenData.company
+                company: tokenData.company || ''
             }
         };
     } catch (error) {
-        return { valid: false, reason: 'Invalid token' };
+        return { valid: false, reason: 'Invalid token format' };
     }
 }
 
 // Check if user is logged in
-function isUserLoggedIn() {
+async function isUserLoggedIn() {
     const token = localStorage.getItem('userToken');
     if (!token) return false;
 
-    const validation = validateSessionToken(token);
-    if (!validation.valid) {
+    // First check token format locally
+    const localValidation = validateSessionToken(token);
+    if (!localValidation.valid) {
         // Clean up invalid token
-        localStorage.removeItem('userToken');
-        localStorage.removeItem('userEmail');
+        clearUserSession();
         return false;
     }
+
+    // Then validate with backend (optional - for extra security)
+    // Uncomment below for server-side validation on every check
+    /*
+    const backendValidation = await validateTokenWithBackend(token);
+    if (!backendValidation.valid) {
+        clearUserSession();
+        return false;
+    }
+    */
 
     return true;
 }
@@ -250,8 +218,7 @@ function getCurrentUser() {
     const validation = validateSessionToken(token);
     if (!validation.valid) {
         // Clean up invalid token
-        localStorage.removeItem('userToken');
-        localStorage.removeItem('userEmail');
+        clearUserSession();
         return null;
     }
 
@@ -262,32 +229,54 @@ function getCurrentUser() {
 function storeUserSession(token, email) {
     localStorage.setItem('userToken', token);
     localStorage.setItem('userEmail', email);
+    
+    // Optional: Store timestamp for local tracking
+    localStorage.setItem('sessionTimestamp', Date.now().toString());
 }
 
 // Clear user session
 function clearUserSession() {
     localStorage.removeItem('userToken');
     localStorage.removeItem('userEmail');
+    localStorage.removeItem('sessionTimestamp');
 }
 
 // Logout user
 function logoutUser() {
     clearUserSession();
-    window.location.href = '../login.html';
+    
+    // Determine the correct redirect path based on current location
+    const currentPath = window.location.pathname;
+    
+    if (currentPath.includes('/website/')) {
+        // Already in website folder, go up one level
+        window.location.href = '../login.html';
+    } else {
+        // At root level
+        window.location.href = 'login.html';
+    }
 }
 
 // Redirect if not authenticated (for protected pages)
-function requireAuthentication() {
-    if (!isUserLoggedIn()) {
-        window.location.href = '../login.html';
+async function requireAuthentication() {
+    const loggedIn = await isUserLoggedIn();
+    if (!loggedIn) {
+        const currentPath = window.location.pathname;
+        
+        if (currentPath.includes('/website/')) {
+            window.location.href = '../login.html';
+        } else {
+            window.location.href = 'login.html';
+        }
         return false;
     }
     return true;
 }
 
 // Redirect if already authenticated (for login page)
-function redirectIfAuthenticated() {
-    if (isUserLoggedIn()) {
+async function redirectIfAuthenticated() {
+    const loggedIn = await isUserLoggedIn();
+    if (loggedIn) {
         window.location.href = 'website/dashboard.html';
         return true;
     }
@@ -310,11 +299,55 @@ function validateRequired(value) {
     return value && value.trim().length > 0;
 }
 
+// Enhanced error handling
+function handleApiError(error, fallbackMessage = 'An error occurred') {
+    if (error.message) {
+        return error.message;
+    }
+    
+    if (typeof error === 'string') {
+        return error;
+    }
+    
+    return fallbackMessage;
+}
+
+// Auto-refresh token before expiry (optional feature)
+async function refreshTokenIfNeeded() {
+    const token = localStorage.getItem('userToken');
+    if (!token) return false;
+
+    try {
+        const tokenData = JSON.parse(atob(token));
+        const now = Date.now();
+        
+        // Refresh if token expires in next 2 hours
+        if (tokenData.expires && (tokenData.expires - now) < (2 * 60 * 60 * 1000)) {
+            const currentUser = getCurrentUser();
+            if (currentUser) {
+                // Re-validate with backend to get fresh token
+                const validation = await validateTokenWithBackend(token);
+                if (validation.valid) {
+                    // Token is still valid, backend might return a new one
+                    // This would need backend support for token refresh
+                    console.log('Token refresh check completed');
+                }
+            }
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('Token refresh error:', error);
+        return false;
+    }
+}
+
 // Export functions for global use
 window.AirtableAPI = {
     createUser,
     authenticateUser,
     getUserData,
+    validateTokenWithBackend,
     isUserLoggedIn,
     getCurrentUser,
     storeUserSession,
@@ -324,10 +357,17 @@ window.AirtableAPI = {
     redirectIfAuthenticated,
     validateEmail,
     validatePassword,
-    validateRequired
+    validateRequired,
+    handleApiError,
+    refreshTokenIfNeeded
 };
 
 // Auto-initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Direct Airtable API client initialized');
+    console.log('Markeb Media API client initialized');
+    
+    // Optional: Auto-refresh token check
+    if (getCurrentUser()) {
+        refreshTokenIfNeeded();
+    }
 });
