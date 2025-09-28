@@ -1,5 +1,9 @@
 // api/auth.js - Vercel serverless function for secure authentication
 
+export const config = {
+  runtime: 'nodejs20.x'
+}
+
 export default async function handler(req, res) {
     // Debug logging
     console.log('=== API Request Debug ===');
@@ -75,7 +79,7 @@ export default async function handler(req, res) {
 
 // Hash password securely
 async function hashPassword(password) {
-    const crypto = require('crypto');
+    const crypto = await import('crypto');
     // Add a salt for better security
     const salt = 'markeb_media_salt_2024';
     return crypto.createHash('sha256').update(password + salt).digest('hex');
