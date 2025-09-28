@@ -12,10 +12,37 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: white;
             color: #1F2E3C;
             line-height: 1.6;
+            padding-top: 100px;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 107, 0, 0.1);
+            color: #FF6B00;
+            border: 2px solid #FF6B00;
+            padding: 12px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 10000;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: #FF6B00;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 0, 0.3);
         }
 
         .container {
@@ -44,6 +71,7 @@
         .header p {
             font-size: 1.2em;
             opacity: 0.9;
+            font-weight: 500;
         }
 
         .main-content {
@@ -104,6 +132,7 @@
             font-size: 16px;
             transition: all 0.3s ease;
             font-family: inherit;
+            color: #1F2E3C;
         }
 
         .form-group select:focus, .form-group textarea:focus, .form-group input:focus {
@@ -127,6 +156,68 @@
             margin-right: 0;
         }
 
+        .property-status-group {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e1e5e9;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .property-status-group:hover {
+            border-color: #FF6B00;
+        }
+
+        .status-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .status-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .status-option:hover {
+            border-color: #FF6B00;
+            background: rgba(255, 107, 0, 0.05);
+        }
+
+        .status-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #FF6B00;
+            margin: 0;
+        }
+
+        .status-option.selected {
+            border-color: #FF6B00;
+            background: rgba(255, 107, 0, 0.1);
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #1F2E3C;
+            flex: 1;
+        }
+
+        .status-description {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
         .checkbox-group {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -142,6 +233,7 @@
 
         .checkbox-item input[type="checkbox"] {
             width: auto;
+            accent-color: #FF6B00;
         }
 
         .generate-btn {
@@ -184,6 +276,7 @@
             font-size: 16px;
             line-height: 1.7;
             transition: all 0.3s ease;
+            color: #1F2E3C;
         }
 
         .output-area:focus {
@@ -258,27 +351,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        .back-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(255, 107, 0, 0.1);
-            color: #FF6B00;
-            border: 2px solid #FF6B00;
-            padding: 12px 20px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-
-        .back-btn:hover {
-            background: #FF6B00;
-            color: white;
-            transform: translateY(-2px);
-        }
-
         .features {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -315,13 +387,223 @@
             color: white;
         }
 
+        .feature-card h3 {
+            color: #1F2E3C;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: #1F2E3C;
+        }
+
+        /* Photo Upload Styles */
+        .photo-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(31,46,60,0.15);
+        }
+
+        .photo-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1F2E3C;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .photo-optional {
+            color: #666;
+            font-weight: 400;
+            font-size: 0.9em;
+            margin-left: 8px;
+        }
+
+        .photo-help {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .photo-upload-area {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .photo-input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+        }
+
+        .photo-upload-btn {
+            width: 100%;
+            min-height: 120px;
+            border: 2px dashed rgba(31,46,60,0.3);
+            border-radius: 10px;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-upload-btn:hover {
+            border-color: #FF6B00;
+            background: rgba(255,107,0,0.02);
+        }
+
+        .photo-upload-btn.drag-over {
+            border-color: #FF6B00;
+            background: rgba(255,107,0,0.1);
+            transform: scale(1.02);
+        }
+
+        .photo-icon {
+            font-size: 2.5em;
+            color: #FF6B00;
+            margin-bottom: 15px;
+        }
+
+        .photo-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1F2E3C;
+            margin-bottom: 5px;
+        }
+
+        .photo-subtext {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .photo-preview {
+            margin-top: 20px;
+        }
+
+        .photo-preview-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1F2E3C;
+            margin-bottom: 15px;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .photo-item {
+            position: relative;
+            background: #fff;
+            border: 1px solid rgba(31,46,60,0.15);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .photo-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .photo-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo-info {
+            padding: 12px;
+            font-size: 12px;
+        }
+
+        .photo-name {
+            font-weight: 500;
+            color: #1F2E3C;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .photo-size {
+            color: #666;
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            opacity: 0.8;
+        }
+
+        .photo-remove:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .photo-limit-notice {
+            background: rgba(255,107,0,0.1);
+            border: 1px solid rgba(255,107,0,0.3);
+            color: #d63384;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .photo-enhancement-notice {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+                margin-bottom: 30px;
             }
             
             .header h1 {
-                font-size: 2em;
+                font-size: 2.2em;
+            }
+            
+            .header p {
+                font-size: 1.1em;
+                line-height: 1.5;
             }
             
             .features {
@@ -329,9 +611,11 @@
             }
             
             .back-btn {
-                position: static;
-                display: inline-block;
-                margin-bottom: 20px;
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                padding: 10px 15px;
+                font-size: 14px;
             }
 
             .form-group input[type="number"] {
@@ -342,6 +626,52 @@
 
             .action-buttons {
                 flex-direction: column;
+            }
+
+            .status-options {
+                grid-template-columns: 1fr;
+            }
+
+            .input-section, .output-section {
+                padding: 20px;
+            }
+
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+
+            body {
+                padding-top: 80px;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .header p {
+                font-size: 1em;
+            }
+            
+            .back-btn {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
+            
+            .generate-btn {
+                font-size: 16px;
+                padding: 16px;
+            }
+            
+            .input-section, .output-section {
+                padding: 15px;
             }
         }
     </style>
@@ -368,6 +698,28 @@
                         <option value="email-marketing">Email Marketing</option>
                         <option value="brochure-copy">Brochure Copy</option>
                     </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Property Status</label>
+                    <div class="property-status-group">
+                        <div class="status-options">
+                            <label class="status-option selected" for="sale">
+                                <input type="radio" name="propertyStatus" id="sale" value="sale" checked>
+                                <div>
+                                    <div class="status-label">For Sale</div>
+                                    <div class="status-description">Property available for purchase</div>
+                                </div>
+                            </label>
+                            <label class="status-option" for="rental">
+                                <input type="radio" name="propertyStatus" id="rental" value="rental">
+                                <div>
+                                    <div class="status-label">To Let</div>
+                                    <div class="status-description">Property available for rental</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -466,6 +818,45 @@
                     <textarea id="additionalInfo" placeholder="Any special features, recent renovations, local amenities, or unique selling points..."></textarea>
                 </div>
 
+                <!-- Photo Upload Section -->
+                <div class="photo-section">
+                    <h3 class="photo-title">
+                        Property Photos<span class="photo-optional">(Optional)</span>
+                    </h3>
+                    <p class="photo-help">
+                        Upload photos of key property features to create more detailed and accurate descriptions. 
+                        Our AI will analyze images of rooms, kitchens, bathrooms, gardens, and special features to enhance your content.
+                        <br><strong>Accepted:</strong> JPEG, PNG, WebP • <strong>Max size:</strong> 50MB each • <strong>Up to 5 photos</strong>
+                    </p>
+                    
+                    <div class="photo-upload-area">
+                        <input 
+                            type="file" 
+                            id="photoInput" 
+                            class="photo-input" 
+                            multiple 
+                            accept="image/jpeg,image/jpg,image/png,image/webp"
+                        >
+                        <label for="photoInput" class="photo-upload-btn" id="photoUploadBtn">
+                            <div class="photo-icon">📷</div>
+                            <div class="photo-text">Choose Photos</div>
+                            <div class="photo-subtext">or drag and drop images here</div>
+                        </label>
+                    </div>
+
+                    <div class="photo-preview" id="photoPreview" style="display: none;">
+                        <div class="photo-preview-title" id="photoPreviewTitle">Selected Photos (0/5)</div>
+                        <div class="photo-grid" id="photoGrid"></div>
+                        <div class="photo-limit-notice" id="photoLimitNotice" style="display: none;">
+                            Maximum of 5 photos reached. Remove a photo to add another.
+                        </div>
+                    </div>
+
+                    <div class="photo-enhancement-notice" id="photoEnhancementNotice" style="display: none;">
+                        Photos will be analyzed to identify key property features and enhance your description with specific visual details
+                    </div>
+                </div>
+
                 <button class="generate-btn" onclick="generateContent()">Ryte for me!</button>
             </div>
 
@@ -508,6 +899,135 @@
     </div>
 
     <script>
+        // Handle property status selection
+        document.querySelectorAll('input[name="propertyStatus"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.status-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                this.closest('.status-option').classList.add('selected');
+            });
+        });
+
+        // Photo upload functionality
+        let selectedPhotos = [];
+
+        function setupPhotoUpload() {
+            const photoInput = document.getElementById('photoInput');
+            const photoUploadBtn = document.getElementById('photoUploadBtn');
+            
+            photoInput.addEventListener('change', handlePhotoSelect);
+            photoUploadBtn.addEventListener('dragover', handleDragOver);
+            photoUploadBtn.addEventListener('dragleave', handleDragLeave);
+            photoUploadBtn.addEventListener('drop', handleDrop);
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                photoUploadBtn.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+        }
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function handleDragOver(e) {
+            document.getElementById('photoUploadBtn').classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            document.getElementById('photoUploadBtn').classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            document.getElementById('photoUploadBtn').classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        }
+
+        function handlePhotoSelect(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            const validFiles = Array.from(files).filter(file => {
+                if (!['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type)) {
+                    alert(`${file.name} is not a valid image type. Please use JPEG, PNG, or WebP.`);
+                    return false;
+                }
+                
+                if (file.size > 50 * 1024 * 1024) {
+                    alert(`${file.name} is too large. Maximum size is 50MB.`);
+                    return false;
+                }
+                
+                return true;
+            });
+
+            const remainingSlots = 5 - selectedPhotos.length;
+            const filesToAdd = validFiles.slice(0, remainingSlots);
+            
+            selectedPhotos = [...selectedPhotos, ...filesToAdd];
+            updatePhotoPreview();
+            
+            document.getElementById('photoInput').value = '';
+        }
+
+        function updatePhotoPreview() {
+            const photoPreview = document.getElementById('photoPreview');
+            const photoPreviewTitle = document.getElementById('photoPreviewTitle');
+            const photoGrid = document.getElementById('photoGrid');
+            const photoLimitNotice = document.getElementById('photoLimitNotice');
+            const photoEnhancementNotice = document.getElementById('photoEnhancementNotice');
+            
+            if (selectedPhotos.length === 0) {
+                photoPreview.style.display = 'none';
+                photoEnhancementNotice.style.display = 'none';
+                return;
+            }
+
+            photoPreview.style.display = 'block';
+            photoEnhancementNotice.style.display = 'block';
+            photoPreviewTitle.textContent = `Selected Photos (${selectedPhotos.length}/5)`;
+            
+            photoLimitNotice.style.display = selectedPhotos.length >= 5 ? 'block' : 'none';
+            
+            photoGrid.innerHTML = selectedPhotos.map((file, index) => {
+                const url = URL.createObjectURL(file);
+                const sizeInMB = (file.size / 1024 / 1024).toFixed(1);
+                
+                return `
+                    <div class="photo-item">
+                        <img src="${url}" alt="Preview ${index + 1}" class="photo-img">
+                        <div class="photo-info">
+                            <div class="photo-name">${file.name}</div>
+                            <div class="photo-size">${sizeInMB}MB</div>
+                        </div>
+                        <button type="button" class="photo-remove" onclick="removePhoto(${index})" title="Remove photo">
+                            ✕
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function removePhoto(index) {
+            if (selectedPhotos[index]) {
+                const url = URL.createObjectURL(selectedPhotos[index]);
+                URL.revokeObjectURL(url);
+            }
+            
+            selectedPhotos.splice(index, 1);
+            updatePhotoPreview();
+        }
+
+        // Initialize photo upload on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setupPhotoUpload();
+        });
+
         async function generateContent() {
             const contentType = document.getElementById('contentType').value;
             const propertyType = document.getElementById('propertyType').value;
@@ -534,193 +1054,136 @@
                 return;
             }
 
-            // Show loading state
+            // Show loading state with photo info if photos are selected
             generateBtn.disabled = true;
             generateBtn.textContent = 'Generating...';
             loading.style.display = 'block';
             outputArea.style.display = 'none';
             actionButtons.style.display = 'none';
 
+            if (selectedPhotos.length > 0) {
+                loading.querySelector('.loading-text').textContent = 'Analyzing photos and creating your copy...';
+                loading.querySelector('.loading-subtext').textContent = `Processing ${selectedPhotos.length} photo${selectedPhotos.length > 1 ? 's' : ''} to enhance your content`;
+            } else {
+                loading.querySelector('.loading-text').textContent = 'Creating your perfect copy...';
+                loading.querySelector('.loading-subtext').textContent = 'Our AI is analyzing your property details and crafting compelling content';
+            }
+
             try {
-                // Simulate AI content generation (replace with actual API call)
-                await new Promise(resolve => setTimeout(resolve, 3000));
+                // Get property status from form
+                const propertyStatus = document.querySelector('input[name="propertyStatus"]:checked')?.value || 'sale';
                 
-                // Generate property-specific content
-                const generatedContent = generatePropertyContent(
-                    contentType, propertyType, bedrooms, bathrooms, 
-                    location, price, tone, features, additionalInfo
-                );
+                // Convert content type to match backend expectations
+                const contentModeMap = {
+                    'property-description': 'description',
+                    'video-script': 'script',
+                    'social-media-post': 'social',
+                    'email-marketing': 'description',
+                    'brochure-copy': 'website'
+                };
+                
+                const contentMode = contentModeMap[contentType] || 'description';
+                
+                // Prepare form data for API
+                const formData = new FormData();
+                
+                // Combine features into a descriptive string
+                const featureDescriptions = {
+                    garden: 'private garden',
+                    parking: 'dedicated parking',
+                    garage: 'garage',
+                    ensuite: 'en-suite bathroom',
+                    balcony: 'balcony with stunning views',
+                    fireplace: 'charming fireplace',
+                    newbuild: 'brand new construction',
+                    period: 'beautiful period features',
+                    transport: 'excellent transport connections',
+                    schools: 'proximity to outstanding schools'
+                };
+                
+                const selectedFeatures = features.map(f => featureDescriptions[f]).filter(Boolean);
+                const featuresText = selectedFeatures.length > 0 ? 
+                    `Key features: ${selectedFeatures.join(', ')}. ${additionalInfo}` : 
+                    additionalInfo;
+                
+                const apiData = {
+                    address: location,
+                    propertyType: propertyType,
+                    bedrooms: bedrooms || '0',
+                    bathrooms: bathrooms || '0',
+                    features: featuresText,
+                    description: `${tone} tone property. ${price ? `Price: ${price}.` : ''} Located in ${location}.`,
+                    propertyStatus: propertyStatus,
+                    agentName: 'Estate Agent',
+                    agentPhone: '01234 567890',
+                    agentEmail: 'info@estate-agent.com',
+                    companyName: 'Your Estate Agency'
+                };
+                
+                formData.append('fields', JSON.stringify(apiData));
+                formData.append('mode', contentMode);
+                
+                // Add photos to form data
+                selectedPhotos.forEach((photo) => {
+                    formData.append('photos', photo);
+                });
+                
+                // Call the real API
+                const response = await fetch('https://ryta.onrender.com/generate', {
+                    method: 'POST',
+                    headers: {
+                        'X-Session-Id': crypto.randomUUID()
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`API Error: ${response.status} - ${errorText}`);
+                }
+
+                const result = await response.json();
                 
                 // Show generated content
-                outputArea.value = generatedContent;
+                outputArea.value = result.text;
                 outputArea.style.display = 'block';
                 actionButtons.style.display = 'flex';
                 
+                // Show photo enhancement notice if photos were processed
+                if (result.photosAnalyzed > 0) {
+                    const notice = document.createElement('div');
+                    notice.style.cssText = `
+                        background: rgba(40, 167, 69, 0.1);
+                        border: 1px solid rgba(40, 167, 69, 0.3);
+                        color: #155724;
+                        padding: 12px;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        margin-bottom: 15px;
+                        text-align: center;
+                    `;
+                    notice.textContent = `✨ Enhanced with analysis of ${result.photosAnalyzed} photo${result.photosAnalyzed > 1 ? 's' : ''}`;
+                    outputArea.parentNode.insertBefore(notice, outputArea);
+                    
+                    // Remove the notice after 5 seconds
+                    setTimeout(() => {
+                        if (notice.parentNode) {
+                            notice.parentNode.removeChild(notice);
+                        }
+                    }, 5000);
+                }
+                
             } catch (error) {
                 console.error('Error generating content:', error);
-                outputArea.value = 'Something went wrong. Please check your details and try again.';
+                outputArea.value = 'Failed to generate content. Please check your internet connection and try again.';
                 outputArea.style.display = 'block';
+                actionButtons.style.display = 'flex';
             } finally {
                 // Reset UI
                 loading.style.display = 'none';
                 generateBtn.disabled = false;
-                generateBtn.textContent = 'Generate Copy';
+                generateBtn.textContent = 'Ryte for me!';
             }
-        }
-
-        function generatePropertyContent(type, propertyType, bedrooms, bathrooms, location, price, tone, features, additional) {
-            const bedroomText = bedrooms ? `${bedrooms} bedroom` : '';
-            const bathroomText = bathrooms ? `${bathrooms} bathroom` : '';
-            const priceText = price ? `Priced at ${price}` : '';
-            
-            const featureDescriptions = {
-                garden: 'private garden',
-                parking: 'dedicated parking',
-                garage: 'garage',
-                ensuite: 'en-suite bathroom',
-                balcony: 'balcony with stunning views',
-                fireplace: 'charming fireplace',
-                newbuild: 'brand new construction',
-                period: 'beautiful period features',
-                transport: 'excellent transport connections',
-                schools: 'proximity to outstanding schools'
-            };
-
-            const selectedFeatures = features.map(f => featureDescriptions[f]).filter(Boolean);
-            
-            const templates = {
-                'property-description': generatePropertyDescription(propertyType, bedroomText, bathroomText, location, priceText, tone, selectedFeatures, additional),
-                'video-script': generateVideoScript(propertyType, bedroomText, bathroomText, location, tone, selectedFeatures, additional),
-                'social-media-post': generateSocialPost(propertyType, bedroomText, location, priceText, selectedFeatures),
-                'email-marketing': generateEmailMarketing(propertyType, bedroomText, location, priceText, tone, selectedFeatures),
-                'brochure-copy': generateBrochureCopy(propertyType, bedroomText, bathroomText, location, priceText, tone, selectedFeatures, additional)
-            };
-
-            return templates[type] || templates['property-description'];
-        }
-
-        function generatePropertyDescription(propertyType, bedrooms, bathrooms, location, price, tone, features, additional) {
-            const toneStyles = {
-                'professional': 'This exceptional',
-                'luxury': 'This prestigious',
-                'family-friendly': 'This wonderful family',
-                'modern': 'This contemporary',
-                'cozy': 'This charming',
-                'investment': 'This excellent investment',
-                'first-time-buyer': 'This perfect starter'
-            };
-
-            const opener = toneStyles[tone] || 'This beautiful';
-            const featuresText = features.length > 0 ? `The property boasts ${features.join(', ')}.` : '';
-            
-            return `${opener} ${bedrooms} ${propertyType} in ${location} offers comfortable living in a sought-after location. ${price}
-
-The property features ${bathrooms} and has been well-maintained throughout. ${featuresText}
-
-${additional || 'Located in a desirable area with local amenities nearby, this property represents an excellent opportunity for both homeowners and investors alike.'}
-
-${tone === 'luxury' ? 'This is a rare opportunity to acquire a truly exceptional property.' : 'Viewing is highly recommended to fully appreciate what this property has to offer.'}
-
-Contact us today to arrange a viewing.`;
-        }
-
-        function generateVideoScript(propertyType, bedrooms, bathrooms, location, tone, features, additional) {
-            return `[INTRO - Property Exterior]
-Welcome to this ${tone === 'luxury' ? 'stunning' : 'beautiful'} ${bedrooms} ${propertyType} located in the heart of ${location}.
-
-[ENTRANCE/HALLWAY]
-As we step inside, you're immediately greeted by ${tone === 'modern' ? 'contemporary styling' : 'a warm and welcoming atmosphere'}.
-
-[LIVING AREAS]
-The spacious living areas are perfect for ${tone === 'family-friendly' ? 'family life and entertaining' : 'both relaxation and entertaining guests'}.
-
-[KITCHEN]
-The well-appointed kitchen offers everything you need for modern living.
-
-[BEDROOMS]
-${bedrooms ? `The ${bedrooms} provide comfortable accommodation with plenty of natural light.` : 'The bedrooms are well-proportioned with excellent natural light.'}
-
-[BATHROOMS]
-${bathrooms ? `The ${bathrooms} are beautifully finished and well-appointed.` : 'The bathroom facilities are modern and well-maintained.'}
-
-${features.length > 0 ? `[SPECIAL FEATURES]\nLet me show you some of the standout features - ${features.join(', ')}.` : ''}
-
-[OUTDOOR SPACE/CONCLUSION]
-${additional || 'This property truly offers everything you could want in a modern home.'}
-
-For more information or to arrange a viewing, contact our team today. Thank you for watching!
-
-[END SCREEN - Contact Details]`;
-        }
-
-        function generateSocialPost(propertyType, bedrooms, location, price, features) {
-            const hashtags = ['#PropertyForSale', '#EstateAgent', '#' + location.replace(/\s+/g, ''), '#Property', '#RealEstate'];
-            
-            return `🏠 NEW TO MARKET! 
-
-${bedrooms} ${propertyType} in ${location}
-${price}
-
-✨ Key Features:
-${features.map(f => `• ${f.charAt(0).toUpperCase() + f.slice(1)}`).join('\n') || '• Well-maintained throughout\n• Excellent location\n• Must be seen to be appreciated'}
-
-📞 Call us today to arrange your viewing!
-
-${hashtags.join(' ')}`;
-        }
-
-        function generateEmailMarketing(propertyType, bedrooms, location, price, tone, features) {
-            return `Subject: New ${bedrooms} ${propertyType} in ${location} - ${price}
-
-Dear [Client Name],
-
-I hope this email finds you well. I'm excited to share details of a ${tone === 'luxury' ? 'exceptional' : 'fantastic'} new property that has just come to market.
-
-🏠 PROPERTY HIGHLIGHTS:
-• ${bedrooms} ${propertyType}
-• Location: ${location}
-• Price: ${price}
-• ${features.join('\n• ') || 'Excellent condition throughout'}
-
-This property offers ${tone === 'family-friendly' ? 'the perfect environment for family living' : 'comfortable modern living'} in a highly sought-after location.
-
-Given the current market conditions and the property's excellent features, I expect significant interest from potential ${tone === 'investment' ? 'investors' : 'buyers'}.
-
-Would you like to arrange a viewing? I have availability this week and would be happy to show you around at your convenience.
-
-Please don't hesitate to contact me if you need any additional information.
-
-Best regards,
-[Your Name]
-[Your Contact Details]`;
-        }
-
-        function generateBrochureCopy(propertyType, bedrooms, bathrooms, location, price, tone, features, additional) {
-            return `${bedrooms.toUpperCase()} ${propertyType.toUpperCase()} - ${location.toUpperCase()}
-
-${price}
-
-PROPERTY OVERVIEW
-${tone === 'luxury' ? 'An exceptional opportunity to acquire' : 'We are delighted to present'} this ${bedrooms} ${propertyType} situated in the ${tone === 'luxury' ? 'prestigious' : 'popular'} location of ${location}.
-
-KEY FEATURES
-${features.map(f => `• ${f.charAt(0).toUpperCase() + f.slice(1)}`).join('\n') || '• Well-maintained throughout\n• Excellent location\n• Good local amenities'}
-
-ACCOMMODATION
-The property briefly comprises: entrance hall, reception room(s), kitchen, ${bedrooms}, ${bathrooms}, and all usual facilities.
-
-${additional || 'The property has been well-maintained by the current owners and viewing is essential to fully appreciate the accommodation on offer.'}
-
-LOCATION
-${location} offers excellent local amenities including shops, restaurants, and transport links to the surrounding areas.
-
-VIEWINGS
-Strictly by appointment through the selling agents.
-
-IMPORTANT NOTICE
-These particulars are believed to be accurate but all interested parties must satisfy themselves by inspection or otherwise as to their accuracy.
-
-For more information, please contact our sales team.`;
         }
 
         function copyToClipboard() {
@@ -752,6 +1215,9 @@ For more information, please contact our sales team.`;
             this.style.height = 'auto';
             this.style.height = Math.max(300, this.scrollHeight) + 'px';
         });
+
+        // Make removePhoto function globally accessible
+        window.removePhoto = removePhoto;
     </script>
 </body>
 </html>

@@ -1,4 +1,992 @@
-<!DOCTYPE html>
+</div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings" class="section">
+                <div class="settings-grid">
+                    <div class="settings-section">
+                        <h3 class="settings-title">Account Information</h3>
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" id="settingsName" placeholder="Your full name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-input" id="settingsEmail" placeholder="your@email.com" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" class="form-input" id="settingsCompany" placeholder="Your company">
+                        </div>
+                        <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3 class="settings-title">Preferences</h3>
+                        <div class="form-group">
+                            <label class="form-label">Preferred Contact Method</label>
+                            <select class="form-input">
+                                <option>Email</option>
+                                <option>Phone</option>
+                                <option>SMS</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Notifications</label>
+                            <div style="display: flex; gap: 16px; align-items: center;">
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" checked> Project updates
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="checkbox" checked> Booking reminders
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - Replace with your actual credentials
+        const ACUITY_CONFIG = {
+            userId: 'YOUR_ACUITY_USER_ID', // Replace with your Acuity User ID
+            apiKey: 'YOUR_ACUITY_API_KEY', // Replace with your Acuity API Key
+            baseUrl: 'https://acuityscheduling.com/api/v1'
+        };
+
+        const AIRTABLE_CONFIG = {
+            apiKey: 'YOUR_AIRTABLE_API_KEY', // Replace with your Airtable API key
+            baseId: 'appVzPU0icwL8H6aP', // Your existing base ID
+            tableId: 'tblRgcv7M9dUU3YuL', // Your Active Bookings table ID
+            baseUrl: 'https://api.airtable.com/v0'
+        };
+
+        // Utility function to create Basic Auth header for Acuity
+        function createAcuityAuthHeader() {
+            const credentials = btoa(`${ACUITY_CONFIG.userId}:${ACUITY_CONFIG.apiKey}`);
+            return `Basic ${credentials}`;
+        }
+
+        // Function to get user's bookings from Acuity Scheduling
+        async function getAcuityBookings(userEmail) {
+            try {
+                // First, get all appointments from Acuity
+                const response = await fetch(`${ACUITY_CONFIG.baseUrl}/appointments`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': createAcuityAuthHeader(),
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Acuity API error: ${response.status}`);
+                }
+
+                const appointments = await response.json();
+                
+                // Filter appointments by user email
+                const userAppointments = appointments.filter(appointment => 
+                    appointment.email && appointment.email.toLowerCase() === userEmail.toLowerCase()
+                );
+
+                // Calculate metrics
+                const totalBookings = userAppointments.length;
+                const totalInvestment = userAppointments.reduce((sum, appointment) => {
+                    // Acuity stores price in cents, convert to dollars
+                    const price = appointment.price ? parseFloat(appointment.price) / 100 : 0;
+                    return sum + price;
+                }, 0);
+
+                return {
+                    totalBookings,
+                    totalInvestment,
+                    appointments: userAppointments
+                };
+            } catch (error) {
+                console.error('Error fetching Acuity bookings:', error);
+                handleAPIError(error, 'Acuity');
+                return {
+                    totalBookings: 0,
+                    totalInvestment: 0,
+                    appointments: []
+                };
+            }
+        }
+
+        // Function to get completed projects from Airtable
+        async function getCompletedProjects(userEmail) {
+            try {
+                // Use filterByFormula to find records with the user's email
+                const filterFormula = encodeURIComponent(`{Customer Email} = '${userEmail}'`);
+                const url = `${AIRTABLE_CONFIG.baseUrl}/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableId}?filterByFormula=${filterFormula}`;
+
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Airtable API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const records = data.records || [];
+
+                // Count completed projects (Status = "Ready for Delivery" or "Delivered")
+                const completedProjects = records.filter(record => {
+                    const status = record.fields.Status;
+                    return status === 'Ready for Delivery' || status === 'Delivered';
+                });
+
+                return {
+                    completedProjects: completedProjects.length,
+                    totalProjects: records.length,
+                    projects: records
+                };
+            } catch (error) {
+                console.error('Error fetching Airtable projects:', error);
+                handleAPIError(error, 'Airtable');
+                return {
+                    completedProjects: 0,
+                    totalProjects: 0,
+                    projects: []
+                };
+            }
+        }
+
+        // Function to get recent activity from both sources
+        async function getRecentActivity(userEmail) {
+            try {
+                const [acuityData, airtableData] = await Promise.all([
+                    getAcuityBookings(userEmail),
+                    getCompletedProjects(userEmail)
+                ]);
+
+                const activities = [];
+
+                // Add recent bookings from Acuity
+                acuityData.appointments
+                    .sort((a, b) => new Date(b.datetime) - new Date(a.datetime))
+                    .slice(0, 3)
+                    .forEach(appointment => {
+                        activities.push({
+                            icon: '📅',
+                            title: `Booking confirmed - ${appointment.type}`,
+                            time: new Date(appointment.datetime).toLocaleDateString(),
+                            type: 'booking'
+                        });
+                    });
+
+                // Add recent project updates from Airtable
+                airtableData.projects
+                    .filter(project => project.fields['Last Modified'])
+                    .sort((a, b) => new Date(b.fields['Last Modified']) - new Date(a.fields['Last Modified']))
+                    .slice(0, 3)
+                    .forEach(project => {
+                        const status = project.fields.Status;
+                        let icon = '📝';
+                        if (status === 'Ready for Delivery') icon = '✅';
+                        if (status === 'Editing') icon = '🎬';
+                        if (status === 'Quality Control') icon = '🔍';
+
+                        activities.push({
+                            icon: icon,
+                            title: `Project ${status.toLowerCase()} - ${project.fields['Service Type'] || 'Photography'}`,
+                            time: new Date(project.fields['Last Modified']).toLocaleDateString(),
+                            type: 'project'
+                        });
+                    });
+
+                // Sort all activities by date and return most recent 5
+                return activities
+                    .sort((a, b) => new Date(b.time) - new Date(a.time))
+                    .slice(0, 5);
+
+            } catch (error) {
+                console.error('Error fetching recent activity:', error);
+                return [];
+            }
+        }
+
+        // Main function to load all dashboard data
+        async function loadDashboardData() {
+            const currentUser = AirtableAPI.getCurrentUser();
+            if (!currentUser || !currentUser.email) {
+                console.error('No user email found');
+                return;
+            }
+
+            try {
+                // Show loading state
+                document.getElementById('totalBookings').textContent = '...';
+                document.getElementById('totalSpending').textContent = '...';
+                document.getElementById('completedProjects').textContent = '...';
+
+                // Fetch data from both APIs
+                const [acuityData, airtableData] = await Promise.all([
+                    getAcuityBookings(currentUser.email),
+                    getCompletedProjects(currentUser.email)
+                ]);
+
+                // Update metrics
+                document.getElementById('totalBookings').textContent = acuityData.totalBookings;
+                document.getElementById('totalSpending').textContent = `£${acuityData.totalInvestment.toFixed(2)}`;
+                document.getElementById('completedProjects').textContent = airtableData.completedProjects;
+
+                // Update recent activity
+                const activities = await getRecentActivity(currentUser.email);
+                updateActivityList(activities);
+
+                console.log('Dashboard data loaded successfully');
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                
+                // Reset to default values on error
+                document.getElementById('totalBookings').textContent = '0';
+                document.getElementById('totalSpending').textContent = '£0';
+                document.getElementById('completedProjects').textContent = '0';
+            }
+        }
+
+        // Function to update the activity list in the dashboard
+        function updateActivityList(activities) {
+            const activityList = document.getElementById('activityList');
+            if (!activityList) return;
+
+            if (activities.length === 0) {
+                activityList.innerHTML = `
+                    <div class="activity-item">
+                        <div class="activity-icon">+</div>
+                        <div class="activity-content">
+                            <div class="activity-title">Welcome to Markeb Media!</div>
+                            <div class="activity-time">Book your first shoot to get started</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            activityList.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon">${activity.icon}</div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-time">${activity.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Error handling for API failures
+        function handleAPIError(error, source) {
+            console.error(`${source} API Error:`, error);
+            
+            // Could show user-friendly error message
+            const errorMessage = document.createElement('div');
+            errorMessage.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #fee2e2;
+                color: #991b1b;
+                padding: 12px 16px;
+                border-radius: 8px;
+                border: 1px solid #fecaca;
+                z-index: 1000;
+                font-size: 14px;
+                max-width: 300px;
+            `;
+            errorMessage.textContent = `Unable to load ${source} data. Please check your connection.`;
+            
+            document.body.appendChild(errorMessage);
+            
+            // Remove error message after 5 seconds
+            setTimeout(() => {
+                if (errorMessage.parentNode) {
+                    errorMessage.parentNode.removeChild(errorMessage);
+                }
+            }, 5000);
+        }
+
+        // File Upload Variables
+        let trackingCodeDeadline = null;
+        let isExpired = false;
+        let selectedFiles = [];
+        const maxFileSize = 50 * 1024 * 1024; // 50MB
+
+        // Mobile sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.mobile-overlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.mobile-overlay');
+            
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        }
+
+        // Section navigation
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+            
+            // Update page title
+            const titles = {
+                'dashboard': 'Dashboard',
+                'booking': 'Book Your Shoot',
+                'gallery': 'Gallery',
+                'copyryta': 'CopyRyta AI',
+                'tracking': 'Content Tracking',
+                'amend': 'Request Amendment',
+                'settings': 'Account Settings'
+            };
+            
+            const subtitles = {
+                'dashboard': "Here's what's happening with your projects",
+                'booking': 'Schedule your professional photography session',
+                'gallery': 'View and download your completed projects',
+                'copyryta': 'AI copywriting assistant for property descriptions',
+                'tracking': 'Track your visual marketing progress',
+                'amend': 'Request changes to your projects',
+                'settings': 'Manage your account and preferences'
+            };
+            
+            document.getElementById('pageTitle').textContent = titles[sectionName];
+            document.getElementById('pageSubtitle').textContent = subtitles[sectionName];
+            
+            // Close sidebar on mobile
+            if (window.innerWidth <= 1024) {
+                closeSidebar();
+            }
+        }
+
+        // Close sidebar when clicking nav items on mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 1024) {
+                        closeSidebar();
+                    }
+                });
+            });
+        });
+
+        // Check authentication and load user data
+        document.addEventListener('DOMContentLoaded', function() {
+            // Require authentication
+            if (!AirtableAPI.requireAuthentication()) {
+                return;
+            }
+
+            // Load user data
+            const currentUser = AirtableAPI.getCurrentUser();
+            if (currentUser) {
+                document.getElementById('pageTitle').textContent = `Welcome back, ${currentUser.name}`;
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('userEmail').textContent = currentUser.email;
+                
+                // Populate settings form
+                document.getElementById('settingsName').value = currentUser.name;
+                document.getElementById('settingsEmail').value = currentUser.email;
+                document.getElementById('settingsCompany').value = currentUser.company;
+                
+                // Set user avatar initial
+                const initials = currentUser.name.split(' ').map(name => name[0]).join('').toUpperCase();
+                document.getElementById('userAvatar').textContent = initials;
+                
+                // Get member since year from token
+                const token = localStorage.getItem('userToken');
+                if (token) {
+                    try {
+                        const tokenData = JSON.parse(atob(token));
+                        const memberSince = new Date(tokenData.timestamp).getFullYear();
+                        document.getElementById('memberSince').textContent = memberSince;
+                    } catch (error) {
+                        console.log('Could not parse token date');
+                    }
+                }
+                
+                // Load dashboard data with real API integration
+                loadDashboardData();
+            }
+
+            // Initialize file upload functionality
+            initializeFileUpload();
+            
+            // Refresh data every 5 minutes
+            setInterval(() => {
+                if (AirtableAPI.getCurrentUser()) {
+                    loadDashboardData();
+                }
+            }, 5 * 60 * 1000);
+        });
+
+        // Function to manually refresh dashboard data
+        function refreshDashboard() {
+            loadDashboardData();
+        }
+
+        // Tracking functionality
+        async function trackBooking() {
+            const trackingCode = document.getElementById("trackingInput").value.trim();
+            const resultDiv = document.getElementById("result");
+
+            if (!trackingCode) {
+                resultDiv.innerHTML = '<div class="warning-message">⚠️ Please enter your tracking code to continue.</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<div class="spinner"></div>';
+
+            const token = AIRTABLE_CONFIG.apiKey;
+            const baseId = AIRTABLE_CONFIG.baseId;
+            const tableId = AIRTABLE_CONFIG.tableId;
+            
+            if (token === 'YOUR_AIRTABLE_API_KEY') {
+                resultDiv.innerHTML = '<div class="error-message">❌ Tracking service is currently being configured. Please try again later.</div>';
+                return;
+            }
+            
+            const url = `${AIRTABLE_CONFIG.baseUrl}/${baseId}/${tableId}?filterByFormula=${encodeURIComponent(`{Tracking Code}='${trackingCode}'`)}`;
+
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!data.records || data.records.length === 0) {
+                    resultDiv.innerHTML = '<div class="error-message">❗ No booking found with that tracking code. Please check your code and try again.</div>';
+                    return;
+                }
+
+                const record = data.records[0].fields;
+                const status = record["Status"] || "-";
+                const rawShootDate = record["Shoot Date"];
+                const customerName = record["Customer Name"] || "-";
+                const serviceType = record["Service Type"] || "-";
+                const projectAddress = record["Project Address"] || "-";
+                const deliveryLink = record["Delivery Link"];
+
+                const stages = ["Booked", "Editing", "Quality Control", "Ready for Delivery"];
+                const icons = ['📅', '🎬', '🔍', '✅'];
+                const currentStageIndex = stages.indexOf(status);
+                const progressPercentage = (currentStageIndex / (stages.length - 1)) * 80 + 10;
+
+                let formattedDate = "-";
+                let formattedDeadline = "-";
+                let deadlineHTML = "";
+
+                if (rawShootDate) {
+                    const shootDate = new Date(rawShootDate);
+                    const now = new Date();
+                    formattedDate = `${shootDate.getDate().toString().padStart(2, '0')}-${(shootDate.getMonth() + 1).toString().padStart(2, '0')}-${shootDate.getFullYear()}`;
+
+                    const deadlineStart = new Date(shootDate);
+                    deadlineStart.setDate(deadlineStart.getDate() + 1);
+                    deadlineStart.setHours(0, 0, 0, 0);
+
+                    const finalDeadline = new Date(deadlineStart.getTime() + (48 * 60 * 60 * 1000));
+                    formattedDeadline = `${finalDeadline.getDate().toString().padStart(2, '0')}-${(finalDeadline.getMonth() + 1).toString().padStart(2, '0')}-${finalDeadline.getFullYear()} ${finalDeadline.getHours().toString().padStart(2, '0')}:00`;
+
+                    if (now >= deadlineStart && (status === "Editing" || status === "Quality Control")) {
+                        const remainingMs = finalDeadline - now;
+                        const remainingHrs = Math.max(Math.floor(remainingMs / (1000 * 60 * 60)), 0);
+                        deadlineHTML = `
+                            <div class="deadline-alert">
+                                <div style="font-size: 1.2em; margin-bottom: 10px;">⏳ <strong>Delivery Timeline</strong></div>
+                                <div>Estimated completion: <strong>${remainingHrs} hours remaining</strong></div>
+                                <div>Expected delivery: <strong>${formattedDeadline}</strong></div>
+                            </div>
+                        `;
+                    }
+                }
+
+                const progressHTML = `
+                    <div class="progress-container">
+                        <div class="progress-line" style="width: ${progressPercentage}%;"></div>
+                        ${stages.map((stage, i) => `
+                            <div class="progress-step ${i <= currentStageIndex ? 'active' : ''}">
+                                <div class="icon">${icons[i]}</div>
+                                <div class="label">${stage}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                const deliveryLinkHTML = (status === "Ready for Delivery" && deliveryLink)
+                    ? `<div class="delivery-link">
+                         <div style="font-size: 1.2em; margin-bottom: 10px;">🎉 <strong>Your Content is Ready!</strong></div>
+                         <a href="${deliveryLink}" target="_blank">📥 Download Your Files</a>
+                       </div>`
+                    : "";
+
+                resultDiv.innerHTML = `
+                    ${progressHTML}
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div><strong>🎯 Current Status:</strong></div>
+                            <div style="margin-top: 5px; color: #FF6B00; font-weight: 600;">${status}</div>
+                        </div>
+                        <div class="info-item">
+                            <div><strong>👤 Customer:</strong></div>
+                            <div style="margin-top: 5px;">${customerName}</div>
+                        </div>
+                        <div class="info-item">
+                            <div><strong>🏷️ Service Type:</strong></div>
+                            <div style="margin-top: 5px;">${serviceType}</div>
+                        </div>
+                        <div class="info-item">
+                            <div><strong>📅 Shoot Date:</strong></div>
+                            <div style="margin-top: 5px;">${formattedDate}</div>
+                        </div>
+                        <div class="info-item">
+                            <div><strong>📍 Project Address:</strong></div>
+                            <div style="margin-top: 5px;">${projectAddress}</div>
+                        </div>
+                    </div>
+                    
+                    ${deadlineHTML}
+                    ${deliveryLinkHTML}
+                    
+                    <div class="track-another">
+                        <a href="#" onclick="location.reload();">🔁 Track another project</a>
+                    </div>
+                `;
+            } catch (err) {
+                console.error(err);
+                resultDiv.innerHTML = '<div class="error-message">❌ There was an error retrieving your tracking info. Please try again later.</div>';
+            }
+        }
+
+        // File Upload Functionality
+        function initializeFileUpload() {
+            const fileUploadArea = document.getElementById('fileUploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const browseButton = document.getElementById('browseButton');
+            const filePreview = document.getElementById('filePreview');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+
+            if (!fileUploadArea) return; // Only initialize if elements exist
+
+            // File upload event listeners
+            fileUploadArea.addEventListener('click', () => fileInput.click());
+            browseButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Drag and drop functionality
+            fileUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.add('dragover');
+            });
+
+            fileUploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.remove('dragover');
+            });
+
+            fileUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                handleFiles(files);
+            });
+        }
+
+        function handleFileSelect(e) {
+            handleFiles(e.target.files);
+        }
+
+        function handleFiles(files) {
+            for (let file of files) {
+                if (file.size > maxFileSize) {
+                    alert(`File "${file.name}" is too large. Maximum size is 50MB.`);
+                    continue;
+                }
+                
+                if (selectedFiles.find(f => f.name === file.name && f.size === file.size)) {
+                    alert(`File "${file.name}" is already selected.`);
+                    continue;
+                }
+
+                selectedFiles.push(file);
+            }
+            
+            updateFilePreview();
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) fileInput.value = ''; // Clear the input
+        }
+
+        function updateFilePreview() {
+            const filePreview = document.getElementById('filePreview');
+            if (!filePreview) return;
+
+            if (selectedFiles.length === 0) {
+                filePreview.style.display = 'none';
+                return;
+            }
+
+            filePreview.style.display = 'block';
+            filePreview.innerHTML = selectedFiles.map((file, index) => {
+                const fileType = getFileIcon(file.type);
+                const fileSize = formatFileSize(file.size);
+                
+                return `
+                    <div class="file-item">
+                        <div class="file-info">
+                            <div class="file-icon">${fileType}</div>
+                            <div class="file-details">
+                                <div class="file-name">${file.name}</div>
+                                <div class="file-size">${fileSize}</div>
+                            </div>
+                        </div>
+                        <button type="button" class="file-remove" onclick="removeFile(${index})">Remove</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFilePreview();
+        }
+
+        function getFileIcon(fileType) {
+            if (fileType.startsWith('image/')) return '🖼️';
+            if (fileType.startsWith('video/')) return '🎥';
+            if (fileType.includes('pdf')) return '📄';
+            if (fileType.includes('word') || fileType.includes('document')) return '📝';
+            return '📎';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Amendment form functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Checkbox styling
+            document.querySelectorAll('.checkbox-item input').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    this.closest('.checkbox-item').classList.toggle('checked', this.checked);
+                });
+            });
+
+            // Tracking code validation
+            const trackingCodeInput = document.querySelector('input[name="trackingCode"]');
+            if (trackingCodeInput) {
+                trackingCodeInput.addEventListener('blur', async function() {
+                    const code = this.value.trim();
+                    if (code && /^MK.*$/.test(code)) await checkTrackingCodeDeadline(code);
+                });
+            }
+
+            // Amendment form submission
+            const amendForm = document.getElementById('amendForm');
+            if (amendForm) {
+                amendForm.addEventListener('submit', handleAmendmentSubmission);
+            }
+        });
+
+        async function checkTrackingCodeDeadline(trackingCode) {
+            const statusDiv = document.getElementById('trackingStatus');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (!statusDiv || !submitBtn) return;
+            
+            statusDiv.className = 'tracking-status checking';
+            statusDiv.style.display = 'block';
+            statusDiv.textContent = '🔍 Checking amendment eligibility...';
+
+            try {
+                const res = await fetch('https://markeb-amend-api.onrender.com/api/check-deadline', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ trackingCode })
+                });
+                const data = await res.json();
+
+                if (!res.ok) {
+                    statusDiv.className = 'tracking-status error';
+                    statusDiv.textContent = '❌ ' + (data.message || 'Unable to verify tracking code');
+                    isExpired = true;
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = '⚠️ Not Eligible';
+                    disableFormFields(true);
+                    return;
+                }
+
+                if (data.message && /No amendment deadline yet/i.test(data.message)) {
+                    isExpired = false;
+                    trackingCodeDeadline = null;
+                    statusDiv.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '📤 Submit Amendment Request';
+                    disableFormFields(false);
+                    return;
+                }
+
+                if (data.deadlineDate) {
+                    trackingCodeDeadline = new Date(data.deadlineDate);
+                    if (data.isExpired) {
+                        isExpired = true;
+                        statusDiv.style.display = 'none';
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = '⚠️ Amendment Window Expired';
+                        disableFormFields(true);
+                    } else {
+                        isExpired = false;
+                        statusDiv.style.display = 'none';
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = '📤 Submit Amendment Request';
+                        disableFormFields(false);
+                    }
+                    return;
+                }
+
+                // fallback allow submit
+                isExpired = false;
+                statusDiv.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = '📤 Submit Amendment Request';
+                disableFormFields(false);
+
+            } catch (err) {
+                statusDiv.className = 'tracking-status error';
+                statusDiv.textContent = '❌ Network error. Please try again.';
+            }
+        }
+
+        function disableFormFields(disable) {
+            document.querySelectorAll('input,textarea,button').forEach(f => {
+                if (f.name === 'trackingCode') return;
+                f.disabled = disable;
+            });
+            document.querySelectorAll('.checkbox-item').forEach(i => {
+                i.style.opacity = disable ? '0.5' : '1';
+                i.style.pointerEvents = disable ? 'none' : 'auto';
+            });
+            
+            const fileUploadArea = document.getElementById('fileUploadArea');
+            if (fileUploadArea) {
+                fileUploadArea.style.pointerEvents = disable ? 'none' : 'auto';
+                fileUploadArea.style.opacity = disable ? '0.5' : '1';
+            }
+        }
+
+        async function uploadFiles() {
+            if (selectedFiles.length === 0) return [];
+
+            const uploadProgress = document.getElementById('uploadProgress');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            if (uploadProgress) uploadProgress.style.display = 'block';
+            
+            const uploadedFiles = [];
+
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                const formData = new FormData();
+                formData.append('file', file);
+
+                try {
+                    const response = await fetch('https://markeb-amend-api.onrender.com/api/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        uploadedFiles.push({
+                            filename: file.name,
+                            url: result.url,
+                            size: file.size,
+                            type: file.type
+                        });
+                    } else {
+                        throw new Error(`Failed to upload ${file.name}`);
+                    }
+
+                    // Update progress
+                    const progress = ((i + 1) / selectedFiles.length) * 100;
+                    if (progressFill) progressFill.style.width = progress + '%';
+                    if (progressText) progressText.textContent = Math.round(progress) + '%';
+
+                } catch (error) {
+                    console.error(`Error uploading ${file.name}:`, error);
+                    throw error;
+                }
+            }
+
+            if (uploadProgress) uploadProgress.style.display = 'none';
+            return uploadedFiles;
+        }
+
+        async function handleAmendmentSubmission(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('submitBtn');
+            const msg = document.getElementById('responseMessage');
+            
+            if (!btn || !msg) return;
+            
+            if (isExpired) {
+                msg.style.display = 'block';
+                msg.className = 'response-message error';
+                msg.textContent = '❌ The amendment window for this tracking code has expired.';
+                return;
+            }
+            
+            const trackingValue = form.trackingCode.value.trim();
+            if (!/^MK.*$/.test(trackingValue)) {
+                alert('Tracking code must start with MK.');
+                form.trackingCode.focus();
+                return;
+            }
+            
+            const mediaTypes = Array.from(form.querySelectorAll('input[name="mediaType"]:checked')).map(cb => cb.value);
+            if (!mediaTypes || mediaTypes.length === 0) {
+                alert('Please select at least one item that needs adjusting.');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Submitting...';
+            msg.style.display = 'none';
+            
+            try {
+                // Upload files first if any are selected
+                let uploadedFiles = [];
+                if (selectedFiles.length > 0) {
+                    btn.textContent = '📤 Uploading files...';
+                    uploadedFiles = await uploadFiles();
+                }
+
+                const payload = {
+                    customerName: form.clientName.value.trim(),
+                    email: form.email.value.trim(),
+                    trackingCode: trackingValue,
+                    amendmentType: mediaTypes,
+                    amendmentDescription: form.amendDetails.value.trim(),
+                    attachments: uploadedFiles
+                };
+                
+                btn.textContent = '⏳ Submitting request...';
+                const res = await fetch('https://markeb-amend-api.onrender.com/api/amend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await res.json();
+                msg.style.display = 'block';
+                
+                if (res.ok) {
+                    msg.className = 'response-message success';
+                    msg.textContent = '✅ Thank you! Your amendment request has been submitted successfully. We\'ll get started on your changes right away.';
+                    form.reset();
+                    document.querySelectorAll('.checkbox-item').forEach(i => i.classList.remove('checked'));
+                    const trackingStatus = document.getElementById('trackingStatus');
+                    if (trackingStatus) trackingStatus.style.display = 'none';
+                    // Clear selected files
+                    selectedFiles = [];
+                    updateFilePreview();
+                } else {
+                    msg.className = 'response-message error';
+                    msg.textContent = '❌ ' + (data.message || 'Submission failed. Please try again.');
+                }
+            } catch (err) {
+                msg.style.display = 'block';
+                msg.className = 'response-message error';
+                msg.textContent = '❌ Network error. Please check your connection and try again.';
+            }
+            
+            btn.disabled = false;
+            btn.textContent = '📤 Submit Amendment Request';
+            msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Action functions
+        function openCopyryta() {
+            // Open the standalone CopyRyta page in a new tab
+            window.open('copyryta.html', '_blank');
+        }
+
+        function contactSupport() {
+            const currentUser = AirtableAPI.getCurrentUser();
+            const subject = 'Support Request from ' + (currentUser ? currentUser.name : 'Portal User');
+            const body = currentUser ? 
+                `Hi Markeb Media team,\n\nI need assistance with:\n\n[Please describe your question or issue]\n\nAccount: ${currentUser.email}\nCompany: ${currentUser.company}\n\nThanks!` :
+                `Hi Markeb Media team,\n\nI need assistance with:\n\n[Please describe your question or issue]\n\nThanks!`;
+            
+            const mailtoUrl = `mailto:hello@markebmedia.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.open(mailtoUrl, '_blank');
+        }
+
+        function saveSettings() {
+            const name = document.getElementById('settingsName').value;
+            const company = document.getElementById('settingsCompany').value;
+            
+            if (!name.trim() || !company.trim()) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // TODO: Implement settings save to Airtable
+            alert('Settings saved successfully! (Feature coming soon)');
+        }
+
+        function logoutUser() {
+            if (confirm('Are you sure you want to logout?')) {
+                AirtableAPI.logoutUser();
+            }
+        }
+    </script>
+
+    <!-- Acuity Scheduling Embed Script -->
+    <script src="https://embed.acuityscheduling.com/js/embed.js" type="text/javascript"></script>
+</body>
+</html><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1923,722 +2911,3 @@
                         <h3>💎 Free Amendment Policy</h3>
                         <p>Each project comes with <span class="highlight">up to two free amendment requests</span> within <span class="highlight">7 days of delivery</span> using your tracking code.</p>
                         <p>Our team typically completes all amendments within <span class="highlight">24 hours</span>, so you can get on with what matters — without delays.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings Section -->
-            <div id="settings" class="section">
-                <div class="settings-grid">
-                    <div class="settings-section">
-                        <h3 class="settings-title">Account Information</h3>
-                        <div class="form-group">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" class="form-input" id="settingsName" placeholder="Your full name">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" class="form-input" id="settingsEmail" placeholder="your@email.com" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Company Name</label>
-                            <input type="text" class="form-input" id="settingsCompany" placeholder="Your company">
-                        </div>
-                        <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
-                    </div>
-
-                    <div class="settings-section">
-                        <h3 class="settings-title">Preferences</h3>
-                        <div class="form-group">
-                            <label class="form-label">Preferred Contact Method</label>
-                            <select class="form-input">
-                                <option>Email</option>
-                                <option>Phone</option>
-                                <option>SMS</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Notifications</label>
-                            <div style="display: flex; gap: 16px; align-items: center;">
-                                <label style="display: flex; align-items: center; gap: 8px;">
-                                    <input type="checkbox" checked> Project updates
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 8px;">
-                                    <input type="checkbox" checked> Booking reminders
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // File Upload Variables
-        let trackingCodeDeadline = null;
-        let isExpired = false;
-        let selectedFiles = [];
-        const maxFileSize = 50 * 1024 * 1024; // 50MB
-
-        // Mobile sidebar functionality
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.querySelector('.mobile-overlay');
-            
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-        }
-
-        function closeSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.querySelector('.mobile-overlay');
-            
-            sidebar.classList.remove('open');
-            overlay.classList.remove('active');
-        }
-
-        // Section navigation
-        function showSection(sectionName) {
-            // Hide all sections
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            
-            // Show selected section
-            document.getElementById(sectionName).classList.add('active');
-            
-            // Update navigation
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            event.target.closest('.nav-item').classList.add('active');
-            
-            // Update page title
-            const titles = {
-                'dashboard': 'Dashboard',
-                'booking': 'Book Your Shoot',
-                'gallery': 'Gallery',
-                'copyryta': 'CopyRyta AI',
-                'tracking': 'Content Tracking',
-                'amend': 'Request Amendment',
-                'settings': 'Account Settings'
-            };
-            
-            const subtitles = {
-                'dashboard': "Here's what's happening with your projects",
-                'booking': 'Schedule your professional photography session',
-                'gallery': 'View and download your completed projects',
-                'copyryta': 'AI copywriting assistant for property descriptions',
-                'tracking': 'Track your visual marketing progress',
-                'amend': 'Request changes to your projects',
-                'settings': 'Manage your account and preferences'
-            };
-            
-            document.getElementById('pageTitle').textContent = titles[sectionName];
-            document.getElementById('pageSubtitle').textContent = subtitles[sectionName];
-            
-            // Close sidebar on mobile
-            if (window.innerWidth <= 1024) {
-                closeSidebar();
-            }
-        }
-
-        // Close sidebar when clicking nav items on mobile
-        document.addEventListener('DOMContentLoaded', function() {
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    if (window.innerWidth <= 1024) {
-                        closeSidebar();
-                    }
-                });
-            });
-        });
-
-
-    // Check authentication and load user data
-document.addEventListener('DOMContentLoaded', function() {
-    // Require authentication
-    if (!AirtableAPI.requireAuthentication()) {
-        return;
-    }
-
-    // Load user data
-    const currentUser = AirtableAPI.getCurrentUser();
-    if (currentUser) {
-        document.getElementById('pageTitle').textContent = `Welcome back, ${currentUser.name}`;
-        document.getElementById('userName').textContent = currentUser.name;
-        document.getElementById('userEmail').textContent = currentUser.email;
-        
-        // Populate settings form
-        document.getElementById('settingsName').value = currentUser.name;
-        document.getElementById('settingsEmail').value = currentUser.email;
-        document.getElementById('settingsCompany').value = currentUser.company;
-        
-        // Set user avatar initial
-        const initials = currentUser.name.split(' ').map(name => name[0]).join('').toUpperCase();
-        document.getElementById('userAvatar').textContent = initials;
-        
-        // Get member since year from token
-        const token = localStorage.getItem('userToken');
-        if (token) {
-            try {
-                const tokenData = JSON.parse(atob(token));
-                const memberSince = new Date(tokenData.timestamp).getFullYear();
-                document.getElementById('memberSince').textContent = memberSince;
-            } catch (error) {
-                console.log('Could not parse token date');
-            }
-        }
-    }
-
-    // Initialize file upload functionality
-    initializeFileUpload();
-});
-
-        // Tracking functionality
-        async function trackBooking() {
-            const trackingCode = document.getElementById("trackingInput").value.trim();
-            const resultDiv = document.getElementById("result");
-
-            if (!trackingCode) {
-                resultDiv.innerHTML = '<div class="warning-message">⚠️ Please enter your tracking code to continue.</div>';
-                return;
-            }
-
-            resultDiv.innerHTML = '<div class="spinner"></div>';
-
-            // TODO: Replace with environment variable or secure token handling
-            const token = 'YOUR_AIRTABLE_TOKEN_HERE';
-            const baseId = 'appVzPU0icwL8H6aP';
-            const tableId = 'tblRgcv7M9dUU3YuL';
-            
-            if (token === 'YOUR_AIRTABLE_TOKEN_HERE') {
-                resultDiv.innerHTML = '<div class="error-message">❌ Tracking service is currently being configured. Please try again later.</div>';
-                return;
-            }
-            
-            const url = `https://api.airtable.com/v0/${baseId}/${tableId}?filterByFormula=${encodeURIComponent(`{Tracking Code}='${trackingCode}'`)}`;
-
-            try {
-                const response = await fetch(url, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-
-                const data = await response.json();
-
-                if (!data.records || data.records.length === 0) {
-                    resultDiv.innerHTML = '<div class="error-message">❗ No booking found with that tracking code. Please check your code and try again.</div>';
-                    return;
-                }
-
-                const record = data.records[0].fields;
-                const status = record["Status"] || "-";
-                const rawShootDate = record["Shoot Date"];
-                const customerName = record["Customer Name"] || "-";
-                const serviceType = record["Service Type"] || "-";
-                const projectAddress = record["Project Address"] || "-";
-                const deliveryLink = record["Delivery Link"];
-
-                const stages = ["Booked", "Editing", "Quality Control", "Ready for Delivery"];
-                const icons = ['📅', '🎬', '🔍', '✅'];
-                const currentStageIndex = stages.indexOf(status);
-                const progressPercentage = (currentStageIndex / (stages.length - 1)) * 80 + 10;
-
-                let formattedDate = "-";
-                let formattedDeadline = "-";
-                let deadlineHTML = "";
-
-                if (rawShootDate) {
-                    const shootDate = new Date(rawShootDate);
-                    const now = new Date();
-                    formattedDate = `${shootDate.getDate().toString().padStart(2, '0')}-${(shootDate.getMonth() + 1).toString().padStart(2, '0')}-${shootDate.getFullYear()}`;
-
-                    const deadlineStart = new Date(shootDate);
-                    deadlineStart.setDate(deadlineStart.getDate() + 1);
-                    deadlineStart.setHours(0, 0, 0, 0);
-
-                    const finalDeadline = new Date(deadlineStart.getTime() + (48 * 60 * 60 * 1000));
-                    formattedDeadline = `${finalDeadline.getDate().toString().padStart(2, '0')}-${(finalDeadline.getMonth() + 1).toString().padStart(2, '0')}-${finalDeadline.getFullYear()} ${finalDeadline.getHours().toString().padStart(2, '0')}:00`;
-
-                    if (now >= deadlineStart && (status === "Editing" || status === "Quality Control")) {
-                        const remainingMs = finalDeadline - now;
-                        const remainingHrs = Math.max(Math.floor(remainingMs / (1000 * 60 * 60)), 0);
-                        deadlineHTML = `
-                            <div class="deadline-alert">
-                                <div style="font-size: 1.2em; margin-bottom: 10px;">⏳ <strong>Delivery Timeline</strong></div>
-                                <div>Estimated completion: <strong>${remainingHrs} hours remaining</strong></div>
-                                <div>Expected delivery: <strong>${formattedDeadline}</strong></div>
-                            </div>
-                        `;
-                    }
-                }
-
-                const progressHTML = `
-                    <div class="progress-container">
-                        <div class="progress-line" style="width: ${progressPercentage}%;"></div>
-                        ${stages.map((stage, i) => `
-                            <div class="progress-step ${i <= currentStageIndex ? 'active' : ''}">
-                                <div class="icon">${icons[i]}</div>
-                                <div class="label">${stage}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-
-                const deliveryLinkHTML = (status === "Ready for Delivery" && deliveryLink)
-                    ? `<div class="delivery-link">
-                         <div style="font-size: 1.2em; margin-bottom: 10px;">🎉 <strong>Your Content is Ready!</strong></div>
-                         <a href="${deliveryLink}" target="_blank">📥 Download Your Files</a>
-                       </div>`
-                    : "";
-
-                resultDiv.innerHTML = `
-                    ${progressHTML}
-                    
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div><strong>🎯 Current Status:</strong></div>
-                            <div style="margin-top: 5px; color: #FF6B00; font-weight: 600;">${status}</div>
-                        </div>
-                        <div class="info-item">
-                            <div><strong>👤 Customer:</strong></div>
-                            <div style="margin-top: 5px;">${customerName}</div>
-                        </div>
-                        <div class="info-item">
-                            <div><strong>🏷️ Service Type:</strong></div>
-                            <div style="margin-top: 5px;">${serviceType}</div>
-                        </div>
-                        <div class="info-item">
-                            <div><strong>📅 Shoot Date:</strong></div>
-                            <div style="margin-top: 5px;">${formattedDate}</div>
-                        </div>
-                        <div class="info-item">
-                            <div><strong>📍 Project Address:</strong></div>
-                            <div style="margin-top: 5px;">${projectAddress}</div>
-                        </div>
-                    </div>
-                    
-                    ${deadlineHTML}
-                    ${deliveryLinkHTML}
-                    
-                    <div class="track-another">
-                        <a href="#" onclick="location.reload();">🔁 Track another project</a>
-                    </div>
-                `;
-            } catch (err) {
-                console.error(err);
-                resultDiv.innerHTML = '<div class="error-message">❌ There was an error retrieving your tracking info. Please try again later.</div>';
-            }
-        }
-
-        // File Upload Functionality
-        function initializeFileUpload() {
-            const fileUploadArea = document.getElementById('fileUploadArea');
-            const fileInput = document.getElementById('fileInput');
-            const browseButton = document.getElementById('browseButton');
-            const filePreview = document.getElementById('filePreview');
-            const uploadProgress = document.getElementById('uploadProgress');
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-
-            if (!fileUploadArea) return; // Only initialize if elements exist
-
-            // File upload event listeners
-            fileUploadArea.addEventListener('click', () => fileInput.click());
-            browseButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                fileInput.click();
-            });
-
-            fileInput.addEventListener('change', handleFileSelect);
-
-            // Drag and drop functionality
-            fileUploadArea.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                fileUploadArea.classList.add('dragover');
-            });
-
-            fileUploadArea.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                fileUploadArea.classList.remove('dragover');
-            });
-
-            fileUploadArea.addEventListener('drop', (e) => {
-                e.preventDefault();
-                fileUploadArea.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                handleFiles(files);
-            });
-        }
-
-        function handleFileSelect(e) {
-            handleFiles(e.target.files);
-        }
-
-        function handleFiles(files) {
-            for (let file of files) {
-                if (file.size > maxFileSize) {
-                    alert(`File "${file.name}" is too large. Maximum size is 50MB.`);
-                    continue;
-                }
-                
-                if (selectedFiles.find(f => f.name === file.name && f.size === file.size)) {
-                    alert(`File "${file.name}" is already selected.`);
-                    continue;
-                }
-
-                selectedFiles.push(file);
-            }
-            
-            updateFilePreview();
-            const fileInput = document.getElementById('fileInput');
-            if (fileInput) fileInput.value = ''; // Clear the input
-        }
-
-        function updateFilePreview() {
-            const filePreview = document.getElementById('filePreview');
-            if (!filePreview) return;
-
-            if (selectedFiles.length === 0) {
-                filePreview.style.display = 'none';
-                return;
-            }
-
-            filePreview.style.display = 'block';
-            filePreview.innerHTML = selectedFiles.map((file, index) => {
-                const fileType = getFileIcon(file.type);
-                const fileSize = formatFileSize(file.size);
-                
-                return `
-                    <div class="file-item">
-                        <div class="file-info">
-                            <div class="file-icon">${fileType}</div>
-                            <div class="file-details">
-                                <div class="file-name">${file.name}</div>
-                                <div class="file-size">${fileSize}</div>
-                            </div>
-                        </div>
-                        <button type="button" class="file-remove" onclick="removeFile(${index})">Remove</button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function removeFile(index) {
-            selectedFiles.splice(index, 1);
-            updateFilePreview();
-        }
-
-        function getFileIcon(fileType) {
-            if (fileType.startsWith('image/')) return '🖼️';
-            if (fileType.startsWith('video/')) return '🎥';
-            if (fileType.includes('pdf')) return '📄';
-            if (fileType.includes('word') || fileType.includes('document')) return '📝';
-            return '📎';
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        // Amendment form functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Checkbox styling
-            document.querySelectorAll('.checkbox-item input').forEach(cb => {
-                cb.addEventListener('change', function() {
-                    this.closest('.checkbox-item').classList.toggle('checked', this.checked);
-                });
-            });
-
-            // Tracking code validation
-            const trackingCodeInput = document.querySelector('input[name="trackingCode"]');
-            if (trackingCodeInput) {
-                trackingCodeInput.addEventListener('blur', async function() {
-                    const code = this.value.trim();
-                    if (code && /^MK.*$/.test(code)) await checkTrackingCodeDeadline(code);
-                });
-            }
-
-            // Amendment form submission
-            const amendForm = document.getElementById('amendForm');
-            if (amendForm) {
-                amendForm.addEventListener('submit', handleAmendmentSubmission);
-            }
-        });
-
-        async function checkTrackingCodeDeadline(trackingCode) {
-            const statusDiv = document.getElementById('trackingStatus');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            if (!statusDiv || !submitBtn) return;
-            
-            statusDiv.className = 'tracking-status checking';
-            statusDiv.style.display = 'block';
-            statusDiv.textContent = '🔍 Checking amendment eligibility...';
-
-            try {
-                const res = await fetch('https://markeb-amend-api.onrender.com/api/check-deadline', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ trackingCode })
-                });
-                const data = await res.json();
-
-                if (!res.ok) {
-                    statusDiv.className = 'tracking-status error';
-                    statusDiv.textContent = '❌ ' + (data.message || 'Unable to verify tracking code');
-                    isExpired = true;
-                    submitBtn.disabled = true;
-                    submitBtn.textContent = '⚠️ Not Eligible';
-                    disableFormFields(true);
-                    return;
-                }
-
-                if (data.message && /No amendment deadline yet/i.test(data.message)) {
-                    isExpired = false;
-                    trackingCodeDeadline = null;
-                    statusDiv.style.display = 'none';
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = '📤 Submit Amendment Request';
-                    disableFormFields(false);
-                    return;
-                }
-
-                if (data.deadlineDate) {
-                    trackingCodeDeadline = new Date(data.deadlineDate);
-                    if (data.isExpired) {
-                        isExpired = true;
-                        statusDiv.style.display = 'none';
-                        submitBtn.disabled = true;
-                        submitBtn.textContent = '⚠️ Amendment Window Expired';
-                        disableFormFields(true);
-                    } else {
-                        isExpired = false;
-                        statusDiv.style.display = 'none';
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = '📤 Submit Amendment Request';
-                        disableFormFields(false);
-                    }
-                    return;
-                }
-
-                // fallback allow submit
-                isExpired = false;
-                statusDiv.style.display = 'none';
-                submitBtn.disabled = false;
-                submitBtn.textContent = '📤 Submit Amendment Request';
-                disableFormFields(false);
-
-            } catch (err) {
-                statusDiv.className = 'tracking-status error';
-                statusDiv.textContent = '❌ Network error. Please try again.';
-            }
-        }
-
-        function disableFormFields(disable) {
-            document.querySelectorAll('input,textarea,button').forEach(f => {
-                if (f.name === 'trackingCode') return;
-                f.disabled = disable;
-            });
-            document.querySelectorAll('.checkbox-item').forEach(i => {
-                i.style.opacity = disable ? '0.5' : '1';
-                i.style.pointerEvents = disable ? 'none' : 'auto';
-            });
-            
-            const fileUploadArea = document.getElementById('fileUploadArea');
-            if (fileUploadArea) {
-                fileUploadArea.style.pointerEvents = disable ? 'none' : 'auto';
-                fileUploadArea.style.opacity = disable ? '0.5' : '1';
-            }
-        }
-
-        async function uploadFiles() {
-            if (selectedFiles.length === 0) return [];
-
-            const uploadProgress = document.getElementById('uploadProgress');
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            
-            if (uploadProgress) uploadProgress.style.display = 'block';
-            
-            const uploadedFiles = [];
-
-            for (let i = 0; i < selectedFiles.length; i++) {
-                const file = selectedFiles[i];
-                const formData = new FormData();
-                formData.append('file', file);
-
-                try {
-                    const response = await fetch('https://markeb-amend-api.onrender.com/api/upload', {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        uploadedFiles.push({
-                            filename: file.name,
-                            url: result.url,
-                            size: file.size,
-                            type: file.type
-                        });
-                    } else {
-                        throw new Error(`Failed to upload ${file.name}`);
-                    }
-
-                    // Update progress
-                    const progress = ((i + 1) / selectedFiles.length) * 100;
-                    if (progressFill) progressFill.style.width = progress + '%';
-                    if (progressText) progressText.textContent = Math.round(progress) + '%';
-
-                } catch (error) {
-                    console.error(`Error uploading ${file.name}:`, error);
-                    throw error;
-                }
-            }
-
-            if (uploadProgress) uploadProgress.style.display = 'none';
-            return uploadedFiles;
-        }
-
-        async function handleAmendmentSubmission(e) {
-            e.preventDefault();
-            const form = e.target;
-            const btn = document.getElementById('submitBtn');
-            const msg = document.getElementById('responseMessage');
-            
-            if (!btn || !msg) return;
-            
-            if (isExpired) {
-                msg.style.display = 'block';
-                msg.className = 'response-message error';
-                msg.textContent = '❌ The amendment window for this tracking code has expired.';
-                return;
-            }
-            
-            const trackingValue = form.trackingCode.value.trim();
-            if (!/^MK.*$/.test(trackingValue)) {
-                alert('Tracking code must start with MK.');
-                form.trackingCode.focus();
-                return;
-            }
-            
-            const mediaTypes = Array.from(form.querySelectorAll('input[name="mediaType"]:checked')).map(cb => cb.value);
-            if (!mediaTypes || mediaTypes.length === 0) {
-                alert('Please select at least one item that needs adjusting.');
-                return;
-            }
-            
-            btn.disabled = true;
-            btn.textContent = '⏳ Submitting...';
-            msg.style.display = 'none';
-            
-            try {
-                // Upload files first if any are selected
-                let uploadedFiles = [];
-                if (selectedFiles.length > 0) {
-                    btn.textContent = '📤 Uploading files...';
-                    uploadedFiles = await uploadFiles();
-                }
-
-                const payload = {
-                    customerName: form.clientName.value.trim(),
-                    email: form.email.value.trim(),
-                    trackingCode: trackingValue,
-                    amendmentType: mediaTypes,
-                    amendmentDescription: form.amendDetails.value.trim(),
-                    attachments: uploadedFiles
-                };
-                
-                btn.textContent = '⏳ Submitting request...';
-                const res = await fetch('https://markeb-amend-api.onrender.com/api/amend', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const data = await res.json();
-                msg.style.display = 'block';
-                
-                if (res.ok) {
-                    msg.className = 'response-message success';
-                    msg.textContent = '✅ Thank you! Your amendment request has been submitted successfully. We\'ll get started on your changes right away.';
-                    form.reset();
-                    document.querySelectorAll('.checkbox-item').forEach(i => i.classList.remove('checked'));
-                    const trackingStatus = document.getElementById('trackingStatus');
-                    if (trackingStatus) trackingStatus.style.display = 'none';
-                    // Clear selected files
-                    selectedFiles = [];
-                    updateFilePreview();
-                } else {
-                    msg.className = 'response-message error';
-                    msg.textContent = '❌ ' + (data.message || 'Submission failed. Please try again.');
-                }
-            } catch (err) {
-                msg.style.display = 'block';
-                msg.className = 'response-message error';
-                msg.textContent = '❌ Network error. Please check your connection and try again.';
-            }
-            
-            btn.disabled = false;
-            btn.textContent = '📤 Submit Amendment Request';
-            msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        // Action functions
-        function openCopyryta() {
-            // Open the standalone CopyRyta page in a new tab
-            window.open('copyryta.html', '_blank');
-        }
-
-        function contactSupport() {
-            const currentUser = AirtableAPI.getCurrentUser();
-            const subject = 'Support Request from ' + (currentUser ? currentUser.name : 'Portal User');
-            const body = currentUser ? 
-                `Hi Markeb Media team,\n\nI need assistance with:\n\n[Please describe your question or issue]\n\nAccount: ${currentUser.email}\nCompany: ${currentUser.company}\n\nThanks!` :
-                `Hi Markeb Media team,\n\nI need assistance with:\n\n[Please describe your question or issue]\n\nThanks!`;
-            
-            const mailtoUrl = `mailto:hello@markebmedia.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.open(mailtoUrl, '_blank');
-        }
-
-        function saveSettings() {
-            const name = document.getElementById('settingsName').value;
-            const company = document.getElementById('settingsCompany').value;
-            
-            if (!name.trim() || !company.trim()) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-            
-            // TODO: Implement settings save to Airtable
-            alert('Settings saved successfully! (Feature coming soon)');
-        }
-
-        function logoutUser() {
-            if (confirm('Are you sure you want to logout?')) {
-                AirtableAPI.logoutUser();
-            }
-        }
-
-        // TODO: Load real data from Acuity and Airtable
-        async function loadDashboardData() {
-            // This will be implemented to pull real booking and project data
-            // const bookingData = await getAcuityBookings(currentUser.email);
-            // const projectData = await getAirtableProjects(currentUser.email);
-            // updateDashboardMetrics(bookingData, projectData);
-        }
-    </script>
-
-    <!-- Acuity Scheduling Embed Script -->
-    <script src="https://embed.acuityscheduling.com/js/embed.js" type="text/javascript"></script>
-</body>
-</html>
