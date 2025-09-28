@@ -1,9 +1,9 @@
-// website/assets/js/airtable.js - Frontend API client
+// website/assets/js/airtable.js - Frontend API client for Netlify Functions
 
 // Create new user account
 async function createUser(userData) {
     try {
-        const response = await fetch('/api/auth?action=register', {
+        const response = await fetch('/.netlify/functions/auth?action=register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -43,7 +43,7 @@ async function createUser(userData) {
 // Authenticate user
 async function authenticateUser(email, password) {
     try {
-        const response = await fetch('/api/auth?action=login', {
+        const response = await fetch('/.netlify/functions/auth?action=login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -81,7 +81,7 @@ async function authenticateUser(email, password) {
 // Get user data
 async function getUserData(email) {
     try {
-        const response = await fetch('/api/auth?action=getUserData', {
+        const response = await fetch('/.netlify/functions/auth?action=getUserData', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -117,7 +117,7 @@ async function getUserData(email) {
 // Validate session token with backend
 async function validateTokenWithBackend(token) {
     try {
-        const response = await fetch('/api/auth?action=validateToken', {
+        const response = await fetch('/.netlify/functions/auth?action=validateToken', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
