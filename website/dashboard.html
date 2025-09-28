@@ -1,143 +1,101 @@
+<!-- /website/dashboard.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Portal - Markeb Media</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Inter',sans-serif;background:#f8fafc;color:#1e293b;line-height:1.6}
-    .sidebar{position:fixed;left:0;top:0;width:280px;height:100vh;background:#fff;border-right:1px solid #e2e8f0;padding:32px 24px;z-index:100;transform:translateX(0);transition:transform .3s ease}
-    .mobile-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);z-index:99}
-    .mobile-toggle{display:none;position:fixed;top:20px;left:20px;z-index:101;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-    .logo{margin-bottom:48px;display:flex;align-items:center}
-    .logo img{height:40px;width:auto}
-    .nav-item{display:flex;align-items:center;gap:12px;padding:12px 16px;margin-bottom:8px;border-radius:8px;color:#64748b;text-decoration:none;font-weight:500;transition:all .2s ease;cursor:pointer}
-    .nav-item:hover,.nav-item.active{background:#f1f5f9;color:#0f172a}
-    .nav-item.active{background:#3b82f6;color:#fff}
-    .nav-icon{width:20px;height:20px;font-size:16px;text-align:center;display:flex;align-items:center;justify-content:center;line-height:1}
-    .main-content{margin-left:280px;min-height:100vh;width:calc(100vw - 280px);box-sizing:border-box}
-    .header{background:#fff;border-bottom:1px solid #e2e8f0;padding:24px 32px;display:flex;justify-content:space-between;align-items:center}
-    .header-left{flex:1}
-    .page-title{font-size:28px;font-weight:600;color:#0f172a;margin-bottom:4px}
-    .page-subtitle{color:#64748b;font-size:16px}
-    .header-right{display:flex;align-items:center;gap:16px}
-    .user-info{display:flex;align-items:center;gap:12px;padding:8px 16px;background:#f8fafc;border-radius:8px}
-    .user-avatar{width:40px;height:40px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600}
-    .user-details h4{font-size:14px;font-weight:600;color:#0f172a}
-    .user-details p{font-size:12px;color:#64748b}
-    .content-area{padding:32px}
-    .section{display:none}
-    .section.active{display:block}
-    .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;margin-bottom:32px}
-    .metric-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;transition:all .2s ease}
-    .metric-card:hover{border-color:#cbd5e1;transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.05)}
-    .metric-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-    .metric-icon{width:48px;height:48px;background:#eff6ff;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
-    .metric-value{font-size:32px;font-weight:700;color:#0f172a;margin-bottom:4px}
-    .metric-label{color:#64748b;font-size:14px;font-weight:500}
-    .content-grid{display:grid;grid-template-columns:2fr 1fr;gap:32px}
-    .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden}
-    .card-header{padding:24px 24px 0;border-bottom:1px solid #f1f5f9;margin-bottom:24px}
-    .card-title{font-size:18px;font-weight:600;color:#0f172a;margin-bottom:8px}
-    .card-subtitle{color:#64748b;font-size:14px}
-    .card-content{padding:0 24px 24px}
-    .activity-item{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid #f1f5f9}
-    .activity-item:last-child{border-bottom:none}
-    .activity-icon{width:40px;height:40px;background:#f8fafc;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-    .activity-content{flex:1}
-    .activity-title{font-weight:500;color:#0f172a;margin-bottom:4px}
-    .activity-time{font-size:13px;color:#64748b}
-    .btn{padding:12px 20px;border-radius:8px;font-weight:500;text-decoration:none;border:none;cursor:pointer;transition:all .2s ease;font-size:14px;display:inline-flex;align-items:center;gap:8px}
-    .btn-primary{background:#3b82f6;color:#fff}
-    .btn-primary:hover{background:#2563eb}
-    .action-grid{display:grid;gap:12px}
-    .action-item{display:flex;align-items:center;gap:12px;padding:16px;background:#f8fafc;border-radius:8px;text-decoration:none;color:#0f172a;transition:all .2s ease;cursor:pointer}
-    .action-item:hover{background:#f1f5f9}
-    .action-icon{width:36px;height:36px;background:#fff;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px}
-    .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:1000px}
-    .settings-section{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px}
-    .settings-title{font-size:18px;font-weight:600;color:#0f172a;margin-bottom:16px}
-    .form-group{margin-bottom:20px}
-    .form-label{display:block;font-weight:500;color:#374151;margin-bottom:8px}
-    .form-input{width:100%;padding:12px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;transition:border-color .2s ease}
-    .form-input:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
-    .copyryta-container{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:32px;text-align:center}
-    .copyryta-title{font-size:24px;font-weight:700;color:#0f172a;margin-bottom:16px}
-    .copyryta-description{color:#64748b;margin-bottom:32px;line-height:1.6}
-    .copyryta-btn{background:linear-gradient(135deg,#FF6B00 0%,#FF8533 100%);color:#fff;padding:16px 32px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;transition:transform .2s ease;border:none;cursor:pointer}
-    .copyryta-btn:hover{transform:translateY(-2px)}
-    .booking-container{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden}
-    .booking-header{padding:24px;border-bottom:1px solid #e2e8f0;background:#f8fafc}
-    .booking-title{font-size:24px;font-weight:700;color:#0f172a;margin-bottom:8px}
-    .booking-description{color:#64748b;line-height:1.6}
-    .booking-iframe-container{padding:0;background:#fff}
-    .booking-iframe{width:100%;height:800px;border:none;display:block}
-    .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}
-    .gallery-item{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;transition:all .2s ease}
-    .gallery-item:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.1)}
-    .gallery-image{width:100%;height:200px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:48px}
-    .gallery-info{padding:20px}
-    .gallery-title{font-weight:600;color:#0f172a;margin-bottom:8px}
-    .gallery-date{color:#64748b;font-size:14px;margin-bottom:12px}
-    .gallery-status{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500}
-    .status-completed{background:#dcfce7;color:#16a34a}
-    .status-processing{background:#fef3c7;color:#d97706}
-    /* Tracker + Amendment + Upload styles trimmed for brevity (kept functional) */
-    .tracker-wrapper{font-family:'Poppins','Segoe UI','Helvetica Neue',sans-serif;text-align:center;padding:50px 30px;background:linear-gradient(135deg,#FFF 0%,#F8FAFC 100%);color:#4A6378;border-radius:24px;max-width:800px;margin:0 auto;box-shadow:0 15px 40px rgba(0,0,0,.08);border:2px solid #F1F5F9;position:relative;overflow:hidden}
-    .tracker-title{margin-bottom:15px;font-size:2.0em;font-weight:800;color:#1F2E3C}
-    .tracker-subtitle{font-size:1.05em;color:#6B7280;margin-bottom:24px}
-    .input-container{position:relative;max-width:450px;margin:0 auto 20px}
-    #trackingInput{padding:14px 18px;width:100%;border:2px solid #E5E7EB;border-radius:12px;font-size:1.05em}
-    .track-button{padding:14px 28px;background:linear-gradient(135deg,#FF6B00,#FF8A33);color:#fff;border:none;border-radius:12px;font-weight:700;font-size:1.05em;cursor:pointer}
-    .result-container{margin-top:24px}
-    #result{text-align:left;font-size:1.05em;background:#fff;border-radius:16px;padding:22px;box-shadow:0 8px 25px rgba(0,0,0,.06);border:1px solid #E5E7EB;margin-top:20px}
-    .file-upload-area{border:2px dashed #E5E7EB;border-radius:12px;padding:24px;text-align:center;background:#FAFAFA;transition:all .3s ease;cursor:pointer;position:relative;overflow:hidden}
-    .file-upload-button{background:linear-gradient(135deg,#FF6B00,#FF8A33);color:#fff;border:none;padding:12px 24px;border-radius:8px;font-weight:600}
-    .file-preview{margin-top:12px;display:none}
-    .file-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border:2px solid #E5E7EB;border-radius:8px;margin-bottom:8px}
-    .upload-progress{display:none;margin-top:12px;padding:12px;background:linear-gradient(135deg,#EBF4FF 0%,#DBEAFE 100%);border:2px solid #3B82F6;border-radius:8px;text-align:center}
-    .progress-bar{width:100%;height:6px;background:#E5E7EB;border-radius:3px;margin:10px 0;overflow:hidden}
-    .progress-fill{height:100%;background:linear-gradient(90deg,#FF6B00,#FF8A33);width:0%}
-    @media (max-width:1024px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.mobile-toggle{display:block}.main-content{margin-left:0;width:100%}.content-grid{grid-template-columns:1fr}.header{padding-left:80px}.booking-iframe{height:600px}}
-    @media (max-width:768px){.header{padding:16px 20px;padding-left:80px;flex-direction:column;gap:16px;text-align:center}.header-left{order:2}.header-right{order:1}.page-title{font-size:24px}.content-area{padding:20px}.metrics-grid{grid-template-columns:repeat(2,1fr);gap:16px}.metric-card{padding:20px}.metric-value{font-size:28px}.metric-label{font-size:12px}.card{margin-bottom:20px}.card-header{padding:20px 20px 0;margin-bottom:20px}.card-content{padding:0 20px 20px}.action-item{padding:12px}.action-icon{width:32px;height:32px;font-size:14px}}
-    @media (max-width:480px){.metrics-grid{grid-template-columns:1fr}.metric-card{text-align:center}.content-area{padding:16px}.card-header{padding:16px 16px 0;margin-bottom:16px}.card-content{padding:0 16px 16px}.activity-item{padding:12px 0}.activity-icon{width:36px;height:36px}.page-title{font-size:20px}.page-subtitle{font-size:14px}.header{padding:12px 16px;padding-left:70px}.booking-iframe{height:400px}}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+    .sidebar { position: fixed; left: 0; top: 0; width: 280px; height: 100vh; background: #fff; border-right: 1px solid #e2e8f0; padding: 32px 24px; z-index: 100; transform: translateX(0); transition: transform .3s ease; }
+    .logo { margin-bottom: 48px; display: flex; align-items: center; }
+    .logo img { height: 40px; width: auto; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; color: #64748b; text-decoration: none; font-weight: 500; transition: all .2s ease; cursor: pointer; }
+    .nav-item:hover, .nav-item.active { background: #f1f5f9; color: #0f172a; }
+    .nav-item.active { background: #3b82f6; color: #fff; }
+    .nav-icon { width: 20px; height: 20px; font-size: 16px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+    .mobile-toggle { display: none; position: fixed; top: 20px; left: 20px; z-index: 101; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+    .mobile-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); z-index: 99; }
+    .main-content { margin-left: 280px; min-height: 100vh; width: calc(100vw - 280px); box-sizing: border-box; }
+    .header { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; }
+    .header-left { flex: 1; }
+    .page-title { font-size: 28px; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
+    .page-subtitle { color: #64748b; font-size: 16px; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .user-info { display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: #f8fafc; border-radius: 8px; }
+    .user-avatar { width: 40px; height: 40px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; }
+    .user-details h4 { font-size: 14px; font-weight: 600; color: #0f172a; }
+    .user-details p { font-size: 12px; color: #64748b; }
+    .btn { padding: 12px 20px; border-radius: 8px; font-weight: 500; text-decoration: none; border: none; cursor: pointer; transition: all .2s ease; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary { background: #3b82f6; color: #fff; }
+    .btn-primary:hover { background: #2563eb; }
+    .content-area { padding: 32px; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 32px; }
+    .metric-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; transition: all .2s ease; }
+    .metric-card:hover { border-color: #cbd5e1; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.05); }
+    .metric-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .metric-icon { width: 48px; height: 48px; background: #eff6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .metric-value { font-size: 32px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .metric-label { color: #64748b; font-size: 14px; font-weight: 500; }
+    .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
+    .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+    .card-header { padding: 24px 24px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 24px; }
+    .card-title { font-size: 18px; font-weight: 600; color: #0f172a; margin-bottom: 8px; }
+    .card-subtitle { color: #64748b; font-size: 14px; }
+    .card-content { padding: 0 24px 24px; }
+    .activity-item { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid #f1f5f9; }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon { width: 40px; height: 40px; background: #f8fafc; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .activity-title { font-weight: 500; color: #0f172a; margin-bottom: 4px; }
+    .activity-time { font-size: 13px; color: #64748b; }
+    .action-grid { display: grid; gap: 12px; }
+    .action-item { display: flex; align-items: center; gap: 12px; padding: 16px; background: #f8fafc; border-radius: 8px; text-decoration: none; color: #0f172a; transition: all .2s ease; cursor: pointer; }
+    .action-item:hover { background: #f1f5f9; }
+    .action-icon { width: 36px; height: 36px; background: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .booking-container { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+    .booking-header { padding: 24px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
+    .booking-title { font-size: 24px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+    .booking-description { color: #64748b; line-height: 1.6; }
+    .booking-iframe-container { padding: 0; background: #fff; }
+    .booking-iframe { width: 100%; height: 800px; border: none; display: block; }
+    @media (max-width: 1024px) { .sidebar { transform: translateX(-100%); } .sidebar.open { transform: translateX(0); } .mobile-toggle { display: block; } .mobile-overlay.active { display: block; } .main-content { margin-left: 0; width: 100%; } .content-grid { grid-template-columns: 1fr; } .header { padding-left: 80px; } .booking-iframe { height: 600px; } }
+    @media (max-width: 768px) { .header { padding: 16px 20px; padding-left: 80px; flex-direction: column; gap: 16px; text-align: center; } .header-left { order: 2; } .header-right { order: 1; } .page-title { font-size: 24px; } .content-area { padding: 20px; } .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; } .metric-card { padding: 20px; } .metric-value { font-size: 28px; } .metric-label { font-size: 12px; } .card { margin-bottom: 20px; } .card-header { padding: 20px 20px 0; margin-bottom: 20px; } .card-content { padding: 0 20px 20px; } .action-item { padding: 12px; } .action-icon { width: 32px; height: 32px; font-size: 14px; } .booking-iframe { height: 500px; } }
+    @media (max-width: 480px) { .metrics-grid { grid-template-columns: 1fr; } .metric-card { padding: 16px; text-align: center; } .content-area { padding: 16px; } .card-header { padding: 16px 16px 0; margin-bottom: 16px; } .card-content { padding: 0 16px 16px; } .activity-item { padding: 12px 0; } .activity-icon { width: 36px; height: 36px; } .page-title { font-size: 20px; } .page-subtitle { font-size: 14px; } .header { padding: 12px 16px; padding-left: 70px; } .booking-iframe { height: 400px; } }
   </style>
 </head>
 <body>
-  <!-- Mobile Toggle Button -->
   <div class="mobile-toggle" onclick="toggleSidebar()">
-    <div style="width:20px;height:20px;display:flex;flex-direction:column;justify-content:space-between;">
-      <div style="width:100%;height:2px;background:#64748b"></div>
-      <div style="width:100%;height:2px;background:#64748b"></div>
-      <div style="width:100%;height:2px;background:#64748b"></div>
+    <div style="width: 20px; height: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+      <div style="width: 100%; height: 2px; background: #64748b;"></div>
+      <div style="width: 100%; height: 2px; background: #64748b;"></div>
+      <div style="width: 100%; height: 2px; background: #64748b;"></div>
     </div>
   </div>
-
-  <!-- Mobile Overlay -->
   <div class="mobile-overlay" onclick="closeSidebar()"></div>
 
-  <!-- Sidebar -->
   <div class="sidebar">
     <div class="logo">
-      <img src="/images/Markeb Media Logo (2).PNG" alt="Markeb Media" />
+      <img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" />
     </div>
     <nav>
       <div class="nav-item active" onclick="showSection('dashboard')"><div class="nav-icon">●</div>Dashboard</div>
       <div class="nav-item" onclick="showSection('booking')"><div class="nav-icon">+</div>Book Shoot</div>
       <div class="nav-item" onclick="showSection('gallery')"><div class="nav-icon">□</div>Gallery</div>
-      <div class="nav-item" onclick="showSection('copyryta')"><div class="nav-icon">◇</div>CopyRyta AI</div>
+      <div class="nav-item" onclick="openCopyryta()"><div class="nav-icon">◇</div>CopyRyta AI</div>
       <div class="nav-item" onclick="showSection('tracking')"><div class="nav-icon">▲</div>Content Tracking</div>
       <div class="nav-item" onclick="showSection('amend')"><div class="nav-icon">△</div>Request Amendment</div>
       <div class="nav-item" onclick="showSection('settings')"><div class="nav-icon">○</div>Settings</div>
-      <div class="nav-item" onclick="contactSupport()"><div class="nav-icon">?</div>Support</div>
-      <div class="nav-item" onclick="logoutAll()" style="margin-top:40px;color:#ef4444"><div class="nav-icon">←</div>Logout</div>
+      <div class="nav-item" onclick="logoutAll()" style="margin-top: 40px; color: #ef4444;"><div class="nav-icon">←</div>Logout</div>
     </nav>
   </div>
 
-  <!-- Main Content -->
   <div class="main-content">
     <div class="header">
       <div class="header-left">
@@ -157,34 +115,82 @@
     </div>
 
     <div class="content-area">
-      <!-- Dashboard Section -->
       <div id="dashboard" class="section active">
         <div class="metrics-grid">
-          <div class="metric-card"><div class="metric-header"><div class="metric-icon">■</div></div><div class="metric-value" id="totalBookings">0</div><div class="metric-label">Total Bookings</div></div>
-          <div class="metric-card"><div class="metric-header"><div class="metric-icon">£</div></div><div class="metric-value" id="totalSpending">£0</div><div class="metric-label">Total Investment</div></div>
-          <div class="metric-card"><div class="metric-header"><div class="metric-icon">✓</div></div><div class="metric-value" id="completedProjects">0</div><div class="metric-label">Completed Projects</div></div>
-          <div class="metric-card"><div class="metric-header"><div class="metric-icon">#</div></div><div class="metric-value" id="memberSince">2024</div><div class="metric-label">Member Since</div></div>
+          <div class="metric-card">
+            <div class="metric-header"><div class="metric-icon">■</div></div>
+            <div class="metric-value" id="totalBookings">0</div>
+            <div class="metric-label">Total Bookings</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-header"><div class="metric-icon">£</div></div>
+            <div class="metric-value" id="totalSpending">£0</div>
+            <div class="metric-label">Total Investment</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-header"><div class="metric-icon">✓</div></div>
+            <div class="metric-value" id="completedProjects">0</div>
+            <div class="metric-label">Completed Projects</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-header"><div class="metric-icon">#</div></div>
+            <div class="metric-value" id="memberSince">—</div>
+            <div class="metric-label">Member Since</div>
+          </div>
         </div>
+
         <div class="content-grid">
           <div class="card">
-            <div class="card-header"><h2 class="card-title">Recent Activity</h2><p class="card-subtitle">Your latest interactions and updates</p></div>
-            <div class="card-content"><div id="activityList"></div></div>
+            <div class="card-header">
+              <h2 class="card-title">Recent Activity</h2>
+              <p class="card-subtitle">Your latest interactions and updates</p>
+            </div>
+            <div class="card-content">
+              <div id="activityList"></div>
+            </div>
           </div>
+
           <div class="card">
-            <div class="card-header"><h2 class="card-title">Quick Actions</h2><p class="card-subtitle">Common tasks and shortcuts</p></div>
+            <div class="card-header">
+              <h2 class="card-title">Quick Actions</h2>
+              <p class="card-subtitle">Common tasks and shortcuts</p>
+            </div>
             <div class="card-content">
               <div class="action-grid">
-                <div class="action-item" onclick="showSection('booking')"><div class="action-icon">+</div><div><div style="font-weight:500">Book New Shoot</div><div style="font-size:12px;color:#64748b">Schedule photos and videos</div></div></div>
-                <div class="action-item" onclick="showSection('tracking')"><div class="action-icon">▲</div><div><div style="font-weight:500">Track Content</div><div style="font-size:12px;color:#64748b">Monitor content progress</div></div></div>
-                <div class="action-item" onclick="showSection('copyryta')"><div class="action-icon">◇</div><div><div style="font-weight:500">CopyRyta AI</div><div style="font-size:12px;color:#64748b">AI copywriting tool</div></div></div>
-                <div class="action-item" onclick="showSection('amend')"><div class="action-icon">△</div><div><div style="font-weight:500">Request Amendment</div><div style="font-size:12px;color:#64748b">Make adjustments to your content</div></div></div>
+                <div class="action-item" onclick="showSection('booking')">
+                  <div class="action-icon">+</div>
+                  <div>
+                    <div style="font-weight: 500;">Book New Shoot</div>
+                    <div style="font-size: 12px; color: #64748b;">Schedule photos and videos</div>
+                  </div>
+                </div>
+                <div class="action-item" onclick="showSection('tracking')">
+                  <div class="action-icon">▲</div>
+                  <div>
+                    <div style="font-weight: 500;">Track Content</div>
+                    <div style="font-size: 12px; color: #64748b;">Monitor content progress</div>
+                  </div>
+                </div>
+                <div class="action-item" onclick="openCopyryta()">
+                  <div class="action-icon">◇</div>
+                  <div>
+                    <div style="font-weight: 500;">CopyRyta AI</div>
+                    <div style="font-size: 12px; color: #64748b;">AI copywriting tool</div>
+                  </div>
+                </div>
+                <div class="action-item" onclick="showSection('amend')">
+                  <div class="action-icon">△</div>
+                  <div>
+                    <div style="font-weight: 500;">Request Amendment</div>
+                    <div style="font-size: 12px; color: #64748b;">Make adjustments to your content</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </div><!-- /content-grid -->
+      </div><!-- /dashboard -->
 
-      <!-- Booking Section -->
       <div id="booking" class="section">
         <div class="booking-container">
           <div class="booking-header">
@@ -192,383 +198,282 @@
             <p class="booking-description">Schedule your professional shoots. Choose your preferred date and time, and we'll handle the rest.</p>
           </div>
           <div class="booking-iframe-container">
-            <iframe src="https://app.acuityscheduling.com/schedule.php?owner=32946394&ref=embedded_csp" title="Schedule Appointment" class="booking-iframe" frameBorder="0" allow="payment"></iframe>
+            <iframe 
+              src="https://app.acuityscheduling.com/schedule.php?owner=32946394&ref=embedded_csp" 
+              title="Schedule Appointment" 
+              class="booking-iframe"
+              frameBorder="0" 
+              allow="payment">
+            </iframe>
           </div>
         </div>
       </div>
 
-      <!-- Gallery Section -->
       <div id="gallery" class="section">
         <div class="card">
-          <div class="card-header"><h2 class="card-title">Your Photo Gallery</h2><p class="card-subtitle">View and download your completed photography projects</p></div>
-          <div class="card-content"><div class="gallery-grid" id="galleryGrid"></div></div>
+          <div class="card-header">
+            <h2 class="card-title">Your Photo Gallery</h2>
+            <p class="card-subtitle">View and download your completed photography projects</p>
+          </div>
+          <div class="card-content">
+            <div class="gallery-grid" id="galleryGrid">
+              <div class="gallery-item" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+                <div class="gallery-image" style="width:100%;height:200px;background:linear-gradient(135deg,#667eea 0%, #764ba2 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:48px;">IMG</div>
+                <div class="gallery-info" style="padding:20px;">
+                  <div class="gallery-title" style="font-weight:600;color:#0f172a;margin-bottom:8px;">Welcome to your gallery</div>
+                  <div class="gallery-date" style="color:#64748b;font-size:14px;margin-bottom:12px;">Your completed projects will appear here</div>
+                  <span class="gallery-status status-processing" style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;background:#fef3c7;color:#d97706;">Coming Soon</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- CopyRyta AI Section -->
       <div id="copyryta" class="section">
-        <div class="copyryta-container">
-          <h2 class="copyryta-title">CopyRyta AI</h2>
-          <p class="copyryta-description">Your AI copywriting assistant for property descriptions and video scripts written in seconds.</p>
-          <button onclick="openCopyryta()" class="copyryta-btn">Launch CopyRyta AI</button>
+        <div class="card" style="padding:24px">
+          <div class="card-header">
+            <h2 class="card-title">CopyRyta AI</h2>
+            <p class="card-subtitle">Open your AI copywriting workspace in a dedicated page.</p>
+          </div>
+          <div class="card-content">
+            <button class="btn btn-primary" onclick="openCopyryta()">Open CopyRyta</button>
+          </div>
         </div>
       </div>
 
-      <!-- Content Tracking Section -->
       <div id="tracking" class="section">
-        <div class="tracker-wrapper">
-          <h2 class="tracker-title">Track Your Content</h2>
-          <p class="tracker-subtitle">Stay updated on your property marketing progress with real-time tracking</p>
-          <div class="input-container"><input type="text" id="trackingInput" placeholder="Enter your tracking code" /></div>
-          <button class="track-button" onclick="trackBooking()">Track Progress</button>
-          <div class="result-container"><div id="result"></div></div>
+        <div class="card" style="padding:24px">
+          <div class="card-header">
+            <h2 class="card-title">Track Your Content</h2>
+            <p class="card-subtitle">Stay updated on your property marketing progress with real-time tracking</p>
+          </div>
+          <div class="card-content">
+            <div style="display:flex;gap:12px;align-items:center;max-width:500px">
+              <input type="text" id="trackingInput" class="form-input" placeholder="Enter your tracking code" style="flex:1;padding:12px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+              <button class="btn btn-primary" onclick="trackBooking()">Track</button>
+            </div>
+            <div class="result-container"><div id="result" style="margin-top:16px;"></div></div>
+          </div>
         </div>
       </div>
 
-      <!-- Request Amendment Section -->
       <div id="amend" class="section">
-        <div class="form-container" style="max-width:700px;margin:0 auto">
-          <div class="form-header" style="text-align:center;margin-bottom:24px">
-            <h2 class="form-title" style="font-size:2rem;font-weight:800;color:#1F2E3C;margin-bottom:10px">Request an Amendment</h2>
-            <p class="form-subtitle" style="color:#6B7280">We're here to help get things just right for your property marketing</p>
+        <div class="card" style="padding:24px">
+          <div class="card-header">
+            <h2 class="card-title">Request an Amendment</h2>
+            <p class="card-subtitle">We're here to help get things just right for your property marketing</p>
           </div>
-          <form id="amendForm">
-            <div class="form-group"><label class="form-label">Your Name</label><input type="text" name="clientName" required class="form-input" placeholder="Enter your full name"/></div>
-            <div class="form-group"><label class="form-label">Your Email</label><input type="email" name="email" required class="form-input" placeholder="your.email@example.com"/></div>
-            <div class="form-group"><label class="form-label">Tracking Code</label><input type="text" name="trackingCode" required pattern="^MK.*$" title="Tracking code must start with MK." class="form-input" placeholder="MK..." oninput="this.value=this.value.toUpperCase()"/></div>
-            <div class="form-group"><label class="form-label">What needs adjusting?</label>
-              <div class="checkbox-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
-                <label class="checkbox-item" style="display:flex;align-items:center;padding:12px;border:1px solid #e5e7eb;border-radius:10px"><input type="checkbox" name="mediaType" value="Photos" style="margin-right:10px"/><span class="checkbox-label">Photos</span></label>
-                <label class="checkbox-item" style="display:flex;align-items:center;padding:12px;border:1px solid #e5e7eb;border-radius:10px"><input type="checkbox" name="mediaType" value="Video" style="margin-right:10px"/><span class="checkbox-label">Video</span></label>
-                <label class="checkbox-item" style="display:flex;align-items:center;padding:12px;border:1px solid #e5e7eb;border-radius:10px"><input type="checkbox" name="mediaType" value="Drone" style="margin-right:10px"/><span class="checkbox-label">Drone</span></label>
-                <label class="checkbox-item" style="display:flex;align-items:center;padding:12px;border:1px solid #e5e7eb;border-radius:10px"><input type="checkbox" name="mediaType" value="Captions" style="margin-right:10px"/><span class="checkbox-label">Captions</span></label>
-                <label class="checkbox-item" style="display:flex;align-items:center;padding:12px;border:1px solid #e5e7eb;border-radius:10px"><input type="checkbox" name="mediaType" value="Other" style="margin-right:10px"/><span class="checkbox-label">Other</span></label>
+          <div class="card-content">
+            <form id="amendForm">
+              <div class="form-group" style="margin-bottom:16px">
+                <label class="form-label" style="display:block;font-weight:600;margin-bottom:6px;">Your Name</label>
+                <input type="text" name="clientName" required class="form-input" placeholder="Enter your full name" style="width:100%;padding:12px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
               </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label class="form-label" style="display:block;font-weight:600;margin-bottom:6px;">Your Email</label>
+                <input type="email" name="email" required class="form-input" placeholder="your.email@example.com" style="width:100%;padding:12px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label class="form-label" style="display:block;font-weight:600;margin-bottom:6px;">Tracking Code</label>
+                <input type="text" name="trackingCode" required pattern="^MK.*$" title="Tracking code must start with MK." class="form-input" placeholder="MK..." oninput="this.value=this.value.toUpperCase()" style="width:100%;padding:12px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label class="form-label" style="display:block;font-weight:600;margin-bottom:6px;">What needs adjusting?</label>
+                <div class="action-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));">
+                  <label class="action-item"><input type="checkbox" name="mediaType" value="Photos"> Photos</label>
+                  <label class="action-item"><input type="checkbox" name="mediaType" value="Video"> Video</label>
+                  <label class="action-item"><input type="checkbox" name="mediaType" value="Drone"> Drone</label>
+                  <label class="action-item"><input type="checkbox" name="mediaType" value="Captions"> Captions</label>
+                  <label class="action-item"><input type="checkbox" name="mediaType" value="Other"> Other</label>
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:16px">
+                <label class="form-label" style="display:block;font-weight:600;margin-bottom:6px;">Details / Notes</label>
+                <textarea name="amendDetails" required class="form-input" placeholder="Please describe the specific changes you'd like us to make..." style="width:100%;padding:12px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;min-height:120px"></textarea>
+              </div>
+              <button id="submitBtn" type="submit" class="btn btn-primary" style="width:100%">Submit Amendment Request</button>
+            </form>
+            <div id="responseMessage" class="response-message" style="display:none;margin-top:12px;font-weight:600;text-align:center"></div>
+
+            <div class="info-box" style="margin-top:20px;background:linear-gradient(135deg,#EBF4FF 0%, #DBEAFE 100%);border:2px solid #3B82F6;border-radius:16px;padding:20px;text-align:center;">
+              <h3 style="color:#1E40AF;font-weight:700;margin-bottom:10px;font-size:1.1em;">Free Amendment Policy</h3>
+              <p style="color:#1E3A8A;font-weight:500;margin-bottom:8px;">Each project comes with <span style="color:#FF6B00;font-weight:700;">up to two free amendment requests</span> within <span style="color:#FF6B00;font-weight:700;">7 days of delivery</span> using your tracking code.</p>
+              <p style="color:#1E3A8A;font-weight:500;">Our team typically completes all amendments within <span style="color:#FF6B00;font-weight:700;">24 hours</span>.</p>
             </div>
-            <div class="form-group"><label class="form-label">Details / Notes</label><textarea name="amendDetails" required class="form-input" style="min-height:120px" placeholder="Please describe the specific changes you'd like us to make..."></textarea></div>
-            <div class="form-group"><label class="form-label">Reference Files (Optional)</label>
-              <div class="file-upload-area" id="fileUploadArea">
-                <div class="file-upload-text">Drag & drop files here</div>
-                <div class="file-upload-subtext" style="font-size:.9em;color:#9CA3AF;margin:6px 0">or click to browse • Max 50MB per file • Images, PDFs, Videos supported</div>
-                <button type="button" class="file-upload-button" id="browseButton">Choose Files</button>
-                <input type="file" id="fileInput" style="display:none" multiple accept="image/*,video/*,.pdf,.doc,.docx,.txt">
-              </div>
-              <div class="file-preview" id="filePreview"></div>
-              <div class="upload-progress" id="uploadProgress">
-                <div>Uploading files...</div>
-                <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-                <div id="progressText">0%</div>
-              </div>
-            </div>
-            <button id="submitBtn" type="submit" class="btn btn-primary" style="width:100%">Submit Amendment Request</button>
-          </form>
-          <div id="responseMessage" class="response-message" style="display:none;margin-top:16px;text-align:center;font-weight:600"></div>
-          <div class="info-box" style="background:#dbeafe;border:2px solid #3b82f6;border-radius:12px;padding:16px;margin-top:16px;text-align:center">
-            <h3 style="color:#1e40af;margin-bottom:8px">Free Amendment Policy</h3>
-            <p>Each project comes with <span class="highlight" style="color:#FF6B00;font-weight:700">up to two free amendment requests</span> within <span class="highlight" style="color:#FF6B00;font-weight:700">7 days of delivery</span> using your tracking code.</p>
-            <p>Our team typically completes all amendments within <span class="highlight" style="color:#FF6B00;font-weight:700">24 hours</span>.</p>
           </div>
         </div>
       </div>
 
-      <!-- Settings Section -->
       <div id="settings" class="section">
-        <div class="settings-grid">
-          <div class="settings-section">
-            <div class="settings-title">Profile</div>
-            <div class="form-group"><label class="form-label">Name</label><input id="settingsName" class="form-input" placeholder="Your name" /></div>
-            <div class="form-group"><label class="form-label">Email</label><input id="settingsEmail" type="email" class="form-input" placeholder="you@example.com" /></div>
+        <div class="card" style="padding:24px">
+          <div class="card-header">
+            <h2 class="card-title">Profile</h2>
+            <p class="card-subtitle">Update your display details (local to your device)</p>
+          </div>
+          <div class="card-content">
+            <div class="form-group" style="margin-bottom:16px">
+              <label class="form-label" style="display:block;font-weight:600;margin-bottom:6px;">Name</label>
+              <input id="settingsName" class="form-input" placeholder="Your name" style="width:100%;padding:12px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+            </div>
+            <div class="form-group" style="margin-bottom:16px">
+              <label class="form-label" style="display:block;font-weight:600;margin-bottom:6px;">Email</label>
+              <input id="settingsEmail" type="email" class="form-input" placeholder="you@example.com" style="width:100%;padding:12px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
+            </div>
             <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
           </div>
-          <div class="settings-section">
-            <div class="settings-title">Integrations</div>
-            <div class="form-group"><label class="form-label">Tracking API URL</label><input id="settingsTrackingApi" class="form-input" placeholder="https://example.com/api/track" /></div>
-            <div class="form-group"><label class="form-label">Amend API URL</label><input id="settingsAmendApi" class="form-input" placeholder="https://markeb-amend-api.vercel.app/api/amend" /></div>
-            <div class="form-group"><label class="form-label">Upload API URL (optional)</label><input id="settingsUploadApi" class="form-input" placeholder="https://example.com/api/upload" /></div>
-            <div class="form-group"><label class="form-label">Acuity Metrics API URL</label><input id="settingsAcuityApi" class="form-input" placeholder="https://yourdomain.com/api/get-appointments" /></div>
-            <div class="form-group"><label class="form-label">Projects API URL (Airtable)</label><input id="settingsProjectsApi" class="form-input" placeholder="https://yourdomain.com/api/get-projects" /></div>
-            <div class="form-group"><label class="form-label">Auth API URL (Netlify)</label><input id="settingsAuthApi" class="form-input" placeholder="https://yourdomain.netlify.app/.netlify/functions/auth" /></div>
-            <button class="btn btn-primary" onclick="saveIntegrations()">Save Integrations</button>
-            <p id="integrationHint" style="margin-top:10px;color:#64748b;font-size:13px">Hint: Paste your live endpoints here (persisted in this browser). The Acuity Metrics API should accept <code>POST</code> with <code>{ userEmail }</code>.</p>
-          </div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- Auth/session client -->
-  <script src="/website/assets/js/airtable.js"></script>
-
+  <script src="./assets/js/airtable.js"></script>
   <script>
-    // ===== UI basics =====
-    function toggleSidebar(){ document.querySelector('.sidebar').classList.toggle('open'); document.querySelector('.mobile-overlay').classList.toggle('active'); }
-    function closeSidebar(){ document.querySelector('.sidebar').classList.remove('open'); document.querySelector('.mobile-overlay').classList.remove('active'); }
-    function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); [...document.querySelectorAll('.nav-item')].find(n=>n.textContent.trim().toLowerCase().includes(id)).classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
-    function contactSupport(){ window.location.href = 'mailto:support@markebmedia.com?subject=Portal%20support'; }
-
-    // ===== Config (persisted) =====
-    const cfg = {
-      get TRACKING_API_URL(){ return localStorage.getItem('tracking_api_url') || ''; },
-      set TRACKING_API_URL(v){ localStorage.setItem('tracking_api_url', v||''); },
-      get AMEND_API_URL(){ return localStorage.getItem('amend_api_url') || 'https://markeb-amend-api.vercel.app/api/amend'; },
-      set AMEND_API_URL(v){ localStorage.setItem('amend_api_url', v||''); },
-      get UPLOAD_API_URL(){ return localStorage.getItem('upload_api_url') || ''; },
-      set UPLOAD_API_URL(v){ localStorage.setItem('upload_api_url', v||''); },
-      get ACUITY_API_URL(){ return localStorage.getItem('acuity_api_url') || ''; },
-      set ACUITY_API_URL(v){ localStorage.setItem('acuity_api_url', v||''); },
-      get PROJECTS_API_URL(){ return localStorage.getItem('projects_api_url') || ''; },
-      set PROJECTS_API_URL(v){ localStorage.setItem('projects_api_url', v||''); },
-      get AUTH_API_URL(){ return localStorage.getItem('auth_api_url') || ''; },
-      set AUTH_API_URL(v){ localStorage.setItem('auth_api_url', v||''); }
+    /* ====== use your actual function names from /netlify/functions ====== */
+    const NETLIFY_ENDPOINTS = {
+      acuity: '/.netlify/functions/acuity-data',
+      projects: '/.netlify/functions/airtable-data',
     };
 
-    // ===== Profile header (prefers AirtableAPI session) =====
-    function loadProfile(){
-      const u = (window.AirtableAPI && AirtableAPI.getCurrentUser) ? AirtableAPI.getCurrentUser() : null;
-      const name = (u && u.name) || localStorage.getItem('user_name') || 'Markeb Client';
-      const email = (u && u.email) || localStorage.getItem('user_email') || 'client@markebmedia.com';
-      document.getElementById('userName').textContent = name;
-      document.getElementById('userEmail').textContent = email;
-      document.getElementById('userAvatar').textContent = (name[0]||'M').toUpperCase();
-      document.getElementById('settingsName').value = name;
-      document.getElementById('settingsEmail').value = email;
-      document.getElementById('settingsTrackingApi').value = cfg.TRACKING_API_URL;
-      document.getElementById('settingsAmendApi').value = cfg.AMEND_API_URL;
-      document.getElementById('settingsUploadApi').value = cfg.UPLOAD_API_URL;
-      document.getElementById('settingsAcuityApi').value = cfg.ACUITY_API_URL;
-      document.getElementById('settingsProjectsApi').value = cfg.PROJECTS_API_URL;
-      document.getElementById('settingsAuthApi').value = cfg.AUTH_API_URL;
-      const btn = document.getElementById('authBtn');
-      if (window.AirtableAPI && AirtableAPI.isUserLoggedIn) {
-        AirtableAPI.isUserLoggedIn().then(ok => {
-          if (ok) { btn.textContent='Sign out'; btn.onclick = ()=>AirtableAPI.logoutUser(); }
-          else { btn.textContent='Sign in'; btn.onclick = ()=>{ window.location.href = '/login.html'; }; }
-        });
-      }
-    }
-    function saveProfile(){
-      const name = document.getElementById('settingsName').value.trim();
-      const email = document.getElementById('settingsEmail').value.trim();
-      if(!name || !email){ alert('Please enter both name and email'); return; }
-      localStorage.setItem('user_name', name); localStorage.setItem('user_email', email);
-      loadProfile(); loadMetrics(); loadProjects(); alert('Profile saved');
+    const fmtGBP = (n) => (typeof n === 'number'
+      ? n.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
+      : '£0');
+
+    function toggleSidebar(){document.querySelector('.sidebar').classList.toggle('open');document.querySelector('.mobile-overlay').classList.toggle('active');}
+    function closeSidebar(){document.querySelector('.sidebar').classList.remove('open');document.querySelector('.mobile-overlay').classList.remove('active');}
+    function showSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));[...document.querySelectorAll('.nav-item')].find(n=>n.textContent.trim().toLowerCase().includes(id))?.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+    function openCopyryta(){window.location.href='./copyryta.html';}
+
+    function setDashboardGreeting(){
+      const titleEl=document.getElementById('pageTitle');
+      const user=window.AirtableAPI?.getCurrentUser?.()||null;
+      const name=(user&&user.name)||localStorage.getItem('user_name')||'there';
+      const action=localStorage.getItem('auth_action');
+      titleEl.textContent=(action==='signup')?`Welcome, ${name}`:`Welcome back, ${name}`;
+      localStorage.removeItem('auth_action');
     }
 
-    // ===== Integrations =====
-    function saveIntegrations(){
-      cfg.TRACKING_API_URL = document.getElementById('settingsTrackingApi').value.trim();
-      cfg.AMEND_API_URL = document.getElementById('settingsAmendApi').value.trim() || 'https://markeb-amend-api.vercel.app/api/amend';
-      cfg.UPLOAD_API_URL = document.getElementById('settingsUploadApi').value.trim();
-      cfg.ACUITY_API_URL = document.getElementById('settingsAcuityApi').value.trim();
-      cfg.PROJECTS_API_URL = document.getElementById('settingsProjectsApi').value.trim();
-      cfg.AUTH_API_URL = document.getElementById('settingsAuthApi').value.trim();
-      loadMetrics(); loadProjects();
-      alert('Integrations saved');
-    }
-
-    // ===== Gallery fallback =====
-    function galleryGrid(){
-      const el = document.getElementById('galleryGrid');
-      if(!el) return;
-      el.innerHTML = `<div class="gallery-item"><div class="gallery-image">IMG</div><div class="gallery-info"><div class="gallery-title">Welcome to your gallery</div><div class="gallery-date">Your completed projects will appear here</div><span class="gallery-status status-processing">Coming Soon</span></div></div>`;
-    }
-
-    // ===== File upload (optional endpoint) =====
-    function setupFileUpload(){
-      const area = document.getElementById('fileUploadArea');
-      const input = document.getElementById('fileInput');
-      const browse = document.getElementById('browseButton');
-      const preview = document.getElementById('filePreview');
-      if(!area || !input) return;
-      const listFiles = files => {
-        preview.style.display = 'block'; preview.innerHTML = '';
-        [...files].forEach(f=>{
-          const item = document.createElement('div'); item.className='file-item';
-          item.innerHTML = `<div class="file-info"><div class="file-details"><div class="file-name">${f.name}</div><div class="file-size">${(f.size/1024/1024).toFixed(2)} MB</div></div></div>`;
-          preview.appendChild(item);
-        });
-      };
-      area.addEventListener('click',()=>input.click());
-      browse.addEventListener('click',()=>input.click());
-      input.addEventListener('change', e=> listFiles(e.target.files));
-      area.addEventListener('dragover',e=>{e.preventDefault(); area.classList.add('dragover');});
-      area.addEventListener('dragleave',()=>area.classList.remove('dragover'));
-      area.addEventListener('drop',e=>{e.preventDefault(); area.classList.remove('dragover'); input.files = e.dataTransfer.files; listFiles(e.dataTransfer.files);});
-    }
-
-    async function uploadFilesIfConfigured(trackingCode){
-      const files = document.getElementById('fileInput').files;
-      if(!files || files.length===0) return [];
-      const links = [];
-      const progress = document.getElementById('uploadProgress');
-      const fill = document.getElementById('progressFill');
-      const text = document.getElementById('progressText');
-      progress.style.display='block'; fill.style.width='0%'; text.textContent='0%';
-      if(!cfg.UPLOAD_API_URL){
-        // Simulate progress
-        for(let i=0;i<=100;i+=10){ await new Promise(r=>setTimeout(r,120)); fill.style.width=i+'%'; text.textContent=i+'%'; }
-        progress.style.display='none';
-        return links;
-      }
-      for(let i=0;i<files.length;i++){
-        const fd = new FormData(); fd.append('file', files[i]); fd.append('trackingCode', trackingCode||'');
-        const res = await fetch(cfg.UPLOAD_API_URL,{ method:'POST', body: fd });
-        const j = await res.json();
-        const url = j.url || j.link; if(url) links.push(url);
-        const pct = Math.round(((i+1)/files.length)*100); fill.style.width=pct+'%'; text.textContent=pct+'%';
-      }
-      progress.style.display='none';
-      return links;
-    }
-
-    // ===== Amend submit =====
-    document.addEventListener('submit', async (e)=>{
-      if(e.target && e.target.id==='amendForm'){
-        e.preventDefault();
-        const fd = new FormData(e.target);
-        const name = fd.get('clientName'); const email = fd.get('email'); const tracking = (fd.get('trackingCode')||'').toString().toUpperCase();
-        const types = [...document.querySelectorAll('input[name="mediaType"]:checked')].map(x=>x.value);
-        const details = fd.get('amendDetails');
-        if(!cfg.AMEND_API_URL){ alert('Set an Amend API URL in Settings.'); return; }
-        const refLinks = await uploadFilesIfConfigured(tracking);
-        const payload = {
-          customerName: name,
-          email: email,
-          trackingCode: tracking,
-          amendmentType: types,
-          amendmentDescription: details + (refLinks.length? `\n\nReferences:\n${refLinks.join('\n')}`:'')
-        };
-        const res = await fetch(cfg.AMEND_API_URL,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
-        const j = await res.json().catch(()=>({success:false}));
-        const msg = document.getElementById('responseMessage');
-        if(res.ok){ msg.style.display='block'; msg.textContent='Amendment request submitted successfully.'; e.target.reset(); document.getElementById('filePreview').style.display='none'; }
-        else { msg.style.display='block'; msg.textContent = j.message || 'Submission failed. Please try again.'; }
-      }
-    });
-
-    // ===== CopyRyta =====
-    function openCopyryta(){ window.open('https://copyryta.markebmedia.com','_blank'); }
-
-    // ===== Tracking =====
-    async function trackBooking(){
-      const code = (document.getElementById('trackingInput').value||'').trim().toUpperCase();
-      const out = document.getElementById('result'); out.innerHTML = '';
-      if(!code){ out.innerHTML = `<div class="warning-message">Please enter a tracking code.</div>`; return; }
-      if(cfg.TRACKING_API_URL){
-        try{
-          const res = await fetch(`${cfg.TRACKING_API_URL}?code=${encodeURIComponent(code)}`);
-          const j = await res.json();
-          renderTracking(j);
-          return;
-        }catch(err){ console.warn('tracking api failed, using demo', err); }
-      }
-      // Demo fallback
-      renderTracking({
-        code, projectAddress:'Sample Property', client:'Markeb Client', package:'Pro',
-        status:'Editing', steps:['Booked','Shot','Editing','QC','Ready'], currentStepIndex:2,
-        deadline:new Date(Date.now()+2*86400000).toISOString(), deliveryLink:''
+    function populateHeaderUser(){
+      const u=window.AirtableAPI?.getCurrentUser?.()||null;
+      const name=(u&&u.name)||localStorage.getItem('user_name')||'Markeb Client';
+      const email=(u&&u.email)||localStorage.getItem('user_email')||'client@markebmedia.com';
+      document.getElementById('userName').textContent=name;
+      document.getElementById('userEmail').textContent=email;
+      document.getElementById('userAvatar').textContent=(name?.[0]||'M').toUpperCase();
+      const btn=document.getElementById('authBtn');
+      window.AirtableAPI?.isUserLoggedIn?.().then(ok=>{
+        if(ok){btn.textContent='Sign out';btn.onclick=()=>AirtableAPI.logoutUser();}
+        else{btn.textContent='Sign in';btn.onclick=()=>window.location.href='../login.html';}
       });
     }
-    function renderTracking(data){
-      const out = document.getElementById('result');
-      const pct = data.steps && Number.isInteger(data.currentStepIndex) ? Math.round(((data.currentStepIndex+1)/data.steps.length)*100) : 0;
-      const dl = data.deliveryLink ? `<div class="delivery-link" style="background:#d1fae5;border:2px solid #10b981;border-radius:12px;padding:12px;margin-top:12px"><a href="${data.deliveryLink}" target="_blank">Open Delivery Folder</a></div>` : '';
-      out.innerHTML = `
-        <div><strong>Tracking:</strong> ${data.code||''}</div>
-        <div class="info-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:10px 0">
-          <div class="info-item"><strong>Address:</strong> ${data.projectAddress||'-'}</div>
-          <div class="info-item"><strong>Client:</strong> ${data.client||'-'}</div>
-          <div class="info-item"><strong>Package:</strong> ${data.package||'-'}</div>
-          <div class="info-item"><strong>Status:</strong> ${data.status||'-'}</div>
-        </div>
-        <div class="progress-container" style="margin:10px 0">
-          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-          <div style="text-align:right;font-weight:600">${pct}%</div>
-        </div>
-        ${dl}
-      `;
+
+    function saveProfile(){
+      const name=document.getElementById('settingsName').value.trim();
+      const email=document.getElementById('settingsEmail').value.trim();
+      if(!name||!email){alert('Please enter both name and email');return;}
+      localStorage.setItem('user_name',name);
+      localStorage.setItem('user_email',email);
+      populateHeaderUser();
+      alert('Profile saved');
     }
 
-    // ===== Metrics (Acuity) =====
-    async function loadMetrics(){
-      const u = (window.AirtableAPI && AirtableAPI.getCurrentUser) ? AirtableAPI.getCurrentUser() : null;
-      const email = (u && u.email) || localStorage.getItem('user_email') || '';
-      const fmtGBP = new Intl.NumberFormat('en-GB',{style:'currency',currency:'GBP'});
-      const set=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
-      set('totalBookings','0'); set('totalSpending', fmtGBP.format(0));
-      if(!cfg.ACUITY_API_URL || !email) return;
+    async function trackBooking(){
+      const code=(document.getElementById('trackingInput').value||'').trim();
+      const resultEl=document.getElementById('result');
+      if(!code){resultEl.textContent='Please enter a tracking code (e.g., MK...)';return;}
+      resultEl.textContent='Checking...';
+      setTimeout(()=>{resultEl.innerHTML=`<div class="delivery-link" style="background:#ecfeff;border:1px solid #06b6d4;padding:12px;border-radius:8px;">Tracking <strong>${code}</strong> • Status: <strong>Processing</strong></div>`;},600);
+    }
+
+    async function fetchJSON(url, bodyObj){
+      const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(bodyObj||{})});
+      const text=await res.text();
+      if(!res.ok) throw new Error(`${res.status} ${res.statusText}: ${text}`);
+      try{return JSON.parse(text);}catch{return {};}
+    }
+
+    async function loadAcuityMetrics(email){
       try{
-        const res = await fetch(cfg.ACUITY_API_URL,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ userEmail: email })});
-        if(!res.ok) throw new Error('Metrics API failed');
-        const data = await res.json();
-        const totalBookings = data.totalBookings || (data.appointments?.length||0);
-        const totalInvestment = (data.totalInvestment!=null) ? Number(data.totalInvestment) : (data.appointments||[]).reduce((s,a)=> s + (a.price? a.price/100 : 0), 0);
-        const completedFromAcuity = (data.appointments||[]).filter(a=> (a.status||'').toLowerCase()==='completed').length;
-        set('totalBookings', String(totalBookings));
-        set('totalSpending', fmtGBP.format(totalInvestment));
-        // Recent activity
+        const data=await fetchJSON(NETLIFY_ENDPOINTS.acuity,{ userEmail: email });
+        const totalBookings=data.totalBookings ?? 0;
+        const totalInvestment=data.totalInvestment ?? 0; // number in GBP
+        document.getElementById('totalBookings').textContent=totalBookings;
+        document.getElementById('totalSpending').textContent=fmtGBP(totalInvestment);
+
         const list=document.getElementById('activityList');
-        if(list && Array.isArray(data.appointments)){
-          list.innerHTML='';
-          data.appointments.slice(0,5).forEach(apt=>{
-            const when = apt.datetime || apt.time || apt.date || apt.createdAt || '';
-            const title = apt.type || apt.appointmentType || 'Appointment';
-            const node=document.createElement('div'); node.className='activity-item';
-            node.innerHTML = `<div class="activity-icon">■</div><div class="activity-content"><div class="activity-title">${title}</div><div class="activity-time">${when}</div></div>`;
-            list.appendChild(node);
-          });
-        }
-        window._completedFromAcuity = completedFromAcuity;
-      }catch(err){ console.error(err); }
+        const appts=Array.isArray(data.appointments)?data.appointments.slice(0,5):[];
+        appts.forEach(a=>{
+          const when=a.datetime||a.time||a.date||'';
+          const title=a.type||a.calendar||'Appointment';
+          const row=document.createElement('div');
+          row.className='activity-item';
+          row.innerHTML=`<div class="activity-icon">■</div><div class="activity-content"><div class="activity-title">${title}</div><div class="activity-time">${when}</div></div>`;
+          list.appendChild(row);
+        });
+      }catch(e){console.warn('Acuity metrics error:',e.message);}
     }
 
-    // ===== Projects (Airtable) =====
-    async function loadProjects(){
-      const u = (window.AirtableAPI && AirtableAPI.getCurrentUser) ? AirtableAPI.getCurrentUser() : null;
-      const email = (u && u.email) || localStorage.getItem('user_email') || '';
-      const set=(id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
-      if(!cfg.PROJECTS_API_URL || !email){ if(typeof window._completedFromAcuity==='number') set('completedProjects', String(window._completedFromAcuity)); return; }
+    async function loadAirtableProjectMetrics(email){
       try{
-        const res = await fetch(cfg.PROJECTS_API_URL,{ method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ userEmail: email })});
-        if(!res.ok) throw new Error('Projects API failed');
-        const data = await res.json();
-        const completed = Number(data.completedProjects || 0);
-        set('completedProjects', String(completed));
-        if(Array.isArray(data.projects)){
-          const el = document.getElementById('galleryGrid'); if(el){ el.innerHTML='';
-            if(data.projects.length===0){ el.innerHTML = `<div class=\"gallery-item\"><div class=\"gallery-image\">IMG</div><div class=\"gallery-info\"><div class=\"gallery-title\">No projects yet</div><div class=\"gallery-date\">Your completed projects will appear here</div><span class=\"gallery-status status-processing\">Coming Soon</span></div></div>`; }
-            else{
-              data.projects.forEach(rec=>{
-                const f = rec.fields||{}; const title = f['Project Address'] || f['Title'] || 'Property';
-                const date = f['Shoot Date'] || f['Created'] || '';
-                const st = f['Status'] || '';
-                const statusClass = (st==='Ready for Delivery'||st==='Delivered') ? 'status-completed' : 'status-processing';
-                const card=document.createElement('div'); card.className='gallery-item';
-                card.innerHTML = `<div class=\"gallery-image\">IMG</div><div class=\"gallery-info\"><div class=\"gallery-title\">${title}</div><div class=\"gallery-date\">${date}</div><span class=\"gallery-status ${statusClass}\">${st||'In progress'}</span></div>`;
-                el.appendChild(card);
-              });
-            }
-          }
+        const data=await fetchJSON(NETLIFY_ENDPOINTS.projects,{ userEmail: email });
+        const completed=data.completedProjects ?? 0;
+        document.getElementById('completedProjects').textContent=completed;
+
+        const list=document.getElementById('activityList');
+        const projects=Array.isArray(data.projects)?data.projects.slice(0,5):[];
+        projects.forEach(p=>{
+          const f=p.fields||{};
+          const title=f['Property']||f['Title']||'Project';
+          const status=f['Status']||'In progress';
+          const row=document.createElement('div');
+          row.className='activity-item';
+          row.innerHTML=`<div class="activity-icon">✓</div><div class="activity-content"><div class="activity-title">${title}</div><div class="activity-time">Status: ${status}</div></div>`;
+          list.appendChild(row);
+        });
+      }catch(e){console.warn('Airtable project metrics error:',e.message);}
+    }
+
+    async function loadMemberSince(email){
+      try{
+        const resp=await window.AirtableAPI.getUserData(email);
+        if(resp?.success && resp.userData?.createdDate){
+          const year=String(resp.userData.createdDate).slice(0,4);
+          document.getElementById('memberSince').textContent=year; return;
         }
-      }catch(err){ console.error(err); }
+      }catch(e){console.warn('memberSince fetch err:',e.message);}
+      document.getElementById('memberSince').textContent='2024';
     }
 
-    // ===== Logout (all) =====
-    function logoutAll(){
-      if(window.AirtableAPI && AirtableAPI.logoutUser){ AirtableAPI.logoutUser(); return; }
-      localStorage.clear(); window.location.href = '/login.html';
+    async function loadDashboardData(){
+      const user=window.AirtableAPI.getCurrentUser();
+      if(!user?.email) return;
+
+      const list=document.getElementById('activityList');
+      list.innerHTML=`<div class="activity-item"><div class="activity-icon">+</div><div class="activity-content"><div class="activity-title">Signed in</div><div class="activity-time">${new Date().toLocaleString('en-GB')}</div></div></div>`;
+
+      await Promise.all([
+        loadAcuityMetrics(user.email),
+        loadAirtableProjectMetrics(user.email),
+        loadMemberSince(user.email),
+      ]);
     }
 
-    // ===== Require session & boot =====
     document.addEventListener('DOMContentLoaded', async ()=>{
-      if (window.AirtableAPI && AirtableAPI.requireAuthentication) {
-        const ok = await AirtableAPI.requireAuthentication(); if(!ok) return;
-        const u = AirtableAPI.getCurrentUser ? AirtableAPI.getCurrentUser() : null;
-        if(u){ localStorage.setItem('user_email', u.email||''); if(u.name) localStorage.setItem('user_name', u.name); }
-      }
-      loadProfile(); galleryGrid(); setupFileUpload(); loadMetrics(); loadProjects();
+      const ok=await window.AirtableAPI.requireAuthentication();
+      if(!ok) return;
+
+      const u=window.AirtableAPI.getCurrentUser();
+      if(u){ localStorage.setItem('user_email',u.email||''); if(u.name) localStorage.setItem('user_name',u.name); }
+
+      populateHeaderUser();
+      setDashboardGreeting();
+      loadDashboardData();
     });
+
+    function logoutAll(){
+      if(window.AirtableAPI?.logoutUser){ AirtableAPI.logoutUser(); }
+      else{ localStorage.clear(); window.location.href='../login.html'; }
+    }
   </script>
 </body>
 </html>
