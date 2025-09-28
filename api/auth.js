@@ -1,9 +1,5 @@
 // api/auth.js - Vercel serverless function for secure authentication
 
-export const config = {
-  runtime: 'nodejs20.x'
-}
-
 export default async function handler(req, res) {
     // Debug logging
     console.log('=== API Request Debug ===');
