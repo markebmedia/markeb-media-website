@@ -1,8 +1,4 @@
-</div>
-                </div>
-            </div>
-
-            <!-- Settings Section -->
+<!-- Settings Section -->
             <div id="settings" class="section">
                 <div class="settings-grid">
                     <div class="settings-section">
@@ -50,7 +46,15 @@
     </div>
 
     <script>
-        // Configuration - Replace with your actual credentials// Function to get user's bookings from Acuity via Netlify function
+        // Configuration - Replace with your actual credentials
+        const AIRTABLE_CONFIG = {
+            apiKey: 'YOUR_AIRTABLE_API_KEY',
+            baseId: 'YOUR_BASE_ID',
+            tableId: 'YOUR_TABLE_ID',
+            baseUrl: 'https://api.airtable.com/v0'
+        };
+
+        // Function to get user's bookings from Acuity via Netlify function
         async function getAcuityBookings(userEmail) {
             try {
                 const response = await fetch('/.netlify/functions/acuity-data', {
@@ -120,7 +124,7 @@
                     .slice(0, 3)
                     .forEach(appointment => {
                         activities.push({
-                            icon: '📅',
+                            icon: '+',
                             title: `Booking confirmed - ${appointment.type}`,
                             time: new Date(appointment.datetime).toLocaleDateString(),
                             type: 'booking'
@@ -134,10 +138,10 @@
                     .slice(0, 3)
                     .forEach(project => {
                         const status = project.fields.Status;
-                        let icon = '📝';
-                        if (status === 'Ready for Delivery') icon = '✅';
-                        if (status === 'Editing') icon = '🎬';
-                        if (status === 'Quality Control') icon = '🔍';
+                        let icon = '•';
+                        if (status === 'Ready for Delivery') icon = '✓';
+                        if (status === 'Editing') icon = '~';
+                        if (status === 'Quality Control') icon = '?';
 
                         activities.push({
                             icon: icon,
@@ -400,7 +404,7 @@
             const resultDiv = document.getElementById("result");
 
             if (!trackingCode) {
-                resultDiv.innerHTML = '<div class="warning-message">⚠️ Please enter your tracking code to continue.</div>';
+                resultDiv.innerHTML = '<div class="warning-message">Please enter your tracking code to continue.</div>';
                 return;
             }
 
@@ -411,7 +415,7 @@
             const tableId = AIRTABLE_CONFIG.tableId;
             
             if (token === 'YOUR_AIRTABLE_API_KEY') {
-                resultDiv.innerHTML = '<div class="error-message">❌ Tracking service is currently being configured. Please try again later.</div>';
+                resultDiv.innerHTML = '<div class="error-message">Tracking service is currently being configured. Please try again later.</div>';
                 return;
             }
             
@@ -427,7 +431,7 @@
                 const data = await response.json();
 
                 if (!data.records || data.records.length === 0) {
-                    resultDiv.innerHTML = '<div class="error-message">❗ No booking found with that tracking code. Please check your code and try again.</div>';
+                    resultDiv.innerHTML = '<div class="error-message">No booking found with that tracking code. Please check your code and try again.</div>';
                     return;
                 }
 
@@ -440,7 +444,7 @@
                 const deliveryLink = record["Delivery Link"];
 
                 const stages = ["Booked", "Editing", "Quality Control", "Ready for Delivery"];
-                const icons = ['📅', '🎬', '🔍', '✅'];
+                const icons = ['+', '~', '?', '✓'];
                 const currentStageIndex = stages.indexOf(status);
                 const progressPercentage = (currentStageIndex / (stages.length - 1)) * 80 + 10;
 
@@ -465,7 +469,7 @@
                         const remainingHrs = Math.max(Math.floor(remainingMs / (1000 * 60 * 60)), 0);
                         deadlineHTML = `
                             <div class="deadline-alert">
-                                <div style="font-size: 1.2em; margin-bottom: 10px;">⏳ <strong>Delivery Timeline</strong></div>
+                                <div style="font-size: 1.2em; margin-bottom: 10px;"><strong>Delivery Timeline</strong></div>
                                 <div>Estimated completion: <strong>${remainingHrs} hours remaining</strong></div>
                                 <div>Expected delivery: <strong>${formattedDeadline}</strong></div>
                             </div>
@@ -487,8 +491,8 @@
 
                 const deliveryLinkHTML = (status === "Ready for Delivery" && deliveryLink)
                     ? `<div class="delivery-link">
-                         <div style="font-size: 1.2em; margin-bottom: 10px;">🎉 <strong>Your Content is Ready!</strong></div>
-                         <a href="${deliveryLink}" target="_blank">📥 Download Your Files</a>
+                         <div style="font-size: 1.2em; margin-bottom: 10px;"><strong>Your Content is Ready!</strong></div>
+                         <a href="${deliveryLink}" target="_blank">Download Your Files</a>
                        </div>`
                     : "";
 
@@ -497,23 +501,23 @@
                     
                     <div class="info-grid">
                         <div class="info-item">
-                            <div><strong>🎯 Current Status:</strong></div>
+                            <div><strong>Current Status:</strong></div>
                             <div style="margin-top: 5px; color: #FF6B00; font-weight: 600;">${status}</div>
                         </div>
                         <div class="info-item">
-                            <div><strong>👤 Customer:</strong></div>
+                            <div><strong>Customer:</strong></div>
                             <div style="margin-top: 5px;">${customerName}</div>
                         </div>
                         <div class="info-item">
-                            <div><strong>🏷️ Service Type:</strong></div>
+                            <div><strong>Service Type:</strong></div>
                             <div style="margin-top: 5px;">${serviceType}</div>
                         </div>
                         <div class="info-item">
-                            <div><strong>📅 Shoot Date:</strong></div>
+                            <div><strong>Shoot Date:</strong></div>
                             <div style="margin-top: 5px;">${formattedDate}</div>
                         </div>
                         <div class="info-item">
-                            <div><strong>📍 Project Address:</strong></div>
+                            <div><strong>Project Address:</strong></div>
                             <div style="margin-top: 5px;">${projectAddress}</div>
                         </div>
                     </div>
@@ -522,12 +526,12 @@
                     ${deliveryLinkHTML}
                     
                     <div class="track-another">
-                        <a href="#" onclick="location.reload();">🔁 Track another project</a>
+                        <a href="#" onclick="location.reload();">Track another project</a>
                     </div>
                 `;
             } catch (err) {
                 console.error(err);
-                resultDiv.innerHTML = '<div class="error-message">❌ There was an error retrieving your tracking info. Please try again later.</div>';
+                resultDiv.innerHTML = '<div class="error-message">There was an error retrieving your tracking info. Please try again later.</div>';
             }
         }
 
@@ -630,11 +634,11 @@
         }
 
         function getFileIcon(fileType) {
-            if (fileType.startsWith('image/')) return '🖼️';
-            if (fileType.startsWith('video/')) return '🎥';
-            if (fileType.includes('pdf')) return '📄';
-            if (fileType.includes('word') || fileType.includes('document')) return '📝';
-            return '📎';
+            if (fileType.startsWith('image/')) return 'IMG';
+            if (fileType.startsWith('video/')) return 'VID';
+            if (fileType.includes('pdf')) return 'PDF';
+            if (fileType.includes('word') || fileType.includes('document')) return 'DOC';
+            return 'FILE';
         }
 
         function formatFileSize(bytes) {
@@ -678,7 +682,7 @@
             
             statusDiv.className = 'tracking-status checking';
             statusDiv.style.display = 'block';
-            statusDiv.textContent = '🔍 Checking amendment eligibility...';
+            statusDiv.textContent = 'Checking amendment eligibility...';
 
             try {
                 const res = await fetch('https://markeb-amend-api.onrender.com/api/check-deadline', {
@@ -690,10 +694,10 @@
 
                 if (!res.ok) {
                     statusDiv.className = 'tracking-status error';
-                    statusDiv.textContent = '❌ ' + (data.message || 'Unable to verify tracking code');
+                    statusDiv.textContent = 'Unable to verify tracking code: ' + (data.message || 'Error');
                     isExpired = true;
                     submitBtn.disabled = true;
-                    submitBtn.textContent = '⚠️ Not Eligible';
+                    submitBtn.textContent = 'Not Eligible';
                     disableFormFields(true);
                     return;
                 }
@@ -714,7 +718,7 @@
                         isExpired = true;
                         statusDiv.style.display = 'none';
                         submitBtn.disabled = true;
-                        submitBtn.textContent = '⚠️ Amendment Window Expired';
+                        submitBtn.textContent = 'Amendment Window Expired';
                         disableFormFields(true);
                     } else {
                         isExpired = false;
@@ -816,7 +820,7 @@
             if (isExpired) {
                 msg.style.display = 'block';
                 msg.className = 'response-message error';
-                msg.textContent = '❌ The amendment window for this tracking code has expired.';
+                msg.textContent = 'The amendment window for this tracking code has expired.';
                 return;
             }
             
@@ -834,14 +838,14 @@
             }
             
             btn.disabled = true;
-            btn.textContent = '⏳ Submitting...';
+            btn.textContent = 'Submitting...';
             msg.style.display = 'none';
             
             try {
                 // Upload files first if any are selected
                 let uploadedFiles = [];
                 if (selectedFiles.length > 0) {
-                    btn.textContent = '📤 Uploading files...';
+                    btn.textContent = 'Uploading files...';
                     uploadedFiles = await uploadFiles();
                 }
 
@@ -854,7 +858,7 @@
                     attachments: uploadedFiles
                 };
                 
-                btn.textContent = '⏳ Submitting request...';
+                btn.textContent = 'Submitting request...';
                 const res = await fetch('https://markeb-amend-api.onrender.com/api/amend', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -866,7 +870,7 @@
                 
                 if (res.ok) {
                     msg.className = 'response-message success';
-                    msg.textContent = '✅ Thank you! Your amendment request has been submitted successfully. We\'ll get started on your changes right away.';
+                    msg.textContent = 'Thank you! Your amendment request has been submitted successfully. We\'ll get started on your changes right away.';
                     form.reset();
                     document.querySelectorAll('.checkbox-item').forEach(i => i.classList.remove('checked'));
                     const trackingStatus = document.getElementById('trackingStatus');
@@ -876,12 +880,12 @@
                     updateFilePreview();
                 } else {
                     msg.className = 'response-message error';
-                    msg.textContent = '❌ ' + (data.message || 'Submission failed. Please try again.');
+                    msg.textContent = 'Submission failed: ' + (data.message || 'Please try again.');
                 }
             } catch (err) {
                 msg.style.display = 'block';
                 msg.className = 'response-message error';
-                msg.textContent = '❌ Network error. Please check your connection and try again.';
+                msg.textContent = 'Network error. Please check your connection and try again.';
             }
             
             btn.disabled = false;
@@ -902,7 +906,7 @@
                 `Hi Markeb Media team,\n\nI need assistance with:\n\n[Please describe your question or issue]\n\nAccount: ${currentUser.email}\nCompany: ${currentUser.company}\n\nThanks!` :
                 `Hi Markeb Media team,\n\nI need assistance with:\n\n[Please describe your question or issue]\n\nThanks!`;
             
-            const mailtoUrl = `mailto:hello@markebmedia.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            const mailtoUrl = `mailto:commercial@markebmedia.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.open(mailtoUrl, '_blank');
         }
 
@@ -929,7 +933,945 @@
     <!-- Acuity Scheduling Embed Script -->
     <script src="https://embed.acuityscheduling.com/js/embed.js" type="text/javascript"></script>
 </body>
-</html><!DOCTYPE html>
+</html>        .response-message {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 1.05em;
+            font-weight: 600;
+            padding: 15px;
+            border-radius: 12px;
+            transition: .3s;
+        }
+
+        .response-message.success {
+            background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+            color: #065F46;
+            border: 2px solid #10B981;
+        }
+
+        .response-message.error {
+            background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+            color: #991B1B;
+            border: 2px solid #EF4444;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #EBF4FF 0%, #DBEAFE 100%);
+            border: 2px solid #3B82F6;
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .info-box h3 {
+            color: #1E40AF;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .info-box p {
+            color: #1E3A8A;
+            font-weight: 500;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .highlight {
+            color: #FF6B00;
+            font-weight: 700;
+        }
+
+        .tracking-status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+
+        .tracking-status.checking {
+            background: linear-gradient(135deg, #E0E7FF 0%, #C7D2FE 100%);
+            color: #3730A3;
+            border: 2px solid #6366F1;
+        }
+
+        /* File Upload Styles */
+        .file-upload-area {
+            border: 2px dashed #E5E7EB;
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            background: #FAFAFA;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-upload-area:hover {
+            border-color: #FF6B00;
+            background: rgba(255, 107, 0, 0.02);
+        }
+
+        .file-upload-area.dragover {
+            border-color: #FF6B00;
+            background: rgba(255, 107, 0, 0.05);
+            transform: scale(1.02);
+        }
+
+        .file-upload-icon {
+            font-size: 3em;
+            color: #9CA3AF;
+            margin-bottom: 15px;
+            transition: color 0.3s ease;
+        }
+
+        .file-upload-area:hover .file-upload-icon,
+        .file-upload-area.dragover .file-upload-icon {
+            color: #FF6B00;
+        }
+
+        .file-upload-text {
+            font-size: 1.1em;
+            color: #6B7280;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .file-upload-subtext {
+            font-size: 0.9em;
+            color: #9CA3AF;
+            margin-bottom: 15px;
+        }
+
+        .file-upload-button {
+            background: linear-gradient(135deg, #FF6B00, #FF8A33);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 107, 0, 0.2);
+        }
+
+        .file-upload-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(255, 107, 0, 0.3);
+        }
+
+        .file-preview {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: white;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .file-item:hover {
+            border-color: #FF6B00;
+            box-shadow: 0 2px 8px rgba(255, 107, 0, 0.1);
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        .file-icon {
+            font-size: 1.5em;
+            margin-right: 12px;
+            color: #FF6B00;
+        }
+
+        .file-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #1F2E3C;
+            font-size: 0.95em;
+            word-break: break-word;
+        }
+
+        .file-size {
+            font-size: 0.8em;
+            color: #6B7280;
+        }
+
+        .file-remove {
+            background: #EF4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-remove:hover {
+            background: #DC2626;
+            transform: scale(1.05);
+        }
+
+        .upload-progress {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #EBF4FF 0%, #DBEAFE 100%);
+            border: 2px solid #3B82F6;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #E5E7EB;
+            border-radius: 3px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF6B00, #FF8A33);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .mobile-toggle {
+                display: block;
+            }
+            
+            .mobile-overlay {
+                display: none;
+            }
+            
+            .mobile-overlay.active {
+                display: block;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding-left: 80px;
+            }
+
+            .booking-iframe {
+                height: 600px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 16px 20px;
+                padding-left: 80px;
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+            
+            .header-left {
+                order: 2;
+            }
+            
+            .header-right {
+                order: 1;
+            }
+            
+            .page-title {
+                font-size: 24px;
+            }
+            
+            .content-area {
+                padding: 20px;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+
+            .metric-card {
+                padding: 20px;
+            }
+
+            .metric-value {
+                font-size: 28px;
+            }
+
+            .metric-label {
+                font-size: 12px;
+            }
+
+            .card {
+                margin-bottom: 20px;
+            }
+
+            .card-header {
+                padding: 20px 20px 0;
+                margin-bottom: 20px;
+            }
+
+            .card-content {
+                padding: 0 20px 20px;
+            }
+
+            .action-item {
+                padding: 12px;
+            }
+
+            .action-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+
+            .nav-item {
+                padding: 16px;
+                font-size: 16px;
+            }
+
+            .nav-icon {
+                width: 24px;
+                height: 24px;
+                font-size: 18px;
+            }
+
+            .user-info {
+                padding: 6px 12px;
+            }
+
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+
+            .user-details h4 {
+                font-size: 13px;
+            }
+
+            .user-details p {
+                font-size: 11px;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .booking-iframe {
+                height: 500px;
+            }
+
+            .booking-header {
+                padding: 20px;
+            }
+
+            .booking-title {
+                font-size: 20px;
+            }
+
+            .tracker-wrapper {
+                padding: 25px 20px;
+                margin: 10px auto;
+                max-width: 98%;
+                border-radius: 20px;
+            }
+
+            .tracker-title {
+                font-size: 2em;
+            }
+
+            .tracker-subtitle {
+                font-size: 1.1em;
+            }
+
+            .form-container {
+                padding: 25px 20px;
+                margin: 10px auto;
+                max-width: 98%;
+                border-radius: 20px;
+            }
+
+            .form-title {
+                font-size: 1.8em;
+            }
+
+            .form-subtitle {
+                font-size: 1em;
+            }
+
+            .checkbox-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 12px;
+            }
+
+            .checkbox-item {
+                padding: 12px;
+                font-size: 0.9em;
+            }
+
+            .info-box {
+                padding: 20px;
+            }
+
+            .file-upload-area {
+                padding: 20px 15px;
+            }
+
+            .file-upload-icon {
+                font-size: 2.5em;
+            }
+
+            .file-upload-text {
+                font-size: 1em;
+            }
+
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .file-info {
+                width: 100%;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metric-card {
+                padding: 16px;
+                text-align: center;
+            }
+
+            .content-area {
+                padding: 16px;
+            }
+
+            .card-header {
+                padding: 16px 16px 0;
+                margin-bottom: 16px;
+            }
+
+            .card-content {
+                padding: 0 16px 16px;
+            }
+
+            .activity-item {
+                padding: 12px 0;
+            }
+
+            .activity-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .page-title {
+                font-size: 20px;
+            }
+
+            .page-subtitle {
+                font-size: 14px;
+            }
+
+            .header {
+                padding: 12px 16px;
+                padding-left: 70px;
+            }
+
+            .mobile-toggle {
+                top: 15px;
+                left: 15px;
+                padding: 10px;
+            }
+
+            .booking-iframe {
+                height: 400px;
+            }
+
+            .tracker-wrapper {
+                padding: 20px 15px;
+                margin: 5px auto;
+                max-width: 99%;
+                border-radius: 16px;
+            }
+
+            .tracker-title {
+                font-size: 1.6em;
+                line-height: 1.2;
+            }
+
+            .tracker-subtitle {
+                font-size: 0.95em;
+                line-height: 1.4;
+            }
+
+            .form-container {
+                padding: 20px 15px;
+                margin: 5px auto;
+                max-width: 99%;
+                border-radius: 16px;
+            }
+
+            .form-title {
+                font-size: 1.6em;
+                line-height: 1.2;
+            }
+
+            .form-subtitle {
+                font-size: 0.95em;
+                line-height: 1.4;
+            }
+
+            .checkbox-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .checkbox-item {
+                padding: 10px;
+                font-size: 0.85em;
+            }
+
+            .form-input, .form-textarea {
+                padding: 14px 16px;
+                font-size: 1em;
+            }
+
+            .submit-button {
+                padding: 16px 20px;
+                font-size: 1em;
+            }
+
+            .info-box {
+                padding: 18px;
+            }
+
+            .info-box h3 {
+                font-size: 1.1em;
+            }
+
+            .info-box p {
+                font-size: 0.9em;
+            }
+
+            .file-upload-area {
+                padding: 20px 10px;
+            }
+
+            .file-upload-icon {
+                font-size: 2em;
+            }
+
+            .file-upload-text {
+                font-size: 0.95em;
+            }
+
+            .file-upload-subtext {
+                font-size: 0.85em;
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Toggle Button -->
+    <div class="mobile-toggle" onclick="toggleSidebar()">
+        <div style="width: 20px; height: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="width: 100%; height: 2px; background: #64748b;"></div>
+            <div style="width: 100%; height: 2px; background: #64748b;"></div>
+            <div style="width: 100%; height: 2px; background: #64748b;"></div>
+        </div>
+    </div>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" onclick="closeSidebar()"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <img src="images/Markeb Media Logo (2).PNG" alt="Markeb Media" />
+        </div>
+        
+        <nav>
+            <div class="nav-item active" onclick="showSection('dashboard')">
+                <div class="nav-icon">●</div>
+                Dashboard
+            </div>
+            
+            <div class="nav-item" onclick="showSection('booking')">
+                <div class="nav-icon">+</div>
+                Book Shoot
+            </div>
+            
+            <div class="nav-item" onclick="showSection('gallery')">
+                <div class="nav-icon">□</div>
+                Gallery
+            </div>
+            
+            <div class="nav-item" onclick="showSection('copyryta')">
+                <div class="nav-icon">◇</div>
+                CopyRyta AI
+            </div>
+            
+            <div class="nav-item" onclick="showSection('tracking')">
+                <div class="nav-icon">▲</div>
+                Content Tracking
+            </div>
+            
+            <div class="nav-item" onclick="showSection('amend')">
+                <div class="nav-icon">△</div>
+                Request Amendment
+            </div>
+            
+            <div class="nav-item" onclick="showSection('settings')">
+                <div class="nav-icon">○</div>
+                Settings
+            </div>
+            
+            <div class="nav-item" onclick="contactSupport()">
+                <div class="nav-icon">?</div>
+                Support
+            </div>
+            
+            <div class="nav-item" onclick="logoutUser()" style="margin-top: 40px; color: #ef4444;">
+                <div class="nav-icon">←</div>
+                Logout
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1 class="page-title" id="pageTitle">Welcome back</h1>
+                <p class="page-subtitle" id="pageSubtitle">Here's what's happening with your projects</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">M</div>
+                    <div class="user-details">
+                        <h4 id="userName">Loading...</h4>
+                        <p id="userEmail">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="section active">
+                <!-- Metrics Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon">■</div>
+                        </div>
+                        <div class="metric-value" id="totalBookings">0</div>
+                        <div class="metric-label">Total Bookings</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon">£</div>
+                        </div>
+                        <div class="metric-value" id="totalSpending">£0</div>
+                        <div class="metric-label">Total Investment</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon">✓</div>
+                        </div>
+                        <div class="metric-value" id="completedProjects">0</div>
+                        <div class="metric-label">Completed Projects</div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon">#</div>
+                        </div>
+                        <div class="metric-value" id="memberSince">2024</div>
+                        <div class="metric-label">Member Since</div>
+                    </div>
+                </div>
+
+                <!-- Content Grid -->
+                <div class="content-grid">
+                    <!-- Recent Activity -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Activity</h2>
+                            <p class="card-subtitle">Your latest interactions and updates</p>
+                        </div>
+                        <div class="card-content">
+                            <div id="activityList">
+                                <div class="activity-item">
+                                    <div class="activity-icon">+</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Account created successfully</div>
+                                        <div class="activity-time">Welcome to Markeb Media</div>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon">■</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Dashboard accessed</div>
+                                        <div class="activity-time">Ready to book your first shoot</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Quick Actions</h2>
+                            <p class="card-subtitle">Common tasks and shortcuts</p>
+                        </div>
+                        <div class="card-content">
+                            <div class="action-grid">
+                                <div class="action-item" onclick="showSection('booking')">
+                                    <div class="action-icon">+</div>
+                                    <div>
+                                        <div style="font-weight: 500;">Book New Shoot</div>
+                                        <div style="font-size: 12px; color: #64748b;">Schedule photos and videos</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="action-item" onclick="showSection('tracking')">
+                                    <div class="action-icon">▲</div>
+                                    <div>
+                                        <div style="font-weight: 500;">Track Content</div>
+                                        <div style="font-size: 12px; color: #64748b;">Monitor content progress</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="action-item" onclick="showSection('copyryta')">
+                                    <div class="action-icon">◇</div>
+                                    <div>
+                                        <div style="font-weight: 500;">CopyRyta AI</div>
+                                        <div style="font-size: 12px; color: #64748b;">AI copywriting tool</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="action-item" onclick="showSection('amend')">
+                                    <div class="action-icon">△</div>
+                                    <div>
+                                        <div style="font-weight: 500;">Request Amendment</div>
+                                        <div style="font-size: 12px; color: #64748b;">Make adjustments to your content</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Section -->
+            <div id="booking" class="section">
+                <div class="booking-container">
+                    <div class="booking-header">
+                        <h2 class="booking-title">Book Your Shoot</h2>
+                        <p class="booking-description">
+                            Schedule your professional shoots. Choose your preferred date and time, and we'll handle the rest.
+                        </p>
+                    </div>
+                    <div class="booking-iframe-container">
+                        <iframe 
+                            src="https://app.acuityscheduling.com/schedule.php?owner=32946394&ref=embedded_csp" 
+                            title="Schedule Appointment" 
+                            class="booking-iframe"
+                            frameBorder="0" 
+                            allow="payment">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery Section -->
+            <div id="gallery" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Your Photo Gallery</h2>
+                        <p class="card-subtitle">View and download your completed photography projects</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="gallery-grid" id="galleryGrid">
+                            <div class="gallery-item">
+                                <div class="gallery-image">IMG</div>
+                                <div class="gallery-info">
+                                    <div class="gallery-title">Welcome to your gallery</div>
+                                    <div class="gallery-date">Your completed projects will appear here</div>
+                                    <span class="gallery-status status-processing">Coming Soon</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CopyRyta AI Section -->
+            <div id="copyryta" class="section">
+                <div class="copyryta-container">
+                    <h2 class="copyryta-title">CopyRyta AI</h2>
+                    <p class="copyryta-description">
+                        Your AI copywriting assistant for property descriptions and video scripts written in seconds. 
+                        Generate compelling, professional copy that helps your listings stand out and sell faster.
+                    </p>
+                    <button onclick="openCopyryta()" class="copyryta-btn">Launch CopyRyta AI</button>
+                </div>
+            </div>
+
+            <!-- Content Tracking Section -->
+            <div id="tracking" class="section">
+                <div class="tracker-wrapper">
+                    <h2 class="tracker-title">Track Your Content</h2>
+                    <p class="tracker-subtitle">Stay updated on your property marketing progress with real-time tracking</p>
+
+                    <div class="input-container">
+                        <input type="text" id="trackingInput" placeholder="Enter your tracking code" />
+                    </div>
+                  
+                    <button class="track-button" onclick="trackBooking()">
+                        Track Progress
+                    </button>
+
+                    <div class="result-container">
+                        <div id="result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Request Amendment Section -->
+            <div id="amend" class="section">
+                <div class="form-container">
+                    <div class="form-header">
+                        <h2 class="form-title">Request an Amendment</h2>
+                        <p class="form-subtitle">We're here to help get things just right for your property marketing</p>
+                    </div>
+
+                    <form id="amendForm">
+                        <div class="form-group">
+                            <label class="form-label">Your Name</label>
+                            <input type="text" name="clientName" required class="form-input" placeholder="Enter your full name"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Your Email</label>
+                            <input type="email" name="email" required class="form-input" placeholder="your.email@example.com"/>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tracking Code</label>
+                            <input type="text" name="trackingCode" required pattern="^MK.*$" title="Tracking code must start with MK." class="form-input" placeholder="MK..." oninput="this.value=this.value.toUpperCase()"/>
+                            <div id="trackingStatus" class="tracking-status"></div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">What needs adjusting?</label>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Photos"/><span class="checkbox-label">Photos</span></label>
+                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Video"/><span class="checkbox-label">Video</span></label>
+                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Drone"/><span class="checkbox-label">Drone</span></label>
+                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Captions"/><span class="checkbox-label">Captions</span></label>
+                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Other"/><span class="checkbox-label">Other</span></label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Details / Notes</label>
+                            <textarea name="amendDetails" required class="form-textarea" placeholder="Please describe the specific changes you'd like us to make..."></textarea>
+                        </div>
+
+                        <!-- File Upload Section -->
+                        <div class="form-group">
+                            <label class="form-label">Reference Files (Optional)</label>
+                            <div class="file-upload-area" id="fileUploadArea">
+                                <div class="file-upload-icon">+</div>
+                                <div class="file-upload-text">Drag & drop files here</div>
+                                <div class="file-upload-subtext">or click to browse • Max 50MB per file • Images, PDFs, Videos supported</div>
+                                <button type="button" class="file-upload-button" id="browseButton">Choose Files</button>
+                                <input type="file" id="fileInput" style="display: none;" multiple accept="image/*,video/*,.pdf,.doc,.docx,.txt">
+                            </div>
+                            <div class="file-preview" id="filePreview"></div>
+                            <div class="upload-progress" id="uploadProgress">
+                                <div>Uploading files...</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progressFill"></div>
+                                </div>
+                                <div id="progressText">0%</div>
+                            </div>
+                        </div>
+
+                        <button id="submitBtn" type="submit" class="submit-button">Submit Amendment Request</button>
+                    </form>
+                    <div id="responseMessage" class="response-message" style="display:none;"></div>
+                    <div class="info-box">
+                        <h3>Free Amendment Policy</h3>
+                        <p>Each project comes with <span class="highlight">up to two free amendment requests</span> within <span class="highlight">7 days of delivery</span> using your tracking code.</p>
+                        <p>Our team typically completes all amendments within <span class="highlight">24 hours</span>, so you can get on with what matters — without delays.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings" class="section">
+                <div class="settings-grid">
+                    <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -992,10 +1934,14 @@
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: #0f172a;
             margin-bottom: 48px;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
         }
 
         .nav-item {
@@ -1036,6 +1982,8 @@
         .main-content {
             margin-left: 280px;
             min-height: 100vh;
+            width: calc(100vw - 280px);
+            box-sizing: border-box;
         }
 
         .header {
@@ -1043,7 +1991,7 @@
             border-bottom: 1px solid #e2e8f0;
             padding: 24px 32px;
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
         }
 
@@ -1136,7 +2084,7 @@
 
         .metric-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 16px;
         }
@@ -1369,7 +2317,9 @@
 
         .settings-grid {
             display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 24px;
+            max-width: 1000px;
         }
 
         .settings-section {
@@ -1947,904 +2897,5 @@
         .response-message {
             margin-top: 25px;
             text-align: center;
-            font-size: 1.05em;
-            font-weight: 600;
-            padding: 15px;
-            border-radius: 12px;
-            transition: .3s;
+            font-size: 1 
         }
-
-        .response-message.success {
-            background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
-            color: #065F46;
-            border: 2px solid #10B981;
-        }
-
-        .response-message.error {
-            background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
-            color: #991B1B;
-            border: 2px solid #EF4444;
-        }
-
-        .info-box {
-            background: linear-gradient(135deg, #EBF4FF 0%, #DBEAFE 100%);
-            border: 2px solid #3B82F6;
-            border-radius: 16px;
-            padding: 25px;
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        .info-box h3 {
-            color: #1E40AF;
-            font-weight: 700;
-            margin-bottom: 15px;
-            font-size: 1.2em;
-        }
-
-        .info-box p {
-            color: #1E3A8A;
-            font-weight: 500;
-            margin-bottom: 10px;
-            line-height: 1.6;
-        }
-
-        .info-box p:last-child {
-            margin-bottom: 0;
-        }
-
-        .highlight {
-            color: #FF6B00;
-            font-weight: 700;
-        }
-
-        .tracking-status {
-            margin-top: 15px;
-            padding: 12px;
-            border-radius: 8px;
-            font-weight: 600;
-            text-align: center;
-            display: none;
-        }
-
-        .tracking-status.checking {
-            background: linear-gradient(135deg, #E0E7FF 0%, #C7D2FE 100%);
-            color: #3730A3;
-            border: 2px solid #6366F1;
-        }
-
-        /* File Upload Styles */
-        .file-upload-area {
-            border: 2px dashed #E5E7EB;
-            border-radius: 12px;
-            padding: 30px 20px;
-            text-align: center;
-            background: #FAFAFA;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .file-upload-area:hover {
-            border-color: #FF6B00;
-            background: rgba(255, 107, 0, 0.02);
-        }
-
-        .file-upload-area.dragover {
-            border-color: #FF6B00;
-            background: rgba(255, 107, 0, 0.05);
-            transform: scale(1.02);
-        }
-
-        .file-upload-icon {
-            font-size: 3em;
-            color: #9CA3AF;
-            margin-bottom: 15px;
-            transition: color 0.3s ease;
-        }
-
-        .file-upload-area:hover .file-upload-icon,
-        .file-upload-area.dragover .file-upload-icon {
-            color: #FF6B00;
-        }
-
-        .file-upload-text {
-            font-size: 1.1em;
-            color: #6B7280;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .file-upload-subtext {
-            font-size: 0.9em;
-            color: #9CA3AF;
-            margin-bottom: 15px;
-        }
-
-        .file-upload-button {
-            background: linear-gradient(135deg, #FF6B00, #FF8A33);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(255, 107, 0, 0.2);
-        }
-
-        .file-upload-button:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(255, 107, 0, 0.3);
-        }
-
-        .file-preview {
-            margin-top: 20px;
-            display: none;
-        }
-
-        .file-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            background: white;
-            border: 2px solid #E5E7EB;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .file-item:hover {
-            border-color: #FF6B00;
-            box-shadow: 0 2px 8px rgba(255, 107, 0, 0.1);
-        }
-
-        .file-info {
-            display: flex;
-            align-items: center;
-            flex-grow: 1;
-        }
-
-        .file-icon {
-            font-size: 1.5em;
-            margin-right: 12px;
-            color: #FF6B00;
-        }
-
-        .file-details {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .file-name {
-            font-weight: 600;
-            color: #1F2E3C;
-            font-size: 0.95em;
-            word-break: break-word;
-        }
-
-        .file-size {
-            font-size: 0.8em;
-            color: #6B7280;
-        }
-
-        .file-remove {
-            background: #EF4444;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 6px 10px;
-            font-size: 0.8em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .file-remove:hover {
-            background: #DC2626;
-            transform: scale(1.05);
-        }
-
-        .upload-progress {
-            display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background: linear-gradient(135deg, #EBF4FF 0%, #DBEAFE 100%);
-            border: 2px solid #3B82F6;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #E5E7EB;
-            border-radius: 3px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #FF6B00, #FF8A33);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            
-            .mobile-toggle {
-                display: block;
-            }
-            
-            .mobile-overlay {
-                display: none;
-            }
-            
-            .mobile-overlay.active {
-                display: block;
-            }
-            
-            .main-content {
-                margin-left: 0;
-            }
-            
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .header {
-                padding-left: 80px;
-            }
-
-            .booking-iframe {
-                height: 600px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header {
-                padding: 16px 20px;
-                padding-left: 80px;
-                flex-direction: column;
-                gap: 16px;
-                text-align: center;
-            }
-            
-            .header-left {
-                order: 2;
-            }
-            
-            .header-right {
-                order: 1;
-            }
-            
-            .page-title {
-                font-size: 24px;
-            }
-            
-            .content-area {
-                padding: 20px;
-            }
-            
-            .metrics-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 16px;
-            }
-
-            .metric-card {
-                padding: 20px;
-            }
-
-            .metric-value {
-                font-size: 28px;
-            }
-
-            .metric-label {
-                font-size: 12px;
-            }
-
-            .card {
-                margin-bottom: 20px;
-            }
-
-            .card-header {
-                padding: 20px 20px 0;
-                margin-bottom: 20px;
-            }
-
-            .card-content {
-                padding: 0 20px 20px;
-            }
-
-            .action-item {
-                padding: 12px;
-            }
-
-            .action-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
-            }
-
-            .nav-item {
-                padding: 16px;
-                font-size: 16px;
-            }
-
-            .nav-icon {
-                width: 24px;
-                height: 24px;
-                font-size: 18px;
-            }
-
-            .user-info {
-                padding: 6px 12px;
-            }
-
-            .user-avatar {
-                width: 36px;
-                height: 36px;
-                font-size: 14px;
-            }
-
-            .user-details h4 {
-                font-size: 13px;
-            }
-
-            .user-details p {
-                font-size: 11px;
-            }
-
-            .gallery-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .booking-iframe {
-                height: 500px;
-            }
-
-            .booking-header {
-                padding: 20px;
-            }
-
-            .booking-title {
-                font-size: 20px;
-            }
-
-            .tracker-wrapper {
-                padding: 25px 20px;
-                margin: 10px auto;
-                max-width: 98%;
-                border-radius: 20px;
-            }
-
-            .tracker-title {
-                font-size: 2em;
-            }
-
-            .tracker-subtitle {
-                font-size: 1.1em;
-            }
-
-            .form-container {
-                padding: 25px 20px;
-                margin: 10px auto;
-                max-width: 98%;
-                border-radius: 20px;
-            }
-
-            .form-title {
-                font-size: 1.8em;
-            }
-
-            .form-subtitle {
-                font-size: 1em;
-            }
-
-            .checkbox-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                gap: 12px;
-            }
-
-            .checkbox-item {
-                padding: 12px;
-                font-size: 0.9em;
-            }
-
-            .info-box {
-                padding: 20px;
-            }
-
-            .file-upload-area {
-                padding: 20px 15px;
-            }
-
-            .file-upload-icon {
-                font-size: 2.5em;
-            }
-
-            .file-upload-text {
-                font-size: 1em;
-            }
-
-            .file-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .file-info {
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .metrics-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .metric-card {
-                padding: 16px;
-                text-align: center;
-            }
-
-            .content-area {
-                padding: 16px;
-            }
-
-            .card-header {
-                padding: 16px 16px 0;
-                margin-bottom: 16px;
-            }
-
-            .card-content {
-                padding: 0 16px 16px;
-            }
-
-            .activity-item {
-                padding: 12px 0;
-            }
-
-            .activity-icon {
-                width: 36px;
-                height: 36px;
-            }
-
-            .page-title {
-                font-size: 20px;
-            }
-
-            .page-subtitle {
-                font-size: 14px;
-            }
-
-            .header {
-                padding: 12px 16px;
-                padding-left: 70px;
-            }
-
-            .mobile-toggle {
-                top: 15px;
-                left: 15px;
-                padding: 10px;
-            }
-
-            .booking-iframe {
-                height: 400px;
-            }
-
-            .tracker-wrapper {
-                padding: 20px 15px;
-                margin: 5px auto;
-                max-width: 99%;
-                border-radius: 16px;
-            }
-
-            .tracker-title {
-                font-size: 1.6em;
-                line-height: 1.2;
-            }
-
-            .tracker-subtitle {
-                font-size: 0.95em;
-                line-height: 1.4;
-            }
-
-            .form-container {
-                padding: 20px 15px;
-                margin: 5px auto;
-                max-width: 99%;
-                border-radius: 16px;
-            }
-
-            .form-title {
-                font-size: 1.6em;
-                line-height: 1.2;
-            }
-
-            .form-subtitle {
-                font-size: 0.95em;
-                line-height: 1.4;
-            }
-
-            .checkbox-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-
-            .checkbox-item {
-                padding: 10px;
-                font-size: 0.85em;
-            }
-
-            .form-input, .form-textarea {
-                padding: 14px 16px;
-                font-size: 1em;
-            }
-
-            .submit-button {
-                padding: 16px 20px;
-                font-size: 1em;
-            }
-
-            .info-box {
-                padding: 18px;
-            }
-
-            .info-box h3 {
-                font-size: 1.1em;
-            }
-
-            .info-box p {
-                font-size: 0.9em;
-            }
-
-            .file-upload-area {
-                padding: 20px 10px;
-            }
-
-            .file-upload-icon {
-                font-size: 2em;
-            }
-
-            .file-upload-text {
-                font-size: 0.95em;
-            }
-
-            .file-upload-subtext {
-                font-size: 0.85em;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Mobile Toggle Button -->
-    <div class="mobile-toggle" onclick="toggleSidebar()">
-        <div style="width: 20px; height: 20px; display: flex; flex-direction: column; justify-content: space-between;">
-            <div style="width: 100%; height: 2px; background: #64748b;"></div>
-            <div style="width: 100%; height: 2px; background: #64748b;"></div>
-            <div style="width: 100%; height: 2px; background: #64748b;"></div>
-        </div>
-    </div>
-
-    <!-- Mobile Overlay -->
-    <div class="mobile-overlay" onclick="closeSidebar()"></div>
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo">
-    <img src="images/markeb-media-logo.png" alt="Markeb Media" style="height: 40px; width: auto;">
-</div>
-        
-        <nav>
-            <div class="nav-item active" onclick="showSection('dashboard')">
-    Dashboard
-</div>
-          </div>
-<div class="nav-item" onclick="showSection('booking')">
-    Book Shoot
-</div>
-<div class="nav-item" onclick="showSection('gallery')">
-    Gallery
-</div>
-<div class="nav-item" onclick="showSection('copyryta')">
-    CopyRyta AI
-</div>
-<div class="nav-item" onclick="showSection('tracking')">
-    Content Tracking
-</div>
-<div class="nav-item" onclick="showSection('amend')">
-    Request Amendment
-</div>
-<div class="nav-item" onclick="showSection('settings')">
-    Settings
-</div>
-<div class="nav-item" onclick="contactSupport()">
-    Support
-</div>
-<div class="nav-item" onclick="logoutUser()" style="margin-top: 40px; color: #ef4444;">
-    Logout
-</div>
-</nav>
-</div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-left">
-                <h1 class="page-title" id="pageTitle">Welcome back</h1>
-                <p class="page-subtitle" id="pageSubtitle">Here's what's happening with your projects</p>
-            </div>
-            <div class="header-right">
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar">M</div>
-                    <div class="user-details">
-                        <h4 id="userName">Loading...</h4>
-                        <p id="userEmail">Loading...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Content Area -->
-        <div class="content-area">
-            <!-- Dashboard Section -->
-            <div id="dashboard" class="section active">
-                <!-- Metrics Grid -->
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <div class="metric-icon">■</div>
-                        </div>
-                        <div class="metric-value" id="totalBookings">0</div>
-                        <div class="metric-label">Total Bookings</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <div class="metric-icon">£</div>
-                        </div>
-                        <div class="metric-value" id="totalSpending">£0</div>
-                        <div class="metric-label">Total Investment</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <div class="metric-icon">✓</div>
-                        </div>
-                        <div class="metric-value" id="completedProjects">0</div>
-                        <div class="metric-label">Completed Projects</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <div class="metric-icon">#</div>
-                        </div>
-                        <div class="metric-value" id="memberSince">2024</div>
-                        <div class="metric-label">Member Since</div>
-                    </div>
-                </div>
-
-                <!-- Content Grid -->
-                <div class="content-grid">
-                    <!-- Recent Activity -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">Recent Activity</h2>
-                            <p class="card-subtitle">Your latest interactions and updates</p>
-                        </div>
-                        <div class="card-content">
-                            <div id="activityList">
-                                <div class="activity-item">
-                                    <div class="activity-icon">+</div>
-                                    <div class="activity-content">
-                                        <div class="activity-title">Account created successfully</div>
-                                        <div class="activity-time">Welcome to Markeb Media</div>
-                                    </div>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon">■</div>
-                                    <div class="activity-content">
-                                        <div class="activity-title">Dashboard accessed</div>
-                                        <div class="activity-time">Ready to book your first shoot</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">Quick Actions</h2>
-                            <p class="card-subtitle">Common tasks and shortcuts</p>
-                        </div>
-                        <div class="card-content">
-                            <div class="action-grid">
-                                <div class="action-item" onclick="showSection('booking')">
-                                    <div class="action-icon">+</div>
-                                    <div>
-                                        <div style="font-weight: 500;">Book New Shoot</div>
-                                        <div style="font-size: 12px; color: #64748b;">Schedule photos and videos</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="action-item" onclick="showSection('tracking')">
-                                    <div class="action-icon">▲</div>
-                                    <div>
-                                        <div style="font-weight: 500;">Track Content</div>
-                                        <div style="font-size: 12px; color: #64748b;">Monitor content progress</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="action-item" onclick="showSection('copyryta')">
-                                    <div class="action-icon">◇</div>
-                                    <div>
-                                        <div style="font-weight: 500;">CopyRyta AI</div>
-                                        <div style="font-size: 12px; color: #64748b;">AI copywriting tool</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="action-item" onclick="showSection('amend')">
-                                    <div class="action-icon">△</div>
-                                    <div>
-                                        <div style="font-weight: 500;">Request Amendment</div>
-                                        <div style="font-size: 12px; color: #64748b;">Make adjustments to your content</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Booking Section -->
-            <div id="booking" class="section">
-                <div class="booking-container">
-                    <div class="booking-header">
-                        <h2 class="booking-title">Book Your Shoot</h2>
-                        <p class="booking-description">
-                            Schedule your professional shoots. Choose your preferred date and time, and we'll handle the rest.
-                        </p>
-                    </div>
-                    <div class="booking-iframe-container">
-                        <iframe 
-                            src="https://app.acuityscheduling.com/schedule.php?owner=32946394&ref=embedded_csp" 
-                            title="Schedule Appointment" 
-                            class="booking-iframe"
-                            frameBorder="0" 
-                            allow="payment">
-                        </iframe>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gallery Section -->
-            <div id="gallery" class="section">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Your Photo Gallery</h2>
-                        <p class="card-subtitle">View and download your completed photography projects</p>
-                    </div>
-                    <div class="card-content">
-                        <div class="gallery-grid" id="galleryGrid">
-                            <div class="gallery-item">
-                                <div class="gallery-image">📷</div>
-                                <div class="gallery-info">
-                                    <div class="gallery-title">Welcome to your gallery</div>
-                                    <div class="gallery-date">Your completed projects will appear here</div>
-                                    <span class="gallery-status status-processing">Coming Soon</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CopyRyta AI Section -->
-            <div id="copyryta" class="section">
-                <div class="copyryta-container">
-                    <h2 class="copyryta-title">CopyRyta AI</h2>
-                    <p class="copyryta-description">
-                        Your AI copywriting assistant for property descriptions and video scripts written in seconds. 
-                        Generate compelling, professional copy that helps your listings stand out and sell faster.
-                    </p>
-                    <button onclick="openCopyryta()" class="copyryta-btn">Launch CopyRyta AI</button>
-                </div>
-            </div>
-
-            <!-- Content Tracking Section -->
-            <div id="tracking" class="section">
-                <div class="tracker-wrapper">
-                    <h2 class="tracker-title">Track Your Content</h2>
-                    <p class="tracker-subtitle">Stay updated on your property marketing progress with real-time tracking</p>
-
-                    <div class="input-container">
-                        <input type="text" id="trackingInput" placeholder="Enter your tracking code" />
-                    </div>
-                  
-                    <button class="track-button" onclick="trackBooking()">
-                        🔍 Track Progress
-                    </button>
-
-                    <div class="result-container">
-                        <div id="result"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Request Amendment Section -->
-            <div id="amend" class="section">
-                <div class="form-container">
-                    <div class="form-header">
-                        <h2 class="form-title">🛠️ Request an Amendment</h2>
-                        <p class="form-subtitle">We're here to help get things just right for your property marketing</p>
-                    </div>
-
-                    <form id="amendForm">
-                        <div class="form-group">
-                            <label class="form-label">Your Name</label>
-                            <input type="text" name="clientName" required class="form-input" placeholder="Enter your full name"/>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Your Email</label>
-                            <input type="email" name="email" required class="form-input" placeholder="your.email@example.com"/>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Tracking Code</label>
-                            <input type="text" name="trackingCode" required pattern="^MK.*$" title="Tracking code must start with MK." class="form-input" placeholder="MK..." oninput="this.value=this.value.toUpperCase()"/>
-                            <div id="trackingStatus" class="tracking-status"></div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">What needs adjusting?</label>
-                            <div class="checkbox-grid">
-                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Photos"/><span class="checkbox-label">📷 Photos</span></label>
-                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Video"/><span class="checkbox-label">🎥 Video</span></label>
-                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Drone"/><span class="checkbox-label">🚁 Drone</span></label>
-                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Captions"/><span class="checkbox-label">📝 Captions</span></label>
-                                <label class="checkbox-item"><input type="checkbox" name="mediaType" value="Other"/><span class="checkbox-label">⚙️ Other</span></label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Details / Notes</label>
-                            <textarea name="amendDetails" required class="form-textarea" placeholder="Please describe the specific changes you'd like us to make..."></textarea>
-                        </div>
-
-                        <!-- File Upload Section -->
-                        <div class="form-group">
-                            <label class="form-label">Reference Files (Optional)</label>
-                            <div class="file-upload-area" id="fileUploadArea">
-                                <div class="file-upload-icon">📎</div>
-                                <div class="file-upload-text">Drag & drop files here</div>
-                                <div class="file-upload-subtext">or click to browse • Max 50MB per file • Images, PDFs, Videos supported</div>
-                                <button type="button" class="file-upload-button" id="browseButton">Choose Files</button>
-                                <input type="file" id="fileInput" style="display: none;" multiple accept="image/*,video/*,.pdf,.doc,.docx,.txt">
-                            </div>
-                            <div class="file-preview" id="filePreview"></div>
-                            <div class="upload-progress" id="uploadProgress">
-                                <div>Uploading files...</div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" id="progressFill"></div>
-                                </div>
-                                <div id="progressText">0%</div>
-                            </div>
-                        </div>
-
-                        <button id="submitBtn" type="submit" class="submit-button">Submit Amendment Request</button>
-                    </form>
-                    <div id="responseMessage" class="response-message" style="display:none;"></div>
-                    <div class="info-box">
-                        <h3>Free Amendment Policy</h3>
-                        <p>Each project comes with <span class="highlight">up to two free amendment requests</span> within <span class="highlight">7 days of delivery</span> using your tracking code.</p>
-                        <p>Our team typically completes all amendments within <span class="highlight">24 hours</span>, so you can get on with what matters — without delays.</p>
