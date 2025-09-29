@@ -33,7 +33,12 @@
   }
 
   .logo { margin-bottom: 48px; display: flex; align-items: center; }
-  .logo img { height: 80px; width: auto; }
+  .logo img { height: 100px; width: auto; }
+
+@media (max-width: 480px) {
+  .logo img { height: 70px; }
+}
+
 
   .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; color: #64748b; text-decoration: none; font-weight: 500; transition: all .2s ease; cursor: pointer; }
   .nav-item:hover, .nav-item.active { background: #f1f5f9; color: #0f172a; }
@@ -312,7 +317,6 @@
             <p id="userEmail">Loading...</p>
           </div>
         </div>
-        <button class="btn btn-primary" id="authBtn">Sign in</button>
       </div>
     </div>
 
@@ -654,18 +658,15 @@
 
     /* Header user info */
     function populateHeaderUser(){
-      const u=window.AirtableAPI?.getCurrentUser?.()||null;
-      const name=(u&&u.name)||localStorage.getItem('user_name')||'Markeb Client';
-      const email=(u&&u.email)||localStorage.getItem('user_email')||'client@markebmedia.com';
-      document.getElementById('userName').textContent=name;
-      document.getElementById('userEmail').textContent=email;
-      document.getElementById('userAvatar').textContent=(name?.[0]||'M').toUpperCase();
-      const btn=document.getElementById('authBtn');
-      window.AirtableAPI?.isUserLoggedIn?.().then(ok=>{
-        if(ok){btn.textContent='Sign out';btn.onclick=()=>AirtableAPI.logoutUser();}
-        else{btn.textContent='Sign in';btn.onclick=()=>window.location.href='../login.html';}
-      });
-    }
+  const u = window.AirtableAPI?.getCurrentUser?.() || null;
+  const name = (u && u.name) || localStorage.getItem('user_name') || 'Markeb Client';
+  const email = (u && u.email) || localStorage.getItem('user_email') || 'client@markebmedia.com';
+
+  document.getElementById('userName').textContent = name;
+  document.getElementById('userEmail').textContent = email;
+  document.getElementById('userAvatar').textContent = (name?.[0] || 'M').toUpperCase();
+}
+
 
     function saveProfile(){
       const name=document.getElementById('settingsName').value.trim();
