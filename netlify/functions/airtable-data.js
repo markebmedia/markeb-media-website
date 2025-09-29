@@ -1,5 +1,5 @@
 exports.handler = async (event, context) => {
-  const { userEmail } = JSON.parse(event.body);
+  const { userEmail } = JSON.parse(event.body || "{}");
   
   try {
     const filterFormula = encodeURIComponent(`{Email Address} = '${userEmail}'`);
@@ -13,9 +13,11 @@ exports.handler = async (event, context) => {
     
     const data = await response.json();
     const records = data.records || [];
+
+    // ✅ Only count projects where Status is exactly "Complete"
     const completedProjects = records.filter(record => {
-      const status = record.fields.Status;
-      return status === 'Complete' || status === 'Delivered';
+      const status = (record.fields?.Status || "").trim();
+      return status === "Complete";
     });
 
     return {
