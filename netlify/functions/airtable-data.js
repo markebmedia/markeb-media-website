@@ -15,7 +15,7 @@ exports.handler = async (event, context) => {
     const records = data.records || [];
     const completedProjects = records.filter(record => {
       const status = record.fields.Status;
-      return status === 'Ready for Delivery' || status === 'Delivered';
+      return status === 'Complete' || status === 'Delivered';
     });
 
     return {
