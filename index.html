@@ -20,6 +20,15 @@
             color: #1F2E3C;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
         /* Hero Landing Section */
         .hero-landing {
             background: #FFFFFF;
@@ -100,11 +109,6 @@
             text-align: center;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -164,7 +168,7 @@
             font-size: 1.5em;
         }
 
-        /* 3-Step Process Section */
+        /* Process Section */
         .process-section {
             background-color: #FFFFFF;
             color: #4A6378;
@@ -192,14 +196,7 @@
             left: 5%;
             width: 90%;
             height: 8px;
-            background: linear-gradient(
-                90deg,
-                #FF6B00 0%,
-                #FFD700 25%,
-                #FF6B00 50%,
-                #FFD700 75%,
-                #FF6B00 100%
-            );
+            background: linear-gradient(90deg, #FF6B00 0%, #FFD700 25%, #FF6B00 50%, #FFD700 75%, #FF6B00 100%);
             background-size: 200% 100%;
             animation: roadFlow 3s linear infinite;
             z-index: 0;
@@ -442,6 +439,11 @@
             transition: opacity 0.3s ease;
         }
 
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
         .service-card:hover::before {
             opacity: 1;
         }
@@ -495,11 +497,6 @@
             transform: scale(.5) rotate(-180deg);
             animation: tickPop .8s ease forwards;
             text-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
-        }
-
-        @keyframes shimmer {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
         }
 
         .service-card:nth-child(1) .tick { animation-delay: .2s; }
@@ -781,11 +778,6 @@
             box-shadow: 0 12px 35px rgba(74, 99, 120, 0.3);
         }
 
-        /* Scroll to section smoothly */
-        html {
-            scroll-behavior: smooth;
-        }
-
         /* Responsive Design */
         @media (max-width: 768px) {
             .hero-landing h1 {
@@ -804,10 +796,6 @@
                 max-width: 300px;
                 margin: 10px auto;
                 text-align: center;
-            }
-
-            .guide-section h2 {
-                font-size: 2em;
             }
 
             .stats-grid {
@@ -846,7 +834,6 @@
                 max-width: 320px;
                 width: 90%;
                 padding: 25px 20px;
-                min-height: 240px;
             }
 
             .marker-start, .marker-sold {
@@ -858,33 +845,21 @@
             .benefits {
                 grid-template-columns: 1fr;
                 gap: 15px;
-                margin-top: 30px;
-            }
-
-            .line-header {
-                font-size: 1.4em;
-                padding: 12px 20px;
-                text-align: center;
             }
 
             .cards {
                 gap: 20px;
-                margin-top: 25px;
             }
 
             .service-card {
                 flex: 1 1 100%;
                 max-width: 320px;
-                margin: 0 auto;
-                padding: 25px 20px;
-                min-height: 200px;
             }
 
             .photo-gallery {
                 flex-direction: column;
                 align-items: center;
                 gap: 25px;
-                margin: 40px 0;
             }
 
             .photo-card {
@@ -898,10 +873,6 @@
                 transform: rotate(0deg);
             }
 
-            .photo-card:hover {
-                transform: scale(1.02);
-            }
-
             .photo-card img {
                 height: 200px;
             }
@@ -909,56 +880,41 @@
             .testimonials-container {
                 grid-template-columns: 1fr;
                 gap: 25px;
-                margin-top: 40px;
             }
 
             .testimonial-card {
-                padding: 25px 20px;
+                padding: 30px 25px;
             }
 
             .testimonial-text {
-                margin-left: 30px;
-                font-size: 1em;
-                margin-bottom: 20px;
+                margin-left: 35px;
+                font-size: 1.05em;
             }
 
             .client-info {
-                margin-left: 30px;
-                padding-top: 15px;
-                gap: 12px;
+                margin-left: 35px;
             }
 
             .quote-mark {
-                font-size: 2.2em;
-                left: 20px;
-                top: 20px;
-            }
-
-            .client-avatar {
-                width: 40px;
-                height: 40px;
-                font-size: 1em;
+                font-size: 2.5em;
+                left: 25px;
             }
 
             .final-cta-buttons {
                 flex-direction: column;
                 align-items: center;
-                gap: 15px;
-                margin-top: 30px;
             }
 
             .final-cta-button {
-                flex: none;
                 width: 100%;
                 max-width: 300px;
-                padding: 16px 25px;
-                font-size: 1em;
             }
         }
-    </style>
+
+        </style>
 </head>
 <body>
-    <!-- Hero Landing Section -->
+    <!-- 1. Hero Landing Section -->
     <section class="hero-landing" id="hero">
         <div class="hero-content">
             <h1>"I need my listings to stand out and sell faster, but I'm stretched thin as it is."</h1>
@@ -976,7 +932,7 @@
         </div>
     </section>
 
-    <!-- Guide Section -->
+    <!-- 2. Guide Section -->
     <section class="guide-section" id="guide">
         <div class="container">
             <h2 style="font-size:2.4em;font-weight:800;line-height:1.2;margin-bottom:25px;color:#1F2E3C;">
@@ -991,7 +947,6 @@
                 We're passionate about elevating estate agents with professional content that makes the difference between blending in and standing out.
             </p>
             
-            <!-- Stats Grid -->
             <div class="stats-grid">
                 <div class="stat-item">
                     <div class="stat-number">48hrs</div>
@@ -1011,7 +966,6 @@
                 </div>
             </div>
             
-            <!-- Trust Badges -->
             <div class="trust-badges">
                 <div class="badge">
                     <span class="badge-icon">✅</span>
@@ -1031,7 +985,6 @@
                 </div>
             </div>
             
-            <!-- Authority Statement -->
             <div style="background:linear-gradient(135deg, #F8F9FA 0%, #E5E7EB 100%);padding:35px;border-radius:20px;margin-top:40px;border-left:5px solid #FF6B00;">
                 <p style="font-size:1.3em;font-weight:600;color:#1F2E3C;margin-bottom:15px;">
                     "We don't just take photos and videos..."
@@ -1043,7 +996,7 @@
         </div>
     </section>
 
-    <!-- 3-Step Process Section -->
+    <!-- 3. Process Section -->
     <section class="process-section" id="process">
         <h2 style="font-size: 2.8em; font-weight: 800; margin-bottom: 15px; color: #1F2E3C; line-height: 1.2;">
             From Brief to Brilliant in 3 Steps
@@ -1052,14 +1005,11 @@
             Our proven process transforms your property into premium marketing content that sells.
         </p>
         
-        <!-- Roadmap with Enhanced Visuals -->
         <div class="roadmap-container" style="margin-top: 60px;">
             <div class="road-line"></div>
             
-            <!-- Start Marker -->
             <div class="marker-start">🚀 START HERE</div>
             
-            <!-- Step 1 -->
             <div class="step-card">
                 <div>
                     <div class="step-number">1</div>
@@ -1068,7 +1018,6 @@
                 </div>
             </div>
             
-            <!-- Step 2 -->
             <div class="step-card">
                 <div>
                     <div class="step-number">2</div>
@@ -1077,7 +1026,6 @@
                 </div>
             </div>
             
-            <!-- Step 3 -->
             <div class="step-card">
                 <div>
                     <div class="step-number">3</div>
@@ -1086,11 +1034,9 @@
                 </div>
             </div>
             
-            <!-- SOLD Marker -->
             <div class="marker-sold">💰 SOLD</div>
         </div>
         
-        <!-- Enhanced Benefits -->
         <div class="benefits">
             <div class="benefit-item">
                 <div class="icon">⚡</div>
@@ -1114,7 +1060,6 @@
             </div>
         </div>
         
-        <!-- Enhanced Final Note -->
         <div style="background:linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);border-radius:20px;padding:35px;margin-top:40px;border-left:6px solid #22C55E;">
             <p style="font-size:1.3em;font-weight:600;color:#15803D;margin:0;">
                 ✅ Your property marketing transformed in under 48 hours
@@ -1122,14 +1067,13 @@
         </div>
     </section>
 
-    <!-- Services Section -->
+    <!-- 4. Services Section -->
     <section class="services-section" id="services">
         <div class="container">
             <div class="line-band" id="mm-line-band">
                 <h2 class="line-header" id="mm-line-header">Consistent, Reliable, High Quality</h2>
             </div>
 
-            <!-- Services Grid -->
             <div class="cards">
                 <div class="service-card">
                     <span class="tick">✅</span>
@@ -1169,7 +1113,7 @@
         </div>
     </section>
 
-    <!-- Photo Showcase Section -->
+    <!-- 5. Photo Showcase Section -->
     <section class="showcase-section" id="showcase">
         <div class="showcase-container">
             <div style="text-align: center; margin-bottom: 60px;">
@@ -1182,7 +1126,6 @@
                 </p>
             </div>
             
-            <!-- Photo Gallery -->
             <div class="photo-gallery">
                 <div class="photo-card">
                     <img 
@@ -1207,7 +1150,6 @@
                 </div>
             </div>
             
-            <!-- CTA Below Photos -->
             <div style="text-align: center; margin-top: 50px; padding: 35px; background: linear-gradient(135deg, #F8F9FA 0%, #E5E7EB 100%); border-radius: 20px; border: 2px solid #E5E7EB;">
                 <h3 style="font-size: 1.6em; font-weight: 700; color: #1F2E3C; margin-bottom: 15px;">Ready for Photography Like This?</h3>
                 <p style="color: #4A6378; font-size: 1.1em; margin-bottom: 25px;">Let us create stunning visuals that make your properties impossible to ignore.</p>
@@ -1218,7 +1160,7 @@
         </div>
     </section>
 
-    <!-- Testimonials Section -->
+    <!-- 6. Testimonials Section -->
     <section class="testimonials-section" id="testimonials">
         <div class="container">
             <h2 style="font-size: 2.6em; font-weight: 800; margin-bottom: 20px; color: #1F2E3C; line-height: 1.2;">
@@ -1228,10 +1170,7 @@
                 Real results from real agents who've transformed their property marketing
             </p>
             
-            <!-- Enhanced Testimonials Grid -->
             <div class="testimonials-container">
-                
-                <!-- Testimonial 1 -->
                 <div class="testimonial-card">
                     <div class="quote-mark">❝</div>
                     <div class="testimonial-text">
@@ -1246,7 +1185,6 @@
                     </div>
                 </div>
                 
-                <!-- Testimonial 2 -->
                 <div class="testimonial-card">
                     <div class="quote-mark">❝</div>
                     <div class="testimonial-text">
@@ -1260,26 +1198,21 @@
                         </div>
                     </div>
                 </div>
-                
             </div>
         </div>
     </section>
 
-    <!-- Final CTA Section -->
+    <!-- 7. Final CTA Section -->
     <section class="final-cta-section" id="final-cta">
         <div style="max-width: 900px; margin: 0 auto;">
-            
-            <!-- Heading -->
             <h2 style="font-size: 2.4em; font-weight: 800; margin-bottom: 20px; color: #1F2E3C; line-height: 1.3;">
                 Be the Agent Everyone Talks About
             </h2>
             
-            <!-- Subheading -->
             <p style="font-size: 1.3em; margin-bottom: 40px; color: #4A6378; max-width: 700px; margin-left: auto; margin-right: auto; margin-bottom: 40px; line-height: 1.6;">
                 Win more instructions, wow your clients, and keep buyers hooked — with high-impact marketing and live content tracking that puts you ahead of the competition.
             </p>
             
-            <!-- Action Buttons -->
             <div class="final-cta-buttons">
                 <a href="login.html" class="final-cta-button primary-final-cta">
                     📅 Book Your Shoot Now
@@ -1289,13 +1222,11 @@
                 </a>
             </div>
             
-            <!-- Trust Elements -->
             <div style="margin-top: 50px; padding: 25px; background: #F8F9FA; border-radius: 16px; border: 2px solid #E5E7EB;">
                 <p style="font-size: 1em; color: #6B7280; margin: 0;">
                     ✅ No contracts • ⚡ 48-hour delivery • 🏆 100% satisfaction guarantee • 📱 Live progress tracking
                 </p>
             </div>
-            
         </div>
     </section>
 
