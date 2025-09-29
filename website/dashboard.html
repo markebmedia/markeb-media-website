@@ -554,7 +554,7 @@
         const projects=Array.isArray(data.projects)?data.projects.slice(0,5):[];
         projects.forEach(p=>{
           const f=p.fields||{};
-          const title=f['Property']||f['Title']||'Project';
+          const title = f['A Project Address'] || f['Property'] || f['Title'] || 'Project';
           const status=f['Status']||'In progress';
           const row=document.createElement('div');
           row.className='activity-item';
