@@ -648,10 +648,16 @@
 
                 const result = await response.json();
 
-                // Show generated content
-                outputArea.value = result.text;
-                outputArea.style.display = 'block';
-                actionButtons.style.display = 'flex';
+// Hide loading, show output area
+loading.style.display = 'none';
+outputArea.style.display = 'block';
+outputArea.value = ''; // Clear first
+
+// TYPING EFFECT - Type out the text character by character
+await typeText(outputArea, result.text);
+
+// Show action buttons after typing completes
+actionButtons.style.display = 'flex';
 
                 // Show photo enhancement notice if photos were processed
                 if (result.photosAnalyzed > 0) {
@@ -675,6 +681,26 @@
                 generateBtn.textContent = 'Ryte for me!';
             }
         }
+
+        // Typing animation function
+async function typeText(element, text, speed = 15) {
+    element.value = '';
+    let index = 0;
+    
+    return new Promise((resolve) => {
+        const interval = setInterval(() => {
+            if (index < text.length) {
+                element.value += text.charAt(index);
+                index++;
+                // Auto-scroll to bottom as text types
+                element.scrollTop = element.scrollHeight;
+            } else {
+                clearInterval(interval);
+                resolve();
+            }
+        }, speed);
+    });
+}
 
         function copyToClipboard() {
             const outputArea = document.getElementById('outputArea');
