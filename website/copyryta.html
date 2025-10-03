@@ -364,7 +364,7 @@
     </div>
 
     <script>
-        // ---- API ENDPOINTS (shared) ----
+        // ---- API ENDPOINTS ----
         const BASE_URL = 'https://ryta.onrender.com';
         const GENERATE_API = `${BASE_URL}/generate`;
         const ADDRESS_API = `${BASE_URL}/api/address-search`;
@@ -403,8 +403,14 @@
 
         function handleFiles(files) {
             const validFiles = Array.from(files).filter(file => {
-                if (!['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type)) { alert(`${file.name} is not a valid image type. Please use JPEG, PNG, or WebP.`); return false; }
-                if (file.size > 50 * 1024 * 1024) { alert(`${file.name} is too large. Maximum size is 50MB.`); return false; }
+                if (!['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type)) { 
+                    alert(`${file.name} is not a valid image type. Please use JPEG, PNG, or WebP.`); 
+                    return false; 
+                }
+                if (file.size > 50 * 1024 * 1024) { 
+                    alert(`${file.name} is too large. Maximum size is 50MB.`); 
+                    return false; 
+                }
                 return true;
             });
 
@@ -422,10 +428,14 @@
             const photoLimitNotice = document.getElementById('photoLimitNotice');
             const photoEnhancementNotice = document.getElementById('photoEnhancementNotice');
 
-            if (selectedPhotos.length === 0) { photoPreview.style.display = 'none'; photoEnhancementNotice.style.display = 'none'; return; }
+            if (selectedPhotos.length === 0) { 
+                photoPreview.style.display = 'none'; 
+                photoEnhancementNotice.style.display = 'none'; 
+                return; 
+            }
 
             photoPreview.style.display = 'block';
-            photoEnhancementNotice.style.display = 'block';
+            photoEnhancementNotice.style.display ='block';
             photoPreviewTitle.textContent = `Selected Photos (${selectedPhotos.length}/5)`;
             photoLimitNotice.style.display = selectedPhotos.length >= 5 ? 'block' : 'none';
 
@@ -455,7 +465,10 @@
         }
 
         // Initialize photo upload on page load
-        document.addEventListener('DOMContentLoaded', function () { setupPhotoUpload(); setupAddressAutocomplete(); });
+        document.addEventListener('DOMContentLoaded', function () { 
+            setupPhotoUpload(); 
+            setupAddressAutocomplete(); 
+        });
 
         // ---- Address Autocomplete ----
         let addressDebounceTimer = null;
@@ -468,7 +481,11 @@
             input.addEventListener('input', (e) => {
                 const q = e.target.value.trim();
                 clearTimeout(addressDebounceTimer);
-                if (q.length < 3) { dropdown.style.display = 'none'; dropdown.innerHTML = ''; return; }
+                if (q.length < 3) { 
+                    dropdown.style.display = 'none'; 
+                    dropdown.innerHTML = ''; 
+                    return; 
+                }
                 addressDebounceTimer = setTimeout(() => searchAddresses(q), 300);
             });
 
@@ -486,6 +503,8 @@
             dropdown.innerHTML = '<div class="address-loading">Searching addresses...</div>';
             dropdown.style.display = 'block';
 
+            console.log('Searching for:', query); // DEBUG
+
             try {
                 const res = await fetch(ADDRESS_API, {
                     method: 'POST',
@@ -494,8 +513,13 @@
                     signal: lastAddressController.signal
                 });
 
+                console.log('Response status:', res.status); // DEBUG
+                
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
+                
+                console.log('Response data:', data); // DEBUG
+                
                 const addresses = Array.isArray(data.addresses) ? data.addresses : [];
 
                 if (addresses.length === 0) {
@@ -508,6 +532,7 @@
                     return `<div class="address-option" onclick="selectAddress('${safe}')">${safe}</div>`;
                 }).join('');
             } catch (err) {
+                console.error('Address search error:', err); // DEBUG
                 if (err.name === 'AbortError') return;
                 dropdown.innerHTML = '<div class="address-loading">Error fetching addresses</div>';
             }
@@ -540,9 +565,12 @@
             const outputArea = document.getElementById('outputArea');
             const actionButtons = document.getElementById('actionButtons');
 
-            if (!location.trim()) { alert('Please enter a location for your property.'); return; }
+            if (!location.trim()) { 
+                alert('Please enter a location for your property.'); 
+                return; 
+            }
 
-            // Show loading state with photo info if photos are selected
+            // Show loading state
             generateBtn.disabled = true;
             generateBtn.textContent = 'Generating...';
             loading.style.display = 'block';
@@ -558,7 +586,6 @@
             }
 
             try {
-                // Get property status from form
                 const propertyStatus = document.querySelector('input[name="propertyStatus"]:checked')?.value || 'sale';
 
                 // Map content type to backend mode
@@ -571,10 +598,9 @@
                 };
                 const contentMode = contentModeMap[contentType] || 'description';
 
-                // Prepare form data for API
                 const formData = new FormData();
 
-                // Combine features into a descriptive string
+                // Feature descriptions
                 const featureDescriptions = {
                     garden: 'private garden',
                     parking: 'dedicated parking',
@@ -589,27 +615,26 @@
                 };
 
                 const selectedFeatures = features.map(f => featureDescriptions[f]).filter(Boolean);
-                const featuresText = selectedFeatures.length > 0 ? `Key features: ${selectedFeatures.join(', ')}. ${additionalInfo}` : additionalInfo;
+                const featuresText = selectedFeatures.length > 0 ? selectedFeatures.join(', ') : '';
 
+                // Build API data with tone and price as SEPARATE fields
                 const apiData = {
                     address: location,
                     propertyType: propertyType,
                     bedrooms: bedrooms || '0',
                     bathrooms: bathrooms || '0',
                     features: featuresText,
-                    description: `${tone} tone property. ${price ? `Price: ${price}.` : ''} Located in ${location}.`,
+                    description: additionalInfo,
                     propertyStatus: propertyStatus,
-                    agentName: 'Estate Agent',
-                    agentPhone: '01234 567890',
-                    agentEmail: 'info@estate-agent.com',
-                    companyName: 'Your Estate Agency'
+                    tone: tone,
+                    price: price
                 };
 
                 formData.append('fields', JSON.stringify(apiData));
                 formData.append('mode', contentMode);
                 selectedPhotos.forEach(photo => formData.append('photos', photo));
 
-                // Call the real API (same endpoint as old code)
+                // Call the API
                 const response = await fetch(GENERATE_API, {
                     method: 'POST',
                     headers: { 'X-Session-Id': crypto.randomUUID() },
@@ -634,7 +659,9 @@
                     notice.style.cssText = 'background: rgba(40, 167, 69, 0.1); border: 1px solid rgba(40, 167, 69, 0.3); color: #155724; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 15px; text-align: center;';
                     notice.textContent = `✨ Enhanced with analysis of ${result.photosAnalyzed} photo${result.photosAnalyzed > 1 ? 's' : ''}`;
                     outputArea.parentNode.insertBefore(notice, outputArea);
-                    setTimeout(() => { if (notice.parentNode) notice.parentNode.removeChild(notice); }, 5000);
+                    setTimeout(() => { 
+                        if (notice.parentNode) notice.parentNode.removeChild(notice); 
+                    }, 5000);
                 }
             } catch (error) {
                 console.error('Error generating content:', error);
@@ -657,7 +684,10 @@
             const originalText = copyBtn.textContent;
             copyBtn.textContent = 'Copied!';
             copyBtn.style.background = '#28a745';
-            setTimeout(() => { copyBtn.textContent = originalText; copyBtn.style.background = '#1F2E3C'; }, 2000);
+            setTimeout(() => { 
+                copyBtn.textContent = originalText; 
+                copyBtn.style.background = '#1F2E3C'; 
+            }, 2000);
         }
 
         function editContent() {
