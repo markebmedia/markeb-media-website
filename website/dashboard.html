@@ -893,27 +893,56 @@
       updateFilePreview();
     }
 
-    async function uploadFiles(){
-      if (selectedFiles.length === 0) return [];
-      const progress = document.getElementById('uploadProgress');
-      const fill = document.getElementById('progressFill');
-      const text = document.getElementById('progressText');
-      progress.style.display='block';
+    async function uploadFilesMulti(trackingCode) {
+  if (!selectedFiles.length) return { attachments: [], folder: null };
 
-      const out = [];
-      for (let i=0;i<selectedFiles.length;i++){
-        const fd = new FormData();
-        fd.append('file', selectedFiles[i]);
-        const r = await fetch('https://markeb-amend-api.onrender.com/api/upload',{ method:'POST', body: fd });
-        if (!r.ok) throw new Error('Upload failed');
-        const j = await r.json();
-        out.push({ filename: selectedFiles[i].name, url: j.url, size: selectedFiles[i].size, type: selectedFiles[i].type });
-        const pct = Math.round(((i+1)/selectedFiles.length)*100);
-        fill.style.width=pct+'%'; text.textContent=pct+'%';
+  const fd = new FormData();
+  fd.append('trackingCode', trackingCode);
+  for (const f of selectedFiles) fd.append('files', f);
+
+  const progress = document.getElementById('uploadProgress');
+  const fill = document.getElementById('progressFill');
+  const text = document.getElementById('progressText');
+
+  const data = await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'https://markeb-amend-api.onrender.com/api/upload-multi');
+
+    progress.style.display = 'block';
+    xhr.upload.onprogress = (e) => {
+      if (!e.lengthComputable) return;
+      const pct = Math.round((e.loaded / e.total) * 100);
+      fill.style.width = pct + '%';
+      text.textContent = pct + '%';
+    };
+
+    xhr.onload = () => {
+      progress.style.display = 'none';
+      try {
+        const res = JSON.parse(xhr.responseText);
+        if (xhr.status >= 200 && xhr.status < 300) resolve(res);
+        else reject(new Error(res.message || 'Upload failed'));
+      } catch {
+        reject(new Error('Invalid server response'));
       }
-      progress.style.display='none';
-      return out;
-    }
+    };
+
+    xhr.onerror = () => { progress.style.display = 'none'; reject(new Error('Network error')); };
+    xhr.send(fd);
+  });
+
+  // Build attachments list (prefer per-file URLs if backend returns them; fallback to folder link)
+  const attachments = Array.isArray(data.files)
+    ? data.files.map(f => ({
+        filename: f.filename,
+        url: f.url || data.folder?.url || '',
+        size: f.size,
+        type: f.type || ''
+      }))
+    : [];
+
+  return { attachments, folder: data.folder || null };
+}
 
     document.addEventListener('DOMContentLoaded', ()=>{
       const tc = document.querySelector('input[name="trackingCode"]');
@@ -967,11 +996,13 @@
       btn.disabled=true; btn.textContent='⏳ Submitting...'; msg.style.display='none';
 
       try{
-        let uploaded = [];
-        if (selectedFiles.length>0){
-          btn.textContent='📤 Uploading files...';
-          uploaded = await uploadFiles();
-        }
+       let uploaded = [];
+if (selectedFiles.length>0){
+  btn.textContent='📤 Uploading files...';
+  const up = await uploadFilesMulti(trackingValue);
+  uploaded = up.attachments; // keep same payload shape for api/amend
+}
+
         const payload={
           customerName:form.clientName.value.trim(),
           email:form.email.value.trim(),
