@@ -83,18 +83,22 @@
         .generate-btn:active { transform: translateY(0); }
         .generate-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 
-        .output-area { 
+       .output-area { 
     background: transparent; 
     border: none; 
     border-radius: 0; 
-    padding: 0; 
-    min-height: 300px; 
+    padding: 20px; 
+    width: 100%;
+    min-height: 400px;
+    height: auto;
     font-size: 16px; 
-    line-height: 1.7; 
+    line-height: 1.8; 
     transition: all 0.3s ease; 
-    color: #1F2E3C; 
+    color: #1F2E3C;
     resize: none;
     outline: none;
+    overflow: hidden;
+    font-family: inherit;
 }
         .output-area:focus { outline: none; border-color: #FF6B00; box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1); }
 
@@ -699,13 +703,18 @@ async function typeText(element, text, speed = 15) {
     element.value = '';
     let index = 0;
     
+    // Auto-expand function
+    const autoExpand = () => {
+        element.style.height = 'auto';
+        element.style.height = element.scrollHeight + 'px';
+    };
+    
     return new Promise((resolve) => {
         const interval = setInterval(() => {
             if (index < text.length) {
                 element.value += text.charAt(index);
                 index++;
-                // Auto-scroll to bottom as text types
-                element.scrollTop = element.scrollHeight;
+                autoExpand(); // Expand as text is added
             } else {
                 clearInterval(interval);
                 resolve();
