@@ -513,7 +513,7 @@
                 <label class="form-label" style="display:block;font-weight:600;margin-bottom:6px;">Reference Files (Optional)</label>
                 <div class="file-upload-area" id="fileUploadArea">
                   <div style="font-size:1.1em;color:#6B7280;margin-bottom:8px;">Drag & drop files here, or click to browse</div>
-                  <div style="font-size:.9em;color:#94a3b8;">Max 50MB each • Images, PDFs, Videos supported</div>
+                  <div style="font-size:.9em;color:#94a3b8;">Max 150MB each • Images, PDFs, Videos supported</div>
                   <button type="button" class="btn btn-primary" id="browseButton" style="margin-top:10px;">Choose Files</button>
                   <input type="file" id="fileInput" style="display:none" multiple accept="image/*,video/*,.pdf,.doc,.docx,.txt">
                 </div>
@@ -834,7 +834,7 @@
 
     /* === Amend: Render endpoints + uploads === */
     let selectedFiles = [];
-    const maxFileSize = 50 * 1024 * 1024;
+    const maxFileSize = 150 * 1024 * 1024;
 
     document.addEventListener('DOMContentLoaded', () => {
       const area = document.getElementById('fileUploadArea');
@@ -860,7 +860,7 @@
     function handleFiles(files){
       const list = Array.from(files);
       for (const f of list){
-        if (f.size > maxFileSize){ alert(`File "${f.name}" is too large (max 50MB).`); continue; }
+        if (f.size > maxFileSize){ alert(`File "${f.name}" is too large (max 150MB).`); continue; }
         if (selectedFiles.find(x => x.name===f.name && x.size===f.size)) { continue; }
         selectedFiles.push(f);
       }
