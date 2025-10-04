@@ -726,15 +726,49 @@
     }
 
     async function loadMemberSince(email){
-      try{
-        const resp=await window.AirtableAPI.getUserData(email);
-        if(resp?.success && resp.userData?.createdDate){
-          const year=String(resp.userData.createdDate).slice(0,4);
-          document.getElementById('memberSince').textContent=year; return;
-        }
-      }catch(e){console.warn('memberSince fetch err:',e.message);}
-      document.getElementById('memberSince').textContent='2024';
+  const el = document.getElementById('memberSince');
+
+  // 1) Try Airtable user profile
+  try {
+    const resp = await window.AirtableAPI.getUserData(email);
+    const raw = resp?.userData?.createdDate;
+    if (resp?.success && raw) {
+      const d = new Date(raw);
+      if (!Number.isNaN(d.getTime())) {
+        el.textContent = String(d.getFullYear());
+        return;
+      }
     }
+  } catch (e) {
+    console.warn('memberSince (profile) err:', e?.message || e);
+  }
+
+  // 2) Try earliest project/appointment year as a backup (already fetched elsewhere)
+  try {
+    // You might have cached data from your earlier calls; if not, you can call again:
+    const pro = await fetchJSON(NETLIFY_ENDPOINTS.projects, { userEmail: email });
+    const years = [];
+    if (Array.isArray(pro?.projects)) {
+      pro.projects.forEach(p => {
+        const f = p.fields || {};
+        const raw = f['Created'] || f['Date'] || f['Shoot Date'] || f['Created time'];
+        if (raw) {
+          const d = new Date(raw);
+          if (!Number.isNaN(d.getTime())) years.push(d.getFullYear());
+        }
+      });
+    }
+    if (years.length) {
+      el.textContent = String(Math.min(...years));
+      return;
+    }
+  } catch (e) {
+    console.warn('memberSince (projects) err:', e?.message || e);
+  }
+
+  // 3) Final fallback: current year (avoid hard-coded 2024)
+  el.textContent = String(new Date().getFullYear());
+}
 
     async function loadDashboardData(){
       const user=window.AirtableAPI.getCurrentUser();
