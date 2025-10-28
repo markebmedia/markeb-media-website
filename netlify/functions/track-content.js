@@ -8,49 +8,48 @@ export async function handler(event) {
     const { trackingCode } = JSON.parse(event.body || '{}');
     if (!trackingCode) return json(400, { message: 'trackingCode required' });
 
-    const token  = process.env.AIRTABLE_TOKEN;      // set in Netlify
-    const baseId = process.env.AIRTABLE_BASE_ID;    // e.g. appVzPU0icwL8H6aP
-    const table  = process.env.AIRTABLE_TABLE_ID;   // e.g. tblRgcv7M9dUU3YuL
-    if (!token || !baseId || !table) {
+    const token  = process.env.AIRTABLE_TOKEN;
+    const baseId = process.env.AIRTABLE_BASE_ID;
+    const mainTable = process.env.AIRTABLE_TABLE_ID;                  // main property table
+    const brandingTable = process.env.AIRTABLE_BRANDING_SESSION_TABLE_ID; // branding sessions table
+
+    if (!token || !baseId || !mainTable || !brandingTable) {
       return json(500, { message: 'Server config missing (AIRTABLE_* env vars)' });
     }
 
-    // Safer, tolerant formula: trim + lowercase + escape single quotes
     const safe = String(trackingCode).trim().replace(/'/g, "\\'");
     const formula = `LOWER(TRIM({Tracking Code}))='${safe.toLowerCase()}'`;
-    const url = `https://api.airtable.com/v0/${baseId}/${table}?maxRecords=1&filterByFormula=${encodeURIComponent(formula)}`;
 
-    const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
-    if (!r.ok) {
-      // Surface Airtable's error so you can diagnose (401/403/422/etc.)
-      const errText = await r.text().catch(() => '');
-      return {
-        statusCode: r.status,
-        headers: { 'Content-Type': 'application/json' },
-        body: errText || JSON.stringify({ message: 'Airtable request failed' })
-      };
+    // helper to query a specific table
+    async function fetchTable(tableId) {
+      const url = `https://api.airtable.com/v0/${baseId}/${tableId}?maxRecords=1&filterByFormula=${encodeURIComponent(formula)}`;
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return (data.records && data.records[0]) ? data.records[0].fields : null;
     }
 
-    const data = await r.json();
-    if (!data.records || data.records.length === 0) {
+    // try main table first, fallback to branding
+    let f = await fetchTable(mainTable);
+    let source = 'main';
+    if (!f) {
+      f = await fetchTable(brandingTable);
+      source = 'branding';
+    }
+
+    if (!f) {
       return json(404, { message: 'Not found' });
     }
 
-    const f = data.records[0].fields || {};
-
-    // ✅ Base response (always included)
     const responseData = {
       status:         f['Status'] || null,
       shootDate:      f['Shoot Date'] || null,
       customerName:   f['Customer Name'] || null,
       serviceType:    f['Service Type'] || null,
-      deliveryLink:   f['Delivery Link'] || null
+      deliveryLink:   f['Delivery Link'] || null,
+      projectAddress: f['Project Address'] || null,
+      source
     };
-
-    // ✅ Only include projectAddress if not from Branding Sessions Bookings
-    if (table !== 'Branding Sessions Bookings') {
-      responseData.projectAddress = f['Project Address'] || null;
-    }
 
     return json(200, { record: responseData });
 
