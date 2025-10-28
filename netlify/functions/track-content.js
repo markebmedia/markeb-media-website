@@ -24,7 +24,11 @@ export async function handler(event) {
     if (!r.ok) {
       // Surface Airtable's error so you can diagnose (401/403/422/etc.)
       const errText = await r.text().catch(() => '');
-      return { statusCode: r.status, headers: { 'Content-Type': 'application/json' }, body: errText || JSON.stringify({ message: 'Airtable request failed' }) };
+      return {
+        statusCode: r.status,
+        headers: { 'Content-Type': 'application/json' },
+        body: errText || JSON.stringify({ message: 'Airtable request failed' })
+      };
     }
 
     const data = await r.json();
@@ -33,16 +37,22 @@ export async function handler(event) {
     }
 
     const f = data.records[0].fields || {};
-    return json(200, {
-      record: {
-        status:         f['Status'] || null,
-        shootDate:      f['Shoot Date'] || null,
-        customerName:   f['Customer Name'] || null,
-        serviceType:    f['Service Type'] || null,
-        projectAddress: f['Project Address'] || null,
-        deliveryLink:   f['Delivery Link'] || null
-      }
-    });
+
+    // ✅ Base response (always included)
+    const responseData = {
+      status:         f['Status'] || null,
+      shootDate:      f['Shoot Date'] || null,
+      customerName:   f['Customer Name'] || null,
+      serviceType:    f['Service Type'] || null,
+      deliveryLink:   f['Delivery Link'] || null
+    };
+
+    // ✅ Only include projectAddress if not from Branding Sessions Bookings
+    if (table !== 'Branding Sessions Bookings') {
+      responseData.projectAddress = f['Project Address'] || null;
+    }
+
+    return json(200, { record: responseData });
 
   } catch (e) {
     return json(500, { message: 'Server error', error: String(e) });
@@ -50,5 +60,9 @@ export async function handler(event) {
 }
 
 function json(statusCode, obj) {
-  return { statusCode, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(obj) };
+  return {
+    statusCode,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(obj)
+  };
 }
