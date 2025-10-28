@@ -10,7 +10,7 @@ export async function handler(event) {
 
     const token  = process.env.AIRTABLE_TOKEN;                      // set in Netlify
 const baseId = process.env.AIRTABLE_BASE_ID;                    // e.g. appVzPU0icwL8H6aP
-const table  = process.env.AIRTABLE_BRANDING_SESSION_TABLE_ID;  // e.g. Branding Sessions Bookings
+const table  = process.env.AIRTABLE_BRANDING_SESSION_TABLE_ID;  // e.g. tblGjnjL74WwwxUlZ
 if (!token || !baseId || !table) {
   return json(500, { message: 'Server config missing (AIRTABLE_* env vars)' });
 }
