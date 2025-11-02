@@ -43,7 +43,7 @@ exports.handler = async (event, context) => {
     }
 
     // Find user in Airtable
-    const records = await base('Users').select({
+    const records = await base('Markeb Media Users').select({
       filterByFormula: `{Email} = "${email}"`,
       maxRecords: 1
     }).firstPage();
@@ -64,7 +64,7 @@ exports.handler = async (event, context) => {
     const expiryTime = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
 
     // Update user record with reset code and expiry
-    await base('Users').update(user.id, {
+    await base('Markeb Media Users').update(user.id, {
       'Reset Token': resetCode,
       'Reset Token Expiry': expiryTime.toISOString()
     });
