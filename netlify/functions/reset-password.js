@@ -43,7 +43,7 @@ exports.handler = async (event, context) => {
     }
 
     // Find user in Airtable
-    const records = await base('Users').select({
+    const records = await base('Markeb Media Users').select({
       filterByFormula: `{Email} = "${email}"`,
       maxRecords: 1
     }).firstPage();
@@ -82,7 +82,7 @@ exports.handler = async (event, context) => {
     const passwordHash = hashPassword(newPassword);
 
     // Update user record with new password and clear reset token
-    await base('Users').update(user.id, {
+    await base('Markeb Media Users').update(user.id, {
       'Password Hash': passwordHash,
       'Reset Token': '',
       'Reset Token Expiry': ''
