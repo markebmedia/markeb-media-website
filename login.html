@@ -186,7 +186,7 @@
                 </div>
                 <button type="submit" class="login-button" id="loginButton">Sign In to Dashboard</button>
                 <div class="forgot-password">
-                    <a href="#" onclick="handleForgotPassword()">Forgot your password?</a>
+                    <a href="reset-password.html">Forgot your password?</a>
                 </div>
             </form>
 
@@ -339,13 +339,6 @@
             } finally {
                 hideLoading();
             }
-        }
-
-        function handleForgotPassword() {
-            const email = document.getElementById('loginEmail').value;
-            if (!email) { showError('Please enter your email address first.'); return; }
-            if (!AirtableAPI.validateEmail(email)) { showError('Please enter a valid email address.'); return; }
-            alert('Password reset functionality will be implemented. For now, please contact support at commercial@markebmedia.com');
         }
     </script>
 </body>
