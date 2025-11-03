@@ -179,8 +179,8 @@ End with a strong, personalized call-to-action]
 - Be encouraging but honest about their gaps`;
 
   try {
-    const message = await anthropic.messages.create({
-      model: process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20241022',
+   const message = await anthropic.messages.create({
+  model: process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20240620',
       max_tokens: 2000,
       temperature: 0.7,
       messages: [
@@ -311,11 +311,15 @@ async function saveToAirtable(data) {
       },
     ]);
 
-    console.log('Saved to Airtable successfully');
+    console.log('Saved to Airtable successfully:', record[0].id);
     return record[0];
   } catch (error) {
-    console.error('Error saving to Airtable:', error);
-    throw new Error('Failed to save to Airtable');
+    console.error('Airtable Error Details:', {
+      message: error.message,
+      statusCode: error.statusCode,
+      error: error.error
+    });
+    throw new Error(`Failed to save to Airtable: ${error.message}`);
   }
 }
 

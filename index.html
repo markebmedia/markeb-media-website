@@ -1579,22 +1579,8 @@
         <div class="error-message" id="errorMessage"></div>
 
         <form id="auditForm">
-            <!-- Step 0: Contact Info -->
-            <div class="form-step active" data-step="0">
-                <div class="question-card">
-                    <div class="question-text">Let's start with your details</div>
-                    <input type="text" class="form-input" id="name" placeholder="Your Full Name *" required>
-                    <input type="text" class="form-input" id="agency" placeholder="Agency Name *" required>
-                    <input type="email" class="form-input" id="email" placeholder="Email Address *" required>
-                    <input type="tel" class="form-input" id="phone" placeholder="Phone Number *" required>
-                </div>
-                <div class="button-group">
-                    <button type="button" class="btn btn-primary" onclick="nextStep()">Start Audit →</button>
-                </div>
-            </div>
-
             <!-- Question 1 -->
-            <div class="form-step" data-step="1">
+            <div class="form-step active" data-step="1">
                 <div class="question-card">
                     <div class="question-number">1</div>
                     <div class="question-text">What type of photography do you currently use for property listings?</div>
@@ -1617,8 +1603,7 @@
                     </div>
                 </div>
                 <div class="button-group">
-                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
-                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()" style="width: 100%;">Next →</button>
                 </div>
             </div>
 
@@ -1821,7 +1806,23 @@
                 </div>
                 <div class="button-group">
                     <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
-                    <button type="button" class="btn btn-primary" onclick="submitAudit()">Get My Results →</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Step 9: Contact Info (Now at the end) -->
+            <div class="form-step" data-step="9">
+                <div class="question-card">
+                    <div class="question-text" style="font-size: 1.5em; margin-bottom: 15px;">📊 Your Score is Ready!</div>
+                    <p style="color: #6B7280; font-size: 1.1em; margin-bottom: 25px;">Enter your details below to receive your personalized marketing analysis and actionable recommendations.</p>
+                    <input type="text" class="form-input" id="name" placeholder="Your Full Name *" required>
+                    <input type="text" class="form-input" id="agency" placeholder="Agency Name *" required>
+                    <input type="email" class="form-input" id="email" placeholder="Email Address *" required>
+                    <input type="tel" class="form-input" id="phone" placeholder="Phone Number *" required>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                    <button type="button" class="btn btn-primary" onclick="submitAudit()">Get My Full Analysis →</button>
                 </div>
             </div>
         </form>
@@ -2368,7 +2369,7 @@
     
     <script>
     // Audit Form JavaScript
-    let currentStep = 0;
+    let currentStep = 1;
     const totalSteps = 8;
     const formData = {};
 
@@ -2380,60 +2381,60 @@
     }
 
     // Next step
-    function nextStep() {
-        const steps = document.querySelectorAll('.form-step');
-        const currentStepElement = steps[currentStep];
+function nextStep() {
+    const steps = document.querySelectorAll('.form-step');
+    const currentStepElement = steps[currentStep - 1]; // Changed from currentStep to currentStep - 1
 
-        // Validate current step
-        if (currentStep === 0) {
-            // Validate contact info
-            const name = document.getElementById('name').value.trim();
-            const agency = document.getElementById('agency').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const phone = document.getElementById('phone').value.trim();
+    // Validate current step
+    if (currentStep === 9) {
+        // Validate contact info (now at step 9)
+        const name = document.getElementById('name').value.trim();
+        const agency = document.getElementById('agency').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
 
-            if (!name || !agency || !email || !phone) {
-                showError('Please fill in all required fields');
-                return;
-            }
-
-            formData.name = name;
-            formData.agency = agency;
-            formData.email = email;
-            formData.phone = phone;
-        } else {
-            // Validate radio selection
-            const questionName = `q${currentStep}`;
-            const selected = document.querySelector(`input[name="${questionName}"]:checked`);
-            
-            if (!selected) {
-                showError('Please select an answer to continue');
-                return;
-            }
-
-            formData[questionName] = parseInt(selected.value);
+        if (!name || !agency || !email || !phone) {
+            showError('Please fill in all required fields');
+            return;
         }
 
-        // Hide error and move to next
-        hideError();
-        currentStepElement.classList.remove('active');
-        currentStep++;
+        formData.name = name;
+        formData.agency = agency;
+        formData.email = email;
+        formData.phone = phone;
+    } else {
+        // Validate radio selection for questions 1-8
+        const questionName = `q${currentStep}`;
+        const selected = document.querySelector(`input[name="${questionName}"]:checked`);
         
-        if (currentStep <= totalSteps) {
-            steps[currentStep].classList.add('active');
-            updateProgress();
+        if (!selected) {
+            showError('Please select an answer to continue');
+            return;
         }
+
+        formData[questionName] = parseInt(selected.value);
     }
 
-    // Previous step
-    function prevStep() {
-        const steps = document.querySelectorAll('.form-step');
-        steps[currentStep].classList.remove('active');
-        currentStep--;
-        steps[currentStep].classList.add('active');
+    // Hide error and move to next
+    hideError();
+    currentStepElement.classList.remove('active');
+    currentStep++;
+    
+    if (currentStep <= 9) {
+        steps[currentStep - 1].classList.add('active');
         updateProgress();
-        hideError();
     }
+}
+
+// Previous step
+function prevStep() {
+    const steps = document.querySelectorAll('.form-step');
+    steps[currentStep - 1].classList.remove('active');
+    currentStep--;
+    steps[currentStep - 1].classList.add('active');
+    updateProgress();
+    hideError();
+}
 
     // Show error message
     function showError(message) {
