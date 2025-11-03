@@ -1133,6 +1133,414 @@
                 max-width: 300px;
             }
         }
+        /* Audit Section Styles */
+.audit-section {
+    background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+    padding: 80px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.audit-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #FF6B00, #FFD700, #FF6B00);
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+.audit-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #FFFFFF;
+    border-radius: 24px;
+    padding: 50px 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    border: 2px solid #F1F5F9;
+}
+
+.audit-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.audit-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #FF6B00, #FF8A33);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 0.9em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+}
+
+.audit-header h2 {
+    font-size: 2.4em;
+    font-weight: 800;
+    color: #1F2E3C;
+    margin-bottom: 15px;
+    line-height: 1.2;
+}
+
+.audit-header p {
+    font-size: 1.2em;
+    color: #6B7280;
+    margin-bottom: 10px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background: #E5E7EB;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 30px 0;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #FF6B00, #FF8A33);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 10px;
+}
+
+.progress-text {
+    text-align: center;
+    color: #6B7280;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.question-card {
+    background: #F9FAFB;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 30px;
+    border: 2px solid #E5E7EB;
+}
+
+.question-number {
+    display: inline-block;
+    background: linear-gradient(135deg, #FF6B00, #FF8A33);
+    color: white;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 35px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.question-text {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #1F2E3C;
+    margin-bottom: 25px;
+    line-height: 1.4;
+}
+
+.option-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    background: white;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.option-label:hover {
+    border-color: #FF6B00;
+    background: #FFF5F0;
+    transform: translateX(5px);
+}
+
+.option-label input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.option-label input[type="radio"]:checked + .checkmark {
+    background: #FF6B00;
+    border-color: #FF6B00;
+}
+
+.option-label input[type="radio"]:checked + .checkmark::after {
+    display: block;
+}
+
+.option-label input[type="radio"]:checked ~ .option-text {
+    font-weight: 600;
+}
+
+.option-label.selected {
+    border-color: #FF6B00;
+    background: linear-gradient(135deg, #FFF5F0 0%, #FFEDE0 100%);
+    box-shadow: 0 4px 15px rgba(255, 107, 0, 0.15);
+}
+
+.checkmark {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #D1D5DB;
+    border-radius: 50%;
+    margin-right: 15px;
+    position: relative;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.checkmark::after {
+    content: '✓';
+    position: absolute;
+    display: none;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.option-text {
+    flex: 1;
+    font-size: 1.05em;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.form-input {
+    width: 100%;
+    padding: 15px 20px;
+    font-size: 1.05em;
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #FF6B00;
+    box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+}
+
+.form-input::placeholder {
+    color: #9CA3AF;
+}
+
+.button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn {
+    flex: 1;
+    padding: 15px 30px;
+    font-size: 1.1em;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #FF6B00, #FF8A33);
+    color: white;
+    box-shadow: 0 6px 20px rgba(255, 107, 0, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 107, 0, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: white;
+    color: #6B7280;
+    border: 2px solid #E5E7EB;
+}
+
+.btn-secondary:hover {
+    background: #F9FAFB;
+    border-color: #D1D5DB;
+}
+
+.results-container {
+    display: none;
+}
+
+.results-container.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+.score-display {
+    background: linear-gradient(135deg, #FF6B00, #FF8A33);
+    color: white;
+    padding: 40px;
+    border-radius: 20px;
+    margin: 30px 0;
+    box-shadow: 0 10px 30px rgba(255, 107, 0, 0.3);
+}
+
+.score-number {
+    font-size: 4em;
+    font-weight: 900;
+    margin-bottom: 10px;
+}
+
+.score-verdict {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.score-description {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+.analysis-content {
+    background: #F9FAFB;
+    border-radius: 16px;
+    padding: 30px;
+    margin: 30px 0;
+    text-align: left;
+    border: 2px solid #E5E7EB;
+}
+
+.analysis-content h3 {
+    color: #1F2E3C;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-size: 1.4em;
+}
+
+.analysis-content h3:first-child {
+    margin-top: 0;
+}
+
+.analysis-content p, .analysis-content ul {
+    color: #4A6378;
+    font-size: 1.05em;
+    line-height: 1.7;
+    margin-bottom: 15px;
+}
+
+.analysis-content ul {
+    padding-left: 20px;
+}
+
+.analysis-content li {
+    margin-bottom: 10px;
+}
+
+.loading-spinner {
+    display: none;
+    text-align: center;
+    padding: 40px;
+}
+
+.loading-spinner.active {
+    display: block;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #E5E7EB;
+    border-top: 4px solid #FF6B00;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-message {
+    display: none;
+    background: #FEE2E2;
+    border: 2px solid #FCA5A5;
+    color: #991B1B;
+    padding: 15px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.error-message.active {
+    display: block;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .audit-container {
+        padding: 30px 20px;
+    }
+    
+    .audit-header h2 {
+        font-size: 1.8em;
+    }
+    
+    .question-text {
+        font-size: 1.15em;
+    }
+    
+    .option-label {
+        padding: 15px;
+    }
+    
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+}
     </style>
 </head>
 <body>
@@ -1147,12 +1555,301 @@
                 <a href="login.html" class="cta-primary">
                     Book Now
                 </a>
-                <a href="#testimonials" class="cta-secondary">
-                    Learn More
-                </a>
+               <a href="#audit" class="cta-secondary">
+    Take Free 10 Seconds Marketing Audit
+              </a>
             </div>
         </div>
     </section>
+
+    <!-- Marketing Audit Section -->
+<section class="audit-section" id="audit">
+    <div class="audit-container">
+        <div class="audit-header">
+            <div class="audit-badge">🎯 Free Marketing Audit</div>
+            <h2>How Effective Is Your Property Marketing?</h2>
+            <p>Answer 8 quick questions to discover where you're losing listings and revenue.</p>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText">Question 1 of 8</div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <form id="auditForm">
+            <!-- Step 0: Contact Info -->
+            <div class="form-step active" data-step="0">
+                <div class="question-card">
+                    <div class="question-text">Let's start with your details</div>
+                    <input type="text" class="form-input" id="name" placeholder="Your Full Name *" required>
+                    <input type="text" class="form-input" id="agency" placeholder="Agency Name *" required>
+                    <input type="email" class="form-input" id="email" placeholder="Email Address *" required>
+                    <input type="tel" class="form-input" id="phone" placeholder="Phone Number *" required>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Start Audit →</button>
+                </div>
+            </div>
+
+            <!-- Question 1 -->
+            <div class="form-step" data-step="1">
+                <div class="question-card">
+                    <div class="question-number">1</div>
+                    <div class="question-text">What type of photography do you currently use for property listings?</div>
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="radio" name="q1" value="1" required>
+                            <div class="checkmark"></div>
+                            <span class="option-text">iPhone or basic camera photos</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q1" value="2">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Entry-level professional photography</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q1" value="3">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Professional property photographer with HDR/editing</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="form-step" data-step="2">
+                <div class="question-card">
+                    <div class="question-number">2</div>
+                    <div class="question-text">Do you currently use video content for your listings?</div>
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="radio" name="q2" value="0" required>
+                            <div class="checkmark"></div>
+                            <span class="option-text">No video content at all</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q2" value="2">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Basic walkthrough videos occasionally</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q2" value="4">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Professional video tours for most/all listings</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="form-step" data-step="3">
+                <div class="question-card">
+                    <div class="question-number">3</div>
+                    <div class="question-text">How often do you use drone/aerial footage?</div>
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="radio" name="q3" value="0" required>
+                            <div class="checkmark"></div>
+                            <span class="option-text">Never - don't use drone footage</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q3" value="2">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Occasionally for premium properties</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q3" value="3">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Regularly use aerial shots when appropriate</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="form-step" data-step="4">
+                <div class="question-card">
+                    <div class="question-number">4</div>
+                    <div class="question-text">What's your typical turnaround time from shoot to receiving media?</div>
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="radio" name="q4" value="1" required>
+                            <div class="checkmark"></div>
+                            <span class="option-text">1 week or more</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q4" value="2">
+                            <div class="checkmark"></div>
+                            <span class="option-text">3-5 business days</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q4" value="3">
+                            <div class="checkmark"></div>
+                            <span class="option-text">48 hours or less</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="form-step" data-step="5">
+                <div class="question-card">
+                    <div class="question-number">5</div>
+                    <div class="question-text">How active are you on social media with property content?</div>
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="radio" name="q5" value="1" required>
+                            <div class="checkmark"></div>
+                            <span class="option-text">Rarely or never post property content</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q5" value="2">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Occasionally share new listings</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q5" value="3">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Regular, engaging content strategy</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="form-step" data-step="6">
+                <div class="question-card">
+                    <div class="question-number">6</div>
+                    <div class="question-text">Can you track the progress of your media production in real-time?</div>
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="radio" name="q6" value="0" required>
+                            <div class="checkmark"></div>
+                            <span class="option-text">No visibility - just wait for delivery</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q6" value="1">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Email updates only</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q6" value="3">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Live tracking system showing project status</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Question 7 -->
+            <div class="form-step" data-step="7">
+                <div class="question-card">
+                    <div class="question-number">7</div>
+                    <div class="question-text">How do vendors typically react to your property marketing materials?</div>
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="radio" name="q7" value="1" required>
+                            <div class="checkmark"></div>
+                            <span class="option-text">Often disappointed or request improvements</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q7" value="2">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Generally satisfied, no major complaints</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q7" value="3">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Consistently impressed and share with friends</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Question 8 -->
+            <div class="form-step" data-step="8">
+                <div class="question-card">
+                    <div class="question-number">8</div>
+                    <div class="question-text">How does your marketing compare to competitors in your area?</div>
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="radio" name="q8" value="1" required>
+                            <div class="checkmark"></div>
+                            <span class="option-text">We're behind - competitors have better visuals</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q8" value="2">
+                            <div class="checkmark"></div>
+                            <span class="option-text">About the same - similar quality</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q8" value="3">
+                            <div class="checkmark"></div>
+                            <span class="option-text">We're the market leader in presentation</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                    <button type="button" class="btn btn-primary" onclick="submitAudit()">Get My Results →</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Loading State -->
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+            <p style="color: #6B7280; font-size: 1.1em;">Analyzing your marketing strategy...</p>
+        </div>
+
+        <!-- Results -->
+        <div class="results-container" id="resultsContainer">
+            <div class="score-display" id="scoreDisplay">
+                <div class="score-number" id="scoreNumber"></div>
+                <div class="score-verdict" id="scoreVerdict"></div>
+                <div class="score-description" id="scoreDescription"></div>
+            </div>
+
+            <div class="analysis-content" id="analysisContent"></div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="login.html" class="cta-primary" style="display: inline-block;">
+                    Book Your Premium Shoot Now
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
 
     <!-- 2. Process Section -->
     <section class="process-section" id="process">
@@ -1668,5 +2365,261 @@
             window.addEventListener('resize', lockHeader);
         })();
     </script>
+    
+    <script>
+    // Audit Form JavaScript
+    let currentStep = 0;
+    const totalSteps = 8;
+    const formData = {};
+
+    // Update progress bar
+    function updateProgress() {
+        const progress = (currentStep / totalSteps) * 100;
+        document.getElementById('progressBar').style.width = progress + '%';
+        document.getElementById('progressText').textContent = `Question ${currentStep} of ${totalSteps}`;
+    }
+
+    // Next step
+    function nextStep() {
+        const steps = document.querySelectorAll('.form-step');
+        const currentStepElement = steps[currentStep];
+
+        // Validate current step
+        if (currentStep === 0) {
+            // Validate contact info
+            const name = document.getElementById('name').value.trim();
+            const agency = document.getElementById('agency').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            if (!name || !agency || !email || !phone) {
+                showError('Please fill in all required fields');
+                return;
+            }
+
+            formData.name = name;
+            formData.agency = agency;
+            formData.email = email;
+            formData.phone = phone;
+        } else {
+            // Validate radio selection
+            const questionName = `q${currentStep}`;
+            const selected = document.querySelector(`input[name="${questionName}"]:checked`);
+            
+            if (!selected) {
+                showError('Please select an answer to continue');
+                return;
+            }
+
+            formData[questionName] = parseInt(selected.value);
+        }
+
+        // Hide error and move to next
+        hideError();
+        currentStepElement.classList.remove('active');
+        currentStep++;
+        
+        if (currentStep <= totalSteps) {
+            steps[currentStep].classList.add('active');
+            updateProgress();
+        }
+    }
+
+    // Previous step
+    function prevStep() {
+        const steps = document.querySelectorAll('.form-step');
+        steps[currentStep].classList.remove('active');
+        currentStep--;
+        steps[currentStep].classList.add('active');
+        updateProgress();
+        hideError();
+    }
+
+    // Show error message
+    function showError(message) {
+        const errorEl = document.getElementById('errorMessage');
+        errorEl.textContent = message;
+        errorEl.classList.add('active');
+    }
+
+    // Hide error message
+    function hideError() {
+        document.getElementById('errorMessage').classList.remove('active');
+    }
+
+    // Calculate score
+    function calculateScore() {
+        return (formData.q1 || 0) + (formData.q2 || 0) + (formData.q3 || 0) + 
+               (formData.q4 || 0) + (formData.q5 || 0) + (formData.q6 || 0) + 
+               (formData.q7 || 0) + (formData.q8 || 0);
+    }
+
+    // Get verdict
+    function getVerdict(score) {
+        if (score <= 8) return { text: 'Poor', color: '#DC2626', desc: 'Your marketing needs urgent attention' };
+        if (score <= 14) return { text: 'Fair', color: '#F59E0B', desc: 'Room for significant improvement' };
+        if (score <= 18) return { text: 'Good', color: '#10B981', desc: 'Strong foundation with growth potential' };
+        return { text: 'Excellent', color: '#059669', desc: 'Industry-leading marketing approach' };
+    }
+
+    // Convert markdown to HTML (simple version)
+    function markdownToHtml(text) {
+        // Headers
+        text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+        text = text.replace(/^## (.*$)/gim, '<h3>$1</h3>');
+        text = text.replace(/^# (.*$)/gim, '<h3>$1</h3>');
+        
+        // Bold
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Bullet lists
+        text = text.replace(/^\- (.*$)/gim, '<li>$1</li>');
+        text = text.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+        
+        // Paragraphs
+        text = text.split('\n\n').map(para => {
+            if (!para.startsWith('<') && para.trim()) {
+                return '<p>' + para + '</p>';
+            }
+            return para;
+        }).join('\n');
+        
+        return text;
+    }
+
+    // Submit audit
+    async function submitAudit() {
+        // Validate last question
+        const selected = document.querySelector('input[name="q8"]:checked');
+        if (!selected) {
+            showError('Please select an answer to continue');
+            return;
+        }
+        formData.q8 = parseInt(selected.value);
+
+        // Calculate score
+        const score = calculateScore();
+        formData.score = score;
+
+        // Prepare answers object
+        const answers = {
+            q1: formData.q1,
+            q2: formData.q2,
+            q3: formData.q3,
+            q4: formData.q4,
+            q5: formData.q5,
+            q6: formData.q6,
+            q7: formData.q7,
+            q8: formData.q8
+        };
+
+        // Hide form, show loading
+        document.getElementById('auditForm').style.display = 'none';
+        document.getElementById('loadingSpinner').classList.add('active');
+        hideError();
+
+        try {
+            // Submit to Netlify function
+            const response = await fetch('/.netlify/functions/submit-audit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    agency: formData.agency,
+                    email: formData.email,
+                    phone: formData.phone,
+                    score: score,
+                    answers: answers
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to submit audit');
+            }
+
+            // Hide loading, show results
+            document.getElementById('loadingSpinner').classList.remove('active');
+            showResults(score, data.analysis);
+
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('loadingSpinner').classList.remove('active');
+            document.getElementById('auditForm').style.display = 'block';
+            showError('Sorry, there was an error submitting your audit. Please try again.');
+        }
+    }
+
+    // Show results
+    function showResults(score, analysis) {
+        const verdict = getVerdict(score);
+        
+        document.getElementById('scoreNumber').textContent = score + '/22';
+        document.getElementById('scoreVerdict').textContent = verdict.text;
+        document.getElementById('scoreDescription').textContent = verdict.desc;
+        
+        // Convert markdown analysis to HTML
+        const htmlAnalysis = markdownToHtml(analysis);
+        document.getElementById('analysisContent').innerHTML = htmlAnalysis;
+        
+        document.getElementById('resultsContainer').classList.add('active');
+    }
+
+    // Add radio button visual feedback
+    document.addEventListener('DOMContentLoaded', function() {
+        const radioLabels = document.querySelectorAll('.option-label');
+        radioLabels.forEach(label => {
+            label.addEventListener('click', function() {
+                // Remove selected class from siblings
+                const siblings = this.parentElement.querySelectorAll('.option-label');
+                siblings.forEach(s => s.classList.remove('selected'));
+                // Add selected class to clicked
+                this.classList.add('selected');
+            });
+        });
+    });
+
+    // FAQ Toggle (existing function)
+    function toggleFaq(element) {
+        const allFaqs = document.querySelectorAll('.faq-item');
+        allFaqs.forEach(faq => {
+            if (faq !== element) {
+                faq.classList.remove('active');
+            }
+        });
+        element.classList.toggle('active');
+    }
+
+    // Smooth scrolling for anchor links (existing)
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Measure header height after fonts/wrapping and lock the line to 50% (existing)
+    (function(){
+        function lockHeader(){
+            var header=document.getElementById('mm-line-header');
+            var band=document.getElementById('mm-line-band');
+            if(!header||!band) return;
+            var h = header.offsetHeight;
+            band.style.setProperty('--headerH', h+'px');
+        }
+        lockHeader();
+        if(document.fonts && document.fonts.ready){ document.fonts.ready.then(lockHeader); }
+        window.addEventListener('load', lockHeader);
+        window.addEventListener('resize', lockHeader);
+    })();
+</script>
 </body>
 </html>
