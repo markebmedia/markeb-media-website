@@ -99,11 +99,16 @@ exports.handler = async (event, context) => {
 
     const passwordHash = await hashPassword(newPassword);
 
-    await base('Markeb Media Users').update(user.id, {
+    const updateFields = {
       'Password Hash': passwordHash,
-      'Reset Token': '',
-      'Reset Token Expiry': ''
-    });
+      'Reset Token': ''
+    };
+
+    if (user.fields['Reset Token Expiry']) {
+      updateFields['Reset Token Expiry'] = null;
+    }
+
+    await base('Markeb Media Users').update(user.id, updateFields);
 
     return {
       statusCode: 200,
