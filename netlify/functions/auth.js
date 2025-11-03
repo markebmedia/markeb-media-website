@@ -1,7 +1,7 @@
 // netlify/functions/auth.js - Netlify serverless function for authentication
+const bcrypt = require('bcryptjs');
 
 exports.handler = async (event, context) => {
-    // Debug logging
     console.log('=== Netlify Function Debug ===');
     console.log('Method:', event.httpMethod);
     console.log('Path:', event.path);
@@ -14,7 +14,6 @@ exports.handler = async (event, context) => {
     });
     console.log('==============================');
 
-    // CORS headers
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -30,7 +29,6 @@ exports.handler = async (event, context) => {
         };
     }
 
-    // Validate environment variables
     if (!process.env.AIRTABLE_API_KEY || !process.env.AIRTABLE_BASE_ID || !process.env.AIRTABLE_USER_TABLE) {
         console.error('Missing required environment variables');
         return {
@@ -78,20 +76,15 @@ exports.handler = async (event, context) => {
     }
 };
 
-// Hash password securely
-function hashPassword(password) {
-    const crypto = require('crypto');
-    const salt = 'markeb_media_salt_2024';
-    return crypto.createHash('sha256').update(password + salt).digest('hex');
+async function hashPassword(password) {
+    const saltRounds = 10;
+    return await bcrypt.hash(password, saltRounds);
 }
 
-// Verify password
-function verifyPassword(password, hash) {
-    const passwordHash = hashPassword(password);
-    return passwordHash === hash;
+async function verifyPassword(password, hash) {
+    return await bcrypt.compare(password, hash);
 }
 
-// Handle user login
 async function handleLogin(event, headers) {
     if (event.httpMethod !== 'POST') {
         return {
@@ -118,8 +111,7 @@ async function handleLogin(event, headers) {
     }
 
     try {
-        // Query Airtable
-        const filterFormula = `{Email} = "${email}"`;
+        const filterFormula = `LOWER({Email}) = "${email.toLowerCase()}"`;
         const url = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}?filterByFormula=${encodeURIComponent(filterFormula)}`;
 
         const response = await fetch(url, {
@@ -160,8 +152,7 @@ async function handleLogin(event, headers) {
             };
         }
 
-        // Verify password
-        const passwordValid = verifyPassword(password, storedHash);
+        const passwordValid = await verifyPassword(password, storedHash);
 
         if (!passwordValid) {
             return {
@@ -174,7 +165,6 @@ async function handleLogin(event, headers) {
             };
         }
 
-        // Check account status
         if (user.fields['Account Status'] !== 'Active') {
             return {
                 statusCode: 401,
@@ -186,13 +176,12 @@ async function handleLogin(event, headers) {
             };
         }
 
-        // Generate secure session token
         const sessionData = {
             email: user.fields['Email'],
             name: user.fields['Name'],
             company: user.fields['Company'] || '',
             timestamp: Date.now(),
-            expires: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+            expires: Date.now() + (24 * 60 * 60 * 1000)
         };
 
         const token = Buffer.from(JSON.stringify(sessionData)).toString('base64');
@@ -224,7 +213,6 @@ async function handleLogin(event, headers) {
     }
 }
 
-// Handle user registration
 async function handleRegister(event, headers) {
     if (event.httpMethod !== 'POST') {
         return {
@@ -250,7 +238,6 @@ async function handleRegister(event, headers) {
         };
     }
 
-    // Basic validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         return {
@@ -275,8 +262,7 @@ async function handleRegister(event, headers) {
     }
 
     try {
-        // Check if user already exists
-        const filterFormula = `{Email} = "${email}"`;
+        const filterFormula = `LOWER({Email}) = "${email.toLowerCase()}"`;
         const checkUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}?filterByFormula=${encodeURIComponent(filterFormula)}`;
 
         const checkResponse = await fetch(checkUrl, {
@@ -298,10 +284,8 @@ async function handleRegister(event, headers) {
             };
         }
 
-        // Hash password
-        const hashedPassword = hashPassword(password);
+        const hashedPassword = await hashPassword(password);
 
-        // Create user in Airtable
         const createUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}`;
         
         const userData = {
@@ -332,13 +316,12 @@ async function handleRegister(event, headers) {
             throw new Error('Failed to create user account');
         }
 
-        // Generate session token
         const sessionData = {
             email: email.toLowerCase().trim(),
             name: name.trim(),
             company: company.trim(),
             timestamp: Date.now(),
-            expires: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+            expires: Date.now() + (24 * 60 * 60 * 1000)
         };
 
         const token = Buffer.from(JSON.stringify(sessionData)).toString('base64');
@@ -370,7 +353,6 @@ async function handleRegister(event, headers) {
     }
 }
 
-// Handle getting user data
 async function handleGetUserData(event, headers) {
     if (event.httpMethod !== 'POST') {
         return {
@@ -397,7 +379,7 @@ async function handleGetUserData(event, headers) {
     }
 
     try {
-        const filterFormula = `{Email} = "${email}"`;
+        const filterFormula = `LOWER({Email}) = "${email.toLowerCase()}"`;
         const url = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}?filterByFormula=${encodeURIComponent(filterFormula)}`;
 
         const response = await fetch(url, {
@@ -449,7 +431,6 @@ async function handleGetUserData(event, headers) {
     }
 }
 
-// Handle token validation
 async function handleValidateToken(event, headers) {
     if (event.httpMethod !== 'POST') {
         return {
@@ -478,7 +459,6 @@ async function handleValidateToken(event, headers) {
     try {
         const sessionData = JSON.parse(Buffer.from(token, 'base64').toString());
         
-        // Check if token is expired
         if (sessionData.expires && Date.now() > sessionData.expires) {
             return {
                 statusCode: 401,
@@ -490,8 +470,7 @@ async function handleValidateToken(event, headers) {
             };
         }
 
-        // Verify user still exists and is active
-        const filterFormula = `{Email} = "${sessionData.email}"`;
+        const filterFormula = `LOWER({Email}) = "${sessionData.email.toLowerCase()}"`;
         const url = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}?filterByFormula=${encodeURIComponent(filterFormula)}`;
 
         const response = await fetch(url, {
