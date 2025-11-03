@@ -2374,11 +2374,23 @@
     const formData = {};
 
     // Update progress bar
-    function updateProgress() {
-        const progress = (currentStep / totalSteps) * 100;
-        document.getElementById('progressBar').style.width = progress + '%';
-        document.getElementById('progressText').textContent = `Question ${currentStep} of ${totalSteps}`;
+   function updateProgress() {
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+
+    // Calculate and cap the progress bar at 100%
+    const progress = Math.min((currentStep / totalSteps) * 100, 100);
+    progressBar.style.width = progress + '%';
+
+    // Only show "Question X of 8" for steps 1–8
+    if (currentStep <= totalSteps) {
+        progressText.style.display = 'block';
+        progressText.textContent = `Question ${currentStep} of ${totalSteps}`;
+    } else {
+        progressText.style.display = 'none';
     }
+}
+
 
     // Next step
 function nextStep() {
