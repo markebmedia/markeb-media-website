@@ -2500,31 +2500,83 @@ function prevStep() {
         return text;
     }
 
-    // Submit audit
-    async function submitAudit() {
-        // Validate last question
-        const selected = document.querySelector('input[name="q8"]:checked');
-        if (!selected) {
-            showError('Please select an answer to continue');
-            return;
+   // --- Submit Audit ---
+async function submitAudit() {
+    // Validate last question (Q8)
+    const selected = document.querySelector('input[name="q8"]:checked');
+    if (!selected) {
+        showError('Please select an answer to continue');
+        return;
+    }
+    formData.q8 = parseInt(selected.value);
+
+    // Calculate score
+    const score = calculateScore();
+    formData.score = score;
+
+    // Collect all answers
+    const answers = {
+        q1: formData.q1,
+        q2: formData.q2,
+        q3: formData.q3,
+        q4: formData.q4,
+        q5: formData.q5,
+        q6: formData.q6,
+        q7: formData.q7,
+        q8: formData.q8
+    };
+
+    // ✅ Re-read contact info directly from form
+    const name = document.getElementById('name').value.trim();
+    const agency = document.getElementById('agency').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+
+    if (!name || !agency || !email || !phone) {
+        showError('Please fill in all required fields');
+        return;
+    }
+
+    console.log('📤 Submitting data:', { name, agency, email, phone, score, answers });
+
+    try {
+        const response = await fetch('/.netlify/functions/submit-audit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name,
+                agency,
+                email,
+                phone,
+                score,
+                answers
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error('❌ Server responded with an error:', data);
+            throw new Error(data.error || 'Server error');
         }
-        formData.q8 = parseInt(selected.value);
 
-        // Calculate score
-        const score = calculateScore();
-        formData.score = score;
+        console.log('✅ Success:', data);
 
-        // Prepare answers object
-        const answers = {
-            q1: formData.q1,
-            q2: formData.q2,
-            q3: formData.q3,
-            q4: formData.q4,
-            q5: formData.q5,
-            q6: formData.q6,
-            q7: formData.q7,
-            q8: formData.q8
-        };
+        // Optional success action (you can customize this)
+        if (typeof showSuccessMessage === 'function') {
+            showSuccessMessage();
+        } else {
+            alert('✅ Your audit has been submitted successfully! Check your email for results.');
+        }
+
+    } catch (error) {
+        console.error('❌ Error submitting audit:', error);
+        showError('Something went wrong. Please try again later.');
+    }
+}
+
 
         // Hide form, show loading
         document.getElementById('auditForm').style.display = 'none';
@@ -2564,7 +2616,7 @@ function prevStep() {
             document.getElementById('auditForm').style.display = 'block';
             showError('Sorry, there was an error submitting your audit. Please try again.');
         }
-    }
+    
 
     // Show results
     function showResults(score, analysis) {
