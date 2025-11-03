@@ -100,6 +100,7 @@ exports.handler = async (event) => {
       'Reset Token Expiry': expiryTime.toISOString()
     });
 
+    // Use EmailJS server-side endpoint with private key
     const emailResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
       method: 'POST',
       headers: {
