@@ -2500,82 +2500,90 @@ function prevStep() {
         return text;
     }
 
-   // --- Submit Audit ---
+// --- Submit Audit ---
 async function submitAudit() {
-    // Validate last question (Q8)
+    console.log('🚀 submitAudit triggered');
+
+    // --- Validate last question (Q8) ---
     const selected = document.querySelector('input[name="q8"]:checked');
     if (!selected) {
-        showError('Please select an answer to continue');
+        alert('Please select an answer to continue.');
         return;
     }
     formData.q8 = parseInt(selected.value);
 
-    // Calculate score
+    // --- Calculate total score ---
     const score = calculateScore();
     formData.score = score;
 
-    // Collect all answers
+    // --- Collect all answers ---
     const answers = {
-        q1: formData.q1,
-        q2: formData.q2,
-        q3: formData.q3,
-        q4: formData.q4,
-        q5: formData.q5,
-        q6: formData.q6,
-        q7: formData.q7,
-        q8: formData.q8
+        q1: formData.q1 ?? 0,
+        q2: formData.q2 ?? 0,
+        q3: formData.q3 ?? 0,
+        q4: formData.q4 ?? 0,
+        q5: formData.q5 ?? 0,
+        q6: formData.q6 ?? 0,
+        q7: formData.q7 ?? 0,
+        q8: formData.q8 ?? 0
     };
 
-    // ✅ Re-read contact info directly from form
-    const name = document.getElementById('name').value.trim();
-    const agency = document.getElementById('agency').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const phone = document.getElementById('phone').value.trim();
+    // --- Safely read contact info fields ---
+    const nameInput = document.getElementById('name');
+    const agencyInput = document.getElementById('agency');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
 
-    if (!name || !agency || !email || !phone) {
-        showError('Please fill in all required fields');
+    if (!nameInput || !agencyInput || !emailInput || !phoneInput) {
+        console.error('❌ Contact fields not found in DOM.');
+        alert('Something went wrong — contact form not found. Please refresh and try again.');
         return;
     }
 
-    console.log('📤 Submitting data:', { name, agency, email, phone, score, answers });
+    const name = nameInput.value.trim();
+    const agency = agencyInput.value.trim();
+    const email = emailInput.value.trim();
+    const phone = phoneInput.value.trim();
+
+    if (!name || !agency || !email || !phone) {
+        alert('Please fill in all required contact details.');
+        return;
+    }
+
+    const payload = { name, agency, email, phone, score, answers };
+    console.log('📤 Submitting data payload:', payload);
 
     try {
         const response = await fetch('/.netlify/functions/submit-audit', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name,
-                agency,
-                email,
-                phone,
-                score,
-                answers
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
 
-        const data = await response.json();
+        let data;
+        try {
+            data = await response.json();
+        } catch (err) {
+            console.error('❌ Could not parse JSON response', err);
+            throw new Error('Invalid response from server.');
+        }
 
         if (!response.ok) {
-            console.error('❌ Server responded with an error:', data);
+            console.error('❌ Server responded with error:', data);
             throw new Error(data.error || 'Server error');
         }
 
         console.log('✅ Success:', data);
 
-        // Optional success action (you can customize this)
-        if (typeof showSuccessMessage === 'function') {
-            showSuccessMessage();
-        } else {
-            alert('✅ Your audit has been submitted successfully! Check your email for results.');
-        }
+        // --- Success Message ---
+        alert('✅ Your audit has been submitted successfully! Check your email for the results.');
 
     } catch (error) {
         console.error('❌ Error submitting audit:', error);
-        showError('Something went wrong. Please try again later.');
+        alert('Something went wrong while submitting your audit. Please try again later.');
     }
 }
+
 
 
         // Hide form, show loading
