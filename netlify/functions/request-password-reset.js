@@ -1,8 +1,9 @@
 // netlify/functions/request-password-reset.js
 const Airtable = require('airtable');
-const fetch = require('node-fetch');
+const { Resend } = require('resend');
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 function generateResetCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -100,38 +101,21 @@ exports.handler = async (event) => {
       'Reset Token Expiry': expiryTime.toISOString()
     });
 
-    // Use EmailJS server-side endpoint with private key
-    const emailResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        service_id: process.env.EMAILJS_SERVICE_ID,
-        template_id: process.env.EMAILJS_TEMPLATE_ID,
-        user_id: process.env.EMAILJS_PUBLIC_KEY,
-        accessToken: process.env.EMAILJS_PRIVATE_KEY,
-        template_params: {
-          to_email: email.toLowerCase(),
-          to_name: user.fields.Name || 'User',
-          reset_code: resetCode,
-          expiry_minutes: '30'
-        }
-      })
+    await resend.emails.send({
+      from: process.env.RESEND_FROM_EMAIL,
+      to: email.toLowerCase(),
+      subject: 'Password Reset Code - Markeb Media',
+      html: `
+        <h2>Password Reset Request</h2>
+        <p>Hello ${user.fields.Name || 'User'},</p>
+        <p>Your password reset code is:</p>
+        <h1 style="color: #4CAF50; font-size: 32px; letter-spacing: 5px;">${resetCode}</h1>
+        <p>This code will expire in 30 minutes.</p>
+        <p>If you didn't request this reset, please ignore this email.</p>
+        <br>
+        <p>Best regards,<br>Markeb Media Team</p>
+      `
     });
-
-    if (!emailResponse.ok) {
-      const errorText = await emailResponse.text();
-      console.error('EmailJS send failed:', errorText);
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ 
-          message: 'If this email exists, a reset code has been sent.',
-          success: true 
-        })
-      };
-    }
 
     console.log('Reset email sent successfully to:', email);
 
