@@ -1,28 +1,41 @@
 // netlify/functions/reset-password.js
 const Airtable = require('airtable');
+const bcrypt = require('bcryptjs');
 
-// Configure Airtable
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-// Hash password (same method as your airtable.js)
-function hashPassword(password) {
-  return btoa(password + 'salt');
+async function hashPassword(password) {
+  const saltRounds = 10;
+  return await bcrypt.hash(password, saltRounds);
+}
+
+function validatePassword(password) {
+  if (password.length < 8) {
+    return { valid: false, message: 'Password must be at least 8 characters long' };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one uppercase letter' };
+  }
+  if (!/[a-z]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one lowercase letter' };
+  }
+  if (!/[0-9]/.test(password)) {
+    return { valid: false, message: 'Password must contain at least one number' };
+  }
+  return { valid: true };
 }
 
 exports.handler = async (event, context) => {
-  // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS'
   };
 
-  // Handle OPTIONS request
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }
 
-  // Only allow POST
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -42,9 +55,17 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Find user in Airtable
+    const passwordCheck = validatePassword(newPassword);
+    if (!passwordCheck.valid) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ message: passwordCheck.message })
+      };
+    }
+
     const records = await base('Markeb Media Users').select({
-      filterByFormula: `{Email} = "${email}"`,
+      filterByFormula: `LOWER({Email}) = "${email.toLowerCase()}"`,
       maxRecords: 1
     }).firstPage();
 
@@ -52,7 +73,7 @@ exports.handler = async (event, context) => {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ message: 'Invalid reset request' })
+        body: JSON.stringify({ message: 'Invalid or expired reset code' })
       };
     }
 
@@ -60,7 +81,6 @@ exports.handler = async (event, context) => {
     const storedCode = user.fields['Reset Token'];
     const expiryTime = user.fields['Reset Token Expiry'];
 
-    // Validate reset code
     if (!storedCode || storedCode !== resetCode) {
       return {
         statusCode: 400,
@@ -69,7 +89,6 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Check if code has expired
     if (expiryTime && new Date(expiryTime) < new Date()) {
       return {
         statusCode: 400,
@@ -78,10 +97,8 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Hash new password
-    const passwordHash = hashPassword(newPassword);
+    const passwordHash = await hashPassword(newPassword);
 
-    // Update user record with new password and clear reset token
     await base('Markeb Media Users').update(user.id, {
       'Password Hash': passwordHash,
       'Reset Token': '',
@@ -98,7 +115,7 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Reset password error:', error);
     return {
       statusCode: 500,
       headers,
