@@ -135,15 +135,7 @@ async function generateAIAnalysis(name, agency, score, answers, verdict) {
   const context = buildAnswerContext(answers);
 
   const prompt = `
-You are an elite property marketing consultant with 15+ years of experience working exclusively with top-performing estate agents across the UK. You specialise in property photography, videography, branding, and digital marketing strategy. You've helped hundreds of agencies increase their vendor fees, win more instructions, and dominate their local markets through superior visual marketing.
-
-You deeply understand:
-- The psychology of property buyers and how visual content influences their decisions
-- How premium marketing materials justify higher vendor fees and attract better clients
-- The competitive dynamics of the UK property market and what separates market leaders from average performers
-- The ROI of professional photography, videography, drone footage, and consistent social media presence
-- How modern vendors expect transparency through performance tracking and weekly updates
-- Current UK property market trends and what buyers are looking for in 2025
+You are an elite property marketing consultant with 15+ years of experience working exclusively with top-performing estate agents across the UK. You specialise in property photography, videography, branding, and digital marketing strategy.
 
 You're analysing the marketing audit results for ${firstName} at ${agency}.
 
@@ -157,35 +149,28 @@ You're analysing the marketing audit results for ${firstName} at ${agency}.
 ${context}
 
 **Your Task:**
-Think deeply like a world-class marketing strategist. Analyse their current marketing approach and provide insights that demonstrate your expertise. Generate a personalised, strategic marketing analysis for ${firstName} at ${agency}.
+Generate a concise, strategic marketing analysis for ${firstName} at ${agency}.
 
-**IMPORTANT REQUIREMENTS:**
-1. Write everything in UK English spelling (e.g., specialise not specialize, analyse not analyze, colour not color, recognise not recognize, optimise not optimize, etc.)
-2. Think like a true expert - provide specific, nuanced insights based on their answers
-3. Reference real market dynamics and competitive positioning
-4. Show you understand the business impact of each recommendation (e.g., "Professional photography can increase online enquiries by 30-50% and justify premium fees")
-5. At the end, naturally mention that Markeb Media specialises in helping estate agents implement these exact improvements through:
-   - Professional property photography and videography
-   - Brand development and positioning
-   - Social media content strategy and management
+**CRITICAL REQUIREMENTS:**
+1. Write everything in UK English spelling (e.g., specialise, analyse, colour, recognise, optimise)
+2. Keep response under 700 words - be concise and impactful
+3. Reference real market dynamics and business impact
+4. At the end, mention that Markeb Media specialises in helping estate agents through professional property photography and videography, brand development, and social media content strategy
 
 **Structure:**
-1. **Opening**: Acknowledge their current score with expert context about what this means in today's market (use their actual score ${score}/25, not a different number)
-2. **Strengths**: If applicable, recognise what they're doing well and why it matters
-3. **Critical Areas for Improvement**: Provide 3-4 strategic, specific recommendations based on their answers. For each:
-   - Explain WHY it matters (business impact, market positioning)
-   - Give specific, actionable next steps
-   - Reference industry benchmarks or outcomes where relevant
-4. **Business Impact**: Paint a clear picture of how these improvements will affect their bottom line, vendor perception, and market position
-5. **Closing**: Position Markeb Media as the partner who can help them achieve these improvements through photography, videography, branding, and social media services
+1. **Opening**: Brief acknowledgement of their score ${score}/25 and what it means
+2. **Key Strengths** (if score >15): 2-3 sentences on what they're doing well
+3. **Critical Improvements**: 3 specific recommendations with brief business impact for each
+4. **Business Impact**: One paragraph on how improvements affect their bottom line
+5. **Closing**: Brief mention of Markeb Media services
 
-Tone: Confident, knowledgeable, strategic, and solution-focused. Sound like the expert consultant they'd pay thousands to work with. Use ${firstName}'s name naturally throughout to maintain personal connection.
+Tone: Confident, strategic, solution-focused. Use ${firstName}'s name naturally.
 `;
 
   try {
     const message = await anthropic.messages.create({
       model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514',
-      max_tokens: 2500,
+      max_tokens: 1200, // ⭐ REDUCED from 2500 to 1200 for faster generation
       temperature: 0.7,
       messages: [{ role: 'user', content: prompt }],
     });
