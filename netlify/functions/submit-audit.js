@@ -160,9 +160,11 @@ Generate a concise, strategic marketing analysis for ${firstName} at ${agency}.
 **Structure:**
 1. **Opening**: Brief acknowledgement of their score ${score}/25 and what it means
 2. **Key Strengths** (if score >15): 2-3 sentences on what they're doing well
-3. **Critical Improvements**: 3 specific recommendations with brief business impact for each
-4. **Business Impact**: One paragraph on how improvements affect their bottom line
+3. **Critical Improvements**: 3 specific recommendations with brief business impact for each. PUT TWO LINE BREAKS between each numbered item for better readability.
+4. **Business Impact**: One paragraph on how improvements affect their bottom line. PUT TWO LINE BREAKS before this section.
 5. **Closing**: Brief mention of Markeb Media services
+
+Use clear spacing with double line breaks between major sections and between numbered items for easy scanning.
 
 Tone: Confident, strategic, solution-focused. Use ${firstName}'s name naturally.
 `;
