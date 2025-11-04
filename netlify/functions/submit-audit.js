@@ -165,7 +165,7 @@ Generate a personalized, actionable marketing analysis for ${firstName} at ${age
 
   try {
     const message = await anthropic.messages.create({
-      model: process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-20240620',
+      model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514',
       max_tokens: 2000,
       temperature: 0.7,
       messages: [{ role: 'user', content: prompt }],
@@ -288,4 +288,3 @@ async function sendEmailNotification(data) {
     console.error('⚠️ Error sending email notification:', error);
   }
 }
-
