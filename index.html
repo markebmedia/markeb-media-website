@@ -2456,10 +2456,10 @@ function calculateScore() {
 
 // Get verdict
 function getVerdict(score) {
-    if (score <= 8) return { text: 'Poor', color: '#DC2626', desc: 'Your marketing needs urgent attention' };
-    if (score <= 14) return { text: 'Fair', color: '#F59E0B', desc: 'Room for significant improvement' };
-    if (score <= 18) return { text: 'Good', color: '#10B981', desc: 'Strong foundation with growth potential' };
-    return { text: 'Excellent', color: '#059669', desc: 'Industry-leading marketing approach' };
+    if (score <= 10) return { text: 'Poor', colour: '#DC2626', desc: 'Your marketing needs urgent attention' };
+    if (score <= 16) return { text: 'Fair', colour: '#F59E0B', desc: 'Room for significant improvement' };
+    if (score <= 21) return { text: 'Good', colour: '#10B981', desc: 'Strong foundation with growth potential' };
+    return { text: 'Excellent', colour: '#059669', desc: 'Industry-leading marketing approach' };
 }
 
 // Convert markdown to HTML
@@ -2490,6 +2490,9 @@ function markdownToHtml(text) {
 // Submit audit
 async function submitAudit() {
     console.log('🚀 submitAudit triggered');
+
+    // ⭐ PREVENT PAGE JUMP - LOCK SCROLL POSITION ⭐
+    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
 
     // Validate contact info
     const nameInput = document.getElementById('name');
@@ -2536,12 +2539,23 @@ async function submitAudit() {
     document.getElementById('loadingSpinner').classList.add('active');
     hideError();
 
+    // ⭐ RESTORE SCROLL POSITION AFTER DOM CHANGES ⭐
+    window.scrollTo(0, scrollPosition);
+
     try {
+        // ⭐ CREATE ABORT CONTROLLER WITH 60 SECOND TIMEOUT ⭐
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 seconds
+
         const response = await fetch('/.netlify/functions/submit-audit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            signal: controller.signal // ⭐ ADD SIGNAL TO PREVENT TIMEOUT ⭐
         });
+
+        // ⭐ CLEAR TIMEOUT AFTER SUCCESSFUL RESPONSE ⭐
+        clearTimeout(timeoutId);
 
         const data = await response.json();
 
@@ -2556,11 +2570,28 @@ async function submitAudit() {
         document.getElementById('loadingSpinner').classList.remove('active');
         showResults(score, data.analysis);
 
+        // ⭐ SMOOTH SCROLL TO TOP OF RESULTS ⭐
+        setTimeout(() => {
+            document.getElementById('resultsContainer').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }, 100);
+
     } catch (error) {
         console.error('❌ Error submitting audit:', error);
         document.getElementById('loadingSpinner').classList.remove('active');
         document.getElementById('auditForm').style.display = 'block';
-        showError('Sorry, there was an error submitting your audit. Please try again.');
+        
+        // ⭐ RESTORE SCROLL POSITION ON ERROR ⭐
+        window.scrollTo(0, scrollPosition);
+        
+        // ⭐ BETTER ERROR MESSAGING FOR TIMEOUT VS OTHER ERRORS ⭐
+        if (error.name === 'AbortError') {
+            showError('Request is taking longer than expected. Please try again or contact support.');
+        } else {
+            showError('Sorry, there was an error submitting your audit. Please try again.');
+        }
     }
 }
 
@@ -2568,7 +2599,7 @@ async function submitAudit() {
 function showResults(score, analysis) {
     const verdict = getVerdict(score);
     
-    document.getElementById('scoreNumber').textContent = score + '/22';
+    document.getElementById('scoreNumber').textContent = score + '/25'; // ⭐ UPDATED TO 25 ⭐
     document.getElementById('scoreVerdict').textContent = verdict.text;
     document.getElementById('scoreDescription').textContent = verdict.desc;
     
@@ -2592,7 +2623,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Initialize progress on page load
+    // Initialise progress on page load
     updateProgress();
 });
 </script>
