@@ -185,14 +185,70 @@ Generate a personalized, actionable marketing analysis for ${firstName} at ${age
  */
 function buildAnswerContext(answers) {
   const questions = {
-    q1: { title: 'Photography Quality', values: { 1: 'iPhone or basic camera', 2: 'Entry-level professional', 3: 'Professional property photographer' } },
-    q2: { title: 'Video Content', values: { 0: 'No video content', 2: 'Basic walkthrough videos', 4: 'Professional video tours' } },
-    q3: { title: 'Drone/Aerial', values: { 0: 'Never use drone', 2: 'Occasionally use drone', 3: 'Regular drone usage' } },
-    q4: { title: 'Turnaround Time', values: { 1: '1 week or more', 2: '3-5 business days', 3: '48 hours or less' } },
-    q5: { title: 'Social Media Activity', values: { 1: 'Rarely or never post', 2: 'Occasionally post listings', 3: 'Regular engaging content' } },
-    q6: { title: 'Progress Tracking', values: { 0: 'No visibility', 1: 'Email updates only', 3: 'Live tracking system' } },
-    q7: { title: 'Vendor Reaction', values: { 1: 'Often disappointed', 2: 'Generally satisfied', 3: 'Consistently impressed' } },
-    q8: { title: 'Competitive Position', values: { 1: 'Behind the competition', 2: 'About the same', 3: 'Market leader' } },
+    q1: { 
+      title: 'Photography Quality', 
+      values: { 
+        1: 'iPhone or basic camera', 
+        2: 'Entry-level professional', 
+        3: 'Professional property photographer' 
+      } 
+    },
+    q2: { 
+      title: 'Video Content', 
+      values: { 
+        0: 'No video content', 
+        2: 'Basic walkthrough videos', 
+        4: 'Professional video tours' 
+      } 
+    },
+    q3: { 
+      title: 'Drone/Aerial', 
+      values: { 
+        0: 'Never use drone', 
+        2: 'Occasionally use drone', 
+        3: 'Regular drone usage' 
+      } 
+    },
+    q4: { 
+      title: 'Turnaround Time', 
+      values: { 
+        1: '1 week or more', 
+        2: '3-5 business days', 
+        3: '48 hours or less' 
+      } 
+    },
+    q5: { 
+      title: 'Social Media Activity', 
+      values: { 
+        1: 'Rarely or never post', 
+        2: 'Occasionally post listings', 
+        3: 'Regular engaging content' 
+      } 
+    },
+    q6: { 
+      title: 'Marketing Performance Reports', 
+      values: { 
+        0: 'No - clients rarely receive performance updates', 
+        1: 'Occasional updates when clients ask', 
+        3: 'Weekly performance reports with views, engagement & enquiries' 
+      } 
+    },
+    q7: { 
+      title: 'Vendor Reaction', 
+      values: { 
+        1: 'Often disappointed', 
+        2: 'Generally satisfied', 
+        3: 'Consistently impressed' 
+      } 
+    },
+    q8: { 
+      title: 'Competitive Position', 
+      values: { 
+        1: 'Behind the competition', 
+        2: 'About the same', 
+        3: 'Market leader' 
+      } 
+    },
   };
 
   let context = '';
@@ -227,7 +283,7 @@ async function saveToAirtable(data) {
           'Q3 - Drone': data.answers.q3,
           'Q4 - Turnaround': data.answers.q4,
           'Q5 - Social Media': data.answers.q5,
-          'Q6 - Tracking': data.answers.q6,
+          'Q6 - Performance Reports': data.answers.q6,
           'Q7 - Vendor Reaction': data.answers.q7,
           'Q8 - Competitive': data.answers.q8,
           Status: 'New Lead',
