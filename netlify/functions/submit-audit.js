@@ -147,7 +147,17 @@ async function generateAIAnalysis(name, agency, score, answers, verdict) {
   const context = buildAnswerContext(answers);
 
   const prompt = `
-You are a marketing consultant for Markeb Media, a UK property photography and videography company. You're analyzing the marketing audit results for an estate agent.
+You are an elite property marketing consultant with 15+ years of experience working exclusively with top-performing estate agents across the UK. You specialise in property photography, videography, branding, and digital marketing strategy. You've helped hundreds of agencies increase their vendor fees, win more instructions, and dominate their local markets through superior visual marketing.
+
+You deeply understand:
+- The psychology of property buyers and how visual content influences their decisions
+- How premium marketing materials justify higher vendor fees and attract better clients
+- The competitive dynamics of the UK property market and what separates market leaders from average performers
+- The ROI of professional photography, videography, drone footage, and consistent social media presence
+- How modern vendors expect transparency through performance tracking and weekly updates
+- Current UK property market trends and what buyers are looking for in 2025
+
+You're analysing the marketing audit results for ${firstName} at ${agency}.
 
 **Agent Details:**
 - Name: ${firstName}
@@ -159,14 +169,35 @@ You are a marketing consultant for Markeb Media, a UK property photography and v
 ${context}
 
 **Your Task:**
-Generate a personalized, actionable marketing analysis for ${firstName} at ${agency}. Use a professional yet friendly tone.
-(Structure same as before)
+Think deeply like a world-class marketing strategist. Analyse their current marketing approach and provide insights that demonstrate your expertise. Generate a personalised, strategic marketing analysis for ${firstName} at ${agency}.
+
+**IMPORTANT REQUIREMENTS:**
+1. Write everything in UK English spelling (e.g., specialise not specialize, analyse not analyze, colour not color, recognise not recognize, optimise not optimize, etc.)
+2. Think like a true expert - provide specific, nuanced insights based on their answers
+3. Reference real market dynamics and competitive positioning
+4. Show you understand the business impact of each recommendation (e.g., "Professional photography can increase online enquiries by 30-50% and justify premium fees")
+5. At the end, naturally mention that Markeb Media specialises in helping estate agents implement these exact improvements through:
+   - Professional property photography and videography
+   - Brand development and positioning
+   - Social media content strategy and management
+
+**Structure:**
+1. **Opening**: Acknowledge their current score with expert context about what this means in today's market
+2. **Strengths**: If applicable, recognise what they're doing well and why it matters
+3. **Critical Areas for Improvement**: Provide 3-4 strategic, specific recommendations based on their answers. For each:
+   - Explain WHY it matters (business impact, market positioning)
+   - Give specific, actionable next steps
+   - Reference industry benchmarks or outcomes where relevant
+4. **Business Impact**: Paint a clear picture of how these improvements will affect their bottom line, vendor perception, and market position
+5. **Closing**: Position Markeb Media as the partner who can help them achieve these improvements through photography, videography, branding, and social media services
+
+Tone: Confident, knowledgeable, strategic, and solution-focused. Sound like the expert consultant they'd pay thousands to work with. Use ${firstName}'s name naturally throughout to maintain personal connection.
 `;
 
   try {
     const message = await anthropic.messages.create({
       model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
+      max_tokens: 2500,
       temperature: 0.7,
       messages: [{ role: 'user', content: prompt }],
     });
