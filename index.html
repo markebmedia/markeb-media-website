@@ -2543,41 +2543,25 @@ async function submitAudit() {
     window.scrollTo(0, scrollPosition);
 
     try {
-        // ⭐ USE XMLHttpRequest WITH LONGER TIMEOUT INSTEAD OF FETCH ⭐
-        const result = await new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/.netlify/functions/submit-audit');
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.timeout = 90000; // 90 seconds timeout (plenty of time for 30s backend)
-            
-            xhr.onload = function() {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    try {
-                        resolve(JSON.parse(xhr.responseText));
-                    } catch (e) {
-                        reject(new Error('Failed to parse response'));
-                    }
-                } else {
-                    try {
-                        const errorData = JSON.parse(xhr.responseText);
-                        reject(new Error(errorData.error || 'Request failed'));
-                    } catch (e) {
-                        reject(new Error(xhr.statusText || 'Request failed'));
-                    }
-                }
-            };
-            
-            xhr.onerror = () => reject(new Error('Network error'));
-            xhr.ontimeout = () => reject(new Error('Request timeout'));
-            
-            xhr.send(JSON.stringify(payload));
+        // ⭐ SIMPLE FETCH - NO SIGNAL, NO TIMEOUT OVERRIDE ⭐
+        const response = await fetch('/.netlify/functions/submit-audit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
         });
 
-        console.log('✅ Success:', result);
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error('❌ Server error:', data);
+            throw new Error(data.error || 'Failed to submit audit');
+        }
+
+        console.log('✅ Success:', data);
 
         // Hide loading, show results
         document.getElementById('loadingSpinner').classList.remove('active');
-        showResults(score, result.analysis);
+        showResults(score, data.analysis);
 
         // ⭐ SMOOTH SCROLL TO TOP OF RESULTS ⭐
         setTimeout(() => {
@@ -2595,12 +2579,7 @@ async function submitAudit() {
         // ⭐ RESTORE SCROLL POSITION ON ERROR ⭐
         window.scrollTo(0, scrollPosition);
         
-        // ⭐ BETTER ERROR MESSAGING ⭐
-        if (error.message === 'Request timeout') {
-            showError('Your analysis is taking longer than expected. Please try again or contact us at commercial@markebmedia.com');
-        } else {
-            showError('Sorry, there was an error submitting your audit. Please try again.');
-        }
+        showError('Sorry, there was an error submitting your audit. Please try again.');
     }
 }
 
