@@ -15,7 +15,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // CORS headers
 const headers = {
-  'Access-Control-Allow-Origin': '*', // change this to your domain for production
+  'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
@@ -50,18 +50,6 @@ exports.handler = async (event, context) => {
     console.log('=== Incoming Audit Submission ===');
     console.log({ name, agency, email, phone, score, answers });
 
-    // Log environment variables (safe summary)
-    console.log('=== Environment Variables Snapshot ===');
-    console.log({
-      AIRTABLE_TABLE_NAME: process.env.AIRTABLE_TABLE_NAME,
-      AIRTABLE_BASE_ID: process.env.AIRTABLE_BASE_ID ? '✅ Set' : '❌ Missing',
-      AIRTABLE_API_KEY: process.env.AIRTABLE_API_KEY ? '✅ Set' : '❌ Missing',
-      ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ? '✅ Set' : '❌ Missing',
-      RESEND_API_KEY: process.env.RESEND_API_KEY ? '✅ Set' : '❌ Missing',
-      RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
-      RESEND_TO_EMAIL: process.env.RESEND_TO_EMAIL,
-    });
-
     // Validate required fields
     if (!name || !agency || !email || !phone || score === undefined || !answers) {
       console.error('❌ Missing required fields:', { name, agency, email, phone, score, answers });
@@ -74,11 +62,11 @@ exports.handler = async (event, context) => {
 
     console.log(`Processing audit for ${name} from ${agency} (Score: ${score})`);
 
-    // Determine verdict based on score
+    // Determine verdict based on score (OUT OF 25)
     let verdict;
-    if (score <= 8) verdict = 'Poor';
-    else if (score <= 14) verdict = 'Fair';
-    else if (score <= 18) verdict = 'Good';
+    if (score <= 10) verdict = 'Poor';
+    else if (score <= 16) verdict = 'Fair';
+    else if (score <= 21) verdict = 'Good';
     else verdict = 'Excellent';
 
     // Step 1: Generate AI analysis using Claude
@@ -162,7 +150,7 @@ You're analysing the marketing audit results for ${firstName} at ${agency}.
 **Agent Details:**
 - Name: ${firstName}
 - Agency: ${agency}
-- Marketing Score: ${score}/22
+- Marketing Score: ${score}/25
 - Verdict: ${verdict}
 
 **Their Audit Answers:**
@@ -182,7 +170,7 @@ Think deeply like a world-class marketing strategist. Analyse their current mark
    - Social media content strategy and management
 
 **Structure:**
-1. **Opening**: Acknowledge their current score with expert context about what this means in today's market
+1. **Opening**: Acknowledge their current score with expert context about what this means in today's market (use their actual score ${score}/25, not a different number)
 2. **Strengths**: If applicable, recognise what they're doing well and why it matters
 3. **Critical Areas for Improvement**: Provide 3-4 strategic, specific recommendations based on their answers. For each:
    - Explain WHY it matters (business impact, market positioning)
@@ -342,10 +330,10 @@ async function sendEmailNotification(data) {
   try {
     let urgency = '📧';
     let priority = 'STANDARD';
-    if (data.score <= 8) {
+    if (data.score <= 10) {
       urgency = '🔥';
       priority = 'HOT LEAD';
-    } else if (data.score <= 14) {
+    } else if (data.score <= 16) {
       urgency = '⚠️';
       priority = 'WARM LEAD';
     }
@@ -357,7 +345,7 @@ async function sendEmailNotification(data) {
         <body>
           <h1>${urgency} ${priority}: New Marketing Audit Lead!</h1>
           <p><strong>${data.name}</strong> from <strong>${data.agency}</strong></p>
-          <p>Score: ${data.score}/22 — Verdict: ${data.verdict}</p>
+          <p>Score: ${data.score}/25 — Verdict: ${data.verdict}</p>
           <p><a href="${data.airtableRecordUrl}">View in Airtable</a></p>
         </body>
       </html>
@@ -366,7 +354,7 @@ async function sendEmailNotification(data) {
     await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL,
       to: process.env.RESEND_TO_EMAIL,
-      subject: `${urgency} ${priority}: ${data.name} from ${data.agency} (${data.score}/22)`,
+      subject: `${urgency} ${priority}: ${data.name} from ${data.agency} (${data.score}/25)`,
       html: emailHtml,
     });
 
