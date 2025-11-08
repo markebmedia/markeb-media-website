@@ -837,62 +837,365 @@
   .client-actions-buttons .btn { width: 100%; justify-content: center; }
 }
 
-/* Add these button styles inside your <style> tag */
-.btn-success {
-  background: #10b981;
+/* Enhanced Content Calendar Styles */
+.calendar-container {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  padding: 40px;
+  margin-bottom: 32px;
   color: #fff;
-  padding: 10px 20px;
+  box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+}
+
+.calendar-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.calendar-title-section h2 {
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.calendar-title-section p {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.filter-select {
+  padding: 10px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
-  font-weight: 500;
-  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  color: #475569;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: all .2s ease;
-  font-size: 14px;
+}
+
+.filter-select:hover {
+  border-color: #fff;
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.calendar-item {
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  border-left: 6px solid;
+  border-radius: 16px;
+  padding: 24px;
+  transition: all .3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.calendar-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, currentColor, transparent);
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+
+.calendar-item:hover {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  border-color: currentColor;
+}
+
+.calendar-item:hover::before {
+  opacity: 1;
+}
+
+.calendar-item.scheduled { 
+  border-left-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.calendar-item.drafting,
+.calendar-item.in-progress { 
+  border-left-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.calendar-item.ready-for-review { 
+  border-left-color: #8b5cf6;
+  color: #8b5cf6;
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-left-width: 6px; }
+  50% { border-left-width: 8px; }
+}
+
+.calendar-item.approved { 
+  border-left-color: #10b981;
+  color: #10b981;
+}
+
+.calendar-item.published { 
+  border-left-color: #6366f1;
+  color: #6366f1;
+}
+
+.calendar-item.declined { 
+  border-left-color: #ef4444;
+  color: #ef4444;
+}
+
+.calendar-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.calendar-date {
+  font-size: 13px;
+  font-weight: 700;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.calendar-platform {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  border: 2px solid #e2e8f0;
+}
+
+.calendar-item-content h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.calendar-status-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-scheduled { 
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+  border: 2px solid #3b82f6;
+}
+
+.status-drafting,
+.status-in-progress { 
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  border: 2px solid #f59e0b;
+}
+
+.status-ready-for-review { 
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  color: #5b21b6;
+  border: 2px solid #8b5cf6;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(139, 92, 246, 0); }
+}
+
+.status-approved { 
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  color: #065f46;
+  border: 2px solid #10b981;
+}
+
+.status-published { 
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+  color: #3730a3;
+  border: 2px solid #6366f1;
+}
+
+.status-declined { 
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+  border: 2px solid #ef4444;
+}
+
+.calendar-caption {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+  margin-top: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 10px;
+  border-left: 4px solid currentColor;
+}
+
+.calendar-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 2px dashed #e2e8f0;
+}
+
+.calendar-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
+  background: #f8fafc;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.client-actions {
+  margin-top: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 3px solid #f59e0b;
+  border-radius: 12px;
+}
+
+.client-actions-header {
+  font-size: 16px;
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
   gap: 8px;
+}
+
+.client-actions-header::before {
+  content: '⚡';
+  font-size: 20px;
+}
+
+.client-actions-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-success,
+.btn-danger,
+.btn-secondary {
+  flex: 1;
+  min-width: 140px;
+  justify-content: center;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }
 
 .btn-success:hover {
-  background: #059669;
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
 }
 
 .btn-danger {
-  background: #ef4444;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: all .2s ease;
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
 }
 
 .btn-danger:hover {
-  background: #dc2626;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
 }
 
 .btn-secondary {
-  background: #64748b;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: all .2s ease;
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
 }
 
 .btn-secondary:hover {
-  background: #475569;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+}
+
+@media (max-width: 768px) {
+  .calendar-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .calendar-container {
+    padding: 24px;
+  }
+  
+  .filter-controls {
+    width: 100%;
+  }
+  
+  .filter-select {
+    flex: 1;
+    min-width: 120px;
+  }
 }
   }
 </style>
