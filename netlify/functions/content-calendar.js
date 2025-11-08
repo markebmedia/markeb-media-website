@@ -27,8 +27,8 @@ exports.handler = async (event, context) => {
 
     // Airtable credentials from environment variables
     const AIRTABLE_API_KEY = process.env.SOCIAL_MEDIA_API_KEY;
-    const SOCIAL_MEDIA_BASE_ID = process.env.SOCIAL_MEDIA_BASE_ID; // New base ID for Social Media base
-    const CONTENT_TABLE_NAME = 'Content Planner'; // Table name
+    const SOCIAL_MEDIA_BASE_ID = process.env.SOCIAL_MEDIA_BASE_ID;
+    const CONTENT_TABLE_NAME = 'Content Planner';
 
     if (!AIRTABLE_API_KEY || !SOCIAL_MEDIA_BASE_ID) {
       throw new Error('Missing Airtable configuration');
@@ -47,7 +47,7 @@ exports.handler = async (event, context) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Airtable API error: ${response.status}`);
+      throw new Error(`Airtable API error: ${response.status}`);  // ← FIXED THIS LINE
     }
 
     const data = await response.json();
