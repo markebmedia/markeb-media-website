@@ -519,6 +519,323 @@
       width: 40px;
       height: 40px;
     }
+  
+  /* === CONTENT CALENDAR STYLES === */
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+.filter-select {
+  padding: 8px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #fff;
+  color: #475569;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.filter-select:hover { border-color: #cbd5e1; }
+.filter-select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+.calendar-grid {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.calendar-item {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all .2s ease;
+}
+.calendar-item:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  transform: translateY(-2px);
+}
+
+.calendar-item.scheduled { border-left-color: #3b82f6; }
+.calendar-item.drafting { border-left-color: #f59e0b; }
+.calendar-item.in-progress { border-left-color: #f59e0b; }
+.calendar-item.ready-for-review { border-left-color: #8b5cf6; }
+.calendar-item.approved { border-left-color: #10b981; }
+.calendar-item.published { border-left-color: #6366f1; }
+.calendar-item.declined { border-left-color: #ef4444; }
+
+.calendar-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.calendar-date {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calendar-platform {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #f8fafc;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.calendar-item-content h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.calendar-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.calendar-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.calendar-status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-scheduled { background: #dbeafe; color: #1e40af; }
+.status-drafting { background: #fef3c7; color: #92400e; }
+.status-in-progress { background: #fef3c7; color: #92400e; }
+.status-ready-for-review { background: #ede9fe; color: #5b21b6; }
+.status-approved { background: #d1fae5; color: #065f46; }
+.status-published { background: #e0e7ff; color: #3730a3; }
+.status-declined { background: #fee2e2; color: #991b1b; }
+
+.calendar-caption {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+  margin-top: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+}
+
+.calendar-notes {
+  margin-top: 12px;
+  padding: 12px;
+  background: #fef3c7;
+  border-left: 3px solid #f59e0b;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #92400e;
+}
+
+.calendar-client-notes {
+  margin-top: 12px;
+  padding: 12px;
+  background: #e0e7ff;
+  border-left: 3px solid #6366f1;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #3730a3;
+}
+
+.client-actions {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 2px solid #f1f5f9;
+}
+
+.client-actions-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.client-actions-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.client-notes-section {
+  margin-top: 12px;
+}
+
+.client-notes-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.client-notes-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color .2s ease;
+}
+
+.client-notes-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.client-notes-submit {
+  margin-top: 8px;
+}
+
+.action-feedback {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.action-feedback.success {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #10b981;
+}
+
+.action-feedback.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #ef4444;
+}
+
+.calendar-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: #fff;
+  border: 2px dashed #e2e8f0;
+  border-radius: 12px;
+}
+
+.calendar-empty-state h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.calendar-empty-state p {
+  color: #64748b;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.social-media-promo {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  border-radius: 16px;
+  padding: 32px;
+  margin-top: 32px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+}
+
+.social-media-promo::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.social-media-promo-content { position: relative; z-index: 1; }
+.social-media-promo h2 { font-size: clamp(24px, 4vw, 32px); font-weight: 700; margin-bottom: 12px; }
+.social-media-promo p { font-size: 16px; line-height: 1.7; margin-bottom: 20px; opacity: 0.95; }
+
+.social-media-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.sm-feature-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-sm-primary {
+  background: #fff;
+  color: #7c3aed;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-sm-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  background: #f5f3ff;
+}
+
+@media (max-width: 480px) {
+  .client-actions-buttons { flex-direction: column; }
+  .client-actions-buttons .btn { width: 100%; justify-content: center; }
+}
   }
 </style>
 
@@ -572,6 +889,7 @@
       <div class="nav-item" onclick="showSection('gallery')"><div class="nav-icon">□</div>Gallery</div>
       <div class="nav-item" onclick="openCopyryta()"><div class="nav-icon">◇</div>CopyRyta AI</div>
       <div class="nav-item" onclick="showSection('tracking')"><div class="nav-icon">▲</div>Content Tracking</div>
+      <div class="nav-item" onclick="showSection('calendar')"><div class="nav-icon">□</div>Content Calendar</div>
       <div class="nav-item" onclick="showSection('amend')"><div class="nav-icon">△</div>Request Amendment</div>
       <div class="nav-item" onclick="showSection('settings')"><div class="nav-icon">○</div>Settings</div>
       <div class="nav-item" onclick="contactSupport()"><div class="nav-icon">@</div>Support</div>
@@ -774,6 +1092,75 @@
         </div>
       </div>
 
+      <!-- CONTENT CALENDAR -->
+<div id="calendar" class="section">
+  <div class="card" style="padding:24px">
+    <div class="card-header">
+      <h2 class="card-title">Content Calendar</h2>
+      <p class="card-subtitle">Your social media content schedule and upcoming posts</p>
+    </div>
+    <div class="card-content">
+      <div class="filter-controls">
+        <select id="statusFilter" class="filter-select">
+          <option value="all">All Status</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="drafting">Drafting</option>
+          <option value="in-progress">In Progress</option>
+          <option value="ready-for-review">Ready for Review</option>
+          <option value="approved">Approved</option>
+          <option value="published">Published</option>
+          <option value="declined">Declined</option>
+        </select>
+        
+        <select id="platformFilter" class="filter-select">
+          <option value="all">All Platforms</option>
+          <option value="Instagram">Instagram</option>
+          <option value="Facebook">Facebook</option>
+          <option value="LinkedIn">LinkedIn</option>
+          <option value="Twitter">Twitter</option>
+        </select>
+
+        <select id="sortFilter" class="filter-select">
+          <option value="date-asc">Date: Upcoming First</option>
+          <option value="date-desc">Date: Latest First</option>
+          <option value="status">Status</option>
+        </select>
+      </div>
+
+      <div id="calendarLoading" style="display:none;text-align:center;padding:40px;">
+        <div class="spinner"></div>
+        <p style="margin-top:16px;color:#64748b;">Loading your content calendar...</p>
+      </div>
+
+      <div id="calendarGrid" class="calendar-grid"></div>
+
+      <div id="calendarEmpty" class="calendar-empty-state" style="display:none;">
+        <div style="font-size:48px;margin-bottom:16px;">📅</div>
+        <h3>No Content Scheduled Yet</h3>
+        <p>You don't have any social media content scheduled at the moment.<br>Interested in having us manage your social media presence?</p>
+        
+        <div class="social-media-promo">
+          <div class="social-media-promo-content">
+            <h2>Social Media Management for Estate Agents</h2>
+            <p>Let us handle your social media so you can focus on selling properties. Professional content creation, scheduling, and engagement management.</p>
+            
+            <div class="social-media-features">
+              <span class="sm-feature-badge">📱 Daily Posting</span>
+              <span class="sm-feature-badge">✍️ Professional Copywriting</span>
+              <span class="sm-feature-badge">📊 Performance Analytics</span>
+              <span class="sm-feature-badge">🎯 Targeted Strategy</span>
+            </div>
+            
+            <button class="btn-sm-primary" onclick="contactSocialMedia()">
+              Get Started with Social Media Management →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
       <!-- REQUEST AMENDMENT (with file upload and Render endpoints) -->
       <div id="amend" class="section">
         <div class="card" style="padding:24px">
@@ -930,10 +1317,12 @@
   <script>
     /* ====== endpoints ====== */
     const NETLIFY_ENDPOINTS = {
-      acuity: '/.netlify/functions/acuity-data',
-      projects: '/.netlify/functions/airtable-data',
-      track: '/.netlify/functions/track-content',
-    };
+  acuity: '/.netlify/functions/acuity-data',
+  projects: '/.netlify/functions/airtable-data',
+  track: '/.netlify/functions/track-content',
+  calendar: '/.netlify/functions/content-calendar',
+  updateContent: '/.netlify/functions/update-content',
+};
 
     const fmtGBP = (n) => (typeof n === 'number'
       ? n.toLocaleString('en-GB', { style: 'currency', currency: 'GBP' })
@@ -941,13 +1330,17 @@
 
     function toggleSidebar(){document.querySelector('.sidebar').classList.toggle('open');document.querySelector('.mobile-overlay').classList.toggle('active');}
     function closeSidebar(){document.querySelector('.sidebar').classList.remove('open');document.querySelector('.mobile-overlay').classList.remove('active');}
-    function showSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));[...document.querySelectorAll('.nav-item')].find(n=>n.textContent.trim().toLowerCase().includes(id))?.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
+    function showSection(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));[...document.querySelectorAll('.nav-item')].find(n=>n.textContent.trim().toLowerCase().includes(id))?.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});if(id === 'calendar') { loadContentCalendar(); }}
     function openCopyryta(){window.location.href='./copyryta.html';}
 
     /* 📧 Support email function */
     function contactSupport(){
       window.location.href = "mailto:commercial@markebmedia.com?subject=Support%20Request&body=Hello%20Markeb%20Media%20Team,";
     }
+
+   function contactSocialMedia(){
+  window.location.href = "mailto:commercial@markebmedia.com?subject=Social%20Media%20Management%20Inquiry&body=Hi%20Markeb%20Media%20Team,%0D%0A%0D%0AI'm%20interested%20in%20learning%20more%20about%20your%20social%20media%20management%20services.%0D%0A%0D%0APlease%20send%20me%20more%20information.";
+}
 
     /* Greeting */
     function setDashboardGreeting(){
@@ -1434,6 +1827,266 @@ Click "Book Your Session" to schedule your branding session.
       alert(info);
       // Or you could create a modal popup instead of alert for a better UX
     }
+
+/* ===== CONTENT CALENDAR ===== */
+let calendarData = [];
+let currentStatusFilter = 'all';
+let currentPlatformFilter = 'all';
+let currentSort = 'date-asc';
+
+async function loadContentCalendar() {
+  const user = window.AirtableAPI?.getCurrentUser?.();
+  if (!user?.email) {
+    showCalendarError('Please log in to view your content calendar');
+    return;
+  }
+
+  const loadingEl = document.getElementById('calendarLoading');
+  const gridEl = document.getElementById('calendarGrid');
+  const emptyEl = document.getElementById('calendarEmpty');
+
+  loadingEl.style.display = 'block';
+  gridEl.innerHTML = '';
+  emptyEl.style.display = 'none';
+
+  try {
+    const data = await fetchJSON(NETLIFY_ENDPOINTS.calendar, { userEmail: user.email });
+    
+    if (!data.success || !Array.isArray(data.content) || data.content.length === 0) {
+      loadingEl.style.display = 'none';
+      emptyEl.style.display = 'block';
+      return;
+    }
+
+    calendarData = data.content;
+    renderCalendar();
+    loadingEl.style.display = 'none';
+
+  } catch (error) {
+    console.error('Calendar error:', error);
+    loadingEl.style.display = 'none';
+    showCalendarError('Unable to load content calendar. Please try again later.');
+  }
+}
+
+function renderCalendar() {
+  const gridEl = document.getElementById('calendarGrid');
+  
+  let filtered = calendarData.filter(item => {
+    const statusMatch = currentStatusFilter === 'all' || 
+      (item.status || '').toLowerCase().replace(/\s+/g, '-') === currentStatusFilter;
+    const platformMatch = currentPlatformFilter === 'all' || 
+      (item.platform || '') === currentPlatformFilter;
+    return statusMatch && platformMatch;
+  });
+
+  filtered.sort((a, b) => {
+    if (currentSort === 'date-asc') {
+      return new Date(a.postDate || 0) - new Date(b.postDate || 0);
+    } else if (currentSort === 'date-desc') {
+      return new Date(b.postDate || 0) - new Date(a.postDate || 0);
+    } else if (currentSort === 'status') {
+      return (a.status || '').localeCompare(b.status || '');
+    }
+    return 0;
+  });
+
+  if (filtered.length === 0) {
+    gridEl.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b;">No content matches your filters.</div>';
+    return;
+  }
+
+  gridEl.innerHTML = filtered.map(item => renderCalendarItem(item)).join('');
+}
+
+function renderCalendarItem(item) {
+  const statusClass = (item.status || '').toLowerCase().replace(/\s+/g, '-');
+  const statusBadgeClass = 'status-' + statusClass;
+  
+  const postDate = item.postDate ? new Date(item.postDate) : null;
+  const formattedDate = postDate ? 
+    `${postDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}` : 
+    'Date TBD';
+
+  const platformIcon = {
+    'Instagram': '📸',
+    'Facebook': '👥',
+    'LinkedIn': '💼',
+    'Twitter': '🐦',
+  }[item.platform] || '📱';
+
+  const contentPillars = Array.isArray(item.contentPillar) ? item.contentPillar : (item.contentPillar ? [item.contentPillar] : []);
+  const contentPillarHTML = contentPillars.length > 0 ? 
+    contentPillars.map(pillar => `<span class="calendar-meta-item">🎯 ${escapeHtml(pillar)}</span>`).join('') : '';
+  
+  const contentType = item.contentType ? 
+    `<span class="calendar-meta-item">📋 ${escapeHtml(item.contentType)}</span>` : '';
+
+  const caption = item.caption ? 
+    `<div class="calendar-caption">${escapeHtml(item.caption)}</div>` : '';
+
+  const notesFromMarkeb = item.notesFromMarkeb ? 
+    `<div class="calendar-notes"><strong>📝 Team Notes:</strong> ${escapeHtml(item.notesFromMarkeb)}</div>` : '';
+
+  const clientNotes = item.notesFromClient ? 
+    `<div class="calendar-client-notes"><strong>💬 Your Notes:</strong> ${escapeHtml(item.notesFromClient)}</div>` : '';
+
+  const mediaLink = item.mediaLink ? 
+    `<span class="calendar-meta-item"><a href="${escapeHtml(item.mediaLink)}" target="_blank" style="color:#3b82f6;text-decoration:none;">🎬 View Media</a></span>` : '';
+
+  const showActions = item.status === 'Ready for Review';
+  const clientActionsHTML = showActions ? `
+    <div class="client-actions">
+      <div class="client-actions-header">Review this content:</div>
+      <div class="client-actions-buttons">
+        <button class="btn btn-success" onclick="approveContent('${item.id}')">✓ Approve</button>
+        <button class="btn btn-danger" onclick="declineContent('${item.id}')">✗ Request Changes</button>
+      </div>
+      <div class="client-notes-section">
+        <label class="client-notes-label">Add notes (optional):</label>
+        <textarea 
+          class="client-notes-textarea" 
+          id="notes-${item.id}" 
+          placeholder="Share your feedback or approval message...">${escapeHtml(item.notesFromClient || '')}</textarea>
+        <button class="btn btn-secondary client-notes-submit" onclick="submitClientNotes('${item.id}')">💬 Save Notes</button>
+      </div>
+      <div id="feedback-${item.id}"></div>
+    </div>
+  ` : '';
+
+  return `
+    <div class="calendar-item ${statusClass}">
+      <div class="calendar-item-header">
+        <span class="calendar-date">📅 ${formattedDate}</span>
+        <span class="calendar-platform">${platformIcon} ${escapeHtml(item.platform || 'Platform')}</span>
+      </div>
+      <div class="calendar-item-content">
+        <h3>${escapeHtml(item.idea || 'Content Idea')}</h3>
+        <span class="calendar-status-badge ${statusBadgeClass}">${escapeHtml(item.status || 'Scheduled')}</span>
+      </div>
+      ${caption}
+      ${notesFromMarkeb}
+      ${clientNotes}
+      <div class="calendar-item-meta">
+        ${contentPillarHTML}
+        ${contentType}
+        ${mediaLink}
+      </div>
+      ${clientActionsHTML}
+    </div>
+  `;
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function showCalendarError(message) {
+  const gridEl = document.getElementById('calendarGrid');
+  gridEl.innerHTML = `<div class="error-message">${message}</div>`;
+}
+
+async function approveContent(recordId) {
+  await updateContentStatus(recordId, 'Approved', 'Content approved by client');
+}
+
+async function declineContent(recordId) {
+  await updateContentStatus(recordId, 'Drafting', 'Changes requested by client');
+}
+
+async function submitClientNotes(recordId) {
+  const notesTextarea = document.getElementById(`notes-${recordId}`);
+  const notes = notesTextarea ? notesTextarea.value.trim() : '';
+  
+  if (!notes) {
+    showFeedback(recordId, 'Please enter some notes.', 'error');
+    return;
+  }
+
+  const feedbackEl = document.getElementById(`feedback-${recordId}`);
+  if (feedbackEl) {
+    feedbackEl.innerHTML = '<div style="text-align:center;padding:10px;"><div class="spinner" style="width:20px;height:20px;margin:0 auto;"></div></div>';
+  }
+
+  try {
+    const response = await fetchJSON(NETLIFY_ENDPOINTS.updateContent, {
+      recordId: recordId,
+      notesFromClient: notes
+    });
+
+    if (response.success) {
+      showFeedback(recordId, '✓ Notes saved successfully!', 'success');
+      const item = calendarData.find(i => i.id === recordId);
+      if (item) {
+        item.notesFromClient = notes;
+      }
+    } else {
+      showFeedback(recordId, '✗ Failed to save notes. Please try again.', 'error');
+    }
+  } catch (error) {
+    console.error('Error saving notes:', error);
+    showFeedback(recordId, '✗ Error saving notes. Please try again.', 'error');
+  }
+}
+
+async function updateContentStatus(recordId, newStatus, message) {
+  const feedbackEl = document.getElementById(`feedback-${recordId}`);
+  if (feedbackEl) {
+    feedbackEl.innerHTML = '<div style="text-align:center;padding:10px;"><div class="spinner" style="width:20px;height:20px;margin:0 auto;"></div></div>';
+  }
+
+  const notesTextarea = document.getElementById(`notes-${recordId}`);
+  const clientNotes = notesTextarea ? notesTextarea.value.trim() : '';
+
+  try {
+    const response = await fetchJSON(NETLIFY_ENDPOINTS.updateContent, {
+      recordId: recordId,
+      status: newStatus,
+      notesFromClient: clientNotes || message
+    });
+
+    if (response.success) {
+      showFeedback(recordId, `✓ ${message}`, 'success');
+      setTimeout(() => {
+        loadContentCalendar();
+      }, 2000);
+    } else {
+      showFeedback(recordId, '✗ Failed to update. Please try again.', 'error');
+    }
+  } catch (error) {
+    console.error('Error updating content:', error);
+    showFeedback(recordId, '✗ Error updating content. Please try again.', 'error');
+  }
+}
+
+function showFeedback(recordId, message, type) {
+  const feedbackEl = document.getElementById(`feedback-${recordId}`);
+  if (feedbackEl) {
+    feedbackEl.innerHTML = `<div class="action-feedback ${type}">${message}</div>`;
+    setTimeout(() => {
+      feedbackEl.innerHTML = '';
+    }, 5000);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('statusFilter')?.addEventListener('change', (e) => {
+    currentStatusFilter = e.target.value;
+    renderCalendar();
+  });
+
+  document.getElementById('platformFilter')?.addEventListener('change', (e) => {
+    currentPlatformFilter = e.target.value;
+    renderCalendar();
+  });
+
+  document.getElementById('sortFilter')?.addEventListener('change', (e) => {
+    currentSort = e.target.value;
+    renderCalendar();
+  });
+});
 
     /* boot */
     document.addEventListener('DOMContentLoaded', async ()=>{
