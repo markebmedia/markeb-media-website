@@ -836,6 +836,64 @@
   .client-actions-buttons { flex-direction: column; }
   .client-actions-buttons .btn { width: 100%; justify-content: center; }
 }
+
+/* Add these button styles inside your <style> tag */
+.btn-success {
+  background: #10b981;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all .2s ease;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-success:hover {
+  background: #059669;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all .2s ease;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+.btn-secondary {
+  background: #64748b;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all .2s ease;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-secondary:hover {
+  background: #475569;
+}
   }
 </style>
 
@@ -1900,7 +1958,9 @@ function renderCalendar() {
 }
 
 function renderCalendarItem(item) {
-  const statusClass = (item.status || '').toLowerCase().replace(/\s+/g, '-');
+  // Fix: Handle status as array or string
+  const status = Array.isArray(item.status) ? item.status[0] : (item.status || 'Scheduled');
+  const statusClass = status.toLowerCase().replace(/\s+/g, '-');
   const statusBadgeClass = 'status-' + statusClass;
   
   const postDate = item.postDate ? new Date(item.postDate) : null;
@@ -1934,7 +1994,7 @@ function renderCalendarItem(item) {
   const mediaLink = item.mediaLink ? 
     `<span class="calendar-meta-item"><a href="${escapeHtml(item.mediaLink)}" target="_blank" style="color:#3b82f6;text-decoration:none;">🎬 View Media</a></span>` : '';
 
-  const showActions = item.status === 'Ready for Review';
+  const showActions = status === 'Ready for Review';
   const clientActionsHTML = showActions ? `
     <div class="client-actions">
       <div class="client-actions-header">Review this content:</div>
@@ -1962,7 +2022,7 @@ function renderCalendarItem(item) {
       </div>
       <div class="calendar-item-content">
         <h3>${escapeHtml(item.idea || 'Content Idea')}</h3>
-        <span class="calendar-status-badge ${statusBadgeClass}">${escapeHtml(item.status || 'Scheduled')}</span>
+        <span class="calendar-status-badge ${statusBadgeClass}">${escapeHtml(status)}</span>
       </div>
       ${caption}
       ${notesFromMarkeb}
