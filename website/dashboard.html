@@ -2230,6 +2230,39 @@ async function loadContentCalendar() {
   }
 }
 
+function renderCalendar() {
+  const gridEl = document.getElementById('calendarGrid');
+  
+  let filtered = calendarData.filter(item => {
+    const itemStatus = Array.isArray(item.status) ? item.status[0] : (item.status || '');
+    const statusMatch = currentStatusFilter === 'all' || 
+      itemStatus.toLowerCase().replace(/\s+/g, '-') === currentStatusFilter;
+    const platformMatch = currentPlatformFilter === 'all' || 
+      (item.platform || '') === currentPlatformFilter;
+    return statusMatch && platformMatch;
+  });
+
+  filtered.sort((a, b) => {
+    if (currentSort === 'date-asc') {
+      return new Date(a.postDate || 0) - new Date(b.postDate || 0);
+    } else if (currentSort === 'date-desc') {
+      return new Date(b.postDate || 0) - new Date(a.postDate || 0);
+    } else if (currentSort === 'status') {
+      const statusA = Array.isArray(a.status) ? a.status[0] : (a.status || '');
+      const statusB = Array.isArray(b.status) ? b.status[0] : (b.status || '');
+      return statusA.localeCompare(statusB);
+    }
+    return 0;
+  });
+
+  if (filtered.length === 0) {
+    gridEl.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b;">No content matches your filters.</div>';
+    return;
+  }
+
+  gridEl.innerHTML = filtered.map(item => renderCalendarItem(item)).join('');
+}
+
 function renderCalendarItem(item) {
   // Fix: Handle status as array or string
   const status = Array.isArray(item.status) ? item.status[0] : (item.status || 'Scheduled');
@@ -2404,6 +2437,7 @@ function showFeedback(recordId, message, type) {
   }
 }
 
+// Filter event listeners
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('statusFilter')?.addEventListener('change', (e) => {
     currentStatusFilter = e.target.value;
