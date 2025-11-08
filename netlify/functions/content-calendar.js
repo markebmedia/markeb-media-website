@@ -1,6 +1,5 @@
 // Netlify Function: /.netlify/functions/content-calendar.js
 // This function fetches content calendar data from Airtable "Social Media" base
-
 const fetch = require('node-fetch');
 
 exports.handler = async (event, context) => {
@@ -36,7 +35,6 @@ exports.handler = async (event, context) => {
 
     // Build filter formula to match user email
     const filterFormula = `{Email} = '${userEmail.replace(/'/g, "\\'")}'`;
-    
     const url = `https://api.airtable.com/v0/${SOCIAL_MEDIA_BASE_ID}/${encodeURIComponent(CONTENT_TABLE_NAME)}?filterByFormula=${encodeURIComponent(filterFormula)}&sort[0][field]=Post Date&sort[0][direction]=asc`;
 
     const response = await fetch(url, {
@@ -47,11 +45,11 @@ exports.handler = async (event, context) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Airtable API error: ${response.status}`);  // ← FIXED THIS LINE
+      throw new Error(`Airtable API error: ${response.status}`);
     }
 
     const data = await response.json();
-    
+
     // Transform the records into a cleaner format
     const contentItems = (data.records || []).map(record => {
       const fields = record.fields;
