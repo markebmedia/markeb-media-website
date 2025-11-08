@@ -1455,12 +1455,12 @@
 
       <!-- CONTENT CALENDAR -->
 <div id="calendar" class="section">
-  <div class="card" style="padding:24px">
-    <div class="card-header">
-      <h2 class="card-title">Content Calendar</h2>
-      <p class="card-subtitle">Your social media content schedule and upcoming posts</p>
-    </div>
-    <div class="card-content">
+  <div class="calendar-container">
+    <div class="calendar-header-content">
+      <div class="calendar-title-section">
+        <h2>Content Calendar</h2>
+        <p>Your social media content schedule and upcoming posts</p>
+      </div>
       <div class="filter-controls">
         <select id="statusFilter" class="filter-select">
           <option value="all">All Status</option>
@@ -1487,35 +1487,35 @@
           <option value="status">Status</option>
         </select>
       </div>
+    </div>
 
-      <div id="calendarLoading" style="display:none;text-align:center;padding:40px;">
-        <div class="spinner"></div>
-        <p style="margin-top:16px;color:#64748b;">Loading your content calendar...</p>
-      </div>
+    <div id="calendarLoading" style="display:none;text-align:center;padding:40px;">
+      <div class="spinner"></div>
+      <p style="margin-top:16px;color:#fff;">Loading your content calendar...</p>
+    </div>
 
-      <div id="calendarGrid" class="calendar-grid"></div>
+    <div id="calendarGrid" class="calendar-grid"></div>
 
-      <div id="calendarEmpty" class="calendar-empty-state" style="display:none;">
-        <div style="font-size:48px;margin-bottom:16px;">📅</div>
-        <h3>No Content Scheduled Yet</h3>
-        <p>You don't have any social media content scheduled at the moment.<br>Interested in having us manage your social media presence?</p>
-        
-        <div class="social-media-promo">
-          <div class="social-media-promo-content">
-            <h2>Social Media Management for Estate Agents</h2>
-            <p>Let us handle your social media so you can focus on selling properties. Professional content creation, scheduling, and engagement management.</p>
-            
-            <div class="social-media-features">
-              <span class="sm-feature-badge">📱 Daily Posting</span>
-              <span class="sm-feature-badge">✍️ Professional Copywriting</span>
-              <span class="sm-feature-badge">📊 Performance Analytics</span>
-              <span class="sm-feature-badge">🎯 Targeted Strategy</span>
-            </div>
-            
-            <button class="btn-sm-primary" onclick="contactSocialMedia()">
-              Get Started with Social Media Management →
-            </button>
+    <div id="calendarEmpty" class="calendar-empty-state" style="display:none;">
+      <div style="font-size:48px;margin-bottom:16px;">📅</div>
+      <h3>No Content Scheduled Yet</h3>
+      <p>You don't have any social media content scheduled at the moment.<br>Interested in having us manage your social media presence?</p>
+      
+      <div class="social-media-promo">
+        <div class="social-media-promo-content">
+          <h2>Social Media Management for Estate Agents</h2>
+          <p>Let us handle your social media so you can focus on selling properties. Professional content creation, scheduling, and engagement management.</p>
+          
+          <div class="social-media-features">
+            <span class="sm-feature-badge">📱 Daily Posting</span>
+            <span class="sm-feature-badge">✍️ Professional Copywriting</span>
+            <span class="sm-feature-badge">📊 Performance Analytics</span>
+            <span class="sm-feature-badge">🎯 Targeted Strategy</span>
           </div>
+          
+          <button class="btn-sm-primary" onclick="contactSocialMedia()">
+            Get Started with Social Media Management →
+          </button>
         </div>
       </div>
     </div>
