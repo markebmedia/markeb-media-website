@@ -1,9 +1,7 @@
 // Netlify Function: /.netlify/functions/content-calendar.js
-// This function fetches content calendar data from Airtable "Social Media" base
 const fetch = require('node-fetch');
 
 exports.handler = async (event, context) => {
-  // Only allow POST
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -24,7 +22,6 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Airtable credentials from environment variables
     const AIRTABLE_API_KEY = process.env.SOCIAL_MEDIA_API_KEY;
     const SOCIAL_MEDIA_BASE_ID = process.env.SOCIAL_MEDIA_BASE_ID;
     const CONTENT_TABLE_NAME = 'Content Planner';
@@ -33,7 +30,7 @@ exports.handler = async (event, context) => {
       throw new Error('Missing Airtable configuration');
     }
 
-    // Build filter formula to match user email
+    // Filter by Email field in Content Planner
     const filterFormula = `{Email} = '${userEmail.replace(/'/g, "\\'")}'`;
     const url = `https://api.airtable.com/v0/${SOCIAL_MEDIA_BASE_ID}/${encodeURIComponent(CONTENT_TABLE_NAME)}?filterByFormula=${encodeURIComponent(filterFormula)}&sort[0][field]=Post Date&sort[0][direction]=asc`;
 
@@ -58,7 +55,7 @@ exports.handler = async (event, context) => {
         clientName: fields['Client Name'] || '',
         email: fields['Email'] || '',
         idea: fields['Idea'] || '',
-        platform: fields['Platform'] || '',
+        platform: Array.isArray(fields['Platform(s)']) ? fields['Platform(s)'].join(', ') : (fields['Platform(s)'] || ''),
         assignee: fields['Assignee'] || '',
         contentPillar: fields['Content Pillar'] || '',
         contentType: fields['Content Type'] || '',
