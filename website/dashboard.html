@@ -1225,6 +1225,18 @@
     margin-bottom: 16px;
   }
 
+  .calendar-header-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .calendar-title-section {
+    text-align: center;
+    width: 100%;
+  }
+
   .calendar-title-section h2 {
     font-size: 18px;
   }
@@ -1236,6 +1248,7 @@
   .calendar-controls {
     padding: 8px 12px;
     gap: 8px;
+    justify-content: center;
   }
 
   .calendar-nav-btn {
@@ -1295,12 +1308,14 @@
 
   .content-modal {
     padding: 5px;
+    padding-bottom: calc(var(--footer-h) + 10px);
   }
 
   .content-modal-dialog {
     max-width: 98%;
-    max-height: 95vh;
+    max-height: calc(95vh - var(--footer-h));
     border-radius: 8px;
+    margin-bottom: calc(var(--footer-h) + 10px);
   }
 
   .content-modal-header {
