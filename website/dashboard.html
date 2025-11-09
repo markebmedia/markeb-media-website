@@ -2421,27 +2421,23 @@ function renderContentItem(item) {
 
   // Show approve/decline buttons ONLY for "Ready for Review"
   const showApprovalButtons = status === 'Ready for Review';
-  
-  // Always show comment section for clients to leave feedback
-  const commentSection = `
-    <div class="modal-notes-section" style="margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 8px; border: 2px solid #e2e8f0;">
-      <label style="font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 8px; display: block;">💬 Leave a comment or feedback:</label>
-      <textarea 
-        id="notes-${item.id}" 
-        placeholder="Share your thoughts, feedback, or approval message..."
-        style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; resize: vertical; min-height: 100px;"
-      >${escapeHtml(item.notesFromClient || '')}</textarea>
-      <button class="btn btn-secondary" onclick="submitClientNotes('${item.id}')" style="margin-top: 12px;">💬 Save Comment</button>
-      <div id="feedback-${item.id}"></div>
-    </div>
-  `;
 
   const approvalButtons = showApprovalButtons ? `
     <div class="modal-actions" style="margin-top: 20px;">
       <h4 style="font-size: 16px; font-weight: 700; color: #92400e; margin-bottom: 12px;">⚡ Ready to review this content?</h4>
       <div class="modal-action-buttons">
-        <button class="btn btn-success" onclick="approveContent('${item.id}')">✓ Approve & Publish</button>
-        <button class="btn btn-danger" onclick="declineContent('${item.id}')">✗ Request Changes</button>
+        <button class="btn btn-success" onclick="approveContent('${item.id}')">✓ APPROVE & PUBLISH</button>
+        <button class="btn btn-danger" onclick="showCommentSection('${item.id}')">✗ REQUEST CHANGES</button>
+      </div>
+      <div id="comment-section-${item.id}" style="display: none; margin-top: 16px; padding: 16px; background: #fef3c7; border-radius: 8px; border: 2px solid #f59e0b;">
+        <label style="font-size: 14px; font-weight: 600; color: #92400e; margin-bottom: 8px; display: block;">💬 What changes would you like?</label>
+        <textarea 
+          id="notes-${item.id}" 
+          placeholder="Please describe the changes you'd like us to make..."
+          style="width: 100%; padding: 12px; border: 2px solid #f59e0b; border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; resize: vertical; min-height: 100px;"
+        >${escapeHtml(item.notesFromClient || '')}</textarea>
+        <button class="btn btn-secondary" onclick="submitChangesRequest('${item.id}')" style="margin-top: 12px;">📤 Save and Send Comment</button>
+        <div id="feedback-${item.id}"></div>
       </div>
     </div>
   ` : '';
@@ -2458,7 +2454,6 @@ function renderContentItem(item) {
       ${clientNotes}
       ${mediaLink}
       ${approvalButtons}
-      ${commentSection}
     </div>
   `;
 }
@@ -2480,6 +2475,54 @@ async function approveContent(recordId) {
 
 async function declineContent(recordId) {
   await updateContentStatus(recordId, 'Drafting', 'Changes requested by client');
+}
+
+function showCommentSection(recordId) {
+  const commentSection = document.getElementById(`comment-section-${recordId}`);
+  if (commentSection) {
+    commentSection.style.display = 'block';
+    // Focus on the textarea
+    const textarea = document.getElementById(`notes-${recordId}`);
+    if (textarea) {
+      textarea.focus();
+    }
+  }
+}
+
+async function submitChangesRequest(recordId) {
+  const notesTextarea = document.getElementById(`notes-${recordId}`);
+  const notes = notesTextarea ? notesTextarea.value.trim() : '';
+  
+  if (!notes) {
+    showFeedback(recordId, 'Please describe what changes you would like.', 'error');
+    return;
+  }
+
+  const feedbackEl = document.getElementById(`feedback-${recordId}`);
+  if (feedbackEl) {
+    feedbackEl.innerHTML = '<div style="text-align:center;padding:10px;"><div class="spinner" style="width:20px;height:20px;margin:0 auto;"></div></div>';
+  }
+
+  try {
+    const response = await fetchJSON(NETLIFY_ENDPOINTS.updateContent, {
+      recordId: recordId,
+      status: 'Drafting',
+      notesFromClient: notes
+    });
+
+    if (response.success) {
+      showFeedback(recordId, '✓ Changes requested and comment sent!', 'success');
+      setTimeout(() => {
+        closeContentModal();
+        loadContentCalendar();
+      }, 2000);
+    } else {
+      showFeedback(recordId, '✗ Failed to send request. Please try again.', 'error');
+    }
+  } catch (error) {
+    console.error('Error submitting changes request:', error);
+    showFeedback(recordId, '✗ Error sending request. Please try again.', 'error');
+  }
 }
 
 async function submitClientNotes(recordId) {
