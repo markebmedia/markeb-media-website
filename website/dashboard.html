@@ -2234,9 +2234,8 @@ Click "Book Your Session" to schedule your branding session.
 
 /* ===== CONTENT CALENDAR ===== */
 let calendarData = [];
-let currentStatusFilter = 'all';
-let currentPlatformFilter = 'all';
-let currentSort = 'date-asc';
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
 
 async function loadContentCalendar() {
   const user = window.AirtableAPI?.getCurrentUser?.();
@@ -2246,11 +2245,11 @@ async function loadContentCalendar() {
   }
 
   const loadingEl = document.getElementById('calendarLoading');
-  const gridEl = document.getElementById('calendarGrid');
   const emptyEl = document.getElementById('calendarEmpty');
+  const calendarView = document.querySelector('.calendar-view');
 
   loadingEl.style.display = 'block';
-  gridEl.innerHTML = '';
+  calendarView.style.display = 'none';
   emptyEl.style.display = 'none';
 
   try {
@@ -2263,8 +2262,9 @@ async function loadContentCalendar() {
     }
 
     calendarData = data.content;
-    renderCalendar();
     loadingEl.style.display = 'none';
+    calendarView.style.display = 'block';
+    renderMonthCalendar();
 
   } catch (error) {
     console.error('Calendar error:', error);
@@ -2273,50 +2273,112 @@ async function loadContentCalendar() {
   }
 }
 
-function renderCalendar() {
-  const gridEl = document.getElementById('calendarGrid');
-  
-  let filtered = calendarData.filter(item => {
-    const itemStatus = Array.isArray(item.status) ? item.status[0] : (item.status || '');
-    const statusMatch = currentStatusFilter === 'all' || 
-      itemStatus.toLowerCase().replace(/\s+/g, '-') === currentStatusFilter;
-    const platformMatch = currentPlatformFilter === 'all' || 
-      (item.platform || '') === currentPlatformFilter;
-    return statusMatch && platformMatch;
-  });
-
-  filtered.sort((a, b) => {
-    if (currentSort === 'date-asc') {
-      return new Date(a.postDate || 0) - new Date(b.postDate || 0);
-    } else if (currentSort === 'date-desc') {
-      return new Date(b.postDate || 0) - new Date(a.postDate || 0);
-    } else if (currentSort === 'status') {
-      const statusA = Array.isArray(a.status) ? a.status[0] : (a.status || '');
-      const statusB = Array.isArray(b.status) ? b.status[0] : (b.status || '');
-      return statusA.localeCompare(statusB);
-    }
-    return 0;
-  });
-
-  if (filtered.length === 0) {
-    gridEl.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b;">No content matches your filters.</div>';
-    return;
+function previousMonth() {
+  currentMonth--;
+  if (currentMonth < 0) {
+    currentMonth = 11;
+    currentYear--;
   }
-
-  gridEl.innerHTML = filtered.map(item => renderCalendarItem(item)).join('');
+  renderMonthCalendar();
 }
 
-function renderCalendarItem(item) {
-  // Fix: Handle status as array or string
+function nextMonth() {
+  currentMonth++;
+  if (currentMonth > 11) {
+    currentMonth = 0;
+    currentYear++;
+  }
+  renderMonthCalendar();
+}
+
+function renderMonthCalendar() {
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'];
+  
+  const monthDisplay = document.getElementById('currentMonthDisplay');
+  monthDisplay.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+  const grid = document.getElementById('calendarDaysGrid');
+  grid.innerHTML = '';
+
+  // Get first day of month and number of days
+  const firstDay = new Date(currentYear, currentMonth, 1);
+  const lastDay = new Date(currentYear, currentMonth + 1, 0);
+  const numDays = lastDay.getDate();
+  
+  // Adjust for Monday start (getDay() returns 0 for Sunday)
+  let firstDayOfWeek = firstDay.getDay();
+  firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+
+  // Add empty cells for days before month starts
+  for (let i = 0; i < firstDayOfWeek; i++) {
+    const emptyDay = document.createElement('div');
+    emptyDay.className = 'calendar-day empty';
+    grid.appendChild(emptyDay);
+  }
+
+  // Add days of the month
+  for (let day = 1; day <= numDays; day++) {
+    const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const contentForDay = getContentForDate(dateStr);
+    
+    const dayEl = document.createElement('div');
+    dayEl.className = 'calendar-day';
+    
+    if (contentForDay.length > 0) {
+      dayEl.classList.add('has-content');
+      dayEl.onclick = () => showDayContent(dateStr, contentForDay);
+    }
+    
+    const today = new Date();
+    if (day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear()) {
+      dayEl.classList.add('today');
+    }
+    
+    dayEl.innerHTML = `
+      <div class="day-number">${day}</div>
+      ${contentForDay.length > 0 ? `<div class="day-content-count">${contentForDay.length} post${contentForDay.length > 1 ? 's' : ''}</div>` : ''}
+    `;
+    
+    grid.appendChild(dayEl);
+  }
+}
+
+function getContentForDate(dateStr) {
+  return calendarData.filter(item => {
+    if (!item.postDate) return false;
+    const itemDate = new Date(item.postDate);
+    const itemDateStr = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, '0')}-${String(itemDate.getDate()).padStart(2, '0')}`;
+    return itemDateStr === dateStr;
+  });
+}
+
+function showDayContent(dateStr, content) {
+  const modal = document.getElementById('contentModal');
+  const modalDate = document.getElementById('modalDate');
+  const modalContent = document.getElementById('modalContent');
+  
+  const date = new Date(dateStr + 'T12:00:00');
+  modalDate.textContent = date.toLocaleDateString('en-GB', { 
+    weekday: 'long', 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric' 
+  });
+  
+  modalContent.innerHTML = content.map(item => renderContentItem(item)).join('');
+  modal.style.display = 'flex';
+}
+
+function closeContentModal(event) {
+  const modal = document.getElementById('contentModal');
+  modal.style.display = 'none';
+}
+
+function renderContentItem(item) {
   const status = Array.isArray(item.status) ? item.status[0] : (item.status || 'Scheduled');
   const statusClass = status.toLowerCase().replace(/\s+/g, '-');
-  const statusBadgeClass = 'status-' + statusClass;
   
-  const postDate = item.postDate ? new Date(item.postDate) : null;
-  const formattedDate = postDate ? 
-    `${postDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}` : 
-    'Date TBD';
-
   const platformIcon = {
     'Instagram': '📸',
     'Facebook': '👥',
@@ -2324,63 +2386,46 @@ function renderCalendarItem(item) {
     'Twitter': '🐦',
   }[item.platform] || '📱';
 
-  const contentPillars = Array.isArray(item.contentPillar) ? item.contentPillar : (item.contentPillar ? [item.contentPillar] : []);
-  const contentPillarHTML = contentPillars.length > 0 ? 
-    contentPillars.map(pillar => `<span class="calendar-meta-item">🎯 ${escapeHtml(pillar)}</span>`).join('') : '';
-  
-  const contentType = item.contentType ? 
-    `<span class="calendar-meta-item">📋 ${escapeHtml(item.contentType)}</span>` : '';
-
   const caption = item.caption ? 
-    `<div class="calendar-caption">${escapeHtml(item.caption)}</div>` : '';
+    `<div class="modal-caption"><strong>Caption:</strong><br>${escapeHtml(item.caption)}</div>` : '';
 
   const notesFromMarkeb = item.notesFromMarkeb ? 
-    `<div class="calendar-notes"><strong>📝 Team Notes:</strong> ${escapeHtml(item.notesFromMarkeb)}</div>` : '';
+    `<div class="modal-notes"><strong>📝 Team Notes:</strong> ${escapeHtml(item.notesFromMarkeb)}</div>` : '';
 
   const clientNotes = item.notesFromClient ? 
-    `<div class="calendar-client-notes"><strong>💬 Your Notes:</strong> ${escapeHtml(item.notesFromClient)}</div>` : '';
+    `<div class="modal-client-notes"><strong>💬 Your Notes:</strong> ${escapeHtml(item.notesFromClient)}</div>` : '';
 
   const mediaLink = item.mediaLink ? 
-    `<span class="calendar-meta-item"><a href="${escapeHtml(item.mediaLink)}" target="_blank" style="color:#3b82f6;text-decoration:none;">🎬 View Media</a></span>` : '';
+    `<div><a href="${escapeHtml(item.mediaLink)}" target="_blank" class="media-link">🎬 View Media</a></div>` : '';
 
   const showActions = status === 'Ready for Review';
   const clientActionsHTML = showActions ? `
-    <div class="client-actions">
-      <div class="client-actions-header">Review this content:</div>
-      <div class="client-actions-buttons">
+    <div class="modal-actions">
+      <h4>Review this content:</h4>
+      <div class="modal-action-buttons">
         <button class="btn btn-success" onclick="approveContent('${item.id}')">✓ Approve</button>
         <button class="btn btn-danger" onclick="declineContent('${item.id}')">✗ Request Changes</button>
       </div>
-      <div class="client-notes-section">
-        <label class="client-notes-label">Add notes (optional):</label>
-        <textarea 
-          class="client-notes-textarea" 
-          id="notes-${item.id}" 
-          placeholder="Share your feedback or approval message...">${escapeHtml(item.notesFromClient || '')}</textarea>
-        <button class="btn btn-secondary client-notes-submit" onclick="submitClientNotes('${item.id}')">💬 Save Notes</button>
+      <div class="modal-notes-section">
+        <label>Add notes (optional):</label>
+        <textarea id="notes-${item.id}" placeholder="Share your feedback...">${escapeHtml(item.notesFromClient || '')}</textarea>
+        <button class="btn btn-secondary" onclick="submitClientNotes('${item.id}')">💬 Save Notes</button>
       </div>
       <div id="feedback-${item.id}"></div>
     </div>
   ` : '';
 
   return `
-    <div class="calendar-item ${statusClass}">
-      <div class="calendar-item-header">
-        <span class="calendar-date">📅 ${formattedDate}</span>
-        <span class="calendar-platform">${platformIcon} ${escapeHtml(item.platform || 'Platform')}</span>
+    <div class="modal-content-item status-${statusClass}">
+      <div class="modal-item-header">
+        <span class="modal-platform">${platformIcon} ${escapeHtml(item.platform || 'Platform')}</span>
+        <span class="modal-status status-${statusClass}">${escapeHtml(status)}</span>
       </div>
-      <div class="calendar-item-content">
-        <h3>${escapeHtml(item.idea || 'Content Idea')}</h3>
-        <span class="calendar-status-badge ${statusBadgeClass}">${escapeHtml(status)}</span>
-      </div>
+      <h3>${escapeHtml(item.idea || 'Content Idea')}</h3>
       ${caption}
       ${notesFromMarkeb}
       ${clientNotes}
-      <div class="calendar-item-meta">
-        ${contentPillarHTML}
-        ${contentType}
-        ${mediaLink}
-      </div>
+      ${mediaLink}
       ${clientActionsHTML}
     </div>
   `;
@@ -2393,8 +2438,8 @@ function escapeHtml(text) {
 }
 
 function showCalendarError(message) {
-  const gridEl = document.getElementById('calendarGrid');
-  gridEl.innerHTML = `<div class="error-message">${message}</div>`;
+  const grid = document.getElementById('calendarDaysGrid');
+  grid.innerHTML = `<div class="error-message" style="grid-column: 1/-1;">${message}</div>`;
 }
 
 async function approveContent(recordId) {
@@ -2459,6 +2504,7 @@ async function updateContentStatus(recordId, newStatus, message) {
     if (response.success) {
       showFeedback(recordId, `✓ ${message}`, 'success');
       setTimeout(() => {
+        closeContentModal();
         loadContentCalendar();
       }, 2000);
     } else {
@@ -2480,23 +2526,9 @@ function showFeedback(recordId, message, type) {
   }
 }
 
-// Filter event listeners
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('statusFilter')?.addEventListener('change', (e) => {
-    currentStatusFilter = e.target.value;
-    renderCalendar();
-  });
-
-  document.getElementById('platformFilter')?.addEventListener('change', (e) => {
-    currentPlatformFilter = e.target.value;
-    renderCalendar();
-  });
-
-  document.getElementById('sortFilter')?.addEventListener('change', (e) => {
-    currentSort = e.target.value;
-    renderCalendar();
-  });
-});
+function contactSocialMedia() {
+  window.open('https://markebmedia.com/contact', '_blank');
+}
 
     /* boot */
     document.addEventListener('DOMContentLoaded', async ()=>{

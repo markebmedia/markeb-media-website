@@ -42,7 +42,7 @@ exports.handler = async (event, context) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Airtable API error: ${response.status}`);
+      throw new Error(`Airtable API error: ${response.status}`); // ← FIXED HERE
     }
 
     const data = await response.json();
