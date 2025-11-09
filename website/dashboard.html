@@ -1049,7 +1049,7 @@
 }
 
 .status-ready-for-review { 
-  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  background: #ffffff;
   color: #5b21b6;
   border: 2px solid #8b5cf6;
   animation: pulse-glow 2s ease-in-out infinite;
@@ -1313,19 +1313,22 @@
   }
 
   .calendar-day {
-    min-height: 70px;
+    min-height: 60px;
+    max-height: 60px;
     padding: 4px;
     border-radius: 8px;
   }
 
   .day-number,
   .calendar-day-number {
-    font-size: 13px;
+    font-size: 12px;
     margin-bottom: 2px;
+    line-height: 1.2;
   }
 
   .day-content-count {
-    font-size: 10px;
+    font-size: 9px;
+    line-height: 1;
   }
 
   .content-modal {
@@ -1439,21 +1442,29 @@
   }
 
   .calendar-day {
-    min-height: 60px;
+    min-height: 48px;
+    max-height: 48px;
+    aspect-ratio: 1;
     padding: 2px;
     border-radius: 6px;
     border-width: 1px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
   .day-number,
   .calendar-day-number {
-    font-size: 12px;
+    font-size: 11px;
     margin-bottom: 0;
+    line-height: 1;
   }
 
   .day-content-count {
-    font-size: 9px;
-    margin-top: 2px;
+    font-size: 8px;
+    margin-top: 1px;
+    line-height: 1;
   }
 
   .content-modal {
