@@ -522,7 +522,7 @@
 
     }
   
-  /* ===== CALENDAR VIEW STYLES ===== */
+/* ===== CALENDAR VIEW STYLES ===== */
 .calendar-container {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 20px;
@@ -626,7 +626,7 @@
   cursor: pointer;
   transition: all .2s ease;
   position: relative;
-  background: #fff;
+  background: #ffffff;
   display: flex;
   flex-direction: column;
   min-height: 100px;
@@ -640,7 +640,8 @@
 
 .calendar-day.today {
   border-color: #3b82f6;
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .calendar-day.other-month {
@@ -648,14 +649,21 @@
   pointer-events: none;
 }
 
+.calendar-day.empty {
+  background: transparent;
+  border: none;
+  cursor: default;
+  pointer-events: none;
+}
+
 .calendar-day.has-content {
   border-color: #10b981;
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  background: #f0fdf4;
 }
 
 .calendar-day.has-review {
   border-color: #f59e0b;
-  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  background: #fffbeb;
   animation: pulse-day 2s ease-in-out infinite;
 }
 
@@ -664,9 +672,23 @@
   50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
 }
 
+.day-number {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.day-content-count {
+  font-size: 12px;
+  color: #16a34a;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
 .calendar-day-number {
   font-weight: 700;
-  color: #0f172a;
+  color: #1e293b;
   font-size: 16px;
   margin-bottom: 4px;
 }
@@ -815,9 +837,11 @@
   height: 100%;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
-  z-index: 1000;
+  z-index: 9999;
   padding: 20px;
   overflow-y: auto;
+  align-items: center;
+  justify-content: center;
 }
 
 .content-modal.active {
@@ -835,6 +859,8 @@
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: modalSlideIn 0.3s ease-out;
+  position: relative;
+  z-index: 10000;
 }
 
 @keyframes modalSlideIn {
@@ -905,12 +931,12 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.modal-content-item.scheduled { border-left-color: #3b82f6; }
-.modal-content-item.drafting { border-left-color: #f59e0b; }
-.modal-content-item.in-progress { border-left-color: #f59e0b; }
-.modal-content-item.ready-for-review { border-left-color: #f59e0b; }
-.modal-content-item.approved { border-left-color: #10b981; }
-.modal-content-item.published { border-left-color: #6366f1; }
+.modal-content-item.status-scheduled { border-left-color: #3b82f6; }
+.modal-content-item.status-drafting { border-left-color: #f59e0b; }
+.modal-content-item.status-in-progress { border-left-color: #f59e0b; }
+.modal-content-item.status-ready-for-review { border-left-color: #f59e0b; }
+.modal-content-item.status-approved { border-left-color: #10b981; }
+.modal-content-item.status-published { border-left-color: #6366f1; }
 
 .modal-item-header {
   display: flex;
@@ -921,7 +947,7 @@
   gap: 12px;
 }
 
-.modal-platform-badge {
+.modal-platform {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -934,14 +960,14 @@
   color: #475569;
 }
 
-.modal-item-title {
+.modal-content-item h3 {
   font-size: 20px;
   font-weight: 700;
   color: #0f172a;
   margin-bottom: 12px;
 }
 
-.modal-item-caption {
+.modal-caption {
   font-size: 15px;
   color: #475569;
   line-height: 1.6;
@@ -949,46 +975,16 @@
   padding: 16px;
   background: #fff;
   border-radius: 8px;
-  border-left: 4px solid currentColor;
+  border-left: 4px solid #667eea;
 }
 
-.modal-item-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.modal-meta-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #64748b;
-}
-
-.modal-media-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: #fff;
-  text-decoration: none;
-  border-radius: 10px;
+.modal-status {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
   font-weight: 700;
-  margin-bottom: 16px;
-  transition: all .2s ease;
-}
-
-.modal-media-link:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .modal-notes {
@@ -1009,6 +1005,25 @@
   border-radius: 8px;
   font-size: 14px;
   color: #3730a3;
+}
+
+.media-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 10px;
+  font-weight: 700;
+  margin: 16px 0;
+  transition: all .2s ease;
+}
+
+.media-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
 .calendar-status-badge {
@@ -1063,6 +1078,7 @@
   border: 2px solid #ef4444;
 }
 
+.modal-actions,
 .client-actions {
   margin-top: 20px;
   padding: 20px;
@@ -1071,6 +1087,7 @@
   border-radius: 12px;
 }
 
+.modal-actions h4,
 .client-actions-header {
   font-size: 16px;
   font-weight: 700;
@@ -1081,11 +1098,7 @@
   gap: 8px;
 }
 
-.client-actions-header::before {
-  content: '⚡';
-  font-size: 20px;
-}
-
+.modal-action-buttons,
 .client-actions-buttons {
   display: flex;
   gap: 12px;
@@ -1093,10 +1106,12 @@
   flex-wrap: wrap;
 }
 
+.modal-notes-section,
 .client-notes-section {
   margin-top: 12px;
 }
 
+.modal-notes-section label,
 .client-notes-label {
   font-size: 13px;
   font-weight: 600;
@@ -1105,6 +1120,7 @@
   display: block;
 }
 
+.modal-notes-section textarea,
 .client-notes-textarea {
   width: 100%;
   padding: 10px 12px;
@@ -1117,6 +1133,7 @@
   transition: border-color .2s ease;
 }
 
+.modal-notes-section textarea:focus,
 .client-notes-textarea:focus {
   outline: none;
   border-color: #d97706;
@@ -1147,6 +1164,7 @@
   border: 1px solid #ef4444;
 }
 
+.btn,
 .btn-success,
 .btn-danger,
 .btn-secondary {
@@ -1216,7 +1234,8 @@
     padding: 4px;
   }
   
-  .calendar-day-number {
+  .calendar-day-number,
+  .day-number {
     font-size: 14px;
   }
   
@@ -1231,11 +1250,13 @@
     border-radius: 0;
   }
   
-  .client-actions-buttons {
+  .client-actions-buttons,
+  .modal-action-buttons {
     flex-direction: column;
   }
   
-  .client-actions-buttons .btn {
+  .client-actions-buttons .btn,
+  .modal-action-buttons .btn {
     width: 100%;
   }
 }
