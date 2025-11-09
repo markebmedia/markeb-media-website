@@ -917,7 +917,7 @@
 }
 
 .modal-content-item {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  background: #ffffff;
   border: 2px solid #e2e8f0;
   border-left: 6px solid;
   border-radius: 12px;
@@ -1218,46 +1218,329 @@
   box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
 }
 
-@media (max-width: 768px) {
+  /* ===== CALENDAR RESPONSIVE STYLES ===== */
+@media (max-width: 1024px) {
+  .calendar-container {
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
   .calendar-header-content {
     flex-direction: column;
-    align-items: stretch;
+    gap: 16px;
   }
-  
+
   .calendar-controls {
     width: 100%;
     justify-content: space-between;
   }
-  
+
+  .calendar-current-month {
+    min-width: 150px;
+    font-size: 16px;
+  }
+
   .calendar-day {
     min-height: 80px;
-    padding: 4px;
+    padding: 6px;
   }
-  
-  .calendar-day-number,
-  .day-number {
+
+  .day-number,
+  .calendar-day-number {
     font-size: 14px;
   }
-  
-  .calendar-content-dot {
-    height: 20px;
-    font-size: 10px;
+
+  .day-content-count {
+    font-size: 11px;
   }
-  
+
   .content-modal-dialog {
-    margin: 0;
-    max-height: 100vh;
-    border-radius: 0;
+    max-width: 90%;
+    max-height: 85vh;
   }
-  
-  .client-actions-buttons,
-  .modal-action-buttons {
+
+  .modal-content-item {
+    padding: 20px;
+  }
+
+  .modal-action-buttons,
+  .client-actions-buttons {
     flex-direction: column;
   }
-  
-  .client-actions-buttons .btn,
-  .modal-action-buttons .btn {
+
+  .btn,
+  .btn-success,
+  .btn-danger,
+  .btn-secondary {
     width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-container {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .calendar-title-section h2 {
+    font-size: 24px;
+  }
+
+  .calendar-title-section p {
+    font-size: 14px;
+  }
+
+  .calendar-nav-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .calendar-view {
+    padding: 16px;
+  }
+
+  .calendar-weekdays {
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .calendar-weekdays > div {
+    font-size: 12px;
+  }
+
+  .calendar-days-grid {
+    gap: 4px;
+  }
+
+  .calendar-day {
+    min-height: 70px;
+    padding: 4px;
+    border-radius: 8px;
+  }
+
+  .day-number,
+  .calendar-day-number {
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+
+  .day-content-count {
+    font-size: 10px;
+  }
+
+  .content-modal {
+    padding: 10px;
+  }
+
+  .content-modal-dialog {
+    max-width: 95%;
+    max-height: 90vh;
+    border-radius: 12px;
+  }
+
+  .content-modal-header {
+    padding: 16px;
+    border-radius: 12px 12px 0 0;
+  }
+
+  .content-modal-header h3 {
+    font-size: 18px;
+  }
+
+  .modal-close {
+    width: 36px;
+    height: 36px;
+    font-size: 24px;
+  }
+
+  .content-modal-body {
+    padding: 16px;
+  }
+
+  .modal-content-item {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .modal-content-item h3 {
+    font-size: 18px;
+  }
+
+  .modal-platform {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+
+  .modal-caption {
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  .modal-actions,
+  .client-actions {
+    padding: 16px;
+  }
+
+  .modal-actions h4 {
+    font-size: 15px;
+  }
+
+  textarea {
+    min-height: 80px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-container {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .calendar-title-section h2 {
+    font-size: 20px;
+  }
+
+  .calendar-title-section p {
+    font-size: 13px;
+  }
+
+  .calendar-controls {
+    padding: 10px 16px;
+    gap: 12px;
+  }
+
+  .calendar-nav-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .calendar-current-month {
+    min-width: 120px;
+    font-size: 14px;
+  }
+
+  .calendar-view {
+    padding: 12px;
+  }
+
+  .calendar-weekdays {
+    gap: 2px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+  }
+
+  .calendar-weekdays > div {
+    font-size: 11px;
+  }
+
+  .calendar-days-grid {
+    gap: 2px;
+  }
+
+  .calendar-day {
+    min-height: 60px;
+    padding: 2px;
+    border-radius: 6px;
+    border-width: 1px;
+  }
+
+  .day-number,
+  .calendar-day-number {
+    font-size: 12px;
+    margin-bottom: 0;
+  }
+
+  .day-content-count {
+    font-size: 9px;
+    margin-top: 2px;
+  }
+
+  .content-modal {
+    padding: 5px;
+  }
+
+  .content-modal-dialog {
+    max-width: 98%;
+    max-height: 95vh;
+    border-radius: 8px;
+  }
+
+  .content-modal-header {
+    padding: 12px;
+  }
+
+  .content-modal-header h3 {
+    font-size: 16px;
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+
+  .content-modal-body {
+    padding: 12px;
+  }
+
+  .modal-content-item {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .modal-content-item h3 {
+    font-size: 16px;
+  }
+
+  .modal-item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .modal-platform {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
+  .modal-caption {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .modal-actions,
+  .client-actions {
+    padding: 12px;
+  }
+
+  .modal-actions h4 {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .modal-action-buttons,
+  .client-actions-buttons {
+    gap: 8px;
+  }
+
+  .btn,
+  .btn-success,
+  .btn-danger,
+  .btn-secondary {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  textarea {
+    min-height: 70px;
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .media-link {
+    padding: 10px 16px;
+    font-size: 13px;
   }
 }
 </style>
