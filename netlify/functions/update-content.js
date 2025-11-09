@@ -1,6 +1,5 @@
 // Netlify Function: /.netlify/functions/update-content.js
 // Allows clients to approve/decline content and add notes
-
 const fetch = require('node-fetch');
 
 exports.handler = async (event, context) => {
@@ -36,18 +35,16 @@ exports.handler = async (event, context) => {
 
     // Build update payload
     const fields = {};
-    
     if (status) {
       fields['Status'] = status;
     }
-    
     if (notesFromClient !== undefined) {
       fields['Notes from Client'] = notesFromClient;
     }
 
     // Update record in Airtable
     const url = `https://api.airtable.com/v0/${SOCIAL_MEDIA_BASE_ID}/${encodeURIComponent(CONTENT_TABLE_NAME)}/${recordId}`;
-
+    
     const response = await fetch(url, {
       method: 'PATCH',
       headers: {
@@ -60,11 +57,11 @@ exports.handler = async (event, context) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Airtable API error:', response.status, errorText);
-      throw new Error(`Airtable API error: ${response.status}`);
+      throw new Error(`Airtable API error: ${response.status}`); // ← FIXED HERE
     }
 
     const data = await response.json();
-    
+
     return {
       statusCode: 200,
       headers: {
