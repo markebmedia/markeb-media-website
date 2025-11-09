@@ -1219,234 +1219,60 @@
 }
 
   /* ===== CALENDAR RESPONSIVE STYLES ===== */
-@media (max-width: 1024px) {
-  .calendar-container {
-    padding: 24px;
-    margin-bottom: 24px;
-  }
-
-  .calendar-header-content {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .calendar-controls {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .calendar-current-month {
-    min-width: 150px;
-    font-size: 16px;
-  }
-
-  .calendar-day {
-    min-height: 80px;
-    padding: 6px;
-  }
-
-  .day-number,
-  .calendar-day-number {
-    font-size: 14px;
-  }
-
-  .day-content-count {
-    font-size: 11px;
-  }
-
-  .content-modal-dialog {
-    max-width: 90%;
-    max-height: 85vh;
-  }
-
-  .modal-content-item {
-    padding: 20px;
-  }
-
-  .modal-action-buttons,
-  .client-actions-buttons {
-    flex-direction: column;
-  }
-
-  .btn,
-  .btn-success,
-  .btn-danger,
-  .btn-secondary {
-    width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  .calendar-container {
-    padding: 20px;
-    border-radius: 16px;
-  }
-
-  .calendar-title-section h2 {
-    font-size: 24px;
-  }
-
-  .calendar-title-section p {
-    font-size: 14px;
-  }
-
-  .calendar-nav-btn {
-    padding: 6px 12px;
-    font-size: 13px;
-  }
-
-  .calendar-view {
-    padding: 16px;
-  }
-
-  .calendar-weekdays {
-    gap: 4px;
-    margin-bottom: 12px;
-  }
-
-  .calendar-weekdays > div {
-    font-size: 12px;
-  }
-
-  .calendar-days-grid {
-    gap: 4px;
-  }
-
-  .calendar-day {
-    min-height: 60px;
-    max-height: 60px;
-    padding: 4px;
-    border-radius: 8px;
-  }
-
-  .day-number,
-  .calendar-day-number {
-    font-size: 12px;
-    margin-bottom: 2px;
-    line-height: 1.2;
-  }
-
-  .day-content-count {
-    font-size: 9px;
-    line-height: 1;
-  }
-
-  .content-modal {
-    padding: 10px;
-  }
-
-  .content-modal-dialog {
-    max-width: 95%;
-    max-height: 90vh;
-    border-radius: 12px;
-  }
-
-  .content-modal-header {
-    padding: 16px;
-    border-radius: 12px 12px 0 0;
-  }
-
-  .content-modal-header h3 {
-    font-size: 18px;
-  }
-
-  .modal-close {
-    width: 36px;
-    height: 36px;
-    font-size: 24px;
-  }
-
-  .content-modal-body {
-    padding: 16px;
-  }
-
-  .modal-content-item {
-    padding: 16px;
-    margin-bottom: 16px;
-  }
-
-  .modal-content-item h3 {
-    font-size: 18px;
-  }
-
-  .modal-platform {
-    font-size: 13px;
-    padding: 6px 12px;
-  }
-
-  .modal-caption {
-    font-size: 14px;
-    padding: 12px;
-  }
-
-  .modal-actions,
-  .client-actions {
-    padding: 16px;
-  }
-
-  .modal-actions h4 {
-    font-size: 15px;
-  }
-
-  textarea {
-    min-height: 80px;
-    font-size: 14px;
-  }
-}
-
 @media (max-width: 480px) {
   .calendar-container {
-    padding: 16px;
+    padding: 12px;
     margin-bottom: 16px;
   }
 
   .calendar-title-section h2 {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .calendar-title-section p {
-    font-size: 13px;
-  }
-
-  .calendar-controls {
-    padding: 10px 16px;
-    gap: 12px;
-  }
-
-  .calendar-nav-btn {
-    padding: 6px 10px;
     font-size: 12px;
   }
 
-  .calendar-current-month {
-    min-width: 120px;
-    font-size: 14px;
+  .calendar-controls {
+    padding: 8px 12px;
+    gap: 8px;
   }
 
-  .calendar-view {
-    padding: 12px;
-  }
-
-  .calendar-weekdays {
-    gap: 2px;
-    margin-bottom: 8px;
-    padding-bottom: 8px;
-  }
-
-  .calendar-weekdays > div {
+  .calendar-nav-btn {
+    padding: 5px 8px;
     font-size: 11px;
   }
 
+  .calendar-current-month {
+    min-width: 100px;
+    font-size: 13px;
+  }
+
+  .calendar-view {
+    padding: 8px;
+  }
+
+  .calendar-weekdays {
+    gap: 1px;
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+  }
+
+  .calendar-weekdays > div {
+    font-size: 10px;
+    padding: 2px 0;
+  }
+
   .calendar-days-grid {
-    gap: 2px;
+    gap: 1px;
   }
 
   .calendar-day {
-    min-height: 48px;
-    max-height: 48px;
+    min-height: 40px;
+    max-height: 40px;
     aspect-ratio: 1;
-    padding: 2px;
-    border-radius: 6px;
+    padding: 1px;
+    border-radius: 4px;
     border-width: 1px;
     display: flex;
     flex-direction: column;
@@ -1456,13 +1282,13 @@
 
   .day-number,
   .calendar-day-number {
-    font-size: 11px;
+    font-size: 10px;
     margin-bottom: 0;
     line-height: 1;
   }
 
   .day-content-count {
-    font-size: 8px;
+    font-size: 7px;
     margin-top: 1px;
     line-height: 1;
   }
