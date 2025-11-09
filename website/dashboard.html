@@ -1307,19 +1307,24 @@
   }
 
   .content-modal {
-    padding: 5px;
-    padding-bottom: calc(var(--footer-h) + 10px);
+    padding: 0;
+    align-items: flex-start;
+    overflow-y: auto;
   }
 
   .content-modal-dialog {
-    max-width: 98%;
-    max-height: calc(95vh - var(--footer-h));
-    border-radius: 8px;
+    max-width: 100%;
+    max-height: calc(100vh - var(--footer-h) - 20px);
+    border-radius: 0;
+    margin: 0;
     margin-bottom: calc(var(--footer-h) + 10px);
   }
 
   .content-modal-header {
     padding: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
 
   .content-modal-header h3 {
