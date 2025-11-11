@@ -145,11 +145,11 @@
   .progress-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#60a5fa);width:0%}
 
   /* Footer */
-.page-footer{position:fixed;bottom:0;left:280px;right:0;background:#fff;border-top:1px solid #e2e8f0;padding:16px 32px;z-index:50;display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;margin-bottom:0;}
-.footer-buttons{display:flex;gap:12px;}
-.footer-btn{padding:10px 20px;border-radius:8px;font-weight:500;text-decoration:none;border:1px solid #e2e8f0;cursor:pointer;transition:all .2s ease;font-size:14px;background:#fff;color:#64748b;}
-.footer-btn:hover{background:#f8fafc;border-color:#cbd5e1;color:#0f172a;}
-.footer-copyright{font-size:12px;color:#64748b;}
+  .page-footer{position:fixed;bottom:0;left:280px;right:0;background:#fff;border-top:1px solid #e2e8f0;padding:16px 32px;z-index:50;display:flex;justify-content:space-between;align-items:center; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));}
+  .footer-buttons{display:flex;gap:12px;}
+  .footer-btn{padding:10px 20px;border-radius:8px;font-weight:500;text-decoration:none;border:1px solid #e2e8f0;cursor:pointer;transition:all .2s ease;font-size:14px;background:#fff;color:#64748b;}
+  .footer-btn:hover{background:#f8fafc;border-color:#cbd5e1;color:#0f172a;}
+  .footer-copyright{font-size:12px;color:#64748b;}
 
   /* ===== DRONE ANIMATION ===== */
   .drone-container {
