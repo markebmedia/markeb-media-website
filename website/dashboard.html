@@ -783,7 +783,11 @@
   border-radius: 50%;
 }
 
-.social-media-promo-content { position: relative; z-index: 1; }
+.social-media-promo-content { 
+  position: relative; 
+  z-index: 1;
+  text-align: center;
+}
 
 .social-media-promo h2 { 
   font-size: clamp(24px, 4vw, 32px); 
@@ -805,6 +809,7 @@
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 24px;
+  justify-content: center;
 }
 
 .sm-feature-badge {
@@ -1691,44 +1696,43 @@
       <p style="margin-top:16px;color:#fff;">Loading your content calendar...</p>
     </div>
 
-    <!-- Calendar Grid -->
-    <div class="calendar-view">
-      <div class="calendar-weekdays">
-        <div>Mon</div>
-        <div>Tue</div>
-        <div>Wed</div>
-        <div>Thu</div>
-        <div>Fri</div>
-        <div>Sat</div>
-        <div>Sun</div>
-      </div>
-      <div class="calendar-days-grid" id="calendarDaysGrid"></div>
-    </div>
+  <!-- Calendar Grid -->
+<div class="calendar-view">
+  <div class="calendar-weekdays">
+    <div>Mon</div>
+    <div>Tue</div>
+    <div>Wed</div>
+    <div>Thu</div>
+    <div>Fri</div>
+    <div>Sat</div>
+    <div>Sun</div>
+  </div>
+  <div class="calendar-days-grid" id="calendarDaysGrid"></div>
+</div>
 
-    <div id="calendarEmpty" class="calendar-empty-state" style="display:none;">
-      <div style="font-size:48px;margin-bottom:16px;">📅</div>
-      <h3>No Content Scheduled Yet</h3>
-      <p>You don't have any social media content scheduled at the moment.<br>Interested in having us manage your social media presence?</p>
+<div id="calendarEmpty" class="calendar-empty-state" style="display:none;">
+  <div style="font-size:48px;margin-bottom:16px;">📅</div>
+  <h3>No Content Scheduled Yet</h3>
+  <p>You don't have any social media content scheduled at the moment.<br>Interested in having us manage your social media presence?</p>
+  
+  <div class="social-media-promo">
+    <div class="social-media-promo-content">
+      <h2>Social Media Management for Estate Agents</h2>
+      <p>Let us handle your social media so you can focus on selling properties. Professional content creation, scheduling, and engagement management.</p>
       
-      <div class="social-media-promo">
-        <div class="social-media-promo-content">
-          <h2>Social Media Management for Estate Agents</h2>
-          <p>Let us handle your social media so you can focus on selling properties. Professional content creation, scheduling, and engagement management.</p>
-          
-          <div class="social-media-features">
-            <span class="sm-feature-badge">📱 Daily Posting</span>
-            <span class="sm-feature-badge">✍️ Professional Copywriting</span>
-            <span class="sm-feature-badge">📊 Performance Analytics</span>
-            <span class="sm-feature-badge">🎯 Targeted Strategy</span>
-          </div>
-          
-          <button class="btn-sm-primary" onclick="contactSocialMedia()">
-            Get Started with Social Media Management →
-          </button>
-        </div>
+      <div class="social-media-features">
+        <span class="sm-feature-badge">📱 Daily Posting</span>
+        <span class="sm-feature-badge">✍️ Professional Copywriting</span>
+        <span class="sm-feature-badge">📊 Performance Analytics</span>
+        <span class="sm-feature-badge">🎯 Targeted Strategy</span>
       </div>
+      
+      <a href="mailto:commercial@markebmedia.com?subject=Social%20Media%20Management%20Enquiry" class="btn-sm-primary">
+        Get Started with Social Media Management →
+      </a>
     </div>
   </div>
+</div>
 
   <!-- Content Detail Modal -->
   <div class="content-modal" id="contentModal" onclick="closeContentModal(event)">
