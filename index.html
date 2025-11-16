@@ -1005,18 +1005,18 @@
             margin-top: 15px;
         }
 
-        /* Responsive Design */
-       @media (max-width: 768px) {
+  /* Responsive Design */
+@media (max-width: 768px) {
     .hero-landing h1 {
         font-size: 2.2em;
         margin-bottom: 25px;
     }
-
+    
     .hero-landing p {
         font-size: 1.15em;
         margin-bottom: 35px;
     }
-
+    
     .cta-primary, .cta-secondary {
         display: block;
         width: 100%;
@@ -1024,15 +1024,22 @@
         margin: 10px auto;
         text-align: center;
     }
-
+    
     /* Header responsive styles */
     header img {
         height: 60px !important;
     }
     
     header .cta-primary {
-        padding: 8px 16px !important;
+        padding: 10px 20px !important;
         font-size: 0.85em !important;
+        width: auto !important;
+        max-width: none !important;
+        display: inline-block !important;
+    }
+    
+    header > div {
+        gap: 10px;
     }
 
     /* Rest of existing mobile styles continue below... */
