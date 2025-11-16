@@ -36,15 +36,15 @@
 
         /* Hero Landing Section */
         .hero-landing {
-            background: #FFFFFF;
-            color: #1F2E3C;
-            padding: 80px 20px;
-            text-align: center;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    background: #FFFFFF;
+    color: #1F2E3C;
+    padding: 40px 20px 80px; /* Changed from 80px 20px */
+    text-align: center;
+    min-height: calc(100vh - 90px); /* Account for header height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
         .hero-content {
             max-width: 900px;
@@ -1006,24 +1006,40 @@
         }
 
         /* Responsive Design */
-        @media (max-width: 768px) {
-            .hero-landing h1 {
-                font-size: 2.2em;
-                margin-bottom: 25px;
-            }
+       @media (max-width: 768px) {
+    .hero-landing h1 {
+        font-size: 2.2em;
+        margin-bottom: 25px;
+    }
 
-            .hero-landing p {
-                font-size: 1.15em;
-                margin-bottom: 35px;
-            }
+    .hero-landing p {
+        font-size: 1.15em;
+        margin-bottom: 35px;
+    }
 
-            .cta-primary, .cta-secondary {
-                display: block;
-                width: 100%;
-                max-width: 300px;
-                margin: 10px auto;
-                text-align: center;
-            }
+    .cta-primary, .cta-secondary {
+        display: block;
+        width: 100%;
+        max-width: 300px;
+        margin: 10px auto;
+        text-align: center;
+    }
+
+    /* Header responsive styles */
+    header img {
+        height: 50px !important;
+    }
+    
+    header .cta-primary {
+        padding: 10px 20px !important;
+        font-size: 0.9em !important;
+    }
+
+    /* Rest of existing mobile styles continue below... */
+    .testimonials-container {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
 
             .testimonials-container {
                 grid-template-columns: 1fr;
@@ -1532,23 +1548,32 @@
     </style>
 </head>
 <body>
-    <!-- 1. Hero Landing Section -->
-    <section class="hero-landing" id="hero">
-        <div class="hero-content">
-            <h1>"I need my listings to stand out and sell faster, but I'm stretched thin as it is."</h1>
-            
-            <p>You're juggling viewings, valuations, and completions, whilst vendors expect premium marketing that matches their investment - and your competitors are winning instructions with better presentation.</p>
-            
-            <div style="margin-bottom: 40px;">
-                <a href="login.html" class="cta-primary">
-                    Book Now
-                </a>
-               <a href="#audit" class="cta-secondary">
-    Get Your Free 2-Minute Marketing Audit
-              </a>
-            </div>
+
+     <!-- Logo Header -->
+<header style="position: fixed; top: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); z-index: 1000; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+        <img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" style="height: 60px; width: auto;">
+        <a href="login.html" class="cta-primary" style="padding: 12px 24px; font-size: 1em; margin: 0;">Book Now</a>
+    </div>
+</header>
+
+<!-- Add padding to hero so it doesn't hide behind fixed header -->
+<div style="height: 90px;"></div>
+
+<!-- 1. Hero Landing Section -->
+<section class="hero-landing" id="hero">
+    <div class="hero-content">
+        <h1>"I need my listings to stand out and sell faster, but I'm stretched thin as it is."</h1>
+        
+        <p>You're juggling viewings, valuations, and completions, whilst vendors expect premium marketing that matches their investment - and your competitors are winning instructions with better presentation.</p>
+        
+        <div style="margin-bottom: 40px;">
+            <a href="#audit" class="cta-secondary">
+                Get Your Free 2-Minute Marketing Audit
+            </a>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- Marketing Audit Section -->
 <section class="audit-section" id="audit">
