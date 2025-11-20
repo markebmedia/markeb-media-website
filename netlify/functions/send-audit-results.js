@@ -3,6 +3,8 @@ const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 exports.handler = async (event, context) => {
+  console.log('🚀 send-audit-results function called');
+  
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
     return {
@@ -14,6 +16,8 @@ exports.handler = async (event, context) => {
   try {
     const data = JSON.parse(event.body);
     const { name, email, company, answers, score } = data;
+    
+    console.log('📥 Received data:', { name, email, company, score });
 
     // Generate personalised analysis based on answers
     const analysis = generateAnalysis(answers, score);
@@ -22,8 +26,8 @@ exports.handler = async (event, context) => {
     // Create email HTML
     const emailHTML = createEmailTemplate(name, company, score, analysis, recommendations);
 
-    // Send email using Resend
-    const emailData = await resend.emails.send({
+    // Send email to customer ONLY
+    const customerEmail = await resend.emails.send({
       from: 'Markeb Media <commercial@markebmedia.com>',
       to: [email],
       subject: `Your Personalised Marketing Audit Results - ${company}`,
@@ -35,17 +39,19 @@ exports.handler = async (event, context) => {
       ]
     });
 
+    console.log('✅ Customer email sent successfully:', customerEmail.id);
+
     return {
       statusCode: 200,
       body: JSON.stringify({ 
         success: true, 
         message: 'Audit results sent successfully',
-        emailId: emailData.id
+        emailId: customerEmail.id
       })
     };
 
   } catch (error) {
-    console.error('Error sending audit results:', error);
+    console.error('❌ Error sending audit results:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({ 
@@ -204,9 +210,9 @@ function generateRecommendations(answers) {
 }
 
 function getScoreRating(score) {
-  if (score >= 9) return { label: 'Excellent', color: '#10b981', message: 'Your marketing is in great shape! Focus on optimisation and scaling.' };
-  if (score >= 7) return { label: 'Good', color: '#3b82f6', message: 'Solid foundation with room for improvement in a few key areas.' };
-  if (score >= 5) return { label: 'Needs Attention', color: '#f59e0b', message: 'Several opportunities to significantly improve your marketing results.' };
+  if (score >= 21) return { label: 'Excellent', color: '#10b981', message: 'Your marketing is in great shape! Focus on optimisation and scaling.' };
+  if (score >= 16) return { label: 'Good', color: '#3b82f6', message: 'Solid foundation with room for improvement in a few key areas.' };
+  if (score >= 10) return { label: 'Needs Attention', color: '#f59e0b', message: 'Several opportunities to significantly improve your marketing results.' };
   return { label: 'Critical', color: '#ef4444', message: 'Your marketing needs immediate attention to stay competitive.' };
 }
 
@@ -474,7 +480,7 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
       color: #64748b;
       font-size: 14px;
     }
-    .offer-box {
+    .account-box {
       background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
       border: 2px solid #3b82f6;
       border-radius: 12px;
@@ -482,16 +488,26 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
       text-align: center;
       margin: 30px 0;
     }
-    .offer-box p {
-      margin: 0;
+    .account-box h3 {
       color: #1e40af;
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 20px;
+      margin-bottom: 12px;
     }
-    .offer-highlight {
-      color: #3b82f6;
+    .account-box p {
+      margin: 0 0 20px 0;
+      color: #1e40af;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .account-button {
+      display: inline-block;
+      background: #3b82f6;
+      color: white;
+      padding: 14px 28px;
+      border-radius: 10px;
+      text-decoration: none;
       font-weight: 700;
-      font-size: 18px;
+      font-size: 15px;
     }
     .footer {
       background: #f8fafc;
@@ -575,7 +591,7 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
         
         <div class="score-container">
           <div class="score-badge">
-            <div class="score-number">${score}/10</div>
+            <div class="score-number">${score}/25</div>
             <div class="score-label">Your Score</div>
           </div>
           <div class="score-rating" style="background-color: ${scoreRating.color};">
@@ -629,7 +645,7 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
         <div class="cta-section">
           <h3>Ready to Transform Your Marketing?</h3>
           <p>Let's discuss how Markeb Media can take your property marketing to the next level.</p>
-          <a href="https://markebmediabookings.as.me/" class="cta-button">📅 Book Your Free Strategy Call</a>
+          <a href="https://markebmediabookings.as.me/intro" class="cta-button">📅 Book Your Free Strategy Call</a>
         </div>
 
         <!-- Services Overview -->
@@ -674,17 +690,16 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
           </div>
         </div>
 
-        <!-- Special Offer -->
-        <div class="offer-box">
-          <p>
-            💡 <span class="offer-highlight">Special Offer:</span> Mention this audit to receive 
-            <span class="offer-highlight">10% off your first project</span> with us!
-          </p>
+        <!-- Create Account Box -->
+        <div class="account-box">
+          <h3>🎁 Want Exclusive Offers?</h3>
+          <p>Create your personalised Markeb Media account to receive special offers, track your projects, and access exclusive content.</p>
+          <a href="https://markebmedia.com/login" class="account-button">Create Your Account</a>
         </div>
 
         <!-- Closing -->
         <p style="color: #475569; margin-top: 30px;">
-          Questions? Simply reply to this email or give us a call. We're here to help you succeed in today's competitive property market.
+          Questions? Simply reply to this email and we'll be happy to help you succeed in today's competitive property market.
         </p>
 
         <!-- Signature -->
@@ -700,7 +715,7 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
       <!-- Footer -->
       <div class="footer">
         <div class="logo">
-          <img src="https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).PNG" alt="Markeb Media" style="height: 50px;">
+          <img src="https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).PNG" alt="Markeb Media" style="height: auto; width: 150px; max-width: 100%;">
         </div>
         
         <div class="footer-links">
