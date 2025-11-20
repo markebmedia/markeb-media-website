@@ -2548,62 +2548,97 @@ async function submitAudit() {
     window.scrollTo(0, scrollPosition);
 
     try {
-        // Call BOTH functions in parallel
-        const [emailResponse, airtableResponse] = await Promise.all([
-            // 1. Send customer email
-            fetch('/.netlify/functions/send-audit-results', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: name,
-                    email: email,
-                    company: agency,
-                    answers: mappedAnswers,
-                    score: score
+        console.log('🚀 Starting audit submission...');
+        
+        // Add timeout wrapper
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Request timeout')), 25000) // 25 second timeout
+        );
+
+        // Call BOTH functions with timeout protection
+        const responsePromises = Promise.race([
+            Promise.all([
+                // 1. Send customer email
+                fetch('/.netlify/functions/send-audit-results', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        email: email,
+                        company: agency,
+                        answers: mappedAnswers,
+                        score: score
+                    })
+                }).then(res => {
+                    console.log('✅ Email function responded:', res.status);
+                    return res;
+                }),
+                // 2. Save to Airtable & send internal notification
+                fetch('/.netlify/functions/submit-audit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                        agency: agency,
+                        email: email,
+                        phone: phone,
+                        score: score,
+                        answers: rawAnswers
+                    })
+                }).then(res => {
+                    console.log('✅ Airtable function responded:', res.status);
+                    return res;
                 })
-            }),
-            // 2. Save to Airtable & send internal notification
-            fetch('/.netlify/functions/submit-audit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: name,
-                    agency: agency,
-                    email: email,
-                    phone: phone,
-                    score: score,
-                    answers: rawAnswers
-                })
-            })
+            ]),
+            timeoutPromise
         ]);
 
+        const [emailResponse, airtableResponse] = await responsePromises;
+        
         const emailData = await emailResponse.json();
-        const airtableData = await airtableResponse.json();
+        
+        // Try to get Airtable data, but don't fail if it errors
+        let airtableData;
+        try {
+            airtableData = await airtableResponse.json();
+        } catch (e) {
+            console.warn('Could not parse Airtable response:', e);
+        }
 
         if (!emailResponse.ok) {
+            console.error('❌ Email function failed:', emailData);
             throw new Error(emailData.error || 'Failed to send email');
         }
 
         if (!airtableResponse.ok) {
-            console.warn('Airtable submission failed:', airtableData.error);
+            console.warn('⚠️ Airtable submission failed:', airtableData?.error || 'Unknown error');
             // Don't throw error - customer still gets their email
         }
 
-        // Hide loading, show success message
+        console.log('✅ Audit submitted successfully!');
+        
         document.getElementById('loadingSpinner').classList.remove('active');
-        showSuccess();
+        showResults(score, `Your detailed analysis has been sent to ${email}`);
 
-        // Show brief results on page
         setTimeout(() => {
-            showResults(score, `Your detailed analysis has been sent to ${email}`);
-        }, 2000);
+            document.getElementById('resultsContainer').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }, 100);
 
     } catch (error) {
-        console.error('Error submitting audit:', error);
+        console.error('❌ Error submitting audit:', error);
         document.getElementById('loadingSpinner').classList.remove('active');
         document.getElementById('auditForm').style.display = 'block';
         window.scrollTo(0, scrollPosition);
-        showError('Sorry, there was an error submitting your audit. Please try again or contact us at commercial@markebmedia.com');
+        
+        // More specific error messages
+        if (error.message === 'Request timeout') {
+            showError('The request is taking longer than expected. We\'ve received your submission and will email you shortly. If you don\'t receive an email within 5 minutes, please contact us at commercial@markebmedia.com');
+        } else {
+            showError('Sorry, there was an error. Please try again or contact us at commercial@markebmedia.com');
+        }
     }
 }
 

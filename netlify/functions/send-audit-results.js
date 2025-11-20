@@ -270,23 +270,23 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
       margin: 30px 0 20px;
     }
     .score-badge {
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      width: 140px;
-      height: 140px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
-    .score-number {
-      font-size: 56px;
-      font-weight: 700;
-      line-height: 1;
-    }
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.score-number {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+}
     .score-label {
       font-size: 14px;
       opacity: 0.9;
