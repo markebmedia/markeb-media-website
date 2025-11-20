@@ -705,14 +705,10 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
         
         <div class="footer-links">
           <a href="https://markebmedia.com">Website</a>
-          <a href="https://markebmedia.com/portfolio">Portfolio</a>
-          <a href="https://markebmediabookings.as.me/">Book Now</a>
         </div>
 
         <div class="social-icons">
-          <a href="https://instagram.com/markebmedia" class="social-link">📸</a>
-          <a href="https://facebook.com/markebmedia" class="social-link">👥</a>
-          <a href="https://linkedin.com/company/markebmedia" class="social-link">💼</a>
+          <a href="https://instagram.com/markeb_mediauk" class="social-link">📸</a>
         </div>
 
         <p class="footer-text">
