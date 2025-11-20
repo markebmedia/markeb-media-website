@@ -283,7 +283,7 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
   flex-direction: column;
 }
 .score-number {
-  font-size: 48px;
+  font-size: 42px;
   font-weight: 700;
   line-height: 1;
 }
@@ -516,8 +516,9 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
       border-top: 1px solid #e2e8f0;
     }
     .logo {
-      margin-bottom: 20px;
-    }
+  margin-bottom: 20px;
+  text-align: center;
+}
     .footer-links {
       margin: 20px 0;
     }
@@ -713,10 +714,10 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
       </div>
 
       <!-- Footer -->
-      <div class="footer">
-        <div class="logo">
-          <img src="https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).PNG" alt="Markeb Media" style="height: auto; width: 150px; max-width: 100%;">
-        </div>
+     <div class="footer">
+  <div class="logo">
+  <img src="https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).PNG" alt="Markeb Media" style="height: auto; width: 150px; max-width: 100%; display: block; margin: 0 auto;">
+</div>
         
         <div class="footer-links">
           <a href="https://markebmedia.com">Website</a>
