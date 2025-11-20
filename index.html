@@ -2388,21 +2388,17 @@
 </script>
 
 <script>
-// Audit Form JavaScript
+// ===== AUDIT FORM FUNCTIONALITY =====
 let currentStep = 1;
 const totalSteps = 8;
 const formData = {};
 
-// Update progress bar
 function updateProgress() {
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
-
-    // Calculate and cap the progress bar at 100%
     const progress = Math.min((currentStep / totalSteps) * 100, 100);
     progressBar.style.width = progress + '%';
-
-    // Only show "Question X of 8" for steps 1–8
+    
     if (currentStep <= totalSteps) {
         progressText.style.display = 'block';
         progressText.textContent = `Question ${currentStep} of ${totalSteps}`;
@@ -2411,14 +2407,11 @@ function updateProgress() {
     }
 }
 
-// Next step
 function nextStep() {
     const steps = document.querySelectorAll('.form-step');
     const currentStepElement = steps[currentStep - 1];
 
-    // Validate current step
     if (currentStep === 9) {
-        // Validate contact info (now at step 9)
         const name = document.getElementById('name').value.trim();
         const agency = document.getElementById('agency').value.trim();
         const email = document.getElementById('email').value.trim();
@@ -2434,7 +2427,6 @@ function nextStep() {
         formData.email = email;
         formData.phone = phone;
     } else {
-        // Validate radio selection for questions 1-8
         const questionName = `q${currentStep}`;
         const selected = document.querySelector(`input[name="${questionName}"]:checked`);
         
@@ -2446,7 +2438,6 @@ function nextStep() {
         formData[questionName] = parseInt(selected.value);
     }
 
-    // Hide error and move to next
     hideError();
     currentStepElement.classList.remove('active');
     currentStep++;
@@ -2457,7 +2448,6 @@ function nextStep() {
     }
 }
 
-// Previous step
 function prevStep() {
     const steps = document.querySelectorAll('.form-step');
     steps[currentStep - 1].classList.remove('active');
@@ -2467,73 +2457,57 @@ function prevStep() {
     hideError();
 }
 
-// Show error message
 function showError(message) {
     const errorEl = document.getElementById('errorMessage');
     errorEl.textContent = message;
     errorEl.classList.add('active');
+    setTimeout(() => errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
 }
 
-// Hide error message
 function hideError() {
     document.getElementById('errorMessage').classList.remove('active');
 }
 
-// Calculate score
 function calculateScore() {
     return (formData.q1 || 0) + (formData.q2 || 0) + (formData.q3 || 0) + 
            (formData.q4 || 0) + (formData.q5 || 0) + (formData.q6 || 0) + 
            (formData.q7 || 0) + (formData.q8 || 0);
 }
 
-// Get verdict
 function getVerdict(score) {
-    if (score <= 10) return { text: 'Poor', colour: '#DC2626', desc: 'Your marketing needs urgent attention' };
+    if (score <= 10) return { text: 'Needs Improvement', colour: '#DC2626', desc: 'Your marketing needs urgent attention' };
     if (score <= 16) return { text: 'Fair', colour: '#F59E0B', desc: 'Room for significant improvement' };
     if (score <= 21) return { text: 'Good', colour: '#10B981', desc: 'Strong foundation with growth potential' };
     return { text: 'Excellent', colour: '#059669', desc: 'Industry-leading marketing approach' };
 }
 
-// Convert markdown to HTML
-function markdownToHtml(text) {
-    // Headers
-    text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-    text = text.replace(/^## (.*$)/gim, '<h3>$1</h3>');
-    text = text.replace(/^# (.*$)/gim, '<h3>$1</h3>');
-    
-    // Bold
-    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    
-    // Bullet lists
-    text = text.replace(/^\- (.*$)/gim, '<li>$1</li>');
-    text = text.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
-    
-    // Paragraphs
-    text = text.split('\n\n').map(para => {
-        if (!para.startsWith('<') && para.trim()) {
-            return '<p>' + para + '</p>';
-        }
-        return para;
-    }).join('\n');
-    
-    return text;
+function mapAnswersToKeys(formData) {
+    return {
+        professionalContent: formData.q1 >= 3 ? 'yes' : 'no',
+        videoContent: formData.q2 >= 2 ? 'yes' : 'no',
+        droneContent: formData.q3 >= 2 ? 'yes' : 'no',
+        quickTurnaround: formData.q4 >= 3 ? 'yes' : 'no',
+        socialMedia: formData.q5 >= 2 ? 'yes' : 'inconsistent',
+        trackResults: formData.q6 >= 1 ? 'yes' : 'no',
+        clientSatisfaction: formData.q7 >= 2 ? 'yes' : 'no',
+        competitivePosition: formData.q8 >= 2 ? 'yes' : 'no',
+        personalBranding: formData.q1 >= 3 && formData.q2 >= 2 ? 'yes' : 'no',
+        contentConsistency: formData.q5 >= 2 ? 'yes' : 'no',
+        timeForMarketing: formData.q4 >= 2 ? 'yes' : 'no',
+        contentManagement: formData.q6 >= 1 ? 'yes' : 'no',
+        outsourceMarketing: formData.q1 <= 2 || formData.q2 <= 2 ? 'no' : 'yes'
+    };
 }
 
-// Submit audit
 async function submitAudit() {
-    console.log('🚀 submitAudit triggered');
-
-    // ⭐ PREVENT PAGE JUMP - LOCK SCROLL POSITION ⭐
     const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
 
-    // Validate contact info
     const nameInput = document.getElementById('name');
     const agencyInput = document.getElementById('agency');
     const emailInput = document.getElementById('email');
     const phoneInput = document.getElementById('phone');
 
     if (!nameInput || !agencyInput || !emailInput || !phoneInput) {
-        console.error('❌ Contact fields not found in DOM.');
         showError('Something went wrong. Please refresh and try again.');
         return;
     }
@@ -2548,54 +2522,36 @@ async function submitAudit() {
         return;
     }
 
-    // Calculate total score
     const score = calculateScore();
-    
-    // Collect all answers
-    const answers = {
-        q1: formData.q1 || 0,
-        q2: formData.q2 || 0,
-        q3: formData.q3 || 0,
-        q4: formData.q4 || 0,
-        q5: formData.q5 || 0,
-        q6: formData.q6 || 0,
-        q7: formData.q7 || 0,
-        q8: formData.q8 || 0
-    };
+    const mappedAnswers = mapAnswersToKeys(formData);
 
-    const payload = { name, agency, email, phone, score, answers };
-    console.log('📤 Submitting payload:', payload);
-
-    // Hide form, show loading
     document.getElementById('auditForm').style.display = 'none';
     document.getElementById('loadingSpinner').classList.add('active');
     hideError();
-
-    // ⭐ RESTORE SCROLL POSITION AFTER DOM CHANGES ⭐
     window.scrollTo(0, scrollPosition);
 
     try {
-        // ⭐ SIMPLE FETCH - NO SIGNAL, NO TIMEOUT OVERRIDE ⭐
-        const response = await fetch('/.netlify/functions/submit-audit', {
+        const emailResponse = await fetch('/.netlify/functions/send-audit-results', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                company: agency,
+                answers: mappedAnswers,
+                score: score
+            })
         });
 
-        const data = await response.json();
+        const emailData = await emailResponse.json();
 
-        if (!response.ok) {
-            console.error('❌ Server error:', data);
-            throw new Error(data.error || 'Failed to submit audit');
+        if (!emailResponse.ok) {
+            throw new Error(emailData.error || 'Failed to send email');
         }
 
-        console.log('✅ Success:', data);
-
-        // Hide loading, show results
         document.getElementById('loadingSpinner').classList.remove('active');
-        showResults(score, data.analysis);
+        showResults(score, `Your detailed analysis has been sent to ${email}`);
 
-        // ⭐ SMOOTH SCROLL TO TOP OF RESULTS ⭐
         setTimeout(() => {
             document.getElementById('resultsContainer').scrollIntoView({ 
                 behavior: 'smooth', 
@@ -2604,46 +2560,47 @@ async function submitAudit() {
         }, 100);
 
     } catch (error) {
-        console.error('❌ Error submitting audit:', error);
+        console.error('Error submitting audit:', error);
         document.getElementById('loadingSpinner').classList.remove('active');
         document.getElementById('auditForm').style.display = 'block';
-        
-        // ⭐ RESTORE SCROLL POSITION ON ERROR ⭐
         window.scrollTo(0, scrollPosition);
-        
-        showError('Sorry, there was an error submitting your audit. Please try again.');
+        showError('Sorry, there was an error. Please try again or contact us at commercial@markebmedia.com');
     }
 }
 
-// Show results
-function showResults(score, analysis) {
+function showResults(score, message) {
     const verdict = getVerdict(score);
     
-    document.getElementById('scoreNumber').textContent = score + '/25'; // ⭐ UPDATED TO 25 ⭐
+    document.getElementById('scoreNumber').textContent = score + '/25';
     document.getElementById('scoreVerdict').textContent = verdict.text;
     document.getElementById('scoreDescription').textContent = verdict.desc;
     
-    // Convert markdown analysis to HTML
-    const htmlAnalysis = markdownToHtml(analysis);
-    document.getElementById('analysisContent').innerHTML = htmlAnalysis;
+    document.getElementById('analysisContent').innerHTML = `
+        <h3>📧 Check Your Email</h3>
+        <p>${message}</p>
+        <p>We've sent you a comprehensive analysis including:</p>
+        <ul>
+            <li>Detailed breakdown of your marketing strengths and weaknesses</li>
+            <li>Personalised recommendations for improvement</li>
+            <li>Priority action items to boost your property marketing</li>
+            <li>How Markeb Media can help you achieve better results</li>
+        </ul>
+        <p><strong>Didn't receive the email?</strong> Check your spam folder or contact us at <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a></p>
+    `;
     
     document.getElementById('resultsContainer').classList.add('active');
 }
 
-// Add radio button visual feedback
 document.addEventListener('DOMContentLoaded', function() {
     const radioLabels = document.querySelectorAll('.option-label');
     radioLabels.forEach(label => {
         label.addEventListener('click', function() {
-            // Remove selected class from siblings
             const siblings = this.parentElement.querySelectorAll('.option-label');
             siblings.forEach(s => s.classList.remove('selected'));
-            // Add selected class to clicked
             this.classList.add('selected');
         });
     });
     
-    // Initialise progress on page load
     updateProgress();
 });
 </script>
