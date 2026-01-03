@@ -1,5 +1,12 @@
 // netlify/functions/auth.js - Netlify serverless function for authentication
 const bcrypt = require('bcryptjs');
+const { Resend } = require('resend');
+
+// Initialize Resend
+let resend;
+if (process.env.RESEND_API_KEY) {
+    resend = new Resend(process.env.RESEND_API_KEY);
+}
 
 exports.handler = async (event, context) => {
     console.log('=== Netlify Function Debug ===');
@@ -10,7 +17,8 @@ exports.handler = async (event, context) => {
     console.log('Environment check:', {
         hasApiKey: !!process.env.AIRTABLE_API_KEY,
         hasBaseId: !!process.env.AIRTABLE_BASE_ID,
-        hasTableName: !!process.env.AIRTABLE_USER_TABLE
+        hasTableName: !!process.env.AIRTABLE_USER_TABLE,
+        hasResend: !!process.env.RESEND_API_KEY
     });
     console.log('==============================');
 
@@ -75,6 +83,145 @@ exports.handler = async (event, context) => {
         };
     }
 };
+
+// Function to send welcome email via Resend
+async function sendWelcomeEmail(name, email, company) {
+    if (!resend) {
+        console.warn('Resend not configured - skipping welcome email');
+        return { success: false, reason: 'not configured' };
+    }
+
+    try {
+        const { data, error } = await resend.emails.send({
+            from: 'Markeb Media <commercial@markebmedia.com>',
+            to: email,
+            subject: 'Welcome to Your Free Personalised Client Dashboard',
+            html: `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4;">
+    <table role="presentation" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 40px 0; text-align: center; background-color: #f4f4f4;">
+                <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 40px 40px 30px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">Welcome to Markeb Media</h1>
+                            <p style="margin: 10px 0 0; color: #ffffff; font-size: 16px; opacity: 0.95;">Your Personalised Client Dashboard is Ready</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">Hi ${name},</p>
+                            
+                            <p style="margin: 0 0 25px; color: #333333; font-size: 16px; line-height: 1.6;">Welcome to Markeb Media! We're delighted to have <strong>${company}</strong> on board.</p>
+                            
+                            <p style="margin: 0 0 25px; color: #333333; font-size: 16px; line-height: 1.6;">Your <strong>free personalised dashboard</strong> is now active, giving you access to exclusive bonus features designed to streamline your content creation and property marketing.</p>
+
+                            <!-- Video Section -->
+                            <div style="margin: 30px 0; text-align: center; background-color: #f8f9fa; padding: 30px; border-radius: 8px;">
+                                <h2 style="margin: 0 0 15px; color: #333333; font-size: 20px; font-weight: 600;">Quick Start Guide</h2>
+                                <p style="margin: 0 0 20px; color: #666666; font-size: 14px;">Watch this 2-minute video to get the most out of your dashboard</p>
+                                <a href="https://youtu.be/5u-AC-X7juk" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 15px 35px; border-radius: 6px; font-weight: 600; font-size: 16px;">▶ Watch Onboarding Video</a>
+                            </div>
+                            
+                            <h3 style="margin: 30px 0 20px; color: #333333; font-size: 18px; font-weight: 600;">Your Dashboard Features:</h3>
+                            
+                            <table role="presentation" style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="padding: 12px 0; vertical-align: top;">
+                                        <div style="display: inline-block; width: 30px; height: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
+                                    </td>
+                                    <td style="padding: 12px 0;">
+                                        <strong style="color: #333333; font-size: 15px;">Track Content Progress</strong>
+                                        <p style="margin: 5px 0 0; color: #666666; font-size: 14px; line-height: 1.5;">See real-time updates on all your property content projects from brief to delivery</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; vertical-align: top;">
+                                        <div style="display: inline-block; width: 30px; height: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
+                                    </td>
+                                    <td style="padding: 12px 0;">
+                                        <strong style="color: #333333; font-size: 15px;">Request Amendments</strong>
+                                        <p style="margin: 5px 0 0; color: #666666; font-size: 14px; line-height: 1.5;">Submit revision requests directly through your dashboard with instant notifications to our team</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; vertical-align: top;">
+                                        <div style="display: inline-block; width: 30px; height: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
+                                    </td>
+                                    <td style="padding: 12px 0;">
+                                        <strong style="color: #333333; font-size: 15px;">AI Copywriting Tool</strong>
+                                        <p style="margin: 5px 0 0; color: #666666; font-size: 14px; line-height: 1.5;">Generate compelling property descriptions and video scripts in seconds with our AI assistant</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; vertical-align: top;">
+                                        <div style="display: inline-block; width: 30px; height: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
+                                    </td>
+                                    <td style="padding: 12px 0;">
+                                        <strong style="color: #333333; font-size: 15px;">Content Calendar</strong>
+                                        <p style="margin: 5px 0 0; color: #666666; font-size: 14px; line-height: 1.5;">View your complete posting schedule and upcoming content when we manage your social media</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; vertical-align: top;">
+                                        <div style="display: inline-block; width: 30px; height: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
+                                    </td>
+                                    <td style="padding: 12px 0;">
+                                        <strong style="color: #333333; font-size: 15px;">Social Media Analytics</strong>
+                                        <p style="margin: 5px 0 0; color: #666666; font-size: 14px; line-height: 1.5;">Track your performance metrics, engagement rates, and audience growth all in one place</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <div style="margin: 35px 0 25px; padding: 20px; background-color: #f0f7ff; border-left: 4px solid #667eea; border-radius: 4px;">
+                                <p style="margin: 0; color: #333333; font-size: 15px; line-height: 1.6;"><strong>💡 Pro Tip:</strong> Bookmark your dashboard for quick access. All your content, analytics, and tools are just one click away!</p>
+                            </div>
+                            
+                            <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">If you have any questions or need assistance navigating your dashboard, our team is here to help.</p>
+                            
+                            <p style="margin: 0; color: #333333; font-size: 16px; line-height: 1.6;">Looking forward to creating outstanding content together!</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 30px 40px; background-color: #f8f9fa; border-top: 1px solid #e9ecef;">
+                            <p style="margin: 0 0 10px; color: #666666; font-size: 14px; font-weight: 600;">Best regards,</p>
+                            <p style="margin: 0 0 15px; color: #666666; font-size: 14px;">The Markeb Media Team</p>
+                            <p style="margin: 0; color: #999999; font-size: 12px; line-height: 1.5;">This dashboard is a complimentary feature included with your Markeb Media service package.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+            `
+        });
+
+        if (error) {
+            console.error('Resend error:', error);
+            return { success: false, error };
+        }
+
+        console.log('Welcome email sent successfully to:', email, '- ID:', data?.id);
+        return { success: true, data };
+    } catch (error) {
+        console.error('Error sending welcome email:', error);
+        // Don't fail registration if email fails
+        return { success: false, error: error.message };
+    }
+}
 
 async function hashPassword(password) {
     const saltRounds = 10;
@@ -315,6 +462,10 @@ async function handleRegister(event, headers) {
             console.error('Airtable create error:', errorData);
             throw new Error('Failed to create user account');
         }
+
+        // Send welcome email (non-blocking - don't wait for it)
+        sendWelcomeEmail(name.trim(), email.toLowerCase().trim(), company.trim())
+            .catch(error => console.error('Welcome email failed:', error));
 
         const sessionData = {
             email: email.toLowerCase().trim(),
