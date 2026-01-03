@@ -95,7 +95,7 @@ async function sendWelcomeEmail(name, email, company) {
         const { data, error } = await resend.emails.send({
             from: 'Markeb Media <commercial@markebmedia.com>',
             to: email,
-            subject: 'Welcome to Your Free Personalised Client Dashboard',
+            subject: 'Welcome to Your Free Personalised Dashboard',
             html: `
 <!DOCTYPE html>
 <html>
@@ -112,7 +112,7 @@ async function sendWelcomeEmail(name, email, company) {
                     <tr>
                         <td style="padding: 40px 40px 30px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                             <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">Welcome to Markeb Media</h1>
-                            <p style="margin: 10px 0 0; color: #ffffff; font-size: 16px; opacity: 0.95;">Your Personalised Client Dashboard is Ready</p>
+                            <p style="margin: 10px 0 0; color: #ffffff; font-size: 16px; opacity: 0.95;">Your Personalised Dashboard is Ready</p>
                         </td>
                     </tr>
                     
@@ -121,7 +121,7 @@ async function sendWelcomeEmail(name, email, company) {
                         <td style="padding: 40px;">
                             <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">Hi ${name},</p>
                             
-                            <p style="margin: 0 0 25px; color: #333333; font-size: 16px; line-height: 1.6;">Welcome to Markeb Media! We're delighted to have <strong>${company}</strong> on board.</p>
+                            <p style="margin: 0 0 25px; color: #333333; font-size: 16px; line-height: 1.6;">Welcome to Markeb Media! We're delighted to have you on board.</p>
                             
                             <p style="margin: 0 0 25px; color: #333333; font-size: 16px; line-height: 1.6;">Your <strong>free personalised dashboard</strong> is now active, giving you access to exclusive bonus features designed to streamline your content creation and property marketing.</p>
 
@@ -169,15 +169,6 @@ async function sendWelcomeEmail(name, email, company) {
                                     <td style="padding: 12px 0;">
                                         <strong style="color: #333333; font-size: 15px;">Content Calendar</strong>
                                         <p style="margin: 5px 0 0; color: #666666; font-size: 14px; line-height: 1.5;">View your complete posting schedule and upcoming content when we manage your social media</p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 12px 0; vertical-align: top;">
-                                        <div style="display: inline-block; width: 30px; height: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
-                                    </td>
-                                    <td style="padding: 12px 0;">
-                                        <strong style="color: #333333; font-size: 15px;">Social Media Analytics</strong>
-                                        <p style="margin: 5px 0 0; color: #666666; font-size: 14px; line-height: 1.5;">Track your performance metrics, engagement rates, and audience growth all in one place</p>
                                     </td>
                                 </tr>
                             </table>
