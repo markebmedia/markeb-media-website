@@ -110,7 +110,7 @@ async function sendWelcomeEmail(name, email, company) {
                 <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                     <!-- Header -->
                     <tr>
-                        <td style="padding: 40px 40px 30px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <td style="padding: 40px 40px 30px; text-align: center; background-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                             <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">Welcome to Markeb Media</h1>
                             <p style="margin: 10px 0 0; color: #ffffff; font-size: 16px; opacity: 0.95;">Your Personalised Dashboard is Ready</p>
                         </td>
@@ -129,7 +129,7 @@ async function sendWelcomeEmail(name, email, company) {
                             <div style="margin: 30px 0; text-align: center; background-color: #f8f9fa; padding: 30px; border-radius: 8px;">
                                 <h2 style="margin: 0 0 15px; color: #333333; font-size: 20px; font-weight: 600;">Quick Start Guide</h2>
                                 <p style="margin: 0 0 20px; color: #666666; font-size: 14px;">Watch this 2-minute video to get the most out of your dashboard</p>
-                                <a href="https://youtu.be/5u-AC-X7juk" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 15px 35px; border-radius: 6px; font-weight: 600; font-size: 16px;">▶ Watch Onboarding Video</a>
+                                <a href="https://youtu.be/5u-AC-X7juk" style="display: inline-block; background-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 15px 35px; border-radius: 6px; font-weight: 600; font-size: 16px;">▶ Watch Onboarding Video</a>
                             </div>
                             
                             <h3 style="margin: 30px 0 20px; color: #333333; font-size: 18px; font-weight: 600;">Your Dashboard Features:</h3>
@@ -137,7 +137,7 @@ async function sendWelcomeEmail(name, email, company) {
                             <table role="presentation" style="width: 100%; border-collapse: collapse;">
                                 <tr>
                                     <td style="padding: 12px 0; vertical-align: top;">
-                                        <div style="display: inline-block; width: 30px; height: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
+                                        <div style="display: inline-block; width: 30px; height: 30px; background-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
                                     </td>
                                     <td style="padding: 12px 0;">
                                         <strong style="color: #333333; font-size: 15px;">Track Content Progress</strong>
@@ -146,7 +146,7 @@ async function sendWelcomeEmail(name, email, company) {
                                 </tr>
                                 <tr>
                                     <td style="padding: 12px 0; vertical-align: top;">
-                                        <div style="display: inline-block; width: 30px; height: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
+                                        <div style="display: inline-block; width: 30px; height: 30px; background-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
                                     </td>
                                     <td style="padding: 12px 0;">
                                         <strong style="color: #333333; font-size: 15px;">Request Amendments</strong>
@@ -155,7 +155,7 @@ async function sendWelcomeEmail(name, email, company) {
                                 </tr>
                                 <tr>
                                     <td style="padding: 12px 0; vertical-align: top;">
-                                        <div style="display: inline-block; width: 30px; height: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
+                                        <div style="display: inline-block; width: 30px; height: 30px; background-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
                                     </td>
                                     <td style="padding: 12px 0;">
                                         <strong style="color: #333333; font-size: 15px;">AI Copywriting Tool</strong>
@@ -164,7 +164,7 @@ async function sendWelcomeEmail(name, email, company) {
                                 </tr>
                                 <tr>
                                     <td style="padding: 12px 0; vertical-align: top;">
-                                        <div style="display: inline-block; width: 30px; height: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
+                                        <div style="display: inline-block; width: 30px; height: 30px; background-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
                                     </td>
                                     <td style="padding: 12px 0;">
                                         <strong style="color: #333333; font-size: 15px;">Content Calendar</strong>
