@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - Markeb Media</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Inter', sans-serif; 
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: #1e293b; 
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .admin-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+      gap: 20px;
+      flex-wrap: wrap;
+      text-align: center;
+    }
+
+    .header-content {
+      flex: 1;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .header-subtitle {
+      color: #64748b;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .admin-badge {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .search-section {
+      margin-bottom: 30px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 14px 20px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+      transition: all .2s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn {
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all .2s ease;
+      font-size: 16px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: #3b82f6;
+      border: 2px solid #3b82f6;
+    }
+
+    .btn-secondary:hover {
+      background: #f8f9fa;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: #fff;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: #3b82f6;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .users-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .users-table thead {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: #fff;
+    }
+
+    .users-table th {
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .users-table td {
+      padding: 16px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+    }
+
+    .users-table tbody tr {
+      transition: background .2s ease;
+    }
+
+    .users-table tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-inactive {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 13px;
+      border-radius: 6px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-dialog {
+      background: #fff;
+      border-radius: 16px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+      padding: 24px;
+      border-bottom: 2px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: #fff;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      font-size: 28px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s ease;
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .detail-item:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      font-weight: 600;
+      color: #64748b;
+      font-size: 14px;
+    }
+
+    .detail-value {
+      color: #0f172a;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .spinner {
+      margin: 30px auto;
+      width: 50px;
+      height: 50px;
+      border: 4px solid #e2e8f0;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-message {
+      text-align: center;
+      padding: 40px;
+      color: #64748b;
+    }
+
+    .error-message {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      border: 2px solid #ef4444;
+      border-radius: 12px;
+      padding: 20px;
+      color: #991b1b;
+      font-weight: 600;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .success-message {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      border: 2px solid #10b981;
+      border-radius: 12px;
+      padding: 20px;
+      color: #065f46;
+      font-weight: 600;
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    .warning-box {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 16px 0;
+      color: #92400e;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .admin-container {
+        padding: 20px;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 16px;
+      }
+
+      .header-content {
+        width: 100%;
+      }
+
+      .search-section {
+        flex-direction: column;
+      }
+
+      .search-input {
+        width: 100%;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .users-table {
+        font-size: 12px;
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .users-table thead {
+        display: none;
+      }
+
+      .users-table,
+      .users-table tbody,
+      .users-table tr,
+      .users-table td {
+        display: block;
+        width: 100%;
+      }
+
+      .users-table tr {
+        margin-bottom: 20px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 16px;
+        background: #fff;
+      }
+
+      .users-table td {
+        padding: 8px 0;
+        border: none;
+        text-align: left;
+        position: relative;
+        padding-left: 50%;
+      }
+
+      .users-table td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 45%;
+        padding-right: 10px;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        font-size: 11px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .btn-small {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .stat-card {
+        padding: 20px;
+      }
+
+      .modal-dialog {
+        max-width: 95%;
+        margin: 10px;
+      }
+
+      .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      .detail-value {
+        text-align: left;
+        width: 100%;
+      }
+
+      /* Auth screen mobile */
+      .auth-box {
+        padding: 32px 24px;
+        width: 95%;
+      }
+
+      .auth-title {
+        font-size: 24px;
+      }
+
+      .auth-subtitle {
+        font-size: 14px;
+      }
+
+      .auth-input {
+        font-size: 16px;
+        padding: 14px 16px;
+      }
+
+      .auth-btn {
+        font-size: 16px;
+        padding: 14px 20px;
+      }
+    }
+
+    /* Tablet Styles (768px - 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      body {
+        padding: 16px;
+      }
+
+      .admin-container {
+        padding: 32px;
+      }
+
+      .header h1 {
+        font-size: 28px;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .search-section {
+        gap: 10px;
+      }
+
+      .users-table {
+        font-size: 13px;
+      }
+
+      .users-table th,
+      .users-table td {
+        padding: 14px 12px;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        font-size: 15px;
+      }
+
+      .modal-dialog {
+        max-width: 90%;
+      }
+
+      /* Auth screen tablet */
+      .auth-box {
+        padding: 40px;
+        max-width: 500px;
+      }
+    }
+
+    /* Small Mobile (320px - 480px) */
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+
+      .admin-container {
+        padding: 16px;
+        border-radius: 12px;
+      }
+
+      .header h1 {
+        font-size: 22px;
+      }
+
+      .header-subtitle {
+        font-size: 13px;
+      }
+
+      .admin-badge {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+
+      .stat-value {
+        font-size: 28px;
+      }
+
+      .stat-label {
+        font-size: 12px;
+      }
+
+      .search-input {
+        padding: 12px 16px;
+        font-size: 14px;
+      }
+
+      .btn {
+        padding: 12px 20px;
+        font-size: 14px;
+      }
+
+      .users-table tr {
+        padding: 12px;
+        margin-bottom: 16px;
+      }
+
+      .users-table td {
+        font-size: 13px;
+        padding: 6px 0;
+        padding-left: 45%;
+      }
+
+      .users-table td:before {
+        font-size: 10px;
+        width: 40%;
+      }
+
+      .status-badge {
+        font-size: 10px;
+        padding: 3px 10px;
+      }
+
+      .modal-dialog {
+        max-width: 100%;
+        margin: 0;
+        border-radius: 0;
+        max-height: 100vh;
+      }
+
+      .modal-header h3 {
+        font-size: 20px;
+      }
+
+      .modal-close {
+        width: 36px;
+        height: 36px;
+        font-size: 24px;
+      }
+
+      .detail-item {
+        padding: 12px;
+      }
+
+      /* Auth screen small mobile */
+      .auth-box {
+        width: 95%;
+        margin: 10px;
+        padding: 32px 24px;
+      }
+
+      .auth-logo {
+        font-size: 48px;
+        margin-bottom: 16px;
+      }
+
+      .auth-title {
+        font-size: 22px;
+        margin-bottom: 8px;
+      }
+
+      .auth-subtitle {
+        font-size: 14px;
+        margin-bottom: 24px;
+      }
+
+      .auth-input {
+        font-size: 16px;
+        padding: 14px 16px;
+        letter-spacing: 2px;
+      }
+
+      .auth-btn {
+        font-size: 16px;
+        padding: 14px 20px;
+      }
+
+      .auth-hint {
+        padding: 12px;
+        margin-top: 20px;
+      }
+
+      .auth-hint-title {
+        font-size: 13px;
+      }
+
+      .auth-hint-text {
+        font-size: 12px;
+      }
+    }
+
+    /* Landscape Mobile (orientation) */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .auth-screen {
+        padding: 10px;
+        align-items: flex-start;
+        overflow-y: auto;
+      }
+
+      .auth-box {
+        margin: 20px auto;
+        padding: 20px;
+      }
+
+      .auth-logo {
+        font-size: 36px;
+        margin-bottom: 12px;
+      }
+
+      .auth-title {
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
+
+      .auth-subtitle {
+        font-size: 12px;
+        margin-bottom: 16px;
+      }
+
+      .auth-hint {
+        margin-top: 12px;
+        padding: 10px;
+      }
+    }
+
+    /* Touch device improvements */
+    @media (pointer: coarse) {
+      .btn,
+      .btn-small,
+      .action-buttons button {
+        min-height: 44px;
+        padding: 14px 20px;
+      }
+
+      .search-input,
+      .auth-input {
+        min-height: 48px;
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+
+      .modal-close {
+        min-width: 44px;
+        min-height: 44px;
+      }
+    }
+    }
+    /* Auth Screen Styles */
+    .auth-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .auth-screen.hidden {
+      display: none;
+    }
+
+    .auth-box {
+      background: #fff;
+      border-radius: 20px;
+      padding: 48px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      border: 1px solid #f1f5f9;
+      position: relative;
+      overflow: hidden;
+      margin: auto;
+    }
+
+    .auth-logo {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+
+    .auth-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 12px;
+    }
+
+    .auth-subtitle {
+      color: #64748b;
+      font-size: 16px;
+      margin-bottom: 32px;
+    }
+
+    .auth-input {
+      width: 100%;
+      padding: 16px 20px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 18px;
+      font-family: 'Inter', sans-serif;
+      text-align: center;
+      letter-spacing: 4px;
+      font-weight: 600;
+      transition: all .2s ease;
+      margin-bottom: 20px;
+      color: #0f172a;
+    }
+
+    .auth-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .auth-input::placeholder {
+      letter-spacing: normal;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .auth-input.error {
+      border-color: #ef4444;
+      animation: shake 0.4s;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+
+    .auth-error {
+      background: #fee2e2;
+      border: 2px solid #ef4444;
+      border-radius: 8px;
+      padding: 12px;
+      color: #991b1b;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .auth-error.show {
+      display: block;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .auth-btn {
+      width: 100%;
+      padding: 16px 28px;
+      border-radius: 12px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all .2s ease;
+      font-size: 18px;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: #fff;
+    }
+
+    .auth-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+    }
+
+    .auth-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .auth-hint {
+      margin-top: 24px;
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .auth-hint-title {
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .auth-hint-text {
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .attempts-warning {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      border-radius: 8px;
+      padding: 12px;
+      color: #92400e;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .attempts-warning.show {
+      display: block;
+      animation: fadeIn 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <!-- Authentication Screen -->
+  <div class="auth-screen" id="authScreen">
+    <div class="auth-box">
+      <div class="auth-logo">🛡️</div>
+      <h1 class="auth-title">Admin Access</h1>
+      <p class="auth-subtitle">Enter your admin code to continue</p>
+      
+      <div class="auth-error" id="authError">
+        ❌ Incorrect code. Please try again.
+      </div>
+
+      <div class="attempts-warning" id="attemptsWarning">
+        ⚠️ <span id="attemptsText"></span>
+      </div>
+      
+      <form id="authForm" onsubmit="validateAdminCode(event)">
+        <input 
+          type="password" 
+          id="adminCodeInput" 
+          class="auth-input" 
+          placeholder="ENTER CODE"
+          maxlength="20"
+          autocomplete="off"
+          required
+        >
+        
+        <button type="submit" class="auth-btn" id="authSubmitBtn">
+          🔓 Unlock Admin Panel
+        </button>
+      </form>
+
+      <div class="auth-hint">
+        <div class="auth-hint-title">🔐 Security Note</div>
+        <div class="auth-hint-text">
+          This is a protected area. Only authorised Markeb Media administrators with the correct access code can proceed.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Admin Panel (Hidden Until Authenticated) -->
+  <div class="admin-container" id="adminContainer" style="display: none;">
+    <div class="header">
+      <div class="header-content">
+        <h1>🛡️ Admin Panel</h1>
+        <p class="header-subtitle">Manage client accounts and view account details</p>
+      </div>
+      <div class="admin-badge">⚠️ ADMIN ACCESS</div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="stat-value" id="totalUsers">-</div>
+        <div class="stat-label">Total Users</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="activeUsers">-</div>
+        <div class="stat-label">Active Users</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="newThisMonth">-</div>
+        <div class="stat-label">New This Month</div>
+      </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section">
+      <input 
+        type="text" 
+        id="searchInput" 
+        class="search-input" 
+        placeholder="Search by name, email, or company..."
+      >
+      <button class="btn btn-primary" onclick="loadAllUsers()">🔍 Search</button>
+      <button class="btn btn-secondary" onclick="loadAllUsers()">🔄 Refresh</button>
+    </div>
+
+    <!-- Users Table -->
+    <div id="usersContainer">
+      <div class="loading-message">
+        <div class="spinner"></div>
+        <p>Loading user accounts...</p>
+      </div>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div class="modal" id="userModal" onclick="closeModal()">
+      <div class="modal-dialog" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3 id="modalTitle">User Details</h3>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody">
+          <!-- User details will be populated here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== ADMIN AUTHENTICATION =====
+    const ADMIN_CODE = 'MARKEB2546'; // Admin access code
+    const MAX_ATTEMPTS = 5;
+    let attemptCount = 0;
+
+    // Check if already authenticated
+    function checkAuth() {
+      const isAuthenticated = sessionStorage.getItem('admin_authenticated');
+      if (isAuthenticated === 'true') {
+        showAdminPanel();
+      }
+    }
+
+    function validateAdminCode(event) {
+      event.preventDefault();
+      
+      const input = document.getElementById('adminCodeInput');
+      const code = input.value.trim().toUpperCase();
+      const errorEl = document.getElementById('authError');
+      const warningEl = document.getElementById('attemptsWarning');
+      const attemptsText = document.getElementById('attemptsText');
+      const submitBtn = document.getElementById('authSubmitBtn');
+
+      if (code === ADMIN_CODE) {
+        // Correct code - grant access
+        sessionStorage.setItem('admin_authenticated', 'true');
+        sessionStorage.setItem('admin_login_time', Date.now());
+        
+        // Smooth transition
+        document.getElementById('authScreen').style.transition = 'opacity 0.3s ease';
+        document.getElementById('authScreen').style.opacity = '0';
+        
+        setTimeout(() => {
+          showAdminPanel();
+        }, 300);
+        
+      } else {
+        // Incorrect code - track attempts
+        attemptCount++;
+        
+        // Show error
+        errorEl.classList.add('show');
+        input.classList.add('error');
+        input.value = '';
+        
+        // Remove error styling after animation
+        setTimeout(() => {
+          input.classList.remove('error');
+        }, 400);
+
+        // Show attempts warning
+        const remainingAttempts = MAX_ATTEMPTS - attemptCount;
+        if (remainingAttempts > 0 && remainingAttempts <= 3) {
+          attemptsText.textContent = `${remainingAttempts} attempt${remainingAttempts !== 1 ? 's' : ''} remaining`;
+          warningEl.classList.add('show');
+        }
+
+        // Lock out after max attempts
+        if (attemptCount >= MAX_ATTEMPTS) {
+          input.disabled = true;
+          submitBtn.disabled = true;
+          errorEl.textContent = '🚫 Too many failed attempts. Access denied for 15 minutes.';
+          
+          // Lock for 15 minutes
+          setTimeout(() => {
+            attemptCount = 0;
+            input.disabled = false;
+            submitBtn.disabled = false;
+            errorEl.classList.remove('show');
+            warningEl.classList.remove('show');
+            errorEl.textContent = '❌ Incorrect code. Please try again.';
+          }, 15 * 60 * 1000); // 15 minutes
+        }
+      }
+    }
+
+    function showAdminPanel() {
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('adminContainer').style.display = 'block';
+      loadAllUsers();
+    }
+
+    // Run auth check on load
+    checkAuth();
+
+    // ===== MAIN ADMIN PANEL CODE =====
+    const API_ENDPOINT = '/.netlify/functions/auth';
+
+    let allUsers = [];
+
+    // Load all users on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAllUsers();
+    });
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      filterUsers(e.target.value);
+    });
+
+    async function loadAllUsers() {
+      const container = document.getElementById('usersContainer');
+      container.innerHTML = `
+        <div class="loading-message">
+          <div class="spinner"></div>
+          <p>Loading user accounts...</p>
+        </div>
+      `;
+
+      try {
+        // We'll need to create a new admin endpoint that returns all users
+        // For now, we'll show instructions
+        const response = await fetch('/.netlify/functions/admin-users', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load users');
+        }
+
+        const data = await response.json();
+        allUsers = data.users || [];
+
+        updateStats(allUsers);
+        displayUsers(allUsers);
+
+      } catch (error) {
+        console.error('Error loading users:', error);
+        container.innerHTML = `
+          <div class="error-message">
+            ❌ Failed to load users. Please ensure the admin-users function is deployed.
+            <br><br>
+            <button class="btn btn-primary" onclick="loadAllUsers()">Try Again</button>
+          </div>
+        `;
+      }
+    }
+
+    function updateStats(users) {
+      const totalUsers = users.length;
+      const activeUsers = users.filter(u => u.fields['Account Status'] === 'Active').length;
+      
+      // Calculate new users this month
+      const now = new Date();
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const newThisMonth = users.filter(u => {
+        const created = new Date(u.fields['Created Date']);
+        return created >= firstDayOfMonth;
+      }).length;
+
+      document.getElementById('totalUsers').textContent = totalUsers;
+      document.getElementById('activeUsers').textContent = activeUsers;
+      document.getElementById('newThisMonth').textContent = newThisMonth;
+    }
+
+    function displayUsers(users) {
+      const container = document.getElementById('usersContainer');
+      
+      if (users.length === 0) {
+        container.innerHTML = '<div class="loading-message"><p>No users found</p></div>';
+        return;
+      }
+
+      const tableHTML = `
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Company</th>
+              <th>Created</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${users.map(user => `
+              <tr>
+                <td data-label="Name"><strong>${escapeHtml(user.fields['Name'] || 'N/A')}</strong></td>
+                <td data-label="Email">${escapeHtml(user.fields['Email'] || 'N/A')}</td>
+                <td data-label="Company">${escapeHtml(user.fields['Company'] || 'N/A')}</td>
+                <td data-label="Created">${formatDate(user.fields['Created Date'])}</td>
+                <td data-label="Status">
+                  <span class="status-badge ${user.fields['Account Status'] === 'Active' ? 'status-active' : 'status-inactive'}">
+                    ${user.fields['Account Status'] || 'Unknown'}
+                  </span>
+                </td>
+                <td data-label="Actions">
+                  <div class="action-buttons">
+                    <button class="btn btn-primary btn-small" onclick='viewUserDetails(${JSON.stringify(user)})'>
+                      👁️ View
+                    </button>
+                    <button class="btn btn-secondary btn-small" onclick='impersonateUser("${user.fields['Email']}")'>
+                      🔑 Login As
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+
+      container.innerHTML = tableHTML;
+    }
+
+    function filterUsers(searchTerm) {
+      if (!searchTerm) {
+        displayUsers(allUsers);
+        return;
+      }
+
+      const term = searchTerm.toLowerCase();
+      const filtered = allUsers.filter(user => {
+        const name = (user.fields['Name'] || '').toLowerCase();
+        const email = (user.fields['Email'] || '').toLowerCase();
+        const company = (user.fields['Company'] || '').toLowerCase();
+        
+        return name.includes(term) || email.includes(term) || company.includes(term);
+      });
+
+      displayUsers(filtered);
+    }
+
+    function viewUserDetails(user) {
+      const modal = document.getElementById('userModal');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalBody = document.getElementById('modalBody');
+
+      modalTitle.textContent = `${user.fields['Name']} - Account Details`;
+
+      modalBody.innerHTML = `
+        <div class="warning-box">
+          ⚠️ <strong>Security Note:</strong> Passwords are hashed and cannot be viewed for security reasons.
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">👤 Full Name</span>
+          <span class="detail-value">${escapeHtml(user.fields['Name'] || 'N/A')}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">📧 Email Address</span>
+          <span class="detail-value">${escapeHtml(user.fields['Email'] || 'N/A')}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">🏢 Company</span>
+          <span class="detail-value">${escapeHtml(user.fields['Company'] || 'N/A')}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">📅 Account Created</span>
+          <span class="detail-value">${formatDate(user.fields['Created Date'])}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">✅ Account Status</span>
+          <span class="detail-value">
+            <span class="status-badge ${user.fields['Account Status'] === 'Active' ? 'status-active' : 'status-inactive'}">
+              ${user.fields['Account Status'] || 'Unknown'}
+            </span>
+          </span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">🔐 Password</span>
+          <span class="detail-value" style="color: #64748b; font-style: italic;">Encrypted (not visible)</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">🆔 Record ID</span>
+          <span class="detail-value" style="font-family: monospace; font-size: 12px;">${user.id}</span>
+        </div>
+
+        <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
+          <button class="btn btn-primary" style="width: 100%;" onclick='impersonateUser("${user.fields['Email']}")'>
+            🔑 Login as ${user.fields['Name']}
+          </button>
+        </div>
+      `;
+
+      modal.classList.add('active');
+    }
+
+    function impersonateUser(email) {
+      if (!email) {
+        alert('Email address is required');
+        return;
+      }
+
+      // Find the full user data
+      const user = allUsers.find(u => u.fields['Email'] === email);
+      if (!user) {
+        alert('User data not found');
+        return;
+      }
+
+      if (confirm(`Are you sure you want to login as ${email}?\n\nThis will open their dashboard in a new tab with FULL access to their account.`)) {
+        // Create a temporary session token for this user with ALL their data
+        const sessionData = {
+          email: email,
+          name: user.fields['Name'] || 'Client',
+          company: user.fields['Company'] || '',
+          timestamp: Date.now(),
+          expires: Date.now() + (24 * 60 * 60 * 1000),
+          adminImpersonation: true
+        };
+
+        const token = btoa(JSON.stringify(sessionData));
+        
+        // Store complete user session
+        localStorage.setItem('auth_token', token);
+        localStorage.setItem('user_email', email);
+        localStorage.setItem('user_name', user.fields['Name'] || 'Client');
+        localStorage.setItem('user_company', user.fields['Company'] || '');
+
+        // Open dashboard in new tab
+        window.open('./dashboard.html', '_blank');
+        
+        alert(`✅ Logged in as ${user.fields['Name']}\n\nOpening their dashboard now...`);
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('userModal').classList.remove('active');
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
