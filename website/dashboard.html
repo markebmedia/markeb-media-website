@@ -2111,8 +2111,13 @@ Any media produced remains the property of Markeb Media until full payment has b
     }
 
     async function loadDashboardData(){
-      const user=window.AirtableAPI.getCurrentUser();
-      if(!user?.email) return;
+  // Check if admin impersonation - use localStorage email
+  const isAdminSession = localStorage.getItem('admin_impersonation') === 'true';
+  const user = isAdminSession 
+    ? { email: localStorage.getItem('user_email') }
+    : window.AirtableAPI.getCurrentUser();
+    
+  if(!user?.email) return;
 
       const list=document.getElementById('activityList');
       list.innerHTML=`<div class="activity-item"><div class="activity-icon">+</div><div class="activity-content"><div class="activity-title">Signed in</div><div class="activity-time">${new Date().toLocaleString('en-GB')}</div></div></div>`;
@@ -2479,7 +2484,11 @@ let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
 
 async function loadContentCalendar() {
-  const user = window.AirtableAPI?.getCurrentUser?.();
+  const isAdminSession = localStorage.getItem('admin_impersonation') === 'true';
+  const user = isAdminSession 
+    ? { email: localStorage.getItem('user_email') }
+    : window.AirtableAPI?.getCurrentUser?.();
+    
   if (!user?.email) {
     showCalendarError('Please log in to view your content calendar');
     return;
@@ -2845,7 +2854,7 @@ function contactSocialMedia() {
       setDashboardGreeting();
       loadDashboardData();
     });
-    
+
     function logoutAll(){
       if(window.AirtableAPI?.logoutUser){ AirtableAPI.logoutUser(); }
       else{ localStorage.clear(); window.location.href='../login.html'; }
