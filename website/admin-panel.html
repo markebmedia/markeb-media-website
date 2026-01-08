@@ -9,13 +9,16 @@
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    
     body { 
-      font-family: 'Inter', sans-serif; 
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #1e293b; 
-      line-height: 1.6;
+      font-family: 'Poppins', sans-serif;
+      background: #FFFFFF;
       min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 20px;
+      color: #1e293b;
     }
 
     .admin-container {
@@ -737,37 +740,52 @@
     }
     /* Auth Screen Styles */
     .auth-screen {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 10000;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
       overflow: hidden;
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+      border: 1px solid #f1f5f9;
     }
 
     .auth-screen.hidden {
       display: none;
     }
 
+    .auth-content {
+      padding: 48px 30px 30px;
+      text-align: center;
+    }
+
+    .auth-logo {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+
+    .auth-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 12px;
+    }
+
+    .auth-subtitle {
+      color: #64748b;
+      font-size: 16px;
+      margin-bottom: 32px;
+    }
+
     .auth-box {
       background: white;
       border-radius: 20px;
       box-shadow: 0 20px 60px rgba(31, 46, 60, 0.15);
-      overflow: hidden;
       width: 100%;
       max-width: 400px;
-      position: relative;
       border: 1px solid #f1f5f9;
       padding: 48px;
       text-align: center;
-      flex-shrink: 0;
     }
 
     .auth-logo {
@@ -913,7 +931,7 @@
 <body>
   <!-- Authentication Screen -->
   <div class="auth-screen" id="authScreen">
-    <div class="auth-box">
+    <div class="auth-content">
       <div class="auth-logo">🛡️</div>
       <h1 class="auth-title">Admin Access</h1>
       <p class="auth-subtitle">Enter your admin code to continue</p>
@@ -1089,6 +1107,8 @@
     }
 
     function showAdminPanel() {
+      document.body.style.display = 'block';
+      document.body.style.padding = '20px';
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('adminContainer').style.display = 'block';
       loadAllUsers();
@@ -1314,7 +1334,7 @@
       }
 
       if (confirm(`Are you sure you want to login as ${email}?\n\nThis will open their dashboard in a new tab with FULL access to their account.`)) {
-        // Create a temporary session token for this user with ALL their data
+        // Create a session that AirtableAPI will recognize
         const sessionData = {
           email: email,
           name: user.fields['Name'] || 'Client',
@@ -1326,14 +1346,14 @@
 
         const token = btoa(JSON.stringify(sessionData));
         
-        // Store complete user session
-        localStorage.setItem('auth_token', token);
-        localStorage.setItem('user_email', email);
-        localStorage.setItem('user_name', user.fields['Name'] || 'Client');
-        localStorage.setItem('user_company', user.fields['Company'] || '');
-
-        // Open dashboard in new tab
-        window.open('/website/dashboard.html', '_blank');
+        // Store in the NEW tab's storage (not current tab)
+        // We'll use a URL parameter to trigger storage in the new tab
+        const dashboardUrl = '/website/dashboard.html?admin_session=' + encodeURIComponent(token) + 
+                            '&admin_email=' + encodeURIComponent(email) +
+                            '&admin_name=' + encodeURIComponent(user.fields['Name'] || 'Client') +
+                            '&admin_company=' + encodeURIComponent(user.fields['Company'] || '');
+        
+        window.open(dashboardUrl, '_blank');
         
         alert(`✅ Logged in as ${user.fields['Name']}\n\nOpening their dashboard now...`);
       }

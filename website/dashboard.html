@@ -6,6 +6,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Portal - Markeb Media</title>
 
+  <script>
+// Admin Session Handler
+(function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const adminSession = urlParams.get('admin_session');
+  const adminEmail = urlParams.get('admin_email');
+  const adminName = urlParams.get('admin_name');
+  const adminCompany = urlParams.get('admin_company');
+
+  if (adminSession && adminEmail) {
+    localStorage.setItem('auth_token', adminSession);
+    localStorage.setItem('user_email', adminEmail);
+    if (adminName) localStorage.setItem('user_name', adminName);
+    if (adminCompany) localStorage.setItem('user_company', adminCompany);
+    
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+    
+    console.log('✅ Admin impersonation active for:', adminEmail);
+  }
+})();
+</script>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
