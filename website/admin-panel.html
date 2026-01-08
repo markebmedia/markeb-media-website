@@ -737,18 +737,19 @@
     }
     /* Auth Screen Styles */
     .auth-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
       z-index: 10000;
-      padding: 20px;
-      overflow-y: auto;
+      overflow: hidden;
     }
 
     .auth-screen.hidden {
@@ -756,17 +757,17 @@
     }
 
     .auth-box {
-      background: #fff;
+      background: white;
       border-radius: 20px;
-      padding: 48px;
-      max-width: 480px;
-      width: 100%;
-      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
-      text-align: center;
-      border: 1px solid #f1f5f9;
-      position: relative;
+      box-shadow: 0 20px 60px rgba(31, 46, 60, 0.15);
       overflow: hidden;
-      margin: auto;
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+      border: 1px solid #f1f5f9;
+      padding: 48px;
+      text-align: center;
+      flex-shrink: 0;
     }
 
     .auth-logo {
@@ -1332,7 +1333,7 @@
         localStorage.setItem('user_company', user.fields['Company'] || '');
 
         // Open dashboard in new tab
-        window.open('./dashboard.html', '_blank');
+        window.open('/website/dashboard.html', '_blank');
         
         alert(`✅ Logged in as ${user.fields['Name']}\n\nOpening their dashboard now...`);
       }
