@@ -20,12 +20,13 @@
     localStorage.setItem('user_email', adminEmail);
     if (adminName) localStorage.setItem('user_name', adminName);
     if (adminCompany) localStorage.setItem('user_company', adminCompany);
-    
+    localStorage.setItem('admin_impersonation', 'true'); // ← ADD THIS LINE
+
     const cleanUrl = window.location.origin + window.location.pathname;
     window.history.replaceState({}, document.title, cleanUrl);
     
-    console.log('✅ Admin impersonation active for:', adminEmail);
-  }
+    console.log('✅ Admin impersonation session activated for:', adminEmail);
+}
 })();
 </script>
 
@@ -2826,8 +2827,16 @@ function contactSocialMedia() {
 
     /* boot */
     document.addEventListener('DOMContentLoaded', async ()=>{
-      const ok=await window.AirtableAPI.requireAuthentication();
-      if(!ok) return;
+      // Check if this is an admin impersonation session
+      const isAdminSession = localStorage.getItem('admin_impersonation') === 'true';
+      
+      if (!isAdminSession) {
+        // Normal users must authenticate
+        const ok = await window.AirtableAPI.requireAuthentication();
+        if(!ok) return;
+      } else {
+        console.log('🔓 Admin impersonation - bypassing authentication');
+      }
 
       const u=window.AirtableAPI.getCurrentUser();
       if(u){ localStorage.setItem('user_email',u.email||''); if(u.name) localStorage.setItem('user_name',u.name); }
@@ -2836,7 +2845,7 @@ function contactSocialMedia() {
       setDashboardGreeting();
       loadDashboardData();
     });
-
+    
     function logoutAll(){
       if(window.AirtableAPI?.logoutUser){ AirtableAPI.logoutUser(); }
       else{ localStorage.clear(); window.location.href='../login.html'; }
