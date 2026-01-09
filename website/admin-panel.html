@@ -1407,32 +1407,51 @@ async function redeemPoints(email, name) {
     alert('Email address is required');
     return;
   }
-  // Find the user to get current points
+  
   const user = allUsers.find(u => u.fields['Email'] === email);
   if (!user) {
     alert('User data not found');
     return;
   }
+  
   try {
-    // Calculate current points from Acuity
+    // Get booking points from Acuity
     const acuityResponse = await fetch('/.netlify/functions/acuity-data', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userEmail: email })
     });
+    
     if (!acuityResponse.ok) {
       throw new Error('Failed to fetch Acuity data');
     }
+
     const acuityData = await acuityResponse.json();
-    const currentPoints = Math.floor(acuityData.totalInvestment ?? 0);
+    const bookingPoints = Math.floor(acuityData.totalInvestment ?? 0);
+    
+    // Get manual points from Airtable
+    const manualPointsResponse = await fetch('/.netlify/functions/get-manual-points', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail: email })
+    });
+    
+    const manualPointsData = await manualPointsResponse.json();
+    const manualPoints = manualPointsData?.manualPoints || 0;
+    
+    // Calculate total points
+    const currentPoints = bookingPoints + manualPoints;
     const pointsValue = (currentPoints / 100).toFixed(2);
+
     if (currentPoints === 0) {
       alert(`${name} has no points to redeem.`);
       return;
     }
-    if (!confirm(`Redeem points for ${name}?\n\nCurrent Points: ${currentPoints} pts (£${pointsValue})\n\nThis will:\n• Record their redeemed points\n• Reset their points counter to 0\n• Future bookings will start earning fresh points\n\nContinue?`)) {
+
+    if (!confirm(`Redeem points for ${name}?\n\nTotal Points: ${currentPoints} pts (£${pointsValue})\n  • Booking Points: ${bookingPoints}\n  • Manual Points: ${manualPoints}\n\nThis will:\n• Record their redeemed points\n• Reset their points counter to 0\n• Future bookings will start earning fresh points\n\nContinue?`)) {
       return;
     }
+
     // Call the redemption endpoint
     const response = await fetch('/.netlify/functions/redeem-points', {
       method: 'POST',
@@ -1443,14 +1462,19 @@ async function redeemPoints(email, name) {
         redeemedValue: pointsValue
       })
     });
+
     if (!response.ok) {
       throw new Error('Failed to redeem points');
     }
+
     const result = await response.json();
+    
     alert(`✅ Points redeemed successfully!\n\n${name} redeemed ${currentPoints} points (£${pointsValue})\n\nTheir points counter has been reset.`);
+    
     // Refresh the user list and close modal
     loadAllUsers();
     closeModal();
+
   } catch (error) {
     console.error('Error redeeming points:', error);
     alert(`❌ Failed to redeem points: ${error.message}\n\nPlease try again.`);

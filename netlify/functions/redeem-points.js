@@ -19,7 +19,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // Find the user in Airtable
     const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_USERS_TABLE)}?filterByFormula={Email}="${userEmail}"`;
     
     const searchResponse = await fetch(searchUrl, {
@@ -41,7 +40,6 @@ exports.handler = async (event) => {
     const userRecord = searchData.records[0];
     const recordId = userRecord.id;
 
-    // Update the user record with redemption data
     const updateUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_USERS_TABLE)}/${recordId}`;
     
     const updateResponse = await fetch(updateUrl, {
@@ -52,6 +50,7 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({
         fields: {
+          'Manual Points': 0,
           'Last Points Redeemed': parseInt(redeemedPoints),
           'Last Points Value': parseFloat(redeemedValue),
           'Last Redemption Date': new Date().toISOString(),
