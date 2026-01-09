@@ -1310,11 +1310,33 @@
           <span class="detail-value" style="font-family: monospace; font-size: 12px;">${user.id}</span>
         </div>
 
-        <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
-          <button class="btn btn-primary" style="width: 100%;" onclick='impersonateUser("${user.fields['Email']}")'>
-            🔑 Login as ${user.fields['Name']}
-          </button>
-        </div>
+       <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
+  <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+    <button class="btn btn-danger" style="flex: 1;" onclick='redeemPoints("${user.fields['Email']}", "${user.fields['Name']}")'>
+      ⭐ Redeem Points
+    </button>
+    <button class="btn btn-primary" style="flex: 1;" onclick='impersonateUser("${user.fields['Email']}")'>
+      🔑 Login as ${user.fields['Name']}
+    </button>
+  </div>
+  
+  <div style="padding: 16px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px;">
+    <div style="font-weight: 600; color: #065f46; margin-bottom: 12px; font-size: 14px;">➕ Manually Add Points</div>
+    <div style="display: flex; gap: 8px; align-items: center;">
+      <input 
+        type="number" 
+        id="manualPoints-${user.id}" 
+        placeholder="Enter points amount" 
+        min="1"
+        style="flex: 1; padding: 10px 14px; border: 2px solid #10b981; border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif;"
+      >
+      <button class="btn btn-primary" style="white-space: nowrap;" onclick='addManualPoints("${user.fields['Email']}", "${user.fields['Name']}", "${user.id}")'>
+        ➕ Add Points
+      </button>
+    </div>
+    <div style="font-size: 12px; color: #047857; margin-top: 8px;">Use this to add bonus/promotional points to the account</div>
+  </div>
+</div>
       `;
 
       modal.classList.add('active');
@@ -1379,6 +1401,97 @@
       div.textContent = text;
       return div.innerHTML;
     }
+
+async function redeemPoints(email, name) {
+  if (!email) {
+    alert('Email address is required');
+    return;
+  }
+  // Find the user to get current points
+  const user = allUsers.find(u => u.fields['Email'] === email);
+  if (!user) {
+    alert('User data not found');
+    return;
+  }
+  try {
+    // Calculate current points from Acuity
+    const acuityResponse = await fetch('/.netlify/functions/acuity-data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail: email })
+    });
+    if (!acuityResponse.ok) {
+      throw new Error('Failed to fetch Acuity data');
+    }
+    const acuityData = await acuityResponse.json();
+    const currentPoints = Math.floor(acuityData.totalInvestment ?? 0);
+    const pointsValue = (currentPoints / 100).toFixed(2);
+    if (currentPoints === 0) {
+      alert(`${name} has no points to redeem.`);
+      return;
+    }
+    if (!confirm(`Redeem points for ${name}?\n\nCurrent Points: ${currentPoints} pts (£${pointsValue})\n\nThis will:\n• Record their redeemed points\n• Reset their points counter to 0\n• Future bookings will start earning fresh points\n\nContinue?`)) {
+      return;
+    }
+    // Call the redemption endpoint
+    const response = await fetch('/.netlify/functions/redeem-points', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        userEmail: email,
+        redeemedPoints: currentPoints,
+        redeemedValue: pointsValue
+      })
+    });
+    if (!response.ok) {
+      throw new Error('Failed to redeem points');
+    }
+    const result = await response.json();
+    alert(`✅ Points redeemed successfully!\n\n${name} redeemed ${currentPoints} points (£${pointsValue})\n\nTheir points counter has been reset.`);
+    // Refresh the user list and close modal
+    loadAllUsers();
+    closeModal();
+  } catch (error) {
+    console.error('Error redeeming points:', error);
+    alert(`❌ Failed to redeem points: ${error.message}\n\nPlease try again.`);
+  }
+}
+
+async function addManualPoints(email, name, userId) {
+  const input = document.getElementById(`manualPoints-${userId}`);
+  const pointsToAdd = parseInt(input.value);
+  if (!pointsToAdd || pointsToAdd <= 0) {
+    alert('Please enter a valid points amount (greater than 0)');
+    return;
+  }
+  if (!confirm(`Add ${pointsToAdd} bonus points to ${name}?\n\nThis will be recorded as a manual adjustment and will increase their total points balance.`)) {
+    return;
+  }
+  try {
+    const response = await fetch('/.netlify/functions/add-manual-points', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        userEmail: email,
+        pointsToAdd: pointsToAdd,
+        addedBy: 'Admin',
+        reason: 'Manual adjustment'
+      })
+    });
+    if (!response.ok) {
+      throw new Error('Failed to add points');
+    }
+    const result = await response.json();
+    alert(`✅ Successfully added ${pointsToAdd} points to ${name}!\n\nNew total: ${result.newTotal} points`);
+    // Clear input and refresh
+    input.value = '';
+    loadAllUsers();
+    closeModal();
+  } catch (error) {
+    console.error('Error adding points:', error);
+    alert(`❌ Failed to add points: ${error.message}\n\nPlease try again.`);
+  }
+}
   </script>
 </body>
 </html>
