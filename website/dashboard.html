@@ -1524,29 +1524,34 @@
 
     <div class="content-area">
       <!-- DASHBOARD -->
-      <div id="dashboard" class="section active">
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <div class="metric-header"><div class="metric-icon">■</div></div>
-            <div class="metric-value" id="totalBookings">0</div>
-            <div class="metric-label">Total Bookings</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-header"><div class="metric-icon">£</div></div>
-            <div class="metric-value" id="totalSpending">£0</div>
-            <div class="metric-label">Total Investment</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-header"><div class="metric-icon">✓</div></div>
-            <div class="metric-value" id="completedProjects">0</div>
-            <div class="metric-label">Completed Projects</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-header"><div class="metric-icon">#</div></div>
-            <div class="metric-value" id="memberSince">—</div>
-            <div class="metric-label">Member Since</div>
-          </div>
-        </div>
+     <div id="dashboard" class="section active">
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-header"><div class="metric-icon">■</div></div>
+      <div class="metric-value" id="totalBookings">0</div>
+      <div class="metric-label">Total Bookings</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-header"><div class="metric-icon">£</div></div>
+      <div class="metric-value" id="totalSpending">£0</div>
+      <div class="metric-label">Total Investment</div>
+    </div>
+    <div class="metric-card" style="cursor: pointer;" onclick="toggleRewardDisplay()" onmouseenter="showRewardValue()" onmouseleave="showRewardPoints()">
+  <div class="metric-header"><div class="metric-icon">★</div></div>
+  <div class="metric-value" id="rewardPoints">0 pts</div>
+  <div class="metric-label">Reward Points</div>
+</div>
+    <div class="metric-card">
+      <div class="metric-header"><div class="metric-icon">✓</div></div>
+      <div class="metric-value" id="completedProjects">0</div>
+      <div class="metric-label">Completed Projects</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-header"><div class="metric-icon">#</div></div>
+      <div class="metric-value" id="memberSince">—</div>
+      <div class="metric-label">Member Since</div>
+    </div>
+  </div>
 
         <div class="content-grid">
           <div class="card">
@@ -1603,7 +1608,7 @@
         <div class="branding-promo">
           <div class="branding-promo-content">
             <div class="branding-promo-text">
-              <h2>NEW: Personal Branding Sessions</h2>
+              <h2>Personal Branding Sessions</h2>
               <p>Personal branding for estate agents. Professional photography and video content to elevate your presence.</p>
               
               <div class="branding-promo-features">
@@ -2027,24 +2032,59 @@ Any media produced remains the property of Markeb Media until full payment has b
     }
 
     /* === Metrics === */
-    async function loadAcuityMetrics(email){
-      try{
-        const data=await fetchJSON(NETLIFY_ENDPOINTS.acuity,{ userEmail: email });
-        document.getElementById('totalBookings').textContent=data.totalBookings ?? 0;
-        document.getElementById('totalSpending').textContent=fmtGBP(data.totalInvestment ?? 0);
+   let rewardPointsData = { points: 0, value: 0 };
+let showingValue = false;
 
-        const list=document.getElementById('activityList');
-        const appts=Array.isArray(data.appointments)?data.appointments.slice(0,5):[];
-        appts.forEach(a=>{
-          const when=a.datetime||a.time||a.date||'';
-          const title=a.type||a.calendar||'Appointment';
-          const row=document.createElement('div');
-          row.className='activity-item';
-          row.innerHTML=`<div class="activity-icon">■</div><div class="activity-content"><div class="activity-title">${title}</div><div class="activity-time">${when}</div></div>`;
-          list.appendChild(row);
-        });
-      }catch(e){console.warn('Acuity metrics error:',e.message);}
-    }
+function toggleRewardDisplay() {
+  showingValue = !showingValue;
+  const el = document.getElementById('rewardPoints');
+  if (showingValue) {
+    el.textContent = fmtGBP(rewardPointsData.value);
+  } else {
+    el.textContent = rewardPointsData.points.toLocaleString('en-GB') + ' pts';
+  }
+}
+
+function showRewardValue() {
+  if (!showingValue) {
+    document.getElementById('rewardPoints').textContent = fmtGBP(rewardPointsData.value);
+  }
+}
+
+function showRewardPoints() {
+  if (!showingValue) {
+    document.getElementById('rewardPoints').textContent = rewardPointsData.points.toLocaleString('en-GB') + ' pts';
+  }
+}
+
+async function loadAcuityMetrics(email){
+  try{
+    const data=await fetchJSON(NETLIFY_ENDPOINTS.acuity,{ userEmail: email });
+    document.getElementById('totalBookings').textContent=data.totalBookings ?? 0;
+    document.getElementById('totalSpending').textContent=fmtGBP(data.totalInvestment ?? 0);
+    
+    // Calculate points and their value
+    const points = Math.floor(data.totalInvestment ?? 0);
+    const pointsValue = points / 100;
+    
+    // Store for toggle functionality
+    rewardPointsData = { points: points, value: pointsValue };
+    
+    // Display points by default
+    document.getElementById('rewardPoints').textContent = points.toLocaleString('en-GB') + ' pts';
+
+    const list=document.getElementById('activityList');
+    const appts=Array.isArray(data.appointments)?data.appointments.slice(0,5):[];
+    appts.forEach(a=>{
+      const when=a.datetime||a.time||a.date||'';
+      const title=a.type||a.calendar||'Appointment';
+      const row=document.createElement('div');
+      row.className='activity-item';
+      row.innerHTML=`<div class="activity-icon">■</div><div class="activity-content"><div class="activity-title">${title}</div><div class="activity-time">${when}</div></div>`;
+      list.appendChild(row);
+    });
+  }catch(e){console.warn('Acuity metrics error:',e.message);}
+}
 
     async function loadAirtableProjectMetrics(email){
       try{
