@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
-const AIRTABLE_USERS_TABLE = process.env.AIRTABLE_USERS_TABLE || 'Users';
+const AIRTABLE_USERS_TABLE = process.env.AIRTABLE_USERS_TABLE || 'Markeb Media Users';
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -20,7 +20,7 @@ exports.handler = async (event) => {
     }
 
     // Find the user in Airtable
-    const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_USERS_TABLE}?filterByFormula={Email}="${userEmail}"`;
+    const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_USERS_TABLE)}?filterByFormula={Email}="${userEmail}"`;
     
     const searchResponse = await fetch(searchUrl, {
       headers: {
@@ -42,7 +42,7 @@ exports.handler = async (event) => {
     const recordId = userRecord.id;
 
     // Update the user record with redemption data
-    const updateUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_USERS_TABLE}/${recordId}`;
+    const updateUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_USERS_TABLE)}/${recordId}`;
     
     const updateResponse = await fetch(updateUrl, {
       method: 'PATCH',
