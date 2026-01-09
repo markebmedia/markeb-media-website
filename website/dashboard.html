@@ -2086,9 +2086,9 @@ async function loadAcuityMetrics(email){
     document.getElementById('totalBookings').textContent=data.totalBookings ?? 0;
     document.getElementById('totalSpending').textContent=fmtGBP(data.totalInvestment ?? 0);
     
-    // Get manual points from user record
-    const userData = await window.AirtableAPI.getUserData(email);
-    const manualPoints = userData?.userData?.['Manual Points'] || 0;
+    // Get manual points from new endpoint
+    const manualPointsData = await fetchJSON('/.netlify/functions/get-manual-points', { userEmail: email });
+    const manualPoints = manualPointsData?.manualPoints || 0;
     
     // Calculate points from bookings and add manual points
     const bookingPoints = Math.floor(data.totalInvestment ?? 0);
