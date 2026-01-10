@@ -740,7 +740,7 @@
   }
   
   .modal-header h3 {
-    font-size: 18px;
+    font-size: 16px;
   }
   
   .modal-close {
@@ -786,22 +786,43 @@
   .modal-body > div[style*="margin-top: 24px"] > div:first-of-type button {
     width: 100% !important;
     flex: none !important;
+    padding: 14px 20px !important;
+    font-size: 14px !important;
   }
   
-  /* Manual points section - stack vertically on mobile */
+  /* Manual points green box */
+  .modal-body > div[style*="background: #f0fdf4"] {
+    padding: 12px !important;
+  }
+  
+  /* Manual points input and button container - stack vertically */
   .modal-body > div[style*="background: #f0fdf4"] > div[style*="display: flex"] {
     flex-direction: column !important;
-    gap: 8px !important;
+    gap: 10px !important;
+    align-items: stretch !important;
   }
   
+  /* Manual points input field */
   .modal-body input[type="number"] {
     font-size: 16px !important;
-    padding: 12px !important;
+    padding: 14px !important;
     width: 100% !important;
+    border: 2px solid #10b981 !important;
+    border-radius: 8px !important;
   }
   
+  /* Add Points button */
   .modal-body > div[style*="background: #f0fdf4"] button {
     width: 100% !important;
+    padding: 14px 20px !important;
+    font-size: 14px !important;
+    white-space: normal !important;
+  }
+  
+  /* Helper text under input */
+  .modal-body > div[style*="background: #f0fdf4"] > div[style*="font-size: 12px"] {
+    font-size: 11px !important;
+    margin-top: 6px !important;
   }
 }
 
