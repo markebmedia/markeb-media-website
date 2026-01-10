@@ -1539,7 +1539,7 @@ async function redeemPoints(email, name) {
     const acuityData = await acuityResponse.json();
     const bookingPoints = Math.floor(acuityData.totalInvestment ?? 0);
     
-    // Get manual points from Airtable
+    // Get manual points AND baseline from Airtable
     const manualPointsResponse = await fetch('/.netlify/functions/get-manual-points', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1548,9 +1548,11 @@ async function redeemPoints(email, name) {
     
     const manualPointsData = await manualPointsResponse.json();
     const manualPoints = manualPointsData?.manualPoints || 0;
+    const lastRedemptionBaseline = manualPointsData?.lastRedemptionBaseline || 0;
     
-    // Calculate total points
-    const currentPoints = bookingPoints + manualPoints;
+    // Calculate NET booking points (subtract baseline) and total points
+    const netBookingPoints = Math.max(0, bookingPoints - lastRedemptionBaseline);
+    const currentPoints = netBookingPoints + manualPoints;
     const pointsValue = (currentPoints / 100).toFixed(2);
 
     if (currentPoints === 0) {
@@ -1559,7 +1561,7 @@ async function redeemPoints(email, name) {
     }
 
     // Ask how many points to redeem
-    const pointsToRedeem = prompt(`How many points would you like to redeem for ${name}?\n\nAvailable: ${currentPoints} pts (£${pointsValue})\n  • Booking Points: ${bookingPoints}\n  • Manual Points: ${manualPoints}\n\nEnter amount (or leave blank to redeem all):`);
+    const pointsToRedeem = prompt(`How many points would you like to redeem for ${name}?\n\nAvailable: ${currentPoints} pts (£${pointsValue})\n  • Net Booking Points: ${netBookingPoints}\n  • Manual Points: ${manualPoints}\n\nEnter amount (or leave blank to redeem all):`);
     
     if (pointsToRedeem === null) {
       return; // User cancelled
