@@ -2239,14 +2239,24 @@ function toggleDropdown() {
     dropdown.classList.remove('active');
     overlay.classList.remove('active');
   } else {
-    // Open dropdown - calculate position based on user card location
+    // Open dropdown - position based on screen size
     const rect = userInfo.getBoundingClientRect();
+    const isMobile = window.innerWidth <= 768;
     
     // Position dropdown 8px below the user card
     dropdown.style.top = (rect.bottom + 8) + 'px';
     
-    // Align right edge of dropdown with right edge of user card
-    dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+    if (isMobile) {
+      // Mobile: Center the dropdown
+      dropdown.style.left = '50%';
+      dropdown.style.right = 'auto';
+      dropdown.style.transform = 'translateX(-50%)';
+    } else {
+      // Desktop: Align right edge with user card right edge
+      dropdown.style.left = 'auto';
+      dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+      dropdown.style.transform = 'none';
+    }
     
     // Open dropdown
     dropdown.classList.add('active');
