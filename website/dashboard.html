@@ -106,6 +106,39 @@
 
   .header-right { display: flex; align-items: center; gap: 16px; }
 .user-info { display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border: 1px solid #bfdbfe; border-radius: 8px; }
+
+/* Hide user name and email on mobile - show only avatar */
+@media (max-width: 768px) {
+  .user-info {
+    padding: 8px;
+    min-width: 56px;
+    justify-content: center;
+  }
+  
+  .user-details {
+    display: none !important;
+  }
+  
+  .user-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-info {
+    padding: 6px;
+    min-width: 50px;
+  }
+  
+  .user-avatar {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+}
+
 .user-avatar { width: 40px; height: 40px; background: #3b82f6; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; }
 .user-details h4 { 
   font-family: 'Playfair Display', serif;
@@ -1659,28 +1692,56 @@
       <div class="nav-item" onclick="showSection('tracking')"><div class="nav-icon">▲</div>Content Tracking</div>
       <div class="nav-item" onclick="showSection('calendar')"><div class="nav-icon">□</div>Content Calendar</div>
       <div class="nav-item" onclick="showSection('amend')"><div class="nav-icon">△</div>Request Amendment</div>
-      <div class="nav-item" onclick="showSection('settings')"><div class="nav-icon">○</div>Settings</div>
       <div class="nav-item" onclick="contactSupport()"><div class="nav-icon">@</div>Support</div>
       <div class="nav-item" onclick="logoutAll()" style="margin-top: 40px; color: #ef4444;"><div class="nav-icon">←</div>Logout</div>
     </nav>
   </div>
 
   <div class="main-content">
-    <div class="header">
-      <div class="header-left">
-        <h1 class="page-title" id="pageTitle">Welcome back</h1>
-        <p class="page-subtitle" id="pageSubtitle">Here's what's happening with your projects</p>
+   <div class="header">
+  <div class="header-left">
+    <h1 class="page-title" id="pageTitle">Welcome back</h1>
+    <p class="page-subtitle" id="pageSubtitle">Here's what's happening with your projects</p>
+  </div>
+  <div class="header-right">
+    <div class="user-info" id="userInfoDropdown">
+      <div class="user-avatar" id="userAvatar">M</div>
+      <div class="user-details">
+        <h4 id="userName">Loading...</h4>
+        <p id="userEmail">Loading...</p>
       </div>
-      <div class="header-right">
-        <div class="user-info">
-          <div class="user-avatar" id="userAvatar">M</div>
-          <div class="user-details">
-            <h4 id="userName">Loading...</h4>
-            <p id="userEmail">Loading...</p>
-          </div>
+    </div>
+    
+    <!-- Dropdown Menu -->
+    <div class="dropdown-overlay" id="dropdownOverlay"></div>
+    <div class="user-dropdown" id="userDropdown">
+      <div class="dropdown-header">
+        <div class="dropdown-header-name" id="dropdownName">Loading...</div>
+        <div class="dropdown-header-email" id="dropdownEmail">Loading...</div>
+      </div>
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="showSection('settings'); toggleDropdown();">
+          <div class="dropdown-item-icon">○</div>
+          <span>Settings</span>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item" onclick="showSection('terms'); toggleDropdown();">
+          <div class="dropdown-item-icon">📄</div>
+          <span>Terms & Conditions</span>
+        </div>
+        <div class="dropdown-item" onclick="showSection('privacy'); toggleDropdown();">
+          <div class="dropdown-item-icon">🔒</div>
+          <span>Privacy Policy</span>
+        </div>
+        <div class="dropdown-divider"></div>
+        <div class="dropdown-item danger" onclick="logoutAll()">
+          <div class="dropdown-item-icon">←</div>
+          <span>Logout</span>
         </div>
       </div>
     </div>
+  </div>
+</div>
 
     <div class="content-area">
       <!-- DASHBOARD -->
@@ -2135,6 +2196,16 @@ Any media produced remains the property of Markeb Media until full payment has b
     clickedNav.classList.add('active');
   }
   
+  // ===== ADD THIS SECTION ===== 
+  // Close dropdown if open when navigating
+  const dropdown = document.getElementById('userDropdown');
+  const overlay = document.getElementById('dropdownOverlay');
+  if (dropdown && dropdown.classList.contains('active')) {
+    dropdown.classList.remove('active');
+    overlay.classList.remove('active');
+  }
+  // ===== END OF NEW CODE =====
+  
   window.scrollTo({top: 0, behavior: 'smooth'});
   
   if (id === 'calendar') {
@@ -2152,6 +2223,29 @@ Any media produced remains the property of Markeb Media until full payment has b
   window.location.href = "mailto:commercial@markebmedia.com?subject=Social%20Media%20Management%20Inquiry&body=Hi%20Markeb%20Media%20Team,%0D%0A%0D%0AI'm%20interested%20in%20learning%20more%20about%20your%20social%20media%20management%20services.%0D%0A%0D%0APlease%20send%20me%20more%20information.";
 }
 
+/* ===== USER DROPDOWN MENU TOGGLE ===== */
+function toggleDropdown() {
+  const dropdown = document.getElementById('userDropdown');
+  const overlay = document.getElementById('dropdownOverlay');
+  
+  if (!dropdown || !overlay) {
+    console.error('Dropdown elements not found');
+    return;
+  }
+  
+  const isActive = dropdown.classList.contains('active');
+  
+  if (isActive) {
+    // Close dropdown
+    dropdown.classList.remove('active');
+    overlay.classList.remove('active');
+  } else {
+    // Open dropdown
+    dropdown.classList.add('active');
+    overlay.classList.add('active');
+  }
+}
+
     /* Greeting */
     function setDashboardGreeting(){
       const titleEl=document.getElementById('pageTitle');
@@ -2162,16 +2256,29 @@ Any media produced remains the property of Markeb Media until full payment has b
       localStorage.removeItem('auth_action');
     }
 
-    /* Header user info */
-    function populateHeaderUser(){
-      const u = window.AirtableAPI?.getCurrentUser?.() || null;
-      const name = (u && u.name) || localStorage.getItem('user_name') || 'Markeb Client';
-      const email = (u && u.email) || localStorage.getItem('user_email') || 'client@markebmedia.com';
+    /* Header user info - populates both header and dropdown */
+function populateHeaderUser(){
+  const u = window.AirtableAPI?.getCurrentUser?.() || null;
+  const name = (u && u.name) || localStorage.getItem('user_name') || 'Markeb Client';
+  const email = (u && u.email) || localStorage.getItem('user_email') || 'client@markebmedia.com';
 
-      document.getElementById('userName').textContent = name;
-      document.getElementById('userEmail').textContent = email;
-      document.getElementById('userAvatar').textContent = (name?.[0] || 'M').toUpperCase();
-    }
+  // Update header display (visible on desktop, avatar only on mobile)
+  document.getElementById('userName').textContent = name;
+  document.getElementById('userEmail').textContent = email;
+  document.getElementById('userAvatar').textContent = (name?.[0] || 'M').toUpperCase();
+  
+  // Update dropdown header (shows full info when dropdown opens)
+  const dropdownName = document.getElementById('dropdownName');
+  const dropdownEmail = document.getElementById('dropdownEmail');
+  
+  if (dropdownName) {
+    dropdownName.textContent = name;
+  }
+  
+  if (dropdownEmail) {
+    dropdownEmail.textContent = email;
+  }
+}
 
     function saveProfile(){
       const name=document.getElementById('settingsName').value.trim();
@@ -3042,25 +3149,59 @@ function contactSocialMedia() {
 }
 
     /* boot */
-    document.addEventListener('DOMContentLoaded', async ()=>{
-      // Check if this is an admin impersonation session
-      const isAdminSession = localStorage.getItem('admin_impersonation') === 'true';
-      
-      if (!isAdminSession) {
-        // Normal users must authenticate
-        const ok = await window.AirtableAPI.requireAuthentication();
-        if(!ok) return;
-      } else {
-        console.log('🔓 Admin impersonation - bypassing authentication');
-      }
+document.addEventListener('DOMContentLoaded', async ()=>{
+  // Check if this is an admin impersonation session
+  const isAdminSession = localStorage.getItem('admin_impersonation') === 'true';
+  
+  if (!isAdminSession) {
+    // Normal users must authenticate
+    const ok = await window.AirtableAPI.requireAuthentication();
+    if(!ok) return;
+  } else {
+    console.log('🔓 Admin impersonation - bypassing authentication');
+  }
 
-      const u=window.AirtableAPI.getCurrentUser();
-      if(u){ localStorage.setItem('user_email',u.email||''); if(u.name) localStorage.setItem('user_name',u.name); }
+  const u=window.AirtableAPI.getCurrentUser();
+  if(u){ localStorage.setItem('user_email',u.email||''); if(u.name) localStorage.setItem('user_name',u.name); }
 
-      populateHeaderUser();
-      setDashboardGreeting();
-      loadDashboardData();
+  populateHeaderUser();
+  setDashboardGreeting();
+  loadDashboardData();
+  
+  /* Dropdown menu event listeners */
+  
+  // 1. Click overlay to close dropdown
+  const overlay = document.getElementById('dropdownOverlay');
+  if (overlay) {
+    overlay.addEventListener('click', function() {
+      toggleDropdown();
     });
+  }
+
+  // 2. Click user info/avatar to toggle dropdown
+  const userInfo = document.getElementById('userInfoDropdown');
+  if (userInfo) {
+    userInfo.addEventListener('click', function(e) {
+      e.stopPropagation(); // Prevent event from bubbling
+      toggleDropdown();
+    });
+  }
+
+  // 3. Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('userDropdown');
+    const userInfoEl = document.getElementById('userInfoDropdown');
+    
+    // If dropdown is open AND click was outside both dropdown and user info
+    if (dropdown && 
+        dropdown.classList.contains('active') && 
+        !dropdown.contains(e.target) && 
+        userInfoEl &&
+        !userInfoEl.contains(e.target)) {
+      toggleDropdown();
+    }
+  });
+});
 
     function logoutAll(){
       if(window.AirtableAPI?.logoutUser){ AirtableAPI.logoutUser(); }
