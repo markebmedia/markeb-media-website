@@ -2086,13 +2086,18 @@ async function loadAcuityMetrics(email){
     document.getElementById('totalBookings').textContent=data.totalBookings ?? 0;
     document.getElementById('totalSpending').textContent=fmtGBP(data.totalInvestment ?? 0);
     
+    // Get user data from Airtable (for baseline tracking)
+    const userData = await window.AirtableAPI.getUserData(email);
+    const lastRedemptionBaseline = userData?.userData?.['Last Redemption Total Investment'] || 0;
+    
     // Get manual points from new endpoint
     const manualPointsData = await fetchJSON('/.netlify/functions/get-manual-points', { userEmail: email });
     const manualPoints = manualPointsData?.manualPoints || 0;
     
-    // Calculate points from bookings and add manual points
+    // Calculate points from bookings (subtract baseline) and add manual points
     const bookingPoints = Math.floor(data.totalInvestment ?? 0);
-    const totalPoints = bookingPoints + manualPoints;
+    const netBookingPoints = Math.max(0, bookingPoints - lastRedemptionBaseline);
+    const totalPoints = netBookingPoints + manualPoints;
     const pointsValue = totalPoints / 100;
     
     // Store for toggle functionality
