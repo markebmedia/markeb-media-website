@@ -39,12 +39,14 @@ exports.handler = async (event) => {
 
     const userRecord = searchData.records[0];
     const manualPoints = userRecord.fields['Manual Points'] || 0;
+    const lastRedemptionBaseline = userRecord.fields['Last Redemption Total Investment'] || 0;
 
     return {
       statusCode: 200,
       body: JSON.stringify({ 
         success: true,
-        manualPoints: manualPoints
+        manualPoints: manualPoints,
+        lastRedemptionBaseline: lastRedemptionBaseline
       })
     };
 
