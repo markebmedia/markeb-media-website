@@ -717,6 +717,84 @@
       }
     }
 
+    /* Enhanced Modal Mobile Styles */
+@media (max-width: 480px) {
+  .modal {
+    padding: 0;
+    align-items: flex-start;
+  }
+
+  .modal-dialog {
+    max-width: 100%;
+    max-height: 100vh;
+    margin: 0;
+    border-radius: 0;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    padding: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .modal-header h3 {
+    font-size: 18px;
+  }
+
+  .modal-close {
+    width: 36px;
+    height: 36px;
+    font-size: 24px;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .detail-item {
+    padding: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .detail-label {
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .detail-value {
+    font-size: 14px;
+    text-align: left;
+    width: 100%;
+    word-break: break-word;
+  }
+
+  .warning-box {
+    padding: 12px;
+    font-size: 12px;
+  }
+
+  /* Top action buttons - full width on mobile */
+  .modal-body > div[style*="margin-top: 24px"] > div:first-of-type {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .modal-body > div[style*="margin-top: 24px"] > div:first-of-type button {
+    width: 100% !important;
+    flex: none !important;
+  }
+
+  /* Manual points input - keep inline on mobile */
+  .modal-body input[type="number"] {
+    font-size: 16px !important;
+    padding: 10px !important;
+  }
+}
+
     /* Touch device improvements */
     @media (pointer: coarse) {
       .btn,
@@ -1457,10 +1535,11 @@ async function redeemPoints(email, name) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
-        userEmail: email,
-        redeemedPoints: currentPoints,
-        redeemedValue: pointsValue
-      })
+  userEmail: email,
+  redeemedPoints: currentPoints,
+  redeemedValue: pointsValue,
+  acuityTotalInvestment: acuityData.totalInvestment // NEW
+})
     });
 
     if (!response.ok) {

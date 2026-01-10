@@ -49,14 +49,15 @@ exports.handler = async (event) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        fields: {
-          'Manual Points': 0,
-          'Last Points Redeemed': parseInt(redeemedPoints),
-          'Last Points Value': parseFloat(redeemedValue),
-          'Last Redemption Date': new Date().toISOString(),
-          'Total Lifetime Points': (userRecord.fields['Total Lifetime Points'] || 0) + parseInt(redeemedPoints)
-        }
-      })
+  fields: {
+    'Manual Points': 0,
+    'Last Redemption Total Investment': acuityData.totalInvestment, // NEW
+    'Last Points Redeemed': parseInt(redeemedPoints),
+    'Last Points Value': parseFloat(redeemedValue),
+    'Last Redemption Date': new Date().toISOString(),
+    'Total Lifetime Points': (userRecord.fields['Total Lifetime Points'] || 0) + parseInt(redeemedPoints)
+  }
+})
     });
 
     if (!updateResponse.ok) {
