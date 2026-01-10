@@ -105,7 +105,7 @@
 }
 
   .header-right { display: flex; align-items: center; gap: 16px; }
-.user-info { display: relative; align-items: center; gap: 12px; padding: 8px 16px; background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border: 1px solid #bfdbfe; border-radius: 8px; }
+.user-info { display: flex; align-items: center; gap: 12px; padding: 8px 16px; background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%); border: 1px solid #bfdbfe; border-radius: 8px; }
 
 /* Hide user name and email on mobile - show only avatar */
 @media (max-width: 768px) {
@@ -159,9 +159,7 @@
 }
 
 .user-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
+  position: fixed;
   background: #fff;
   border: 2px solid #3b82f6;
   border-radius: 12px;
@@ -2227,8 +2225,9 @@ Any media produced remains the property of Markeb Media until full payment has b
 function toggleDropdown() {
   const dropdown = document.getElementById('userDropdown');
   const overlay = document.getElementById('dropdownOverlay');
+  const userInfo = document.getElementById('userInfoDropdown');
   
-  if (!dropdown || !overlay) {
+  if (!dropdown || !overlay || !userInfo) {
     console.error('Dropdown elements not found');
     return;
   }
@@ -2240,6 +2239,15 @@ function toggleDropdown() {
     dropdown.classList.remove('active');
     overlay.classList.remove('active');
   } else {
+    // Open dropdown - calculate position based on user card location
+    const rect = userInfo.getBoundingClientRect();
+    
+    // Position dropdown 8px below the user card
+    dropdown.style.top = (rect.bottom + 8) + 'px';
+    
+    // Align right edge of dropdown with right edge of user card
+    dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+    
     // Open dropdown
     dropdown.classList.add('active');
     overlay.classList.add('active');
