@@ -10,7 +10,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { userEmail, redeemedPoints, redeemedValue } = JSON.parse(event.body);
+    const { userEmail, redeemedPoints, redeemedValue, acuityTotalInvestment, currentTotalPoints } = JSON.parse(event.body);
 
     if (!userEmail) {
       return {
@@ -39,6 +39,31 @@ exports.handler = async (event) => {
 
     const userRecord = searchData.records[0];
     const recordId = userRecord.id;
+    const currentManualPoints = userRecord.fields['Manual Points'] || 0;
+
+    // Calculate how many points to deduct from manual vs baseline
+    let newManualPoints = currentManualPoints;
+    let newBaseline = userRecord.fields['Last Redemption Total Investment'] || 0;
+    
+    // If redeeming all points, reset everything
+    if (redeemedPoints >= currentTotalPoints) {
+      newManualPoints = 0;
+      newBaseline = acuityTotalInvestment || 0;
+    } else {
+      // Partial redemption - deduct from manual points first
+      if (currentManualPoints > 0) {
+        if (redeemedPoints <= currentManualPoints) {
+          newManualPoints = currentManualPoints - redeemedPoints;
+        } else {
+          newManualPoints = 0;
+          const remainingToRedeem = redeemedPoints - currentManualPoints;
+          newBaseline = (userRecord.fields['Last Redemption Total Investment'] || 0) + remainingToRedeem;
+        }
+      } else {
+        // No manual points, deduct from booking baseline
+        newBaseline = (userRecord.fields['Last Redemption Total Investment'] || 0) + redeemedPoints;
+      }
+    }
 
     const updateUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_USERS_TABLE)}/${recordId}`;
     
@@ -49,15 +74,15 @@ exports.handler = async (event) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-  fields: {
-    'Manual Points': 0,
-    'Last Redemption Total Investment': acuityData.totalInvestment, // NEW
-    'Last Points Redeemed': parseInt(redeemedPoints),
-    'Last Points Value': parseFloat(redeemedValue),
-    'Last Redemption Date': new Date().toISOString(),
-    'Total Lifetime Points': (userRecord.fields['Total Lifetime Points'] || 0) + parseInt(redeemedPoints)
-  }
-})
+        fields: {
+          'Manual Points': newManualPoints,
+          'Last Redemption Total Investment': newBaseline,
+          'Last Points Redeemed': parseInt(redeemedPoints),
+          'Last Points Value': parseFloat(redeemedValue),
+          'Last Redemption Date': new Date().toISOString(),
+          'Total Lifetime Points': (userRecord.fields['Total Lifetime Points'] || 0) + parseInt(redeemedPoints)
+        }
+      })
     });
 
     if (!updateResponse.ok) {

@@ -717,13 +717,13 @@
       }
     }
 
-    /* Enhanced Modal Mobile Styles */
+/* Enhanced Modal Mobile Styles */
 @media (max-width: 480px) {
   .modal {
     padding: 0;
     align-items: flex-start;
   }
-
+  
   .modal-dialog {
     max-width: 100%;
     max-height: 100vh;
@@ -731,67 +731,77 @@
     border-radius: 0;
     overflow-y: auto;
   }
-
+  
   .modal-header {
     padding: 16px;
     position: sticky;
     top: 0;
     z-index: 10;
   }
-
+  
   .modal-header h3 {
     font-size: 18px;
   }
-
+  
   .modal-close {
     width: 36px;
     height: 36px;
     font-size: 24px;
   }
-
+  
   .modal-body {
     padding: 16px;
   }
-
+  
   .detail-item {
     padding: 12px;
     flex-direction: column;
     align-items: flex-start;
     gap: 6px;
   }
-
+  
   .detail-label {
     font-size: 12px;
     font-weight: 700;
   }
-
+  
   .detail-value {
     font-size: 14px;
     text-align: left;
     width: 100%;
     word-break: break-word;
   }
-
+  
   .warning-box {
     padding: 12px;
     font-size: 12px;
   }
-
+  
   /* Top action buttons - full width on mobile */
   .modal-body > div[style*="margin-top: 24px"] > div:first-of-type {
     flex-direction: column !important;
     gap: 8px !important;
   }
-
+  
   .modal-body > div[style*="margin-top: 24px"] > div:first-of-type button {
     width: 100% !important;
     flex: none !important;
   }
-
-  /* Manual points input - keep inline on mobile */
+  
+  /* Manual points section - stack vertically on mobile */
+  .modal-body > div[style*="background: #f0fdf4"] > div[style*="display: flex"] {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  
   .modal-body input[type="number"] {
     font-size: 16px !important;
-    padding: 10px !important;
+    padding: 12px !important;
+    width: 100% !important;
+  }
+  
+  .modal-body > div[style*="background: #f0fdf4"] button {
+    width: 100% !important;
   }
 }
 
@@ -1526,7 +1536,32 @@ async function redeemPoints(email, name) {
       return;
     }
 
-    if (!confirm(`Redeem points for ${name}?\n\nTotal Points: ${currentPoints} pts (£${pointsValue})\n  • Booking Points: ${bookingPoints}\n  • Manual Points: ${manualPoints}\n\nThis will:\n• Record their redeemed points\n• Reset their points counter to 0\n• Future bookings will start earning fresh points\n\nContinue?`)) {
+    // Ask how many points to redeem
+    const pointsToRedeem = prompt(`How many points would you like to redeem for ${name}?\n\nAvailable: ${currentPoints} pts (£${pointsValue})\n  • Booking Points: ${bookingPoints}\n  • Manual Points: ${manualPoints}\n\nEnter amount (or leave blank to redeem all):`);
+    
+    if (pointsToRedeem === null) {
+      return; // User cancelled
+    }
+
+    let finalPointsToRedeem = currentPoints; // Default: redeem all
+    
+    if (pointsToRedeem.trim() !== '') {
+      finalPointsToRedeem = parseInt(pointsToRedeem);
+      
+      if (isNaN(finalPointsToRedeem) || finalPointsToRedeem <= 0) {
+        alert('Please enter a valid number greater than 0.');
+        return;
+      }
+      
+      if (finalPointsToRedeem > currentPoints) {
+        alert(`Cannot redeem ${finalPointsToRedeem} points. Only ${currentPoints} points available.`);
+        return;
+      }
+    }
+
+    const finalValue = (finalPointsToRedeem / 100).toFixed(2);
+
+    if (!confirm(`Confirm redemption for ${name}?\n\nRedeeming: ${finalPointsToRedeem} pts (£${finalValue})\nRemaining: ${currentPoints - finalPointsToRedeem} pts\n\nContinue?`)) {
       return;
     }
 
@@ -1535,11 +1570,12 @@ async function redeemPoints(email, name) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
-  userEmail: email,
-  redeemedPoints: currentPoints,
-  redeemedValue: pointsValue,
-  acuityTotalInvestment: acuityData.totalInvestment // NEW
-})
+        userEmail: email,
+        redeemedPoints: finalPointsToRedeem,
+        redeemedValue: finalValue,
+        acuityTotalInvestment: acuityData.totalInvestment,
+        currentTotalPoints: currentPoints
+      })
     });
 
     if (!response.ok) {
@@ -1548,7 +1584,7 @@ async function redeemPoints(email, name) {
 
     const result = await response.json();
     
-    alert(`✅ Points redeemed successfully!\n\n${name} redeemed ${currentPoints} points (£${pointsValue})\n\nTheir points counter has been reset.`);
+    alert(`✅ Points redeemed successfully!\n\n${name} redeemed ${finalPointsToRedeem} points (£${finalValue})\n\nRemaining: ${currentPoints - finalPointsToRedeem} points`);
     
     // Refresh the user list and close modal
     loadAllUsers();
