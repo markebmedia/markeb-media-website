@@ -4,7 +4,7 @@ const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
 const AIRTABLE_TABLE_NAME = 'Markeb Media Users';
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = 'commercial@markebmedia.com'; // Verified Resend domain
+const FROM_EMAIL = 'commercial@markebmedia.com';
 
 // Milestone configuration (Ex VAT prices)
 const MILESTONES = [
@@ -145,12 +145,12 @@ exports.handler = async (event, context) => {
     // 6. Get last milestone reached
     const lastMilestoneReached = user.fields['Last Milestone Reached'] || 0;
 
-    // 7. Find milestones that should be triggered
-    const milestoneToSend = MILESTONES.find(m => 
+    // 7. Find the HIGHEST milestone they've reached (skip intermediate ones)
+    const eligibleMilestones = MILESTONES.filter(m => 
       currentBalance >= m.points && lastMilestoneReached < m.points
     );
 
-    if (!milestoneToSend) {
+    if (eligibleMilestones.length === 0) {
       return {
         statusCode: 200,
         headers,
@@ -161,6 +161,9 @@ exports.handler = async (event, context) => {
         })
       };
     }
+
+    // Get the HIGHEST milestone (last one in the eligible array)
+    const milestoneToSend = eligibleMilestones[eligibleMilestones.length - 1];
 
     // 8. Send email via Resend
     const emailSent = await sendMilestoneEmail(user, milestoneToSend, currentBalance);
@@ -180,6 +183,7 @@ exports.handler = async (event, context) => {
         message: `Milestone email sent: ${milestoneToSend.tier} (${milestoneToSend.points} points)`,
         milestone: milestoneToSend,
         currentBalance,
+        skippedMilestones: eligibleMilestones.length - 1,
         emailSent: true
       })
     };
@@ -230,7 +234,7 @@ async function updateAirtableMilestone(recordId, milestonePoints) {
     body: JSON.stringify({
       fields: {
         'Last Milestone Reached': milestonePoints,
-        'Last Email Sent Date': new Date().toISOString()
+        'Late Email Sent Date': new Date().toISOString()
       }
     })
   });
