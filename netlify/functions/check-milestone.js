@@ -234,7 +234,7 @@ async function updateAirtableMilestone(recordId, milestonePoints) {
     body: JSON.stringify({
       fields: {
         'Last Milestone Reached': milestonePoints,
-        'Late Email Sent Date': new Date().toISOString()
+        'Last Email Sent Date': new Date().toISOString()
       }
     })
   });
