@@ -11,7 +11,7 @@ exports.handler = async (event) => {
 
   try {
     const { userEmail } = JSON.parse(event.body);
-
+    
     if (!userEmail) {
       return {
         statusCode: 400,
@@ -19,7 +19,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_USERS_TABLE)}?filterByFormula={Email}="${userEmail}"`;
+    const searchUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_USERS_TABLE)}?filterByFormula=LOWER({Email})="${userEmail.toLowerCase()}"`;
     
     const searchResponse = await fetch(searchUrl, {
       headers: {
@@ -38,8 +38,13 @@ exports.handler = async (event) => {
     }
 
     const userRecord = searchData.records[0];
+    
+    // Use "Manual Points" field as requested
     const manualPoints = userRecord.fields['Manual Points'] || 0;
-    const lastRedemptionBaseline = userRecord.fields['Last Redemption Total Investment'] || 0;
+    
+    // Convert baseline from pounds to points (multiply by 100)
+    const lastRedemptionInvestment = userRecord.fields['Last Redemption Total Investment'] || 0;
+    const lastRedemptionBaseline = Math.floor(lastRedemptionInvestment * 100);
 
     return {
       statusCode: 200,
