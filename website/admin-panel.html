@@ -1386,7 +1386,7 @@
                   <label class="toggle-switch">
                     <input 
                       type="checkbox" 
-                      ${user.fields['Email Notifications Enabled'] !== false ? 'checked' : ''} 
+                      ${user.fields['Email Notifications Enabled'] === true ? 'checked' : ''} 
                       onchange='toggleEmailNotifications("${user.fields['Email']}", this.checked, "${user.id}")'
                     >
                     <span class="toggle-slider"></span>
