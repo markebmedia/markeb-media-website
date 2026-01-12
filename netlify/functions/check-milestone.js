@@ -333,7 +333,7 @@ function generateEmailHtml(userName, milestone, currentBalance) {
               <table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
                 <tr>
                   <td style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 8px; padding: 16px 32px; text-align: center;">
-                    <a href="https://markebmedia.co.uk/website/dashboard.html" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; display: block;">View Dashboard</a>
+                    <a href="https://markebmedia.com/login.html" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; display: block;">View Dashboard</a>
                   </td>
                 </tr>
               </table>
@@ -422,7 +422,7 @@ function generateEmailHtml(userName, milestone, currentBalance) {
               <table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
                 <tr>
                   <td style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; padding: 16px 32px; text-align: center;">
-                    <a href="https://markebmedia.co.uk/website/dashboard.html" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; display: block;">Book Your Free Service</a>
+                    <a href="https://markebmedia.com/login.html" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; display: block;">Book Your Free Service</a>
                   </td>
                 </tr>
               </table>
