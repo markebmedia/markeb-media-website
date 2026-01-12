@@ -1546,6 +1546,9 @@
     <button class="btn btn-primary" style="flex: 1;" onclick='impersonateUser("${user.fields['Email']}")'>
       🔑 Login as ${user.fields['Name']}
     </button>
+    <button class="btn btn-secondary" style="flex: 1;" onclick='checkMilestone("${user.fields['Email']}", "${user.fields['Name']}")'>
+      📧 Check Milestone
+    </button>
   </div>
   
   <div style="padding: 16px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px;">
@@ -1771,6 +1774,46 @@ async function addManualPoints(email, name, userId) {
   } catch (error) {
     console.error('Error adding points:', error);
     alert(`❌ Failed to add points: ${error.message}\n\nPlease try again.`);
+  }
+}
+
+async function checkMilestone(email, name) {
+  if (!email) {
+    alert('Email address is required');
+    return;
+  }
+  
+  if (!confirm(`Check milestone for ${name}?\n\nThis will check if they've reached a new milestone and send an email if applicable.`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/.netlify/functions/check-milestone', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail: email })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to check milestone');
+    }
+    
+    const result = await response.json();
+    
+    if (result.skipped) {
+      alert(`ℹ️ Email notifications are disabled for ${name}`);
+    } else if (result.emailSent) {
+      alert(`✅ Milestone email sent to ${name}!\n\nMilestone: ${result.milestone.tier} (${result.milestone.points} points)\nCurrent Balance: ${result.currentBalance} points`);
+    } else {
+      alert(`ℹ️ No new milestone reached for ${name}\n\nCurrent Balance: ${result.currentBalance} points\nLast Milestone: ${result.lastMilestoneReached} points`);
+    }
+    
+    // Refresh user list
+    loadAllUsers();
+    
+  } catch (error) {
+    console.error('Error checking milestone:', error);
+    alert(`❌ Failed to check milestone: ${error.message}\n\nPlease try again.`);
   }
 }
 
