@@ -1,5 +1,4 @@
 const fetch = require('node-fetch');
-
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
 const AIRTABLE_USERS_TABLE = process.env.AIRTABLE_USERS_TABLE || 'Markeb Media Users';
@@ -44,7 +43,7 @@ exports.handler = async (event) => {
     // Calculate how many points to deduct from manual vs baseline
     let newManualPoints = currentManualPoints;
     let newBaseline = userRecord.fields['Last Redemption Total Investment'] || 0;
-    
+
     // If redeeming all points, reset everything
     if (redeemedPoints >= currentTotalPoints) {
       newManualPoints = 0;
@@ -80,7 +79,8 @@ exports.handler = async (event) => {
           'Last Points Redeemed': parseInt(redeemedPoints),
           'Last Points Value': parseFloat(redeemedValue),
           'Last Redemption Date': new Date().toISOString(),
-          'Total Lifetime Points': (userRecord.fields['Total Lifetime Points'] || 0) + parseInt(redeemedPoints)
+          'Total Lifetime Points': (userRecord.fields['Total Lifetime Points'] || 0) + parseInt(redeemedPoints),
+          'Last Milestone Reached': 0  // ← ADD THIS LINE TO RESET MILESTONE CYCLE
         }
       })
     });
@@ -93,7 +93,8 @@ exports.handler = async (event) => {
       statusCode: 200,
       body: JSON.stringify({ 
         success: true,
-        message: 'Points redeemed successfully'
+        message: 'Points redeemed successfully',
+        milestoneReset: true  // ← OPTIONAL: Confirm milestone was reset
       })
     };
 
