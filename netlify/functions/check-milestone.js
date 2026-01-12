@@ -438,7 +438,7 @@ function generateEmailHtml(userName, milestone, currentBalance) {
             <td style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
               <p style="margin: 0; font-size: 14px; color: #64748b;">
                 Thanks for being a valued Markeb Media client,<br>
-                <strong style="color: #0f172a;">Mark & The Markeb Team</strong>
+                <strong style="color: #0f172a;">The Markeb Team</strong>
               </p>
             </td>
           </tr>
