@@ -109,15 +109,30 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // 3. Calculate current available balance
-    const totalLifetimePoints = user.fields['Total Lifetime Points'] || 0;
-    const manualPoints = user.fields['Points Added'] || 0;
-    const currentBalance = totalLifetimePoints + manualPoints;
+    // 3. Get booking points from Acuity
+    const acuityResponse = await fetch(`${process.env.URL || 'http://localhost:8888'}/.netlify/functions/acuity-data`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail: userEmail })
+    });
 
-    // 4. Get last milestone reached
+    if (!acuityResponse.ok) {
+      throw new Error('Failed to fetch Acuity data');
+    }
+
+    const acuityData = await acuityResponse.json();
+    const bookingPoints = Math.floor(acuityData.totalInvestment ?? 0);
+
+    // 4. Get manual points from Airtable
+    const manualPoints = user.fields['Points Added'] || 0;
+    
+    // 5. Calculate current available balance
+    const currentBalance = bookingPoints + manualPoints;
+
+    // 6. Get last milestone reached
     const lastMilestoneReached = user.fields['Last Milestone Reached'] || 0;
 
-    // 5. Find milestones that should be triggered
+    // 7. Find milestones that should be triggered
     const milestoneToSend = MILESTONES.find(m => 
       currentBalance >= m.points && lastMilestoneReached < m.points
     );
@@ -134,14 +149,14 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // 6. Send email via Resend
+    // 8. Send email via Resend
     const emailSent = await sendMilestoneEmail(user, milestoneToSend, currentBalance);
 
     if (!emailSent) {
       throw new Error('Failed to send email');
     }
 
-    // 7. Update Airtable with new milestone
+    // 9. Update Airtable with new milestone
     await updateAirtableMilestone(user.id, milestoneToSend.points);
 
     return {
