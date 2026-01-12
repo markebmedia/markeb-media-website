@@ -123,11 +123,24 @@ exports.handler = async (event, context) => {
     const acuityData = await acuityResponse.json();
     const bookingPoints = Math.floor(acuityData.totalInvestment ?? 0);
 
-    // 4. Get manual points from Airtable
-    const manualPoints = user.fields['Points Added'] || 0;
+    // 4. Get manual points AND last redemption baseline from Airtable
+    const pointsData = await fetch(`${process.env.URL || 'http://localhost:8888'}/.netlify/functions/get-manual-points`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail: userEmail })
+    });
+
+    if (!pointsData.ok) {
+      throw new Error('Failed to fetch manual points data');
+    }
+
+    const pointsResult = await pointsData.json();
+    const manualPoints = pointsResult?.manualPoints || 0;
+    const lastRedemptionBaseline = pointsResult?.lastRedemptionBaseline || 0;
     
-    // 5. Calculate current available balance
-    const currentBalance = bookingPoints + manualPoints;
+    // 5. Calculate current available balance (same as dashboard)
+    const netBookingPoints = Math.max(0, bookingPoints - lastRedemptionBaseline);
+    const currentBalance = netBookingPoints + manualPoints;
 
     // 6. Get last milestone reached
     const lastMilestoneReached = user.fields['Last Milestone Reached'] || 0;
