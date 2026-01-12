@@ -224,6 +224,57 @@
       border-radius: 6px;
     }
 
+    /* Toggle Switch Styles */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 28px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #cbd5e1;
+      transition: .3s;
+      border-radius: 28px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(24px);
+    }
+
+    .toggle-switch input:disabled + .toggle-slider {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .modal {
       display: none;
       position: fixed;
@@ -1252,8 +1303,6 @@
       `;
 
       try {
-        // We'll need to create a new admin endpoint that returns all users
-        // For now, we'll show instructions
         const response = await fetch('/.netlify/functions/admin-users', {
           method: 'GET',
           headers: {
@@ -1317,6 +1366,7 @@
               <th>Company</th>
               <th>Created</th>
               <th>Status</th>
+              <th>Email Alerts</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -1332,9 +1382,19 @@
                     ${user.fields['Account Status'] || 'Unknown'}
                   </span>
                 </td>
+                <td data-label="Email Alerts">
+                  <label class="toggle-switch">
+                    <input 
+                      type="checkbox" 
+                      ${user.fields['Email Notifications Enabled'] !== false ? 'checked' : ''} 
+                      onchange='toggleEmailNotifications("${user.fields['Email']}", this.checked, "${user.id}")'
+                    >
+                    <span class="toggle-slider"></span>
+                  </label>
+                </td>
                 <td data-label="Actions">
                   <div class="action-buttons">
-                    <button class="btn btn-primary btn-small" onclick='viewUserDetails(${JSON.stringify(user)})'>
+                    <button class="btn btn-primary btn-small" onclick='viewUserDetails(${JSON.stringify(user).replace(/'/g, "&#39;")})'>
                       👁️ View
                     </button>
                     <button class="btn btn-secondary btn-small" onclick='impersonateUser("${user.fields['Email']}")'>
@@ -1349,6 +1409,52 @@
       `;
 
       container.innerHTML = tableHTML;
+    }
+
+    async function toggleEmailNotifications(email, enabled, recordId) {
+      try {
+        // Show loading state
+        const toggleInput = event.target;
+        toggleInput.disabled = true;
+
+        const response = await fetch('/.netlify/functions/toggle-email-notifications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            userEmail: email,
+            enabled: enabled,
+            recordId: recordId
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update email notification settings');
+        }
+
+        const result = await response.json();
+        
+        // Update the user in allUsers array
+        const userIndex = allUsers.findIndex(u => u.fields['Email'] === email);
+        if (userIndex !== -1) {
+          allUsers[userIndex].fields['Email Notifications Enabled'] = enabled;
+        }
+
+        // Show success message briefly
+        const statusText = enabled ? 'enabled' : 'disabled';
+        console.log(`✅ Email notifications ${statusText} for ${email}`);
+        
+        toggleInput.disabled = false;
+
+      } catch (error) {
+        console.error('Error toggling email notifications:', error);
+        alert(`❌ Failed to update email notifications: ${error.message}`);
+        
+        // Revert the toggle
+        event.target.checked = !enabled;
+        event.target.disabled = false;
+      }
     }
 
     function filterUsers(searchTerm) {
@@ -1375,6 +1481,9 @@
       const modalBody = document.getElementById('modalBody');
 
       modalTitle.textContent = `${user.fields['Name']} - Account Details`;
+
+      const emailNotificationsStatus = user.fields['Email Notifications Enabled'] !== false ? 'Enabled' : 'Disabled';
+      const emailNotificationsColor = user.fields['Email Notifications Enabled'] !== false ? '#10b981' : '#ef4444';
 
       modalBody.innerHTML = `
         <div class="warning-box">
@@ -1406,6 +1515,15 @@
           <span class="detail-value">
             <span class="status-badge ${user.fields['Account Status'] === 'Active' ? 'status-active' : 'status-inactive'}">
               ${user.fields['Account Status'] || 'Unknown'}
+            </span>
+          </span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">📬 Milestone Emails</span>
+          <span class="detail-value">
+            <span style="color: ${emailNotificationsColor}; font-weight: 600;">
+              ${emailNotificationsStatus}
             </span>
           </span>
         </div>
@@ -1655,6 +1773,7 @@ async function addManualPoints(email, name, userId) {
     alert(`❌ Failed to add points: ${error.message}\n\nPlease try again.`);
   }
 }
+
 // Scroll input into view when keyboard appears on mobile/tablet
 if (window.innerWidth <= 1024) {
   document.addEventListener('focusin', function(e) {
