@@ -724,7 +724,7 @@
               <button type="button" class="bedroom-btn" onclick="adjustBedrooms(1)" style="width: 50px; height: 50px; border-radius: 10px; border: 2px solid #e2e8f0; background: #fff; font-size: 24px; font-weight: 700; color: #64748b; cursor: pointer; transition: all 0.2s;">+</button>
             </div>
             <div id="bedroomFeeNotice" style="display: none; margin-top: 12px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
-              <strong>Additional £30 fee</strong> applies for properties with more than 4 bedrooms
+              <strong>£30 per additional bedroom</strong> after the first 4 bedrooms
             </div>
           </div>
         </div>
@@ -736,8 +736,8 @@
             <span style="font-size: 14px; font-weight: 600; color: #1e293b;" id="servicePrice">£0.00</span>
           </div>
           <div id="bedroomFeeRow" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span style="font-size: 14px; color: #64748b;">Extra bedrooms (5+)</span>
-            <span style="font-size: 14px; font-weight: 600; color: #1e293b;">£30.00</span>
+            <span style="font-size: 14px; color: #64748b;">Extra bedrooms</span>
+            <span style="font-size: 14px; font-weight: 600; color: #1e293b;" class="detail-value">£0.00</span>
           </div>
           <div style="border-top: 2px solid #e2e8f0; margin: 16px 0;"></div>
           <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -967,7 +967,7 @@
         },
         {
           id: 'silver-package',
-          name: 'Silver Package (Most Popular)',
+          name: 'Silver Package',
           price: 262.80,
           duration: 90,
           description: 'Everything in our Bronze Package, plus full videography and drone shots for complete property marketing.',
@@ -1026,7 +1026,7 @@
         },
         {
           id: 'silver-package',
-          name: 'Silver Package (Most Popular)',
+          name: 'Silver Package',
           price: 262.80,
           duration: 90,
           description: 'Everything in our Bronze Package, plus full videography and drone shots for complete property marketing.',
@@ -1372,12 +1372,24 @@
       
       console.log('Creating booking:', bookingPayload);
       
-      // TODO: Send to Netlify function to create Airtable record
-      // For now, just show success message
-      alert('Booking created successfully! We will contact you shortly.');
+      // Send to Netlify function
+      const response = await fetch('/.netlify/functions/create-booking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bookingPayload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create booking');
+      }
+
+      const result = await response.json();
+      console.log('Booking created:', result);
       
-      // Reset form
-      window.location.reload();
+      // Redirect to confirmation page
+      window.location.href = `booking-confirmation.html?ref=${result.bookingId}&email=${encodeURIComponent(bookingData.clientEmail)}`;
     }
 
     // Process Stripe Payment
@@ -1440,7 +1452,8 @@
         const isPast = date < today;
         const isTooFarAhead = date > maxDate;
         const isSunday = date.getDay() === 0; // Disable Sundays
-        const isDisabled = isPast || isTooFarAhead || isSunday;
+        const isSaturday = date.getDay() === 6; // Disable Saturdays
+        const isDisabled = isPast || isTooFarAhead || isSunday || isSaturday;
         const isToday = date.getTime() === today.getTime();
         const isSelected = bookingData.selectedDate && date.getTime() === new Date(bookingData.selectedDate).getTime();
 
@@ -1634,7 +1647,9 @@
       if (!bookingData.service) return;
 
       const basePrice = bookingData.basePrice;
-      const extraBedroomFee = bookingData.bedrooms > 4 ? 30 : 0;
+      // £30 per additional room after 4 bedrooms
+      const extraRooms = bookingData.bedrooms > 4 ? bookingData.bedrooms - 4 : 0;
+      const extraBedroomFee = extraRooms * 30;
       const totalPrice = basePrice + extraBedroomFee;
 
       bookingData.extraBedroomFee = extraBedroomFee;
@@ -1647,6 +1662,7 @@
       const bedroomFeeRow = document.getElementById('bedroomFeeRow');
       if (extraBedroomFee > 0) {
         bedroomFeeRow.style.display = 'flex';
+        bedroomFeeRow.querySelector('.detail-value').textContent = `£${extraBedroomFee.toFixed(2)}`;
       } else {
         bedroomFeeRow.style.display = 'none';
       }
