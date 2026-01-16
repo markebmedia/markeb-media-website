@@ -5,31 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>UK Client Map - Markeb Media</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet Core -->
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+  
+  <!-- Leaflet Marker Cluster -->
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  
+  <!-- Leaflet Heat Map -->
+  <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.min.js"></script>
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     body { 
       font-family: 'Inter', sans-serif;
-      background: #f8fafc;
+      background: #0f172a;
       min-height: 100vh;
       padding: 20px;
-      color: #1e293b;
+      color: #e2e8f0;
     }
 
     .map-container {
-      max-width: 1800px;
+      max-width: 1900px;
       margin: 0 auto;
     }
 
     .header {
-      background: #fff;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border-radius: 16px;
       padding: 32px;
       margin-bottom: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      border: 1px solid #334155;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -40,12 +51,15 @@
     .header-content h1 {
       font-size: 32px;
       font-weight: 700;
-      color: #0f172a;
+      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin-bottom: 8px;
     }
 
     .header-subtitle {
-      color: #64748b;
+      color: #94a3b8;
       font-size: 14px;
     }
 
@@ -73,17 +87,23 @@
     .btn-primary {
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       color: #fff;
+      border: 1px solid #60a5fa;
     }
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.5);
     }
 
     .btn-secondary {
-      background: #fff;
-      color: #3b82f6;
-      border: 2px solid #3b82f6;
+      background: #1e293b;
+      color: #60a5fa;
+      border: 2px solid #334155;
+    }
+
+    .btn-secondary:hover {
+      border-color: #60a5fa;
+      background: #334155;
     }
 
     .stats-overview {
@@ -94,43 +114,58 @@
     }
 
     .stat-card {
-      background: #fff;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      border: 1px solid #334155;
       text-align: center;
+      transition: all .3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+      border-color: #60a5fa;
     }
 
     .stat-value {
-      font-size: 32px;
+      font-size: 36px;
       font-weight: 700;
-      color: #3b82f6;
+      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin-bottom: 8px;
     }
 
     .stat-label {
-      color: #64748b;
+      color: #94a3b8;
       font-size: 13px;
       font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .content-grid {
       display: grid;
-      grid-template-columns: 1fr 400px;
+      grid-template-columns: 400px 1fr 350px;
       gap: 24px;
     }
 
     .map-section {
-      background: #fff;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border-radius: 16px;
-      padding: 32px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      padding: 24px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      border: 1px solid #334155;
     }
 
     #map {
       height: 700px;
       border-radius: 12px;
-      border: 2px solid #e2e8f0;
+      border: 2px solid #334155;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     }
 
     .sidebar {
@@ -139,11 +174,143 @@
       gap: 20px;
     }
 
-    .region-list {
-      background: #fff;
+    .control-panel {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border-radius: 16px;
       padding: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      border: 1px solid #334155;
+    }
+
+    .control-panel h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-section {
+      margin-bottom: 24px;
+    }
+
+    .control-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .control-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .view-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .view-btn {
+      padding: 12px;
+      border-radius: 8px;
+      background: #0f172a;
+      color: #94a3b8;
+      border: 2px solid #334155;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .view-btn:hover {
+      border-color: #60a5fa;
+      color: #60a5fa;
+    }
+
+    .view-btn.active {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: #fff;
+      border-color: #60a5fa;
+    }
+
+    .filter-btn {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #334155;
+      border-radius: 8px;
+      background: #0f172a;
+      color: #94a3b8;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .2s ease;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .filter-btn:hover {
+      border-color: #60a5fa;
+      color: #60a5fa;
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: #fff;
+      border-color: #60a5fa;
+    }
+
+    .filter-count {
+      background: #334155;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .filter-btn.active .filter-count {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .date-filter {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .date-input {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #334155;
+      border-radius: 8px;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .date-input:focus {
+      outline: none;
+      border-color: #60a5fa;
+    }
+
+    .region-list {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      border: 1px solid #334155;
       max-height: 600px;
       overflow-y: auto;
     }
@@ -151,7 +318,7 @@
     .region-list h3 {
       font-size: 18px;
       font-weight: 700;
-      color: #0f172a;
+      color: #e2e8f0;
       margin-bottom: 16px;
       display: flex;
       justify-content: space-between;
@@ -163,13 +330,15 @@
       justify-content: space-between;
       align-items: center;
       padding: 12px;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid #334155;
       cursor: pointer;
-      transition: background .2s ease;
+      transition: all .2s ease;
+      border-radius: 8px;
+      margin-bottom: 4px;
     }
 
     .region-item:hover {
-      background: #f8fafc;
+      background: #334155;
     }
 
     .region-item:last-child {
@@ -178,7 +347,7 @@
 
     .region-name {
       font-weight: 600;
-      color: #0f172a;
+      color: #e2e8f0;
       font-size: 14px;
     }
 
@@ -192,8 +361,8 @@
     }
 
     .region-item.active {
-      background: #eff6ff;
-      border-left: 4px solid #3b82f6;
+      background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+      border-left: 4px solid #60a5fa;
     }
 
     .region-item.empty {
@@ -201,90 +370,127 @@
     }
 
     .region-item.empty .region-count {
-      background: #e2e8f0;
-      color: #64748b;
+      background: #334155;
+      color: #94a3b8;
+    }
+
+    .client-detail-panel {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      border: 1px solid #334155;
+      max-height: 700px;
+      overflow-y: auto;
+    }
+
+    .client-detail-panel h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .client-card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: all .2s ease;
+    }
+
+    .client-card:hover {
+      border-color: #60a5fa;
+      transform: translateX(4px);
+    }
+
+    .client-name {
+      font-weight: 700;
+      color: #e2e8f0;
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .client-info {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .client-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+
+    .badge-active {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      border: 1px solid #10b981;
+    }
+
+    .badge-inactive {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      border: 1px solid #ef4444;
     }
 
     .map-legend {
-      background: #fff;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border-radius: 16px;
       padding: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      border: 1px solid #334155;
     }
 
     .map-legend h4 {
       font-size: 14px;
       font-weight: 700;
-      color: #0f172a;
+      color: #e2e8f0;
       margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .legend-item {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       font-size: 13px;
+      color: #94a3b8;
     }
 
     .legend-color {
       width: 20px;
       height: 20px;
       border-radius: 4px;
-      border: 2px solid #e2e8f0;
-    }
-
-    .filter-section {
-      background: #fff;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .filter-section h4 {
-      font-size: 14px;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 12px;
-    }
-
-    .filter-btn {
-      width: 100%;
-      padding: 10px 16px;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      background: #fff;
-      color: #0f172a;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all .2s ease;
-      margin-bottom: 8px;
-    }
-
-    .filter-btn:hover {
-      border-color: #3b82f6;
-      color: #3b82f6;
-    }
-
-    .filter-btn.active {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #fff;
-      border-color: #3b82f6;
+      border: 2px solid #334155;
     }
 
     .loading-message {
       text-align: center;
       padding: 60px 20px;
-      color: #64748b;
+      color: #94a3b8;
     }
 
     .spinner {
       margin: 0 auto 20px;
       width: 50px;
       height: 50px;
-      border: 4px solid #e2e8f0;
-      border-top: 4px solid #3b82f6;
+      border: 4px solid #334155;
+      border-top: 4px solid #60a5fa;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -293,10 +499,18 @@
       to { transform: rotate(360deg); }
     }
 
-    /* Custom Leaflet Popup */
+    /* Custom Leaflet Styles */
     .leaflet-popup-content-wrapper {
+      background: #1e293b;
+      color: #e2e8f0;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      border: 1px solid #334155;
+    }
+
+    .leaflet-popup-tip {
+      background: #1e293b;
+      border: 1px solid #334155;
     }
 
     .leaflet-popup-content {
@@ -307,34 +521,104 @@
     .popup-title {
       font-size: 16px;
       font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 8px;
+      color: #e2e8f0;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #334155;
     }
 
     .popup-info {
       font-size: 13px;
-      color: #64748b;
-      margin-bottom: 4px;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .popup-clients {
       font-size: 14px;
       font-weight: 600;
-      color: #3b82f6;
+      color: #60a5fa;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 2px solid #334155;
+    }
+
+    .popup-client-list {
+      max-height: 150px;
+      overflow-y: auto;
       margin-top: 8px;
     }
 
-    @media (max-width: 1200px) {
+    .popup-client-item {
+      padding: 6px 0;
+      color: #e2e8f0;
+      font-size: 13px;
+      border-bottom: 1px solid #334155;
+    }
+
+    .popup-client-item:last-child {
+      border-bottom: none;
+    }
+
+    /* Marker Cluster Styles */
+    .marker-cluster-small {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(37, 99, 235, 0.8) 100%);
+      border: 3px solid #60a5fa;
+    }
+
+    .marker-cluster-medium {
+      background: linear-gradient(135deg, rgba(251, 146, 60, 0.8) 0%, rgba(249, 115, 22, 0.8) 100%);
+      border: 3px solid #fb923c;
+    }
+
+    .marker-cluster-large {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.8) 0%, rgba(220, 38, 38, 0.8) 100%);
+      border: 3px solid #ef4444;
+    }
+
+    .marker-cluster div {
+      background: transparent;
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #60a5fa;
+    }
+
+    @media (max-width: 1400px) {
       .content-grid {
         grid-template-columns: 1fr;
       }
 
       .sidebar {
         order: -1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
       }
 
       #map {
-        height: 500px;
+        height: 600px;
       }
     }
 
@@ -352,11 +636,19 @@
       }
 
       .stats-overview {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
         grid-template-columns: 1fr;
       }
 
       .map-section {
-        padding: 20px;
+        padding: 16px;
       }
 
       #map {
@@ -367,6 +659,23 @@
         max-height: none;
       }
     }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #64748b;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state-text {
+      font-size: 14px;
+      color: #94a3b8;
+    }
   </style>
 </head>
 <body>
@@ -375,7 +684,7 @@
     <div class="header">
       <div class="header-content">
         <h1>🗺️ UK Client Distribution Map</h1>
-        <p class="header-subtitle">Interactive map showing your client locations across the UK</p>
+        <p class="header-subtitle">Advanced analytics and geographic visualization</p>
       </div>
       <div class="header-actions">
         <button class="btn btn-secondary" onclick="window.location.href='admin-panel.html'">
@@ -395,7 +704,7 @@
       </div>
       <div class="stat-card">
         <div class="stat-value" id="regionsWithClients">-</div>
-        <div class="stat-label">Regions with Clients</div>
+        <div class="stat-label">Regions Covered</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" id="emptyRegions">-</div>
@@ -405,11 +714,101 @@
         <div class="stat-value" id="topRegion">-</div>
         <div class="stat-label">Top Region</div>
       </div>
+      <div class="stat-card">
+        <div class="stat-value" id="growthRate">-</div>
+        <div class="stat-label">30-Day Growth</div>
+      </div>
     </div>
 
     <!-- Main Content -->
     <div class="content-grid">
-      <!-- Map Section -->
+      <!-- Control Panel (Left Sidebar) -->
+      <div class="sidebar">
+        <div class="control-panel">
+          <h3>⚙️ Map Controls</h3>
+          
+          <!-- View Mode -->
+          <div class="control-section">
+            <div class="control-label">View Mode</div>
+            <div class="view-toggle">
+              <button class="view-btn active" onclick="setViewMode('markers')" id="viewMarkers">
+                📍 Markers
+              </button>
+              <button class="view-btn" onclick="setViewMode('heatmap')" id="viewHeatmap">
+                🔥 Heat Map
+              </button>
+            </div>
+          </div>
+
+          <!-- Filters -->
+          <div class="control-section">
+            <div class="control-label">Quick Filters</div>
+            <button class="filter-btn active" onclick="filterMap('all')">
+              <span>All Regions</span>
+              <span class="filter-count" id="countAll">-</span>
+            </button>
+            <button class="filter-btn" onclick="filterMap('with-clients')">
+              <span>With Clients</span>
+              <span class="filter-count" id="countWithClients">-</span>
+            </button>
+            <button class="filter-btn" onclick="filterMap('opportunities')">
+              <span>Opportunities</span>
+              <span class="filter-count" id="countOpportunities">-</span>
+            </button>
+            <button class="filter-btn" onclick="filterMap('active')">
+              <span>Active Clients</span>
+              <span class="filter-count" id="countActive">-</span>
+            </button>
+          </div>
+
+          <!-- Date Filter -->
+          <div class="control-section">
+            <div class="control-label">Date Range</div>
+            <div class="date-filter">
+              <input type="date" class="date-input" id="dateFrom" onchange="applyDateFilter()">
+              <input type="date" class="date-input" id="dateTo" onchange="applyDateFilter()">
+            </div>
+          </div>
+
+          <!-- Legend -->
+          <div class="control-section">
+            <div class="control-label">Legend</div>
+            <div class="map-legend">
+              <div class="legend-item">
+                <div class="legend-color" style="background: #ef4444; border-radius: 50%;"></div>
+                <span>Client marker</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div>
+                <span>Small cluster (2-10)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #fb923c, #f97316);"></div>
+                <span>Medium cluster (10-20)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #ef4444, #dc2626);"></div>
+                <span>Large cluster (20+)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Region List -->
+        <div class="region-list">
+          <h3>
+            <span>📍 Regions</span>
+            <span id="regionTotal" style="color: #94a3b8; font-size: 14px; font-weight: 500;">-</span>
+          </h3>
+          <div id="regionListContainer">
+            <div class="loading-message">
+              <p>Loading regions...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map Section (Center) -->
       <div class="map-section">
         <div id="map">
           <div class="loading-message">
@@ -419,48 +818,16 @@
         </div>
       </div>
 
-      <!-- Sidebar -->
+      <!-- Client Detail Panel (Right Sidebar) -->
       <div class="sidebar">
-        <!-- Filters -->
-        <div class="filter-section">
-          <h4>🔍 Quick Filters</h4>
-          <button class="filter-btn active" onclick="filterMap('all')">
-            Show All Regions
-          </button>
-          <button class="filter-btn" onclick="filterMap('with-clients')">
-            Regions with Clients
-          </button>
-          <button class="filter-btn" onclick="filterMap('opportunities')">
-            Opportunity Regions
-          </button>
-        </div>
-
-        <!-- Legend -->
-        <div class="map-legend">
-          <h4>📊 Map Legend</h4>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #ef4444; border-radius: 50%;"></div>
-            <span>Client location marker</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #3b82f6; opacity: 0.3;"></div>
-            <span>Region with clients</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #e2e8f0;"></div>
-            <span>No clients yet</span>
-          </div>
-        </div>
-
-        <!-- Region List -->
-        <div class="region-list">
+        <div class="client-detail-panel" id="clientDetailPanel">
           <h3>
-            Regions
-            <span id="regionTotal" style="color: #64748b; font-size: 14px; font-weight: 500;">-</span>
+            <span id="detailPanelTitle">👥 All Clients</span>
           </h3>
-          <div id="regionListContainer">
-            <div class="loading-message">
-              <p>Loading regions...</p>
+          <div id="clientDetailContent">
+            <div class="empty-state">
+              <div class="empty-state-icon">🗺️</div>
+              <div class="empty-state-text">Click a region or marker to view clients</div>
             </div>
           </div>
         </div>
@@ -513,7 +880,7 @@
       'Fife': [56.2079, -3.1498],
       'Highland': [57.4778, -4.2247],
       'Aberdeenshire': [57.1497, -2.5943],
-      'Perth and Kinross': [56.3950, -3.4373],
+      'Perth and Kinross': [56.3950, -4.2373],
       'Dumfries and Galloway': [55.0700, -3.6053],
       'Scottish Borders': [55.5446, -2.7820],
       'South Lanarkshire': [55.6743, -3.7819],
@@ -549,27 +916,63 @@
     const UK_REGIONS = Object.keys(REGION_COORDS).sort();
     
     let clientData = [];
+    let filteredClientData = [];
     let regionCounts = {};
     let map;
-    let markers = [];
+    let markerCluster;
+    let heatLayer;
+    let currentViewMode = 'markers';
     let currentFilter = 'all';
+    let dateFilterFrom = null;
+    let dateFilterTo = null;
 
     // Initialize map
     document.addEventListener('DOMContentLoaded', () => {
       initMap();
       loadMapData();
+      initDateFilters();
     });
 
     function initMap() {
       // Create map centered on UK
       map = L.map('map').setView([54.5, -3], 6);
 
-      // Add OpenStreetMap tiles
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 10,
+      // Add dark theme map tiles
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap contributors, © CARTO',
+        maxZoom: 12,
         minZoom: 5
       }).addTo(map);
+
+      // Initialize marker cluster group
+      markerCluster = L.markerClusterGroup({
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        spiderfyOnMaxZoom: true,
+        removeOutsideVisibleBounds: true,
+        iconCreateFunction: function(cluster) {
+          const count = cluster.getChildCount();
+          let size = 'small';
+          if (count >= 20) size = 'large';
+          else if (count >= 10) size = 'medium';
+          
+          return L.divIcon({
+            html: '<div><span>' + count + '</span></div>',
+            className: 'marker-cluster marker-cluster-' + size,
+            iconSize: L.point(40, 40)
+          });
+        }
+      });
+    }
+
+    function initDateFilters() {
+      // Set default date range (last 12 months)
+      const today = new Date();
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(today.getFullYear() - 1);
+      
+      document.getElementById('dateTo').value = today.toISOString().split('T')[0];
+      document.getElementById('dateFrom').value = oneYearAgo.toISOString().split('T')[0];
     }
 
     async function loadMapData() {
@@ -585,6 +988,7 @@
 
         const data = await response.json();
         clientData = data.users || [];
+        filteredClientData = [...clientData];
 
         // Calculate region counts
         regionCounts = {};
@@ -602,11 +1006,17 @@
         // Update stats
         updateStats();
 
+        // Update filter counts
+        updateFilterCounts();
+
         // Add markers to map
         addMarkersToMap();
 
         // Render region list
         renderRegionList();
+
+        // Show all clients initially
+        showAllClients();
 
       } catch (error) {
         console.error('Error loading map data:', error);
@@ -628,60 +1038,175 @@
         }
       }
 
+      // Calculate 30-day growth
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const recentClients = clientData.filter(u => {
+        const created = new Date(u.fields['Created Date']);
+        return created >= thirtyDaysAgo;
+      }).length;
+      const growthRate = totalClients > 0 ? `+${recentClients}` : '-';
+
       document.getElementById('totalClients').textContent = totalClients;
       document.getElementById('regionsWithClients').textContent = regionsWithClients;
       document.getElementById('emptyRegions').textContent = emptyRegions;
       document.getElementById('topRegion').textContent = maxCount > 0 ? topRegion : '-';
+      document.getElementById('growthRate').textContent = growthRate;
+    }
+
+    function updateFilterCounts() {
+      const all = UK_REGIONS.length;
+      const withClients = Object.values(regionCounts).filter(c => c > 0).length;
+      const opportunities = all - withClients;
+      const active = clientData.filter(u => u.fields['Account Status'] === 'Active').length;
+
+      document.getElementById('countAll').textContent = all;
+      document.getElementById('countWithClients').textContent = withClients;
+      document.getElementById('countOpportunities').textContent = opportunities;
+      document.getElementById('countActive').textContent = active;
     }
 
     function addMarkersToMap() {
-      // Clear existing markers
-      markers.forEach(marker => map.removeLayer(marker));
-      markers = [];
+      // Clear existing layers
+      markerCluster.clearLayers();
+      if (heatLayer) {
+        map.removeLayer(heatLayer);
+      }
 
-      // Add markers for each region with clients
-      Object.entries(regionCounts).forEach(([region, count]) => {
-        if (count > 0 && REGION_COORDS[region]) {
-          const coords = REGION_COORDS[region];
-          
-          // Create custom icon based on client count
-          const iconSize = Math.min(20 + (count * 3), 40);
-          const icon = L.divIcon({
-            className: 'custom-marker',
-            html: `<div style="
-              background: #ef4444;
-              border: 3px solid #fff;
-              border-radius: 50%;
-              width: ${iconSize}px;
-              height: ${iconSize}px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              color: #fff;
-              font-weight: 700;
-              font-size: 12px;
-              box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            ">${count}</div>`,
-            iconSize: [iconSize, iconSize]
-          });
+      if (currentViewMode === 'markers') {
+        // Add clustered markers
+        filteredClientData.forEach(user => {
+          const region = user.fields['Region'];
+          if (region && REGION_COORDS[region]) {
+            const coords = REGION_COORDS[region];
+            
+            // Add small random offset to prevent exact overlaps
+            const lat = coords[0] + (Math.random() - 0.5) * 0.05;
+            const lng = coords[1] + (Math.random() - 0.5) * 0.05;
 
-          // Get client names for this region
-          const clients = clientData.filter(u => u.fields['Region'] === region);
-          const clientNames = clients.map(c => c.fields['Name']).join('<br>');
+            const icon = L.divIcon({
+              className: 'custom-marker',
+              html: `<div style="
+                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                border: 3px solid #fff;
+                border-radius: 50%;
+                width: 24px;
+                height: 24px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+              "></div>`,
+              iconSize: [24, 24]
+            });
 
-          const marker = L.marker(coords, { icon: icon }).addTo(map);
-          
-          marker.bindPopup(`
-            <div class="popup-title">${region}</div>
-            <div class="popup-clients">${count} client${count !== 1 ? 's' : ''}</div>
-            <div class="popup-info" style="margin-top: 8px; max-height: 150px; overflow-y: auto;">
-              ${clientNames}
-            </div>
-          `);
+            const marker = L.marker([lat, lng], { icon: icon });
+            
+            marker.bindPopup(`
+              <div class="popup-title">${user.fields['Name']}</div>
+              <div class="popup-info">🏢 ${user.fields['Company'] || 'N/A'}</div>
+              <div class="popup-info">📧 ${user.fields['Email']}</div>
+              <div class="popup-info">📍 ${region}</div>
+              <div class="popup-info">📅 Joined: ${formatDate(user.fields['Created Date'])}</div>
+              <div class="popup-clients">
+                <span class="client-badge ${user.fields['Account Status'] === 'Active' ? 'badge-active' : 'badge-inactive'}">
+                  ${user.fields['Account Status'] || 'Unknown'}
+                </span>
+              </div>
+            `);
 
-          markers.push(marker);
+            markerCluster.addLayer(marker);
+          }
+        });
+
+        map.addLayer(markerCluster);
+
+      } else if (currentViewMode === 'heatmap') {
+        // Create heat map
+        const heatData = [];
+        
+        Object.entries(regionCounts).forEach(([region, count]) => {
+          if (count > 0 && REGION_COORDS[region]) {
+            const coords = REGION_COORDS[region];
+            heatData.push([coords[0], coords[1], count / 10]); // Intensity based on count
+          }
+        });
+
+        heatLayer = L.heatLayer(heatData, {
+          radius: 40,
+          blur: 50,
+          maxZoom: 10,
+          max: 1.0,
+          gradient: {
+            0.0: '#3b82f6',
+            0.5: '#fb923c',
+            1.0: '#ef4444'
+          }
+        }).addTo(map);
+      }
+    }
+
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      
+      // Update button states
+      document.getElementById('viewMarkers').classList.toggle('active', mode === 'markers');
+      document.getElementById('viewHeatmap').classList.toggle('active', mode === 'heatmap');
+      
+      // Re-render map
+      addMarkersToMap();
+    }
+
+    function filterMap(filterType) {
+      currentFilter = filterType;
+      
+      // Update button states
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      // Apply filter to data
+      if (filterType === 'all') {
+        filteredClientData = [...clientData];
+      } else if (filterType === 'active') {
+        filteredClientData = clientData.filter(u => u.fields['Account Status'] === 'Active');
+      }
+
+      // Re-render
+      addMarkersToMap();
+      renderRegionList();
+    }
+
+    function applyDateFilter() {
+      const fromDate = document.getElementById('dateFrom').value;
+      const toDate = document.getElementById('dateTo').value;
+
+      if (!fromDate || !toDate) return;
+
+      dateFilterFrom = new Date(fromDate);
+      dateFilterTo = new Date(toDate);
+
+      // Filter clients by date
+      filteredClientData = clientData.filter(user => {
+        const created = new Date(user.fields['Created Date']);
+        return created >= dateFilterFrom && created <= dateFilterTo;
+      });
+
+      // Recalculate region counts for filtered data
+      regionCounts = {};
+      UK_REGIONS.forEach(region => {
+        regionCounts[region] = 0;
+      });
+
+      filteredClientData.forEach(user => {
+        const region = user.fields['Region'];
+        if (region && regionCounts.hasOwnProperty(region)) {
+          regionCounts[region]++;
         }
       });
+
+      // Re-render
+      addMarkersToMap();
+      renderRegionList();
+      updateFilterCounts();
     }
 
     function renderRegionList() {
@@ -696,7 +1221,7 @@
         visibleRegions = UK_REGIONS.filter(region => regionCounts[region] === 0);
       }
 
-      regionTotal.textContent = `${visibleRegions.length} of ${UK_REGIONS.length}`;
+      regionTotal.textContent = `${visibleRegions.length} / ${UK_REGIONS.length}`;
 
       const listHTML = visibleRegions.map(region => {
         const count = regionCounts[region] || 0;
@@ -710,7 +1235,7 @@
         `;
       }).join('');
 
-      container.innerHTML = listHTML || '<p style="text-align: center; color: #64748b; padding: 20px;">No regions match this filter</p>';
+      container.innerHTML = listHTML || '<div class="empty-state"><div class="empty-state-text">No regions match this filter</div></div>';
     }
 
     function flyToRegion(region) {
@@ -720,12 +1245,8 @@
           duration: 1.5
         });
 
-        // Find and open the marker popup
-        markers.forEach(marker => {
-          if (marker.getLatLng().lat === coords[0] && marker.getLatLng().lng === coords[1]) {
-            setTimeout(() => marker.openPopup(), 1600);
-          }
-        });
+        // Show clients in this region
+        showClientsInRegion(region);
       }
 
       // Highlight in sidebar
@@ -733,24 +1254,87 @@
         item.classList.remove('active');
       });
       
-      const selectedItem = Array.from(document.querySelectorAll('.region-item')).find(
-        item => item.textContent.includes(region)
-      );
-      if (selectedItem) {
-        selectedItem.classList.add('active');
-        selectedItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      event.target.closest('.region-item').classList.add('active');
+    }
+
+    function showClientsInRegion(region) {
+      const clients = filteredClientData.filter(u => u.fields['Region'] === region);
+      const panelTitle = document.getElementById('detailPanelTitle');
+      const panelContent = document.getElementById('clientDetailContent');
+
+      panelTitle.innerHTML = `📍 ${region} <span style="color: #94a3b8; font-size: 14px; font-weight: 500;">(${clients.length})</span>`;
+
+      if (clients.length === 0) {
+        panelContent.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <div class="empty-state-text">No clients in ${region} yet</div>
+          </div>
+        `;
+        return;
+      }
+
+      const clientCards = clients.map(client => `
+        <div class="client-card">
+          <div class="client-name">${client.fields['Name']}</div>
+          <div class="client-info">🏢 ${client.fields['Company'] || 'N/A'}</div>
+          <div class="client-info">📧 ${client.fields['Email']}</div>
+          <div class="client-info">📅 Joined: ${formatDate(client.fields['Created Date'])}</div>
+          <span class="client-badge ${client.fields['Account Status'] === 'Active' ? 'badge-active' : 'badge-inactive'}">
+            ${client.fields['Account Status'] || 'Unknown'}
+          </span>
+        </div>
+      `).join('');
+
+      panelContent.innerHTML = clientCards;
+    }
+
+    function showAllClients() {
+      const panelTitle = document.getElementById('detailPanelTitle');
+      const panelContent = document.getElementById('clientDetailContent');
+
+      panelTitle.innerHTML = `👥 All Clients <span style="color: #94a3b8; font-size: 14px; font-weight: 500;">(${filteredClientData.length})</span>`;
+
+      if (filteredClientData.length === 0) {
+        panelContent.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <div class="empty-state-text">No clients found</div>
+          </div>
+        `;
+        return;
+      }
+
+      const clientCards = filteredClientData
+        .filter(u => u.fields['Region'])
+        .slice(0, 50) // Show first 50
+        .map(client => `
+          <div class="client-card" onclick="flyToRegion('${client.fields['Region']}')">
+            <div class="client-name">${client.fields['Name']}</div>
+            <div class="client-info">🏢 ${client.fields['Company'] || 'N/A'}</div>
+            <div class="client-info">📍 ${client.fields['Region']}</div>
+            <div class="client-info">📅 ${formatDate(client.fields['Created Date'])}</div>
+            <span class="client-badge ${client.fields['Account Status'] === 'Active' ? 'badge-active' : 'badge-inactive'}">
+              ${client.fields['Account Status'] || 'Unknown'}
+            </span>
+          </div>
+        `).join('');
+
+      panelContent.innerHTML = clientCards;
+      
+      if (filteredClientData.length > 50) {
+        panelContent.innerHTML += `<div style="text-align: center; padding: 20px; color: #94a3b8; font-size: 13px;">Showing 50 of ${filteredClientData.length} clients</div>`;
       }
     }
 
-    function filterMap(filterType) {
-      currentFilter = filterType;
-      
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('active');
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
       });
-      event.target.classList.add('active');
-
-      renderRegionList();
     }
   </script>
 </body>
