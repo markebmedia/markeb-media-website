@@ -4,9 +4,10 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>UK Client Map - Markeb Media</title>
-
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
@@ -124,7 +125,12 @@
       border-radius: 16px;
       padding: 32px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      min-height: 800px;
+    }
+
+    #map {
+      height: 700px;
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
     }
 
     .sidebar {
@@ -199,11 +205,6 @@
       color: #64748b;
     }
 
-    #ukMapSvg {
-      width: 100%;
-      height: 700px;
-    }
-
     .map-legend {
       background: #fff;
       border-radius: 16px;
@@ -231,37 +232,6 @@
       height: 20px;
       border-radius: 4px;
       border: 2px solid #e2e8f0;
-    }
-
-    .loading-message {
-      text-align: center;
-      padding: 60px 20px;
-      color: #64748b;
-    }
-
-    .spinner {
-      margin: 0 auto 20px;
-      width: 50px;
-      height: 50px;
-      border: 4px solid #e2e8f0;
-      border-top: 4px solid #3b82f6;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .error-message {
-      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-      border: 2px solid #ef4444;
-      border-radius: 12px;
-      padding: 20px;
-      color: #991b1b;
-      font-weight: 600;
-      text-align: center;
-      margin: 20px 0;
     }
 
     .filter-section {
@@ -303,62 +273,55 @@
       border-color: #3b82f6;
     }
 
-    /* SVG Map Styles */
-    .uk-region {
-      fill: #e2e8f0;
-      stroke: #fff;
-      stroke-width: 1.5;
-      cursor: pointer;
-      transition: all .3s ease;
+    .loading-message {
+      text-align: center;
+      padding: 60px 20px;
+      color: #64748b;
     }
 
-    .uk-region:hover {
-      fill: #cbd5e1;
-      stroke-width: 2;
+    .spinner {
+      margin: 0 auto 20px;
+      width: 50px;
+      height: 50px;
+      border: 4px solid #e2e8f0;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
 
-    .uk-region.has-clients {
-      fill: #93c5fd;
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
-    .uk-region.has-clients:hover {
-      fill: #60a5fa;
+    /* Custom Leaflet Popup */
+    .leaflet-popup-content-wrapper {
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
-    .uk-region.active {
-      fill: #3b82f6 !important;
-      stroke: #1e40af;
-      stroke-width: 3;
+    .leaflet-popup-content {
+      margin: 16px;
+      font-family: 'Inter', sans-serif;
     }
 
-    .region-label {
-      font-size: 9px;
+    .popup-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .popup-info {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .popup-clients {
+      font-size: 14px;
       font-weight: 600;
-      fill: #475569;
-      pointer-events: none;
-      text-anchor: middle;
-      user-select: none;
-    }
-
-    .client-marker {
-      fill: #ef4444;
-      stroke: #fff;
-      stroke-width: 2;
-      pointer-events: none;
-    }
-
-    .region-tooltip {
-      position: absolute;
-      background: rgba(15, 23, 42, 0.95);
-      color: #fff;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      pointer-events: none;
-      z-index: 1000;
-      display: none;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      color: #3b82f6;
+      margin-top: 8px;
     }
 
     @media (max-width: 1200px) {
@@ -370,7 +333,7 @@
         order: -1;
       }
 
-      #ukMapSvg {
+      #map {
         height: 500px;
       }
     }
@@ -396,7 +359,7 @@
         padding: 20px;
       }
 
-      #ukMapSvg {
+      #map {
         height: 400px;
       }
 
@@ -407,8 +370,6 @@
   </style>
 </head>
 <body>
-  <div class="region-tooltip" id="tooltip"></div>
-
   <div class="map-container">
     <!-- Header -->
     <div class="header">
@@ -450,13 +411,12 @@
     <div class="content-grid">
       <!-- Map Section -->
       <div class="map-section">
-        <div id="mapContainer">
+        <div id="map">
           <div class="loading-message">
             <div class="spinner"></div>
-            <p>Loading UK map data...</p>
+            <p>Loading interactive UK map...</p>
           </div>
         </div>
-        <svg id="ukMapSvg" style="display: none;" viewBox="0 0 600 800"></svg>
       </div>
 
       <!-- Sidebar -->
@@ -479,20 +439,16 @@
         <div class="map-legend">
           <h4>📊 Map Legend</h4>
           <div class="legend-item">
-            <div class="legend-color" style="background: #e2e8f0;"></div>
-            <span>No clients</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #93c5fd;"></div>
-            <span>Has clients</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color" style="background: #3b82f6;"></div>
-            <span>Selected region</span>
-          </div>
-          <div class="legend-item">
             <div class="legend-color" style="background: #ef4444; border-radius: 50%;"></div>
             <span>Client location marker</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #3b82f6; opacity: 0.3;"></div>
+            <span>Region with clients</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #e2e8f0;"></div>
+            <span>No clients yet</span>
           </div>
         </div>
 
@@ -513,98 +469,110 @@
   </div>
 
   <script>
-    // UK Regions - Grouped by country/area for map visualization
-    const UK_REGIONS_DATA = {
-      'Scotland': {
-        regions: ['Aberdeenshire', 'Angus', 'Argyll and Bute', 'City of Edinburgh', 'Clackmannanshire', 
-          'Dumfries and Galloway', 'Dundee City', 'East Ayrshire', 'East Dunbartonshire', 'East Lothian',
-          'East Renfrewshire', 'Falkirk', 'Fife', 'Glasgow City', 'Highland', 'Inverclyde',
-          'Midlothian', 'Moray', 'North Ayrshire', 'North Lanarkshire', 'Orkney Islands',
-          'Perth and Kinross', 'Renfrewshire', 'Scottish Borders', 'Shetland Islands', 'South Ayrshire',
-          'South Lanarkshire', 'Stirling', 'West Dunbartonshire', 'West Lothian', 'Western Isles'],
-        color: '#93c5fd',
-        position: { x: 250, y: 50 }
-      },
-      'Northern England': {
-        regions: ['County Durham', 'Northumberland', 'Tyne and Wear', 'Cumbria', 'Lancashire', 
-          'Greater Manchester', 'Merseyside', 'Cheshire', 'East Riding of Yorkshire', 'North Yorkshire', 
-          'South Yorkshire', 'West Yorkshire'],
-        color: '#7dd3fc',
-        position: { x: 300, y: 250 }
-      },
-      'Midlands': {
-        regions: ['Derbyshire', 'Leicestershire', 'Lincolnshire', 'Northamptonshire', 'Nottinghamshire', 
-          'Rutland', 'Herefordshire', 'Shropshire', 'Staffordshire', 'Warwickshire', 'West Midlands', 'Worcestershire'],
-        color: '#67e8f9',
-        position: { x: 300, y: 350 }
-      },
-      'East of England': {
-        regions: ['Bedfordshire', 'Cambridgeshire', 'Essex', 'Hertfordshire', 'Norfolk', 'Suffolk'],
-        color: '#5eead4',
-        position: { x: 380, y: 380 }
-      },
-      'Greater London': {
-        regions: ['Greater London'],
-        color: '#6ee7b7',
-        position: { x: 370, y: 450 }
-      },
-      'South East': {
-        regions: ['Berkshire', 'Buckinghamshire', 'East Sussex', 'Hampshire', 'Isle of Wight', 
-          'Kent', 'Oxfordshire', 'Surrey', 'West Sussex'],
-        color: '#86efac',
-        position: { x: 350, y: 500 }
-      },
-      'South West': {
-        regions: ['Bristol', 'Cornwall', 'Devon', 'Dorset', 'Gloucestershire', 'Somerset', 'Wiltshire'],
-        color: '#a7f3d0',
-        position: { x: 250, y: 520 }
-      },
-      'Wales': {
-        regions: ['Anglesey', 'Blaenau Gwent', 'Bridgend', 'Caerphilly', 'Cardiff', 'Carmarthenshire',
-          'Ceredigion', 'Conwy', 'Denbighshire', 'Flintshire', 'Gwynedd', 'Merthyr Tydfil',
-          'Monmouthshire', 'Neath Port Talbot', 'Newport', 'Pembrokeshire', 'Powys', 'Rhondda Cynon Taf',
-          'Swansea', 'Torfaen', 'Vale of Glamorgan', 'Wrexham'],
-        color: '#bef264',
-        position: { x: 180, y: 380 }
-      },
-      'Northern Ireland': {
-        regions: ['Antrim', 'Armagh', 'Down', 'Fermanagh', 'Londonderry', 'Tyrone'],
-        color: '#fde047',
-        position: { x: 100, y: 250 }
-      }
+    // UK Region coordinates (approximate centers)
+    const REGION_COORDS = {
+      'Leicestershire': [52.6369, -1.1398],
+      'Derbyshire': [53.1235, -1.5650],
+      'Nottinghamshire': [53.1000, -0.9900],
+      'Greater London': [51.5074, -0.1278],
+      'Greater Manchester': [53.4808, -2.2426],
+      'West Midlands': [52.4862, -1.8904],
+      'Hampshire': [51.0577, -1.3081],
+      'Kent': [51.2787, 0.5217],
+      'Essex': [51.7341, 0.4700],
+      'Surrey': [51.3148, -0.5600],
+      'Lancashire': [53.7632, -2.7044],
+      'Hertfordshire': [51.8090, -0.2376],
+      'Berkshire': [51.4543, -1.0000],
+      'Staffordshire': [52.8700, -2.0800],
+      'Cheshire': [53.2000, -2.5300],
+      'West Yorkshire': [53.7900, -1.7500],
+      'South Yorkshire': [53.5400, -1.3500],
+      'Norfolk': [52.6295, 0.7100],
+      'Oxfordshire': [51.7612, -1.2500],
+      'Lincolnshire': [53.2307, -0.5406],
+      'Suffolk': [52.1872, 0.9708],
+      'Cambridgeshire': [52.2053, 0.1218],
+      'Worcestershire': [52.2500, -2.2200],
+      'Devon': [50.7184, -3.5339],
+      'Gloucestershire': [51.8642, -2.2381],
+      'Somerset': [51.1054, -2.9260],
+      'Dorset': [50.7480, -2.3440],
+      'Wiltshire': [51.3493, -1.9927],
+      'Cornwall': [50.2660, -5.0527],
+      'East Sussex': [50.9085, 0.2500],
+      'West Sussex': [50.9200, -0.6000],
+      'Bedfordshire': [52.0406, -0.4547],
+      'Northamptonshire': [52.2700, -0.8700],
+      'Warwickshire': [52.2819, -1.5849],
+      'Shropshire': [52.7069, -2.7464],
+      'Herefordshire': [52.0564, -2.7160],
+      'Buckinghamshire': [51.8133, -0.8084],
+      'City of Edinburgh': [55.9533, -3.1883],
+      'Glasgow City': [55.8642, -4.2518],
+      'Fife': [56.2079, -3.1498],
+      'Highland': [57.4778, -4.2247],
+      'Aberdeenshire': [57.1497, -2.5943],
+      'Perth and Kinross': [56.3950, -3.4373],
+      'Dumfries and Galloway': [55.0700, -3.6053],
+      'Scottish Borders': [55.5446, -2.7820],
+      'South Lanarkshire': [55.6743, -3.7819],
+      'North Lanarkshire': [55.8667, -3.9667],
+      'Angus': [56.6500, -2.8667],
+      'Stirling': [56.1165, -3.9369],
+      'Cardiff': [51.4816, -3.1791],
+      'Swansea': [51.6214, -3.9436],
+      'Newport': [51.5842, -2.9977],
+      'Gwynedd': [52.9167, -4.1333],
+      'Powys': [52.3333, -3.3333],
+      'Carmarthenshire': [51.8567, -4.3123],
+      'Pembrokeshire': [51.6730, -4.9094],
+      'Ceredigion': [52.4167, -3.9667],
+      'Antrim': [54.7167, -6.2167],
+      'Down': [54.3167, -5.7167],
+      'Armagh': [54.3500, -6.6500],
+      'Londonderry': [54.9958, -7.3086],
+      'Tyrone': [54.6000, -7.3000],
+      'Fermanagh': [54.3500, -7.6333],
+      'Bristol': [51.4545, -2.5879],
+      'Cumbria': [54.5772, -2.7974],
+      'Northumberland': [55.2083, -2.0784],
+      'County Durham': [54.7753, -1.5849],
+      'Tyne and Wear': [54.9783, -1.6178],
+      'North Yorkshire': [54.2766, -1.4090],
+      'East Riding of Yorkshire': [53.8429, -0.4380],
+      'Rutland': [52.6558, -0.6389],
+      'Isle of Wight': [50.6938, -1.3047],
+      'Merseyside': [53.4106, -2.9779]
     };
 
-    // Flatten regions for easy lookup
-    const UK_REGIONS = [];
-    Object.values(UK_REGIONS_DATA).forEach(area => {
-      UK_REGIONS.push(...area.regions);
-    });
-    UK_REGIONS.sort();
-
+    const UK_REGIONS = Object.keys(REGION_COORDS).sort();
+    
     let clientData = [];
     let regionCounts = {};
-    let selectedRegion = null;
+    let map;
+    let markers = [];
     let currentFilter = 'all';
 
-    // Load map data on page load
+    // Initialize map
     document.addEventListener('DOMContentLoaded', () => {
+      initMap();
       loadMapData();
     });
 
-    async function loadMapData() {
-      const mapContainer = document.getElementById('mapContainer');
-      const ukMap = document.getElementById('ukMapSvg');
-      
-      mapContainer.style.display = 'block';
-      ukMap.style.display = 'none';
-      
-      mapContainer.innerHTML = `
-        <div class="loading-message">
-          <div class="spinner"></div>
-          <p>Loading UK map data...</p>
-        </div>
-      `;
+    function initMap() {
+      // Create map centered on UK
+      map = L.map('map').setView([54.5, -3], 6);
 
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 10,
+        minZoom: 5
+      }).addTo(map);
+    }
+
+    async function loadMapData() {
       try {
         const response = await fetch('/.netlify/functions/admin-users', {
           method: 'GET',
@@ -634,19 +602,15 @@
         // Update stats
         updateStats();
 
-        // Render map and region list
-        renderMap();
+        // Add markers to map
+        addMarkersToMap();
+
+        // Render region list
         renderRegionList();
 
       } catch (error) {
         console.error('Error loading map data:', error);
-        mapContainer.innerHTML = `
-          <div class="error-message">
-            ❌ Failed to load map data: ${error.message}
-            <br><br>
-            <button class="btn btn-primary" onclick="loadMapData()">Try Again</button>
-          </div>
-        `;
+        alert('Failed to load map data: ' + error.message);
       }
     }
 
@@ -655,7 +619,6 @@
       const regionsWithClients = Object.values(regionCounts).filter(count => count > 0).length;
       const emptyRegions = UK_REGIONS.length - regionsWithClients;
       
-      // Find top region
       let topRegion = '-';
       let maxCount = 0;
       for (const [region, count] of Object.entries(regionCounts)) {
@@ -671,113 +634,54 @@
       document.getElementById('topRegion').textContent = maxCount > 0 ? topRegion : '-';
     }
 
-    function renderMap() {
-      const mapContainer = document.getElementById('mapContainer');
-      const ukMap = document.getElementById('ukMapSvg');
-      
-      mapContainer.style.display = 'none';
-      ukMap.style.display = 'block';
+    function addMarkersToMap() {
+      // Clear existing markers
+      markers.forEach(marker => map.removeLayer(marker));
+      markers = [];
 
-      let svgContent = '';
-      let yOffset = 0;
+      // Add markers for each region with clients
+      Object.entries(regionCounts).forEach(([region, count]) => {
+        if (count > 0 && REGION_COORDS[region]) {
+          const coords = REGION_COORDS[region];
+          
+          // Create custom icon based on client count
+          const iconSize = Math.min(20 + (count * 3), 40);
+          const icon = L.divIcon({
+            className: 'custom-marker',
+            html: `<div style="
+              background: #ef4444;
+              border: 3px solid #fff;
+              border-radius: 50%;
+              width: ${iconSize}px;
+              height: ${iconSize}px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #fff;
+              font-weight: 700;
+              font-size: 12px;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            ">${count}</div>`,
+            iconSize: [iconSize, iconSize]
+          });
 
-      // Draw each area of the UK
-      Object.entries(UK_REGIONS_DATA).forEach(([areaName, areaData], areaIndex) => {
-        const x = areaData.position.x;
-        const y = areaData.position.y;
-        
-        // Calculate total clients in this area
-        let areaClients = 0;
-        areaData.regions.forEach(region => {
-          areaClients += regionCounts[region] || 0;
-        });
+          // Get client names for this region
+          const clients = clientData.filter(u => u.fields['Region'] === region);
+          const clientNames = clients.map(c => c.fields['Name']).join('<br>');
 
-        const hasClients = areaClients > 0;
-        const fillColor = hasClients ? '#93c5fd' : '#e2e8f0';
+          const marker = L.marker(coords, { icon: icon }).addTo(map);
+          
+          marker.bindPopup(`
+            <div class="popup-title">${region}</div>
+            <div class="popup-clients">${count} client${count !== 1 ? 's' : ''}</div>
+            <div class="popup-info" style="margin-top: 8px; max-height: 150px; overflow-y: auto;">
+              ${clientNames}
+            </div>
+          `);
 
-        // Draw area as a rounded rectangle
-        const width = 120;
-        const height = 80;
-        
-        svgContent += `
-          <g class="area-group" data-area="${areaName}">
-            <rect 
-              x="${x}" 
-              y="${y}" 
-              width="${width}" 
-              height="${height}" 
-              rx="12"
-              class="uk-region ${hasClients ? 'has-clients' : ''}" 
-              data-area="${areaName}"
-              data-clients="${areaClients}"
-              onclick="selectArea('${areaName}')"
-              onmouseover="showTooltip(event, '${areaName}', ${areaClients})"
-              onmouseout="hideTooltip()"
-            />
-            <text 
-              x="${x + width/2}" 
-              y="${y + height/2 - 10}" 
-              class="region-label" 
-              style="font-size: 11px; font-weight: 700;"
-            >
-              ${areaName}
-            </text>
-            <text 
-              x="${x + width/2}" 
-              y="${y + height/2 + 8}" 
-              class="region-label" 
-              style="font-size: 14px; fill: ${hasClients ? '#1e40af' : '#64748b'};"
-            >
-              ${areaClients} client${areaClients !== 1 ? 's' : ''}
-            </text>
-            <text 
-              x="${x + width/2}" 
-              y="${y + height/2 + 22}" 
-              class="region-label" 
-              style="font-size: 9px; fill: #94a3b8;"
-            >
-              ${areaData.regions.length} region${areaData.regions.length !== 1 ? 's' : ''}
-            </text>
-          </g>
-        `;
-      });
-
-      ukMap.innerHTML = svgContent;
-    }
-
-    function showTooltip(event, areaName, clientCount) {
-      const tooltip = document.getElementById('tooltip');
-      const area = UK_REGIONS_DATA[areaName];
-      
-      tooltip.innerHTML = `
-        <strong>${areaName}</strong><br>
-        ${clientCount} client${clientCount !== 1 ? 's' : ''} • ${area.regions.length} regions
-      `;
-      tooltip.style.display = 'block';
-      tooltip.style.left = (event.pageX + 10) + 'px';
-      tooltip.style.top = (event.pageY - 30) + 'px';
-    }
-
-    function hideTooltip() {
-      document.getElementById('tooltip').style.display = 'none';
-    }
-
-    function selectArea(areaName) {
-      // Highlight area on map
-      document.querySelectorAll('.uk-region').forEach(rect => {
-        rect.classList.remove('active');
-      });
-      
-      document.querySelectorAll(`[data-area="${areaName}"]`).forEach(el => {
-        if (el.classList.contains('uk-region')) {
-          el.classList.add('active');
+          markers.push(marker);
         }
       });
-
-      // Show regions in sidebar
-      console.log(`Selected: ${areaName}`);
-      const area = UK_REGIONS_DATA[areaName];
-      console.log('Regions:', area.regions);
     }
 
     function renderRegionList() {
@@ -799,7 +703,7 @@
         const isEmpty = count === 0;
         
         return `
-          <div class="region-item ${isEmpty ? 'empty' : ''}" onclick="selectRegion('${region}')">
+          <div class="region-item ${isEmpty ? 'empty' : ''}" onclick="flyToRegion('${region}')">
             <span class="region-name">${region}</span>
             <span class="region-count">${count}</span>
           </div>
@@ -809,10 +713,22 @@
       container.innerHTML = listHTML || '<p style="text-align: center; color: #64748b; padding: 20px;">No regions match this filter</p>';
     }
 
-    function selectRegion(region) {
-      selectedRegion = region;
-      
-      // Update region list highlighting
+    function flyToRegion(region) {
+      if (REGION_COORDS[region]) {
+        const coords = REGION_COORDS[region];
+        map.flyTo(coords, 9, {
+          duration: 1.5
+        });
+
+        // Find and open the marker popup
+        markers.forEach(marker => {
+          if (marker.getLatLng().lat === coords[0] && marker.getLatLng().lng === coords[1]) {
+            setTimeout(() => marker.openPopup(), 1600);
+          }
+        });
+      }
+
+      // Highlight in sidebar
       document.querySelectorAll('.region-item').forEach(item => {
         item.classList.remove('active');
       });
@@ -824,28 +740,16 @@
         selectedItem.classList.add('active');
         selectedItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
-
-      const count = regionCounts[region] || 0;
-      const clients = clientData.filter(u => u.fields['Region'] === region);
-      
-      if (count > 0) {
-        const clientNames = clients.map(c => c.fields['Name']).join(', ');
-        console.log(`📍 ${region}: ${count} client${count !== 1 ? 's' : ''} - ${clientNames}`);
-      } else {
-        console.log(`📍 ${region}: Opportunity region - no clients yet`);
-      }
     }
 
     function filterMap(filterType) {
       currentFilter = filterType;
       
-      // Update button states
       document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.classList.remove('active');
       });
       event.target.classList.add('active');
 
-      // Re-render region list with filter
       renderRegionList();
     }
   </script>
