@@ -364,6 +364,19 @@
       font-weight: 700;
     }
 
+    .bedroom-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      border: 2px solid #e2e8f0;
+      background: #fff;
+      font-size: 24px;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
     .bedroom-btn:hover {
       border-color: #3b82f6;
       color: #3b82f6;
@@ -562,11 +575,11 @@
         </div>
         <div class="step" id="step2Indicator">
           <div class="step-number">2</div>
-          <div class="step-label">Date & Time</div>
+          <div class="step-label">Service</div>
         </div>
         <div class="step" id="step3Indicator">
           <div class="step-number">3</div>
-          <div class="step-label">Service</div>
+          <div class="step-label">Date & Time</div>
         </div>
         <div class="step" id="step4Indicator">
           <div class="step-number">4</div>
@@ -643,14 +656,89 @@
             <div class="loading-spinner"></div>
             <span>Check Availability</span>
           </button>
-          <button class="btn btn-primary" id="continueWithAddressBtn" onclick="proceedToCalendar()" style="display: none;">
+          <button class="btn btn-primary" id="continueWithAddressBtn" onclick="proceedToServiceSelection()" style="display: none;">
+            <span>Continue to Service Selection</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Service Selection -->
+      <div class="form-section" id="step2">
+        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 12px; color: #1e293b;">
+          Choose Your Service
+        </h2>
+        <p style="font-size: 14px; color: #64748b; margin-bottom: 28px;">
+          Select the photography service that best suits your property
+        </p>
+
+        <!-- Service Cards -->
+        <div id="serviceCards" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px;">
+          <!-- Services will be dynamically inserted here -->
+        </div>
+
+        <!-- Bedroom Counter (only shown for property services) -->
+        <div id="bedroomSection" style="display: none;">
+          <div class="form-group">
+            <label class="form-label">Number of Bedrooms</label>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <button type="button" class="bedroom-btn" onclick="adjustBedrooms(-1)">-</button>
+              <div style="flex: 1; text-align: center;">
+                <div id="bedroomCount" style="font-size: 48px; font-weight: 700; color: #3b82f6;">4</div>
+                <div style="font-size: 13px; color: #64748b; margin-top: 4px;">bedrooms</div>
+              </div>
+              <button type="button" class="bedroom-btn" onclick="adjustBedrooms(1)">+</button>
+            </div>
+            <div id="bedroomFeeNotice" style="display: none; margin-top: 12px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
+              <strong>£30 per additional bedroom</strong> after the first 4 bedrooms
+            </div>
+          </div>
+        </div>
+
+        <!-- Add-Ons Section -->
+        <div id="addonsSection" style="display: none; margin-top: 32px;">
+          <div style="border-top: 2px solid #e2e8f0; padding-top: 32px;">
+            <h3 style="font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 12px;">
+              📦 Enhance Your Service
+            </h3>
+            <p style="font-size: 14px; color: #64748b; margin-bottom: 24px;">
+              Select optional add-ons to enhance your booking
+            </p>
+            <div id="addonsGrid" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Add-ons will be inserted here dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Price Breakdown -->
+        <div id="priceBreakdown" style="background: #f8fafc; border-radius: 12px; padding: 24px; margin-bottom: 28px; display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 14px; color: #64748b;">Service</span>
+            <span style="font-size: 14px; font-weight: 600; color: #1e293b;" id="servicePrice">£0.00</span>
+          </div>
+          <div id="bedroomFeeRow" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 14px; color: #64748b;">Extra bedrooms</span>
+            <span style="font-size: 14px; font-weight: 600; color: #1e293b;" class="detail-value">£0.00</span>
+          </div>
+          <div style="border-top: 2px solid #e2e8f0; margin: 16px 0;"></div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 18px; font-weight: 700; color: #1e293b;">Total</span>
+            <span style="font-size: 24px; font-weight: 700; color: #3b82f6;" id="totalPrice">£0.00</span>
+          </div>
+          <div style="font-size: 12px; color: #94a3b8; text-align: right; margin-top: 4px;">Inc. VAT</div>
+        </div>
+
+        <div class="button-group">
+          <button type="button" class="btn btn-secondary" onclick="goToStep(1)" style="flex: 1;">
+            Back
+          </button>
+          <button type="button" class="btn btn-primary" id="continueToCalendarBtn" onclick="goToStep(3)" style="flex: 2;" disabled>
             <span>Continue to Date Selection</span>
           </button>
         </div>
       </div>
 
-      <!-- Step 2: Date & Time Selection -->
-      <div class="form-section" id="step2">
+      <!-- Step 3: Date & Time Selection -->
+      <div class="form-section" id="step3">
         <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 12px; color: #1e293b;">
           Choose Date & Time
         </h2>
@@ -685,66 +773,6 @@
             <div class="spinner" style="margin: 0 auto 20px;"></div>
             <p>Checking availability...</p>
           </div>
-        </div>
-
-        <div class="button-group">
-          <button type="button" class="btn btn-secondary" onclick="goToStep(1)" style="flex: 1;">
-            Back
-          </button>
-          <button type="button" class="btn btn-primary" id="continueToServiceBtn" onclick="goToStep(3)" style="flex: 2;" disabled>
-            <span>Continue to Services</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Step 3: Service Selection -->
-      <div class="form-section" id="step3">
-        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 12px; color: #1e293b;">
-          Choose Your Service
-        </h2>
-        <p style="font-size: 14px; color: #64748b; margin-bottom: 28px;">
-          Select the photography service that best suits your property
-        </p>
-
-        <!-- Service Cards -->
-        <div id="serviceCards" style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px;">
-          <!-- Services will be dynamically inserted here -->
-        </div>
-
-        <!-- Bedroom Counter (only shown for property services) -->
-        <div id="bedroomSection" style="display: none;">
-          <div class="form-group">
-            <label class="form-label">Number of Bedrooms</label>
-            <div style="display: flex; align-items: center; gap: 16px;">
-              <button type="button" class="bedroom-btn" onclick="adjustBedrooms(-1)" style="width: 50px; height: 50px; border-radius: 10px; border: 2px solid #e2e8f0; background: #fff; font-size: 24px; font-weight: 700; color: #64748b; cursor: pointer; transition: all 0.2s;">-</button>
-              <div style="flex: 1; text-align: center;">
-                <div id="bedroomCount" style="font-size: 48px; font-weight: 700; color: #3b82f6;">4</div>
-                <div style="font-size: 13px; color: #64748b; margin-top: 4px;">bedrooms</div>
-              </div>
-              <button type="button" class="bedroom-btn" onclick="adjustBedrooms(1)" style="width: 50px; height: 50px; border-radius: 10px; border: 2px solid #e2e8f0; background: #fff; font-size: 24px; font-weight: 700; color: #64748b; cursor: pointer; transition: all 0.2s;">+</button>
-            </div>
-            <div id="bedroomFeeNotice" style="display: none; margin-top: 12px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
-              <strong>£30 per additional bedroom</strong> after the first 4 bedrooms
-            </div>
-          </div>
-        </div>
-
-        <!-- Price Breakdown -->
-        <div id="priceBreakdown" style="background: #f8fafc; border-radius: 12px; padding: 24px; margin-bottom: 28px; display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span style="font-size: 14px; color: #64748b;">Service</span>
-            <span style="font-size: 14px; font-weight: 600; color: #1e293b;" id="servicePrice">£0.00</span>
-          </div>
-          <div id="bedroomFeeRow" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <span style="font-size: 14px; color: #64748b;">Extra bedrooms</span>
-            <span style="font-size: 14px; font-weight: 600; color: #1e293b;" class="detail-value">£0.00</span>
-          </div>
-          <div style="border-top: 2px solid #e2e8f0; margin: 16px 0;"></div>
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 18px; font-weight: 700; color: #1e293b;">Total</span>
-            <span style="font-size: 24px; font-weight: 700; color: #3b82f6;" id="totalPrice">£0.00</span>
-          </div>
-          <div style="font-size: 12px; color: #94a3b8; text-align: right; margin-top: 4px;">Inc. VAT</div>
         </div>
 
         <div class="button-group">
@@ -809,6 +837,94 @@
             rows="4"
             style="resize: vertical; min-height: 100px;"
           ></textarea>
+        </div>
+
+        <!-- Terms & Conditions -->
+        <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 28px;">
+          <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 16px;">
+            Important Information
+          </h3>
+
+          <!-- Revisions -->
+          <div style="margin-bottom: 16px;">
+            <label style="display: flex; align-items: start; gap: 12px; cursor: pointer;">
+              <input type="checkbox" id="termsRevisions" style="margin-top: 4px; width: 18px; height: 18px; cursor: pointer;" required>
+              <span style="font-size: 14px; color: #64748b; line-height: 1.6;">
+                I understand that I am entitled to <strong>two free revisions</strong> and additional revisions may be charged.
+              </span>
+            </label>
+          </div>
+
+          <!-- Item Removal -->
+          <div id="termsItemRemoval" style="margin-bottom: 16px; display: none;">
+            <label style="display: flex; align-items: start; gap: 12px; cursor: pointer;">
+              <input type="checkbox" id="termsItemRemovalConfirm" style="margin-top: 4px; width: 18px; height: 18px; cursor: pointer;">
+              <span style="font-size: 14px; color: #64748b; line-height: 1.6;">
+                I understand that <strong>item removal from photos</strong> may incur extra charges.
+              </span>
+            </label>
+          </div>
+
+          <!-- Property Access (Property services only) -->
+          <div id="termsPropertyAccess" style="margin-bottom: 16px; display: none;">
+            <label style="display: flex; align-items: start; gap: 12px; cursor: pointer;">
+              <input type="checkbox" id="termsAccess" style="margin-top: 4px; width: 18px; height: 18px; cursor: pointer;">
+              <span style="font-size: 14px; color: #64748b; line-height: 1.6;">
+                I have arranged <strong>access to the property</strong> and informed the owner/occupants (if applicable).
+              </span>
+            </label>
+          </div>
+
+          <!-- Hygiene Notice (Property services only - not drone) -->
+          <div id="termsHygiene" style="margin-bottom: 16px; display: none;">
+            <div style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+              <p style="font-size: 13px; color: #92400e; line-height: 1.6; margin: 0;">
+                <strong>Please note:</strong> For hygiene reasons, Markeb Media will not handle or move items such as towels, toiletries or other personal items. Please advise the owner of the property to do so before arrival.
+              </p>
+            </div>
+            <label style="display: flex; align-items: start; gap: 12px; cursor: pointer;">
+              <input type="checkbox" id="termsHygieneConfirm" style="margin-top: 4px; width: 18px; height: 18px; cursor: pointer;">
+              <span style="font-size: 14px; color: #64748b; line-height: 1.6;">
+                I acknowledge the hygiene policy and will ensure the property is prepared accordingly.
+              </span>
+            </label>
+          </div>
+
+          <!-- Privacy & Payment Policy -->
+          <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+            <h4 style="font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">
+              Privacy & Payment
+            </h4>
+            <p style="font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 8px;">
+              Markeb Media respects your privacy. We do not sell, rent, or share your personal data with third parties for marketing purposes. Your information is used solely to manage bookings, deliver services, and process payments.
+            </p>
+            <p style="font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 8px;">
+              All card payments are securely processed by <strong>Stripe</strong>. Markeb Media does not store or have access to your full card details.
+            </p>
+            <p style="font-size: 13px; color: #64748b; line-height: 1.6; margin: 0;">
+              Your card will be charged automatically once your content enters the editing stage, and you will receive a confirmation notification at that time.
+            </p>
+          </div>
+
+          <!-- Cancellation Policy -->
+          <div style="background: #fef2f2; border: 1px solid #ef4444; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+            <h4 style="font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">
+              Cancellation Policy
+            </h4>
+            <p style="font-size: 13px; color: #64748b; line-height: 1.6; margin: 0;">
+              You may cancel or reschedule your booking up to <strong>24 hours before</strong> the scheduled shoot time at no charge. Cancellations made within 24 hours incur a <strong>50% charge</strong>. Same-day cancellations or no-shows are charged in full (<strong>100%</strong>).
+            </p>
+          </div>
+
+          <!-- Final Agreement Checkbox -->
+          <div style="margin-bottom: 0;">
+            <label style="display: flex; align-items: start; gap: 12px; cursor: pointer;">
+              <input type="checkbox" id="termsAgree" style="margin-top: 4px; width: 18px; height: 18px; cursor: pointer;" required>
+              <span style="font-size: 14px; color: #1e293b; font-weight: 600; line-height: 1.6;">
+                I have read, understood, and agree to the Terms & Conditions, Privacy Policy, and Cancellation Policy.
+              </span>
+            </label>
+          </div>
         </div>
 
         <!-- Booking Summary -->
@@ -883,8 +999,6 @@
         </div>
       </div>
 
-      <!-- Step 5: Confirmation (will add later) -->
-
     </div>
   </div>
 
@@ -898,11 +1012,11 @@
 
     const PHOTOGRAPHERS = {
       north: {
-        name: 'Northern Photographer',
+        name: 'Jodie',
         territory: 'North'
       },
       south: {
-        name: 'Southern Photographer',
+        name: 'Abbie',
         territory: 'South'
       }
     };
@@ -924,22 +1038,91 @@
       clientEmail: '',
       clientPhone: '',
       clientNotes: '',
-      paymentOption: null
+      paymentOption: null,
+      selectedAddons: []
     };
 
     let currentCalendarDate = new Date();
-    let existingBookings = [];
 
-    // Service Catalog
+    // Add-Ons Catalog
+    const ADDONS = {
+      'standard-floor-plan': {
+        id: 'standard-floor-plan',
+        name: 'Standard Floor Plan',
+        price: 24.00,
+        duration: 0,
+        description: '2D floor plan to help buyers visualize the property layout',
+        appliesToVideo: false
+      },
+      'plus-floor-plan': {
+        id: 'plus-floor-plan',
+        name: 'Plus Floor Plan',
+        price: 36.00,
+        duration: 0,
+        description: 'Enhanced 2D floor plan with measurements and room labels',
+        appliesToVideo: false
+      },
+      'cinematic-edit': {
+        id: 'cinematic-edit',
+        name: 'Cinematic Edit',
+        price: 50.00,
+        duration: 0,
+        description: 'Premium cinematic editing with color grading, transitions, and professional soundtrack',
+        appliesToVideo: true
+      },
+      'property-drone-photo': {
+        id: 'property-drone-photo',
+        name: 'Property Drone Photography',
+        price: 130.80,
+        duration: 15,
+        description: 'Up to 10 stunning aerial photographs',
+        appliesToVideo: false
+      },
+      'property-drone-video': {
+        id: 'property-drone-video',
+        name: 'Property Drone Videography',
+        price: 130.80,
+        duration: 15,
+        description: 'Up to 30-second cinematic aerial showcase',
+        appliesToVideo: true
+      },
+      'property-video': {
+        id: 'property-video',
+        name: 'Property Videography',
+        price: 154.80,
+        duration: 60,
+        description: 'Shot in 4K to captivate viewers and drive enquiries',
+        appliesToVideo: true
+      },
+      'property-speed-tours': {
+        id: 'property-speed-tours',
+        name: 'Property Speed Tours',
+        price: 60.00,
+        duration: 0,
+        description: 'Quick walkthrough video tour of the property',
+        appliesToVideo: true
+      },
+      'add-branded-outro': {
+        id: 'add-branded-outro',
+        name: 'Add Branded Outro To Video',
+        price: 0.00,
+        duration: 0,
+        description: 'Add your branded outro to any video content',
+        appliesToVideo: true
+      }
+    };
+
+    // Service Catalog with Add-Ons
     const SERVICES = {
       north: [
         {
           id: 'complete-branding',
           name: 'Complete Branding Package - Photo & Video',
           price: 894.00,
-          duration: 300, // 5 hours in minutes
+          duration: 300,
           description: 'Full personal branding suite for estate agents. Photography and video content.',
-          isPropertyService: false
+          isPropertyService: false,
+          availableAddons: ['cinematic-edit', 'add-branded-outro']
         },
         {
           id: 'branding-video',
@@ -947,7 +1130,8 @@
           price: 534.00,
           duration: 180,
           description: 'Personal branding video for estate agents. Multiple sequences for social content.',
-          isPropertyService: false
+          isPropertyService: false,
+          availableAddons: ['cinematic-edit', 'add-branded-outro']
         },
         {
           id: 'branding-photo',
@@ -955,7 +1139,8 @@
           price: 414.00,
           duration: 120,
           description: 'Personal branding for estate agents. You\'re in every shot.',
-          isPropertyService: false
+          isPropertyService: false,
+          availableAddons: []
         },
         {
           id: 'gold-package',
@@ -963,7 +1148,8 @@
           price: 600.00,
           duration: 150,
           description: 'Everything in our Silver Package, plus enhanced lifestyle content.',
-          isPropertyService: true
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-speed-tours', 'add-branded-outro']
         },
         {
           id: 'silver-package',
@@ -972,7 +1158,8 @@
           duration: 90,
           description: 'Everything in our Bronze Package, plus full videography and drone shots for complete property marketing.',
           popular: true,
-          isPropertyService: true
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-speed-tours', 'add-branded-outro']
         },
         {
           id: 'all-in-one-drone',
@@ -980,7 +1167,8 @@
           price: 214.80,
           duration: 45,
           description: '10 aerial photos and a 30-second drone video for your property marketing.',
-          isPropertyService: true
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
         },
         {
           id: 'property-video',
@@ -988,7 +1176,8 @@
           price: 154.80,
           duration: 60,
           description: 'Shot in 4K to captivate viewers and drive enquiries.',
-          isPropertyService: true
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
         },
         {
           id: 'property-photo',
@@ -996,7 +1185,8 @@
           price: 118.80,
           duration: 45,
           description: 'Up to 30 magazine-quality images that make your property irresistible to potential buyers.',
-          isPropertyService: true
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
         },
         {
           id: 'drone-video',
@@ -1004,7 +1194,8 @@
           price: 130.80,
           duration: 20,
           description: 'Up to 30-second cinematic aerial showcase.',
-          isPropertyService: true
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
         },
         {
           id: 'drone-photo',
@@ -1012,7 +1203,8 @@
           price: 130.80,
           duration: 20,
           description: 'Up to 10 stunning aerial photographs.',
-          isPropertyService: true
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-video', 'property-speed-tours']
         }
       ],
       south: [
@@ -1022,7 +1214,8 @@
           price: 600.00,
           duration: 150,
           description: 'Everything in our Silver Package, plus enhanced lifestyle content.',
-          isPropertyService: true
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-speed-tours', 'add-branded-outro']
         },
         {
           id: 'silver-package',
@@ -1031,7 +1224,8 @@
           duration: 90,
           description: 'Everything in our Bronze Package, plus full videography and drone shots for complete property marketing.',
           popular: true,
-          isPropertyService: true
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-speed-tours', 'add-branded-outro']
         },
         {
           id: 'all-in-one-drone',
@@ -1039,7 +1233,8 @@
           price: 214.80,
           duration: 45,
           description: '10 aerial photos and a 30-second drone video for your property marketing.',
-          isPropertyService: true
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
         },
         {
           id: 'property-video',
@@ -1047,7 +1242,8 @@
           price: 154.80,
           duration: 60,
           description: 'Shot in 4K to captivate viewers and drive enquiries.',
-          isPropertyService: true
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
         },
         {
           id: 'property-photo',
@@ -1055,7 +1251,8 @@
           price: 118.80,
           duration: 45,
           description: 'Up to 30 magazine-quality images that make your property irresistible to potential buyers.',
-          isPropertyService: true
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
         },
         {
           id: 'drone-video',
@@ -1063,7 +1260,8 @@
           price: 130.80,
           duration: 20,
           description: 'Up to 30-second cinematic aerial showcase.',
-          isPropertyService: true
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
         },
         {
           id: 'drone-photo',
@@ -1071,7 +1269,8 @@
           price: 130.80,
           duration: 20,
           description: 'Up to 10 stunning aerial photographs.',
-          isPropertyService: true
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-video', 'property-speed-tours']
         }
       ]
     };
@@ -1087,13 +1286,12 @@
       const cleanPostcode = postcode.trim().toUpperCase().replace(/\s/g, '');
       const outcodeArea = cleanPostcode.match(/^[A-Z]+/)[0];
       
-      // Check if it's a northern postcode
       const isNorth = NORTH_POSTCODES.includes(outcodeArea);
       
       return {
         territory: isNorth ? 'north' : 'south',
         photographer: isNorth ? PHOTOGRAPHERS.north : PHOTOGRAPHERS.south,
-        isServiceable: isNorth // For now, only service North
+        isServiceable: isNorth
       };
     }
 
@@ -1106,37 +1304,29 @@
       const territoryInfo = document.getElementById('territoryInfo');
       const unavailableInfo = document.getElementById('unavailableInfo');
 
-      // Reset states
       postcodeInput.classList.remove('error');
       errorMsg.classList.remove('show');
       territoryInfo.classList.remove('show');
       unavailableInfo.classList.remove('show');
 
-      // Validate format
       if (!validatePostcode(postcode)) {
         postcodeInput.classList.add('error');
         errorMsg.classList.add('show');
         return;
       }
 
-      // Show loading
       checkBtn.classList.add('loading');
       checkBtn.disabled = true;
 
-      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 800));
 
-      // Determine territory
       const result = determineTerritory(postcode);
 
-      // Store booking data
       bookingData.postcode = postcode.toUpperCase();
       bookingData.territory = result.territory;
       bookingData.photographer = result.photographer.name;
 
-      // Show result
       if (result.isServiceable) {
-        // Show success info
         const territoryBadge = document.getElementById('territoryBadge');
         territoryBadge.className = `territory-badge ${result.territory}`;
         territoryBadge.textContent = result.territory.toUpperCase();
@@ -1144,43 +1334,32 @@
         document.getElementById('photographerName').textContent = result.photographer.name;
         territoryInfo.classList.add('show');
 
-        // Show address section
         document.getElementById('addressSection').style.display = 'block';
-        
-        // Hide postcode button, show continue button
         document.getElementById('checkPostcodeBtn').style.display = 'none';
         document.getElementById('continueWithAddressBtn').style.display = 'block';
 
-        // Scroll to address field
         setTimeout(() => {
           document.getElementById('propertyAddress').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           document.getElementById('propertyAddress').focus();
         }, 500);
-
       } else {
-        // Show unavailable message
         unavailableInfo.classList.add('show');
       }
 
-      // Remove loading
       checkBtn.classList.remove('loading');
       checkBtn.disabled = false;
     }
 
     // Navigate to Step
     function goToStep(stepNumber) {
-      // Update current step
       currentStep = stepNumber;
 
-      // Hide all sections
       document.querySelectorAll('.form-section').forEach(section => {
         section.classList.remove('active');
       });
 
-      // Show target section
       document.getElementById(`step${stepNumber}`).classList.add('active');
 
-      // Update step indicators
       document.querySelectorAll('.step').forEach((step, index) => {
         const stepNum = index + 1;
         step.classList.remove('active', 'completed');
@@ -1192,31 +1371,25 @@
         }
       });
 
-      // Special logic for step 3 (service selection)
-      if (stepNumber === 3) {
+      if (stepNumber === 2) {
         renderServices();
       }
 
-      // Special logic for step 2 (calendar)
-      if (stepNumber === 2) {
+      if (stepNumber === 3) {
         renderCalendar();
       }
 
-      // Special logic for step 4 (populate summary)
       if (stepNumber === 4) {
         populateBookingSummary();
       }
 
-      // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Populate Booking Summary in Step 4
+    // Populate Booking Summary
     function populateBookingSummary() {
-      // Service
       document.getElementById('summaryService').textContent = bookingData.service ? bookingData.service.name : '-';
       
-      // Date & Time
       if (bookingData.selectedDate && bookingData.selectedTime) {
         const date = new Date(bookingData.selectedDate + 'T12:00:00');
         const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
@@ -1226,32 +1399,71 @@
         document.getElementById('summaryDateTime').textContent = '-';
       }
       
-      // Location
-      document.getElementById('summaryLocation').textContent = bookingData.propertyAddress || bookingData.postcode || '-';
-      
-      // Total
+      document.getElementById('summaryAddress').textContent = bookingData.propertyAddress || bookingData.postcode || '-';
+      document.getElementById('summaryPhotographer').textContent = bookingData.photographer || '-';
       document.getElementById('summaryTotal').textContent = `£${bookingData.totalPrice.toFixed(2)}`;
+
+      updateTermsVisibility();
+    }
+
+    // Update Terms Visibility
+    function updateTermsVisibility() {
+      const service = bookingData.service;
+      if (!service) return;
+
+      const termsItemRemoval = document.getElementById('termsItemRemoval');
+      const termsItemRemovalConfirm = document.getElementById('termsItemRemovalConfirm');
+      const termsPropertyAccess = document.getElementById('termsPropertyAccess');
+      const termsHygiene = document.getElementById('termsHygiene');
+      const termsAccess = document.getElementById('termsAccess');
+      const termsHygieneConfirm = document.getElementById('termsHygieneConfirm');
+
+      const isPropertyService = service.isPropertyService;
+      const isDroneOnly = service.id === 'all-in-one-drone' || service.id === 'drone-video' || service.id === 'drone-photo';
+
+      if (isPropertyService) {
+        termsItemRemoval.style.display = 'block';
+        termsItemRemovalConfirm.required = true;
+      } else {
+        termsItemRemoval.style.display = 'none';
+        termsItemRemovalConfirm.required = false;
+      }
+
+      if (isPropertyService) {
+        termsPropertyAccess.style.display = 'block';
+        termsAccess.required = true;
+
+        if (!isDroneOnly) {
+          termsHygiene.style.display = 'block';
+          termsHygieneConfirm.required = true;
+        } else {
+          termsHygiene.style.display = 'none';
+          termsHygieneConfirm.required = false;
+        }
+      } else {
+        termsPropertyAccess.style.display = 'none';
+        termsHygiene.style.display = 'none';
+        termsAccess.required = false;
+        termsHygieneConfirm.required = false;
+      }
     }
 
     // Select Payment Option
     function selectPaymentOption(option) {
       bookingData.paymentOption = option;
       
-      // Update UI
       document.querySelectorAll('.payment-option').forEach(opt => {
         opt.classList.remove('selected');
       });
       event.target.closest('.payment-option').classList.add('selected');
       
-      // Update button text
-      const submitBtn = document.getElementById('submitBtnText');
+      const submitBtnText = document.getElementById('completeBookingText');
       if (option === 'pay-now') {
-        submitBtn.textContent = 'Proceed to Payment';
+        submitBtnText.textContent = 'Proceed to Payment';
       } else {
-        submitBtn.textContent = 'Complete Booking';
+        submitBtnText.textContent = 'Complete Booking';
       }
       
-      // Enable submit button if form is valid
       validateStep4Form();
     }
 
@@ -1262,16 +1474,27 @@
       const phone = document.getElementById('clientPhone').value.trim();
       const paymentOption = bookingData.paymentOption;
       
-      const submitBtn = document.getElementById('submitBookingBtn');
+      const termsRevisions = document.getElementById('termsRevisions').checked;
+      const termsAgree = document.getElementById('termsAgree').checked;
       
-      if (name && email && phone && paymentOption) {
+      const termsItemRemovalConfirm = document.getElementById('termsItemRemovalConfirm');
+      const termsAccess = document.getElementById('termsAccess');
+      const termsHygieneConfirm = document.getElementById('termsHygieneConfirm');
+      
+      const itemRemovalChecked = termsItemRemovalConfirm.required ? termsItemRemovalConfirm.checked : true;
+      const accessChecked = termsAccess.required ? termsAccess.checked : true;
+      const hygieneChecked = termsHygieneConfirm.required ? termsHygieneConfirm.checked : true;
+      
+      const submitBtn = document.getElementById('completeBookingBtn');
+      
+      if (name && email && phone && paymentOption && termsRevisions && termsAgree && itemRemovalChecked && accessChecked && hygieneChecked) {
         submitBtn.disabled = false;
       } else {
         submitBtn.disabled = true;
       }
     }
 
-    // Add event listeners for form validation
+    // Event listeners for form validation
     document.addEventListener('DOMContentLoaded', function() {
       const nameField = document.getElementById('clientName');
       const emailField = document.getElementById('clientEmail');
@@ -1280,21 +1503,24 @@
       if (nameField) nameField.addEventListener('input', validateStep4Form);
       if (emailField) emailField.addEventListener('input', validateStep4Form);
       if (phoneField) phoneField.addEventListener('input', validateStep4Form);
+
+      const checkboxes = ['termsRevisions', 'termsItemRemovalConfirm', 'termsAccess', 'termsHygieneConfirm', 'termsAgree'];
+      checkboxes.forEach(id => {
+        const checkbox = document.getElementById(id);
+        if (checkbox) checkbox.addEventListener('change', validateStep4Form);
+      });
     });
 
-    // Submit Booking
-    async function submitBooking() {
-      // Get form values
+    // Complete Booking
+    async function completeBooking() {
       const name = document.getElementById('clientName').value.trim();
       const email = document.getElementById('clientEmail').value.trim();
       const phone = document.getElementById('clientPhone').value.trim();
       const notes = document.getElementById('clientNotes').value.trim();
       
-      // Reset errors
       document.querySelectorAll('.error-message').forEach(msg => msg.classList.remove('show'));
       document.querySelectorAll('.form-input').forEach(input => input.classList.remove('error'));
       
-      // Validate
       let hasError = false;
       
       if (!name || name.length < 2) {
@@ -1319,23 +1545,19 @@
       
       if (hasError) return;
       
-      // Store client data
       bookingData.clientName = name;
       bookingData.clientEmail = email;
       bookingData.clientPhone = phone;
       bookingData.clientNotes = notes;
       
-      // Show loading
-      const submitBtn = document.getElementById('submitBookingBtn');
+      const submitBtn = document.getElementById('completeBookingBtn');
       submitBtn.classList.add('loading');
       submitBtn.disabled = true;
       
       try {
         if (bookingData.paymentOption === 'pay-now') {
-          // Redirect to Stripe payment (will build this)
           await processStripePayment();
         } else {
-          // Create booking without payment
           await createBooking();
         }
       } catch (error) {
@@ -1346,7 +1568,7 @@
       }
     }
 
-    // Create Booking (Reserve Without Payment)
+    // Create Booking
     async function createBooking() {
       const bookingPayload = {
         postcode: bookingData.postcode,
@@ -1357,10 +1579,16 @@
         time: bookingData.selectedTime,
         service: bookingData.service.name,
         serviceId: bookingData.service.id,
-        duration: bookingData.service.duration,
+        duration: bookingData.service.duration + (bookingData.addonsDuration || 0),
         bedrooms: bookingData.bedrooms,
         basePrice: bookingData.basePrice,
         extraBedroomFee: bookingData.extraBedroomFee,
+        addons: bookingData.selectedAddons.map(id => ({
+          id: id,
+          name: ADDONS[id].name,
+          price: ADDONS[id].price
+        })),
+        addonsPrice: bookingData.addonsPrice || 0,
         totalPrice: bookingData.totalPrice,
         clientName: bookingData.clientName,
         clientEmail: bookingData.clientEmail,
@@ -1372,7 +1600,6 @@
       
       console.log('Creating booking:', bookingPayload);
       
-      // Send to Netlify function
       const response = await fetch('/.netlify/functions/create-booking', {
         method: 'POST',
         headers: {
@@ -1388,13 +1615,11 @@
       const result = await response.json();
       console.log('Booking created:', result);
       
-      // Redirect to confirmation page
       window.location.href = `booking-confirmation.html?ref=${result.bookingId}&email=${encodeURIComponent(bookingData.clientEmail)}`;
     }
 
     // Process Stripe Payment
     async function processStripePayment() {
-      // TODO: Implement Stripe checkout
       console.log('Processing Stripe payment...');
       alert('Stripe payment coming soon!');
     }
@@ -1410,49 +1635,41 @@
       const year = currentCalendarDate.getFullYear();
       const month = currentCalendarDate.getMonth();
       
-      // Update month display
       const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
       document.getElementById('calendarMonth').textContent = `${monthNames[month]} ${year}`;
 
-      // Get first and last day of month
       const firstDay = new Date(year, month, 1);
       const lastDay = new Date(year, month + 1, 0);
       const daysInMonth = lastDay.getDate();
-      const startDay = firstDay.getDay(); // 0 = Sunday
+      const startDay = firstDay.getDay();
 
-      // Today
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      // Max booking date (60 days from now)
       const maxDate = new Date();
       maxDate.setDate(maxDate.getDate() + 60);
       maxDate.setHours(23, 59, 59, 999);
 
-      // Build calendar grid
       const grid = document.getElementById('calendarGrid');
       let html = '';
 
-      // Day labels
       const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
       dayLabels.forEach(label => {
         html += `<div class="calendar-day day-label">${label}</div>`;
       });
 
-      // Empty cells before first day
       for (let i = 0; i < startDay; i++) {
         html += `<div class="calendar-day disabled other-month"></div>`;
       }
 
-      // Days of month
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(year, month, day);
         date.setHours(0, 0, 0, 0);
         
         const isPast = date < today;
         const isTooFarAhead = date > maxDate;
-        const isSunday = date.getDay() === 0; // Disable Sundays
-        const isSaturday = date.getDay() === 6; // Disable Saturdays
+        const isSunday = date.getDay() === 0;
+        const isSaturday = date.getDay() === 6;
         const isDisabled = isPast || isTooFarAhead || isSunday || isSaturday;
         const isToday = date.getTime() === today.getTime();
         const isSelected = bookingData.selectedDate && date.getTime() === new Date(bookingData.selectedDate).getTime();
@@ -1474,51 +1691,69 @@
       bookingData.selectedDate = dateString;
       bookingData.selectedTime = null;
 
-      // Update UI
       renderCalendar();
 
-      // Show time slot section
       document.getElementById('timeSlotSection').style.display = 'block';
       document.getElementById('loadingTimeSlots').style.display = 'block';
       document.getElementById('timeSlotGrid').style.display = 'none';
 
-      // Format date for display
       const date = new Date(dateString + 'T12:00:00');
       const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
       document.getElementById('selectedDateDisplay').textContent = date.toLocaleDateString('en-GB', options);
 
-      // Fetch available time slots
       await loadAvailableTimeSlots(dateString);
 
-      // Scroll to time slots
       document.getElementById('timeSlotSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     // Load Available Time Slots
     async function loadAvailableTimeSlots(dateString) {
       try {
-        // For now, generate all time slots (9am-5pm, 30-min intervals)
-        // Later we'll check against existing bookings and calculate drive times
+        const response = await fetch('/.netlify/functions/check-availability', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            postcode: bookingData.postcode,
+            territory: bookingData.territory,
+            selectedDate: dateString
+          })
+        });
 
-        const timeSlots = [];
-        for (let hour = 9; hour <= 17; hour++) {
+        if (!response.ok) {
+          throw new Error('Failed to check availability');
+        }
+
+        const data = await response.json();
+        console.log('Availability check:', data);
+
+        renderTimeSlots(data.availableSlots);
+      } catch (error) {
+        console.error('Error loading time slots:', error);
+        
+        const fallbackSlots = [];
+        for (let hour = 9; hour <= 15; hour++) {
           for (let minute of [0, 30]) {
-            if (hour === 17 && minute === 30) break; // Stop at 5:00 PM
+            if (hour === 15 && minute === 30) break;
             
             const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-            timeSlots.push({
+            fallbackSlots.push({
               time: timeString,
-              available: true // We'll implement availability checking next
+              available: true
             });
           }
         }
-
-        // Render time slots
-        renderTimeSlots(timeSlots);
-
-      } catch (error) {
-        console.error('Error loading time slots:', error);
-        document.getElementById('loadingTimeSlots').innerHTML = '<p style="color: #ef4444;">Failed to load time slots. Please try again.</p>';
+        
+        renderTimeSlots(fallbackSlots);
+        
+        document.getElementById('loadingTimeSlots').innerHTML = 
+          '<p style="color: #f59e0b;">Could not verify availability. Showing all time slots.</p>';
+        
+        setTimeout(() => {
+          document.getElementById('loadingTimeSlots').style.display = 'none';
+          document.getElementById('timeSlotGrid').style.display = 'grid';
+        }, 1000);
       }
     }
 
@@ -1535,7 +1770,6 @@
 
       grid.innerHTML = html;
       
-      // Hide loading, show grid
       document.getElementById('loadingTimeSlots').style.display = 'none';
       document.getElementById('timeSlotGrid').style.display = 'grid';
     }
@@ -1544,17 +1778,15 @@
     function selectTimeSlot(time) {
       bookingData.selectedTime = time;
 
-      // Update UI
       document.querySelectorAll('.time-slot').forEach(slot => {
         slot.classList.remove('selected');
       });
       event.target.classList.add('selected');
 
-      // Enable continue button
-      document.getElementById('continueToServiceBtn').disabled = false;
+      document.getElementById('continueToDetailsBtn').disabled = false;
     }
 
-    // Render Services Based on Territory
+    // Render Services
     function renderServices() {
       const territory = bookingData.territory;
       const services = SERVICES[territory] || SERVICES.south;
@@ -1594,32 +1826,90 @@
 
       if (!service) return;
 
-      // Update booking data
       bookingData.service = service;
       bookingData.basePrice = service.price;
+      bookingData.selectedAddons = [];
 
-      // Update UI - highlight selected service
       document.querySelectorAll('.service-card').forEach(card => {
         card.classList.remove('selected');
       });
       document.querySelector(`[data-service-id="${serviceId}"]`).classList.add('selected');
 
-      // Show/hide bedroom section based on service type
       const bedroomSection = document.getElementById('bedroomSection');
       if (service.isPropertyService) {
         bedroomSection.style.display = 'block';
-        bookingData.bedrooms = 4; // Reset to default
+        bookingData.bedrooms = 4;
         document.getElementById('bedroomCount').textContent = 4;
       } else {
         bedroomSection.style.display = 'none';
         bookingData.bedrooms = 0;
       }
 
-      // Calculate and show price
+      renderAddons();
       calculatePrice();
 
-      // Enable continue button
-      document.getElementById('continueToDetailsBtn').disabled = false;
+      document.getElementById('continueToCalendarBtn').disabled = false;
+    }
+
+    // Render Add-Ons
+    function renderAddons() {
+      const service = bookingData.service;
+      if (!service || !service.availableAddons || service.availableAddons.length === 0) {
+        document.getElementById('addonsSection').style.display = 'none';
+        return;
+      }
+
+      const container = document.getElementById('addonsGrid');
+      const addonsHTML = service.availableAddons.map(addonId => {
+        const addon = ADDONS[addonId];
+        if (!addon) return '';
+
+        const isSelected = bookingData.selectedAddons.includes(addonId);
+
+        return `
+          <div class="service-card ${isSelected ? 'selected' : ''}" 
+               data-addon-id="${addon.id}" 
+               onclick="toggleAddon('${addon.id}')"
+               style="padding: 16px;">
+            <div style="flex: 1;">
+              <h4 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">
+                ${addon.name}
+              </h4>
+              <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 8px;">
+                ${addon.description}
+              </p>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                ${addon.duration > 0 ? `
+                  <span style="font-size: 12px; color: #94a3b8;">
+                    +${addon.duration} min
+                  </span>
+                ` : ''}
+                <span style="font-size: 18px; font-weight: 700; color: #3b82f6;">
+                  ${addon.price === 0 ? 'FREE' : `+£${addon.price.toFixed(2)}`}
+                </span>
+              </div>
+            </div>
+            <div class="service-radio"></div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = addonsHTML;
+      document.getElementById('addonsSection').style.display = 'block';
+    }
+
+    // Toggle Add-On
+    function toggleAddon(addonId) {
+      const index = bookingData.selectedAddons.indexOf(addonId);
+      
+      if (index > -1) {
+        bookingData.selectedAddons.splice(index, 1);
+      } else {
+        bookingData.selectedAddons.push(addonId);
+      }
+
+      renderAddons();
+      calculatePrice();
     }
 
     // Adjust Bedrooms
@@ -1630,7 +1920,6 @@
       bookingData.bedrooms = newBedrooms;
       document.getElementById('bedroomCount').textContent = newBedrooms;
 
-      // Show/hide fee notice
       const feeNotice = document.getElementById('bedroomFeeNotice');
       if (newBedrooms > 4) {
         feeNotice.style.display = 'block';
@@ -1638,7 +1927,6 @@
         feeNotice.style.display = 'none';
       }
 
-      // Recalculate price
       calculatePrice();
     }
 
@@ -1647,15 +1935,26 @@
       if (!bookingData.service) return;
 
       const basePrice = bookingData.basePrice;
-      // £30 per additional room after 4 bedrooms
       const extraRooms = bookingData.bedrooms > 4 ? bookingData.bedrooms - 4 : 0;
       const extraBedroomFee = extraRooms * 30;
-      const totalPrice = basePrice + extraBedroomFee;
+      
+      let addonsPrice = 0;
+      let addonsDuration = 0;
+      bookingData.selectedAddons.forEach(addonId => {
+        const addon = ADDONS[addonId];
+        if (addon) {
+          addonsPrice += addon.price;
+          addonsDuration += addon.duration;
+        }
+      });
+
+      const totalPrice = basePrice + extraBedroomFee + addonsPrice;
 
       bookingData.extraBedroomFee = extraBedroomFee;
+      bookingData.addonsPrice = addonsPrice;
+      bookingData.addonsDuration = addonsDuration;
       bookingData.totalPrice = totalPrice;
 
-      // Update UI
       document.getElementById('servicePrice').textContent = `£${basePrice.toFixed(2)}`;
       document.getElementById('totalPrice').textContent = `£${totalPrice.toFixed(2)}`;
 
@@ -1667,15 +1966,35 @@
         bedroomFeeRow.style.display = 'none';
       }
 
-      // Show price breakdown
+      let addonsRow = document.getElementById('addonsRow');
+      if (!addonsRow && addonsPrice > 0) {
+        const bedroomRow = document.getElementById('bedroomFeeRow');
+        addonsRow = document.createElement('div');
+        addonsRow.id = 'addonsRow';
+        addonsRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;';
+        addonsRow.innerHTML = `
+          <span style="font-size: 14px; color: #64748b;">Add-ons</span>
+          <span style="font-size: 14px; font-weight: 600; color: #1e293b;" class="addons-value">£0.00</span>
+        `;
+        bedroomRow.parentNode.insertBefore(addonsRow, bedroomRow.nextSibling);
+      }
+
+      if (addonsRow) {
+        if (addonsPrice > 0) {
+          addonsRow.style.display = 'flex';
+          addonsRow.querySelector('.addons-value').textContent = `£${addonsPrice.toFixed(2)}`;
+        } else {
+          addonsRow.style.display = 'none';
+        }
+      }
+
       document.getElementById('priceBreakdown').style.display = 'block';
     }
 
-    // Auto-format postcode as user types
+    // Auto-format postcode
     document.getElementById('postcode').addEventListener('input', function(e) {
       let value = e.target.value.toUpperCase().replace(/\s/g, '');
       
-      // Add space before last 3 characters if length > 3
       if (value.length > 3) {
         value = value.slice(0, -3) + ' ' + value.slice(-3);
       }
@@ -1683,24 +2002,22 @@
       e.target.value = value;
     });
 
-    // Allow Enter key to submit
+    // Allow Enter key
     document.getElementById('postcode').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         checkPostcode();
       }
     });
 
-    // Proceed to Calendar (after address entered)
-    function proceedToCalendar() {
+    // Proceed to Service Selection
+    function proceedToServiceSelection() {
       const addressInput = document.getElementById('propertyAddress');
       const address = addressInput.value.trim();
       const errorMsg = document.getElementById('addressError');
 
-      // Reset error
       addressInput.classList.remove('error');
       errorMsg.classList.remove('show');
 
-      // Validate address
       if (!address || address.length < 10) {
         addressInput.classList.add('error');
         errorMsg.classList.add('show');
@@ -1708,10 +2025,8 @@
         return;
       }
 
-      // Store address
       bookingData.propertyAddress = address;
 
-      // Move to calendar
       goToStep(2);
     }
 
@@ -1721,15 +2036,13 @@
       if (addressField) {
         addressField.addEventListener('keypress', function(e) {
           if (e.key === 'Enter') {
-            proceedToCalendar();
+            proceedToServiceSelection();
           }
         });
       }
     });
 
-    console.log('Booking Platform Initialized');
-    console.log('Territory: North = Birmingham and above');
-    console.log('Routing: Next shoot must be within 45 mins drive');
+    console.log('Booking Platform with Add-Ons Initialized');
   </script>
 </body>
 </html>
