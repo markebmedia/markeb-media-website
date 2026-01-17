@@ -1,10 +1,16 @@
-const fetch = require('node-fetch');
+// netlify/functions/create-booking.js
+
+const Airtable = require('airtable');
+const { sendBookingConfirmation } = require('./email-service');
+
+const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
 exports.handler = async (event, context) => {
-  // Only allow POST requests
+  // Only allow POST
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ error: 'Method not allowed' })
     };
   }
@@ -12,78 +18,81 @@ exports.handler = async (event, context) => {
   try {
     const bookingData = JSON.parse(event.body);
 
-    // Validate required fields
-    const required = ['postcode', 'propertyAddress', 'territory', 'date', 'time', 'service', 'clientName', 'clientEmail', 'clientPhone', 'totalPrice'];
-    for (const field of required) {
-      if (!bookingData[field]) {
-        return {
-          statusCode: 400,
-          body: JSON.stringify({ error: `Missing required field: ${field}` })
-        };
-      }
-    }
+    // Generate booking reference
+    const bookingRef = `BK-${Date.now()}`;
 
-    // Generate Booking ID
-    const bookingId = generateBookingId();
+    // Prepare add-ons string
+    const addonsString = bookingData.addons && bookingData.addons.length > 0
+      ? bookingData.addons.map(a => a.name).join(', ')
+      : '';
 
-    // Format shoot date (combine date + time)
-    const shootDateTime = `${bookingData.date}T${bookingData.time}:00`;
-
-    // Prepare Airtable record
-    const airtableRecord = {
-      fields: {
-        'Project Address': bookingData.propertyAddress,
-        'Customer Name': bookingData.clientName,
-        'Service Type': bookingData.service,
-        'Shoot Date': shootDateTime,
-        'Email Address': bookingData.clientEmail,
-        'Phone Number': bookingData.clientPhone,
-        'Status': 'Booked',
-        'Booking ID': bookingId,
-        // Additional fields (optional but useful)
-        'Territory': bookingData.territory,
-        'Photographer': bookingData.photographer || 'TBD',
-        'Total Price': bookingData.totalPrice,
-        'Payment Option': bookingData.paymentOption || 'reserve',
-        'Bedrooms': bookingData.bedrooms || 0,
-        'Notes': bookingData.clientNotes || '',
-        'Created Date': new Date().toISOString()
-      }
-    };
-
-    // Create record in Airtable
-    const airtableResponse = await fetch(
-      `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Active%20Bookings`,
+    // Create booking record
+    const record = await base('Bookings').create([
       {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(airtableRecord)
+        fields: {
+          'Booking Reference': bookingRef,
+          'Postcode': bookingData.postcode,
+          'Property Address': bookingData.propertyAddress,
+          'Territory': bookingData.territory,
+          'Photographer': bookingData.photographer,
+          'Date': bookingData.date,
+          'Time': bookingData.time,
+          'Service': bookingData.serviceId,
+          'Service Name': bookingData.service,
+          'Duration (mins)': bookingData.duration,
+          'Bedrooms': bookingData.bedrooms || 0,
+          'Base Price': bookingData.basePrice,
+          'Extra Bedroom Fee': bookingData.extraBedroomFee || 0,
+          'Add-ons': addonsString,
+          'Add-ons Price': bookingData.addonsPrice || 0,
+          'Total Price': bookingData.totalPrice,
+          'Client Name': bookingData.clientName,
+          'Client Email': bookingData.clientEmail,
+          'Client Phone': bookingData.clientPhone,
+          'Client Notes': bookingData.clientNotes || '',
+          'Bank Account Holder': bookingData.bankAccountHolder || '',
+          'Bank Sort Code': bookingData.bankSortCode || '',
+          'Bank Account Number': bookingData.bankAccountNumber || '',
+          'Status': 'Reserved - Awaiting Payment',
+          'Payment Status': 'Pending',
+          'Payment Method': 'Bank Transfer',
+          'Created Date': new Date().toISOString(),
+          'Cancellation Allowed Until': new Date(new Date(bookingData.date).getTime() - 24 * 60 * 60 * 1000).toISOString()
+        }
       }
-    );
+    ]);
 
-    if (!airtableResponse.ok) {
-      const error = await airtableResponse.json();
-      console.error('Airtable error:', error);
-      throw new Error('Failed to create Airtable record');
+    console.log('Booking created:', record[0].id, bookingRef);
+
+    // Send confirmation email
+    try {
+      await sendBookingConfirmation({
+        clientName: bookingData.clientName,
+        clientEmail: bookingData.clientEmail,
+        bookingRef: bookingRef,
+        date: bookingData.date,
+        time: bookingData.time,
+        service: bookingData.service,
+        propertyAddress: bookingData.propertyAddress,
+        photographer: bookingData.photographer,
+        totalPrice: bookingData.totalPrice,
+        duration: bookingData.duration
+      });
+
+      console.log('Confirmation email sent to:', bookingData.clientEmail);
+    } catch (emailError) {
+      console.error('Failed to send confirmation email:', emailError);
+      // Don't fail the booking if email fails
     }
 
-    const airtableData = await airtableResponse.json();
-
-    // Return success with booking reference
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         success: true,
-        bookingId: bookingId,
-        airtableRecordId: airtableData.id,
-        message: 'Booking created successfully'
+        bookingId: record[0].id,
+        bookingRef: bookingRef,
+        message: 'Booking reserved successfully'
       })
     };
 
@@ -91,21 +100,11 @@ exports.handler = async (event, context) => {
     console.error('Error creating booking:', error);
     return {
       statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        success: false,
-        error: error.message || 'Failed to create booking'
+        error: 'Failed to create booking',
+        details: error.message
       })
     };
   }
 };
-
-// Generate unique booking ID
-function generateBookingId() {
-  const timestamp = Date.now().toString(36).toUpperCase();
-  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-  return `MK-${timestamp}-${random}`;
-}

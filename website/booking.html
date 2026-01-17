@@ -559,10 +559,10 @@
     <!-- Header -->
     <div class="booking-header">
       <div style="margin-bottom: 20px;">
-        <img src="https://cdn.prod.website-files.com/66e82259bc314e521e9902b0/66e82259bc314e521e990386_Markeb%20Media%20(4).svg" alt="Markeb Media" style="height: 60px;">
+       <img src="/public/images/Markeb Media Logo (2).png" alt="Markeb Media" style="height: 60px;">
       </div>
       <h1>Book Your Shoot</h1>
-      <p>Professional property photography in the UK</p>
+      <p>Professional property marketing & media partner in the UK</p>
     </div>
 
     <!-- Booking Card -->
@@ -981,10 +981,63 @@
                 Reserve Without Payment
               </div>
               <div style="font-size: 13px; color: #64748b;">
-                We'll contact you to arrange payment before the shoot.
+                We'll take payment on the day. Please provide your bank details below.
               </div>
             </div>
             <div class="payment-radio"></div>
+          </div>
+        </div>
+
+        <!-- Bank Details Section (only shown for Reserve Without Payment) -->
+        <div id="bankDetailsSection" style="display: none; margin-bottom: 28px;">
+          <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 24px;">
+            <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 12px;">
+              Bank Details for Payment on Day
+            </h3>
+            <p style="font-size: 14px; color: #64748b; margin-bottom: 20px;">
+              We'll take payment manually on the day of your shoot. Please provide your bank details below.
+            </p>
+
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label" for="bankAccountHolder">Account Holder Name *</label>
+              <input 
+                type="text" 
+                id="bankAccountHolder" 
+                class="form-input" 
+                placeholder="e.g. John Smith"
+              />
+              <div class="error-message" id="accountHolderError">Please enter the account holder name</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 16px; margin-bottom: 16px;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="bankSortCode">Sort Code *</label>
+                <input 
+                  type="text" 
+                  id="bankSortCode" 
+                  class="form-input" 
+                  placeholder="12-34-56"
+                  maxlength="8"
+                />
+                <div class="error-message" id="sortCodeError">Invalid sort code</div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="bankAccountNumber">Account Number *</label>
+                <input 
+                  type="text" 
+                  id="bankAccountNumber" 
+                  class="form-input" 
+                  placeholder="12345678"
+                  maxlength="8"
+                />
+                <div class="error-message" id="accountNumberError">Invalid account number</div>
+              </div>
+            </div>
+
+            <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 12px; font-size: 13px; color: #1e40af;">
+              <strong>🔒 Secure:</strong> Your bank details are encrypted and stored securely. We'll only use them to process payment on the day of your shoot.
+            </div>
           </div>
         </div>
 
@@ -1457,11 +1510,27 @@
       });
       event.target.closest('.payment-option').classList.add('selected');
       
+      // Show/hide bank details section
+      const bankDetailsSection = document.getElementById('bankDetailsSection');
+      if (option === 'reserve') {
+        bankDetailsSection.style.display = 'block';
+        // Make bank fields required
+        document.getElementById('bankAccountHolder').required = true;
+        document.getElementById('bankSortCode').required = true;
+        document.getElementById('bankAccountNumber').required = true;
+      } else {
+        bankDetailsSection.style.display = 'none';
+        // Remove required from bank fields
+        document.getElementById('bankAccountHolder').required = false;
+        document.getElementById('bankSortCode').required = false;
+        document.getElementById('bankAccountNumber').required = false;
+      }
+      
       const submitBtnText = document.getElementById('completeBookingText');
       if (option === 'pay-now') {
         submitBtnText.textContent = 'Proceed to Payment';
       } else {
-        submitBtnText.textContent = 'Complete Booking';
+        submitBtnText.textContent = 'Reserve Booking';
       }
       
       validateStep4Form();
@@ -1542,8 +1611,53 @@
         document.getElementById('phoneError').classList.add('show');
         hasError = true;
       }
+
+      // Validate bank details if Reserve Without Payment is selected
+      let bankDetails = {};
+      if (bookingData.paymentOption === 'reserve') {
+        const accountHolder = document.getElementById('bankAccountHolder').value.trim();
+        const sortCode = document.getElementById('bankSortCode').value.trim();
+        const accountNumber = document.getElementById('bankAccountNumber').value.trim();
+
+        if (!accountHolder || accountHolder.length < 2) {
+          document.getElementById('bankAccountHolder').classList.add('error');
+          document.getElementById('accountHolderError').classList.add('show');
+          hasError = true;
+        }
+
+        // Validate sort code (XX-XX-XX format)
+        const sortCodeRegex = /^\d{2}-?\d{2}-?\d{2}$/;
+        if (!sortCode || !sortCodeRegex.test(sortCode.replace(/-/g, ''))) {
+          document.getElementById('bankSortCode').classList.add('error');
+          document.getElementById('sortCodeError').classList.add('show');
+          hasError = true;
+        }
+
+        // Validate account number (8 digits)
+        const accountNumberRegex = /^\d{8}$/;
+        if (!accountNumber || !accountNumberRegex.test(accountNumber)) {
+          document.getElementById('bankAccountNumber').classList.add('error');
+          document.getElementById('accountNumberError').classList.add('show');
+          hasError = true;
+        }
+
+        if (!hasError) {
+          bankDetails = {
+            bankAccountHolder: accountHolder,
+            bankSortCode: sortCode,
+            bankAccountNumber: accountNumber
+          };
+        }
+      }
       
-      if (hasError) return;
+      if (hasError) {
+        // Scroll to first error
+        const firstError = document.querySelector('.form-input.error');
+        if (firstError) {
+          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
       
       bookingData.clientName = name;
       bookingData.clientEmail = email;
@@ -1558,6 +1672,8 @@
         if (bookingData.paymentOption === 'pay-now') {
           await processStripePayment();
         } else {
+          // Add bank details to booking data
+          Object.assign(bookingData, bankDetails);
           await createBooking();
         }
       } catch (error) {
@@ -1620,8 +1736,52 @@
 
     // Process Stripe Payment
     async function processStripePayment() {
-      console.log('Processing Stripe payment...');
-      alert('Stripe payment coming soon!');
+      try {
+        const response = await fetch('/.netlify/functions/create-stripe-checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            postcode: bookingData.postcode,
+            propertyAddress: bookingData.propertyAddress,
+            territory: bookingData.territory,
+            photographer: bookingData.photographer,
+            date: bookingData.selectedDate,
+            time: bookingData.selectedTime,
+            service: bookingData.service.name,
+            serviceId: bookingData.service.id,
+            duration: bookingData.service.duration + (bookingData.addonsDuration || 0),
+            bedrooms: bookingData.bedrooms,
+            basePrice: bookingData.basePrice,
+            extraBedroomFee: bookingData.extraBedroomFee,
+            addons: bookingData.selectedAddons.map(id => ({
+              id: id,
+              name: ADDONS[id].name,
+              price: ADDONS[id].price
+            })),
+            addonsPrice: bookingData.addonsPrice || 0,
+            totalPrice: bookingData.totalPrice,
+            clientName: bookingData.clientName,
+            clientEmail: bookingData.clientEmail,
+            clientPhone: bookingData.clientPhone,
+            clientNotes: bookingData.clientNotes
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create checkout session');
+        }
+
+        const { url } = await response.json();
+        
+        // Redirect to Stripe Checkout
+        window.location.href = url;
+
+      } catch (error) {
+        console.error('Stripe error:', error);
+        throw error;
+      }
     }
 
     // Change Month
@@ -2038,6 +2198,33 @@
           if (e.key === 'Enter') {
             proceedToServiceSelection();
           }
+        });
+      }
+
+      // Auto-format sort code
+      const sortCodeField = document.getElementById('bankSortCode');
+      if (sortCodeField) {
+        sortCodeField.addEventListener('input', function(e) {
+          let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+          if (value.length > 6) value = value.slice(0, 6);
+          
+          // Format as XX-XX-XX
+          if (value.length >= 2) {
+            value = value.slice(0, 2) + '-' + value.slice(2);
+          }
+          if (value.length >= 5) {
+            value = value.slice(0, 5) + '-' + value.slice(5);
+          }
+          
+          e.target.value = value;
+        });
+      }
+
+      // Only allow digits in account number
+      const accountNumberField = document.getElementById('bankAccountNumber');
+      if (accountNumberField) {
+        accountNumberField.addEventListener('input', function(e) {
+          e.target.value = e.target.value.replace(/\D/g, '').slice(0, 8);
         });
       }
     });
