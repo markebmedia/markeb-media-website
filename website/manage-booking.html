@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Manage Your Booking - Markeb Media</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Stripe.js for cancellation payments -->
+  <script src="https://js.stripe.com/v3/"></script>
   
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -236,6 +238,29 @@
     .hidden {
       display: none !important;
     }
+
+    .payment-breakdown {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .payment-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 14px;
+    }
+
+    .payment-row.total {
+      border-top: 2px solid #e2e8f0;
+      margin-top: 12px;
+      padding-top: 12px;
+      font-size: 18px;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
@@ -366,8 +391,31 @@
           Cancel Your Booking
         </h2>
         
-        <div id="cancellationFeeWarning" class="alert alert-error">
-          <strong>⚠️ Cancellation Fee:</strong> Cancelling within 24 hours of your booking incurs a 50% charge. Same-day cancellations are charged in full.
+        <div id="cancellationFeeWarning" class="alert alert-error hidden">
+          <strong>⚠️ Cancellation Fee Applies:</strong>
+          <p style="margin-top: 8px;" id="cancellationFeeText"></p>
+        </div>
+
+        <div id="freeCancellation" class="alert alert-success hidden">
+          <strong>✅ Free Cancellation Available</strong>
+          <p style="margin-top: 8px;">You're cancelling more than 24 hours before your shoot, so no fees apply.</p>
+        </div>
+
+        <!-- Payment Breakdown (for paid cancellations) -->
+        <div id="cancellationPaymentBreakdown" class="payment-breakdown hidden">
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">Cancellation Charges</h3>
+          <div class="payment-row">
+            <span>Original Booking Amount:</span>
+            <span id="cancelOriginalAmount">£0.00</span>
+          </div>
+          <div class="payment-row">
+            <span id="cancelFeeLabel">Cancellation Fee (50%):</span>
+            <span id="cancelFeeAmount">£0.00</span>
+          </div>
+          <div class="payment-row total">
+            <span>Amount to Charge:</span>
+            <span id="cancelTotalCharge">£0.00</span>
+          </div>
         </div>
 
         <label class="form-label">Reason for Cancellation (Optional)</label>
@@ -375,13 +423,16 @@
 
         <div class="button-group">
           <button class="btn btn-secondary" onclick="hideCancelForm()">Go Back</button>
-          <button class="btn btn-danger" onclick="submitCancellation()">Confirm Cancellation</button>
+          <button class="btn btn-danger" id="confirmCancelBtn" onclick="submitCancellation()">
+            <span id="cancelButtonText">Confirm Cancellation</span>
+          </button>
         </div>
       </div>
     </div>
   </div>
 
   <script>
+    const stripe = Stripe('pk_live_51QycLvQAVOs8qTDFVfXTNzuuhBnPjgZQSS3AH30NGMuSf3SxAWF9pLzYwL0ulj1wMMCC2jnhDyeqeop7BkWDfeZ400wT3Ko8aK');
     let bookingData = null;
 
     // Get booking reference and email from URL
@@ -421,7 +472,7 @@
       document.getElementById('bookingRef').textContent = booking.bookingRef;
       document.getElementById('detailService').textContent = booking.service;
       
-      const date = new Date(booking.date);
+      const date = new Date(booking.date + 'T' + booking.time);
       const dateStr = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
       document.getElementById('detailDateTime').textContent = `${dateStr} at ${booking.time}`;
       
@@ -442,27 +493,28 @@
         statusBadge.className = 'status-badge reserved';
       }
 
+      // Calculate hours until booking
+      const bookingDateTime = new Date(booking.date + 'T' + booking.time);
+      const now = new Date();
+      const hoursUntil = Math.floor((bookingDateTime - now) / (1000 * 60 * 60));
+      
+      booking.hoursUntilBooking = hoursUntil;
+
       // Show cancellation warning
-      if (booking.hoursUntilBooking > 0) {
-        document.getElementById('hoursRemaining').textContent = booking.hoursUntilBooking;
+      if (hoursUntil > 0 && hoursUntil <= 48) {
+        document.getElementById('hoursRemaining').textContent = hoursUntil;
         document.getElementById('cancellationWarning').classList.remove('hidden');
       }
 
-      // Disable buttons if can't cancel/reschedule
-      if (!booking.canReschedule) {
-        document.getElementById('rescheduleBtn').disabled = true;
-        document.getElementById('rescheduleBtn').textContent = '📅 Cannot Reschedule';
-      }
-
-      if (!booking.canCancel) {
-        document.getElementById('cancelBtn').disabled = true;
-        document.getElementById('cancelBtn').textContent = '✖️ Cannot Cancel';
-      }
-
-      // Hide buttons if already cancelled
+      // Disable buttons if booking is in the past or already cancelled
       if (booking.status === 'Cancelled') {
         document.getElementById('rescheduleBtn').style.display = 'none';
         document.getElementById('cancelBtn').style.display = 'none';
+      } else if (hoursUntil < 0) {
+        document.getElementById('rescheduleBtn').disabled = true;
+        document.getElementById('rescheduleBtn').textContent = '📅 Shoot Completed';
+        document.getElementById('cancelBtn').disabled = true;
+        document.getElementById('cancelBtn').textContent = '✖️ Cannot Cancel';
       }
 
       // Set min date for reschedule (tomorrow)
@@ -486,9 +538,46 @@
     }
 
     function showCancelForm() {
-      // Update cancellation fee warning based on timing
-      if (bookingData.hoursUntilBooking > 24) {
+      const hoursUntil = bookingData.hoursUntilBooking;
+      const totalPrice = bookingData.totalPrice;
+      
+      // Determine cancellation fee based on timing
+      let cancellationFee = 0;
+      let feePercentage = 0;
+      let feeText = '';
+      
+      if (hoursUntil < 24 && hoursUntil >= 0) {
+        // Within 24 hours but not same day
+        feePercentage = 50;
+        cancellationFee = totalPrice * 0.5;
+        feeText = `Cancelling within 24 hours of your booking incurs a <strong>50% charge (£${cancellationFee.toFixed(2)})</strong>.`;
+      } else if (hoursUntil < 0) {
+        // Same day or past
+        feePercentage = 100;
+        cancellationFee = totalPrice;
+        feeText = `Same-day cancellations are charged in full <strong>(£${cancellationFee.toFixed(2)})</strong>.`;
+      }
+      
+      // Update UI based on cancellation fee
+      if (cancellationFee > 0) {
+        document.getElementById('cancellationFeeWarning').classList.remove('hidden');
+        document.getElementById('cancellationFeeText').innerHTML = feeText;
+        document.getElementById('freeCancellation').classList.add('hidden');
+        
+        // Show payment breakdown
+        document.getElementById('cancellationPaymentBreakdown').classList.remove('hidden');
+        document.getElementById('cancelOriginalAmount').textContent = `£${totalPrice.toFixed(2)}`;
+        document.getElementById('cancelFeeLabel').textContent = `Cancellation Fee (${feePercentage}%):`;
+        document.getElementById('cancelFeeAmount').textContent = `£${cancellationFee.toFixed(2)}`;
+        document.getElementById('cancelTotalCharge').textContent = `£${cancellationFee.toFixed(2)}`;
+        
+        // Update button text
+        document.getElementById('cancelButtonText').textContent = `Pay £${cancellationFee.toFixed(2)} & Cancel`;
+      } else {
         document.getElementById('cancellationFeeWarning').classList.add('hidden');
+        document.getElementById('freeCancellation').classList.remove('hidden');
+        document.getElementById('cancellationPaymentBreakdown').classList.add('hidden');
+        document.getElementById('cancelButtonText').textContent = 'Confirm Free Cancellation';
       }
       
       document.getElementById('cancelForm').classList.remove('hidden');
@@ -517,7 +606,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            bookingId: bookingData.id,
+            bookingRef: bookingData.bookingRef,
             newDate: newDate,
             newTime: newTime,
             clientEmail: bookingData.clientEmail
@@ -540,17 +629,73 @@
 
     async function submitCancellation() {
       const reason = document.getElementById('cancelReason').value;
-
-      if (!confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
-        return;
+      const hoursUntil = bookingData.hoursUntilBooking;
+      const totalPrice = bookingData.totalPrice;
+      
+      // Calculate cancellation fee
+      let cancellationFee = 0;
+      if (hoursUntil < 24 && hoursUntil >= 0) {
+        cancellationFee = totalPrice * 0.5; // 50% fee
+      } else if (hoursUntil < 0) {
+        cancellationFee = totalPrice; // 100% fee
       }
+      
+      const requiresPayment = cancellationFee > 0;
+      
+      if (requiresPayment) {
+        // Confirm payment requirement
+        if (!confirm(`This cancellation requires a fee of £${cancellationFee.toFixed(2)}. You will be redirected to complete payment. Continue?`)) {
+          return;
+        }
+        
+        // Process cancellation with payment via Stripe
+        await processCancellationWithPayment(cancellationFee, reason);
+      } else {
+        // Free cancellation
+        if (!confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
+          return;
+        }
+        
+        await processFreeCancellation(reason);
+      }
+    }
 
+    async function processCancellationWithPayment(cancellationFee, reason) {
+      try {
+        const response = await fetch('/.netlify/functions/cancel-booking-with-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bookingRef: bookingData.bookingRef,
+            clientEmail: bookingData.clientEmail,
+            cancellationFee: cancellationFee,
+            reason: reason
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to process cancellation');
+        }
+
+        const result = await response.json();
+        
+        // Redirect to Stripe Checkout for cancellation payment
+        window.location.href = result.checkoutUrl;
+
+      } catch (error) {
+        console.error('Cancellation payment error:', error);
+        alert(`Failed to process cancellation: ${error.message}`);
+      }
+    }
+
+    async function processFreeCancellation(reason) {
       try {
         const response = await fetch('/.netlify/functions/cancel-booking', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            bookingId: bookingData.id,
+            bookingRef: bookingData.bookingRef,
             clientEmail: bookingData.clientEmail,
             reason: reason
           })
@@ -562,7 +707,7 @@
         }
 
         const result = await response.json();
-        alert(`✅ Booking cancelled. ${result.refundNote}`);
+        alert(`✅ Booking cancelled successfully. ${result.refundNote}`);
         window.location.reload();
 
       } catch (error) {
