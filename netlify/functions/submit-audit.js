@@ -195,8 +195,8 @@ function buildAnswerContext(answers) {
       title: 'Photography Quality', 
       values: { 
         1: 'iPhone or basic camera', 
-        2: 'General photographer (does properties occasionally)', 
-        3: 'Specialist property photographer with HDR/editing' 
+        2: 'General mediaspecialist (does properties occasionally)', 
+        3: 'Specialist property mediaspecialist with HDR/editing' 
       } 
     },
     q2: { 

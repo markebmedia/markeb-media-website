@@ -205,25 +205,25 @@
       line-height: 1.6;
     }
 
-    .territory-badge {
-      display: inline-block;
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .region-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-    .territory-badge.north {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #fff;
-    }
+.region-badge.north {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #fff;
+}
 
-    .territory-badge.south {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      color: #fff;
-    }
+.region-badge.south {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #fff;
+}
 
     .btn {
       padding: 14px 32px;
@@ -615,26 +615,26 @@
           <div class="error-message" id="postcodeError">Please enter a valid UK postcode</div>
         </div>
 
-        <!-- Territory Info Box (hidden initially) -->
-        <div class="info-box" id="territoryInfo">
-          <div class="info-box-title">
-            Great news! We cover your area
-          </div>
-          <div class="info-box-text">
-            Your property is in our <span id="territoryBadge"></span> territory.
-            <br><br>
-            <strong>Your photographer:</strong> <span id="photographerName"></span>
-          </div>
-        </div>
+        <!-- Region Info Box (hidden initially) -->
+<div class="info-box" id="regionInfo">
+  <div class="info-box-title">
+    Great news! We cover your area
+  </div>
+  <div class="info-box-text">
+    Your property is in our <span id="regionBadge"></span> region.
+    <br><br>
+    <strong>Your media specialist:</strong> <span id="mediaSpecialistName"></span>
+  </div>
+</div>
 
         <div class="info-box warning" id="unavailableInfo">
-          <div class="info-box-title">
-            Sorry, we don't cover this area yet
-          </div>
-          <div class="info-box-text">
-            We're currently only available in the Midlands and surrounding areas. Please contact us directly if you'd like to discuss options.
-          </div>
-        </div>
+  <div class="info-box-title">
+    Sorry, we don't cover this area yet
+  </div>
+  <div class="info-box-text">
+    We're currently available in the Midlands & North (Jodie) and London & South (Maeve). Please contact us if you'd like to discuss options.
+  </div>
+</div>
 
         <!-- Address Form (shown after postcode validation) -->
         <div id="addressSection" style="display: none;">
@@ -835,7 +835,7 @@
           <textarea 
             id="clientNotes" 
             class="form-input" 
-            placeholder="Any special requirements or notes for the photographer..."
+            placeholder="Any special requirements or notes for the mediaspecialist..."
             rows="4"
             style="resize: vertical; min-height: 100px;"
           ></textarea>
@@ -948,8 +948,8 @@
               <span style="font-weight: 600; color: #1e293b; text-align: right;" id="summaryService">-</span>
             </div>
             <div style="display: flex; justify-content: space-between;">
-              <span style="color: #64748b;">Photographer:</span>
-              <span style="font-weight: 600; color: #1e293b;" id="summaryPhotographer">-</span>
+              <span style="color: #64748b;">mediaspecialist:</span>
+              <span style="font-weight: 600; color: #1e293b;" id="summarymediaspecialist">-</span>
             </div>
             <div style="border-top: 2px solid #3b82f6; margin: 8px 0;"></div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -1084,44 +1084,54 @@
       });
     }
 
-    // ===== TERRITORY CONFIGURATION =====
-    const NORTH_POSTCODES = [
-      'B', 'CV', 'LE', 'DE', 'NG', 'S', 'DN', 'HU', 'YO', 'LS', 'BD', 'HX', 
-      'WF', 'HD', 'M', 'OL', 'BL', 'WN', 'SK', 'L', 'WA', 'CH', 'CW', 'ST', 
-      'TF', 'SY', 'WV', 'WS', 'DY', 'CF', 'SA', 'NP', 'LL', 'LD'
-    ];
+    // ===== REGION CONFIGURATION =====
+const NORTH_POSTCODES = [
+  'B', 'CV', 'LE', 'DE', 'NG', 'S', 'DN', 'HU', 'YO', 'LS', 'BD', 'HX', 
+  'WF', 'HD', 'M', 'OL', 'BL', 'WN', 'SK', 'L', 'WA', 'CH', 'CW', 'ST', 
+  'TF', 'SY', 'WV', 'WS', 'DY', 'CF', 'SA', 'NP', 'LL', 'LD'
+];
 
-    const PHOTOGRAPHERS = {
-      north: {
-        name: 'Jodie',
-        territory: 'North'
-      },
-      south: {
-        name: 'Maeve',
-        territory: 'South'
-      }
-    };
+const SOUTH_POSTCODES = [
+  // Greater London
+  'E', 'EC', 'N', 'NW', 'SE', 'SW', 'W', 'WC',
+  // Surrounding areas
+  'AL', 'BR', 'CM', 'CR', 'DA', 'EN', 'HA', 'IG', 'KT', 'RM', 'SL', 'SM', 
+  'TW', 'UB', 'WD',
+  // Home Counties
+  'GU', 'HP', 'LU', 'MK', 'OX', 'RG', 'SG', 'SS', 'TN'
+];
 
-    let currentStep = 1;
-    let bookingData = {
-      postde: '',
-      propertyAddress: '',
-      territory: '',
-      photographer: '',
-      selectedDate: null,
-      selectedTime: null,
-      service: null,
-      bedrooms: 4,
-      basePrice: 0,
-      extraBedroomFee: 0,
-      totalPrice: 0,
-      clientName: '',
-      clientEmail: '',
-      clientPhone: '',
-      clientNotes: '',
-      paymentOption: null,
-      selectedAddons: []
-    };
+const MEDIA_SPECIALISTS = {
+  north: {
+    name: 'Jodie',
+    region: 'North'
+  },
+  south: {
+    name: 'Maeve',
+    region: 'South'
+  }
+};
+
+let currentStep = 1;
+let bookingData = {
+  postcode: '',
+  propertyAddress: '',
+  region: '',
+  mediaSpecialist: '',
+  selectedDate: null,
+  selectedTime: null,
+  service: null,
+  bedrooms: 4,
+  basePrice: 0,
+  extraBedroomFee: 0,
+  totalPrice: 0,
+  clientName: '',
+  clientEmail: '',
+  clientPhone: '',
+  clientNotes: '',
+  paymentOption: null,
+  selectedAddons: []
+};
 
     let currentCalendarDate = new Date();
 
@@ -1362,74 +1372,74 @@
       return postcodeRegex.test(postcode.trim());
     }
 
-    // Determine Territory from Postcode
-    function determineTerritory(postcode) {
-      const cleanPostcode = postcode.trim().toUpperCase().replace(/\s/g, '');
-      const outcodeArea = cleanPostcode.match(/^[A-Z]+/)[0];
-      
-      const isNorth = NORTH_POSTCODES.includes(outcodeArea);
-      
-      return {
-        territory: isNorth ? 'north' : 'south',
-        photographer: isNorth ? PHOTOGRAPHERS.north : PHOTOGRAPHERS.south,
-        isServiceable: isNorth
-      };
-    }
+   // Determine Region from Postcode
+function determineRegion(postcode) {
+  const cleanPostcode = postcode.trim().toUpperCase().replace(/\s/g, '');
+  const outcodeArea = cleanPostcode.match(/^[A-Z]+/)[0];
+  
+  const isNorth = NORTH_POSTCODES.includes(outcodeArea);
+  const isSouth = SOUTH_POSTCODES.includes(outcodeArea);
+  
+  return {
+    region: isNorth ? 'north' : (isSouth ? 'south' : 'unknown'),
+    mediaSpecialist: isNorth ? MEDIA_SPECIALISTS.north : (isSouth ? MEDIA_SPECIALISTS.south : null),
+    isServiceable: isNorth || isSouth  // Both regions serviceable!
+  };
+}
 
-    // Check Postcode and Show Territory
     async function checkPostcode() {
-      const postcodeInput = document.getElementById('postcode');
-      const postcode = postcodeInput.value;
-      const errorMsg = document.getElementById('postcodeError');
-      const checkBtn = document.getElementById('checkPostcodeBtn');
-      const territoryInfo = document.getElementById('territoryInfo');
-      const unavailableInfo = document.getElementById('unavailableInfo');
+  const postcodeInput = document.getElementById('postcode');
+  const postcode = postcodeInput.value;
+  const errorMsg = document.getElementById('postcodeError');
+  const checkBtn = document.getElementById('checkPostcodeBtn');
+  const regionInfo = document.getElementById('regionInfo');  // Changed from territoryInfo
+  const unavailableInfo = document.getElementById('unavailableInfo');
 
-      postcodeInput.classList.remove('error');
-      errorMsg.classList.remove('show');
-      territoryInfo.classList.remove('show');
-      unavailableInfo.classList.remove('show');
+  postcodeInput.classList.remove('error');
+  errorMsg.classList.remove('show');
+  regionInfo.classList.remove('show');
+  unavailableInfo.classList.remove('show');
 
-      if (!validatePostcode(postcode)) {
-        postcodeInput.classList.add('error');
-        errorMsg.classList.add('show');
-        return;
-      }
+  if (!validatePostcode(postcode)) {
+    postcodeInput.classList.add('error');
+    errorMsg.classList.add('show');
+    return;
+  }
 
-      checkBtn.classList.add('loading');
-      checkBtn.disabled = true;
+  checkBtn.classList.add('loading');
+  checkBtn.disabled = true;
 
-      await new Promise(resolve => setTimeout(resolve, 800));
+  await new Promise(resolve => setTimeout(resolve, 800));
 
-      const result = determineTerritory(postcode);
+  const result = determineRegion(postcode);
 
-      bookingData.postcode = postcode.toUpperCase();
-      bookingData.territory = result.territory;
-      bookingData.photographer = result.photographer.name;
+  bookingData.postcode = postcode.toUpperCase();
+  bookingData.region = result.region;
+  bookingData.mediaSpecialist = result.mediaSpecialist.name;
 
-      if (result.isServiceable) {
-        const territoryBadge = document.getElementById('territoryBadge');
-        territoryBadge.className = `territory-badge ${result.territory}`;
-        territoryBadge.textContent = result.territory.toUpperCase();
-        
-        document.getElementById('photographerName').textContent = result.photographer.name;
-        territoryInfo.classList.add('show');
+  if (result.isServiceable) {
+    const regionBadge = document.getElementById('regionBadge');  // Changed from territoryBadge
+    regionBadge.className = `region-badge ${result.region}`;  // Changed class
+    regionBadge.textContent = result.region.toUpperCase();
+    
+    document.getElementById('mediaSpecialistName').textContent = result.mediaSpecialist.name;  // Changed ID
+    regionInfo.classList.add('show');
 
-        document.getElementById('addressSection').style.display = 'block';
-        document.getElementById('checkPostcodeBtn').style.display = 'none';
-        document.getElementById('continueWithAddressBtn').style.display = 'block';
+    document.getElementById('addressSection').style.display = 'block';
+    document.getElementById('checkPostcodeBtn').style.display = 'none';
+    document.getElementById('continueWithAddressBtn').style.display = 'block';
 
-        setTimeout(() => {
-          document.getElementById('propertyAddress').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-          document.getElementById('propertyAddress').focus();
-        }, 500);
-      } else {
-        unavailableInfo.classList.add('show');
-      }
+    setTimeout(() => {
+      document.getElementById('propertyAddress').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      document.getElementById('propertyAddress').focus();
+    }, 500);
+  } else {
+    unavailableInfo.classList.add('show');
+  }
 
-      checkBtn.classList.remove('loading');
-      checkBtn.disabled = false;
-    }
+  checkBtn.classList.remove('loading');
+  checkBtn.disabled = false;
+}
 
     // Navigate to Step
     function goToStep(stepNumber) {
@@ -1481,7 +1491,7 @@
       }
       
       document.getElementById('summaryAddress').textContent = bookingData.propertyAddress || bookingData.postcode || '-';
-      document.getElementById('summaryPhotographer').textContent = bookingData.photographer || '-';
+      document.getElementById('summarymediaspecialist').textContent = bookingData.mediaspecialist || '-';
       document.getElementById('summaryTotal').textContent = `£${bookingData.totalPrice.toFixed(2)}`;
 
       updateTermsVisibility();
@@ -1740,8 +1750,8 @@
       const bookingPayload = {
         postcode: bookingData.postcode,
         propertyAddress: bookingData.propertyAddress,
-        territory: bookingData.territory,
-        photographer: bookingData.photographer,
+        Region: bookingData.Region,
+        mediaspecialist: bookingData.mediaspecialist,
         date: bookingData.selectedDate,
         time: bookingData.selectedTime,
         service: bookingData.service.name,
@@ -1804,8 +1814,8 @@
           body: JSON.stringify({
             postcode: bookingData.postcode,
             propertyAddress: bookingData.propertyAddress,
-            territory: bookingData.territory,
-            photographer: bookingData.photographer,
+            Region: bookingData.Region,
+            mediaspecialist: bookingData.mediaspecialist,
             date: bookingData.selectedDate,
             time: bookingData.selectedTime,
             service: bookingData.service.name,
@@ -1935,7 +1945,7 @@
           },
           body: JSON.stringify({
             postcode: bookingData.postcode,
-            territory: bookingData.territory,
+            Region: bookingData.Region,
             selectedDate: dateString
           })
         });
@@ -2007,8 +2017,8 @@
 
     // Render Services
     function renderServices() {
-      const territory = bookingData.territory;
-      const services = SERVICES[territory] || SERVICES.south;
+      const Region = bookingData.Region;
+      const services = SERVICES[Region] || SERVICES.south;
       const container = document.getElementById('serviceCards');
 
       const servicesHTML = services.map(service => `
@@ -2039,8 +2049,8 @@
 
     // Select Service
     function selectService(serviceId) {
-      const territory = bookingData.territory;
-      const services = SERVICES[territory] || SERVICES.south;
+      const Region = bookingData.Region;
+      const services = SERVICES[Region] || SERVICES.south;
       const service = services.find(s => s.id === serviceId);
 
       if (!service) return;

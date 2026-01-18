@@ -267,7 +267,7 @@
   <div class="container">
     <div class="header">
       <div style="margin-bottom: 20px;">
-        <img src="/public/images/Markeb Media Logo (2).png" alt="Markeb Media" style="height: 60px;">
+        <img src="/public/images/Markeb Media Logo (2).png" alt="Markeb itory" style="height: 60px;">
       </div>
       <h1>Manage Your Booking</h1>
       <p>Reschedule or cancel your shoot</p>
@@ -326,8 +326,8 @@
             <span class="booking-detail-value" id="detailAddress" style="max-width: 400px;">-</span>
           </div>
           <div class="booking-detail">
-            <span class="booking-detail-label">Photographer</span>
-            <span class="booking-detail-value" id="detailPhotographer">-</span>
+            <span class="booking-detail-label">mediaspecialist</span>
+            <span class="booking-detail-value" id="detailmediaspecialist">-</span>
           </div>
           <div class="booking-detail">
             <span class="booking-detail-label">Total Amount</span>
@@ -355,7 +355,7 @@
         </p>
 
         <div class="alert alert-info">
-          <strong>Note:</strong> Availability is subject to photographer schedule. If your preferred slot is unavailable, we'll contact you with alternative options.
+          <strong>Note:</strong> Availability is subject to mediaspecialist schedule. If your preferred slot is unavailable, we'll contact you with alternative options.
         </div>
 
         <label class="form-label">New Date</label>
@@ -477,7 +477,7 @@
       document.getElementById('detailDateTime').textContent = `${dateStr} at ${booking.time}`;
       
       document.getElementById('detailAddress').textContent = booking.propertyAddress;
-      document.getElementById('detailPhotographer').textContent = booking.photographer;
+      document.getElementById('detailmediaspecialist').textContent = booking.mediaspecialist;
       document.getElementById('detailTotal').textContent = `£${booking.totalPrice.toFixed(2)}`;
 
       // Set status badge
