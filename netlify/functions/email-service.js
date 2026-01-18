@@ -6,6 +6,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM_EMAIL = 'Markeb Media <bookings@markebmedia.com>';
 const SITE_URL = 'https://markebmedia.com';
 const LOGO_URL = 'https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png';
+const MANAGE_BOOKING_PATH = '/manage-booking';
 
 // Format date nicely
 function formatDate(dateString) {
@@ -154,7 +155,7 @@ function getEmailLayout(content) {
 
 // 1. Booking Confirmation (Reserve Without Payment)
 async function sendBookingConfirmation(booking) {
-  const manageUrl = `${SITE_URL}/manage-booking?ref=${booking.bookingRef}&email=${encodeURIComponent(booking.clientEmail)}`;
+  const manageUrl = `${SITE_URL}${MANAGE_BOOKING_PATH}?ref=${booking.bookingRef}&email=${encodeURIComponent(booking.clientEmail)}`;
   
   const content = `
     <h2>🎉 Your Shoot is Reserved!</h2>
@@ -189,8 +190,8 @@ async function sendBookingConfirmation(booking) {
     </div>
 
     <div class="alert alert-warning">
-      <strong>💳 Payment on the Day</strong><br>
-      We'll collect payment manually on the day of your shoot using the bank details you provided.
+      <strong>💳 Payment After Shoot</strong><br>
+      We'll charge your card automatically once your content enters the editing stage.
     </div>
 
     <center>
@@ -206,8 +207,8 @@ async function sendBookingConfirmation(booking) {
     <ul>
       <li><strong>${booking.photographer}</strong> will arrive at your property at ${booking.time}</li>
       <li>The shoot will take approximately ${Math.floor(booking.duration / 60)} hour${booking.duration >= 120 ? 's' : ''}</li>
-      <li>You'll receive your edited content within 3-5 business days</li>
-      <li>Payment will be collected on the day</li>
+      <li>You'll receive your edited content within 48 hours</li>
+      <li>Payment will be collected automatically after your shoot</li>
     </ul>
 
     <h3>Preparing for Your Shoot</h3>
@@ -234,7 +235,7 @@ async function sendBookingConfirmation(booking) {
 
 // 2. Payment Confirmation (Stripe)
 async function sendPaymentConfirmation(booking) {
-  const manageUrl = `${SITE_URL}/manage-booking?ref=${booking.bookingRef}&email=${encodeURIComponent(booking.clientEmail)}`;
+  const manageUrl = `${SITE_URL}${MANAGE_BOOKING_PATH}?ref=${booking.bookingRef}&email=${encodeURIComponent(booking.clientEmail)}`;
   
   const content = `
     <h2>✅ Payment Confirmed!</h2>
@@ -286,7 +287,7 @@ async function sendPaymentConfirmation(booking) {
     <ul>
       <li><strong>${booking.photographer}</strong> will arrive at your property at ${booking.time}</li>
       <li>The shoot will take approximately ${Math.floor(booking.duration / 60)} hour${booking.duration >= 120 ? 's' : ''}</li>
-      <li>You'll receive your edited content within 3-5 business days</li>
+      <li>You'll receive your edited content within 48 hours</li>
     </ul>
 
     <h3>Preparing for Your Shoot</h3>
@@ -313,7 +314,7 @@ async function sendPaymentConfirmation(booking) {
 
 // 3. Reschedule Confirmation
 async function sendRescheduleConfirmation(booking, oldDate, oldTime) {
-  const manageUrl = `${SITE_URL}/manage-booking?ref=${booking.bookingRef}&email=${encodeURIComponent(booking.clientEmail)}`;
+  const manageUrl = `${SITE_URL}${MANAGE_BOOKING_PATH}?ref=${booking.bookingRef}&email=${encodeURIComponent(booking.clientEmail)}`;
   
   const content = `
     <h2>📅 Booking Rescheduled</h2>
