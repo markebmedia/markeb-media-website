@@ -6,7 +6,6 @@ const { sendBookingConfirmation } = require('./email-service');
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
 exports.handler = async (event, context) => {
-  // Only allow POST
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -17,11 +16,8 @@ exports.handler = async (event, context) => {
 
   try {
     const bookingData = JSON.parse(event.body);
-
-    // Generate booking reference
     const bookingRef = `BK-${Date.now()}`;
 
-    // Prepare add-ons string
     const addonsString = bookingData.addons && bookingData.addons.length > 0
       ? bookingData.addons.map(a => a.name).join(', ')
       : '';
@@ -50,12 +46,17 @@ exports.handler = async (event, context) => {
           'Client Email': bookingData.clientEmail,
           'Client Phone': bookingData.clientPhone,
           'Client Notes': bookingData.clientNotes || '',
-          'Bank Account Holder': bookingData.bankAccountHolder || '',
-          'Bank Sort Code': bookingData.bankSortCode || '',
-          'Bank Account Number': bookingData.bankAccountNumber || '',
+          
+          // Stripe Payment Method (card on file)
+          'Stripe Payment Method ID': bookingData.stripePaymentMethodId || '',
+          'Cardholder Name': bookingData.cardholderName || '',
+          'Card Last 4': bookingData.cardLast4 || '',
+          'Card Brand': bookingData.cardBrand || '',
+          'Card Expiry': bookingData.cardExpiry || '',
+          
           'Status': 'Reserved - Awaiting Payment',
           'Payment Status': 'Pending',
-          'Payment Method': 'Bank Transfer',
+          'Payment Method': 'Card on File',
           'Created Date': new Date().toISOString(),
           'Cancellation Allowed Until': new Date(new Date(bookingData.date).getTime() - 24 * 60 * 60 * 1000).toISOString()
         }
@@ -82,7 +83,6 @@ exports.handler = async (event, context) => {
       console.log('Confirmation email sent to:', bookingData.clientEmail);
     } catch (emailError) {
       console.error('Failed to send confirmation email:', emailError);
-      // Don't fail the booking if email fails
     }
 
     return {
