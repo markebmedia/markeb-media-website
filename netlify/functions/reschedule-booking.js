@@ -88,7 +88,7 @@ exports.handler = async (event, context) => {
         time: newTime,
         service: booking.fields['Service Name'],
         propertyAddress: booking.fields['Property Address'],
-        photographer: booking.fields['Photographer']
+        mediaspecialist: booking.fields['mediaspecialist']
       }, oldDate, oldTime);
 
       console.log('Reschedule confirmation sent to:', clientEmail);

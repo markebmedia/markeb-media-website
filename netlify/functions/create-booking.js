@@ -29,8 +29,8 @@ exports.handler = async (event, context) => {
           'Booking Reference': bookingRef,
           'Postcode': bookingData.postcode,
           'Property Address': bookingData.propertyAddress,
-          'Territory': bookingData.territory,
-          'Photographer': bookingData.photographer,
+          'region': bookingData.region,
+          'mediaspecialist': bookingData.mediaspecialist,
           'Date': bookingData.date,
           'Time': bookingData.time,
           'Service': bookingData.serviceId,
@@ -75,7 +75,7 @@ exports.handler = async (event, context) => {
         time: bookingData.time,
         service: bookingData.service,
         propertyAddress: bookingData.propertyAddress,
-        photographer: bookingData.photographer,
+        mediaspecialist: bookingData.mediaspecialist,
         totalPrice: bookingData.totalPrice,
         duration: bookingData.duration
       });

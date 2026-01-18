@@ -79,7 +79,7 @@ exports.handler = async (event, context) => {
         time: fields['Time'],
         service: fields['Service Name'],
         propertyAddress: fields['Property Address'],
-        photographer: fields['Photographer'],
+        mediaspecialist: fields['mediaspecialist'],
         amountPaid: fields['Total Price'],
         totalPrice: fields['Total Price'],
         duration: fields['Duration (mins)'] || 60
