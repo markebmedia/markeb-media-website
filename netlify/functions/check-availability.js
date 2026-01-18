@@ -132,77 +132,126 @@ function generateAllTimeSlots() {
 // Calculate available time slots based on drive times between bookings
 async function calculateAvailableSlots(userPostcode, existingBookings) {
   const allSlots = generateAllTimeSlots();
+  const bufferMinutes = 15; // 15-minute buffer for pack/unpack
+  const estimatedUserDuration = 90; // Conservative estimate for user's booking
   
   // Sort bookings by start time
   existingBookings.sort((a, b) => timeToMinutes(a.startTime) - timeToMinutes(b.startTime));
   
-  // For each existing booking, calculate drive time and block unavailable slots
+  // STEP 1: Block slots that overlap with existing bookings or are too soon after them
   for (const booking of existingBookings) {
     if (!booking.postcode || !booking.startTime) continue;
     
     try {
+      // Calculate when media specialist finishes existing shoot
+      const bookingStartMinutes = timeToMinutes(booking.startTime);
+      const shootEndMinutes = bookingStartMinutes + booking.duration;
+      
       // Get drive time from existing booking location to user's location
       const driveTimeMinutes = await getDriveTime(booking.postcode, userPostcode);
       
-      // Calculate when mediaspecialist finishes existing shoot
-      const bookingStartMinutes = timeToMinutes(booking.startTime);
-      const shootEndMinutes = bookingStartMinutes + booking.duration;
-      const bufferMinutes = 15; // 15-minute buffer for pack/unpack
+      // CRITICAL CHECK: If drive time exceeds 45 minutes, block ALL remaining slots
+      // The media specialist can't travel that far between bookings
+      if (driveTimeMinutes > 45) {
+        allSlots.forEach(slot => {
+          const slotMinutes = timeToMinutes(slot.time);
+          // Only block slots that come after this booking ends
+          if (slotMinutes >= shootEndMinutes) {
+            slot.available = false;
+            slot.reason = `Too far from ${booking.startTime} booking (${driveTimeMinutes} min drive - max 45 min allowed)`;
+          }
+        });
+        continue; // Skip to next booking
+      }
+      
       const earliestNextStart = shootEndMinutes + driveTimeMinutes + bufferMinutes;
       
-      // Block all slots before earliest possible next start
+      // Block all slots that overlap with or are too soon after this booking
       allSlots.forEach(slot => {
         const slotMinutes = timeToMinutes(slot.time);
         
-        // Block slots that are too early after this booking
-        if (slotMinutes < earliestNextStart) {
+        // CASE 1: Block slots during the existing booking
+        if (slotMinutes >= bookingStartMinutes && slotMinutes < shootEndMinutes) {
           slot.available = false;
-          slot.reason = `Too close to ${booking.startTime} booking (${driveTimeMinutes} min drive time needed)`;
+          slot.reason = `Media specialist has booking at ${booking.startTime}`;
+        }
+        // CASE 2: Block slots after booking but before media specialist can arrive
+        // (not enough time for drive + buffer)
+        else if (slotMinutes < earliestNextStart) {
+          slot.available = false;
+          slot.reason = `Not enough time to travel from ${booking.startTime} booking (${driveTimeMinutes} min drive + ${bufferMinutes} min buffer needed)`;
         }
       });
       
-      // Also check if user's booking would conflict with NEXT booking
-      // Find next booking after current one
-      const nextBooking = existingBookings.find(b => 
-        timeToMinutes(b.startTime) > bookingStartMinutes
-      );
-      
-      if (nextBooking) {
-        // Calculate drive time from user's location to next booking
-        const driveToNextMinutes = await getDriveTime(userPostcode, nextBooking.postcode);
-        const nextBookingStart = timeToMinutes(nextBooking.startTime);
-        
-        // Block slots where user's booking would end too late to reach next booking
-        allSlots.forEach(slot => {
-          const slotMinutes = timeToMinutes(slot.time);
-          
-          // Assume user's booking duration (we don't know it yet, so use conservative estimate)
-          const estimatedUserDuration = 90; // Conservative estimate
-          const userBookingEnd = slotMinutes + estimatedUserDuration + bufferMinutes;
-          const arrivalAtNext = userBookingEnd + driveToNextMinutes;
-          
-          // If can't reach next booking in time, block this slot
-          if (arrivalAtNext > nextBookingStart) {
-            slot.available = false;
-            slot.reason = `Would conflict with ${nextBooking.startTime} booking`;
-          }
-        });
-      }
-      
     } catch (error) {
-      console.error('Error calculating drive time for booking:', booking.id, error);
+      console.error('Error calculating drive time from booking:', booking.id, error);
       // If drive time calculation fails, be conservative and block slots around this booking
       const bookingStartMinutes = timeToMinutes(booking.startTime);
-      const conservativeBuffer = 120; // 2 hours buffer
+      const shootEndMinutes = bookingStartMinutes + (booking.duration || 90);
+      const conservativeBuffer = 60; // 1 hour buffer after booking ends
       
       allSlots.forEach(slot => {
         const slotMinutes = timeToMinutes(slot.time);
-        // Block slots within 2 hours before booking
-        if (Math.abs(slotMinutes - bookingStartMinutes) < conservativeBuffer) {
+        
+        // Block the actual booking time
+        if (slotMinutes >= bookingStartMinutes && slotMinutes < shootEndMinutes) {
+          slot.available = false;
+          slot.reason = `Media specialist has booking at ${booking.startTime}`;
+        }
+        // Block slots within 1 hour after booking ends
+        else if (slotMinutes >= shootEndMinutes && slotMinutes < shootEndMinutes + conservativeBuffer) {
           slot.available = false;
           slot.reason = 'Conservative buffer (drive time unavailable)';
         }
       });
+    }
+  }
+  
+  // STEP 2: For each remaining available slot, check if media specialist can reach ALL future bookings from user's location
+  for (const slot of allSlots) {
+    if (!slot.available) continue; // Skip if already blocked
+    
+    const slotMinutes = timeToMinutes(slot.time);
+    
+    // Check all existing bookings that come AFTER this time slot
+    for (const futureBooking of existingBookings) {
+      const futureBookingStart = timeToMinutes(futureBooking.startTime);
+      
+      // Only check bookings that are after this slot
+      if (futureBookingStart <= slotMinutes) continue;
+      
+      try {
+        // Calculate drive time from user's location to the future booking
+        const driveToFutureMinutes = await getDriveTime(userPostcode, futureBooking.postcode);
+        
+        // CRITICAL CHECK: If drive time exceeds 45 minutes, block this slot
+        // The media specialist can't travel that far between bookings
+        if (driveToFutureMinutes > 45) {
+          slot.available = false;
+          slot.reason = `Next booking is too far away (${driveToFutureMinutes} min drive - max 45 min allowed)`;
+          break; // No need to check other future bookings for this slot
+        }
+        
+        // Calculate when user's booking would end
+        const userBookingEnd = slotMinutes + estimatedUserDuration + bufferMinutes;
+        const arrivalAtFuture = userBookingEnd + driveToFutureMinutes;
+        
+        // If media specialist can't reach the future booking in time, block this slot
+        if (arrivalAtFuture > futureBookingStart) {
+          slot.available = false;
+          slot.reason = `Would conflict with ${futureBooking.startTime} booking (need ${driveToFutureMinutes} min to travel there)`;
+          break; // No need to check other future bookings for this slot
+        }
+      } catch (error) {
+        console.error('Error calculating drive time to future booking:', futureBooking.id, error);
+        // Be conservative - if we can't calculate drive time, block slots close to the future booking
+        const timeDifference = futureBookingStart - slotMinutes;
+        if (timeDifference < estimatedUserDuration + 60) { // Less than estimated duration + 1 hour buffer
+          slot.available = false;
+          slot.reason = `May conflict with ${futureBooking.startTime} booking (drive time unavailable)`;
+          break;
+        }
+      }
     }
   }
   
