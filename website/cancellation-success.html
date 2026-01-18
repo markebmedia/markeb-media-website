@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cancellation Confirmed - Markeb Media</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body { 
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 60px 48px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 32px;
+      font-size: 40px;
+      animation: scaleIn 0.5s ease;
+    }
+
+    @keyframes scaleIn {
+      from { transform: scale(0); }
+      to { transform: scale(1); }
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 16px;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #64748b;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    .booking-ref {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 32px;
+    }
+
+    .booking-ref-label {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .booking-ref-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e293b;
+      font-family: 'Courier New', monospace;
+    }
+
+    .info-box {
+      background: #fef2f2;
+      border: 2px solid #ef4444;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 32px;
+      text-align: left;
+    }
+
+    .info-box h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #991b1b;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-box p {
+      font-size: 14px;
+      color: #991b1b;
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
+
+    .info-box ul {
+      margin: 12px 0 0 20px;
+      font-size: 14px;
+      color: #991b1b;
+      line-height: 1.8;
+    }
+
+    .alert {
+      background: #eff6ff;
+      border: 2px solid #3b82f6;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 32px;
+      text-align: left;
+    }
+
+    .alert p {
+      font-size: 14px;
+      color: #1e40af;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .btn {
+      padding: 16px 40px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      margin: 0 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .divider {
+      height: 1px;
+      background: #e2e8f0;
+      margin: 32px 0;
+    }
+
+    .contact-info {
+      font-size: 14px;
+      color: #64748b;
+      line-height: 1.8;
+    }
+
+    .contact-info a {
+      color: #3b82f6;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .contact-info a:hover {
+      text-decoration: underline;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #e2e8f0;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 20px 12px;
+      }
+
+      .card {
+        padding: 40px 24px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .subtitle {
+        font-size: 16px;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <!-- Loading State -->
+      <div id="loadingState">
+        <div class="loading">
+          <div class="loading-spinner"></div>
+          <p style="color: #64748b;">Processing your cancellation...</p>
+        </div>
+      </div>
+
+      <!-- Success State -->
+      <div id="successState" style="display: none;">
+        <div class="success-icon">❌</div>
+        
+        <h1>Booking Cancelled</h1>
+        <p class="subtitle">
+          Your booking has been cancelled and the cancellation fee has been processed.
+        </p>
+
+        <div class="booking-ref">
+          <div class="booking-ref-label">Booking Reference</div>
+          <div class="booking-ref-value" id="bookingRef">-</div>
+        </div>
+
+        <div class="info-box">
+          <h3>💳 Cancellation Fee Processed</h3>
+          <p>
+            As per our cancellation policy, a fee has been applied to your booking:
+          </p>
+          <ul>
+            <li>Cancellations within 24 hours: <strong>50% charge</strong></li>
+            <li>Same-day cancellations: <strong>100% charge</strong></li>
+          </ul>
+          <p style="margin-top: 12px;">
+            You will receive a confirmation email shortly with the full details of your cancellation and payment receipt.
+          </p>
+        </div>
+
+        <div class="alert">
+          <p>
+            <strong>📧 Confirmation Email Sent</strong><br>
+            We've sent a confirmation email to <strong id="clientEmail">your email address</strong> with all the details of your cancellation.
+          </p>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="button-group">
+          <a href="/booking" class="btn btn-primary">
+            📅 Make a New Booking
+          </a>
+          <a href="/" class="btn btn-secondary">
+            🏠 Return Home
+          </a>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="contact-info">
+          <p><strong>Need Help?</strong></p>
+          <p>
+            If you have any questions about your cancellation, please contact us:<br>
+            <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div id="errorState" style="display: none;">
+        <div class="success-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">⚠️</div>
+        
+        <h1>Something Went Wrong</h1>
+        <p class="subtitle">
+          We couldn't process your cancellation. Please try again or contact us for assistance.
+        </p>
+
+        <div class="button-group">
+          <a href="/manage-booking" class="btn btn-primary">
+            Try Again
+          </a>
+          <a href="mailto:commercial@markebmedia.com" class="btn btn-secondary">
+            Contact Support
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const bookingRef = urlParams.get('ref');
+    const sessionId = urlParams.get('session_id');
+
+    // Process cancellation on page load
+    if (bookingRef && sessionId) {
+      processCancellation(bookingRef, sessionId);
+    } else {
+      showError();
+    }
+
+    async function processCancellation(ref, session) {
+      try {
+        // Verify the Stripe session and update booking
+        const response = await fetch('/.netlify/functions/process-cancellation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            bookingRef: ref,
+            sessionId: session
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to process cancellation');
+        }
+
+        const result = await response.json();
+        
+        // Show success state
+        showSuccess(result);
+
+      } catch (error) {
+        console.error('Error processing cancellation:', error);
+        showError();
+      }
+    }
+
+    function showSuccess(data) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('successState').style.display = 'block';
+      
+      if (data.bookingRef) {
+        document.getElementById('bookingRef').textContent = data.bookingRef;
+      }
+      
+      if (data.clientEmail) {
+        document.getElementById('clientEmail').textContent = data.clientEmail;
+      }
+    }
+
+    function showError() {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
