@@ -19,8 +19,12 @@ exports.handler = async (event, context) => {
       };
     }
 
+    console.log(`Checking availability for: postcode=${postcode}, region=${region}, date=${selectedDate}`);
+
     // Fetch existing bookings from Airtable for this region and date
     const bookings = await fetchBookingsForRegion(region, selectedDate);
+
+    console.log(`Found ${bookings.length} existing bookings for this date/region`);
 
     // If no bookings exist for this date, all time slots are available
     if (bookings.length === 0) {
@@ -69,29 +73,68 @@ exports.handler = async (event, context) => {
   }
 };
 
+// Helper function to format date to match Airtable's UK format (D/M/YYYY)
+function formatDateForAirtable(dateString) {
+  // Handle various input formats and convert to D/M/YYYY
+  let date;
+  
+  // If it's already in D/M/YYYY or DD/MM/YYYY format, parse it correctly
+  if (dateString.includes('/')) {
+    const parts = dateString.split('/');
+    // Assume DD/MM/YYYY or D/M/YYYY format
+    date = new Date(parts[2], parts[1] - 1, parts[0]);
+  } else {
+    // Assume ISO format YYYY-MM-DD
+    date = new Date(dateString);
+  }
+  
+  // Return in D/M/YYYY format (no leading zeros)
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  
+  return `${day}/${month}/${year}`;
+}
+
 // Fetch bookings from Airtable for specific region and date
 async function fetchBookingsForRegion(region, selectedDate) {
   try {
     const Airtable = require('airtable');
     const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
+    // Format the date to match Airtable's format (D/M/YYYY)
+    const formattedDate = formatDateForAirtable(selectedDate);
+    
+    console.log(`Formatted date for Airtable: ${formattedDate} (original: ${selectedDate})`);
+    console.log(`Filter formula: AND({Region} = '${region}', {Date} = '${formattedDate}', {Booking Status} = 'Booked')`);
+
     // Query bookings for this specific region and date
     const records = await base('Bookings')
       .select({
-        filterByFormula: `AND({Region} = '${region}', {Date} = '${selectedDate}', {Booking Status} = 'Booked')`,
+        filterByFormula: `AND({Region} = '${region}', {Date} = '${formattedDate}', {Booking Status} = 'Booked')`,
         sort: [{ field: 'Time', direction: 'asc' }]
       })
       .firstPage();
 
+    console.log(`Retrieved ${records.length} records from Airtable`);
+
     // Extract relevant booking info
-    return records.map(record => ({
-      id: record.id,
-      postcode: record.fields['Postcode'] || extractPostcode(record.fields['Property Address']),
-      startTime: record.fields['Time'],
-      duration: record.fields['Duration'] || 90,
-      date: record.fields['Date'],
-      region: record.fields['Region']
-    }));
+    const bookings = records.map(record => {
+      const booking = {
+        id: record.id,
+        postcode: record.fields['Postcode'] || extractPostcode(record.fields['Property Address']),
+        startTime: record.fields['Time'],
+        duration: record.fields['Duration'] || 90,
+        date: record.fields['Date'],
+        region: record.fields['Region']
+      };
+      
+      console.log(`Booking found: ${booking.startTime} at ${booking.postcode} (Duration: ${booking.duration}min)`);
+      
+      return booking;
+    });
+
+    return bookings;
 
   } catch (error) {
     console.error('Error fetching bookings:', error);
@@ -133,9 +176,14 @@ async function calculateAvailableSlots(userPostcode, existingBookings) {
   const allSlots = generateAllTimeSlots();
   const maxDriveMinutes = 45;
   
+  console.log(`Calculating availability for ${existingBookings.length} existing bookings`);
+  
   // STEP 1: Check if user's location is within 45 min drive of ALL existing bookings
   for (const booking of existingBookings) {
-    if (!booking.postcode) continue;
+    if (!booking.postcode) {
+      console.log(`Skipping booking at ${booking.startTime} - no postcode available`);
+      continue;
+    }
     
     try {
       const driveTime = await getDriveTime(userPostcode, booking.postcode);
@@ -171,16 +219,22 @@ async function calculateAvailableSlots(userPostcode, existingBookings) {
     const bookingStartMinutes = timeToMinutes(booking.startTime);
     const bookingEndMinutes = bookingStartMinutes + booking.duration;
     
+    console.log(`Blocking slots from ${booking.startTime} (${bookingStartMinutes} min) to ${bookingEndMinutes} min (${booking.duration} min duration)`);
+    
     allSlots.forEach(slot => {
       const slotMinutes = timeToMinutes(slot.time);
       
       // Block slots that fall within this booking's time range
       if (slotMinutes >= bookingStartMinutes && slotMinutes < bookingEndMinutes) {
+        console.log(`  -> Blocking slot ${slot.time} (${slotMinutes} min)`);
         slot.available = false;
         slot.reason = `Media specialist already booked at ${booking.startTime}`;
       }
     });
   }
+  
+  const availableCount = allSlots.filter(s => s.available).length;
+  console.log(`Final result: ${availableCount} available slots, ${allSlots.length - availableCount} blocked slots`);
   
   return allSlots;
 }
