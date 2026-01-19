@@ -180,8 +180,8 @@ async function sendBookingConfirmation(booking) {
         <span class="detail-value">${booking.propertyAddress}</span>
       </div>
       <div class="detail-row">
-        <span class="detail-label">Your mediaspecialist</span>
-        <span class="detail-value">${booking.mediaspecialist}</span>
+        <span class="detail-label">Your Media Specialist</span>
+        <span class="detail-value">${booking.Media Specialist}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Total Amount</span>
@@ -205,7 +205,7 @@ async function sendBookingConfirmation(booking) {
 
     <h3>What to Expect</h3>
     <ul>
-      <li><strong>${booking.mediaspecialist}</strong> will arrive at your property at ${booking.time}</li>
+      <li><strong>${booking.Media Specialist}</strong> will arrive at your property at ${booking.time}</li>
       <li>The shoot will take approximately ${Math.floor(booking.duration / 60)} hour${booking.duration >= 120 ? 's' : ''}</li>
       <li>You'll receive your edited content within 48 hours</li>
       <li>Payment will be collected automatically after your shoot</li>
@@ -216,7 +216,7 @@ async function sendBookingConfirmation(booking) {
       <li>Ensure the property is tidy and well-lit</li>
       <li>Remove personal items, toiletries, and clutter</li>
       <li>Turn on all lights for the best results</li>
-      <li>Have access arranged for the mediaspecialist</li>
+      <li>Have access arranged for the Media Specialist</li>
     </ul>
 
     <p>If you have any questions, feel free to reach out!</p>
@@ -260,8 +260,8 @@ async function sendPaymentConfirmation(booking) {
         <span class="detail-value">${booking.propertyAddress}</span>
       </div>
       <div class="detail-row">
-        <span class="detail-label">Your mediaspecialist</span>
-        <span class="detail-value">${booking.mediaspecialist}</span>
+        <span class="detail-label">Your Media Specialist</span>
+        <span class="detail-value">${booking.Media Specialist}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Amount Paid</span>
@@ -285,7 +285,7 @@ async function sendPaymentConfirmation(booking) {
 
     <h3>What to Expect</h3>
     <ul>
-      <li><strong>${booking.mediaspecialist}</strong> will arrive at your property at ${booking.time}</li>
+      <li><strong>${booking.Media Specialist}</strong> will arrive at your property at ${booking.time}</li>
       <li>The shoot will take approximately ${Math.floor(booking.duration / 60)} hour${booking.duration >= 120 ? 's' : ''}</li>
       <li>You'll receive your edited content within 48 hours</li>
     </ul>
@@ -295,7 +295,7 @@ async function sendPaymentConfirmation(booking) {
       <li>Ensure the property is tidy and well-lit</li>
       <li>Remove personal items, toiletries, and clutter</li>
       <li>Turn on all lights for the best results</li>
-      <li>Have access arranged for the mediaspecialist</li>
+      <li>Have access arranged for the Media Specialist</li>
     </ul>
 
     <p>If you have any questions, feel free to reach out!</p>
@@ -344,8 +344,8 @@ async function sendRescheduleConfirmation(booking, oldDate, oldTime) {
         <span class="detail-value">${booking.propertyAddress}</span>
       </div>
       <div class="detail-row">
-        <span class="detail-label">Your mediaspecialist</span>
-        <span class="detail-value">${booking.mediaspecialist}</span>
+        <span class="detail-label">Your Media Specialist</span>
+        <span class="detail-value">${booking.Media Specialist}</span>
       </div>
     </div>
 
@@ -446,8 +446,8 @@ async function sendReminderEmail(booking) {
         <span class="detail-value">${booking.propertyAddress}</span>
       </div>
       <div class="detail-row">
-        <span class="detail-label">Your mediaspecialist</span>
-        <span class="detail-value">${booking.mediaspecialist}</span>
+        <span class="detail-label">Your Media Specialist</span>
+        <span class="detail-value">${booking.Media Specialist}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Service</span>
@@ -465,7 +465,7 @@ async function sendReminderEmail(booking) {
       <li>✅ Property is clean and tidy</li>
       <li>✅ Personal items and clutter removed</li>
       <li>✅ All lights turned on</li>
-      <li>✅ Access arranged for mediaspecialist</li>
+      <li>✅ Access arranged for Media Specialist</li>
       <li>✅ Pets secured (if applicable)</li>
     </ul>
 

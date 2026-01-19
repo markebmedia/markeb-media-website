@@ -47,7 +47,7 @@ exports.handler = async (event, context) => {
             'Postcode': metadata.postcode,
             'Property Address': metadata.propertyAddress,
             'region': metadata.region,
-            'mediaspecialist': metadata.mediaspecialist,
+            'Media Specialist': metadata.Media Specialist,
             'Date': metadata.date,
             'Time': metadata.time,
             'Service': metadata.serviceId,
@@ -83,7 +83,7 @@ exports.handler = async (event, context) => {
           time: metadata.time,
           service: metadata.service || metadata.serviceId,
           propertyAddress: metadata.propertyAddress,
-          mediaspecialist: metadata.mediaspecialist,
+          Media Specialist: metadata.Media Specialist,
           amountPaid: session.amount_total / 100,
           totalPrice: session.amount_total / 100,
           duration: parseInt(metadata.duration) || 60
