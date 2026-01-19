@@ -1387,12 +1387,138 @@ function determineRegion(postcode) {
   };
 }
 
-    async function checkPostcode() {
+// New function to fetch addresses from GetAddress.io
+async function fetchAddressesFromPostcode(postcode) {
+  const cleanPostcode = postcode.replace(/\s/g, '');
+  
+  const response = await fetch('/.netlify/functions/get-address', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ postcode: cleanPostcode })
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch addresses');
+  }
+  
+  const data = await response.json();
+  return data.addresses || [];
+}
+
+// New function to format address from GetAddress.io response
+function formatAddress(address) {
+  const parts = [
+    address.line_1,
+    address.line_2,
+    address.line_3,
+    address.line_4,
+    address.locality,
+    address.town_or_city,
+    address.county
+  ].filter(part => part && part.trim() !== '');
+  
+  return parts.join(', ');
+}
+
+// New function to show address section with dropdown or manual entry
+function showAddressSection(addresses) {
+  const addressSection = document.getElementById('addressSection');
+  
+  if (addresses && addresses.length > 0) {
+    addressSection.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" for="addressSelect">Select Your Property Address *</label>
+        <select 
+          id="addressSelect" 
+          class="form-input" 
+          style="cursor: pointer;"
+          onchange="handleAddressSelection()"
+        >
+          <option value="">-- Select an address --</option>
+          ${addresses.map((addr, index) => `
+            <option value="${index}">
+              ${formatAddress(addr)}
+            </option>
+          `).join('')}
+          <option value="manual">Enter address manually</option>
+        </select>
+        <div class="error-message" id="addressSelectError">Please select an address</div>
+      </div>
+      
+      <div id="manualAddressEntry" style="display: none;">
+        <div class="form-group">
+          <label class="form-label" for="propertyAddress">Full Property Address *</label>
+          <input 
+            type="text" 
+            id="propertyAddress" 
+            class="form-input" 
+            placeholder="e.g. 123 High Street, Leicester"
+          />
+          <div style="font-size: 12px; color: #64748b; margin-top: 6px;">
+            This helps us plan the best route and ensure accurate timing
+          </div>
+          <div class="error-message" id="addressError">Please enter the property address</div>
+        </div>
+      </div>
+    `;
+    
+    bookingData.availableAddresses = addresses;
+  } else {
+    addressSection.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" for="propertyAddress">Full Property Address *</label>
+        <input 
+          type="text" 
+          id="propertyAddress" 
+          class="form-input" 
+          placeholder="e.g. 123 High Street, Leicester"
+        />
+        <div style="font-size: 12px; color: #64748b; margin-top: 6px;">
+          This helps us plan the best route and ensure accurate timing
+        </div>
+        <div class="error-message" id="addressError">Please enter the property address</div>
+      </div>
+    `;
+  }
+  
+  addressSection.style.display = 'block';
+}
+
+// New function to handle address selection
+function handleAddressSelection() {
+  const select = document.getElementById('addressSelect');
+  const selectedValue = select.value;
+  const manualEntry = document.getElementById('manualAddressEntry');
+  const errorMsg = document.getElementById('addressSelectError');
+  
+  errorMsg.classList.remove('show');
+  select.classList.remove('error');
+  
+  if (selectedValue === 'manual') {
+    manualEntry.style.display = 'block';
+    bookingData.propertyAddress = '';
+    
+    setTimeout(() => {
+      document.getElementById('propertyAddress').focus();
+    }, 100);
+  } else if (selectedValue !== '') {
+    manualEntry.style.display = 'none';
+    const address = bookingData.availableAddresses[parseInt(selectedValue)];
+    bookingData.propertyAddress = formatAddress(address);
+  } else {
+    manualEntry.style.display = 'none';
+    bookingData.propertyAddress = '';
+  }
+}
+
+   async function checkPostcode() {
   const postcodeInput = document.getElementById('postcode');
   const postcode = postcodeInput.value;
   const errorMsg = document.getElementById('postcodeError');
   const checkBtn = document.getElementById('checkPostcodeBtn');
-  const regionInfo = document.getElementById('regionInfo');  // Changed from territoryInfo
+  const regionInfo = document.getElementById('regionInfo');
   const unavailableInfo = document.getElementById('unavailableInfo');
 
   postcodeInput.classList.remove('error');
@@ -1409,32 +1535,65 @@ function determineRegion(postcode) {
   checkBtn.classList.add('loading');
   checkBtn.disabled = true;
 
-  await new Promise(resolve => setTimeout(resolve, 800));
-
-  const result = determineRegion(postcode);
-
-  bookingData.postcode = postcode.toUpperCase();
-  bookingData.region = result.region;
-  bookingData.mediaSpecialist = result.mediaSpecialist.name;
-
-  if (result.isServiceable) {
-    const regionBadge = document.getElementById('regionBadge');  // Changed from territoryBadge
-    regionBadge.className = `region-badge ${result.region}`;  // Changed class
-    regionBadge.textContent = result.region.toUpperCase();
+  try {
+    // Fetch addresses from GetAddress.io
+    const addresses = await fetchAddressesFromPostcode(postcode);
     
-    document.getElementById('mediaSpecialistName').textContent = result.mediaSpecialist.name;  // Changed ID
-    regionInfo.classList.add('show');
+    const result = determineRegion(postcode);
 
-    document.getElementById('addressSection').style.display = 'block';
-    document.getElementById('checkPostcodeBtn').style.display = 'none';
-    document.getElementById('continueWithAddressBtn').style.display = 'block';
+    bookingData.postcode = postcode.toUpperCase();
+    bookingData.region = result.region;
+    bookingData.mediaSpecialist = result.mediaSpecialist.name;
 
-    setTimeout(() => {
-      document.getElementById('propertyAddress').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      document.getElementById('propertyAddress').focus();
-    }, 500);
-  } else {
-    unavailableInfo.classList.add('show');
+    if (result.isServiceable) {
+      const regionBadge = document.getElementById('regionBadge');
+      regionBadge.className = `region-badge ${result.region}`;
+      regionBadge.textContent = result.region.toUpperCase();
+      
+      document.getElementById('mediaSpecialistName').textContent = result.mediaSpecialist.name;
+      regionInfo.classList.add('show');
+
+      // Show address section with dropdown if addresses found
+      showAddressSection(addresses);
+      
+      document.getElementById('checkPostcodeBtn').style.display = 'none';
+      document.getElementById('continueWithAddressBtn').style.display = 'block';
+
+      setTimeout(() => {
+        const addressSelect = document.getElementById('addressSelect');
+        if (addressSelect) {
+          addressSelect.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          addressSelect.focus();
+        } else {
+          document.getElementById('propertyAddress').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          document.getElementById('propertyAddress').focus();
+        }
+      }, 500);
+    } else {
+      unavailableInfo.classList.add('show');
+    }
+  } catch (error) {
+    console.error('Error fetching addresses:', error);
+    // Fallback to manual entry if API fails
+    const result = determineRegion(postcode);
+    bookingData.postcode = postcode.toUpperCase();
+    bookingData.region = result.region;
+    bookingData.mediaSpecialist = result.mediaSpecialist.name;
+
+    if (result.isServiceable) {
+      const regionBadge = document.getElementById('regionBadge');
+      regionBadge.className = `region-badge ${result.region}`;
+      regionBadge.textContent = result.region.toUpperCase();
+      
+      document.getElementById('mediaSpecialistName').textContent = result.mediaSpecialist.name;
+      regionInfo.classList.add('show');
+
+      // Show manual address entry
+      showAddressSection([]);
+      
+      document.getElementById('checkPostcodeBtn').style.display = 'none';
+      document.getElementById('continueWithAddressBtn').style.display = 'block';
+    }
   }
 
   checkBtn.classList.remove('loading');
@@ -2240,24 +2399,58 @@ function determineRegion(postcode) {
 
     // Proceed to Service Selection
     function proceedToServiceSelection() {
-      const addressInput = document.getElementById('propertyAddress');
-      const address = addressInput.value.trim();
-      const errorMsg = document.getElementById('addressError');
-
-      addressInput.classList.remove('error');
-      errorMsg.classList.remove('show');
-
+  const addressSelect = document.getElementById('addressSelect');
+  const manualAddressInput = document.getElementById('propertyAddress');
+  
+  // Clear previous errors
+  const addressSelectError = document.getElementById('addressSelectError');
+  const addressError = document.getElementById('addressError');
+  
+  if (addressSelectError) addressSelectError.classList.remove('show');
+  if (addressError) addressError.classList.remove('show');
+  if (addressSelect) addressSelect.classList.remove('error');
+  if (manualAddressInput) manualAddressInput.classList.remove('error');
+  
+  // Check if using dropdown or manual entry
+  if (addressSelect) {
+    const selectedValue = addressSelect.value;
+    
+    if (selectedValue === 'manual') {
+      // Validate manual entry
+      const address = manualAddressInput.value.trim();
+      
       if (!address || address.length < 10) {
-        addressInput.classList.add('error');
-        errorMsg.classList.add('show');
-        addressInput.focus();
+        manualAddressInput.classList.add('error');
+        addressError.classList.add('show');
+        manualAddressInput.focus();
         return;
       }
-
+      
       bookingData.propertyAddress = address;
-
-      goToStep(2);
+    } else if (selectedValue === '') {
+      // No address selected
+      addressSelect.classList.add('error');
+      addressSelectError.classList.add('show');
+      addressSelect.focus();
+      return;
     }
+    // If valid selection, propertyAddress is already set in handleAddressSelection
+  } else {
+    // Fallback to manual entry only (if dropdown doesn't exist)
+    const address = manualAddressInput.value.trim();
+    
+    if (!address || address.length < 10) {
+      manualAddressInput.classList.add('error');
+      addressError.classList.add('show');
+      manualAddressInput.focus();
+      return;
+    }
+    
+    bookingData.propertyAddress = address;
+  }
+
+  goToStep(2);
+}
 
     // Allow Enter key on address field
     document.addEventListener('DOMContentLoaded', function() {
