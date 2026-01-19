@@ -1,5 +1,4 @@
 // netlify/functions/charge-card.js
-
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Airtable = require('airtable');
 const { sendPaymentConfirmation } = require('./email-service');
@@ -16,6 +15,8 @@ exports.handler = async (event, context) => {
 
   try {
     const { bookingId } = JSON.parse(event.body);
+
+    console.log('Charging card for booking:', bookingId);
 
     // Get booking from Airtable
     const booking = await base('Bookings').find(bookingId);
@@ -37,6 +38,8 @@ exports.handler = async (event, context) => {
       };
     }
 
+    console.log('Charging payment method:', fields['Stripe Payment Method ID']);
+
     // Charge the card using Payment Intent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(fields['Total Price'] * 100), // Convert to pence
@@ -55,6 +58,8 @@ exports.handler = async (event, context) => {
       }
     });
 
+    console.log('✅ Payment intent created:', paymentIntent.id);
+
     // Update booking in Airtable
     await base('Bookings').update([
       {
@@ -69,6 +74,8 @@ exports.handler = async (event, context) => {
       }
     ]);
 
+    console.log('✅ Booking updated in Airtable');
+
     // Send payment confirmation email
     try {
       await sendPaymentConfirmation({
@@ -79,15 +86,15 @@ exports.handler = async (event, context) => {
         time: fields['Time'],
         service: fields['Service Name'],
         propertyAddress: fields['Property Address'],
-        Media Specialist: fields['Media Specialist'],
+        mediaSpecialist: fields['Media Specialist'], // ✅ FIX: Changed from Media Specialist to mediaSpecialist
         amountPaid: fields['Total Price'],
         totalPrice: fields['Total Price'],
         duration: fields['Duration (mins)'] || 60
       });
-
       console.log('Payment confirmation sent to:', fields['Client Email']);
     } catch (emailError) {
       console.error('Failed to send payment confirmation:', emailError);
+      // Don't fail the charge if email fails
     }
 
     return {
@@ -101,7 +108,13 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Error charging card:', error);
+    console.error('❌ Error charging card:', error);
+    console.error('Error details:', {
+      message: error.message,
+      type: error.type,
+      code: error.code
+    });
+    
     return {
       statusCode: 500,
       body: JSON.stringify({

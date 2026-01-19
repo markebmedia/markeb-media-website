@@ -1,5 +1,4 @@
 // netlify/functions/stripe-webhook.js
-
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Airtable = require('airtable');
 const { sendPaymentConfirmation } = require('./email-service');
@@ -37,8 +36,18 @@ exports.handler = async (event, context) => {
       // Create booking in Airtable
       const metadata = session.metadata;
       const addons = JSON.parse(metadata.addons || '[]');
-
       const bookingRef = `BK-${Date.now()}`;
+
+      console.log('Creating booking from Stripe webhook:', {
+        bookingRef,
+        region: metadata.region,
+        mediaSpecialist: metadata.mediaSpecialist
+      });
+
+      // ✅ FIX: Capitalize region for Airtable
+      const capitalizedRegion = metadata.region 
+        ? metadata.region.charAt(0).toUpperCase() + metadata.region.slice(1) 
+        : 'Unknown';
 
       const bookingRecord = await base('Bookings').create([
         {
@@ -46,18 +55,18 @@ exports.handler = async (event, context) => {
             'Booking Reference': bookingRef,
             'Postcode': metadata.postcode,
             'Property Address': metadata.propertyAddress,
-            'region': metadata.region,
-            'Media Specialist': metadata.Media Specialist,
+            'Region': capitalizedRegion, // ✅ FIX: Changed from 'region' to 'Region' and capitalized
+            'Media Specialist': metadata.mediaSpecialist, // ✅ FIX: Changed from Media Specialist to mediaSpecialist
             'Date': metadata.date,
             'Time': metadata.time,
             'Service': metadata.serviceId,
             'Service Name': metadata.service || metadata.serviceId,
             'Duration (mins)': parseInt(metadata.duration) || 60,
-            'Bedrooms': parseInt(metadata.bedrooms),
+            'Bedrooms': parseInt(metadata.bedrooms) || 0,
             'Client Name': metadata.clientName,
             'Client Email': metadata.clientEmail,
             'Client Phone': metadata.clientPhone,
-            'Client Notes': metadata.clientNotes,
+            'Client Notes': metadata.clientNotes || '',
             'Status': 'Paid',
             'Payment Status': 'Paid',
             'Payment Method': 'Stripe',
@@ -71,7 +80,7 @@ exports.handler = async (event, context) => {
         }
       ]);
 
-      console.log('Booking created:', bookingRecord[0].id);
+      console.log('✅ Booking created from webhook:', bookingRecord[0].id);
 
       // Send payment confirmation email
       try {
@@ -83,12 +92,12 @@ exports.handler = async (event, context) => {
           time: metadata.time,
           service: metadata.service || metadata.serviceId,
           propertyAddress: metadata.propertyAddress,
-          Media Specialist: metadata.Media Specialist,
+          mediaSpecialist: metadata.mediaSpecialist, // ✅ FIX: Changed from Media Specialist to mediaSpecialist
           amountPaid: session.amount_total / 100,
           totalPrice: session.amount_total / 100,
           duration: parseInt(metadata.duration) || 60
         });
-
+        
         console.log('Payment confirmation sent to:', metadata.clientEmail);
       } catch (emailError) {
         console.error('Failed to send payment confirmation:', emailError);
@@ -101,7 +110,12 @@ exports.handler = async (event, context) => {
       };
 
     } catch (error) {
-      console.error('Error creating booking:', error);
+      console.error('❌ Error creating booking from webhook:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack
+      });
+      
       return {
         statusCode: 500,
         body: JSON.stringify({ error: 'Failed to create booking' })

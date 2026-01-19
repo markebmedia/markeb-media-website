@@ -1,5 +1,4 @@
 // netlify/functions/reschedule-booking.js
-
 const Airtable = require('airtable');
 const { sendRescheduleConfirmation } = require('./email-service');
 
@@ -24,9 +23,11 @@ exports.handler = async (event, context) => {
       };
     }
 
+    console.log('Rescheduling booking:', bookingId, 'to', newDate, newTime);
+
     // Verify the booking belongs to this email
     const booking = await base('Bookings').find(bookingId);
-
+    
     if (booking.fields['Client Email'] !== clientEmail) {
       return {
         statusCode: 403,
@@ -61,6 +62,9 @@ exports.handler = async (event, context) => {
     const oldDate = booking.fields['Date'];
     const oldTime = booking.fields['Time'];
 
+    console.log('Old date/time:', oldDate, oldTime);
+    console.log('New date/time:', newDate, newTime);
+
     // Update the booking with new date/time
     const updatedRecord = await base('Bookings').update([
       {
@@ -78,6 +82,8 @@ exports.handler = async (event, context) => {
       }
     ]);
 
+    console.log('✅ Booking rescheduled successfully');
+
     // Send reschedule confirmation email
     try {
       await sendRescheduleConfirmation({
@@ -88,9 +94,9 @@ exports.handler = async (event, context) => {
         time: newTime,
         service: booking.fields['Service Name'],
         propertyAddress: booking.fields['Property Address'],
-        Media Specialist: booking.fields['Media Specialist']
+        mediaSpecialist: booking.fields['Media Specialist'] // ✅ FIX: Changed from Media Specialist to mediaSpecialist
       }, oldDate, oldTime);
-
+      
       console.log('Reschedule confirmation sent to:', clientEmail);
     } catch (emailError) {
       console.error('Failed to send reschedule confirmation:', emailError);
@@ -109,7 +115,8 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Error rescheduling booking:', error);
+    console.error('❌ Error rescheduling booking:', error);
+    
     return {
       statusCode: 500,
       body: JSON.stringify({ 
