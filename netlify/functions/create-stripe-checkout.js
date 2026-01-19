@@ -1,5 +1,4 @@
 // netlify/functions/create-stripe-checkout.js
-
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 exports.handler = async (event, context) => {
@@ -13,6 +12,12 @@ exports.handler = async (event, context) => {
 
   try {
     const bookingData = JSON.parse(event.body);
+
+    console.log('Creating Stripe checkout for:', {
+      service: bookingData.service,
+      region: bookingData.region,
+      mediaSpecialist: bookingData.mediaSpecialist
+    });
 
     // Build line items for Stripe
     const lineItems = [];
@@ -74,7 +79,7 @@ exports.handler = async (event, context) => {
         postcode: bookingData.postcode,
         propertyAddress: bookingData.propertyAddress,
         region: bookingData.region,
-        Media Specialist: bookingData.Media Specialist,
+        mediaSpecialist: bookingData.mediaSpecialist, // ✅ FIX: Changed from Media Specialist to mediaSpecialist
         date: bookingData.date,
         time: bookingData.time,
         serviceId: bookingData.serviceId,
@@ -90,6 +95,8 @@ exports.handler = async (event, context) => {
       customer_email: bookingData.clientEmail,
     });
 
+    console.log('✅ Stripe checkout session created:', session.id);
+
     return {
       statusCode: 200,
       headers: {
@@ -102,7 +109,8 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Stripe checkout error:', error);
+    console.error('❌ Stripe checkout error:', error);
+    
     return {
       statusCode: 500,
       body: JSON.stringify({ 
