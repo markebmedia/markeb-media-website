@@ -73,12 +73,12 @@ exports.handler = async (event, context) => {
 async function fetchBookingsForRegion(region, selectedDate) {
   try {
     const Airtable = require('airtable');
-    const base = new Airtable({ apiKey: process.env.AIRTABLE_PAT }).base(process.env.AIRTABLE_BASE_ID);
+    const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
     // Query bookings for this specific region and date
     const records = await base('Bookings')
       .select({
-        filterByFormula: `AND({Region} = '${region}', {Date} = '${selectedDate}', {Status} = 'Booked')`,
+        filterByFormula: `AND({Region} = '${region}', {Date} = '${selectedDate}', {Booking Status} = 'Booked')`,
         sort: [{ field: 'Time', direction: 'asc' }]
       })
       .firstPage();

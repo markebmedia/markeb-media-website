@@ -1,8 +1,6 @@
 // netlify/functions/cancel-booking.js
-
 const Airtable = require('airtable');
 const { sendCancellationConfirmation } = require('./email-service');
-
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
 exports.handler = async (event, context) => {
@@ -26,7 +24,7 @@ exports.handler = async (event, context) => {
 
     // Verify the booking belongs to this email
     const booking = await base('Bookings').find(bookingId);
-
+    
     if (booking.fields['Client Email'] !== clientEmail) {
       return {
         statusCode: 403,
@@ -34,35 +32,35 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Check if the booking is already cancelled
-    if (booking.fields['Status'] === 'Cancelled') {
+    // Check if the booking is already cancelled using Booking Status
+    if (booking.fields['Booking Status'] === 'Cancelled') {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: 'Booking is already cancelled' })
       };
     }
 
-    // Calculate cancellation charge
-    const bookingDate = new Date(booking.fields['Date']);
+    // Calculate cancellation charge based on time and date
+    const bookingDateTime = new Date(`${booking.fields['Date']}T${booking.fields['Time']}:00`);
     const now = new Date();
-    const hoursUntilBooking = (bookingDate - now) / (1000 * 60 * 60);
+    const hoursUntilBooking = (bookingDateTime - now) / (1000 * 60 * 60);
 
     let cancellationCharge = 0;
     let cancellationChargePercentage = 0;
 
     if (hoursUntilBooking < 24) {
       if (hoursUntilBooking < 0) {
-        // Same day / past
+        // Same day / past - 100% charge
         cancellationChargePercentage = 100;
       } else {
-        // Within 24 hours
+        // Within 24 hours - 50% charge
         cancellationChargePercentage = 50;
       }
       cancellationCharge = (booking.fields['Total Price'] * cancellationChargePercentage) / 100;
     }
 
     const refundAmount = booking.fields['Total Price'] - cancellationCharge;
-    
+
     // Generate refund note
     const refundNote = cancellationChargePercentage === 0 
       ? 'Full refund will be processed within 5-7 business days'
@@ -70,12 +68,12 @@ exports.handler = async (event, context) => {
       ? '50% cancellation fee applies. Remaining amount will be refunded within 5-7 business days'
       : 'Full cancellation fee applies. No refund available';
 
-    // Update the booking
+    // Update the booking with Booking Status
     const updatedRecord = await base('Bookings').update([
       {
         id: bookingId,
         fields: {
-          'Status': 'Cancelled',
+          'Booking Status': 'Cancelled',  // ✅ Updated to use Booking Status
           'Cancellation Date': new Date().toISOString(),
           'Cancellation Reason': reason || 'Customer requested',
           'Cancellation Charge %': cancellationChargePercentage,
@@ -96,7 +94,7 @@ exports.handler = async (event, context) => {
         service: booking.fields['Service Name'],
         totalPrice: booking.fields['Total Price']
       }, cancellationCharge, refundAmount, refundNote);
-
+      
       console.log('Cancellation confirmation sent to:', clientEmail);
     } catch (emailError) {
       console.error('Failed to send cancellation email:', emailError);
@@ -105,7 +103,10 @@ exports.handler = async (event, context) => {
 
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
       body: JSON.stringify({
         success: true,
         message: 'Booking cancelled successfully',
@@ -120,6 +121,10 @@ exports.handler = async (event, context) => {
     console.error('Error cancelling booking:', error);
     return {
       statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
       body: JSON.stringify({ 
         error: 'Failed to cancel booking',
         details: error.message 

@@ -46,6 +46,10 @@
       animation: scaleIn 0.5s ease;
     }
 
+    .success-icon.free {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
     @keyframes scaleIn {
       from { transform: scale(0); }
       to { transform: scale(1); }
@@ -98,6 +102,11 @@
       text-align: left;
     }
 
+    .info-box.free {
+      background: #f0fdf4;
+      border-color: #10b981;
+    }
+
     .info-box h3 {
       font-size: 16px;
       font-weight: 700;
@@ -108,11 +117,19 @@
       gap: 8px;
     }
 
+    .info-box.free h3 {
+      color: #065f46;
+    }
+
     .info-box p {
       font-size: 14px;
       color: #991b1b;
       line-height: 1.6;
       margin-bottom: 0;
+    }
+
+    .info-box.free p {
+      color: #065f46;
     }
 
     .info-box ul {
@@ -262,11 +279,11 @@
 
       <!-- Success State -->
       <div id="successState" style="display: none;">
-        <div class="success-icon">❌</div>
+        <div class="success-icon" id="successIcon">❌</div>
         
         <h1>Booking Cancelled</h1>
-        <p class="subtitle">
-          Your booking has been cancelled and the cancellation fee has been processed.
+        <p class="subtitle" id="successSubtitle">
+          Your booking has been cancelled successfully.
         </p>
 
         <div class="booking-ref">
@@ -274,7 +291,8 @@
           <div class="booking-ref-value" id="bookingRef">-</div>
         </div>
 
-        <div class="info-box">
+        <!-- Paid Cancellation Info -->
+        <div class="info-box" id="feeInfoBox" style="display: none;">
           <h3>💳 Cancellation Fee Processed</h3>
           <p>
             As per our cancellation policy, a fee has been applied to your booking:
@@ -288,6 +306,17 @@
           </p>
         </div>
 
+        <!-- Free Cancellation Info -->
+        <div class="info-box free" id="freeCancelBox" style="display: none;">
+          <h3>✅ Free Cancellation Processed</h3>
+          <p>
+            Since you cancelled more than 24 hours in advance, no cancellation fee has been charged.
+          </p>
+          <p style="margin-top: 12px;">
+            You will receive a confirmation email shortly with the details of your cancellation.
+          </p>
+        </div>
+
         <div class="alert">
           <p>
             <strong>📧 Confirmation Email Sent</strong><br>
@@ -298,7 +327,7 @@
         <div class="divider"></div>
 
         <div class="button-group">
-          <a href="/booking" class="btn btn-primary">
+          <a href="/booking.html" class="btn btn-primary">
             📅 Make a New Booking
           </a>
           <a href="/" class="btn btn-secondary">
@@ -327,7 +356,7 @@
         </p>
 
         <div class="button-group">
-          <a href="/manage-booking" class="btn btn-primary">
+          <a href="/manage-booking.html" class="btn btn-primary">
             Try Again
           </a>
           <a href="mailto:commercial@markebmedia.com" class="btn btn-secondary">
@@ -390,6 +419,21 @@
       
       if (data.clientEmail) {
         document.getElementById('clientEmail').textContent = data.clientEmail;
+      }
+      
+      // Show appropriate fee box based on cancellation charge
+      const cancellationCharge = data.cancellationCharge || 0;
+      
+      if (cancellationCharge > 0) {
+        // Paid cancellation
+        document.getElementById('feeInfoBox').style.display = 'block';
+        document.getElementById('successSubtitle').textContent = 'Your booking has been cancelled and the cancellation fee has been processed.';
+      } else {
+        // Free cancellation
+        document.getElementById('freeCancelBox').style.display = 'block';
+        document.getElementById('successIcon').classList.add('free');
+        document.getElementById('successIcon').textContent = '✓';
+        document.getElementById('successSubtitle').textContent = 'Your booking has been cancelled at no charge.';
       }
     }
 

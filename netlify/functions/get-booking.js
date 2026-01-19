@@ -1,7 +1,5 @@
 // netlify/functions/get-booking.js
-
 const Airtable = require('airtable');
-
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
 exports.handler = async (event, context) => {
@@ -41,37 +39,47 @@ exports.handler = async (event, context) => {
     const booking = records[0];
     const fields = booking.fields;
 
+    // Check if already cancelled
+    const bookingStatus = fields['Booking Status'] || 'Booked';
+    const isCancelled = bookingStatus === 'Cancelled';
+
     // Check if cancellation is allowed (24 hours before)
-    const bookingDate = new Date(fields['Date']);
+    const bookingDateTime = new Date(`${fields['Date']}T${fields['Time']}:00`);
     const now = new Date();
-    const hoursUntilBooking = (bookingDate - now) / (1000 * 60 * 60);
-    const canCancel = hoursUntilBooking > 24;
-    const canReschedule = hoursUntilBooking > 24;
+    const hoursUntilBooking = (bookingDateTime - now) / (1000 * 60 * 60);
+    
+    // Can only cancel if not already cancelled AND more than 24 hours away
+    const canCancel = !isCancelled && hoursUntilBooking > 24;
+    const canReschedule = !isCancelled && hoursUntilBooking > 24;
 
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
       body: JSON.stringify({
         id: booking.id,
         bookingRef: fields['Booking Reference'],
         postcode: fields['Postcode'],
         propertyAddress: fields['Property Address'],
-        region: fields['region'],
-        mediaspecialist: fields['mediaspecialist'],
+        region: fields['Region'],
+        mediaSpecialist: fields['Media Specialist'],
         date: fields['Date'],
         time: fields['Time'],
         service: fields['Service Name'],
         bedrooms: fields['Bedrooms'],
         totalPrice: fields['Total Price'],
-        status: fields['Status'],
-        paymentStatus: fields['Payment Status'],
+        bookingStatus: bookingStatus,
+        paymentStatus: fields['Status'],
         clientName: fields['Client Name'],
         clientEmail: fields['Client Email'],
         clientPhone: fields['Client Phone'],
         addons: fields['Add-ons'],
         canCancel: canCancel,
         canReschedule: canReschedule,
-        hoursUntilBooking: Math.round(hoursUntilBooking)
+        hoursUntilBooking: Math.round(hoursUntilBooking),
+        isCancelled: isCancelled
       })
     };
 
@@ -79,6 +87,10 @@ exports.handler = async (event, context) => {
     console.error('Error fetching booking:', error);
     return {
       statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
       body: JSON.stringify({ 
         error: 'Failed to fetch booking',
         details: error.message 

@@ -835,7 +835,7 @@
           <textarea 
             id="clientNotes" 
             class="form-input" 
-            placeholder="Any special requirements or notes for the mediaspecialist..."
+            placeholder="Any special requirements or notes for the Media Specialist..."
             rows="4"
             style="resize: vertical; min-height: 100px;"
           ></textarea>
@@ -947,10 +947,10 @@
               <span style="color: #64748b;">Service:</span>
               <span style="font-weight: 600; color: #1e293b; text-align: right;" id="summaryService">-</span>
             </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: #64748b;">mediaspecialist:</span>
-              <span style="font-weight: 600; color: #1e293b;" id="summarymediaspecialist">-</span>
-            </div>
+           <div style="display: flex; justify-content: space-between;">
+  <span style="color: #64748b;">Media Specialist:</span>
+  <span style="font-weight: 600; color: #1e293b;" id="summaryMediaSpecialist">-</span>
+</div>
             <div style="border-top: 2px solid #3b82f6; margin: 8px 0;"></div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="font-size: 16px; font-weight: 700; color: #1e293b;">Total Amount:</span>
@@ -1650,7 +1650,7 @@ function handleAddressSelection() {
       }
       
       document.getElementById('summaryAddress').textContent = bookingData.propertyAddress || bookingData.postcode || '-';
-      document.getElementById('summarymediaspecialist').textContent = bookingData.mediaspecialist || '-';
+      document.getElementById('summaryMediaSpecialist').textContent = bookingData.mediaSpecialist || '-';
       document.getElementById('summaryTotal').textContent = `£${bookingData.totalPrice.toFixed(2)}`;
 
       updateTermsVisibility();
@@ -1910,7 +1910,7 @@ function handleAddressSelection() {
         postcode: bookingData.postcode,
         propertyAddress: bookingData.propertyAddress,
         Region: bookingData.Region,
-        mediaspecialist: bookingData.mediaspecialist,
+        mediaSpecialist: bookingData.mediaSpecialist,
         date: bookingData.selectedDate,
         time: bookingData.selectedTime,
         service: bookingData.service.name,
@@ -1974,7 +1974,7 @@ function handleAddressSelection() {
             postcode: bookingData.postcode,
             propertyAddress: bookingData.propertyAddress,
             Region: bookingData.Region,
-            mediaspecialist: bookingData.mediaspecialist,
+            mediaSpecialist: bookingData.mediaSpecialist,
             date: bookingData.selectedDate,
             time: bookingData.selectedTime,
             service: bookingData.service.name,

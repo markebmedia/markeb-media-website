@@ -74,7 +74,7 @@ exports.handler = async (event, context) => {
         postcode: bookingData.postcode,
         propertyAddress: bookingData.propertyAddress,
         region: bookingData.region,
-        mediaspecialist: bookingData.mediaspecialist,
+        Media Specialist: bookingData.Media Specialist,
         date: bookingData.date,
         time: bookingData.time,
         serviceId: bookingData.serviceId,
