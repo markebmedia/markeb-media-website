@@ -12,21 +12,54 @@ exports.handler = async (event, context) => {
   try {
     const { postcode, region, selectedDate } = JSON.parse(event.body);
 
-    if (!postcode || !region) {
+    if (!postcode || !region || !selectedDate) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Missing required fields: postcode, region' })
+        body: JSON.stringify({ error: 'Missing required fields: postcode, region, selectedDate' })
       };
     }
 
     console.log(`Checking availability for: postcode=${postcode}, region=${region}, date=${selectedDate}`);
+
+    // Check if the selected date is within 24 hours
+    const selectedDateObj = new Date(selectedDate);
+    const now = new Date();
+    const twentyFourHoursFromNow = new Date(now.getTime() + (24 * 60 * 60 * 1000));
+    
+    // Set time to start of day for comparison
+    const selectedDateStart = new Date(selectedDateObj);
+    selectedDateStart.setHours(0, 0, 0, 0);
+    
+    const tomorrowStart = new Date(now);
+    tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+    tomorrowStart.setHours(0, 0, 0, 0);
+
+    // Block if date is today or tomorrow (within 24 hours)
+    if (selectedDateStart < tomorrowStart) {
+      console.log('Date is within 24 hours - blocking all slots (requires 24hr notice)');
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({
+          availableSlots: generateAllTimeSlots().map(slot => ({
+            ...slot,
+            available: false,
+            reason: 'Bookings require 24 hours notice'
+          })),
+          message: 'Bookings require 24 hours notice'
+        })
+      };
+    }
 
     // Fetch existing bookings from Airtable for this region and date
     const bookings = await fetchBookingsForRegion(region, selectedDate);
 
     console.log(`Found ${bookings.length} existing bookings for this date/region`);
 
-    // If no bookings exist for this date, all time slots are available
+    // If no bookings exist for this date, all slots are available
     if (bookings.length === 0) {
       return {
         statusCode: 200,
