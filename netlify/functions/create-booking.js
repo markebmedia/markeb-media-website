@@ -1,5 +1,4 @@
 // netlify/functions/create-booking.js
-
 const Airtable = require('airtable');
 const { sendBookingConfirmation } = require('./email-service');
 
@@ -16,11 +15,23 @@ exports.handler = async (event, context) => {
 
   try {
     const bookingData = JSON.parse(event.body);
+    
+    console.log('Received booking data:', {
+      region: bookingData.region,
+      mediaSpecialist: bookingData.mediaSpecialist,
+      postcode: bookingData.postcode
+    });
+
     const bookingRef = `BK-${Date.now()}`;
 
     const addonsString = bookingData.addons && bookingData.addons.length > 0
       ? bookingData.addons.map(a => a.name).join(', ')
       : '';
+
+    // ✅ FIX: Capitalize region for Airtable ("north" → "North")
+    const capitalizedRegion = bookingData.region.charAt(0).toUpperCase() + bookingData.region.slice(1);
+
+    console.log('Creating booking with capitalized region:', capitalizedRegion);
 
     // Create booking record
     const record = await base('Bookings').create([
@@ -29,8 +40,8 @@ exports.handler = async (event, context) => {
           'Booking Reference': bookingRef,
           'Postcode': bookingData.postcode,
           'Property Address': bookingData.propertyAddress,
-          'region': bookingData.region,
-          'Media Specialist': bookingData.Media Specialist,
+          'Region': capitalizedRegion, // ✅ FIX: Changed from 'region' to 'Region' and capitalized value
+          'Media Specialist': bookingData.mediaSpecialist, // ✅ FIX: Changed from Media Specialist to mediaSpecialist
           'Date': bookingData.date,
           'Time': bookingData.time,
           'Service': bookingData.serviceId,
@@ -63,7 +74,7 @@ exports.handler = async (event, context) => {
       }
     ]);
 
-    console.log('Booking created:', record[0].id, bookingRef);
+    console.log('✅ Booking created successfully:', record[0].id, bookingRef);
 
     // Send confirmation email
     try {
@@ -75,14 +86,14 @@ exports.handler = async (event, context) => {
         time: bookingData.time,
         service: bookingData.service,
         propertyAddress: bookingData.propertyAddress,
-        Media Specialist: bookingData.Media Specialist,
+        mediaSpecialist: bookingData.mediaSpecialist, // ✅ FIX: Changed from Media Specialist to mediaSpecialist
         totalPrice: bookingData.totalPrice,
         duration: bookingData.duration
       });
-
       console.log('Confirmation email sent to:', bookingData.clientEmail);
     } catch (emailError) {
       console.error('Failed to send confirmation email:', emailError);
+      // Don't fail the booking if email fails
     }
 
     return {
@@ -97,7 +108,12 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Error creating booking:', error);
+    console.error('❌ Error creating booking:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack
+    });
+    
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
