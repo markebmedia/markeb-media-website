@@ -24,7 +24,6 @@ exports.handler = async (event, context) => {
     // Check if the selected date is within 24 hours
     const selectedDateObj = new Date(selectedDate);
     const now = new Date();
-    const twentyFourHoursFromNow = new Date(now.getTime() + (24 * 60 * 60 * 1000));
     
     // Set time to start of day for comparison
     const selectedDateStart = new Date(selectedDateObj);
@@ -138,13 +137,17 @@ async function fetchBookingsForRegion(region, selectedDate) {
     // Format the date to match Airtable's format (D/M/YYYY)
     const formattedDate = formatDateForAirtable(selectedDate);
     
+    // Capitalize region for Airtable (it stores "North" or "South", not "north" or "south")
+    const capitalizedRegion = region.charAt(0).toUpperCase() + region.slice(1);
+    
     console.log(`Formatted date for Airtable: ${formattedDate} (original: ${selectedDate})`);
-    console.log(`Filter formula: AND({Region} = '${region}', {Date} = '${formattedDate}', {Booking Status} = 'Booked')`);
+    console.log(`Capitalized region for Airtable: ${capitalizedRegion} (original: ${region})`);
+    console.log(`Filter formula: AND({Region} = '${capitalizedRegion}', {Date} = '${formattedDate}', {Booking Status} = 'Booked')`);
 
     // Query bookings for this specific region and date
     const records = await base('Bookings')
       .select({
-        filterByFormula: `AND({Region} = '${region}', {Date} = '${formattedDate}', {Booking Status} = 'Booked')`,
+        filterByFormula: `AND({Region} = '${capitalizedRegion}', {Date} = '${formattedDate}', {Booking Status} = 'Booked')`,
         sort: [{ field: 'Time', direction: 'asc' }]
       })
       .firstPage();
