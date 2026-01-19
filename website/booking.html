@@ -2095,55 +2095,55 @@ function handleAddressSelection() {
     }
 
     // Load Available Time Slots
-    async function loadAvailableTimeSlots(dateString) {
-      try {
-        const response = await fetch('/.netlify/functions/check-availability', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            postcode: bookingData.postcode,
-            Region: bookingData.Region,
-            selectedDate: dateString
-          })
+async function loadAvailableTimeSlots(dateString) {
+  try {
+    const response = await fetch('/.netlify/functions/check-availability', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        postcode: bookingData.postcode,
+        region: bookingData.region,  // ✅ Changed from Region to region (lowercase)
+        selectedDate: dateString
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to check availability');
+    }
+
+    const data = await response.json();
+    console.log('Availability check:', data);
+
+    renderTimeSlots(data.availableSlots);
+  } catch (error) {
+    console.error('Error loading time slots:', error);
+    
+    const fallbackSlots = [];
+    for (let hour = 9; hour <= 15; hour++) {
+      for (let minute of [0, 30]) {
+        if (hour === 15 && minute === 30) break;
+        
+        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        fallbackSlots.push({
+          time: timeString,
+          available: true
         });
-
-        if (!response.ok) {
-          throw new Error('Failed to check availability');
-        }
-
-        const data = await response.json();
-        console.log('Availability check:', data);
-
-        renderTimeSlots(data.availableSlots);
-      } catch (error) {
-        console.error('Error loading time slots:', error);
-        
-        const fallbackSlots = [];
-        for (let hour = 9; hour <= 15; hour++) {
-          for (let minute of [0, 30]) {
-            if (hour === 15 && minute === 30) break;
-            
-            const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-            fallbackSlots.push({
-              time: timeString,
-              available: true
-            });
-          }
-        }
-        
-        renderTimeSlots(fallbackSlots);
-        
-        document.getElementById('loadingTimeSlots').innerHTML = 
-          '<p style="color: #f59e0b;">Could not verify availability. Showing all time slots.</p>';
-        
-        setTimeout(() => {
-          document.getElementById('loadingTimeSlots').style.display = 'none';
-          document.getElementById('timeSlotGrid').style.display = 'grid';
-        }, 1000);
       }
     }
+    
+    renderTimeSlots(fallbackSlots);
+    
+    document.getElementById('loadingTimeSlots').innerHTML = 
+      '<p style="color: #f59e0b;">Could not verify availability. Showing all time slots.</p>';
+    
+    setTimeout(() => {
+      document.getElementById('loadingTimeSlots').style.display = 'none';
+      document.getElementById('timeSlotGrid').style.display = 'grid';
+    }, 1000);
+  }
+}
 
     // Render Time Slots
     function renderTimeSlots(slots) {
