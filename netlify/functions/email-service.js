@@ -232,7 +232,7 @@ async function sendBookingConfirmation(booking) {
   await resend.emails.send({
     from: FROM_EMAIL,
     to: booking.clientEmail,
-    bcc: BCC_EMAIL, // ✅ BCC to commercial
+    bcc: BCC_EMAIL,
     subject: `Booking Confirmed - ${booking.bookingRef}`,
     html: emailHtml
   });
@@ -312,7 +312,7 @@ async function sendPaymentConfirmation(booking) {
   await resend.emails.send({
     from: FROM_EMAIL,
     to: booking.clientEmail,
-    bcc: BCC_EMAIL, // ✅ BCC to commercial
+    bcc: BCC_EMAIL,
     subject: `Payment Confirmed - ${booking.bookingRef}`,
     html: emailHtml
   });
@@ -368,7 +368,7 @@ async function sendRescheduleConfirmation(booking, oldDate, oldTime) {
   await resend.emails.send({
     from: FROM_EMAIL,
     to: booking.clientEmail,
-    bcc: BCC_EMAIL, // ✅ BCC to commercial
+    bcc: BCC_EMAIL,
     subject: `Booking Rescheduled - ${booking.bookingRef}`,
     html: emailHtml
   });
@@ -431,7 +431,7 @@ async function sendCancellationConfirmation(booking, cancellationCharge, refundA
   await resend.emails.send({
     from: FROM_EMAIL,
     to: booking.clientEmail,
-    bcc: BCC_EMAIL, // ✅ BCC to commercial
+    bcc: BCC_EMAIL,
     subject: `Booking Cancelled - ${booking.bookingRef}`,
     html: emailHtml
   });
@@ -486,8 +486,89 @@ async function sendReminderEmail(booking) {
   await resend.emails.send({
     from: FROM_EMAIL,
     to: booking.clientEmail,
-    bcc: BCC_EMAIL, // ✅ BCC to commercial
+    bcc: BCC_EMAIL,
     subject: `Reminder: Your Shoot Tomorrow - ${booking.bookingRef}`,
+    html: emailHtml
+  });
+}
+
+// 6. Service Modification Confirmation
+async function sendServiceModificationConfirmation(booking, oldService, oldPrice, newPrice, priceDifference, paymentAction) {
+  const manageUrl = `${SITE_URL}${MANAGE_BOOKING_PATH}?ref=${booking.bookingRef}&email=${encodeURIComponent(booking.clientEmail)}`;
+  
+  let paymentSection = '';
+  
+  if (paymentAction === 'charged') {
+    paymentSection = `
+      <div class="alert alert-info">
+        <strong>💳 Payment Processed</strong><br>
+        An additional charge of £${priceDifference.toFixed(2)} has been processed to your saved payment method.
+      </div>
+    `;
+  } else if (paymentAction === 'refunded') {
+    paymentSection = `
+      <div class="alert alert-success">
+        <strong>💰 Refund Processed</strong><br>
+        A refund of £${Math.abs(priceDifference).toFixed(2)} will be processed to your original payment method within 5-7 business days.
+      </div>
+    `;
+  }
+  
+  const content = `
+    <h2>📝 Service Updated</h2>
+    <p>Hi ${booking.clientName},</p>
+    <p>Your booking service has been updated as requested.</p>
+
+    <div class="alert alert-warning">
+      <strong>Previous Service:</strong><br>
+      ${oldService} - £${oldPrice.toFixed(2)}
+    </div>
+
+    <div class="alert alert-success">
+      <strong>New Service:</strong><br>
+      ${booking.service} - £${newPrice.toFixed(2)}
+    </div>
+
+    ${paymentSection}
+
+    <div class="booking-details">
+      <div class="detail-row">
+        <span class="detail-label">Booking Reference</span>
+        <span class="detail-value">${booking.bookingRef}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Date & Time</span>
+        <span class="detail-value">${formatDate(booking.date)} at ${booking.time}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Property Address</span>
+        <span class="detail-value">${booking.propertyAddress}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Your Media Specialist</span>
+        <span class="detail-value">${booking.mediaSpecialist}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">New Total Amount</span>
+        <span class="detail-value">£${newPrice.toFixed(2)}</span>
+      </div>
+    </div>
+
+    <center>
+      <a href="${manageUrl}" class="button">Manage Your Booking</a>
+    </center>
+
+    <p>If you have any questions about this change, please don't hesitate to contact us.</p>
+    <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+  `;
+
+  const emailHtml = getEmailLayout(content);
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: booking.clientEmail,
+    bcc: BCC_EMAIL,
+    subject: `Service Updated - ${booking.bookingRef}`,
     html: emailHtml
   });
 }
@@ -497,5 +578,6 @@ module.exports = {
   sendPaymentConfirmation,
   sendRescheduleConfirmation,
   sendCancellationConfirmation,
-  sendReminderEmail
+  sendReminderEmail,
+  sendServiceModificationConfirmation
 };
