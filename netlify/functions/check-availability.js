@@ -22,20 +22,13 @@ exports.handler = async (event, context) => {
     console.log(`Checking availability for: postcode=${postcode}, region=${region}, date=${selectedDate}`);
 
     // Check if the selected date is within 24 hours
-    const selectedDateObj = new Date(selectedDate);
+    const selectedDateObj = new Date(selectedDate + 'T00:00:00');
     const now = new Date();
-    
-    // Set time to start of day for comparison
-    const selectedDateStart = new Date(selectedDateObj);
-    selectedDateStart.setHours(0, 0, 0, 0);
-    
-    const tomorrowStart = new Date(now);
-    tomorrowStart.setDate(tomorrowStart.getDate() + 1);
-    tomorrowStart.setHours(0, 0, 0, 0);
+    const hoursDifference = (selectedDateObj - now) / (1000 * 60 * 60);
 
-    // Block if date is today or tomorrow (within 24 hours)
-    if (selectedDateStart < tomorrowStart) {
-      console.log('Date is within 24 hours - blocking all slots (requires 24hr notice)');
+    // Block if date is within 24 hours from now
+    if (hoursDifference < 24) {
+      console.log(`Date is within 24 hours (${hoursDifference.toFixed(1)} hours) - blocking all slots`);
       return {
         statusCode: 200,
         headers: {
@@ -85,7 +78,15 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         availableSlots: availableSlots,
         existingBookings: bookings.length,
-        region: region
+        region: region,
+        debug: {
+          selectedDate,
+          bookingDetails: bookings.map(b => ({
+            time: b.startTime,
+            postcode: b.postcode,
+            duration: b.duration
+          }))
+        }
       })
     };
 
@@ -105,27 +106,30 @@ exports.handler = async (event, context) => {
   }
 };
 
-// Helper function to format date to match Airtable's UK format (D/M/YYYY)
+// ✅ SIMPLIFIED: No conversion needed - Airtable now uses ISO format
 function formatDateForAirtable(dateString) {
-  // Handle various input formats and convert to D/M/YYYY
-  let date;
-  
-  // If it's already in D/M/YYYY or DD/MM/YYYY format, parse it correctly
-  if (dateString.includes('/')) {
-    const parts = dateString.split('/');
-    // Assume DD/MM/YYYY or D/M/YYYY format
-    date = new Date(parts[2], parts[1] - 1, parts[0]);
-  } else {
-    // Assume ISO format YYYY-MM-DD
-    date = new Date(dateString);
+  // If already in YYYY-MM-DD format, return as-is
+  if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    return dateString;
   }
   
-  // Return in D/M/YYYY format (no leading zeros)
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
+  // If it's in D/M/YYYY or DD/MM/YYYY format, convert to YYYY-MM-DD
+  if (dateString.includes('/')) {
+    const parts = dateString.split('/');
+    const day = parts[0].padStart(2, '0');
+    const month = parts[1].padStart(2, '0');
+    const year = parts[2];
+    return `${year}-${month}-${day}`;
+  }
   
-  return `${day}/${month}/${year}`;
+  // Try parsing as date object and return ISO format
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) {
+    console.error(`Invalid date: ${dateString}`);
+    return dateString;
+  }
+  
+  return date.toISOString().split('T')[0];
 }
 
 // Fetch bookings from Airtable for specific region and date
@@ -134,20 +138,23 @@ async function fetchBookingsForRegion(region, selectedDate) {
     const Airtable = require('airtable');
     const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-    // Format the date to match Airtable's format (D/M/YYYY)
+    // ✅ Ensure date is in ISO format (YYYY-MM-DD)
     const formattedDate = formatDateForAirtable(selectedDate);
     
-    // Capitalize region for Airtable (it stores "North" or "South", not "north" or "south")
-    const capitalizedRegion = region.charAt(0).toUpperCase() + region.slice(1);
+    // Capitalise region for Airtable (it stores "North" or "South")
+    const capitalisedRegion = region.charAt(0).toUpperCase() + region.slice(1).toLowerCase();
     
-    console.log(`Formatted date for Airtable: ${formattedDate} (original: ${selectedDate})`);
-    console.log(`Capitalized region for Airtable: ${capitalizedRegion} (original: ${region})`);
-    console.log(`Filter formula: AND({Region} = '${capitalizedRegion}', {Date} = '${formattedDate}', {Booking Status} = 'Booked')`);
+    console.log(`Querying Airtable with:`);
+    console.log(`  - Date: ${formattedDate} (ISO format, original: ${selectedDate})`);
+    console.log(`  - Region: ${capitalisedRegion} (original: ${region})`);
+    
+    const filterFormula = `AND({Region} = '${capitalisedRegion}', {Date} = '${formattedDate}', {Booking Status} = 'Booked')`;
+    console.log(`  - Filter: ${filterFormula}`);
 
     // Query bookings for this specific region and date
     const records = await base('Bookings')
       .select({
-        filterByFormula: `AND({Region} = '${capitalizedRegion}', {Date} = '${formattedDate}', {Booking Status} = 'Booked')`,
+        filterByFormula: filterFormula,
         sort: [{ field: 'Time', direction: 'asc' }]
       })
       .firstPage();
@@ -156,16 +163,17 @@ async function fetchBookingsForRegion(region, selectedDate) {
 
     // Extract relevant booking info
     const bookings = records.map(record => {
+      const postcode = record.fields['Postcode'] || extractPostcode(record.fields['Property Address']);
       const booking = {
         id: record.id,
-        postcode: record.fields['Postcode'] || extractPostcode(record.fields['Property Address']),
+        postcode: postcode,
         startTime: record.fields['Time'],
         duration: record.fields['Duration'] || 90,
         date: record.fields['Date'],
         region: record.fields['Region']
       };
       
-      console.log(`Booking found: ${booking.startTime} at ${booking.postcode} (Duration: ${booking.duration}min)`);
+      console.log(`  ✓ Booking: ${booking.startTime} at ${booking.postcode} (${booking.duration}min)`);
       
       return booking;
     });
@@ -173,8 +181,8 @@ async function fetchBookingsForRegion(region, selectedDate) {
     return bookings;
 
   } catch (error) {
-    console.error('Error fetching bookings:', error);
-    return [];
+    console.error('Error fetching bookings from Airtable:', error);
+    throw error; // Throw instead of returning empty array so we can see the error
   }
 }
 
@@ -212,65 +220,66 @@ async function calculateAvailableSlots(userPostcode, existingBookings) {
   const allSlots = generateAllTimeSlots();
   const maxDriveMinutes = 45;
   
-  console.log(`Calculating availability for ${existingBookings.length} existing bookings`);
+  console.log(`\nCalculating availability for ${existingBookings.length} existing bookings`);
   
   // STEP 1: Check if user's location is within 45 min drive of ALL existing bookings
   for (const booking of existingBookings) {
     if (!booking.postcode) {
-      console.log(`Skipping booking at ${booking.startTime} - no postcode available`);
+      console.log(`⚠ Skipping booking at ${booking.startTime} - no postcode available`);
       continue;
     }
     
     try {
       const driveTime = await getDriveTime(userPostcode, booking.postcode);
       
-      console.log(`Drive time from user (${userPostcode}) to existing booking (${booking.postcode}): ${driveTime} minutes`);
+      console.log(`🚗 Drive time: ${userPostcode} → ${booking.postcode} = ${driveTime} minutes`);
       
       // If ANY existing booking is more than 45 min away, block ENTIRE day
       if (driveTime > maxDriveMinutes) {
-        console.log(`BLOCKING ENTIRE DAY: Drive time (${driveTime} min) exceeds max (${maxDriveMinutes} min)`);
+        console.log(`❌ BLOCKING ENTIRE DAY: ${driveTime} min exceeds max ${maxDriveMinutes} min`);
         
         allSlots.forEach(slot => {
           slot.available = false;
-          slot.reason = `Too far from existing booking at ${booking.startTime} (${driveTime} min drive - max ${maxDriveMinutes} min allowed)`;
+          slot.reason = `Too far from existing booking at ${booking.startTime} (${driveTime} min drive)`;
         });
         
         return allSlots; // Return immediately - entire day blocked
       }
     } catch (error) {
-      console.error('Error calculating drive time:', error);
+      console.error('❌ Error calculating drive time:', error);
       // If we can't calculate drive time, be conservative and block the day
       allSlots.forEach(slot => {
         slot.available = false;
-        slot.reason = 'Unable to verify drive time - day blocked for safety';
+        slot.reason = 'Unable to verify drive time';
       });
       return allSlots;
     }
   }
   
-  // STEP 2: User is within 45 min of all bookings, so now just block the actual booked time slots
-  console.log('User is within 45 min of all existing bookings - blocking only booked time slots');
+  // STEP 2: User is within 45 min of all bookings, so now block the booked time slots
+  console.log('\n✓ User is within 45 min of all existing bookings');
+  console.log('Blocking booked time slots:\n');
   
   for (const booking of existingBookings) {
     const bookingStartMinutes = timeToMinutes(booking.startTime);
     const bookingEndMinutes = bookingStartMinutes + booking.duration;
     
-    console.log(`Blocking slots from ${booking.startTime} (${bookingStartMinutes} min) to ${bookingEndMinutes} min (${booking.duration} min duration)`);
+    console.log(`  Booking: ${booking.startTime}-${minutesToTime(bookingEndMinutes)} (${booking.duration} min)`);
     
     allSlots.forEach(slot => {
       const slotMinutes = timeToMinutes(slot.time);
       
       // Block slots that fall within this booking's time range
       if (slotMinutes >= bookingStartMinutes && slotMinutes < bookingEndMinutes) {
-        console.log(`  -> Blocking slot ${slot.time} (${slotMinutes} min)`);
+        console.log(`    ❌ Blocking ${slot.time}`);
         slot.available = false;
-        slot.reason = `Media specialist already booked at ${booking.startTime}`;
+        slot.reason = `Specialist already booked at ${booking.startTime}`;
       }
     });
   }
   
   const availableCount = allSlots.filter(s => s.available).length;
-  console.log(`Final result: ${availableCount} available slots, ${allSlots.length - availableCount} blocked slots`);
+  console.log(`\n✓ Final result: ${availableCount} available, ${allSlots.length - availableCount} blocked\n`);
   
   return allSlots;
 }
@@ -280,7 +289,7 @@ async function getDriveTime(fromPostcode, toPostcode) {
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
   
   if (!apiKey) {
-    console.warn('Google Maps API key not configured - blocking day for safety');
+    console.warn('⚠ Google Maps API key not configured');
     throw new Error('Google Maps API key not configured');
   }
   
@@ -290,7 +299,7 @@ async function getDriveTime(fromPostcode, toPostcode) {
     const response = await fetch(url);
     
     if (!response.ok) {
-      throw new Error('Google Maps API request failed');
+      throw new Error(`Google Maps API request failed: ${response.status}`);
     }
     
     const data = await response.json();
@@ -302,7 +311,7 @@ async function getDriveTime(fromPostcode, toPostcode) {
     const element = data.rows[0]?.elements[0];
     
     if (!element || element.status !== 'OK') {
-      throw new Error('No route found between locations');
+      throw new Error(`No route found: ${element?.status || 'Unknown error'}`);
     }
     
     // Return duration in minutes (use duration_in_traffic if available)
@@ -313,7 +322,7 @@ async function getDriveTime(fromPostcode, toPostcode) {
     
   } catch (error) {
     console.error('Error getting drive time:', error);
-    throw error; // Propagate error so we can block the day
+    throw error;
   }
 }
 
@@ -322,4 +331,11 @@ function timeToMinutes(timeString) {
   if (!timeString) return 0;
   const [hours, minutes] = timeString.split(':').map(Number);
   return hours * 60 + minutes;
+}
+
+// Convert minutes to time string (HH:MM)
+function minutesToTime(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
 }
