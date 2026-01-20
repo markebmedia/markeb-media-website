@@ -119,7 +119,7 @@ async function fetchBookingsForRegion(region, selectedDate) {
     console.log(`  - Date: ${selectedDate}`);
     console.log(`  - Region: ${capitalisedRegion} (original: ${region})`);
     
-    // ✅ USE AIRTABLE'S IS_SAME() FUNCTION FOR DATE COMPARISON
+    // Use Airtable's IS_SAME() function for date comparison
     const filterFormula = `AND({Region} = '${capitalisedRegion}', IS_SAME({Date}, '${selectedDate}', 'day'), {Booking Status} = 'Booked')`;
     console.log(`  - Filter: ${filterFormula}`);
 
@@ -174,7 +174,7 @@ function generateAllTimeSlots() {
   
   for (let hour = 9; hour <= 15; hour++) {
     for (let minute of [0, 30]) {
-      if (hour === 15 && minute === 30) break; // Stop at 3:00 PM
+      if (hour === 15 && minute === 30) break; // Stop at 3:00 PM (last slot is 15:00)
       
       const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
       slots.push({
@@ -190,11 +190,13 @@ function generateAllTimeSlots() {
 // Calculate available time slots based on drive times and existing bookings
 async function calculateAvailableSlots(userPostcode, existingBookings) {
   const allSlots = generateAllTimeSlots();
-  const maxDriveMinutes = 45;
+  const maxDriveMinutes = 45; // Max drive time to determine if booking can happen on this day
+  const fixedBufferMinutes = 45; // Fixed buffer time before AND after each booking
   
   console.log(`\nCalculating availability for ${existingBookings.length} existing bookings`);
   
   // STEP 1: Check if user's location is within 45 min drive of ALL existing bookings
+  // This determines IF the booking can happen on this day
   for (const booking of existingBookings) {
     if (!booking.postcode) {
       console.log(`⚠ Skipping booking at ${booking.startTime} - no postcode available`);
@@ -204,15 +206,15 @@ async function calculateAvailableSlots(userPostcode, existingBookings) {
     try {
       const driveTime = await getDriveTime(userPostcode, booking.postcode);
       
-      console.log(`🚗 Drive time: ${userPostcode} → ${booking.postcode} = ${driveTime} minutes`);
+      console.log(`🚗 Drive time check: ${userPostcode} → ${booking.postcode} = ${driveTime} minutes`);
       
       // If ANY existing booking is more than 45 min away, block ENTIRE day
       if (driveTime > maxDriveMinutes) {
-        console.log(`❌ BLOCKING ENTIRE DAY: ${driveTime} min exceeds max ${maxDriveMinutes} min`);
+        console.log(`❌ BLOCKING ENTIRE DAY: Drive time (${driveTime} min) exceeds max (${maxDriveMinutes} min)`);
         
         allSlots.forEach(slot => {
           slot.available = false;
-          slot.reason = `Too far from existing booking at ${booking.startTime} (${driveTime} min drive)`;
+          slot.reason = `Too far from existing booking at ${booking.startTime} (${driveTime} min drive - max ${maxDriveMinutes} min)`;
         });
         
         return allSlots; // Return immediately - entire day blocked
@@ -228,24 +230,38 @@ async function calculateAvailableSlots(userPostcode, existingBookings) {
     }
   }
   
-  // STEP 2: User is within 45 min of all bookings, so now block the booked time slots
+  // STEP 2: User is within 45 min of all bookings
+  // Now block: 45 min BEFORE + booking duration + 45 min AFTER
   console.log('\n✓ User is within 45 min of all existing bookings');
-  console.log('Blocking booked time slots:\n');
+  console.log(`Blocking: ${fixedBufferMinutes} min before + booking + ${fixedBufferMinutes} min after:\n`);
   
   for (const booking of existingBookings) {
     const bookingStartMinutes = timeToMinutes(booking.startTime);
     const bookingEndMinutes = bookingStartMinutes + booking.duration;
     
+    const bufferStartMinutes = bookingStartMinutes - fixedBufferMinutes; // 45 min BEFORE
+    const bufferEndMinutes = bookingEndMinutes + fixedBufferMinutes;     // 45 min AFTER
+    
+    console.log(`  Buffer before: ${minutesToTime(bufferStartMinutes)}-${booking.startTime} (${fixedBufferMinutes} min)`);
     console.log(`  Booking: ${booking.startTime}-${minutesToTime(bookingEndMinutes)} (${booking.duration} min)`);
+    console.log(`  Buffer after: ${minutesToTime(bookingEndMinutes)}-${minutesToTime(bufferEndMinutes)} (${fixedBufferMinutes} min)`);
+    console.log(`  Total blocked: ${minutesToTime(bufferStartMinutes)}-${minutesToTime(bufferEndMinutes)}`);
     
     allSlots.forEach(slot => {
       const slotMinutes = timeToMinutes(slot.time);
       
-      // Block slots that fall within this booking's time range
-      if (slotMinutes >= bookingStartMinutes && slotMinutes < bookingEndMinutes) {
+      // Block slots that fall within: buffer before + booking + buffer after
+      if (slotMinutes >= bufferStartMinutes && slotMinutes < bufferEndMinutes) {
         console.log(`    ❌ Blocking ${slot.time}`);
         slot.available = false;
-        slot.reason = `Specialist already booked at ${booking.startTime}`;
+        
+        if (slotMinutes < bookingStartMinutes) {
+          slot.reason = `Buffer time before booking at ${booking.startTime}`;
+        } else if (slotMinutes < bookingEndMinutes) {
+          slot.reason = `Specialist already booked at ${booking.startTime}`;
+        } else {
+          slot.reason = `Buffer time after booking at ${booking.startTime}`;
+        }
       }
     });
   }
