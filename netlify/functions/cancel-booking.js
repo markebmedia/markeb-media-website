@@ -1,7 +1,9 @@
 // netlify/functions/cancel-booking.js
 const Airtable = require('airtable');
-const { sendCancellationConfirmation } = require('./email-service');
+const { Resend } = require('resend');
+
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 exports.handler = async (event, context) => {
   // Only allow POST
@@ -18,92 +20,128 @@ exports.handler = async (event, context) => {
     if (!bookingId || !clientEmail) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Missing required fields' })
+        body: JSON.stringify({ error: 'Booking ID and email are required' })
       };
     }
 
-    // Verify the booking belongs to this email
+    // Fetch the booking
     const booking = await base('Bookings').find(bookingId);
-    
-    if (booking.fields['Client Email'] !== clientEmail) {
+    const fields = booking.fields;
+
+    // Verify email matches
+    if (fields['Client Email'] !== clientEmail) {
       return {
         statusCode: 403,
-        body: JSON.stringify({ error: 'Unauthorized' })
+        body: JSON.stringify({ error: 'Email does not match booking' })
       };
     }
 
-    // Check if the booking is already cancelled using Booking Status
-    if (booking.fields['Booking Status'] === 'Cancelled') {
+    // Check if already cancelled
+    if (fields['Booking Status'] === 'Cancelled') {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: 'Booking is already cancelled' })
       };
     }
 
-    // Calculate cancellation charge based on time and date
-    const bookingDateTime = new Date(`${booking.fields['Date']}T${booking.fields['Time']}:00`);
+    // Check 24-hour cancellation policy
+    const bookingDateTime = new Date(`${fields['Date']}T${fields['Time']}:00`);
     const now = new Date();
-    const hoursUntilBooking = (bookingDateTime - now) / (1000 * 60 * 60);
+    const hoursUntil = (bookingDateTime - now) / (1000 * 60 * 60);
 
-    let cancellationCharge = 0;
-    let cancellationChargePercentage = 0;
-
-    if (hoursUntilBooking < 24) {
-      if (hoursUntilBooking < 0) {
-        // Same day / past - 100% charge
-        cancellationChargePercentage = 100;
-      } else {
-        // Within 24 hours - 50% charge
-        cancellationChargePercentage = 50;
-      }
-      cancellationCharge = (booking.fields['Total Price'] * cancellationChargePercentage) / 100;
+    if (hoursUntil < 24) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ 
+          error: 'Cancellations within 24 hours require a fee. Please use the paid cancellation option.',
+          hoursUntil: Math.round(hoursUntil)
+        })
+      };
     }
 
-    const refundAmount = booking.fields['Total Price'] - cancellationCharge;
+    // Calculate refund details
+    const totalPrice = fields['Total Price'];
+    const cancellationCharge = 0; // Free cancellation
+    const cancellationChargePercentage = 0;
+    const refundAmount = totalPrice;
 
-    // Generate refund note
-    const refundNote = cancellationChargePercentage === 0 
-      ? 'Full refund will be processed within 5-7 business days'
-      : cancellationChargePercentage === 50
-      ? '50% cancellation fee applies. Remaining amount will be refunded within 5-7 business days'
-      : 'Full cancellation fee applies. No refund available';
+    // Update booking status in Airtable
+    await base('Bookings').update(bookingId, {
+      'Booking Status': 'Cancelled',
+      'Cancellation Date': new Date().toISOString().split('T')[0],
+      'Cancellation Reason': reason || 'Customer requested',
+      'Cancellation Charge %': cancellationChargePercentage,
+      'Cancellation Charge': cancellationCharge,
+      'Refund Amount': refundAmount
+    });
 
-    // Update the booking with Booking Status
-    const updatedRecord = await base('Bookings').update([
-      {
-        id: bookingId,
-        fields: {
-          'Booking Status': 'Cancelled',  // ✅ Updated to use Booking Status
-          'Cancellation Date': new Date().toISOString(),
-          'Cancellation Reason': reason || 'Customer requested',
-          'Cancellation Charge %': cancellationChargePercentage,
-          'Cancellation Charge': cancellationCharge,
-          'Refund Amount': refundAmount
-        }
-      }
-    ]);
+    // Determine refund note
+    let refundNote = '';
+    if (fields['Status'] === 'Paid') {
+      refundNote = 'A full refund will be processed to your original payment method within 5-7 business days.';
+    } else {
+      refundNote = 'Your reservation has been released.';
+    }
 
     // Send cancellation confirmation email
     try {
-      await sendCancellationConfirmation({
-        clientName: booking.fields['Client Name'],
-        clientEmail: clientEmail,
-        bookingRef: booking.fields['Booking Reference'],
-        date: booking.fields['Date'],
-        time: booking.fields['Time'],
-        service: booking.fields['Service Name'],
-        totalPrice: booking.fields['Total Price']
-      }, cancellationCharge, refundAmount, refundNote);
-      
-      console.log('Cancellation confirmation sent to:', clientEmail);
+      await resend.emails.send({
+        from: 'Markeb Media <commercial@markebmedia.com>',
+        to: clientEmail,
+        subject: `Booking Cancelled - ${fields['Booking Reference']}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #ef4444;">Booking Cancelled</h2>
+            
+            <p>Hi ${fields['Client Name']},</p>
+            
+            <p>Your booking has been successfully cancelled.</p>
+            
+            <div style="background: #f8fafc; border-left: 4px solid #ef4444; padding: 16px; margin: 20px 0;">
+              <h3 style="margin-top: 0;">Cancelled Booking Details</h3>
+              <p><strong>Reference:</strong> ${fields['Booking Reference']}</p>
+              <p><strong>Service:</strong> ${fields['Service Name']}</p>
+              <p><strong>Date & Time:</strong> ${new Date(fields['Date']).toLocaleDateString('en-GB')} at ${fields['Time']}</p>
+              <p><strong>Property:</strong> ${fields['Property Address']}</p>
+              <p><strong>Cancellation Fee:</strong> £0.00 (Free cancellation)</p>
+            </div>
+            
+            ${fields['Status'] === 'Paid' ? `
+              <div style="background: #f0fdf4; border-left: 4px solid #10b981; padding: 16px; margin: 20px 0;">
+                <h3 style="margin-top: 0; color: #065f46;">Refund Information</h3>
+                <p style="color: #065f46;">A full refund of <strong>£${totalPrice.toFixed(2)}</strong> will be processed to your original payment method within 5-7 business days.</p>
+              </div>
+            ` : ''}
+            
+            ${reason ? `
+              <p><strong>Cancellation Reason:</strong> ${reason}</p>
+            ` : ''}
+            
+            <p>If you'd like to reschedule instead, please visit our booking page to select a new date and time.</p>
+            
+            <p style="margin-top: 30px;">
+              <a href="https://markebmedia.com/booking" style="background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Book a New Shoot</a>
+            </p>
+            
+            <p style="color: #64748b; margin-top: 30px;">
+              If you have any questions, please contact us at <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
+            </p>
+            
+            <p style="color: #64748b;">
+              Best regards,<br>
+              The Markeb Media Team
+            </p>
+          </div>
+        `
+      });
     } catch (emailError) {
       console.error('Failed to send cancellation email:', emailError);
-      // Don't fail the request if email fails
+      // Don't fail the cancellation if email fails
     }
 
     return {
       statusCode: 200,
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       },

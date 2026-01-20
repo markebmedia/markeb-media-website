@@ -11,49 +11,102 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     body { 
-      font-family: 'Poppins', sans-serif;
-      background: #FFFFFF;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
       color: #1e293b;
     }
 
-    .admin-container {
-      max-width: 1400px;
-      margin: 0 auto;
+    /* Sidebar Navigation */
+    .admin-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 260px;
+      height: 100vh;
       background: #fff;
-      border-radius: 16px;
-      padding: 40px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border-right: 2px solid #e2e8f0;
+      padding: 24px;
+      overflow-y: auto;
+      z-index: 1000;
     }
 
-    .header {
+    .admin-logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: #3b82f6;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .nav-section {
+      margin-bottom: 24px;
+    }
+
+    .nav-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      padding-left: 12px;
+    }
+
+    .nav-item {
       display: flex;
-      justify-content: center;
       align-items: center;
-      margin-bottom: 40px;
-      padding-bottom: 20px;
-      border-bottom: 2px solid #e2e8f0;
-      gap: 20px;
-      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      color: #64748b;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all .2s ease;
+      cursor: pointer;
+      margin-bottom: 4px;
+    }
+
+    .nav-item:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .nav-item.active {
+      background: #3b82f6;
+      color: #fff;
+    }
+
+    .nav-icon {
+      font-size: 18px;
+      width: 20px;
       text-align: center;
     }
 
-    .header-content {
-      flex: 1;
-      text-align: center;
+    /* Main Content */
+    .admin-main {
+      margin-left: 260px;
+      min-height: 100vh;
+      padding: 24px;
     }
 
-    .header h1 {
-      font-size: 32px;
+    .admin-header {
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .admin-title {
+      font-size: 28px;
       font-weight: 700;
       color: #0f172a;
     }
 
-    .header-subtitle {
+    .admin-subtitle {
       color: #64748b;
       font-size: 14px;
       margin-top: 4px;
@@ -66,85 +119,35 @@
       border-radius: 20px;
       font-weight: 600;
       font-size: 14px;
-      white-space: nowrap;
     }
 
-    .search-section {
-      margin-bottom: 30px;
-      display: flex;
-      gap: 12px;
-      align-items: center;
+    /* Sections */
+    .admin-section {
+      display: none;
     }
 
-    .search-input {
-      flex: 1;
-      padding: 14px 20px;
-      border: 2px solid #e2e8f0;
-      border-radius: 10px;
-      font-size: 16px;
-      font-family: 'Inter', sans-serif;
-      transition: all .2s ease;
+    .admin-section.active {
+      display: block;
     }
 
-    .search-input:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .btn {
-      padding: 14px 28px;
-      border-radius: 10px;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      transition: all .2s ease;
-      font-size: 16px;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #fff;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-    }
-
-    .btn-secondary {
-      background: #fff;
-      color: #3b82f6;
-      border: 2px solid #3b82f6;
-    }
-
-    .btn-secondary:hover {
-      background: #f8f9fa;
-    }
-
-    .btn-danger {
-      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-      color: #fff;
-    }
-
+    /* Stats Cards */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-bottom: 40px;
+      gap: 16px;
+      margin-bottom: 24px;
     }
 
     .stat-card {
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      background: #fff;
       border: 2px solid #e2e8f0;
       border-radius: 12px;
-      padding: 24px;
+      padding: 20px;
       text-align: center;
     }
 
     .stat-value {
-      font-size: 36px;
+      font-size: 32px;
       font-weight: 700;
       color: #3b82f6;
       margin-bottom: 8px;
@@ -152,79 +155,263 @@
 
     .stat-label {
       color: #64748b;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
     }
 
-    .users-table {
+    /* Tables */
+    .data-table {
       width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
       background: #fff;
+      border: 2px solid #e2e8f0;
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
-    .users-table thead {
+    .data-table thead {
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       color: #fff;
     }
 
-    .users-table th {
+    .data-table th {
       padding: 16px;
       text-align: left;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
-    .users-table td {
+    .data-table td {
       padding: 16px;
       border-bottom: 1px solid #e2e8f0;
       font-size: 14px;
     }
 
-    .users-table tbody tr {
-      transition: background .2s ease;
-    }
-
-    .users-table tbody tr:hover {
+    .data-table tbody tr:hover {
       background: #f8fafc;
     }
 
-    .status-badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 12px;
+    /* Buttons */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
       font-weight: 600;
-      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: all .2s ease;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .status-active {
-      background: #d1fae5;
-      color: #065f46;
+    .btn-primary {
+      background: #3b82f6;
+      color: #fff;
     }
 
-    .status-inactive {
+    .btn-primary:hover {
+      background: #2563eb;
+    }
+
+    .btn-success {
+      background: #10b981;
+      color: #fff;
+    }
+
+    .btn-success:hover {
+      background: #059669;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    /* Calendar */
+    .calendar-container {
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .calendar-current {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0f172a;
+      min-width: 200px;
+      text-align: center;
+    }
+
+    .calendar-view-selector {
+      display: flex;
+      gap: 4px;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 8px;
+    }
+
+    .calendar-view-btn {
+      padding: 8px 16px;
+      border: none;
+      background: transparent;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      color: #64748b;
+      transition: all .2s ease;
+    }
+
+    .calendar-view-btn.active {
+      background: #fff;
+      color: #3b82f6;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .calendar-grid {
+      display: grid;
+      gap: 1px;
+      background: #e2e8f0;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Month View */
+    .calendar-grid.month {
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .calendar-day-header {
+      background: #f8fafc;
+      padding: 12px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .calendar-day {
+      background: #fff;
+      min-height: 120px;
+      padding: 8px;
+      position: relative;
+    }
+
+    .calendar-day-number {
+      font-weight: 600;
+      font-size: 14px;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .calendar-day.other-month {
+      opacity: 0.3;
+    }
+
+    .calendar-day.today {
+      background: #eff6ff;
+      border: 2px solid #3b82f6;
+    }
+
+    .calendar-booking {
+      background: #3b82f6;
+      color: #fff;
+      padding: 4px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-bottom: 2px;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .calendar-booking:hover {
+      background: #2563eb;
+    }
+
+    .calendar-booking.reserved {
+      background: #f59e0b;
+    }
+
+    .calendar-booking.cancelled {
+      background: #ef4444;
+    }
+
+    /* Week View */
+    .calendar-grid.week {
+      grid-template-columns: 80px repeat(7, 1fr);
+    }
+
+    .calendar-time-slot {
+      background: #f8fafc;
+      padding: 8px;
+      font-size: 12px;
+      color: #64748b;
+      text-align: right;
+      border-right: 2px solid #e2e8f0;
+    }
+
+    .calendar-week-slot {
+      background: #fff;
+      padding: 4px;
+      min-height: 60px;
+      position: relative;
+    }
+
+    /* Day View */
+    .calendar-grid.day {
+      grid-template-columns: 80px 1fr;
+    }
+
+    /* Drive Time Badge */
+    .drive-time-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .drive-time-badge.warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .drive-time-badge.error {
       background: #fee2e2;
       color: #991b1b;
     }
 
-    .action-buttons {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn-small {
-      padding: 8px 16px;
-      font-size: 13px;
-      border-radius: 6px;
-    }
-
-    /* Toggle Switch Styles */
+    /* Toggle Switch */
     .toggle-switch {
       position: relative;
       display: inline-block;
@@ -270,61 +457,57 @@
       transform: translateX(24px);
     }
 
-    .toggle-switch input:disabled + .toggle-slider {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* Region dropdown select styling */
-    .region-select {
-      padding: 8px 12px;
-      border: 2px solid #e2e8f0;
-      border-radius: 6px;
-      font-size: 13px;
-      font-family: 'Inter', sans-serif;
+    /* Filters */
+    .filters-bar {
       background: #fff;
-      color: #0f172a;
-      cursor: pointer;
-      transition: all .2s ease;
-      min-width: 140px;
-      max-width: 180px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
-    .region-select:focus {
+    .filter-input {
+      padding: 10px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .filter-input:focus {
       outline: none;
       border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
 
-    .region-select:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      background: #f8f9fa;
+    .filter-select {
+      padding: 10px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #fff;
+      cursor: pointer;
     }
 
-    .region-select:hover:not(:disabled) {
-      border-color: #cbd5e1;
+    /* Loading */
+    .spinner {
+      margin: 30px auto;
+      width: 50px;
+      height: 50px;
+      border: 4px solid #e2e8f0;
+      border-top: 4px solid #3b82f6;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
 
-    /* Region badge styling for modal */
-    .region-badge {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 600;
-      background: #eff6ff;
-      color: #1e40af;
-      border: 2px solid #bfdbfe;
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
-    .region-badge.empty {
-      background: #f1f5f9;
-      color: #64748b;
-      border-color: #e2e8f0;
-      font-style: italic;
-    }
-
+    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -347,7 +530,7 @@
     .modal-dialog {
       background: #fff;
       border-radius: 16px;
-      max-width: 600px;
+      max-width: 800px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
@@ -419,122 +602,133 @@
       text-align: right;
     }
 
-    .spinner {
-      margin: 30px auto;
-      width: 50px;
-      height: 50px;
-      border: 4px solid #e2e8f0;
-      border-top: 4px solid #3b82f6;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .loading-message {
-      text-align: center;
-      padding: 40px;
-      color: #64748b;
-    }
-
-    .error-message {
-      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-      border: 2px solid #ef4444;
+    /* Status Badges */
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
       border-radius: 12px;
-      padding: 20px;
-      color: #991b1b;
+      font-size: 12px;
       font-weight: 600;
-      text-align: center;
-      margin: 20px 0;
+      text-transform: uppercase;
     }
 
-    .success-message {
-      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-      border: 2px solid #10b981;
-      border-radius: 12px;
-      padding: 20px;
+    .status-paid {
+      background: #d1fae5;
       color: #065f46;
-      font-weight: 600;
-      text-align: center;
-      margin: 20px 0;
     }
 
-    .warning-box {
+    .status-reserved {
       background: #fef3c7;
-      border: 2px solid #f59e0b;
-      border-radius: 12px;
-      padding: 16px;
-      margin: 16px 0;
       color: #92400e;
-      font-size: 14px;
+    }
+
+    .status-cancelled {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status-active {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-inactive {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .admin-sidebar {
+        transform: translateX(-100%);
+        transition: transform .3s ease;
+      }
+
+      .admin-sidebar.open {
+        transform: translateX(0);
+      }
+
+      .admin-main {
+        margin-left: 0;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 999;
+        background: #3b82f6;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 12px;
+        cursor: pointer;
+      }
+
+      .calendar-grid.month .calendar-day {
+        min-height: 80px;
+      }
+
+      .calendar-booking {
+        font-size: 10px;
+      }
     }
 
     @media (max-width: 768px) {
-      .admin-container {
-        padding: 20px;
-      }
-
-      .header {
+      .admin-header {
         flex-direction: column;
-        align-items: center;
-        text-align: center;
         gap: 16px;
+        text-align: center;
       }
 
-      .header-content {
-        width: 100%;
-      }
-
-      .search-section {
+      .filters-bar {
         flex-direction: column;
       }
 
-      .search-input {
+      .filter-input {
         width: 100%;
       }
 
-      .btn {
-        width: 100%;
+      .stats-grid {
+        grid-template-columns: 1fr;
       }
 
-      .users-table {
+      .calendar-grid.month .calendar-day {
+        min-height: 60px;
+      }
+
+      .data-table {
         font-size: 12px;
-        display: block;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
       }
 
-      .users-table thead {
+      .data-table thead {
         display: none;
       }
 
-      .users-table,
-      .users-table tbody,
-      .users-table tr,
-      .users-table td {
+      .data-table, 
+      .data-table tbody, 
+      .data-table tr, 
+      .data-table td {
         display: block;
         width: 100%;
       }
 
-      .users-table tr {
+      .data-table tr {
         margin-bottom: 20px;
         border: 2px solid #e2e8f0;
         border-radius: 12px;
         padding: 16px;
-        background: #fff;
       }
 
-      .users-table td {
+      .data-table td {
         padding: 8px 0;
         border: none;
-        text-align: left;
         position: relative;
         padding-left: 50%;
       }
 
-      .users-table td:before {
+      .data-table td:before {
         content: attr(data-label);
         position: absolute;
         left: 0;
@@ -542,1238 +736,832 @@
         padding-right: 10px;
         font-weight: 600;
         color: #64748b;
-        text-transform: uppercase;
         font-size: 11px;
-      }
-
-      .action-buttons {
-        flex-direction: column;
-        width: 100%;
-      }
-
-      .btn-small {
-        width: 100%;
-        justify-content: center;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
-      .stat-card {
-        padding: 20px;
-      }
-
-      .modal-dialog {
-        max-width: 95%;
-        margin: 10px;
-      }
-
-      .detail-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-
-      .detail-value {
-        text-align: left;
-        width: 100%;
-      }
-
-      /* Region select mobile */
-      .region-select {
-        width: 100%;
-        max-width: none;
-        font-size: 14px;
-        padding: 10px 12px;
-      }
-
-      .users-table td[data-label="Region"] {
-        padding-left: 0 !important;
-      }
-
-      .users-table td[data-label="Region"]:before {
-        position: relative !important;
-        display: block !important;
-        margin-bottom: 8px;
-      }
-
-      /* Auth screen mobile */
-      .auth-box {
-        padding: 32px 24px;
-        width: 95%;
-      }
-
-      .auth-title {
-        font-size: 24px;
-      }
-
-      .auth-subtitle {
-        font-size: 14px;
-      }
-
-      .auth-input {
-        font-size: 16px;
-        padding: 14px 16px;
-      }
-
-      .auth-btn {
-        font-size: 16px;
-        padding: 14px 20px;
+        text-transform: uppercase;
       }
     }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-  body {
-    padding: 16px;
-  }
-
-  .admin-container {
-    padding: 32px;
-  }
-
-  .header h1 {
-    font-size: 28px;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .search-section {
-    gap: 10px;
-  }
-
-  .users-table {
-    font-size: 13px;
-  }
-
-  .users-table th,
-  .users-table td {
-    padding: 14px 12px;
-  }
-
-  .btn {
-    padding: 12px 24px;
-    font-size: 15px;
-  }
-
-  .modal-dialog {
-    max-width: 90%;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  .modal-body {
-    padding-bottom: 200px;
-  }
-
-  /* Auth screen tablet */
-  .auth-box {
-    padding: 40px;
-    max-width: 500px;
-  }
-}
-
-    /* Small Mobile (320px - 480px) */
-    @media (max-width: 480px) {
-      body {
-        padding: 10px;
-      }
-
-      .admin-container {
-        padding: 16px;
-        border-radius: 12px;
-      }
-
-      .header h1 {
-        font-size: 22px;
-      }
-
-      .header-subtitle {
-        font-size: 13px;
-      }
-
-      .admin-badge {
-        font-size: 12px;
-        padding: 6px 12px;
-      }
-
-      .stat-value {
-        font-size: 28px;
-      }
-
-      .stat-label {
-        font-size: 12px;
-      }
-
-      .search-input {
-        padding: 12px 16px;
-        font-size: 14px;
-      }
-
-      .btn {
-        padding: 12px 20px;
-        font-size: 14px;
-      }
-
-      .users-table tr {
-        padding: 12px;
-        margin-bottom: 16px;
-      }
-
-      .users-table td {
-        font-size: 13px;
-        padding: 6px 0;
-        padding-left: 45%;
-      }
-
-      .users-table td:before {
-        font-size: 10px;
-        width: 40%;
-      }
-
-      .status-badge {
-        font-size: 10px;
-        padding: 3px 10px;
-      }
-
-      .region-select {
-        font-size: 14px;
-        padding: 12px;
-      }
-
-      .modal-dialog {
-        max-width: 100%;
-        margin: 0;
-        border-radius: 0;
-        max-height: 100vh;
-      }
-
-      .modal-header h3 {
-        font-size: 20px;
-      }
-
-      .modal-close {
-        width: 36px;
-        height: 36px;
-        font-size: 24px;
-      }
-
-      .detail-item {
-        padding: 12px;
-      }
-
-      /* Auth screen small mobile */
-      .auth-box {
-        width: 95%;
-        margin: 10px;
-        padding: 32px 24px;
-      }
-
-      .auth-logo {
-        font-size: 48px;
-        margin-bottom: 16px;
-      }
-
-      .auth-title {
-        font-size: 22px;
-        margin-bottom: 8px;
-      }
-
-      .auth-subtitle {
-        font-size: 14px;
-        margin-bottom: 24px;
-      }
-
-      .auth-input {
-        font-size: 16px;
-        padding: 14px 16px;
-        letter-spacing: 2px;
-      }
-
-      .auth-btn {
-        font-size: 16px;
-        padding: 14px 20px;
-      }
-
-      .auth-hint {
-        padding: 12px;
-        margin-top: 20px;
-      }
-
-      .auth-hint-title {
-        font-size: 13px;
-      }
-
-      .auth-hint-text {
-        font-size: 12px;
-      }
-    }
-
-    /* Landscape Mobile (orientation) */
-    @media (max-height: 500px) and (orientation: landscape) {
-      .auth-screen {
-        padding: 10px;
-        align-items: flex-start;
-        overflow-y: auto;
-      }
-
-      .auth-box {
-        margin: 20px auto;
-        padding: 20px;
-      }
-
-      .auth-logo {
-        font-size: 36px;
-        margin-bottom: 12px;
-      }
-
-      .auth-title {
-        font-size: 18px;
-        margin-bottom: 8px;
-      }
-
-      .auth-subtitle {
-        font-size: 12px;
-        margin-bottom: 16px;
-      }
-
-      .auth-hint {
-        margin-top: 12px;
-        padding: 10px;
-      }
-    }
-
-/* Enhanced Modal Mobile Styles */
-@media (max-width: 480px) {
-  .modal {
-    padding: 0;
-    align-items: flex-start;
-  }
-  
- .modal-dialog {
-  max-width: 100%;
-  max-height: 100vh;
-  margin: 0;
-  border-radius: 0;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.modal-body {
-  padding: 16px;
-  padding-bottom: 350px !important;
-}
-  
-  .modal-header h3 {
-    font-size: 16px;
-  }
-  
-  .modal-close {
-    width: 36px;
-    height: 36px;
-    font-size: 24px;
-  }
-  
-  .modal-body {
-    padding: 16px;
-  }
-  
-  .detail-item {
-    padding: 12px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-  
-  .detail-label {
-    font-size: 12px;
-    font-weight: 700;
-  }
-  
-  .detail-value {
-    font-size: 14px;
-    text-align: left;
-    width: 100%;
-    word-break: break-word;
-  }
-  
-  .warning-box {
-    padding: 12px;
-    font-size: 12px;
-  }
-  
-  /* Top action buttons - full width on mobile */
-  .modal-body > div[style*="margin-top: 24px"] > div:first-of-type {
-    flex-direction: column !important;
-    gap: 8px !important;
-  }
-  
-  .modal-body > div[style*="margin-top: 24px"] > div:first-of-type button {
-    width: 100% !important;
-    flex: none !important;
-    padding: 14px 20px !important;
-    font-size: 14px !important;
-  }
-  
-  /* Manual points green box */
-  .modal-body > div[style*="background: #f0fdf4"] {
-    padding: 14px !important;
-  }
-  
-  /* Manual points input and button - keep inline (side by side) */
-  .modal-body > div[style*="background: #f0fdf4"] > div[style*="display: flex"] {
-    display: flex !important;
-    flex-direction: row !important;
-    gap: 8px !important;
-    align-items: center !important;
-  }
-  
-  /* Manual points input field - takes 60% width */
-  .modal-body input[type="number"] {
-    font-size: 16px !important;
-    padding: 12px !important;
-    flex: 1 !important;
-    min-width: 0 !important;
-    border: 2px solid #10b981 !important;
-    border-radius: 8px !important;
-    box-sizing: border-box !important;
-  }
-  
-  /* Add Points button - compact, inline */
-  .modal-body > div[style*="background: #f0fdf4"] button {
-    flex: 0 0 auto !important;
-    padding: 12px 14px !important;
-    font-size: 13px !important;
-    white-space: nowrap !important;
-    width: auto !important;
-  }
-}
-
-    /* Touch device improvements */
-    @media (pointer: coarse) {
-      .btn,
-      .btn-small,
-      .action-buttons button {
-        min-height: 44px;
-        padding: 14px 20px;
-      }
-
-      .search-input,
-      .auth-input {
-        min-height: 48px;
-        font-size: 16px; /* Prevents zoom on iOS */
-      }
-
-      .modal-close {
-        min-width: 44px;
-        min-height: 44px;
-      }
-    }
-  
-    /* Auth Screen Styles */
-    .auth-screen {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
-      overflow: hidden;
-      width: 100%;
-      max-width: 400px;
-      position: relative;
-      border: 1px solid #f1f5f9;
-    }
-
-    .auth-screen.hidden {
+    .mobile-menu-btn {
       display: none;
-    }
-
-    .auth-content {
-      padding: 48px 30px 30px;
-      text-align: center;
-    }
-
-    .auth-logo {
-      font-size: 64px;
-      margin-bottom: 24px;
-    }
-
-    .auth-title {
-      font-size: 32px;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 12px;
-    }
-
-    .auth-subtitle {
-      color: #64748b;
-      font-size: 16px;
-      margin-bottom: 32px;
-    }
-
-    .auth-box {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(31, 46, 60, 0.15);
-      width: 100%;
-      max-width: 400px;
-      border: 1px solid #f1f5f9;
-      padding: 48px;
-      text-align: center;
-    }
-
-    .auth-logo {
-      font-size: 64px;
-      margin-bottom: 24px;
-    }
-
-    .auth-title {
-      font-size: 32px;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 12px;
-    }
-
-    .auth-subtitle {
-      color: #64748b;
-      font-size: 16px;
-      margin-bottom: 32px;
-    }
-
-    .auth-input {
-      width: 100%;
-      padding: 16px 20px;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      font-size: 18px;
-      font-family: 'Inter', sans-serif;
-      text-align: center;
-      letter-spacing: 4px;
-      font-weight: 600;
-      transition: all .2s ease;
-      margin-bottom: 20px;
-      color: #0f172a;
-    }
-
-    .auth-input:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-    }
-
-    .auth-input::placeholder {
-      letter-spacing: normal;
-      color: #94a3b8;
-      font-weight: 500;
-    }
-
-    .auth-input.error {
-      border-color: #ef4444;
-      animation: shake 0.4s;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-10px); }
-      75% { transform: translateX(10px); }
-    }
-
-    .auth-error {
-      background: #fee2e2;
-      border: 2px solid #ef4444;
-      border-radius: 8px;
-      padding: 12px;
-      color: #991b1b;
-      font-weight: 600;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .auth-error.show {
-      display: block;
-      animation: fadeIn 0.3s;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .auth-btn {
-      width: 100%;
-      padding: 16px 28px;
-      border-radius: 12px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-      transition: all .2s ease;
-      font-size: 18px;
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #fff;
-    }
-
-    .auth-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
-    }
-
-    .auth-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .auth-hint {
-      margin-top: 24px;
-      padding: 16px;
-      background: #f8fafc;
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-    }
-
-    .auth-hint-title {
-      font-weight: 600;
-      color: #0f172a;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-
-    .auth-hint-text {
-      color: #64748b;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .attempts-warning {
-      background: #fef3c7;
-      border: 2px solid #f59e0b;
-      border-radius: 8px;
-      padding: 12px;
-      color: #92400e;
-      font-weight: 600;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .attempts-warning.show {
-      display: block;
-      animation: fadeIn 0.3s;
     }
   </style>
 </head>
 <body>
-  <!-- Authentication Screen -->
-  <div class="auth-screen" id="authScreen">
-    <div class="auth-content">
-      <div class="auth-logo">🛡️</div>
-      <h1 class="auth-title">Admin Access</h1>
-      <p class="auth-subtitle">Enter your admin code to continue</p>
-      
-      <div class="auth-error" id="authError">
-        ❌ Incorrect code. Please try again.
+  <!-- Mobile Menu Button -->
+  <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+
+  <!-- Sidebar Navigation -->
+  <div class="admin-sidebar" id="adminSidebar">
+    <div class="admin-logo">🛡️ MARKEB ADMIN</div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Overview</div>
+      <div class="nav-item active" onclick="showSection('dashboard')">
+        <span class="nav-icon">📊</span>
+        Dashboard
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Bookings</div>
+      <div class="nav-item" onclick="showSection('calendar')">
+        <span class="nav-icon">📅</span>
+        Calendar
+      </div>
+      <div class="nav-item" onclick="showSection('bookings')">
+        <span class="nav-icon">📋</span>
+        All Bookings
+      </div>
+      <div class="nav-item" onclick="showSection('reserved')">
+        <span class="nav-icon">💳</span>
+        Reserved (Need Payment)
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Customers</div>
+      <div class="nav-item" onclick="showSection('customers')">
+        <span class="nav-icon">👥</span>
+        All Customers
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Tools</div>
+      <div class="nav-item" onclick="window.open('uk-client-map.html', '_blank')">
+        <span class="nav-icon">🗺️</span>
+        UK Map
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="admin-main">
+    <!-- Header -->
+    <div class="admin-header">
+      <div>
+        <div class="admin-title">Admin Panel</div>
+        <div class="admin-subtitle">Manage bookings, customers, and payments</div>
+      </div>
+      <div class="admin-badge">⚠️ ADMIN ACCESS</div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div class="admin-section active" id="dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="totalBookings">-</div>
+          <div class="stat-label">Total Bookings</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="upcomingBookings">-</div>
+          <div class="stat-label">Upcoming</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="reservedBookings">-</div>
+          <div class="stat-label">Need Payment</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="totalCustomers">-</div>
+          <div class="stat-label">Total Customers</div>
+        </div>
       </div>
 
-      <div class="attempts-warning" id="attemptsWarning">
-        ⚠️ <span id="attemptsText"></span>
+      <div class="calendar-container">
+        <div style="text-align: center; padding: 40px;">
+          <h3 style="color: #64748b;">Welcome to the Admin Panel</h3>
+          <p style="color: #94a3b8; margin-top: 8px;">Select a section from the sidebar to get started</p>
+        </div>
       </div>
-      
-      <form id="authForm" onsubmit="validateAdminCode(event)">
-        <input 
-          type="password" 
-          id="adminCodeInput" 
-          class="auth-input" 
-          placeholder="ENTER CODE"
-          maxlength="20"
-          autocomplete="off"
-          required
-        >
-        
-        <button type="submit" class="auth-btn" id="authSubmitBtn">
-          🔓 Unlock Admin Panel
-        </button>
-      </form>
+    </div>
 
-      <div class="auth-hint">
-        <div class="auth-hint-title">🔐 Security Note</div>
-        <div class="auth-hint-text">
-          This is a protected area. Only authorised Markeb Media administrators with the correct access code can proceed.
+    <!-- Calendar Section -->
+    <div class="admin-section" id="calendar">
+      <div class="calendar-container">
+        <div class="calendar-header">
+          <div class="calendar-nav">
+            <button class="btn btn-primary btn-small" onclick="previousPeriod()">◀ Previous</button>
+            <div class="calendar-current" id="calendarCurrent">Loading...</div>
+            <button class="btn btn-primary btn-small" onclick="nextPeriod()">Next ▶</button>
+          </div>
+          <div class="calendar-view-selector">
+            <button class="calendar-view-btn active" data-view="month" onclick="setCalendarView('month')">Month</button>
+            <button class="calendar-view-btn" data-view="week" onclick="setCalendarView('week')">Week</button>
+            <button class="calendar-view-btn" data-view="day" onclick="setCalendarView('day')">Day</button>
+          </div>
+        </div>
+
+        <div class="filters-bar">
+          <select class="filter-select" id="calendarRegion" onchange="loadCalendar()">
+            <option value="">All Regions</option>
+            <option value="North">North</option>
+            <option value="South">South</option>
+          </select>
+          <button class="btn btn-primary" onclick="loadCalendar()">🔄 Refresh</button>
+        </div>
+
+        <div id="calendarGrid">
+          <div style="text-align: center; padding: 40px;">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Bookings Section -->
+    <div class="admin-section" id="bookings">
+      <div class="filters-bar">
+        <input type="text" class="filter-input" id="bookingSearch" placeholder="Search by name, email, address, reference...">
+        <select class="filter-select" id="bookingRegion">
+          <option value="">All Regions</option>
+          <option value="North">North</option>
+          <option value="South">South</option>
+        </select>
+        <select class="filter-select" id="bookingStatus">
+          <option value="">All Status</option>
+          <option value="Booked">Booked</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+        <button class="btn btn-primary" onclick="loadBookings()">🔍 Search</button>
+      </div>
+
+      <div class="calendar-container" id="bookingsContainer">
+        <div style="text-align: center; padding: 40px;">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reserved Bookings Section -->
+    <div class="admin-section" id="reserved">
+      <div class="calendar-container" id="reservedContainer">
+        <div style="text-align: center; padding: 40px;">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customers Section -->
+    <div class="admin-section" id="customers">
+      <div class="filters-bar">
+        <input type="text" class="filter-input" id="customerSearch" placeholder="Search by name, email, company...">
+        <button class="btn btn-primary" onclick="loadCustomers()">🔍 Search</button>
+      </div>
+
+      <div class="calendar-container" id="customersContainer">
+        <div style="text-align: center; padding: 40px;">
+          <div class="spinner"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Main Admin Panel (Hidden Until Authenticated) -->
-  <div class="admin-container" id="adminContainer" style="display: none;">
-    <div class="header">
-      <div class="header-content">
-        <h1>🛡️ Admin Panel</h1>
-        <p class="header-subtitle">Manage client accounts and view account details</p>
+  <!-- Booking Detail Modal -->
+  <div class="modal" id="bookingModal" onclick="closeModal('bookingModal')">
+    <div class="modal-dialog" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="bookingModalTitle">Booking Details</h3>
+        <button class="modal-close" onclick="closeModal('bookingModal')">&times;</button>
       </div>
-      <div class="admin-badge">⚠️ ADMIN ACCESS</div>
-    </div>
-
-    <!-- Stats Section -->
-    <div class="stats-grid" id="statsGrid">
-      <div class="stat-card">
-        <div class="stat-value" id="totalUsers">-</div>
-        <div class="stat-label">Total Users</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="activeUsers">-</div>
-        <div class="stat-label">Active Users</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="newThisMonth">-</div>
-        <div class="stat-label">New This Month</div>
+      <div class="modal-body" id="bookingModalBody">
+        <!-- Content will be populated by JavaScript -->
       </div>
     </div>
+  </div>
 
-    <!-- Search Section -->
-    <div class="search-section">
-      <input 
-        type="text" 
-        id="searchInput" 
-        class="search-input" 
-        placeholder="Search by name, email, or company..."
-      >
-      <button class="btn btn-primary" onclick="loadAllUsers()">🔍 Search</button>
-      <button class="btn btn-secondary" onclick="loadAllUsers()">🔄 Refresh</button>
-      <button class="btn btn-secondary" onclick="window.open('uk-client-map.html', '_blank')" style="display: inline-flex; align-items: center; gap: 8px;">
-        🗺️ View UK Map
-      </button>
-    </div>
-
-    <!-- Users Table -->
-    <div id="usersContainer">
-      <div class="loading-message">
-        <div class="spinner"></div>
-        <p>Loading user accounts...</p>
+  <!-- Customer Detail Modal -->
+  <div class="modal" id="customerModal" onclick="closeModal('customerModal')">
+    <div class="modal-dialog" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="customerModalTitle">Customer Details</h3>
+        <button class="modal-close" onclick="closeModal('customerModal')">&times;</button>
       </div>
-    </div>
-
-    <!-- User Detail Modal -->
-    <div class="modal" id="userModal" onclick="closeModal()">
-      <div class="modal-dialog" onclick="event.stopPropagation()">
-        <div class="modal-header">
-          <h3 id="modalTitle">User Details</h3>
-          <button class="modal-close" onclick="closeModal()">&times;</button>
-        </div>
-        <div class="modal-body" id="modalBody">
-          <!-- User details will be populated here -->
-        </div>
+      <div class="modal-body" id="customerModalBody">
+        <!-- Content will be populated by JavaScript -->
       </div>
     </div>
   </div>
 
   <script>
-    // ===== ADMIN AUTHENTICATION =====
-    const ADMIN_CODE = 'MARKEB2546'; // Admin access code
-    const MAX_ATTEMPTS = 5;
-    let attemptCount = 0;
+    // Global state
+    let currentView = 'month';
+    let currentDate = new Date();
+    let allBookings = [];
+    let allCustomers = [];
 
-    // Check if already authenticated
-    function checkAuth() {
-      const isAuthenticated = sessionStorage.getItem('admin_authenticated');
-      if (isAuthenticated === 'true') {
-        showAdminPanel();
-      }
-    }
-
-    function validateAdminCode(event) {
-      event.preventDefault();
-      
-      const input = document.getElementById('adminCodeInput');
-      const code = input.value.trim().toUpperCase();
-      const errorEl = document.getElementById('authError');
-      const warningEl = document.getElementById('attemptsWarning');
-      const attemptsText = document.getElementById('attemptsText');
-      const submitBtn = document.getElementById('authSubmitBtn');
-
-      if (code === ADMIN_CODE) {
-        // Correct code - grant access
-        sessionStorage.setItem('admin_authenticated', 'true');
-        sessionStorage.setItem('admin_login_time', Date.now());
-        
-        // Smooth transition
-        document.getElementById('authScreen').style.transition = 'opacity 0.3s ease';
-        document.getElementById('authScreen').style.opacity = '0';
-        
-        setTimeout(() => {
-          showAdminPanel();
-        }, 300);
-        
-      } else {
-        // Incorrect code - track attempts
-        attemptCount++;
-        
-        // Show error
-        errorEl.classList.add('show');
-        input.classList.add('error');
-        input.value = '';
-        
-        // Remove error styling after animation
-        setTimeout(() => {
-          input.classList.remove('error');
-        }, 400);
-
-        // Show attempts warning
-        const remainingAttempts = MAX_ATTEMPTS - attemptCount;
-        if (remainingAttempts > 0 && remainingAttempts <= 3) {
-          attemptsText.textContent = `${remainingAttempts} attempt${remainingAttempts !== 1 ? 's' : ''} remaining`;
-          warningEl.classList.add('show');
-        }
-
-        // Lock out after max attempts
-        if (attemptCount >= MAX_ATTEMPTS) {
-          input.disabled = true;
-          submitBtn.disabled = true;
-          errorEl.textContent = '🚫 Too many failed attempts. Access denied for 15 minutes.';
-          
-          // Lock for 15 minutes
-          setTimeout(() => {
-            attemptCount = 0;
-            input.disabled = false;
-            submitBtn.disabled = false;
-            errorEl.classList.remove('show');
-            warningEl.classList.remove('show');
-            errorEl.textContent = '❌ Incorrect code. Please try again.';
-          }, 15 * 60 * 1000); // 15 minutes
-        }
-      }
-    }
-
-    function showAdminPanel() {
-      document.body.style.display = 'block';
-      document.body.style.padding = '20px';
-      document.getElementById('authScreen').classList.add('hidden');
-      document.getElementById('adminContainer').style.display = 'block';
-      loadAllUsers();
-    }
-
-    // Run auth check on load
-    checkAuth();
-
-    // ===== MAIN ADMIN PANEL CODE =====
-    const API_ENDPOINT = '/.netlify/functions/auth';
-
-    // UK REGIONS - All UK counties and regions
-    const UK_REGIONS = [
-      // England - North West
-      'Cheshire', 'Cumbria', 'Greater Manchester', 'Lancashire', 'Merseyside',
-      // England - North East
-      'County Durham', 'Northumberland', 'Tyne and Wear',
-      // England - Yorkshire and the Humber
-      'East Riding of Yorkshire', 'North Yorkshire', 'South Yorkshire', 'West Yorkshire',
-      // England - East Midlands
-      'Derbyshire', 'Leicestershire', 'Lincolnshire', 'Northamptonshire', 'Nottinghamshire', 'Rutland',
-      // England - West Midlands
-      'Herefordshire', 'Shropshire', 'Staffordshire', 'Warwickshire', 'West Midlands', 'Worcestershire',
-      // England - East of England
-      'Bedfordshire', 'Cambridgeshire', 'Essex', 'Hertfordshire', 'Norfolk', 'Suffolk',
-      // England - South East
-      'Berkshire', 'Buckinghamshire', 'East Sussex', 'Hampshire', 'Isle of Wight', 'Kent', 'Oxfordshire', 'Surrey', 'West Sussex',
-      // England - South West
-      'Bristol', 'Cornwall', 'Devon', 'Dorset', 'Gloucestershire', 'Somerset', 'Wiltshire',
-      // England - London
-      'Greater London',
-      // Scotland
-      'Aberdeenshire', 'Angus', 'Argyll and Bute', 'City of Edinburgh', 'Clackmannanshire', 
-      'Dumfries and Galloway', 'Dundee City', 'East Ayrshire', 'East Dunbartonshire', 'East Lothian',
-      'East Renfrewshire', 'Falkirk', 'Fife', 'Glasgow City', 'Highland', 'Inverclyde',
-      'Midlothian', 'Moray', 'North Ayrshire', 'North Lanarkshire', 'Orkney Islands',
-      'Perth and Kinross', 'Renfrewshire', 'Scottish Borders', 'Shetland Islands', 'South Ayrshire',
-      'South Lanarkshire', 'Stirling', 'West Dunbartonshire', 'West Lothian', 'Western Isles',
-      // Wales
-      'Anglesey', 'Blaenau Gwent', 'Bridgend', 'Caerphilly', 'Cardiff', 'Carmarthenshire',
-      'Ceredigion', 'Conwy', 'Denbighshire', 'Flintshire', 'Gwynedd', 'Merthyr Tydfil',
-      'Monmouthshire', 'Neath Port Talbot', 'Newport', 'Pembrokeshire', 'Powys', 'Rhondda Cynon Taf',
-      'Swansea', 'Torfaen', 'Vale of Glamorgan', 'Wrexham',
-      // Northern Ireland
-      'Antrim', 'Armagh', 'Down', 'Fermanagh', 'Londonderry', 'Tyrone'
-    ].sort();
-
-    let allUsers = [];
-
-    // Load all users on page load
+    // Initialize
     document.addEventListener('DOMContentLoaded', () => {
-      loadAllUsers();
+      loadDashboardStats();
+      loadCalendar();
+      loadBookings();
+      loadCustomers();
     });
 
-    // Search functionality
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-      filterUsers(e.target.value);
-    });
+    // Navigation
+    function showSection(sectionId) {
+      document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      
+      document.getElementById(sectionId).classList.add('active');
+      
+      const navItem = [...document.querySelectorAll('.nav-item')].find(n => 
+        n.getAttribute('onclick')?.includes(`showSection('${sectionId}')`)
+      );
+      if (navItem) navItem.classList.add('active');
 
-    async function loadAllUsers() {
-      const container = document.getElementById('usersContainer');
-      container.innerHTML = `
-        <div class="loading-message">
-          <div class="spinner"></div>
-          <p>Loading user accounts...</p>
-        </div>
-      `;
+      // Close sidebar on mobile
+      if (window.innerWidth <= 1024) {
+        document.getElementById('adminSidebar').classList.remove('open');
+      }
+    }
 
+    function toggleSidebar() {
+      document.getElementById('adminSidebar').classList.toggle('open');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    // Dashboard Stats
+    async function loadDashboardStats() {
       try {
-        const response = await fetch('/.netlify/functions/admin-users', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+        const response = await fetch('/.netlify/functions/admin-bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
         });
 
-        if (!response.ok) {
-          throw new Error('Failed to load users');
+        const data = await response.json();
+        
+        if (data.success) {
+          document.getElementById('totalBookings').textContent = data.stats.total;
+          document.getElementById('upcomingBookings').textContent = data.stats.upcoming;
+          document.getElementById('reservedBookings').textContent = data.stats.reserved;
         }
 
-        const data = await response.json();
-        allUsers = data.users || [];
-
-        updateStats(allUsers);
-        displayUsers(allUsers);
+        // Load customer count
+        const customersResponse = await fetch('/.netlify/functions/admin-users');
+        const customersData = await customersResponse.json();
+        
+        if (customersData.success) {
+          document.getElementById('totalCustomers').textContent = customersData.total;
+        }
 
       } catch (error) {
-        console.error('Error loading users:', error);
-        container.innerHTML = `
-          <div class="error-message">
-            ❌ Failed to load users. Please ensure the admin-users function is deployed.
-            <br><br>
-            <button class="btn btn-primary" onclick="loadAllUsers()">Try Again</button>
-          </div>
-        `;
+        console.error('Error loading dashboard stats:', error);
       }
     }
 
-    function updateStats(users) {
-      const totalUsers = users.length;
-      const activeUsers = users.filter(u => u.fields['Account Status'] === 'Active').length;
-      
-      // Calculate new users this month
-      const now = new Date();
-      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const newThisMonth = users.filter(u => {
-        const created = new Date(u.fields['Created Date']);
-        return created >= firstDayOfMonth;
-      }).length;
-
-      document.getElementById('totalUsers').textContent = totalUsers;
-      document.getElementById('activeUsers').textContent = activeUsers;
-      document.getElementById('newThisMonth').textContent = newThisMonth;
+    // Calendar Functions
+    function setCalendarView(view) {
+      currentView = view;
+      document.querySelectorAll('.calendar-view-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === view);
+      });
+      loadCalendar();
     }
 
-    function displayUsers(users) {
-      const container = document.getElementById('usersContainer');
+    function previousPeriod() {
+      if (currentView === 'month') {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+      } else if (currentView === 'week') {
+        currentDate.setDate(currentDate.getDate() - 7);
+      } else {
+        currentDate.setDate(currentDate.getDate() - 1);
+      }
+      loadCalendar();
+    }
+
+    function nextPeriod() {
+      if (currentView === 'month') {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+      } else if (currentView === 'week') {
+        currentDate.setDate(currentDate.getDate() + 7);
+      } else {
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      loadCalendar();
+    }
+
+    async function loadCalendar() {
+      const grid = document.getElementById('calendarGrid');
+      const currentEl = document.getElementById('calendarCurrent');
+      const region = document.getElementById('calendarRegion')?.value || '';
+
+      grid.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+
+      try {
+        let startDate, endDate;
+
+        if (currentView === 'month') {
+          const year = currentDate.getFullYear();
+          const month = currentDate.getMonth();
+          startDate = new Date(year, month, 1).toISOString().split('T')[0];
+          endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
+          
+          currentEl.textContent = currentDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+        } else if (currentView === 'week') {
+          const day = currentDate.getDay();
+          const diff = currentDate.getDate() - day + (day === 0 ? -6 : 1);
+          const monday = new Date(currentDate.setDate(diff));
+          const sunday = new Date(monday);
+          sunday.setDate(monday.getDate() + 6);
+          
+          startDate = monday.toISOString().split('T')[0];
+          endDate = sunday.toISOString().split('T')[0];
+          
+          currentEl.textContent = `Week of ${monday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })} - ${sunday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+        } else {
+          startDate = currentDate.toISOString().split('T')[0];
+          endDate = startDate;
+          
+          currentEl.textContent = currentDate.toLocaleDateString('en-GB', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+        }
+
+        const response = await fetch('/.netlify/functions/admin-bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ startDate, endDate, region })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          if (currentView === 'month') {
+            renderMonthView(data.bookings);
+          } else if (currentView === 'week') {
+            renderWeekView(data.bookings);
+          } else {
+            renderDayView(data.bookings);
+          }
+        }
+
+      } catch (error) {
+        console.error('Error loading calendar:', error);
+        grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading calendar</div>';
+      }
+    }
+
+    function renderMonthView(bookings) {
+      const grid = document.getElementById('calendarGrid');
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
       
-      if (users.length === 0) {
-        container.innerHTML = '<div class="loading-message"><p>No users found</p></div>';
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startingDayOfWeek = firstDay.getDay() || 7; // 1=Monday, 7=Sunday
+
+      let html = '<div class="calendar-grid month">';
+      
+      // Day headers
+      ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(day => {
+        html += `<div class="calendar-day-header">${day}</div>`;
+      });
+
+      // Empty cells before first day
+      for (let i = 1; i < startingDayOfWeek; i++) {
+        html += '<div class="calendar-day other-month"></div>';
+      }
+
+      // Days of month
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayBookings = bookings.filter(b => b.fields['Date'] === dateStr);
+        
+        const today = new Date();
+        const isToday = dateStr === today.toISOString().split('T')[0];
+        
+        html += `<div class="calendar-day ${isToday ? 'today' : ''}">`;
+        html += `<div class="calendar-day-number">${day}</div>`;
+        
+        dayBookings.forEach(booking => {
+          const statusClass = booking.fields['Payment Status'] === 'Reserved' ? 'reserved' : 
+                              booking.fields['Booking Status'] === 'Cancelled' ? 'cancelled' : '';
+          html += `<div class="calendar-booking ${statusClass}" onclick='viewBooking(${JSON.stringify(booking).replace(/'/g, "&#39;")})'>${booking.fields['Time']} ${booking.fields['Client Name']}</div>`;
+        });
+        
+        html += '</div>';
+      }
+
+      html += '</div>';
+      grid.innerHTML = html;
+    }
+
+    function renderWeekView(bookings) {
+      const grid = document.getElementById('calendarGrid');
+      // Implementation for week view
+      grid.innerHTML = '<div style="padding: 40px; text-align: center;">Week view coming soon...</div>';
+    }
+
+    function renderDayView(bookings) {
+      const grid = document.getElementById('calendarGrid');
+      // Implementation for day view
+      grid.innerHTML = '<div style="padding: 40px; text-align: center;">Day view coming soon...</div>';
+    }
+
+    // Bookings Functions
+    async function loadBookings() {
+      const container = document.getElementById('bookingsContainer');
+      container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+
+      try {
+        const search = document.getElementById('bookingSearch')?.value || '';
+        const region = document.getElementById('bookingRegion')?.value || '';
+        const status = document.getElementById('bookingStatus')?.value || '';
+
+        const response = await fetch('/.netlify/functions/admin-bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ region, status })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          allBookings = data.bookings;
+          renderBookingsTable(allBookings, search);
+        }
+
+      } catch (error) {
+        console.error('Error loading bookings:', error);
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading bookings</div>';
+      }
+    }
+
+    function renderBookingsTable(bookings, search = '') {
+      const container = document.getElementById('bookingsContainer');
+      
+      let filtered = bookings;
+      if (search) {
+        const term = search.toLowerCase();
+        filtered = bookings.filter(b => 
+          (b.fields['Client Name'] || '').toLowerCase().includes(term) ||
+          (b.fields['Client Email'] || '').toLowerCase().includes(term) ||
+          (b.fields['Property Address'] || '').toLowerCase().includes(term) ||
+          (b.fields['Booking Reference'] || '').toLowerCase().includes(term)
+        );
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 40px;">No bookings found</div>';
         return;
       }
 
-      const tableHTML = `
-        <table class="users-table">
+      let html = `
+        <table class="data-table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Company</th>
-              <th>Created</th>
+              <th>Reference</th>
+              <th>Date & Time</th>
+              <th>Client</th>
+              <th>Address</th>
+              <th>Service</th>
               <th>Status</th>
-              <th>Region</th>
-              <th>Email Alerts</th>
+              <th>Drive Time</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            ${users.map(user => `
-              <tr>
-                <td data-label="Name"><strong>${escapeHtml(user.fields['Name'] || 'N/A')}</strong></td>
-                <td data-label="Email">${escapeHtml(user.fields['Email'] || 'N/A')}</td>
-                <td data-label="Company">${escapeHtml(user.fields['Company'] || 'N/A')}</td>
-                <td data-label="Created">${formatDate(user.fields['Created Date'])}</td>
-                <td data-label="Status">
-                  <span class="status-badge ${user.fields['Account Status'] === 'Active' ? 'status-active' : 'status-inactive'}">
-                    ${user.fields['Account Status'] || 'Unknown'}
-                  </span>
-                </td>
-                <td data-label="Region">
-                  <select 
-                    class="region-select" 
-                    data-user-email="${user.fields['Email']}" 
-                    data-record-id="${user.id}"
-                    data-original-value="${user.fields['Region'] || ''}"
-                    onchange="updateUserRegion(this)"
-                  >
-                    <option value="">Select Region...</option>
-                    ${UK_REGIONS.map(region => `
-                      <option value="${region}" ${user.fields['Region'] === region ? 'selected' : ''}>
-                        ${region}
-                      </option>
-                    `).join('')}
-                  </select>
-                </td>
-                <td data-label="Email Alerts">
-                  <label class="toggle-switch">
-                    <input 
-                      type="checkbox" 
-                      ${user.fields['Email Notifications Enabled'] === true ? 'checked' : ''} 
-                      onchange='toggleEmailNotifications("${user.fields['Email']}", this.checked, "${user.id}")'
-                    >
-                    <span class="toggle-slider"></span>
-                  </label>
-                </td>
-                <td data-label="Actions">
-                  <div class="action-buttons">
-                    <button class="btn btn-primary btn-small" onclick='viewUserDetails(${JSON.stringify(user).replace(/'/g, "&#39;")})'>
-                      👁️ View
-                    </button>
-                    <button class="btn btn-secondary btn-small" onclick='impersonateUser("${user.fields['Email']}")'>
-                      🔑 Login As
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
       `;
 
-      container.innerHTML = tableHTML;
-    }
+      filtered.forEach(booking => {
+        const driveTimeInfo = booking.driveTimeInfo;
+        const driveTimeBadge = driveTimeInfo ? `
+          <span class="drive-time-badge ${driveTimeInfo.hasConflict ? 'error' : driveTimeInfo.bufferTime.surplus < 15 ? 'warning' : ''}">
+            🚗 ${driveTimeInfo.driveTimeFormatted} ${driveTimeInfo.hasConflict ? '⚠️' : ''}
+          </span>
+        ` : '-';
 
-    async function updateUserRegion(selectElement) {
-      const email = selectElement.dataset.userEmail;
-      const recordId = selectElement.dataset.recordId;
-      const region = selectElement.value;
-      
-      const originalValue = selectElement.dataset.originalValue || '';
-      selectElement.disabled = true;
-      
-      try {
-        const response = await fetch('/.netlify/functions/update-user-region', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userEmail: email,
-            recordId: recordId,
-            region: region
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to update region');
-        }
-
-        const result = await response.json();
-
-        // Update the user in allUsers array
-        const userIndex = allUsers.findIndex(u => u.fields['Email'] === email);
-        if (userIndex !== -1) {
-          allUsers[userIndex].fields['Region'] = region;
-        }
-
-        // Store new value
-        selectElement.dataset.originalValue = region;
-        selectElement.disabled = false;
-        
-        console.log(`✅ Region updated to "${region}" for ${email}`);
-
-      } catch (error) {
-        console.error('Error updating region:', error);
-        alert(`❌ Failed to update region: ${error.message}`);
-        
-        // Revert selection
-        selectElement.value = originalValue;
-        selectElement.disabled = false;
-      }
-    }
-
-    async function toggleEmailNotifications(email, enabled, recordId) {
-      try {
-        // Show loading state
-        const toggleInput = event.target;
-        toggleInput.disabled = true;
-
-        const response = await fetch('/.netlify/functions/toggle-email-notifications', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            userEmail: email,
-            enabled: enabled,
-            recordId: recordId
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to update email notification settings');
-        }
-
-        const result = await response.json();
-        
-        // Update the user in allUsers array
-        const userIndex = allUsers.findIndex(u => u.fields['Email'] === email);
-        if (userIndex !== -1) {
-          allUsers[userIndex].fields['Email Notifications Enabled'] = enabled;
-        }
-
-        // Show success message briefly
-        const statusText = enabled ? 'enabled' : 'disabled';
-        console.log(`✅ Email notifications ${statusText} for ${email}`);
-        
-        toggleInput.disabled = false;
-
-      } catch (error) {
-        console.error('Error toggling email notifications:', error);
-        alert(`❌ Failed to update email notifications: ${error.message}`);
-        
-        // Revert the toggle
-        event.target.checked = !enabled;
-        event.target.disabled = false;
-      }
-    }
-
-    function filterUsers(searchTerm) {
-      if (!searchTerm) {
-        displayUsers(allUsers);
-        return;
-      }
-
-      const term = searchTerm.toLowerCase();
-      const filtered = allUsers.filter(user => {
-        const name = (user.fields['Name'] || '').toLowerCase();
-        const email = (user.fields['Email'] || '').toLowerCase();
-        const company = (user.fields['Company'] || '').toLowerCase();
-        
-        return name.includes(term) || email.includes(term) || company.includes(term);
+        html += `
+          <tr>
+            <td data-label="Reference"><strong>${booking.fields['Booking Reference']}</strong></td>
+            <td data-label="Date & Time">${booking.fields['Date']}<br>${booking.fields['Time']}</td>
+            <td data-label="Client">
+              ${booking.fields['Client Name']}<br>
+              <small style="color: #64748b;">${booking.fields['Client Email']}</small>
+            </td>
+            <td data-label="Address">${booking.fields['Property Address'] || '-'}</td>
+            <td data-label="Service">${booking.fields['Service Name'] || '-'}</td>
+            <td data-label="Status">
+              <span class="status-badge status-${(booking.fields['Payment Status'] || '').toLowerCase()}">
+                ${booking.fields['Payment Status'] || '-'}
+              </span>
+            </td>
+            <td data-label="Drive Time">${driveTimeBadge}</td>
+            <td data-label="Actions">
+              <button class="btn btn-primary btn-small" onclick='viewBooking(${JSON.stringify(booking).replace(/'/g, "&#39;")})'>
+                View
+              </button>
+            </td>
+          </tr>
+        `;
       });
 
-      displayUsers(filtered);
+      html += '</tbody></table>';
+      container.innerHTML = html;
     }
 
-    function viewUserDetails(user) {
-      const modal = document.getElementById('userModal');
-      const modalTitle = document.getElementById('modalTitle');
-      const modalBody = document.getElementById('modalBody');
+    function viewBooking(booking) {
+      const modal = document.getElementById('bookingModal');
+      const title = document.getElementById('bookingModalTitle');
+      const body = document.getElementById('bookingModalBody');
 
-      modalTitle.textContent = `${user.fields['Name']} - Account Details`;
+      title.textContent = `Booking ${booking.fields['Booking Reference']}`;
 
-      const emailNotificationsStatus = user.fields['Email Notifications Enabled'] !== false ? 'Enabled' : 'Disabled';
-      const emailNotificationsColor = user.fields['Email Notifications Enabled'] !== false ? '#10b981' : '#ef4444';
-
-      modalBody.innerHTML = `
-        <div class="warning-box">
-          ⚠️ <strong>Security Note:</strong> Passwords are hashed and cannot be viewed for security reasons.
+      const driveTimeSection = booking.driveTimeInfo ? `
+        <div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 12px; padding: 16px; margin: 16px 0;">
+          <h4 style="margin: 0 0 12px 0; color: #1e40af;">🚗 Drive Time Information</h4>
+          <div class="detail-item">
+            <span class="detail-label">From Previous Booking</span>
+            <span class="detail-value">${booking.driveTimeInfo.fromBooking}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Drive Time</span>
+            <span class="detail-value">${booking.driveTimeInfo.driveTimeFormatted}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Previous End Time</span>
+            <span class="detail-value">${booking.driveTimeInfo.previousBookingEndTime}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Current Start Time</span>
+            <span class="detail-value">${booking.driveTimeInfo.currentBookingStartTime}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Buffer Time</span>
+            <span class="detail-value">
+              ${booking.driveTimeInfo.bufferTime.available} min 
+              (${booking.driveTimeInfo.bufferTime.sufficient ? '✓ Sufficient' : '⚠️ Tight Schedule'})
+            </span>
+          </div>
+          ${booking.driveTimeInfo.hasConflict ? `
+            <div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 12px; margin-top: 12px; color: #991b1b;">
+              <strong>⚠️ Schedule Conflict:</strong> Insufficient time between bookings
+            </div>
+          ` : ''}
         </div>
+      ` : '';
 
+      body.innerHTML = `
         <div class="detail-item">
-          <span class="detail-label">👤 Full Name</span>
-          <span class="detail-value">${escapeHtml(user.fields['Name'] || 'N/A')}</span>
+          <span class="detail-label">Reference</span>
+          <span class="detail-value">${booking.fields['Booking Reference']}</span>
         </div>
-
         <div class="detail-item">
-          <span class="detail-label">📧 Email Address</span>
-          <span class="detail-value">${escapeHtml(user.fields['Email'] || 'N/A')}</span>
+          <span class="detail-label">Date & Time</span>
+          <span class="detail-value">${booking.fields['Date']} at ${booking.fields['Time']}</span>
         </div>
-
         <div class="detail-item">
-          <span class="detail-label">🏢 Company</span>
-          <span class="detail-value">${escapeHtml(user.fields['Company'] || 'N/A')}</span>
+          <span class="detail-label">Client Name</span>
+          <span class="detail-value">${booking.fields['Client Name']}</span>
         </div>
-
         <div class="detail-item">
-          <span class="detail-label">📍 Region</span>
+          <span class="detail-label">Client Email</span>
+          <span class="detail-value">${booking.fields['Client Email']}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Property Address</span>
+          <span class="detail-value">${booking.fields['Property Address'] || '-'}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Service</span>
+          <span class="detail-value">${booking.fields['Service Name'] || '-'}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Payment Status</span>
           <span class="detail-value">
-            ${user.fields['Region'] ? 
-              `<span class="region-badge">${escapeHtml(user.fields['Region'])}</span>` : 
-              '<span class="region-badge empty">Not set</span>'
-            }
-          </span>
-        </div>
-
-        <div class="detail-item">
-          <span class="detail-label">📅 Account Created</span>
-          <span class="detail-value">${formatDate(user.fields['Created Date'])}</span>
-        </div>
-
-        <div class="detail-item">
-          <span class="detail-label">✅ Account Status</span>
-          <span class="detail-value">
-            <span class="status-badge ${user.fields['Account Status'] === 'Active' ? 'status-active' : 'status-inactive'}">
-              ${user.fields['Account Status'] || 'Unknown'}
+            <span class="status-badge status-${(booking.fields['Payment Status'] || '').toLowerCase()}">
+              ${booking.fields['Payment Status'] || '-'}
             </span>
           </span>
         </div>
-
-        <div class="detail-item">
-          <span class="detail-label">📬 Milestone Emails</span>
-          <span class="detail-value">
-            <span style="color: ${emailNotificationsColor}; font-weight: 600;">
-              ${emailNotificationsStatus}
-            </span>
-          </span>
-        </div>
-
-        <div class="detail-item">
-          <span class="detail-label">🔐 Password</span>
-          <span class="detail-value" style="color: #64748b; font-style: italic;">Encrypted (not visible)</span>
-        </div>
-
-        <div class="detail-item">
-          <span class="detail-label">🆔 Record ID</span>
-          <span class="detail-value" style="font-family: monospace; font-size: 12px;">${user.id}</span>
-        </div>
-
-       <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
-  <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
-    <button class="btn btn-danger" style="flex: 1;" onclick='redeemPoints("${user.fields['Email']}", "${user.fields['Name']}")'>
-      ⭐ Redeem Points
-    </button>
-    <button class="btn btn-primary" style="flex: 1;" onclick='impersonateUser("${user.fields['Email']}")'>
-      🔑 Login as ${user.fields['Name']}
-    </button>
-    <button class="btn btn-secondary" style="flex: 1;" onclick='checkMilestone("${user.fields['Email']}", "${user.fields['Name']}")'>
-      📧 Check Milestone
-    </button>
-  </div>
-  
-  <div style="padding: 16px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px;">
-    <div style="font-weight: 600; color: #065f46; margin-bottom: 12px; font-size: 14px;">➕ Manually Add Points</div>
-    <div style="display: flex; gap: 8px; align-items: center;">
-      <input 
-        type="number" 
-        id="manualPoints-${user.id}" 
-        placeholder="Enter points amount" 
-        min="1"
-        style="flex: 1; padding: 10px 14px; border: 2px solid #10b981; border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif;"
-      >
-      <button class="btn btn-primary" style="white-space: nowrap;" onclick='addManualPoints("${user.fields['Email']}", "${user.fields['Name']}", "${user.id}")'>
-        ➕ Add Points
-      </button>
-    </div>
-    <div style="font-size: 12px; color: #047857; margin-top: 8px;">Use this to add bonus/promotional points to the account</div>
-  </div>
-</div>
+        ${driveTimeSection}
+        ${booking.fields['Payment Status'] === 'Reserved' ? `
+          <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
+            <button class="btn btn-success" onclick='processPayment("${booking.id}", "${booking.fields['Booking Reference']}")' style="width: 100%;">
+              💳 Send Payment Link
+            </button>
+          </div>
+        ` : ''}
       `;
 
       modal.classList.add('active');
     }
 
-    function impersonateUser(email) {
-      if (!email) {
-        alert('Email address is required');
+    async function processPayment(bookingId, bookingRef) {
+      if (!confirm(`Send payment link for booking ${bookingRef}?`)) return;
+
+      try {
+        const response = await fetch('/.netlify/functions/process-reserved-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId, bookingRef })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert(`✓ Payment link sent successfully!\n\nLink: ${data.paymentLink}`);
+          closeModal('bookingModal');
+          loadBookings();
+          loadDashboardStats();
+        } else {
+          alert(`Error: ${data.error}`);
+        }
+
+      } catch (error) {
+        console.error('Error processing payment:', error);
+        alert('Error sending payment link');
+      }
+    }
+
+    // Customers Functions
+    async function loadCustomers() {
+      const container = document.getElementById('customersContainer');
+      container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+
+      try {
+        const response = await fetch('/.netlify/functions/admin-users');
+        const data = await response.json();
+
+        if (data.success) {
+          allCustomers = data.users;
+          renderCustomersTable(allCustomers);
+        }
+
+      } catch (error) {
+        console.error('Error loading customers:', error);
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading customers</div>';
+      }
+    }
+
+    function renderCustomersTable(customers) {
+      const container = document.getElementById('customersContainer');
+      const search = document.getElementById('customerSearch')?.value || '';
+
+      let filtered = customers;
+      if (search) {
+        const term = search.toLowerCase();
+        filtered = customers.filter(c => 
+          (c.fields['Name'] || '').toLowerCase().includes(term) ||
+          (c.fields['Email'] || '').toLowerCase().includes(term) ||
+          (c.fields['Company'] || '').toLowerCase().includes(term)
+        );
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 40px;">No customers found</div>';
         return;
       }
 
-      // Find the full user data
-      const user = allUsers.find(u => u.fields['Email'] === email);
+      let html = `
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Company</th>
+              <th>Status</th>
+              <th>Reserve Privilege</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      filtered.forEach(customer => {
+        const allowReserve = customer.fields['Allow Reserve Without Payment'] === true;
+
+        html += `
+          <tr>
+            <td data-label="Name"><strong>${customer.fields['Name']}</strong></td>
+            <td data-label="Email">${customer.fields['Email']}</td>
+            <td data-label="Company">${customer.fields['Company'] || '-'}</td>
+            <td data-label="Status">
+              <span class="status-badge status-${(customer.fields['Account Status'] || '').toLowerCase()}">
+                ${customer.fields['Account Status'] || '-'}
+              </span>
+            </td>
+            <td data-label="Reserve Privilege">
+              <label class="toggle-switch">
+                <input 
+                  type="checkbox" 
+                  ${allowReserve ? 'checked' : ''} 
+                  onchange='toggleReservePrivilege("${customer.id}", "${customer.fields['Email']}", this.checked)'
+                >
+                <span class="toggle-slider"></span>
+              </label>
+            </td>
+            <td data-label="Actions">
+              <button class="btn btn-primary btn-small" onclick='viewCustomer(${JSON.stringify(customer).replace(/'/g, "&#39;")})'>
+                View
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function viewCustomer(customer) {
+      const modal = document.getElementById('customerModal');
+      const title = document.getElementById('customerModalTitle');
+      const body = document.getElementById('customerModalBody');
+
+      title.textContent = customer.fields['Name'];
+
+      const allowReserve = customer.fields['Allow Reserve Without Payment'] === true;
+
+      body.innerHTML = `
+        <div class="detail-item">
+          <span class="detail-label">Name</span>
+          <span class="detail-value">${customer.fields['Name']}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Email</span>
+          <span class="detail-value">${customer.fields['Email']}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Company</span>
+          <span class="detail-value">${customer.fields['Company'] || '-'}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Account Status</span>
+          <span class="detail-value">
+            <span class="status-badge status-${(customer.fields['Account Status'] || '').toLowerCase()}">
+              ${customer.fields['Account Status'] || '-'}
+            </span>
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Created Date</span>
+          <span class="detail-value">${customer.fields['Created Date']}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Allow Reserve Without Payment</span>
+          <span class="detail-value">
+            <label class="toggle-switch">
+              <input 
+                type="checkbox" 
+                ${allowReserve ? 'checked' : ''} 
+                onchange='toggleReservePrivilege("${customer.id}", "${customer.fields['Email']}", this.checked)'
+              >
+              <span class="toggle-slider"></span>
+            </label>
+          </span>
+        </div>
+        <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
+          <button class="btn btn-primary" onclick='impersonateUser("${customer.fields['Email']}")' style="width: 100%;">
+            🔑 Login as ${customer.fields['Name']}
+          </button>
+        </div>
+      `;
+
+      modal.classList.add('active');
+    }
+
+    async function toggleReservePrivilege(recordId, email, enabled) {
+      try {
+        const response = await fetch('/.netlify/functions/update-reserve-privilege', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ recordId, email, enabled })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          console.log(`✓ Reserve privilege ${enabled ? 'enabled' : 'disabled'} for ${email}`);
+          // Update local cache
+          const customer = allCustomers.find(c => c.id === recordId);
+          if (customer) {
+            customer.fields['Allow Reserve Without Payment'] = enabled;
+          }
+        } else {
+          alert(`Error: ${data.message}`);
+          // Revert toggle
+          event.target.checked = !enabled;
+        }
+
+      } catch (error) {
+        console.error('Error toggling reserve privilege:', error);
+        alert('Error updating privilege');
+        event.target.checked = !enabled;
+      }
+    }
+
+    function impersonateUser(email) {
+      const user = allCustomers.find(c => c.fields['Email'] === email);
       if (!user) {
         alert('User data not found');
         return;
       }
 
-      if (confirm(`Are you sure you want to login as ${email}?\n\nThis will open their dashboard in a new tab with FULL access to their account.`)) {
-        // Create a session that AirtableAPI will recognize
+      if (confirm(`Login as ${user.fields['Name']}?\n\nThis will open their dashboard in a new tab.`)) {
         const sessionData = {
           email: email,
           name: user.fields['Name'] || 'Client',
@@ -1785,234 +1573,25 @@
 
         const token = btoa(JSON.stringify(sessionData));
         
-        // Build the full URL with parameters
         const baseUrl = window.location.origin;
         const dashboardUrl = baseUrl + '/website/dashboard.html?admin_session=' + encodeURIComponent(token) + 
                             '&admin_email=' + encodeURIComponent(email) +
                             '&admin_name=' + encodeURIComponent(user.fields['Name'] || 'Client') +
                             '&admin_company=' + encodeURIComponent(user.fields['Company'] || '');
         
-        console.log('Opening dashboard at:', dashboardUrl);
         window.open(dashboardUrl, '_blank');
-        
-        alert(`✅ Logged in as ${user.fields['Name']}\n\nOpening their dashboard now...`);
+        alert(`✓ Logged in as ${user.fields['Name']}`);
       }
     }
 
-    function closeModal() {
-      document.getElementById('userModal').classList.remove('active');
-    }
-
-    function formatDate(dateString) {
-      if (!dateString) return 'N/A';
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      });
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-async function redeemPoints(email, name) {
-  if (!email) {
-    alert('Email address is required');
-    return;
-  }
-  
-  const user = allUsers.find(u => u.fields['Email'] === email);
-  if (!user) {
-    alert('User data not found');
-    return;
-  }
-  
-  try {
-    // Get booking points from Acuity
-    const acuityResponse = await fetch('/.netlify/functions/acuity-data', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userEmail: email })
-    });
-    
-    if (!acuityResponse.ok) {
-      throw new Error('Failed to fetch Acuity data');
-    }
-
-    const acuityData = await acuityResponse.json();
-    const bookingPoints = Math.floor(acuityData.totalInvestment ?? 0);
-    
-    // Get manual points AND baseline from Airtable
-    const manualPointsResponse = await fetch('/.netlify/functions/get-manual-points', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userEmail: email })
-    });
-    
-    const manualPointsData = await manualPointsResponse.json();
-    const manualPoints = manualPointsData?.manualPoints || 0;
-    const lastRedemptionBaseline = manualPointsData?.lastRedemptionBaseline || 0;
-    
-    // Calculate NET booking points (subtract baseline) and total points
-    const netBookingPoints = Math.max(0, bookingPoints - lastRedemptionBaseline);
-    const currentPoints = netBookingPoints + manualPoints;
-    const pointsValue = (currentPoints / 100).toFixed(2);
-
-    if (currentPoints === 0) {
-      alert(`${name} has no points to redeem.`);
-      return;
-    }
-
-    // Ask how many points to redeem
-    const pointsToRedeem = prompt(`How many points would you like to redeem for ${name}?\n\nAvailable: ${currentPoints} pts (£${pointsValue})\n  • Net Booking Points: ${netBookingPoints}\n  • Manual Points: ${manualPoints}\n\nEnter amount (or leave blank to redeem all):`);
-    
-    if (pointsToRedeem === null) {
-      return; // User cancelled
-    }
-
-    let finalPointsToRedeem = currentPoints; // Default: redeem all
-    
-    if (pointsToRedeem.trim() !== '') {
-      finalPointsToRedeem = parseInt(pointsToRedeem);
-      
-      if (isNaN(finalPointsToRedeem) || finalPointsToRedeem <= 0) {
-        alert('Please enter a valid number greater than 0.');
-        return;
-      }
-      
-      if (finalPointsToRedeem > currentPoints) {
-        alert(`Cannot redeem ${finalPointsToRedeem} points. Only ${currentPoints} points available.`);
-        return;
-      }
-    }
-
-    const finalValue = (finalPointsToRedeem / 100).toFixed(2);
-
-    if (!confirm(`Confirm redemption for ${name}?\n\nRedeeming: ${finalPointsToRedeem} pts (£${finalValue})\nRemaining: ${currentPoints - finalPointsToRedeem} pts\n\nContinue?`)) {
-      return;
-    }
-
-    // Call the redemption endpoint
-    const response = await fetch('/.netlify/functions/redeem-points', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        userEmail: email,
-        redeemedPoints: finalPointsToRedeem,
-        redeemedValue: finalValue,
-        acuityTotalInvestment: acuityData.totalInvestment,
-        currentTotalPoints: currentPoints
-      })
+    // Real-time search
+    document.getElementById('bookingSearch')?.addEventListener('input', (e) => {
+      renderBookingsTable(allBookings, e.target.value);
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to redeem points');
-    }
-
-    const result = await response.json();
-    
-    alert(`✅ Points redeemed successfully!\n\n${name} redeemed ${finalPointsToRedeem} points (£${finalValue})\n\nRemaining: ${currentPoints - finalPointsToRedeem} points`);
-    
-    // Refresh the user list and close modal
-    loadAllUsers();
-    closeModal();
-
-  } catch (error) {
-    console.error('Error redeeming points:', error);
-    alert(`❌ Failed to redeem points: ${error.message}\n\nPlease try again.`);
-  }
-}
-
-async function addManualPoints(email, name, userId) {
-  const input = document.getElementById(`manualPoints-${userId}`);
-  const pointsToAdd = parseInt(input.value);
-  if (!pointsToAdd || pointsToAdd <= 0) {
-    alert('Please enter a valid points amount (greater than 0)');
-    return;
-  }
-  if (!confirm(`Add ${pointsToAdd} bonus points to ${name}?\n\nThis will be recorded as a manual adjustment and will increase their total points balance.`)) {
-    return;
-  }
-  try {
-    const response = await fetch('/.netlify/functions/add-manual-points', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        userEmail: email,
-        pointsToAdd: pointsToAdd,
-        addedBy: 'Admin',
-        reason: 'Manual adjustment'
-      })
+    document.getElementById('customerSearch')?.addEventListener('input', (e) => {
+      renderCustomersTable(allCustomers);
     });
-    if (!response.ok) {
-      throw new Error('Failed to add points');
-    }
-    const result = await response.json();
-    alert(`✅ Successfully added ${pointsToAdd} points to ${name}!\n\nNew total: ${result.newTotal} points`);
-    // Clear input and refresh
-    input.value = '';
-    loadAllUsers();
-    closeModal();
-  } catch (error) {
-    console.error('Error adding points:', error);
-    alert(`❌ Failed to add points: ${error.message}\n\nPlease try again.`);
-  }
-}
-
-async function checkMilestone(email, name) {
-  if (!email) {
-    alert('Email address is required');
-    return;
-  }
-  
-  if (!confirm(`Check milestone for ${name}?\n\nThis will check if they've reached a new milestone and send an email if applicable.`)) {
-    return;
-  }
-  
-  try {
-    const response = await fetch('/.netlify/functions/check-milestone', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userEmail: email })
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to check milestone');
-    }
-    
-    const result = await response.json();
-    
-    if (result.skipped) {
-      alert(`ℹ️ Email notifications are disabled for ${name}`);
-    } else if (result.emailSent) {
-      alert(`✅ Milestone email sent to ${name}!\n\nMilestone: ${result.milestone.tier} (${result.milestone.points} points)\nCurrent Balance: ${result.currentBalance} points`);
-    } else {
-      alert(`ℹ️ No new milestone reached for ${name}\n\nCurrent Balance: ${result.currentBalance} points\nLast Milestone: ${result.lastMilestoneReached} points`);
-    }
-    
-    // Refresh user list
-    loadAllUsers();
-    
-  } catch (error) {
-    console.error('Error checking milestone:', error);
-    alert(`❌ Failed to check milestone: ${error.message}\n\nPlease try again.`);
-  }
-}
-
-// Scroll input into view when keyboard appears on mobile/tablet
-if (window.innerWidth <= 1024) {
-  document.addEventListener('focusin', function(e) {
-    if (e.target.matches('input[type="number"]')) {
-      setTimeout(() => {
-        e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 300);
-    }
-  });
-}
-</script>
+  </script>
 </body>
 </html>

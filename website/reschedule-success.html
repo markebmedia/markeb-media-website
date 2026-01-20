@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cancellation Confirmed - Markeb Media</title>
+  <title>Booking Rescheduled - Markeb Media</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
@@ -44,7 +44,7 @@
     .icon {
       width: 80px;
       height: 80px;
-      background: #fef3c7;
+      background: #dbeafe;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -73,26 +73,42 @@
       margin-bottom: 32px;
     }
 
-    .alert {
-      background: #fef3c7;
-      border: 2px solid #f59e0b;
+    .info-box {
+      background: #f0fdf4;
+      border: 2px solid #10b981;
       border-radius: 12px;
       padding: 20px;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
       text-align: left;
     }
 
-    .alert h3 {
-      color: #92400e;
+    .info-box h3 {
+      color: #065f46;
       font-size: 16px;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
-    .alert p {
-      color: #92400e;
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
       font-size: 14px;
-      line-height: 1.6;
+      border-bottom: 1px solid #d1fae5;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: #064e3b;
+      font-weight: 600;
+    }
+
+    .info-value {
+      color: #065f46;
+      text-align: right;
     }
 
     .btn {
@@ -105,11 +121,22 @@
       font-size: 16px;
       text-decoration: none;
       transition: all 0.2s ease;
+      margin: 0 6px;
     }
 
     .btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .footer {
@@ -118,6 +145,22 @@
       border-top: 2px solid #e2e8f0;
       color: #64748b;
       font-size: 14px;
+    }
+
+    .alert {
+      background: #eff6ff;
+      border: 2px solid #3b82f6;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      color: #1e40af;
+      text-align: left;
+    }
+
+    .alert strong {
+      display: block;
+      margin-bottom: 8px;
     }
   </style>
 </head>
@@ -128,24 +171,41 @@
         <img src="/public/images/Markeb Media Logo (2).png" alt="Markeb Media">
       </div>
 
-      <div class="icon">⚠️</div>
+      <div class="icon">📅</div>
 
-      <h1>Booking Cancelled</h1>
+      <h1>Booking Rescheduled!</h1>
       
       <p class="booking-ref">
         Reference: <strong id="bookingRef">Loading...</strong>
       </p>
 
       <div class="message">
-        <p>Your booking has been cancelled and the cancellation fee has been processed. You will receive a confirmation email shortly with full details.</p>
+        <p>Your booking has been successfully rescheduled. You will receive a confirmation email shortly with all the updated details.</p>
+      </div>
+
+      <div class="info-box">
+        <h3>New Booking Details</h3>
+        <div class="info-row">
+          <span class="info-label">New Date:</span>
+          <span class="info-value" id="newDate">-</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">New Time:</span>
+          <span class="info-value" id="newTime">-</span>
+        </div>
       </div>
 
       <div class="alert">
-        <h3>Cancellation Fee Charged</h3>
-        <p>The cancellation fee has been charged to your payment method. This is in accordance with our cancellation policy for late cancellations.</p>
+        <strong>📋 Important Reminders</strong>
+        • Free cancellation available until 24 hours before your shoot<br>
+        • Please ensure property access is arranged<br>
+        • Check your email for full booking details
       </div>
 
-      <a href="/booking" class="btn">Book a New Shoot</a>
+      <div style="margin-top: 32px;">
+        <a href="#" id="manageBookingLink" class="btn">View Booking Details</a>
+        <a href="/booking" class="btn btn-secondary">Book Another Shoot</a>
+      </div>
 
       <div class="footer">
         <p>Questions? Contact us at <a href="mailto:commercial@markebmedia.com" style="color: #3b82f6; text-decoration: none;">commercial@markebmedia.com</a></p>
@@ -153,16 +213,33 @@
     </div>
   </div>
 
-  <script>
-    // Get booking reference from URL
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const bookingRef = urlParams.get('ref');
+    const newDate = urlParams.get('date');
+    const newTime = urlParams.get('time');
+    const email = urlParams.get('email');
     
+    // Display booking reference
     if (bookingRef) {
       document.getElementById('bookingRef').textContent = bookingRef;
     } else {
       document.getElementById('bookingRef').textContent = 'N/A';
     }
-  </script>
-</body>
-</html>
+
+    // Display new date
+    if (newDate) {
+      const date = new Date(newDate + 'T12:00:00');
+      const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+      document.getElementById('newDate').textContent = date.toLocaleDateString('en-GB', options);
+    }
+
+    // Display new time
+    if (newTime) {
+      const [hours, minutes] = newTime.split(':');
+      const hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12;
+      document.getElementById('newTime').textContent = `${hour12}:${minutes} ${ampm}`;
+    }
