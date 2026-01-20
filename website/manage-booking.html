@@ -555,19 +555,25 @@
       document.getElementById('confirmRescheduleBtn').disabled = true;
     }
 
-    // ✅ NEW: Check availability when date is selected (SAME AS BOOKING.HTML)
+    // ✅ FIXED: Check availability using the booking's stored postcode
     async function checkRescheduleAvailability() {
       const newDate = document.getElementById('newDate').value;
       
       if (!newDate) return;
 
-      // Extract postcode from property address
-      const postcode = extractPostcode(bookingData.propertyAddress);
+      // ✅ Use the postcode stored with the booking (not extracted from address)
+      const postcode = bookingData.postcode;
       
       if (!postcode) {
-        alert('Unable to extract postcode from property address. Please contact support.');
+        alert('Unable to determine booking postcode. Please contact support.');
         return;
       }
+
+      console.log('Checking availability for reschedule:', {
+        postcode: postcode,
+        region: bookingData.region,
+        date: newDate
+      });
 
       // Show loading state
       document.getElementById('availabilityLoading').classList.remove('hidden');
@@ -576,13 +582,13 @@
       document.getElementById('confirmRescheduleBtn').disabled = true;
 
       try {
-        // ✅ SAME CALL AS BOOKING.HTML - with lowercase region
+        // ✅ SAME CALL AS BOOKING.HTML - region will be normalised server-side
         const response = await fetch('/.netlify/functions/check-availability', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             postcode: postcode,
-            region: bookingData.region, // lowercase 'north' or 'south'
+            region: bookingData.region.toLowerCase(), // ensure lowercase
             selectedDate: newDate
           })
         });
@@ -638,29 +644,19 @@
       }
     }
 
-    // ✅ NEW: Enable reschedule button when time selected
+    // ✅ Enable reschedule button when time selected
     function enableRescheduleButton() {
       const newTime = document.getElementById('newTime').value;
       document.getElementById('confirmRescheduleBtn').disabled = !newTime;
     }
 
-    // ✅ NEW: Format time to 12-hour format
+    // ✅ Format time to 12-hour format
     function formatTime(time24) {
       const [hours, minutes] = time24.split(':');
       const hour = parseInt(hours);
       const ampm = hour >= 12 ? 'PM' : 'AM';
       const hour12 = hour % 12 || 12;
       return `${hour12}:${minutes} ${ampm}`;
-    }
-
-    // ✅ NEW: Extract postcode from address
-    function extractPostcode(address) {
-      if (!address) return '';
-      
-      const postcodeRegex = /([A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2})/i;
-      const match = address.match(postcodeRegex);
-      
-      return match ? match[0].trim().toUpperCase() : '';
     }
 
     async function submitReschedule() {
