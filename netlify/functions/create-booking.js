@@ -36,42 +36,45 @@ exports.handler = async (event, context) => {
     // Create booking record
     const record = await base('Bookings').create([
       {
-        fields: {
-          'Booking Reference': bookingRef,
-'Postcode': bookingData.postcode,
-'Property Address': bookingData.propertyAddress,
-'Region': capitalizedRegion,
-'Media Specialist': bookingData.mediaSpecialist,
-'Date': bookingData.date,
-'Time': bookingData.time,
-'Service': bookingData.serviceId,
-'Service Name': bookingData.service,
-'Duration (mins)': bookingData.duration,
-'Bedrooms': bookingData.bedrooms || 0,
-'Base Price': bookingData.basePrice,
-'Extra Bedroom Fee': bookingData.extraBedroomFee || 0,
-'Add-ons': addonsString,
-'Add-ons Price': bookingData.addonsPrice || 0,
-'Total Price': bookingData.totalPrice,
-'Client Name': bookingData.clientName,
-'Client Email': bookingData.clientEmail,
-'Client Phone': bookingData.clientPhone,
-'Client Notes': bookingData.clientNotes || '',
-'Booking Status': 'Booked',  // ✅ ADD THIS LINE!
-          
-          // Stripe Payment Method (card on file)
-          'Stripe Payment Method ID': bookingData.stripePaymentMethodId || '',
-          'Cardholder Name': bookingData.cardholderName || '',
-          'Card Last 4': bookingData.cardLast4 || '',
-          'Card Brand': bookingData.cardBrand || '',
-          'Card Expiry': bookingData.cardExpiry || '',
-          
-          'Status': 'Reserved - Awaiting Payment',
-          'Payment Status': 'Pending',
-          'Payment Method': 'Card on File',
-          'Created Date': new Date().toISOString(),
-          'Cancellation Allowed Until': new Date(new Date(bookingData.date).getTime() - 24 * 60 * 60 * 1000).toISOString()
-        }
+       fields: {
+  'Booking Reference': bookingRef,
+  'Postcode': bookingData.postcode,
+  'Property Address': bookingData.propertyAddress,
+  'Region': capitalizedRegion,
+  'Media Specialist': bookingData.mediaSpecialist,
+  'Date': bookingData.date,
+  'Time': bookingData.time,
+  'Service': bookingData.serviceId,
+  'Service Name': bookingData.service,
+  'Duration (mins)': bookingData.duration,
+  'Bedrooms': bookingData.bedrooms || 0,
+  'Base Price': bookingData.basePrice,
+  'Extra Bedroom Fee': bookingData.extraBedroomFee || 0,
+  'Add-ons': addonsString,
+  'Add-ons Price': bookingData.addonsPrice || 0,
+  'Total Price': bookingData.totalPrice,
+  'Client Name': bookingData.clientName,
+  'Client Email': bookingData.clientEmail,
+  'Client Phone': bookingData.clientPhone,
+  'Client Notes': bookingData.clientNotes || '',
+  
+  // ✅ SIMPLIFIED: Just one status field
+  'Booking Status': 'Booked',  // Options: Booked, Completed, Cancelled, No Show
+  
+  // ✅ FIXED: Payment status based on payment option
+  'Payment Status': bookingData.paymentOption === 'pay-now' ? 'Paid' : 'Pending',
+  'Payment Method': bookingData.paymentOption === 'pay-now' ? 'Stripe' : 'Card on File',
+  
+  // Stripe Payment Method (only for "reserve" option)
+  'Stripe Payment Method ID': bookingData.stripePaymentMethodId || '',
+  'Cardholder Name': bookingData.cardholderName || '',
+  'Card Last 4': bookingData.cardLast4 || '',
+  'Card Brand': bookingData.cardBrand || '',
+  'Card Expiry': bookingData.cardExpiry || '',
+  
+  'Created Date': new Date().toISOString(),
+  'Cancellation Allowed Until': new Date(new Date(bookingData.date).getTime() - 24 * 60 * 60 * 1000).toISOString()
+}
       }
     ]);
 
