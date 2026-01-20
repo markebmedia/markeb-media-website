@@ -1532,7 +1532,7 @@
 
       filtered.forEach(customer => {
         const allowReserve = customer.fields['Allow Reserve Without Payment'] === true;
-        const emailNotifications = customer.fields['Email Notifications Enabled'] !== false;
+        const emailNotifications = customer.fields['Email Notifications Enabled'] === true;
 
         html += `
           <tr>
@@ -1601,8 +1601,9 @@
       title.textContent = customer.fields['Name'];
 
       const allowReserve = customer.fields['Allow Reserve Without Payment'] === true;
-      const emailNotificationsStatus = customer.fields['Email Notifications Enabled'] !== false ? 'Enabled' : 'Disabled';
-      const emailNotificationsColor = customer.fields['Email Notifications Enabled'] !== false ? '#10b981' : '#ef4444';
+      const emailNotificationsEnabled = customer.fields['Email Notifications Enabled'] === true;
+      const emailNotificationsStatus = emailNotificationsEnabled ? 'Enabled' : 'Disabled';
+      const emailNotificationsColor = emailNotificationsEnabled ? '#10b981' : '#ef4444';
 
       body.innerHTML = `
         <div class="warning-box">
