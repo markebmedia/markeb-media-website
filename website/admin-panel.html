@@ -652,67 +652,6 @@
       color: #991b1b;
     }
 
-    /* Region Dropdown */
-    .region-select {
-      padding: 8px 12px;
-      border: 2px solid #e2e8f0;
-      border-radius: 6px;
-      font-size: 13px;
-      font-family: 'Inter', sans-serif;
-      background: #fff;
-      color: #0f172a;
-      cursor: pointer;
-      transition: all .2s ease;
-      min-width: 140px;
-      max-width: 180px;
-    }
-
-    .region-select:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .region-select:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      background: #f8f9fa;
-    }
-
-    .region-select:hover:not(:disabled) {
-      border-color: #cbd5e1;
-    }
-
-    /* Region badge */
-    .region-badge {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 600;
-      background: #eff6ff;
-      color: #1e40af;
-      border: 2px solid #bfdbfe;
-    }
-
-    .region-badge.empty {
-      background: #f1f5f9;
-      color: #64748b;
-      border-color: #e2e8f0;
-      font-style: italic;
-    }
-
-    /* Warning/Info boxes */
-    .warning-box {
-      background: #fef3c7;
-      border: 2px solid #f59e0b;
-      border-radius: 12px;
-      padding: 16px;
-      margin: 16px 0;
-      color: #92400e;
-      font-size: 14px;
-    }
-
     .info-box {
       background: #eff6ff;
       border: 2px solid #3b82f6;
@@ -726,11 +665,9 @@
     /* Action Buttons Grid */
     .action-buttons-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
       margin-top: 24px;
-      padding-top: 24px;
-      border-top: 2px solid #e2e8f0;
     }
 
     /* Responsive */
@@ -1059,6 +996,814 @@
     </div>
   </div>
 
-  <script src="admin-panel.js"></script>
+  <script>
+// Global state
+let currentView = 'month';
+let currentDate = new Date();
+let allBookings = [];
+let allCustomers = [];
+let currentBooking = null;
+
+// UK REGIONS - All UK counties and regions
+const UK_REGIONS = [
+  'Cheshire', 'Cumbria', 'Greater Manchester', 'Lancashire', 'Merseyside',
+  'County Durham', 'Northumberland', 'Tyne and Wear',
+  'East Riding of Yorkshire', 'North Yorkshire', 'South Yorkshire', 'West Yorkshire',
+  'Derbyshire', 'Leicestershire', 'Lincolnshire', 'Northamptonshire', 'Nottinghamshire', 'Rutland',
+  'Herefordshire', 'Shropshire', 'Staffordshire', 'Warwickshire', 'West Midlands', 'Worcestershire',
+  'Bedfordshire', 'Cambridgeshire', 'Essex', 'Hertfordshire', 'Norfolk', 'Suffolk',
+  'Berkshire', 'Buckinghamshire', 'East Sussex', 'Hampshire', 'Isle of Wight', 'Kent', 'Oxfordshire', 'Surrey', 'West Sussex',
+  'Bristol', 'Cornwall', 'Devon', 'Dorset', 'Gloucestershire', 'Somerset', 'Wiltshire',
+  'Greater London',
+  'Aberdeenshire', 'Angus', 'Argyll and Bute', 'City of Edinburgh', 'Clackmannanshire',
+  'Dumfries and Galloway', 'Dundee City', 'East Ayrshire', 'East Dunbartonshire', 'East Lothian',
+  'East Renfrewshire', 'Falkirk', 'Fife', 'Glasgow City', 'Highland', 'Inverclyde',
+  'Midlothian', 'Moray', 'North Ayrshire', 'North Lanarkshire', 'Orkney Islands',
+  'Perth and Kinross', 'Renfrewshire', 'Scottish Borders', 'Shetland Islands', 'South Ayrshire',
+  'South Lanarkshire', 'Stirling', 'West Dunbartonshire', 'West Lothian', 'Western Isles',
+  'Anglesey', 'Blaenau Gwent', 'Bridgend', 'Caerphilly', 'Cardiff', 'Carmarthenshire',
+  'Ceredigion', 'Conwy', 'Denbighshire', 'Flintshire', 'Gwynedd', 'Merthyr Tydfil',
+  'Monmouthshire', 'Neath Port Talbot', 'Newport', 'Pembrokeshire', 'Powys', 'Rhondda Cynon Taf',
+  'Swansea', 'Torfaen', 'Vale of Glamorgan', 'Wrexham',
+  'Antrim', 'Armagh', 'Down', 'Fermanagh', 'Londonderry', 'Tyrone'
+].sort();
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  loadDashboardStats();
+  loadCalendar();
+  loadBookings();
+  loadReservedBookings();
+  loadCustomers();
+});
+
+// ===== NAVIGATION =====
+function showSection(sectionId) {
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  
+  document.getElementById(sectionId).classList.add('active');
+  
+  const navItem = [...document.querySelectorAll('.nav-item')].find(n => 
+    n.getAttribute('onclick')?.includes(`showSection('${sectionId}')`)
+  );
+  if (navItem) navItem.classList.add('active');
+
+  if (window.innerWidth <= 1024) {
+    document.getElementById('adminSidebar').classList.remove('open');
+  }
+}
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('adminSidebar');
+  sidebar.classList.toggle('open');
+  
+  if (sidebar.classList.contains('open')) {
+    document.addEventListener('click', closeSidebarOutside);
+  } else {
+    document.removeEventListener('click', closeSidebarOutside);
+  }
+}
+
+function closeSidebarOutside(event) {
+  const sidebar = document.getElementById('adminSidebar');
+  const menuBtn = document.querySelector('.mobile-menu-btn');
+  
+  if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+    sidebar.classList.remove('open');
+    document.removeEventListener('click', closeSidebarOutside);
+  }
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).classList.remove('active');
+  
+  if (window.innerWidth <= 1024) {
+    document.getElementById('adminSidebar')?.classList.remove('open');
+  }
+}
+
+// ===== DASHBOARD STATS =====
+async function loadDashboardStats() {
+  try {
+    const response = await fetch('/.netlify/functions/admin-bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+
+    const data = await response.json();
+    
+    if (data.success) {
+      document.getElementById('totalBookings').textContent = data.stats.total;
+      document.getElementById('upcomingBookings').textContent = data.stats.upcoming;
+      document.getElementById('reservedBookings').textContent = data.stats.reserved;
+    }
+
+    const customersResponse = await fetch('/.netlify/functions/admin-users');
+    const customersData = await customersResponse.json();
+    
+    if (customersData.success) {
+      document.getElementById('totalCustomers').textContent = customersData.total;
+    }
+
+  } catch (error) {
+    console.error('Error loading dashboard stats:', error);
+  }
+}
+
+// ===== CALENDAR FUNCTIONS =====
+function setCalendarView(view) {
+  currentView = view;
+  document.querySelectorAll('.calendar-view-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.view === view);
+  });
+  loadCalendar();
+}
+
+function previousPeriod() {
+  if (currentView === 'month') {
+    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+  } else if (currentView === 'week') {
+    currentDate = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+  } else {
+    currentDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
+  }
+  loadCalendar();
+}
+
+function nextPeriod() {
+  if (currentView === 'month') {
+    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+  } else if (currentView === 'week') {
+    currentDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+  } else {
+    currentDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+  }
+  loadCalendar();
+}
+
+async function loadCalendar() {
+  const grid = document.getElementById('calendarGrid');
+  const currentEl = document.getElementById('calendarCurrent');
+  const region = document.getElementById('calendarRegion')?.value || '';
+
+  grid.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+
+  try {
+    let startDate, endDate;
+
+    if (currentView === 'month') {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      startDate = new Date(year, month, 1).toISOString().split('T')[0];
+      endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
+      
+      currentEl.textContent = currentDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    } else if (currentView === 'week') {
+      const tempDate = new Date(currentDate);
+      const day = tempDate.getDay();
+      const diff = tempDate.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(tempDate.setDate(diff));
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      
+      startDate = monday.toISOString().split('T')[0];
+      endDate = sunday.toISOString().split('T')[0];
+      
+      currentEl.textContent = `Week of ${monday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })} - ${sunday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+    } else {
+      startDate = currentDate.toISOString().split('T')[0];
+      endDate = startDate;
+      
+      currentEl.textContent = currentDate.toLocaleDateString('en-GB', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    const response = await fetch('/.netlify/functions/admin-bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ startDate, endDate, region })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      if (currentView === 'month') {
+        renderMonthView(data.bookings);
+      } else if (currentView === 'week') {
+        renderWeekView(data.bookings);
+      } else {
+        renderDayView(data.bookings);
+      }
+    }
+
+  } catch (error) {
+    console.error('Error loading calendar:', error);
+    grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading calendar</div>';
+  }
+}
+
+function renderMonthView(bookings) {
+  const grid = document.getElementById('calendarGrid');
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+  const startingDayOfWeek = firstDay.getDay() || 7;
+
+  let html = '<div class="calendar-grid month">';
+  
+  ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(day => {
+    html += `<div class="calendar-day-header">${day}</div>`;
+  });
+
+  for (let i = 1; i < startingDayOfWeek; i++) {
+    html += '<div class="calendar-day other-month"></div>';
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dayBookings = bookings.filter(b => b.fields['Date'] === dateStr);
+    
+    const today = new Date();
+    const isToday = dateStr === today.toISOString().split('T')[0];
+    
+    html += `<div class="calendar-day ${isToday ? 'today' : ''}">`;
+    html += `<div class="calendar-day-number">${day}</div>`;
+    
+    dayBookings.forEach(booking => {
+      const statusClass = booking.fields['Payment Status'] === 'Reserved' ? 'reserved' : 
+                          booking.fields['Booking Status'] === 'Cancelled' ? 'cancelled' : '';
+      html += `<div class="calendar-booking ${statusClass}" onclick="viewBookingById('${booking.id}')">${booking.fields['Time']} ${booking.fields['Client Name']}</div>`;
+    });
+    
+    html += '</div>';
+  }
+
+  html += '</div>';
+  grid.innerHTML = html;
+}
+
+function renderWeekView(bookings) {
+  const grid = document.getElementById('calendarGrid');
+  grid.innerHTML = '<div style="padding: 40px; text-align: center;">Week view coming soon...</div>';
+}
+
+function renderDayView(bookings) {
+  const grid = document.getElementById('calendarGrid');
+  grid.innerHTML = '<div style="padding: 40px; text-align: center;">Day view coming soon...</div>';
+}
+
+// ===== BOOKINGS FUNCTIONS =====
+async function loadBookings() {
+  const container = document.getElementById('bookingsContainer');
+  container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+
+  try {
+    const search = document.getElementById('bookingSearch')?.value || '';
+    const region = document.getElementById('bookingRegion')?.value || '';
+    const status = document.getElementById('bookingStatus')?.value || '';
+
+    const response = await fetch('/.netlify/functions/admin-bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ region, status })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      allBookings = data.bookings;
+      renderBookingsTable(allBookings, search);
+    }
+
+  } catch (error) {
+    console.error('Error loading bookings:', error);
+    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading bookings</div>';
+  }
+}
+
+async function loadReservedBookings() {
+  const container = document.getElementById('reservedContainer');
+  container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+
+  try {
+    const response = await fetch('/.netlify/functions/admin-bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentStatus: 'Reserved' })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      renderBookingsTable(data.bookings, '', 'reservedContainer');
+    }
+
+  } catch (error) {
+    console.error('Error loading reserved bookings:', error);
+    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading reserved bookings</div>';
+  }
+}
+
+function renderBookingsTable(bookings, search = '', containerId = 'bookingsContainer') {
+  const container = document.getElementById(containerId);
+  
+  let filtered = bookings;
+  if (search) {
+    const term = search.toLowerCase();
+    filtered = bookings.filter(b => 
+      (b.fields['Client Name'] || '').toLowerCase().includes(term) ||
+      (b.fields['Client Email'] || '').toLowerCase().includes(term) ||
+      (b.fields['Property Address'] || '').toLowerCase().includes(term) ||
+      (b.fields['Booking Reference'] || '').toLowerCase().includes(term)
+    );
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="text-align: center; padding: 40px;">No bookings found</div>';
+    return;
+  }
+
+  let html = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Date & Time</th>
+          <th>Client</th>
+          <th>Address</th>
+          <th>Service</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  filtered.forEach(booking => {
+    html += `
+      <tr>
+        <td data-label="Reference"><strong>${booking.fields['Booking Reference']}</strong></td>
+        <td data-label="Date & Time">${booking.fields['Date']}<br>${booking.fields['Time']}</td>
+        <td data-label="Client">
+          ${booking.fields['Client Name']}<br>
+          <small style="color: #64748b;">${booking.fields['Client Email']}</small>
+        </td>
+        <td data-label="Address">${booking.fields['Property Address'] || '-'}</td>
+        <td data-label="Service">${booking.fields['Service Name'] || '-'}</td>
+        <td data-label="Status">
+          <span class="status-badge status-${(booking.fields['Payment Status'] || '').toLowerCase()}">
+            ${booking.fields['Payment Status'] || '-'}
+          </span>
+        </td>
+        <td data-label="Actions">
+          <button class="btn btn-primary btn-small" onclick="viewBookingById('${booking.id}')">
+            View
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// ===== VIEW BOOKING WITH ADMIN ACTIONS =====
+function viewBookingById(bookingId) {
+  const booking = allBookings.find(b => b.id === bookingId);
+  if (!booking) {
+    alert('Booking not found');
+    return;
+  }
+  viewBooking(booking);
+}
+
+function viewBooking(booking) {
+  currentBooking = booking;
+  const modal = document.getElementById('bookingModal');
+  const title = document.getElementById('bookingModalTitle');
+  const body = document.getElementById('bookingModalBody');
+
+  title.textContent = `Booking ${booking.fields['Booking Reference']}`;
+
+  const driveTimeSection = booking.driveTimeInfo ? `
+    <div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 12px; padding: 16px; margin: 16px 0;">
+      <h4 style="margin: 0 0 12px 0; color: #1e40af;">🚗 Drive Time Information</h4>
+      <div class="detail-item">
+        <span class="detail-label">Drive Time</span>
+        <span class="detail-value">${booking.driveTimeInfo.driveTimeFormatted}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Buffer Time</span>
+        <span class="detail-value">
+          ${booking.driveTimeInfo.bufferTime.available} min 
+          (${booking.driveTimeInfo.bufferTime.sufficient ? '✓ Sufficient' : '⚠️ Tight'})
+        </span>
+      </div>
+    </div>
+  ` : '';
+
+  const isCancelled = booking.fields['Booking Status'] === 'Cancelled';
+  const isReserved = booking.fields['Payment Status'] === 'Reserved' || booking.fields['Payment Status'] === 'Pending';
+
+  body.innerHTML = `
+    <div class="detail-item">
+      <span class="detail-label">Reference</span>
+      <span class="detail-value">${booking.fields['Booking Reference']}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Date & Time</span>
+      <span class="detail-value">${booking.fields['Date']} at ${booking.fields['Time']}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Client Name</span>
+      <span class="detail-value">${booking.fields['Client Name']}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Client Email</span>
+      <span class="detail-value">${booking.fields['Client Email']}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Property Address</span>
+      <span class="detail-value">${booking.fields['Property Address'] || '-'}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Service</span>
+      <span class="detail-value">${booking.fields['Service Name'] || '-'}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Total Price</span>
+      <span class="detail-value">£${(booking.fields['Total Price'] || 0).toFixed(2)}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Payment Status</span>
+      <span class="detail-value">
+        <span class="status-badge status-${(booking.fields['Payment Status'] || '').toLowerCase()}">
+          ${booking.fields['Payment Status'] || '-'}
+        </span>
+      </span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Booking Status</span>
+      <span class="detail-value">
+        <span class="status-badge status-${isCancelled ? 'cancelled' : 'active'}">
+          ${booking.fields['Booking Status'] || 'Booked'}
+        </span>
+      </span>
+    </div>
+    
+    ${driveTimeSection}
+    
+    ${!isCancelled ? `
+      <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
+        
+        <div style="margin-bottom: 20px; padding: 16px; background: #f8fafc; border-radius: 8px;">
+          <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+            <span style="font-weight: 600; color: #64748b; font-size: 14px;">📧 Send Email Notifications</span>
+            <span class="toggle-switch">
+              <input type="checkbox" id="sendEmailToggle-${booking.id}" checked>
+              <span class="toggle-slider"></span>
+            </span>
+          </label>
+        </div>
+
+        <div class="action-buttons-grid">
+          
+          ${isReserved ? `
+            <button class="btn btn-success" onclick="chargeReservedBooking('${booking.id}')" style="width: 100%; justify-content: center;">
+              💳 Charge Card
+            </button>
+          ` : ''}
+          
+          <button class="btn btn-primary" onclick="showAdminReschedule('${booking.id}')" style="width: 100%; justify-content: center;">
+            📅 Reschedule
+          </button>
+          
+          <button class="btn btn-secondary" onclick="showModifyService('${booking.id}')" style="width: 100%; justify-content: center;">
+            ✏️ Modify Service
+          </button>
+          
+          <button class="btn btn-danger" onclick="showAdminCancel('${booking.id}')" style="width: 100%; justify-content: center;">
+            ❌ Cancel
+          </button>
+        </div>
+
+        <div class="info-box" style="margin-top: 16px;">
+          <strong>ℹ️ Admin Actions:</strong> These bypass normal restrictions and can modify any booking.
+        </div>
+      </div>
+    ` : `
+      <div style="margin-top: 24px; padding: 16px; background: #fee2e2; border: 2px solid #ef4444; border-radius: 12px; text-align: center; color: #991b1b;">
+        <strong>❌ This booking has been cancelled</strong>
+      </div>
+    `}
+  `;
+
+  modal.classList.add('active');
+}
+
+// ===== ADMIN ACTIONS =====
+
+// Charge Reserved Booking
+async function chargeReservedBooking(bookingId) {
+  const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
+  if (!booking) return alert('Booking data not found');
+
+  if (!confirm(`Charge reserved booking?\n\nClient: ${booking.fields['Client Name']}\nAmount: £${(booking.fields['Total Price'] || 0).toFixed(2)}`)) return;
+  
+  try {
+    const response = await fetch('/.netlify/functions/charge-card', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert(`✅ Payment charged!\n\nAmount: £${data.amount.toFixed(2)}\n\nConfirmation email sent.`);
+      closeModal('bookingModal');
+      loadBookings();
+      loadDashboardStats();
+      loadCalendar();
+    } else {
+      alert(`❌ Error: ${data.error || 'Failed to charge card'}`);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('❌ Failed to charge card.');
+  }
+}
+
+// Admin Reschedule
+function showAdminReschedule(bookingId) {
+  const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
+  if (!booking) return;
+  
+  const sendEmail = document.getElementById(`sendEmailToggle-${bookingId}`)?.checked ?? true;
+  
+  const newDate = prompt('Enter new date (YYYY-MM-DD):', booking.fields['Date']);
+  if (!newDate || !newDate.match(/^\d{4}-\d{2}-\d{2}$/)) return;
+  
+  const newTime = prompt('Enter new time (HH:MM):', booking.fields['Time']);
+  if (!newTime || !newTime.match(/^\d{2}:\d{2}$/)) return;
+  
+  if (!confirm(`Reschedule to ${newDate} at ${newTime}?\n\nSend email: ${sendEmail ? 'Yes' : 'No'}`)) return;
+  
+  adminRescheduleBooking(bookingId, newDate, newTime, sendEmail);
+}
+
+async function adminRescheduleBooking(bookingId, newDate, newTime, sendEmail) {
+  try {
+    const response = await fetch('/.netlify/functions/admin-reschedule-booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId, newDate, newTime, sendEmail })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert(`✅ Rescheduled!\n\n${newDate} at ${newTime}\n\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`);
+      closeModal('bookingModal');
+      loadBookings();
+      loadCalendar();
+    } else {
+      alert(`❌ Error: ${data.error}`);
+    }
+  } catch (error) {
+    alert('❌ Failed to reschedule.');
+  }
+}
+
+// Admin Cancel
+function showAdminCancel(bookingId) {
+  const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
+  if (!booking) return;
+  
+  const sendEmail = document.getElementById(`sendEmailToggle-${bookingId}`)?.checked ?? true;
+  const reason = prompt('Reason:') || 'Admin cancelled';
+  
+  if (!confirm(`Cancel booking?\n\nClient: ${booking.fields['Client Name']}\nReason: ${reason}\n\nSend email: ${sendEmail ? 'Yes' : 'No'}`)) return;
+  
+  adminCancelBooking(bookingId, reason, sendEmail);
+}
+
+async function adminCancelBooking(bookingId, reason, sendEmail) {
+  try {
+    const response = await fetch('/.netlify/functions/admin-cancel-booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId, reason, sendEmail })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      let msg = `✅ Cancelled!\n\n`;
+      if (data.cancellationCharge > 0) msg += `Fee: £${data.cancellationCharge.toFixed(2)}\n`;
+      if (data.refundProcessed) msg += `Refund: £${data.refundAmount.toFixed(2)}\n`;
+      msg += `\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`;
+      alert(msg);
+      closeModal('bookingModal');
+      loadBookings();
+      loadCalendar();
+    } else {
+      alert(`❌ Error: ${data.error}`);
+    }
+  } catch (error) {
+    alert('❌ Failed to cancel.');
+  }
+}
+
+// Modify Service
+function showModifyService(bookingId) {
+  const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
+  if (!booking) return;
+  
+  const sendEmail = document.getElementById(`sendEmailToggle-${bookingId}`)?.checked ?? true;
+  
+  const newServiceName = prompt('New service name:');
+  if (!newServiceName) return;
+  
+  const newPrice = parseFloat(prompt('New base price (£):'));
+  if (isNaN(newPrice)) return;
+  
+  const newDuration = parseInt(prompt('Duration (mins):', '60'));
+  if (isNaN(newDuration)) return;
+  
+  if (!confirm(`Change service?\n\nNew: ${newServiceName} (£${newPrice})\n\nSend email: ${sendEmail ? 'Yes' : 'No'}`)) return;
+  
+  adminModifyService(bookingId, newServiceName, newPrice, newDuration, sendEmail);
+}
+
+async function adminModifyService(bookingId, newServiceName, newServicePrice, newServiceDuration, sendEmail) {
+  try {
+    const response = await fetch('/.netlify/functions/admin-modify-service', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bookingId,
+        newServiceId: newServiceName.toLowerCase().replace(/\s+/g, '-'),
+        newServiceName,
+        newServicePrice,
+        newServiceDuration,
+        sendEmail
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert(`✅ Modified!\n\nNew: ${data.newService} (£${data.newPrice.toFixed(2)})\n\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`);
+      closeModal('bookingModal');
+      loadBookings();
+    } else {
+      alert(`❌ Error: ${data.error}`);
+    }
+  } catch (error) {
+    alert('❌ Failed to modify service.');
+  }
+}
+
+// ===== CUSTOMERS =====
+async function loadCustomers() {
+  const container = document.getElementById('customersContainer');
+  container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+
+  try {
+    const response = await fetch('/.netlify/functions/admin-users');
+    const data = await response.json();
+
+    if (data.success) {
+      allCustomers = data.users;
+      renderCustomersTable(allCustomers);
+    }
+
+  } catch (error) {
+    console.error('Error loading customers:', error);
+    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading customers</div>';
+  }
+}
+
+function renderCustomersTable(customers) {
+  const container = document.getElementById('customersContainer');
+  const search = document.getElementById('customerSearch')?.value || '';
+
+  let filtered = customers;
+  if (search) {
+    const term = search.toLowerCase();
+    filtered = customers.filter(c => 
+      (c.fields['Name'] || '').toLowerCase().includes(term) ||
+      (c.fields['Email'] || '').toLowerCase().includes(term) ||
+      (c.fields['Company'] || '').toLowerCase().includes(term)
+    );
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="text-align: center; padding: 40px;">No customers found</div>';
+    return;
+  }
+
+  let html = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Company</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  filtered.forEach(customer => {
+    html += `
+      <tr>
+        <td data-label="Name"><strong>${customer.fields['Name']}</strong></td>
+        <td data-label="Email">${customer.fields['Email']}</td>
+        <td data-label="Company">${customer.fields['Company'] || '-'}</td>
+        <td data-label="Status">
+          <span class="status-badge status-${(customer.fields['Account Status'] || '').toLowerCase()}">
+            ${customer.fields['Account Status'] || '-'}
+          </span>
+        </td>
+        <td data-label="Actions">
+          <button class="btn btn-primary btn-small" onclick="viewCustomerById('${customer.id}')">
+            View
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function viewCustomerById(customerId) {
+  const customer = allCustomers.find(c => c.id === customerId);
+  if (!customer) {
+    alert('Customer not found');
+    return;
+  }
+  
+  const modal = document.getElementById('customerModal');
+  const title = document.getElementById('customerModalTitle');
+  const body = document.getElementById('customerModalBody');
+
+  title.textContent = customer.fields['Name'];
+
+  body.innerHTML = `
+    <div class="detail-item">
+      <span class="detail-label">Name</span>
+      <span class="detail-value">${customer.fields['Name']}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Email</span>
+      <span class="detail-value">${customer.fields['Email']}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Company</span>
+      <span class="detail-value">${customer.fields['Company'] || '-'}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Phone</span>
+      <span class="detail-value">${customer.fields['Phone'] || '-'}</span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Account Status</span>
+      <span class="detail-value">
+        <span class="status-badge status-${(customer.fields['Account Status'] || '').toLowerCase()}">
+          ${customer.fields['Account Status'] || '-'}
+        </span>
+      </span>
+    </div>
+    <div class="detail-item">
+      <span class="detail-label">Total Bookings</span>
+      <span class="detail-value">${customer.fields['Total Bookings'] || 0}</span>
+    </div>
+  `;
+
+  modal.classList.add('active');
+}
+
+// Real-time search
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('bookingSearch')?.addEventListener('input', (e) => {
+    renderBookingsTable(allBookings, e.target.value);
+  });
+
+  document.getElementById('customerSearch')?.addEventListener('input', () => {
+    renderCustomersTable(allCustomers);
+  });
+});
+  </script>
 </body>
 </html>
