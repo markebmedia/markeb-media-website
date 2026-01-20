@@ -106,49 +106,21 @@ exports.handler = async (event, context) => {
   }
 };
 
-// ✅ SIMPLIFIED: No conversion needed - Airtable now uses ISO format
-function formatDateForAirtable(dateString) {
-  // If already in YYYY-MM-DD format, return as-is
-  if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-    return dateString;
-  }
-  
-  // If it's in D/M/YYYY or DD/MM/YYYY format, convert to YYYY-MM-DD
-  if (dateString.includes('/')) {
-    const parts = dateString.split('/');
-    const day = parts[0].padStart(2, '0');
-    const month = parts[1].padStart(2, '0');
-    const year = parts[2];
-    return `${year}-${month}-${day}`;
-  }
-  
-  // Try parsing as date object and return ISO format
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) {
-    console.error(`Invalid date: ${dateString}`);
-    return dateString;
-  }
-  
-  return date.toISOString().split('T')[0];
-}
-
 // Fetch bookings from Airtable for specific region and date
 async function fetchBookingsForRegion(region, selectedDate) {
   try {
     const Airtable = require('airtable');
     const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-    // ✅ Ensure date is in ISO format (YYYY-MM-DD)
-    const formattedDate = formatDateForAirtable(selectedDate);
-    
     // Capitalise region for Airtable (it stores "North" or "South")
     const capitalisedRegion = region.charAt(0).toUpperCase() + region.slice(1).toLowerCase();
     
     console.log(`Querying Airtable with:`);
-    console.log(`  - Date: ${formattedDate} (ISO format, original: ${selectedDate})`);
+    console.log(`  - Date: ${selectedDate}`);
     console.log(`  - Region: ${capitalisedRegion} (original: ${region})`);
     
-    const filterFormula = `AND({Region} = '${capitalisedRegion}', {Date} = '${formattedDate}', {Booking Status} = 'Booked')`;
+    // ✅ USE AIRTABLE'S IS_SAME() FUNCTION FOR DATE COMPARISON
+    const filterFormula = `AND({Region} = '${capitalisedRegion}', IS_SAME({Date}, '${selectedDate}', 'day'), {Booking Status} = 'Booked')`;
     console.log(`  - Filter: ${filterFormula}`);
 
     // Query bookings for this specific region and date
@@ -168,7 +140,7 @@ async function fetchBookingsForRegion(region, selectedDate) {
         id: record.id,
         postcode: postcode,
         startTime: record.fields['Time'],
-        duration: record.fields['Duration'] || 90,
+        duration: record.fields['Duration (mins)'] || 90,
         date: record.fields['Date'],
         region: record.fields['Region']
       };
@@ -182,7 +154,7 @@ async function fetchBookingsForRegion(region, selectedDate) {
 
   } catch (error) {
     console.error('Error fetching bookings from Airtable:', error);
-    throw error; // Throw instead of returning empty array so we can see the error
+    throw error;
   }
 }
 
