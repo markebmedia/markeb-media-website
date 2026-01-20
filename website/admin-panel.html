@@ -637,6 +637,67 @@
       color: #991b1b;
     }
 
+    /* Region Dropdown */
+    .region-select {
+      padding: 8px 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: #0f172a;
+      cursor: pointer;
+      transition: all .2s ease;
+      min-width: 140px;
+      max-width: 180px;
+    }
+
+    .region-select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .region-select:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: #f8f9fa;
+    }
+
+    .region-select:hover:not(:disabled) {
+      border-color: #cbd5e1;
+    }
+
+    /* Region badge */
+    .region-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #eff6ff;
+      color: #1e40af;
+      border: 2px solid #bfdbfe;
+    }
+
+    .region-badge.empty {
+      background: #f1f5f9;
+      color: #64748b;
+      border-color: #e2e8f0;
+      font-style: italic;
+    }
+
+    /* Warning/Info boxes */
+    .warning-box {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 16px 0;
+      color: #92400e;
+      font-size: 14px;
+    }
+
     /* Responsive */
     @media (max-width: 1024px) {
       .admin-sidebar {
@@ -948,6 +1009,42 @@
     let currentDate = new Date();
     let allBookings = [];
     let allCustomers = [];
+
+    // UK REGIONS - All UK counties and regions
+    const UK_REGIONS = [
+      // England - North West
+      'Cheshire', 'Cumbria', 'Greater Manchester', 'Lancashire', 'Merseyside',
+      // England - North East
+      'County Durham', 'Northumberland', 'Tyne and Wear',
+      // England - Yorkshire and the Humber
+      'East Riding of Yorkshire', 'North Yorkshire', 'South Yorkshire', 'West Yorkshire',
+      // England - East Midlands
+      'Derbyshire', 'Leicestershire', 'Lincolnshire', 'Northamptonshire', 'Nottinghamshire', 'Rutland',
+      // England - West Midlands
+      'Herefordshire', 'Shropshire', 'Staffordshire', 'Warwickshire', 'West Midlands', 'Worcestershire',
+      // England - East of England
+      'Bedfordshire', 'Cambridgeshire', 'Essex', 'Hertfordshire', 'Norfolk', 'Suffolk',
+      // England - South East
+      'Berkshire', 'Buckinghamshire', 'East Sussex', 'Hampshire', 'Isle of Wight', 'Kent', 'Oxfordshire', 'Surrey', 'West Sussex',
+      // England - South West
+      'Bristol', 'Cornwall', 'Devon', 'Dorset', 'Gloucestershire', 'Somerset', 'Wiltshire',
+      // England - London
+      'Greater London',
+      // Scotland
+      'Aberdeenshire', 'Angus', 'Argyll and Bute', 'City of Edinburgh', 'Clackmannanshire', 
+      'Dumfries and Galloway', 'Dundee City', 'East Ayrshire', 'East Dunbartonshire', 'East Lothian',
+      'East Renfrewshire', 'Falkirk', 'Fife', 'Glasgow City', 'Highland', 'Inverclyde',
+      'Midlothian', 'Moray', 'North Ayrshire', 'North Lanarkshire', 'Orkney Islands',
+      'Perth and Kinross', 'Renfrewshire', 'Scottish Borders', 'Shetland Islands', 'South Ayrshire',
+      'South Lanarkshire', 'Stirling', 'West Dunbartonshire', 'West Lothian', 'Western Isles',
+      // Wales
+      'Anglesey', 'Blaenau Gwent', 'Bridgend', 'Caerphilly', 'Cardiff', 'Carmarthenshire',
+      'Ceredigion', 'Conwy', 'Denbighshire', 'Flintshire', 'Gwynedd', 'Merthyr Tydfil',
+      'Monmouthshire', 'Neath Port Talbot', 'Newport', 'Pembrokeshire', 'Powys', 'Rhondda Cynon Taf',
+      'Swansea', 'Torfaen', 'Vale of Glamorgan', 'Wrexham',
+      // Northern Ireland
+      'Antrim', 'Armagh', 'Down', 'Fermanagh', 'Londonderry', 'Tyrone'
+    ].sort();
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
@@ -1423,7 +1520,9 @@
               <th>Name</th>
               <th>Email</th>
               <th>Company</th>
+              <th>Region</th>
               <th>Status</th>
+              <th>Email Alerts</th>
               <th>Reserve Privilege</th>
               <th>Actions</th>
             </tr>
@@ -1433,16 +1532,43 @@
 
       filtered.forEach(customer => {
         const allowReserve = customer.fields['Allow Reserve Without Payment'] === true;
+        const emailNotifications = customer.fields['Email Notifications Enabled'] !== false;
 
         html += `
           <tr>
             <td data-label="Name"><strong>${customer.fields['Name']}</strong></td>
             <td data-label="Email">${customer.fields['Email']}</td>
             <td data-label="Company">${customer.fields['Company'] || '-'}</td>
+            <td data-label="Region">
+              <select 
+                class="region-select" 
+                data-user-email="${customer.fields['Email']}" 
+                data-record-id="${customer.id}"
+                data-original-value="${customer.fields['Region'] || ''}"
+                onchange="updateUserRegion(this)"
+              >
+                <option value="">Select Region...</option>
+                ${UK_REGIONS.map(region => `
+                  <option value="${region}" ${customer.fields['Region'] === region ? 'selected' : ''}>
+                    ${region}
+                  </option>
+                `).join('')}
+              </select>
+            </td>
             <td data-label="Status">
               <span class="status-badge status-${(customer.fields['Account Status'] || '').toLowerCase()}">
                 ${customer.fields['Account Status'] || '-'}
               </span>
+            </td>
+            <td data-label="Email Alerts">
+              <label class="toggle-switch">
+                <input 
+                  type="checkbox" 
+                  ${emailNotifications ? 'checked' : ''} 
+                  onchange='toggleEmailNotifications("${customer.fields['Email']}", this.checked, "${customer.id}")'
+                >
+                <span class="toggle-slider"></span>
+              </label>
             </td>
             <td data-label="Reserve Privilege">
               <label class="toggle-switch">
@@ -1475,34 +1601,64 @@
       title.textContent = customer.fields['Name'];
 
       const allowReserve = customer.fields['Allow Reserve Without Payment'] === true;
+      const emailNotificationsStatus = customer.fields['Email Notifications Enabled'] !== false ? 'Enabled' : 'Disabled';
+      const emailNotificationsColor = customer.fields['Email Notifications Enabled'] !== false ? '#10b981' : '#ef4444';
 
       body.innerHTML = `
+        <div class="warning-box">
+          ⚠️ <strong>Security Note:</strong> Passwords are hashed and cannot be viewed for security reasons.
+        </div>
+
         <div class="detail-item">
-          <span class="detail-label">Name</span>
+          <span class="detail-label">👤 Full Name</span>
           <span class="detail-value">${customer.fields['Name']}</span>
         </div>
+
         <div class="detail-item">
-          <span class="detail-label">Email</span>
+          <span class="detail-label">📧 Email Address</span>
           <span class="detail-value">${customer.fields['Email']}</span>
         </div>
+
         <div class="detail-item">
-          <span class="detail-label">Company</span>
-          <span class="detail-value">${customer.fields['Company'] || '-'}</span>
+          <span class="detail-label">🏢 Company</span>
+          <span class="detail-value">${customer.fields['Company'] || 'N/A'}</span>
         </div>
+
         <div class="detail-item">
-          <span class="detail-label">Account Status</span>
+          <span class="detail-label">📍 Region</span>
+          <span class="detail-value">
+            ${customer.fields['Region'] ? 
+              `<span class="region-badge">${customer.fields['Region']}</span>` : 
+              '<span class="region-badge empty">Not set</span>'
+            }
+          </span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">📅 Account Created</span>
+          <span class="detail-value">${customer.fields['Created Date']}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">✅ Account Status</span>
           <span class="detail-value">
             <span class="status-badge status-${(customer.fields['Account Status'] || '').toLowerCase()}">
-              ${customer.fields['Account Status'] || '-'}
+              ${customer.fields['Account Status'] || 'Unknown'}
             </span>
           </span>
         </div>
+
         <div class="detail-item">
-          <span class="detail-label">Created Date</span>
-          <span class="detail-value">${customer.fields['Created Date']}</span>
+          <span class="detail-label">📬 Milestone Emails</span>
+          <span class="detail-value">
+            <span style="color: ${emailNotificationsColor}; font-weight: 600;">
+              ${emailNotificationsStatus}
+            </span>
+          </span>
         </div>
+
         <div class="detail-item">
-          <span class="detail-label">Allow Reserve Without Payment</span>
+          <span class="detail-label">💳 Allow Reserve Without Payment</span>
           <span class="detail-value">
             <label class="toggle-switch">
               <input 
@@ -1514,10 +1670,46 @@
             </label>
           </span>
         </div>
+
+        <div class="detail-item">
+          <span class="detail-label">🔐 Password</span>
+          <span class="detail-value" style="color: #64748b; font-style: italic;">Encrypted (not visible)</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">🆔 Record ID</span>
+          <span class="detail-value" style="font-family: monospace; font-size: 12px;">${customer.id}</span>
+        </div>
+
         <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
-          <button class="btn btn-primary" onclick='impersonateUser("${customer.fields['Email']}")' style="width: 100%;">
-            🔑 Login as ${customer.fields['Name']}
-          </button>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+            <button class="btn btn-danger" style="flex: 1;" onclick='redeemPoints("${customer.fields['Email']}", "${customer.fields['Name']}")'>
+              ⭐ Redeem Points
+            </button>
+            <button class="btn btn-primary" style="flex: 1;" onclick='impersonateUser("${customer.fields['Email']}")'>
+              🔑 Login as ${customer.fields['Name']}
+            </button>
+            <button class="btn btn-secondary" style="flex: 1;" onclick='checkMilestone("${customer.fields['Email']}", "${customer.fields['Name']}")'>
+              📧 Check Milestone
+            </button>
+          </div>
+          
+          <div style="padding: 16px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px;">
+            <div style="font-weight: 600; color: #065f46; margin-bottom: 12px; font-size: 14px;">➕ Manually Add Points</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input 
+                type="number" 
+                id="manualPoints-${customer.id}" 
+                placeholder="Enter points amount" 
+                min="1"
+                style="flex: 1; padding: 10px 14px; border: 2px solid #10b981; border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif;"
+              >
+              <button class="btn btn-primary" style="white-space: nowrap;" onclick='addManualPoints("${customer.fields['Email']}", "${customer.fields['Name']}", "${customer.id}")'>
+                ➕ Add Points
+              </button>
+            </div>
+            <div style="font-size: 12px; color: #047857; margin-top: 8px;">Use this to add bonus/promotional points to the account</div>
+          </div>
         </div>
       `;
 
@@ -1551,6 +1743,99 @@
         console.error('Error toggling reserve privilege:', error);
         alert('Error updating privilege');
         event.target.checked = !enabled;
+      }
+    }
+
+    async function updateUserRegion(selectElement) {
+      const email = selectElement.dataset.userEmail;
+      const recordId = selectElement.dataset.recordId;
+      const region = selectElement.value;
+      
+      const originalValue = selectElement.dataset.originalValue || '';
+      selectElement.disabled = true;
+      
+      try {
+        const response = await fetch('/.netlify/functions/update-user-region', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userEmail: email,
+            recordId: recordId,
+            region: region
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update region');
+        }
+
+        const result = await response.json();
+
+        // Update the user in allCustomers array
+        const userIndex = allCustomers.findIndex(u => u.fields['Email'] === email);
+        if (userIndex !== -1) {
+          allCustomers[userIndex].fields['Region'] = region;
+        }
+
+        // Store new value
+        selectElement.dataset.originalValue = region;
+        selectElement.disabled = false;
+        
+        console.log(`✅ Region updated to "${region}" for ${email}`);
+
+      } catch (error) {
+        console.error('Error updating region:', error);
+        alert(`❌ Failed to update region: ${error.message}`);
+        
+        // Revert selection
+        selectElement.value = originalValue;
+        selectElement.disabled = false;
+      }
+    }
+
+    async function toggleEmailNotifications(email, enabled, recordId) {
+      try {
+        // Show loading state
+        const toggleInput = event.target;
+        toggleInput.disabled = true;
+
+        const response = await fetch('/.netlify/functions/toggle-email-notifications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            userEmail: email,
+            enabled: enabled,
+            recordId: recordId
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update email notification settings');
+        }
+
+        const result = await response.json();
+        
+        // Update the user in allCustomers array
+        const userIndex = allCustomers.findIndex(u => u.fields['Email'] === email);
+        if (userIndex !== -1) {
+          allCustomers[userIndex].fields['Email Notifications Enabled'] = enabled;
+        }
+
+        // Show success message briefly
+        const statusText = enabled ? 'enabled' : 'disabled';
+        console.log(`✅ Email notifications ${statusText} for ${email}`);
+        
+        toggleInput.disabled = false;
+
+      } catch (error) {
+        console.error('Error toggling email notifications:', error);
+        alert(`❌ Failed to update email notifications: ${error.message}`);
+        
+        // Revert the toggle
+        event.target.checked = !enabled;
+        event.target.disabled = false;
       }
     }
 
@@ -1592,6 +1877,209 @@
     document.getElementById('customerSearch')?.addEventListener('input', (e) => {
       renderCustomersTable(allCustomers);
     });
+
+    // Rewards and Points Management
+    async function redeemPoints(email, name) {
+      if (!email) {
+        alert('Email address is required');
+        return;
+      }
+      
+      const user = allCustomers.find(u => u.fields['Email'] === email);
+      if (!user) {
+        alert('User data not found');
+        return;
+      }
+      
+      try {
+        // Get booking points from Acuity
+        const acuityResponse = await fetch('/.netlify/functions/acuity-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userEmail: email })
+        });
+        
+        if (!acuityResponse.ok) {
+          throw new Error('Failed to fetch Acuity data');
+        }
+
+        const acuityData = await acuityResponse.json();
+        const bookingPoints = Math.floor(acuityData.totalInvestment ?? 0);
+        
+        // Get manual points AND baseline from Airtable
+        const manualPointsResponse = await fetch('/.netlify/functions/get-manual-points', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userEmail: email })
+        });
+        
+        const manualPointsData = await manualPointsResponse.json();
+        const manualPoints = manualPointsData?.manualPoints || 0;
+        const lastRedemptionBaseline = manualPointsData?.lastRedemptionBaseline || 0;
+        
+        // Calculate NET booking points (subtract baseline) and total points
+        const netBookingPoints = Math.max(0, bookingPoints - lastRedemptionBaseline);
+        const currentPoints = netBookingPoints + manualPoints;
+        const pointsValue = (currentPoints / 100).toFixed(2);
+
+        if (currentPoints === 0) {
+          alert(`${name} has no points to redeem.`);
+          return;
+        }
+
+        // Ask how many points to redeem
+        const pointsToRedeem = prompt(`How many points would you like to redeem for ${name}?\n\nAvailable: ${currentPoints} pts (£${pointsValue})\n  • Net Booking Points: ${netBookingPoints}\n  • Manual Points: ${manualPoints}\n\nEnter amount (or leave blank to redeem all):`);
+        
+        if (pointsToRedeem === null) {
+          return; // User cancelled
+        }
+
+        let finalPointsToRedeem = currentPoints; // Default: redeem all
+        
+        if (pointsToRedeem.trim() !== '') {
+          finalPointsToRedeem = parseInt(pointsToRedeem);
+          
+          if (isNaN(finalPointsToRedeem) || finalPointsToRedeem <= 0) {
+            alert('Please enter a valid number greater than 0.');
+            return;
+          }
+          
+          if (finalPointsToRedeem > currentPoints) {
+            alert(`Cannot redeem ${finalPointsToRedeem} points. Only ${currentPoints} points available.`);
+            return;
+          }
+        }
+
+        const finalValue = (finalPointsToRedeem / 100).toFixed(2);
+
+        if (!confirm(`Confirm redemption for ${name}?\n\nRedeeming: ${finalPointsToRedeem} pts (£${finalValue})\nRemaining: ${currentPoints - finalPointsToRedeem} pts\n\nContinue?`)) {
+          return;
+        }
+
+        // Call the redemption endpoint
+        const response = await fetch('/.netlify/functions/redeem-points', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            userEmail: email,
+            redeemedPoints: finalPointsToRedeem,
+            redeemedValue: finalValue,
+            acuityTotalInvestment: acuityData.totalInvestment,
+            currentTotalPoints: currentPoints
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to redeem points');
+        }
+
+        const result = await response.json();
+        
+        alert(`✅ Points redeemed successfully!\n\n${name} redeemed ${finalPointsToRedeem} points (£${finalValue})\n\nRemaining: ${currentPoints - finalPointsToRedeem} points`);
+        
+        // Refresh the user list and close modal
+        loadCustomers();
+        closeModal('customerModal');
+
+      } catch (error) {
+        console.error('Error redeeming points:', error);
+        alert(`❌ Failed to redeem points: ${error.message}\n\nPlease try again.`);
+      }
+    }
+
+    async function addManualPoints(email, name, userId) {
+      const input = document.getElementById(`manualPoints-${userId}`);
+      const pointsToAdd = parseInt(input.value);
+      
+      if (!pointsToAdd || pointsToAdd <= 0) {
+        alert('Please enter a valid points amount (greater than 0)');
+        return;
+      }
+      
+      if (!confirm(`Add ${pointsToAdd} bonus points to ${name}?\n\nThis will be recorded as a manual adjustment and will increase their total points balance.`)) {
+        return;
+      }
+      
+      try {
+        const response = await fetch('/.netlify/functions/add-manual-points', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            userEmail: email,
+            pointsToAdd: pointsToAdd,
+            addedBy: 'Admin',
+            reason: 'Manual adjustment'
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to add points');
+        }
+        
+        const result = await response.json();
+        alert(`✅ Successfully added ${pointsToAdd} points to ${name}!\n\nNew total: ${result.newTotal} points`);
+        
+        // Clear input and refresh
+        input.value = '';
+        loadCustomers();
+        closeModal('customerModal');
+        
+      } catch (error) {
+        console.error('Error adding points:', error);
+        alert(`❌ Failed to add points: ${error.message}\n\nPlease try again.`);
+      }
+    }
+
+    async function checkMilestone(email, name) {
+      if (!email) {
+        alert('Email address is required');
+        return;
+      }
+      
+      if (!confirm(`Check milestone for ${name}?\n\nThis will check if they've reached a new milestone and send an email if applicable.`)) {
+        return;
+      }
+      
+      try {
+        const response = await fetch('/.netlify/functions/check-milestone', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userEmail: email })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to check milestone');
+        }
+        
+        const result = await response.json();
+        
+        if (result.skipped) {
+          alert(`ℹ️ Email notifications are disabled for ${name}`);
+        } else if (result.emailSent) {
+          alert(`✅ Milestone email sent to ${name}!\n\nMilestone: ${result.milestone.tier} (${result.milestone.points} points)\nCurrent Balance: ${result.currentBalance} points`);
+        } else {
+          alert(`ℹ️ No new milestone reached for ${name}\n\nCurrent Balance: ${result.currentBalance} points\nLast Milestone: ${result.lastMilestoneReached} points`);
+        }
+        
+        // Refresh user list
+        loadCustomers();
+        
+      } catch (error) {
+        console.error('Error checking milestone:', error);
+        alert(`❌ Failed to check milestone: ${error.message}\n\nPlease try again.`);
+      }
+    }
+
+    // Scroll input into view when keyboard appears on mobile/tablet
+    if (window.innerWidth <= 1024) {
+      document.addEventListener('focusin', function(e) {
+        if (e.target.matches('input[type="number"]')) {
+          setTimeout(() => {
+            e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 300);
+        }
+      });
+    }
   </script>
 </body>
 </html>
