@@ -1132,233 +1132,233 @@
 
     // Add-Ons Catalog
     const ADDONS = {
-      'standard-floor-plan': {
-        id: 'standard-floor-plan',
-        name: 'Standard Floor Plan',
-        price: 24.00,
-        duration: 0,
-        description: '2D floor plan to help buyers visualize the property layout',
-        appliesToVideo: false
-      },
-      'plus-floor-plan': {
-        id: 'plus-floor-plan',
-        name: 'Plus Floor Plan',
-        price: 36.00,
-        duration: 0,
-        description: 'Enhanced 2D floor plan with measurements and room labels',
-        appliesToVideo: false
-      },
-      'cinematic-edit': {
-        id: 'cinematic-edit',
-        name: 'Cinematic Edit',
-        price: 50.00,
-        duration: 0,
-        description: 'Premium cinematic editing with color grading, transitions, and professional soundtrack',
-        appliesToVideo: true
-      },
-      'property-drone-photo': {
-        id: 'property-drone-photo',
-        name: 'Property Drone Photography',
-        price: 130.80,
-        duration: 15,
-        description: 'Up to 10 stunning aerial photographs',
-        appliesToVideo: false
-      },
-      'property-drone-video': {
-        id: 'property-drone-video',
-        name: 'Property Drone Videography',
-        price: 130.80,
-        duration: 15,
-        description: 'Up to 30-second cinematic aerial showcase',
-        appliesToVideo: true
-      },
-      'property-video': {
-        id: 'property-video',
-        name: 'Property Videography',
-        price: 154.80,
-        duration: 60,
-        description: 'Shot in 4K to captivate viewers and drive enquiries',
-        appliesToVideo: true
-      },
-      'property-speed-tours': {
-        id: 'property-speed-tours',
-        name: 'Property Speed Tours',
-        price: 60.00,
-        duration: 0,
-        description: 'Quick walkthrough video tour of the property',
-        appliesToVideo: true
-      },
-      'add-branded-outro': {
-        id: 'add-branded-outro',
-        name: 'Add Branded Outro To Video',
-        price: 0.00,
-        duration: 0,
-        description: 'Add your branded outro to any video content',
-        appliesToVideo: true
-      }
-    };
+  'standard-floor-plan': {
+    id: 'standard-floor-plan',
+    name: 'Standard Floor Plan',
+    price: 24.00,
+    duration: 0,
+    description: '2D floor plan to help buyers visualize the property layout',
+    appliesToVideo: false
+  },
+  'plus-floor-plan': {
+    id: 'plus-floor-plan',
+    name: 'Plus Floor Plan',
+    price: 36.00,
+    duration: 0,
+    description: 'Enhanced 2D floor plan with measurements and room labels',
+    appliesToVideo: false
+  },
+  'elevate-edit': {  // ✅ CHANGED from 'cinematic-edit'
+    id: 'elevate-edit',
+    name: 'Elevate Your Edit',  // ✅ NEW NAME
+    price: 75.00,  // ✅ CHANGED from 50.00
+    duration: 0,
+    description: 'Transform your video with premium editing including dynamic transitions, bold captions, spotlight features on key property details, advanced color grading, and creative effects that make your listing unforgettable',  // ✅ NEW DESCRIPTION
+    appliesToVideo: true
+  },
+  'property-drone-photo': {
+    id: 'property-drone-photo',
+    name: 'Property Drone Photography',
+    price: 130.80,
+    duration: 15,
+    description: 'Up to 10 stunning aerial photographs',
+    appliesToVideo: false
+  },
+  'property-drone-video': {
+    id: 'property-drone-video',
+    name: 'Property Drone Videography',
+    price: 130.80,
+    duration: 15,
+    description: 'Up to 30-second cinematic aerial showcase',
+    appliesToVideo: true
+  },
+  'property-video': {
+    id: 'property-video',
+    name: 'Property Videography',
+    price: 154.80,
+    duration: 60,
+    description: 'Shot in 4K to captivate viewers and drive enquiries',
+    appliesToVideo: true
+  },
+  'property-speed-tours': {
+    id: 'property-speed-tours',
+    name: 'Property Speed Tours',
+    price: 60.00,
+    duration: 0,
+    description: 'Quick walkthrough video tour of the property',
+    appliesToVideo: true
+  },
+  'add-branded-outro': {
+    id: 'add-branded-outro',
+    name: 'Add Branded Outro To Video',
+    price: 0.00,
+    duration: 0,
+    description: 'Add your branded outro to any video content',
+    appliesToVideo: true
+  }
+};
     // Service Catalog with Add-Ons
     const SERVICES = {
-      north: [
-        {
-          id: 'complete-branding',
-          name: 'Complete Branding Package - Photo & Video',
-          price: 894.00,
-          duration: 300,
-          description: 'Full personal branding suite for estate agents. Photography and video content.',
-          isPropertyService: false,
-          availableAddons: ['cinematic-edit', 'add-branded-outro']
-        },
-        {
-          id: 'branding-video',
-          name: 'Branding Videography Session',
-          price: 534.00,
-          duration: 180,
-          description: 'Personal branding video for estate agents. Multiple sequences for social content.',
-          isPropertyService: false,
-          availableAddons: ['cinematic-edit', 'add-branded-outro']
-        },
-        {
-          id: 'branding-photo',
-          name: 'Branding Photography Session - 10 Signature Shots',
-          price: 414.00,
-          duration: 120,
-          description: 'Personal branding for estate agents. You\'re in every shot.',
-          isPropertyService: false,
-          availableAddons: []
-        },
-        {
-          id: 'gold-package',
-          name: 'Gold Package',
-          price: 600.00,
-          duration: 150,
-          description: 'Everything in our Silver Package, plus enhanced lifestyle content.',
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'silver-package',
-          name: 'Silver Package',
-          price: 262.80,
-          duration: 90,
-          description: 'Everything in our Bronze Package, plus full videography and drone shots for complete property marketing.',
-          popular: true,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'all-in-one-drone',
-          name: 'All In One Drone',
-          price: 214.80,
-          duration: 45,
-          description: '10 aerial photos and a 30-second drone video for your property marketing.',
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'property-video',
-          name: 'Property Videography',
-          price: 154.80,
-          duration: 60,
-          description: 'Shot in 4K to captivate viewers and drive enquiries.',
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'property-photo',
-          name: 'Property Photography',
-          price: 118.80,
-          duration: 45,
-          description: 'Up to 30 magazine-quality images that make your property irresistible to potential buyers.',
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
-        },
-        {
-          id: 'drone-video',
-          name: 'Property Drone Videography',
-          price: 130.80,
-          duration: 20,
-          description: 'Up to 30-second cinematic aerial showcase.',
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'drone-photo',
-          name: 'Property Drone Photography',
-          price: 130.80,
-          duration: 20,
-          description: 'Up to 10 stunning aerial photographs.',
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-video', 'property-speed-tours']
-        }
-      ],
-      south: [
-        {
-          id: 'gold-package',
-          name: 'Gold Package',
-          price: 600.00,
-          duration: 150,
-          description: 'Everything in our Silver Package, plus enhanced lifestyle content.',
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'silver-package',
-          name: 'Silver Package',
-          price: 262.80,
-          duration: 90,
-          description: 'Everything in our Bronze Package, plus full videography and drone shots for complete property marketing.',
-          popular: true,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'all-in-one-drone',
-          name: 'All In One Drone',
-          price: 214.80,
-          duration: 45,
-          description: '10 aerial photos and a 30-second drone video for your property marketing.',
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'property-video',
-          name: 'Property Videography',
-          price: 154.80,
-          duration: 60,
-          description: 'Shot in 4K to captivate viewers and drive enquiries.',
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'property-photo',
-          name: 'Property Photography',
-          price: 118.80,
-          duration: 45,
-          description: 'Up to 30 magazine-quality images that make your property irresistible to potential buyers.',
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
-        },
-        {
-          id: 'drone-video',
-          name: 'Property Drone Videography',
-          price: 130.80,
-          duration: 20,
-          description: 'Up to 30-second cinematic aerial showcase.',
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'cinematic-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'drone-photo',
-          name: 'Property Drone Photography',
-          price: 130.80,
-          duration: 20,
-          description: 'Up to 10 stunning aerial photographs.',
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-video', 'property-speed-tours']
-        }
-      ]
-    };
+  north: [
+    {
+      id: 'complete-branding',
+      name: 'Complete Branding Package - Photo & Video',
+      price: 894.00,
+      duration: 300,
+      description: 'Full personal branding suite for estate agents. Photography and video content with classic editing included.',  // ✅ UPDATED
+      isPropertyService: false,
+      availableAddons: ['elevate-edit', 'add-branded-outro']  // ✅ CHANGED
+    },
+    {
+      id: 'branding-video',
+      name: 'Branding Videography Session',
+      price: 534.00,
+      duration: 180,
+      description: 'Personal branding video for estate agents. Multiple sequences for social content with classic editing included.',  // ✅ UPDATED
+      isPropertyService: false,
+      availableAddons: ['elevate-edit', 'add-branded-outro']  // ✅ CHANGED
+    },
+    {
+      id: 'branding-photo',
+      name: 'Branding Photography Session - 10 Signature Shots',
+      price: 414.00,
+      duration: 120,
+      description: 'Personal branding for estate agents. You\'re in every shot.',
+      isPropertyService: false,
+      availableAddons: []
+    },
+    {
+      id: 'gold-package',
+      name: 'Gold Package',
+      price: 600.00,
+      duration: 150,
+      description: 'Everything in our Silver Package, plus enhanced lifestyle content with classic editing included.',  // ✅ UPDATED
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']  // ✅ CHANGED
+    },
+    {
+      id: 'silver-package',
+      name: 'Silver Package',
+      price: 262.80,
+      duration: 90,
+      description: 'Everything in our Bronze Package, plus full videography and drone shots with classic editing included for complete property marketing.',  // ✅ UPDATED
+      popular: true,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']  // ✅ CHANGED
+    },
+    {
+      id: 'all-in-one-drone',
+      name: 'All In One Drone',
+      price: 214.80,
+      duration: 45,
+      description: '10 aerial photos and a 30-second drone video with classic editing included for your property marketing.',  // ✅ UPDATED
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']  // ✅ CHANGED
+    },
+    {
+      id: 'property-video',
+      name: 'Property Videography',
+      price: 154.80,
+      duration: 60,
+      description: 'Shot in 4K with classic editing included (color grading & smooth transitions) to captivate viewers and drive enquiries.',  // ✅ UPDATED
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']  // ✅ CHANGED
+    },
+    {
+      id: 'property-photo',
+      name: 'Property Photography',
+      price: 118.80,
+      duration: 45,
+      description: 'Up to 30 magazine-quality images that make your property irresistible to potential buyers.',
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
+    },
+    {
+      id: 'drone-video',
+      name: 'Property Drone Videography',
+      price: 130.80,
+      duration: 20,
+      description: 'Up to 30-second cinematic aerial showcase with classic editing included.',  // ✅ UPDATED
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']  // ✅ CHANGED
+    },
+    {
+      id: 'drone-photo',
+      name: 'Property Drone Photography',
+      price: 130.80,
+      duration: 20,
+      description: 'Up to 10 stunning aerial photographs.',
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-video', 'property-speed-tours']
+    }
+  ],
+  south: [
+    {
+      id: 'gold-package',
+      name: 'Gold Package',
+      price: 600.00,
+      duration: 150,
+      description: 'Everything in our Silver Package, plus enhanced lifestyle content with classic editing included.',  // ✅ UPDATED
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']  // ✅ CHANGED
+    },
+    {
+      id: 'silver-package',
+      name: 'Silver Package',
+      price: 262.80,
+      duration: 90,
+      description: 'Everything in our Bronze Package, plus full videography and drone shots with classic editing included for complete property marketing.',  // ✅ UPDATED
+      popular: true,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']  // ✅ CHANGED
+    },
+    {
+      id: 'all-in-one-drone',
+      name: 'All In One Drone',
+      price: 214.80,
+      duration: 45,
+      description: '10 aerial photos and a 30-second drone video with classic editing included for your property marketing.',  // ✅ UPDATED
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']  // ✅ CHANGED
+    },
+    {
+      id: 'property-video',
+      name: 'Property Videography',
+      price: 154.80,
+      duration: 60,
+      description: 'Shot in 4K with classic editing included (color grading & smooth transitions) to captivate viewers and drive enquiries.',  // ✅ UPDATED
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']  // ✅ CHANGED
+    },
+    {
+      id: 'property-photo',
+      name: 'Property Photography',
+      price: 118.80,
+      duration: 45,
+      description: 'Up to 30 magazine-quality images that make your property irresistible to potential buyers.',
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
+    },
+    {
+      id: 'drone-video',
+      name: 'Property Drone Videography',
+      price: 130.80,
+      duration: 20,
+      description: 'Up to 30-second cinematic aerial showcase with classic editing included.',  // ✅ UPDATED
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']  // ✅ CHANGED
+    },
+    {
+      id: 'drone-photo',
+      name: 'Property Drone Photography',
+      price: 130.80,
+      duration: 20,
+      description: 'Up to 10 stunning aerial photographs.',
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-video', 'property-speed-tours']
+    }
+  ]
+};
 
     // Validate UK Postcode Format
     function validatePostcode(postcode) {
