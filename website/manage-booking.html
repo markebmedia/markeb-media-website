@@ -355,33 +355,35 @@
         </p>
 
         <div class="alert alert-info">
-          <strong>Note:</strong> Availability is subject to media specialist schedule. If your preferred slot is unavailable, we'll contact you with alternative options.
+          <strong>Note:</strong> Availability is checked in real-time based on media specialist schedule and travel times between properties.
+        </div>
+
+        <div id="reschedule24HourWarning" class="alert alert-warning hidden">
+          <strong>⏰ Cannot Reschedule:</strong> Rescheduling requires 24 hours notice. Your booking is too close to reschedule.
         </div>
 
         <label class="form-label">New Date</label>
-        <input type="date" id="newDate" class="form-input" />
+        <input type="date" id="newDate" class="form-input" onchange="checkRescheduleAvailability()" />
 
-        <label class="form-label">New Time</label>
-        <select id="newTime" class="form-input">
-          <option value="">Select a time</option>
-          <option value="09:00">09:00 AM</option>
-          <option value="09:30">09:30 AM</option>
-          <option value="10:00">10:00 AM</option>
-          <option value="10:30">10:30 AM</option>
-          <option value="11:00">11:00 AM</option>
-          <option value="11:30">11:30 AM</option>
-          <option value="12:00">12:00 PM</option>
-          <option value="12:30">12:30 PM</option>
-          <option value="13:00">01:00 PM</option>
-          <option value="13:30">01:30 PM</option>
-          <option value="14:00">02:00 PM</option>
-          <option value="14:30">02:30 PM</option>
-          <option value="15:00">03:00 PM</option>
-        </select>
+        <div id="availabilityLoading" class="hidden" style="text-align: center; padding: 20px; color: #64748b;">
+          <div class="loading-spinner" style="width: 32px; height: 32px; margin: 0 auto 12px;"></div>
+          <p>Checking availability...</p>
+        </div>
+
+        <div id="noSlotsAvailable" class="alert alert-warning hidden">
+          <strong>⚠️ No Available Times:</strong> <span id="noSlotsReason">Please select a different date.</span>
+        </div>
+
+        <div id="timeSlotSection" class="hidden">
+          <label class="form-label">New Time</label>
+          <select id="newTime" class="form-input" onchange="enableRescheduleButton()">
+            <option value="">Select a time</option>
+          </select>
+        </div>
 
         <div class="button-group">
           <button class="btn btn-secondary" onclick="hideRescheduleForm()">Cancel</button>
-          <button class="btn btn-primary" onclick="submitReschedule()">Confirm Reschedule</button>
+          <button class="btn btn-primary" id="confirmRescheduleBtn" onclick="submitReschedule()" disabled>Confirm Reschedule</button>
         </div>
       </div>
 
@@ -515,6 +517,10 @@
         document.getElementById('rescheduleBtn').textContent = '📅 Shoot Completed';
         document.getElementById('cancelBtn').disabled = true;
         document.getElementById('cancelBtn').textContent = '✖️ Cannot Cancel';
+      } else if (hoursUntil < 24) {
+        // Disable reschedule within 24 hours
+        document.getElementById('rescheduleBtn').disabled = true;
+        document.getElementById('rescheduleBtn').textContent = '📅 Too Late to Reschedule';
       }
 
       // Set min date for reschedule (tomorrow)
@@ -529,12 +535,180 @@
     }
 
     function showRescheduleForm() {
+      // Check if within 24 hours
+      if (bookingData.hoursUntilBooking < 24) {
+        document.getElementById('reschedule24HourWarning').classList.remove('hidden');
+      } else {
+        document.getElementById('reschedule24HourWarning').classList.add('hidden');
+      }
+      
       document.getElementById('rescheduleForm').classList.remove('hidden');
       document.getElementById('rescheduleForm').scrollIntoView({ behavior: 'smooth' });
     }
 
     function hideRescheduleForm() {
       document.getElementById('rescheduleForm').classList.add('hidden');
+      document.getElementById('newDate').value = '';
+      document.getElementById('newTime').innerHTML = '<option value="">Select a time</option>';
+      document.getElementById('timeSlotSection').classList.add('hidden');
+      document.getElementById('noSlotsAvailable').classList.add('hidden');
+      document.getElementById('confirmRescheduleBtn').disabled = true;
+    }
+
+    // ✅ NEW: Check availability when date is selected (SAME AS BOOKING.HTML)
+    async function checkRescheduleAvailability() {
+      const newDate = document.getElementById('newDate').value;
+      
+      if (!newDate) return;
+
+      // Extract postcode from property address
+      const postcode = extractPostcode(bookingData.propertyAddress);
+      
+      if (!postcode) {
+        alert('Unable to extract postcode from property address. Please contact support.');
+        return;
+      }
+
+      // Show loading state
+      document.getElementById('availabilityLoading').classList.remove('hidden');
+      document.getElementById('timeSlotSection').classList.add('hidden');
+      document.getElementById('noSlotsAvailable').classList.add('hidden');
+      document.getElementById('confirmRescheduleBtn').disabled = true;
+
+      try {
+        // ✅ SAME CALL AS BOOKING.HTML - with lowercase region
+        const response = await fetch('/.netlify/functions/check-availability', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            postcode: postcode,
+            region: bookingData.region, // lowercase 'north' or 'south'
+            selectedDate: newDate
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to check availability');
+        }
+
+        const data = await response.json();
+        
+        console.log('Availability response:', data);
+
+        // Hide loading
+        document.getElementById('availabilityLoading').classList.add('hidden');
+
+        // Filter available slots
+        const availableSlots = data.availableSlots.filter(slot => slot.available);
+
+        if (availableSlots.length === 0) {
+          // No slots available
+          document.getElementById('noSlotsAvailable').classList.remove('hidden');
+          
+          // Determine reason
+          let reason = 'No available times on this date.';
+          if (data.message) {
+            reason = data.message;
+          } else if (data.availableSlots[0]?.reason) {
+            reason = data.availableSlots[0].reason;
+          }
+          
+          document.getElementById('noSlotsReason').textContent = reason;
+          document.getElementById('timeSlotSection').classList.add('hidden');
+        } else {
+          // Populate time slots
+          document.getElementById('noSlotsAvailable').classList.add('hidden');
+          document.getElementById('timeSlotSection').classList.remove('hidden');
+          
+          const timeSelect = document.getElementById('newTime');
+          timeSelect.innerHTML = '<option value="">Select a time</option>';
+          
+          availableSlots.forEach(slot => {
+            const option = document.createElement('option');
+            option.value = slot.time;
+            option.textContent = formatTime(slot.time);
+            timeSelect.appendChild(option);
+          });
+        }
+
+      } catch (error) {
+        console.error('Error checking availability:', error);
+        document.getElementById('availabilityLoading').classList.add('hidden');
+        alert('Failed to check availability. Please try again.');
+      }
+    }
+
+    // ✅ NEW: Enable reschedule button when time selected
+    function enableRescheduleButton() {
+      const newTime = document.getElementById('newTime').value;
+      document.getElementById('confirmRescheduleBtn').disabled = !newTime;
+    }
+
+    // ✅ NEW: Format time to 12-hour format
+    function formatTime(time24) {
+      const [hours, minutes] = time24.split(':');
+      const hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12;
+      return `${hour12}:${minutes} ${ampm}`;
+    }
+
+    // ✅ NEW: Extract postcode from address
+    function extractPostcode(address) {
+      if (!address) return '';
+      
+      const postcodeRegex = /([A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2})/i;
+      const match = address.match(postcodeRegex);
+      
+      return match ? match[0].trim().toUpperCase() : '';
+    }
+
+    async function submitReschedule() {
+      const newDate = document.getElementById('newDate').value;
+      const newTime = document.getElementById('newTime').value;
+
+      if (!newDate || !newTime) {
+        alert('Please select both a date and time');
+        return;
+      }
+
+      if (!confirm(`Are you sure you want to reschedule to ${newDate} at ${formatTime(newTime)}?`)) {
+        return;
+      }
+
+      // Show loading state
+      const confirmBtn = document.getElementById('confirmRescheduleBtn');
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Rescheduling...';
+
+      try {
+        const response = await fetch('/.netlify/functions/reschedule-booking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bookingRef: bookingData.bookingRef,
+            newDate: newDate,
+            newTime: newTime,
+            clientEmail: bookingData.clientEmail
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to reschedule');
+        }
+
+        // Redirect to success page
+        window.location.href = `/reschedule-success.html?ref=${bookingData.bookingRef}&date=${newDate}&time=${newTime}&email=${encodeURIComponent(bookingData.clientEmail)}`;
+
+      } catch (error) {
+        console.error('Reschedule error:', error);
+        alert(`Failed to reschedule: ${error.message}`);
+        
+        // Reset button
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm Reschedule';
+      }
     }
 
     function showCancelForm() {
@@ -586,45 +760,6 @@
 
     function hideCancelForm() {
       document.getElementById('cancelForm').classList.add('hidden');
-    }
-
-    async function submitReschedule() {
-      const newDate = document.getElementById('newDate').value;
-      const newTime = document.getElementById('newTime').value;
-
-      if (!newDate || !newTime) {
-        alert('Please select both a date and time');
-        return;
-      }
-
-      if (!confirm(`Are you sure you want to reschedule to ${newDate} at ${newTime}?`)) {
-        return;
-      }
-
-      try {
-        const response = await fetch('/.netlify/functions/reschedule-booking', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            bookingRef: bookingData.bookingRef,
-            newDate: newDate,
-            newTime: newTime,
-            clientEmail: bookingData.clientEmail
-          })
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || 'Failed to reschedule');
-        }
-
-        alert('✅ Booking rescheduled successfully! You will receive a confirmation email shortly.');
-        window.location.reload();
-
-      } catch (error) {
-        console.error('Reschedule error:', error);
-        alert(`Failed to reschedule: ${error.message}`);
-      }
     }
 
     async function submitCancellation() {

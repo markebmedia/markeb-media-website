@@ -3,10 +3,11 @@
 const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM_EMAIL = 'Markeb Media <bookings@markebmedia.com>';
+const FROM_EMAIL = 'Markeb Media <commercial@markebmedia.com>';
+const BCC_EMAIL = 'commercial@markebmedia.com'; // ✅ BCC all client emails
 const SITE_URL = 'https://markebmedia.com';
 const LOGO_URL = 'https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png';
-const MANAGE_BOOKING_PATH = '/manage-booking';
+const MANAGE_BOOKING_PATH = '/manage-booking'; // ✅ Uses redirect to /website/manage-booking.html
 
 // Format date nicely
 function formatDate(dateString) {
@@ -48,7 +49,9 @@ function getEmailLayout(content) {
       text-align: center;
     }
     .header img {
-      height: 50px;
+      max-width: 200px;
+      width: 100%;
+      height: auto;
       margin-bottom: 20px;
     }
     .header h1 {
@@ -84,6 +87,7 @@ function getEmailLayout(content) {
       color: #1e293b;
       font-weight: 600;
       text-align: right;
+      max-width: 60%;
     }
     .button {
       display: inline-block;
@@ -141,7 +145,7 @@ function getEmailLayout(content) {
       <p>
         <strong>Markeb Media</strong><br>
         Professional Property Photography<br>
-        <a href="mailto:bookings@markebmedia.com">bookings@markebmedia.com</a>
+        <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
       </p>
       <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">
         Need help? <a href="${SITE_URL}/contact">Contact us</a>
@@ -228,6 +232,7 @@ async function sendBookingConfirmation(booking) {
   await resend.emails.send({
     from: FROM_EMAIL,
     to: booking.clientEmail,
+    bcc: BCC_EMAIL, // ✅ BCC to commercial
     subject: `Booking Confirmed - ${booking.bookingRef}`,
     html: emailHtml
   });
@@ -307,6 +312,7 @@ async function sendPaymentConfirmation(booking) {
   await resend.emails.send({
     from: FROM_EMAIL,
     to: booking.clientEmail,
+    bcc: BCC_EMAIL, // ✅ BCC to commercial
     subject: `Payment Confirmed - ${booking.bookingRef}`,
     html: emailHtml
   });
@@ -362,6 +368,7 @@ async function sendRescheduleConfirmation(booking, oldDate, oldTime) {
   await resend.emails.send({
     from: FROM_EMAIL,
     to: booking.clientEmail,
+    bcc: BCC_EMAIL, // ✅ BCC to commercial
     subject: `Booking Rescheduled - ${booking.bookingRef}`,
     html: emailHtml
   });
@@ -424,6 +431,7 @@ async function sendCancellationConfirmation(booking, cancellationCharge, refundA
   await resend.emails.send({
     from: FROM_EMAIL,
     to: booking.clientEmail,
+    bcc: BCC_EMAIL, // ✅ BCC to commercial
     subject: `Booking Cancelled - ${booking.bookingRef}`,
     html: emailHtml
   });
@@ -478,6 +486,7 @@ async function sendReminderEmail(booking) {
   await resend.emails.send({
     from: FROM_EMAIL,
     to: booking.clientEmail,
+    bcc: BCC_EMAIL, // ✅ BCC to commercial
     subject: `Reminder: Your Shoot Tomorrow - ${booking.bookingRef}`,
     html: emailHtml
   });
