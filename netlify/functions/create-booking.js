@@ -26,6 +26,11 @@ exports.handler = async (event, context) => {
   try {
     const bookingData = JSON.parse(event.body);
     
+    // ✅ Capitalize region to match Airtable Single Select options (North/South)
+    if (bookingData.region) {
+      bookingData.region = bookingData.region.charAt(0).toUpperCase() + bookingData.region.slice(1).toLowerCase();
+    }
+    
     console.log('Received booking data:', {
       postcode: bookingData.postcode,
       region: bookingData.region,
@@ -106,6 +111,7 @@ exports.handler = async (event, context) => {
     };
 
     console.log('Creating Airtable record with payment status:', paymentStatus);
+    console.log('Airtable record Region field:', airtableRecord.fields.Region);
 
     // Create booking in Airtable
     const airtableUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Bookings`;
