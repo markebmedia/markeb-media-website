@@ -946,9 +946,561 @@
       font-size: 20px;
       box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
+
+    /* ===== MOBILE-FRIENDLY CALENDAR STYLES ===== */
+
+/* Optimize calendar for small screens */
+@media (max-width: 768px) {
+  .calendar-container {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .calendar-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .calendar-nav {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .calendar-current {
+    font-size: 16px;
+    min-width: 150px;
+  }
+
+  .calendar-view-selector {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .calendar-view-btn {
+    flex: 1;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .calendar-grid.month .calendar-day {
+    min-height: 70px;
+    padding: 4px;
+  }
+
+  .calendar-day-number {
+    font-size: 12px;
+  }
+
+  .calendar-booking {
+    font-size: 9px;
+    padding: 2px 4px;
+  }
+
+  .modal-dialog {
+    max-width: 95%;
+    margin: 10px auto;
+  }
+
+  .modal-header {
+    padding: 16px;
+  }
+
+  .modal-header h3 {
+    font-size: 18px;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 12px;
+  }
+
+  .detail-value {
+    text-align: left;
+    width: 100%;
+  }
+
+  .action-buttons-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-bar {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .filter-input,
+  .filter-select {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+
+  .data-table {
+    font-size: 13px;
+  }
+}
+
+/* Extra small screens (phones) */
+@media (max-width: 480px) {
+  .calendar-container {
+    padding: 8px;
+    border-radius: 8px;
+  }
+
+  .calendar-header {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .calendar-nav {
+    gap: 6px;
+  }
+
+  .btn.btn-small {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .calendar-current {
+    font-size: 13px;
+    min-width: 100px;
+  }
+
+  .calendar-view-selector {
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .calendar-view-btn {
+    padding: 5px 6px;
+    font-size: 10px;
+  }
+
+  /* Compact calendar grid */
+  .calendar-grid {
+    gap: 0.5px;
+  }
+
+  .calendar-day-header {
+    padding: 6px 2px;
+    font-size: 10px;
+  }
+
+  .calendar-grid.month .calendar-day {
+    min-height: 50px;
+    max-height: 50px;
+    padding: 2px;
+    border-radius: 4px;
+  }
+
+  .calendar-day-number {
+    font-size: 11px;
+    margin-bottom: 2px;
+  }
+
+  /* Show only dots for bookings on tiny screens */
+  .calendar-booking {
+    height: 6px;
+    padding: 0;
+    margin-bottom: 1px;
+    border-radius: 3px;
+    text-indent: -9999px; /* Hide text */
+    overflow: hidden;
+  }
+
+  /* Add +more indicator */
+  .calendar-day.has-more::after {
+    content: '+';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 8px;
+    font-weight: 700;
+    color: #64748b;
+    background: #fff;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal {
+    padding: 0;
+    align-items: flex-start;
+  }
+
+  .modal-dialog {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  .modal-header {
+    border-radius: 0;
+    padding: 12px;
+  }
+
+  .modal-header h3 {
+    font-size: 16px;
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+
+  .modal-body {
+    padding: 12px;
+  }
+
+  .detail-item {
+    padding: 10px 0;
+  }
+
+  .detail-label,
+  .detail-value {
+    font-size: 13px;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .action-buttons-grid {
+    gap: 8px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 12px;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+
+  .data-table {
+    font-size: 12px;
+  }
+
+  .data-table td {
+    padding: 6px 0;
+  }
+
+  .data-table td:before {
+    font-size: 10px;
+  }
+
+  .data-table .btn-small {
+    padding: 6px 10px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .data-table td[data-label="Actions"] {
+    padding-left: 0 !important;
+  }
+
+  .data-table td[data-label="Actions"] > div {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .data-table td[data-label="Actions"] .btn {
+    width: 100%;
+  }
+
+  .spinner {
+    width: 35px;
+    height: 35px;
+    border-width: 3px;
+  }
+}
+
+/* Touch-friendly tap targets */
+@media (pointer: coarse) {
+  .calendar-booking,
+  .calendar-day,
+  .btn,
+  .nav-item {
+    min-height: 44px;
+  }
+
+  .calendar-view-btn {
+    min-height: 40px;
+  }
+}
+
+/* ===== PASSWORD PROTECTION STYLES ===== */
+.password-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 20px;
+}
+
+.password-modal.unlocked {
+  display: none;
+}
+
+.password-dialog {
+  background: #fff;
+  border-radius: 24px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  animation: passwordSlideIn 0.4s ease-out;
+}
+
+@keyframes passwordSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.password-header {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  padding: 48px 32px;
+  text-align: center;
+  color: #fff;
+}
+
+.password-logo {
+  font-size: 64px;
+  margin-bottom: 16px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.password-header h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.password-header p {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.password-body {
+  padding: 40px 32px;
+}
+
+.password-input-group {
+  margin-bottom: 24px;
+}
+
+.password-input {
+  width: 100%;
+  padding: 16px 20px;
+  border: 3px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 18px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: #f8fafc;
+}
+
+.password-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.password-error {
+  display: none;
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: #fee2e2;
+  border: 2px solid #ef4444;
+  border-radius: 8px;
+  color: #991b1b;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.password-error.show {
+  display: block;
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.password-submit {
+  width: 100%;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.password-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.password-submit:active {
+  transform: translateY(0);
+}
+
+.password-icon {
+  font-size: 20px;
+}
+
+.password-footer {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 2px solid #e2e8f0;
+  text-align: center;
+}
+
+.password-footer p {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+  .password-dialog {
+    border-radius: 16px;
+  }
+
+  .password-header {
+    padding: 32px 24px;
+  }
+
+  .password-logo {
+    font-size: 48px;
+  }
+
+  .password-header h2 {
+    font-size: 24px;
+  }
+
+  .password-body {
+    padding: 28px 24px;
+  }
+
+  .password-input {
+    font-size: 16px;
+    padding: 14px 16px;
+  }
+}
   </style>
 </head>
 <body>
+
+  <body>
+  <!-- Password Protection Modal -->
+  <div class="password-modal" id="passwordModal">
+    <div class="password-dialog">
+      <div class="password-header">
+        <div class="password-logo">🛡️</div>
+        <h2>Admin Access Required</h2>
+        <p>Enter the admin code to continue</p>
+      </div>
+      
+      <div class="password-body">
+        <form id="passwordForm" onsubmit="checkPassword(event)">
+          <div class="password-input-group">
+            <input 
+              type="password" 
+              id="adminPassword" 
+              class="password-input"
+              placeholder="Enter admin code"
+              autocomplete="off"
+              autofocus
+            />
+            <div class="password-error" id="passwordError">
+              ❌ Incorrect code. Please try again.
+            </div>
+          </div>
+          
+          <button type="submit" class="password-submit">
+            <span>Unlock Admin Panel</span>
+            <span class="password-icon">🔓</span>
+          </button>
+        </form>
+        
+        <div class="password-footer">
+          <p>⚠️ Authorized personnel only</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Mobile Menu Button -->
   <button class="mobile-menu-btn" onclick="toggleSidebar()">☰ Menu</button>
 
@@ -995,6 +1547,13 @@
         UK Map
       </div>
     </div>
+
+<div class="nav-section" style="margin-top: auto; padding-top: 24px; border-top: 2px solid #e2e8f0;">
+  <div class="nav-item" onclick="adminLogout()" style="color: #ef4444;">
+    <span class="nav-icon">🚪</span>
+    Logout
+  </div>
+</div>
   </div>
 
   <!-- Main Content -->
@@ -1149,7 +1708,320 @@
     </div>
   </div>
 
+  <!-- Reschedule Modal -->
+<div class="modal" id="rescheduleModal" onclick="closeModal('rescheduleModal')">
+  <div class="modal-dialog" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Reschedule Booking</h3>
+      <button class="modal-close" onclick="closeModal('rescheduleModal')">&times;</button>
+    </div>
+    <div class="modal-body" id="rescheduleModalBody">
+      <!-- Content populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<!-- Cancel Modal -->
+<div class="modal" id="cancelModal" onclick="closeModal('cancelModal')">
+  <div class="modal-dialog" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Cancel Booking</h3>
+      <button class="modal-close" onclick="closeModal('cancelModal')">&times;</button>
+    </div>
+    <div class="modal-body" id="cancelModalBody">
+      <!-- Content populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<!-- Modify Service Modal -->
+<div class="modal" id="modifyServiceModal" onclick="closeModal('modifyServiceModal')">
+  <div class="modal-dialog" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Modify Service</h3>
+      <button class="modal-close" onclick="closeModal('modifyServiceModal')">&times;</button>
+    </div>
+    <div class="modal-body" id="modifyServiceModalBody">
+      <!-- Content populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
   <script>
+    // ===== PASSWORD PROTECTION =====
+    const ADMIN_CODE = 'MARKEB2546';
+    const SESSION_KEY = 'admin_authenticated';
+    const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
+
+    // Check if already authenticated
+    function isAuthenticated() {
+      const authData = localStorage.getItem(SESSION_KEY);
+      if (!authData) return false;
+      
+      try {
+        const { timestamp } = JSON.parse(authData);
+        const now = Date.now();
+        
+        // Check if session is still valid
+        if (now - timestamp < SESSION_DURATION) {
+          return true;
+        } else {
+          // Session expired
+          localStorage.removeItem(SESSION_KEY);
+          return false;
+        }
+      } catch (e) {
+        return false;
+      }
+    }
+
+    // Check password
+    function checkPassword(event) {
+      event.preventDefault();
+      
+      const input = document.getElementById('adminPassword');
+      const error = document.getElementById('passwordError');
+      const modal = document.getElementById('passwordModal');
+      
+      if (input.value === ADMIN_CODE) {
+        // Correct password
+        localStorage.setItem(SESSION_KEY, JSON.stringify({
+          timestamp: Date.now()
+        }));
+        
+        // Success animation
+        modal.style.opacity = '0';
+        modal.style.transform = 'scale(0.95)';
+        modal.style.transition = 'all 0.3s ease';
+        
+        setTimeout(() => {
+          modal.classList.add('unlocked');
+        }, 300);
+        
+      } else {
+        // Incorrect password
+        error.classList.add('show');
+        input.value = '';
+        input.classList.add('error');
+        
+        setTimeout(() => {
+          error.classList.remove('show');
+          input.classList.remove('error');
+        }, 3000);
+      }
+    }
+
+    // Logout function
+    function adminLogout() {
+      if (confirm('Are you sure you want to logout from the admin panel?')) {
+        localStorage.removeItem(SESSION_KEY);
+        location.reload();
+      }
+    }
+
+    // Check authentication on page load
+    window.addEventListener('DOMContentLoaded', function() {
+      if (isAuthenticated()) {
+        document.getElementById('passwordModal').classList.add('unlocked');
+      }
+    });
+
+
+   // ===== SERVICE & ADDON CATALOGS =====
+    const SERVICES_CATALOG = {
+      north: [
+        {
+          id: 'complete-branding',
+          name: 'Complete Branding Package - Photo & Video',
+          price: 894.00,
+          duration: 300,
+          isPropertyService: false,
+          availableAddons: ['elevate-edit', 'add-branded-outro']
+        },
+        {
+          id: 'branding-video',
+          name: 'Branding Videography Session',
+          price: 534.00,
+          duration: 180,
+          isPropertyService: false,
+          availableAddons: ['elevate-edit', 'add-branded-outro']
+        },
+        {
+          id: 'branding-photo',
+          name: 'Branding Photography Session - 10 Signature Shots',
+          price: 414.00,
+          duration: 120,
+          isPropertyService: false,
+          availableAddons: []
+        },
+        {
+          id: 'gold-package',
+          name: 'Gold Package',
+          price: 600.00,
+          duration: 150,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'silver-package',
+          name: 'Silver Package',
+          price: 262.80,
+          duration: 90,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'all-in-one-drone',
+          name: 'All In One Drone',
+          price: 214.80,
+          duration: 45,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'property-video',
+          name: 'Property Videography',
+          price: 154.80,
+          duration: 60,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'property-photo',
+          name: 'Property Photography',
+          price: 118.80,
+          duration: 45,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
+        },
+        {
+          id: 'drone-video',
+          name: 'Property Drone Videography',
+          price: 130.80,
+          duration: 20,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'drone-photo',
+          name: 'Property Drone Photography',
+          price: 130.80,
+          duration: 20,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-video', 'property-speed-tours']
+        }
+      ],
+      south: [
+        {
+          id: 'gold-package',
+          name: 'Gold Package',
+          price: 600.00,
+          duration: 150,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'silver-package',
+          name: 'Silver Package',
+          price: 262.80,
+          duration: 90,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'all-in-one-drone',
+          name: 'All In One Drone',
+          price: 214.80,
+          duration: 45,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'property-video',
+          name: 'Property Videography',
+          price: 154.80,
+          duration: 60,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'property-photo',
+          name: 'Property Photography',
+          price: 118.80,
+          duration: 45,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
+        },
+        {
+          id: 'drone-video',
+          name: 'Property Drone Videography',
+          price: 130.80,
+          duration: 20,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'drone-photo',
+          name: 'Property Drone Photography',
+          price: 130.80,
+          duration: 20,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-video', 'property-speed-tours']
+        }
+      ]
+    };
+
+    const ADDONS_CATALOG = {
+      'standard-floor-plan': {
+        id: 'standard-floor-plan',
+        name: 'Standard Floor Plan',
+        price: 24.00,
+        description: '2D floor plan to help buyers visualize the property layout'
+      },
+      'plus-floor-plan': {
+        id: 'plus-floor-plan',
+        name: 'Plus Floor Plan',
+        price: 36.00,
+        description: 'Enhanced 2D floor plan with measurements and room labels'
+      },
+      'elevate-edit': {
+        id: 'elevate-edit',
+        name: 'Elevate Your Edit',
+        price: 75.00,
+        description: 'Transform your video with premium editing including dynamic transitions, bold captions, spotlight features'
+      },
+      'property-drone-photo': {
+        id: 'property-drone-photo',
+        name: 'Property Drone Photography',
+        price: 130.80,
+        description: 'Up to 10 stunning aerial photographs'
+      },
+      'property-drone-video': {
+        id: 'property-drone-video',
+        name: 'Property Drone Videography',
+        price: 130.80,
+        description: 'Up to 30-second cinematic aerial showcase'
+      },
+      'property-video': {
+        id: 'property-video',
+        name: 'Property Videography',
+        price: 154.80,
+        description: 'Shot in 4K to captivate viewers and drive enquiries'
+      },
+      'property-speed-tours': {
+        id: 'property-speed-tours',
+        name: 'Property Speed Tours',
+        price: 60.00,
+        description: 'Quick walkthrough video tour of the property'
+      },
+      'add-branded-outro': {
+        id: 'add-branded-outro',
+        name: 'Add Branded Outro To Video',
+        price: 0.00,
+        description: 'Add your branded outro to any video content'
+      }
+    };
+
     // Global state
     let currentView = 'month';
     let currentDate = new Date();
@@ -1850,192 +2722,538 @@ function renderPendingBookingsTable(bookings) {
 }
 
     // ===== ADMIN BOOKING ACTIONS =====
- async function chargePendingBooking(bookingId) {
+    async function chargePendingBooking(bookingId) {
+      const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
+      if (!booking) return alert('Booking data not found');
+
+      if (booking.fields['Payment Status'] !== 'Pending') {
+        alert(`❌ Cannot charge card\n\nThis booking is not in "Pending" status.\nCurrent status: ${booking.fields['Payment Status'] || 'Unknown'}\n\nOnly bookings with "Pending" payment status can be charged.`);
+        return;
+      }
+
+      if (!booking.fields['Stripe Payment Method ID']) {
+        alert(`❌ No payment method on file\n\nThis booking does not have a saved card.\n\nPlease use "Send Payment Link" instead.`);
+        return;
+      }
+
+      const clientName = booking.fields['Client Name'];
+      const amount = (booking.fields['Total Price'] || 0).toFixed(2);
+      
+      if (!confirm(`Charge ${clientName}'s saved card?\n\nAmount: £${amount}\n\nThis will immediately charge their payment method and send a confirmation email.`)) return;
+      
+      const btn = event.target;
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '⏳ Processing...';
+      btn.disabled = true;
+
+      try {
+        const response = await fetch('/.netlify/functions/charge-card', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert(`✅ Payment Successful!\n\nCharged: £${data.amount.toFixed(2)}\nClient: ${clientName}\n\nConfirmation email sent automatically.`);
+          closeModal('bookingModal');
+          loadBookings();
+          loadPendingBookings();
+          loadDashboardStats();
+          loadCalendar();
+        } else {
+          alert(`❌ Payment Failed\n\n${data.error || 'Unknown error'}\n\n${data.userMessage || 'Please try sending a payment link instead.'}`);
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      } catch (error) {
+        console.error('Error charging card:', error);
+        alert('❌ System Error\n\nFailed to process payment. Please try again or contact support.');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    // Show Reschedule Modal
+function showAdminReschedule(bookingId) {
   const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
-  if (!booking) return alert('Booking data not found');
+  if (!booking) return;
+  
+  const modal = document.getElementById('rescheduleModal');
+  const modalBody = document.getElementById('rescheduleModalBody');
+  
+  modalBody.innerHTML = `
+    <div class="form-group">
+      <label class="form-label">Current Date & Time</label>
+      <div style="padding: 12px; background: #f8fafc; border-radius: 8px; font-weight: 600;">
+        ${booking.fields['Date']} at ${booking.fields['Time']}
+      </div>
+    </div>
 
-  // ✅ Check payment status on frontend first
-  if (booking.fields['Payment Status'] !== 'Pending') {
-    alert(`❌ Cannot charge card\n\nThis booking is not in "Pending" status.\nCurrent status: ${booking.fields['Payment Status'] || 'Unknown'}\n\nOnly bookings with "Pending" payment status can be charged.`);
+    <div class="form-group">
+      <label class="form-label" for="rescheduleDate">New Date *</label>
+      <input 
+        type="date" 
+        id="rescheduleDate" 
+        class="form-input" 
+        value="${booking.fields['Date']}"
+        min="${new Date().toISOString().split('T')[0]}"
+      />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="rescheduleTime">New Time *</label>
+      <select id="rescheduleTime" class="form-input">
+        ${generateTimeOptions(booking.fields['Time'])}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+        <input type="checkbox" id="rescheduleSendEmail" checked style="width: 20px; height: 20px;">
+        <span style="font-size: 14px; font-weight: 600;">Send email notification to customer</span>
+      </label>
+    </div>
+
+    <div class="button-group" style="margin-top: 24px;">
+      <button class="btn btn-secondary" onclick="closeModal('rescheduleModal')" style="flex: 1;">
+        Cancel
+      </button>
+      <button class="btn btn-primary" onclick="confirmReschedule('${bookingId}')" style="flex: 2;">
+        Confirm Reschedule
+      </button>
+    </div>
+  `;
+  
+  modal.classList.add('active');
+}
+
+function generateTimeOptions(currentTime) {
+  const times = [];
+  for (let hour = 9; hour <= 17; hour++) {
+    for (let minute of [0, 30]) {
+      if (hour === 17 && minute === 30) break;
+      const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      const selected = timeStr === currentTime ? 'selected' : '';
+      times.push(`<option value="${timeStr}" ${selected}>${timeStr}</option>`);
+    }
+  }
+  return times.join('');
+}
+
+async function confirmReschedule(bookingId) {
+  const newDate = document.getElementById('rescheduleDate').value;
+  const newTime = document.getElementById('rescheduleTime').value;
+  const sendEmail = document.getElementById('rescheduleSendEmail').checked;
+
+  if (!newDate || !newTime) {
+    alert('Please select both date and time');
     return;
   }
-
-  // ✅ Check if payment method exists
-  if (!booking.fields['Stripe Payment Method ID']) {
-    alert(`❌ No payment method on file\n\nThis booking does not have a saved card.\n\nPlease use "Send Payment Link" instead.`);
-    return;
-  }
-
-  const clientName = booking.fields['Client Name'];
-  const amount = (booking.fields['Total Price'] || 0).toFixed(2);
-  
-  if (!confirm(`Charge ${clientName}'s saved card?\n\nAmount: £${amount}\n\nThis will immediately charge their payment method and send a confirmation email.`)) return;
-  
-  // Show loading state
-  const btn = event.target;
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '⏳ Processing...';
-  btn.disabled = true;
 
   try {
-    const response = await fetch('/.netlify/functions/charge-card', {
+    const response = await fetch('/.netlify/functions/admin-reschedule-booking', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bookingId })
+      body: JSON.stringify({ bookingId, newDate, newTime, sendEmail })
     });
 
     const data = await response.json();
-    
-    console.log('Charge card response:', data); // Debug log
 
     if (data.success) {
-      alert(`✅ Payment Successful!\n\nCharged: £${data.amount.toFixed(2)}\nClient: ${clientName}\n\nConfirmation email sent automatically.`);
+      alert(`✅ Rescheduled!\n\n${newDate} at ${newTime}\n\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`);
+      closeModal('rescheduleModal');
       closeModal('bookingModal');
       loadBookings();
-      loadPendingBookings();
-      loadDashboardStats();
       loadCalendar();
+      loadDashboardStats();
     } else {
-      // Display the exact error from backend
-      alert(`❌ Payment Failed\n\n${data.error || 'Unknown error'}\n\n${data.userMessage || 'Please try sending a payment link instead.'}`);
-      btn.innerHTML = originalText;
-      btn.disabled = false;
+      alert(`❌ Error: ${data.error}`);
     }
   } catch (error) {
-    console.error('Error charging card:', error);
-    alert('❌ System Error\n\nFailed to process payment. Please try again or contact support.');
-    btn.innerHTML = originalText;
-    btn.disabled = false;
+    console.error('Reschedule error:', error);
+    alert('❌ Failed to reschedule.');
   }
 }
 
-    function showAdminReschedule(bookingId) {
-      const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
-      if (!booking) return;
-      
-      const sendEmail = document.getElementById('sendEmailToggle')?.checked ?? true;
-      
-      const newDate = prompt('Enter new date (YYYY-MM-DD):', booking.fields['Date']);
-      if (!newDate || !newDate.match(/^\d{4}-\d{2}-\d{2}$/)) return;
-      
-      const newTime = prompt('Enter new time (HH:MM):', booking.fields['Time']);
-      if (!newTime || !newTime.match(/^\d{2}:\d{2}$/)) return;
-      
-      if (!confirm(`Reschedule to ${newDate} at ${newTime}?\n\nSend email: ${sendEmail ? 'Yes' : 'No'}`)) return;
-      
-      adminRescheduleBooking(bookingId, newDate, newTime, sendEmail);
+    // Show Cancel Modal
+function showAdminCancel(bookingId) {
+  const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
+  if (!booking) return;
+  
+  const modal = document.getElementById('cancelModal');
+  const modalBody = document.getElementById('cancelModalBody');
+  
+  modalBody.innerHTML = `
+    <div class="warning-box">
+      ⚠️ <strong>Warning:</strong> This action cannot be undone. Cancellation fees may apply based on the timing.
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Booking Details</label>
+      <div style="padding: 12px; background: #f8fafc; border-radius: 8px;">
+        <div style="margin-bottom: 8px;"><strong>Client:</strong> ${booking.fields['Client Name']}</div>
+        <div style="margin-bottom: 8px;"><strong>Date:</strong> ${booking.fields['Date']} at ${booking.fields['Time']}</div>
+        <div><strong>Service:</strong> ${booking.fields['Service']}</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="cancelReason">Cancellation Reason *</label>
+      <select id="cancelReason" class="form-input">
+        <option value="">-- Select a reason --</option>
+        <option value="Customer request">Customer request</option>
+        <option value="Property not ready">Property not ready</option>
+        <option value="Weather conditions">Weather conditions</option>
+        <option value="Media specialist unavailable">Media specialist unavailable</option>
+        <option value="Scheduling conflict">Scheduling conflict</option>
+        <option value="Other">Other (specify below)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="cancelNotes">Additional Notes (Optional)</label>
+      <textarea 
+        id="cancelNotes" 
+        class="form-input" 
+        rows="3"
+        placeholder="Any additional details about the cancellation..."
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+        <input type="checkbox" id="cancelSendEmail" checked style="width: 20px; height: 20px;">
+        <span style="font-size: 14px; font-weight: 600;">Send cancellation email to customer</span>
+      </label>
+    </div>
+
+    <div class="button-group" style="margin-top: 24px;">
+      <button class="btn btn-secondary" onclick="closeModal('cancelModal')" style="flex: 1;">
+        Keep Booking
+      </button>
+      <button class="btn btn-danger" onclick="confirmCancel('${bookingId}')" style="flex: 2;">
+        Confirm Cancellation
+      </button>
+    </div>
+  `;
+  
+  modal.classList.add('active');
+}
+
+async function confirmCancel(bookingId) {
+  const reason = document.getElementById('cancelReason').value;
+  const notes = document.getElementById('cancelNotes').value.trim();
+  const sendEmail = document.getElementById('cancelSendEmail').checked;
+
+  if (!reason) {
+    alert('Please select a cancellation reason');
+    document.getElementById('cancelReason').focus();
+    return;
+  }
+
+  const finalReason = notes ? `${reason}: ${notes}` : reason;
+
+  try {
+    const response = await fetch('/.netlify/functions/admin-cancel-booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId, reason: finalReason, sendEmail })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      let msg = `✅ Cancelled!\n\n`;
+      if (data.cancellationCharge > 0) msg += `Fee: £${data.cancellationCharge.toFixed(2)}\n`;
+      if (data.refundProcessed) msg += `Refund: £${data.refundAmount.toFixed(2)}\n`;
+      msg += `\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`;
+      alert(msg);
+      closeModal('cancelModal');
+      closeModal('bookingModal');
+      loadBookings();
+      loadCalendar();
+      loadDashboardStats();
+    } else {
+      alert(`❌ Error: ${data.error}`);
     }
+  } catch (error) {
+    console.error('Cancel error:', error);
+    alert('❌ Failed to cancel.');
+  }
+}
 
-    async function adminRescheduleBooking(bookingId, newDate, newTime, sendEmail) {
-      try {
-        const response = await fetch('/.netlify/functions/admin-reschedule-booking', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bookingId, newDate, newTime, sendEmail })
-        });
+    // Show Modify Service Modal
+function showModifyService(bookingId) {
+  const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
+  if (!booking) return;
+  
+  const modal = document.getElementById('modifyServiceModal');
+  const modalBody = document.getElementById('modifyServiceModalBody');
+  
+  const region = booking.fields['Region'] === 'North' ? 'north' : 'south';
+  const services = SERVICES_CATALOG[region] || SERVICES_CATALOG.south;
+  
+  modalBody.innerHTML = `
+    <div class="form-group">
+      <label class="form-label">Current Service</label>
+      <div style="padding: 12px; background: #f8fafc; border-radius: 8px; font-weight: 600;">
+        ${booking.fields['Service']} - £${(booking.fields['Total Price'] || 0).toFixed(2)}
+      </div>
+    </div>
 
-        const data = await response.json();
+    <div class="form-group">
+      <label class="form-label" for="newService">New Service *</label>
+      <select id="newService" class="form-input" onchange="updateServicePrice()">
+        <option value="">-- Select new service --</option>
+        ${services.map(service => `
+          <option 
+            value="${service.id}" 
+            data-price="${service.price}"
+            data-duration="${service.duration}"
+            data-name="${service.name}"
+          >
+            ${service.name} - £${service.price.toFixed(2)}
+          </option>
+        `).join('')}
+      </select>
+    </div>
 
-        if (data.success) {
-          alert(`✅ Rescheduled!\n\n${newDate} at ${newTime}\n\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`);
-          closeModal('bookingModal');
-          loadBookings();
-          loadCalendar();
-        } else {
-          alert(`❌ Error: ${data.error}`);
-        }
-      } catch (error) {
-        alert('❌ Failed to reschedule.');
-      }
+    <div id="addonSection" style="display: none; margin-top: 24px;">
+      <label class="form-label">Add-Ons (Optional)</label>
+      <div id="addonCheckboxes" style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- Add-ons will be populated dynamically -->
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Bedrooms (if applicable)</label>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <button type="button" class="bedroom-btn" onclick="adjustModifyBedrooms(-1)">-</button>
+        <div style="flex: 1; text-align: center;">
+          <div id="modifyBedroomCount" style="font-size: 32px; font-weight: 700; color: #3b82f6;">4</div>
+        </div>
+        <button type="button" class="bedroom-btn" onclick="adjustModifyBedrooms(1)">+</button>
+      </div>
+    </div>
+
+    <div id="modifyPriceBreakdown" style="background: #f8fafc; border-radius: 12px; padding: 20px; margin: 24px 0;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+        <span style="color: #64748b;">Service</span>
+        <span id="modifyServicePrice" style="font-weight: 600;">£0.00</span>
+      </div>
+      <div id="modifyBedroomRow" style="display: none; justify-content: space-between; margin-bottom: 12px;">
+        <span style="color: #64748b;">Extra bedrooms</span>
+        <span id="modifyBedroomFee" style="font-weight: 600;">£0.00</span>
+      </div>
+      <div id="modifyAddonsRow" style="display: none; justify-content: space-between; margin-bottom: 12px;">
+        <span style="color: #64748b;">Add-ons</span>
+        <span id="modifyAddonsFee" style="font-weight: 600;">£0.00</span>
+      </div>
+      <div style="border-top: 2px solid #e2e8f0; margin: 16px 0;"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 18px; font-weight: 700;">New Total</span>
+        <span id="modifyTotalPrice" style="font-size: 24px; font-weight: 700; color: #3b82f6;">£0.00</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+        <input type="checkbox" id="modifySendEmail" checked style="width: 20px; height: 20px;">
+        <span style="font-size: 14px; font-weight: 600;">Send update email to customer</span>
+      </label>
+    </div>
+
+    <div class="button-group" style="margin-top: 24px;">
+      <button class="btn btn-secondary" onclick="closeModal('modifyServiceModal')" style="flex: 1;">
+        Cancel
+      </button>
+      <button class="btn btn-primary" onclick="confirmModifyService('${bookingId}')" style="flex: 2;">
+        Update Service
+      </button>
+    </div>
+  `;
+  
+  modal.classList.add('active');
+}
+
+let modifyServiceData = {
+  bedrooms: 4,
+  selectedAddons: []
+};
+
+function updateServicePrice() {
+  const select = document.getElementById('newService');
+  const selectedOption = select.options[select.selectedIndex];
+  
+  if (!selectedOption || !selectedOption.value) {
+    document.getElementById('addonSection').style.display = 'none';
+    return;
+  }
+
+  const serviceId = selectedOption.value;
+  const booking = currentBooking || allBookings.find(b => b.id);
+  const region = booking?.fields['Region'] === 'North' ? 'north' : 'south';
+  const services = SERVICES_CATALOG[region] || SERVICES_CATALOG.south;
+  const service = services.find(s => s.id === serviceId);
+
+  // Show add-ons if available
+  if (service && service.availableAddons && service.availableAddons.length > 0) {
+    const addonContainer = document.getElementById('addonCheckboxes');
+    addonContainer.innerHTML = service.availableAddons.map(addonId => {
+      const addon = ADDONS_CATALOG[addonId];
+      if (!addon) return '';
+      
+      return `
+        <label style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #fff; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer;">
+          <input 
+            type="checkbox" 
+            value="${addon.id}" 
+            onchange="toggleModifyAddon('${addon.id}')"
+            style="width: 20px; height: 20px;"
+          >
+          <div style="flex: 1;">
+            <div style="font-weight: 600; margin-bottom: 4px;">${addon.name}</div>
+            <div style="font-size: 13px; color: #64748b;">${addon.description}</div>
+          </div>
+          <div style="font-weight: 700; color: #3b82f6;">
+            ${addon.price === 0 ? 'FREE' : `+£${addon.price.toFixed(2)}`}
+          </div>
+        </label>
+      `;
+    }).join('');
+    
+    document.getElementById('addonSection').style.display = 'block';
+  } else {
+    document.getElementById('addonSection').style.display = 'none';
+  }
+
+  modifyServiceData.selectedAddons = [];
+  calculateModifyPrice();
+}
+
+function toggleModifyAddon(addonId) {
+  const index = modifyServiceData.selectedAddons.indexOf(addonId);
+  if (index > -1) {
+    modifyServiceData.selectedAddons.splice(index, 1);
+  } else {
+    modifyServiceData.selectedAddons.push(addonId);
+  }
+  calculateModifyPrice();
+}
+
+function adjustModifyBedrooms(change) {
+  modifyServiceData.bedrooms = Math.max(1, Math.min(15, modifyServiceData.bedrooms + change));
+  document.getElementById('modifyBedroomCount').textContent = modifyServiceData.bedrooms;
+  calculateModifyPrice();
+}
+
+function calculateModifyPrice() {
+  const select = document.getElementById('newService');
+  const selectedOption = select.options[select.selectedIndex];
+  
+  if (!selectedOption || !selectedOption.value) return;
+
+  const servicePrice = parseFloat(selectedOption.dataset.price);
+  const extraBedrooms = Math.max(0, modifyServiceData.bedrooms - 4);
+  const bedroomFee = extraBedrooms * 30;
+
+  let addonsFee = 0;
+  modifyServiceData.selectedAddons.forEach(addonId => {
+    const addon = ADDONS_CATALOG[addonId];
+    if (addon) addonsFee += addon.price;
+  });
+
+  const totalPrice = servicePrice + bedroomFee + addonsFee;
+
+  document.getElementById('modifyServicePrice').textContent = `£${servicePrice.toFixed(2)}`;
+  document.getElementById('modifyTotalPrice').textContent = `£${totalPrice.toFixed(2)}`;
+
+  const bedroomRow = document.getElementById('modifyBedroomRow');
+  if (bedroomFee > 0) {
+    bedroomRow.style.display = 'flex';
+    document.getElementById('modifyBedroomFee').textContent = `£${bedroomFee.toFixed(2)}`;
+  } else {
+    bedroomRow.style.display = 'none';
+  }
+
+  const addonsRow = document.getElementById('modifyAddonsRow');
+  if (addonsFee > 0) {
+    addonsRow.style.display = 'flex';
+    document.getElementById('modifyAddonsFee').textContent = `£${addonsFee.toFixed(2)}`;
+  } else {
+    addonsRow.style.display = 'none';
+  }
+}
+
+async function confirmModifyService(bookingId) {
+  const select = document.getElementById('newService');
+  const selectedOption = select.options[select.selectedIndex];
+  
+  if (!selectedOption || !selectedOption.value) {
+    alert('Please select a new service');
+    return;
+  }
+
+  const serviceId = selectedOption.value;
+  const serviceName = selectedOption.dataset.name;
+  const servicePrice = parseFloat(selectedOption.dataset.price);
+  const serviceDuration = parseInt(selectedOption.dataset.duration);
+  const sendEmail = document.getElementById('modifySendEmail').checked;
+
+  const extraBedrooms = Math.max(0, modifyServiceData.bedrooms - 4);
+  const bedroomFee = extraBedrooms * 30;
+
+  let addonsFee = 0;
+  const addonsArray = modifyServiceData.selectedAddons.map(addonId => {
+    const addon = ADDONS_CATALOG[addonId];
+    if (addon) addonsFee += addon.price;
+    return {
+      id: addonId,
+      name: addon?.name || '',
+      price: addon?.price || 0
+    };
+  });
+
+  const totalPrice = servicePrice + bedroomFee + addonsFee;
+
+  try {
+    const response = await fetch('/.netlify/functions/admin-modify-service', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bookingId,
+        newServiceId: serviceId,
+        newServiceName: serviceName,
+        newServicePrice: servicePrice,
+        newServiceDuration: serviceDuration,
+        bedrooms: modifyServiceData.bedrooms,
+        extraBedroomFee: bedroomFee,
+        addons: addonsArray,
+        addonsPrice: addonsFee,
+        totalPrice: totalPrice,
+        sendEmail
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert(`✅ Service Updated!\n\nNew: ${serviceName} (£${totalPrice.toFixed(2)})\n\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`);
+      closeModal('modifyServiceModal');
+      closeModal('bookingModal');
+      loadBookings();
+      loadCalendar();
+      loadDashboardStats();
+    } else {
+      alert(`❌ Error: ${data.error}`);
     }
-
-    function showAdminCancel(bookingId) {
-      const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
-      if (!booking) return;
-      
-      const sendEmail = document.getElementById('sendEmailToggle')?.checked ?? true;
-      const reason = prompt('Reason:') || 'Admin cancelled';
-      
-      if (!confirm(`Cancel booking?\n\nClient: ${booking.fields['Client Name']}\nReason: ${reason}\n\nSend email: ${sendEmail ? 'Yes' : 'No'}`)) return;
-      
-      adminCancelBooking(bookingId, reason, sendEmail);
-    }
-
-    async function adminCancelBooking(bookingId, reason, sendEmail) {
-      try {
-        const response = await fetch('/.netlify/functions/admin-cancel-booking', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bookingId, reason, sendEmail })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          let msg = `✅ Cancelled!\n\n`;
-          if (data.cancellationCharge > 0) msg += `Fee: £${data.cancellationCharge.toFixed(2)}\n`;
-          if (data.refundProcessed) msg += `Refund: £${data.refundAmount.toFixed(2)}\n`;
-          msg += `\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`;
-          alert(msg);
-          closeModal('bookingModal');
-          loadBookings();
-          loadCalendar();
-        } else {
-          alert(`❌ Error: ${data.error}`);
-        }
-      } catch (error) {
-        alert('❌ Failed to cancel.');
-      }
-    }
-
-    function showModifyService(bookingId) {
-      const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
-      if (!booking) return;
-      
-      const sendEmail = document.getElementById('sendEmailToggle')?.checked ?? true;
-      
-      const newServiceName = prompt('New Service:');
-      if (!newServiceName) return;
-      
-      const newPrice = parseFloat(prompt('New base price (£):'));
-      if (isNaN(newPrice)) return;
-      
-      const newDuration = parseInt(prompt('Duration (mins):', '60'));
-      if (isNaN(newDuration)) return;
-      
-      if (!confirm(`Change service?\n\nNew: ${newServiceName} (£${newPrice})\n\nSend email: ${sendEmail ? 'Yes' : 'No'}`)) return;
-      
-      adminModifyService(bookingId, newServiceName, newPrice, newDuration, sendEmail);
-    }
-
-    async function adminModifyService(bookingId, newServiceName, newServicePrice, newServiceDuration, sendEmail) {
-      try {
-        const response = await fetch('/.netlify/functions/admin-modify-service', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            bookingId,
-            newServiceId: newServiceName.toLowerCase().replace(/\s+/g, '-'),
-            newServiceName,
-            newServicePrice,
-            newServiceDuration,
-            sendEmail
-          })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          alert(`✅ Modified!\n\nNew: ${data.newService} (£${data.newPrice.toFixed(2)})\n\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`);
-          closeModal('bookingModal');
-          loadBookings();
-        } else {
-          alert(`❌ Error: ${data.error}`);
-        }
-      } catch (error) {
-        alert('❌ Failed to modify service.');
-      }
-    }
+  } catch (error) {
+    console.error('Modify service error:', error);
+    alert('❌ Failed to modify service.');
+  }
+}
 
     // Customers Functions
     async function loadCustomers() {
