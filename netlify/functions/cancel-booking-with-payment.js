@@ -6,10 +6,20 @@ const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process
 const SITE_URL = process.env.URL || 'https://markebmedia.co.uk';
 
 exports.handler = async (event) => {
-  // Only allow POST
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
   if (event.httpMethod !== 'POST') {
     return { 
-      statusCode: 405, 
+      statusCode: 405,
+      headers,
       body: JSON.stringify({ error: 'Method not allowed' })
     };
   }
@@ -20,11 +30,14 @@ exports.handler = async (event) => {
     if (!bookingRef || !clientEmail || cancellationFee === undefined) {
       return {
         statusCode: 400,
+        headers,
         body: JSON.stringify({ error: 'Booking reference, email, and cancellation fee are required' })
       };
     }
 
-    // Find the booking - ✅ FIXED: Use correct field name
+    console.log(`Processing cancellation with payment for ${bookingRef}`);
+
+    // Find the booking
     const records = await base('Bookings')
       .select({
         filterByFormula: `AND({Booking Reference} = '${bookingRef}', {Client Email} = '${clientEmail}')`,
@@ -35,6 +48,7 @@ exports.handler = async (event) => {
     if (records.length === 0) {
       return {
         statusCode: 404,
+        headers,
         body: JSON.stringify({ error: 'Booking not found' })
       };
     }
@@ -46,6 +60,7 @@ exports.handler = async (event) => {
     if (fields['Booking Status'] === 'Cancelled') {
       return {
         statusCode: 400,
+        headers,
         body: JSON.stringify({ error: 'Booking is already cancelled' })
       };
     }
@@ -68,6 +83,7 @@ exports.handler = async (event) => {
     } else {
       return {
         statusCode: 400,
+        headers,
         body: JSON.stringify({ 
           error: 'No cancellation fee required. Use free cancellation instead.',
           hoursUntil: Math.round(hoursUntil)
@@ -79,6 +95,7 @@ exports.handler = async (event) => {
     if (Math.abs(expectedFee - cancellationFee) > 0.01) {
       return {
         statusCode: 400,
+        headers,
         body: JSON.stringify({ 
           error: 'Cancellation fee mismatch',
           expected: expectedFee,
@@ -95,7 +112,7 @@ exports.handler = async (event) => {
           price_data: {
             currency: 'gbp',
             product_data: {
-              name: `Cancellation Fee - ${fields['Service Name']}`,
+              name: `Cancellation Fee - ${fields['Service']}`, // ✅ FIXED: Was 'Service Name'
               description: `${feeType} for booking ${bookingRef}`,
             },
             unit_amount: Math.round(cancellationFee * 100), // Convert to pence
@@ -126,12 +143,11 @@ exports.handler = async (event) => {
       'Cancellation Session ID': session.id
     });
 
+    console.log(`✅ Cancellation payment session created: ${session.id}`);
+
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers,
       body: JSON.stringify({
         success: true,
         checkoutUrl: session.url,
@@ -145,10 +161,7 @@ exports.handler = async (event) => {
     console.error('Error creating cancellation payment:', error);
     return {
       statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers,
       body: JSON.stringify({ 
         error: 'Failed to process cancellation payment',
         details: error.message 

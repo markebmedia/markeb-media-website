@@ -1,9 +1,7 @@
 // netlify/functions/admin-reschedule-booking.js
 const Airtable = require('airtable');
-const { Resend } = require('resend');
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -58,11 +56,10 @@ exports.handler = async (event, context) => {
     const newBookingDateTime = new Date(`${newDate}T${newTime}`);
     const cancellationDeadline = new Date(newBookingDateTime.getTime() - 24 * 60 * 60 * 1000);
 
-    // Update booking in Airtable
+    // ✅ Update booking in Airtable - REMOVE 'Last Modified' (computed field)
     await base('Bookings').update(bookingId, {
       'Date': newDate,
       'Time': newTime,
-      'Last Modified': new Date().toISOString(),
       'Rescheduled': true,
       'Rescheduled By': 'Admin',
       'Original Date': originalDate,
@@ -85,7 +82,7 @@ exports.handler = async (event, context) => {
           originalTime: originalTime,
           newDate: newDate,
           newTime: newTime,
-          service: fields['Service Name'],
+          service: fields['Service'], // ✅ FIXED: Was 'Service Name'
           propertyAddress: fields['Property Address'],
           mediaSpecialist: fields['Media Specialist'],
           totalPrice: fields['Total Price']
@@ -129,6 +126,15 @@ exports.handler = async (event, context) => {
 
 // Send reschedule confirmation email
 async function sendRescheduleEmail(data) {
+  // Check if Resend is configured
+  if (!process.env.RESEND_API_KEY) {
+    console.log('Resend not configured - skipping email');
+    return;
+  }
+
+  const { Resend } = require('resend');
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
   const {
     clientName,
     clientEmail,
@@ -191,7 +197,7 @@ async function sendRescheduleEmail(data) {
       </div>
       
       <p style="margin-top: 30px;">
-        <a href="https://markebmedia.com/manage-booking?ref=${bookingRef}&email=${encodeURIComponent(clientEmail)}" 
+        <a href="https://markebmedia.com/manage-booking.html?ref=${bookingRef}&email=${encodeURIComponent(clientEmail)}" 
            style="background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
           Manage Your Booking
         </a>

@@ -1,5 +1,3 @@
-// netlify/functions/update-reserve-privilege.js
-// Admin function to toggle "Reserve without payment" privilege for customers
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -20,44 +18,61 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { recordId, email, enabled } = JSON.parse(event.body);
+    const { email } = JSON.parse(event.body);
 
-    if (!recordId || !email) {
+    if (!email) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ success: false, error: 'Record ID and email required' })
+        body: JSON.stringify({ success: false, error: 'Email required' })
       };
     }
 
-    // Update customer record in Airtable
     const Airtable = require('airtable');
     const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-    await base(process.env.AIRTABLE_USER_TABLE || 'Markeb Media Users').update(recordId, {
-      'Allow Reserve Without Payment': enabled
-    });
+    // Find user by email
+    const records = await base(process.env.AIRTABLE_USER_TABLE || 'Markeb Media Users')
+      .select({
+        filterByFormula: `{Email} = '${email}'`,
+        maxRecords: 1
+      })
+      .firstPage();
 
-    console.log(`✓ Reserve privilege ${enabled ? 'enabled' : 'disabled'} for ${email}`);
+    if (records.length === 0) {
+      // User not found - no privilege
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          success: true,
+          canReserve: false,
+          message: 'User not found'
+        })
+      };
+    }
+
+    const user = records[0];
+    const canReserve = user.fields['Allow Reserve Without Payment'] === true;
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        message: `Reserve privilege ${enabled ? 'enabled' : 'disabled'}`,
-        enabled: enabled
+        canReserve: canReserve,
+        userName: user.fields['Name'] || ''
       })
     };
 
   } catch (error) {
-    console.error('Error updating reserve privilege:', error);
+    console.error('Error checking user privilege:', error);
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({ 
         success: false, 
-        message: 'Failed to update privilege',
+        canReserve: false,
         error: error.message 
       })
     };

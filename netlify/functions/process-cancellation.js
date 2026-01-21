@@ -1,5 +1,4 @@
 // netlify/functions/process-cancellation.js
-
 const Airtable = require('airtable');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { sendCancellationConfirmation } = require('./email-service');
@@ -24,7 +23,7 @@ exports.handler = async (event) => {
 
     // Verify Stripe session
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-
+    
     if (session.payment_status !== 'paid') {
       return {
         statusCode: 400,
@@ -32,10 +31,10 @@ exports.handler = async (event) => {
       };
     }
 
-    // Find booking in Airtable
+    // ✅ FIXED: Find booking in Airtable using correct field name
     const records = await base(BOOKINGS_TABLE)
       .select({
-        filterByFormula: `{Booking Ref} = '${bookingRef}'`,
+        filterByFormula: `{Booking Reference} = '${bookingRef}'`, // ✅ Was 'Booking Ref'
         maxRecords: 1
       })
       .firstPage();
@@ -52,9 +51,9 @@ exports.handler = async (event) => {
     const totalPrice = parseFloat(booking.fields['Total Price'] || 0);
     const refundAmount = totalPrice - cancellationFee;
 
-    // Update booking status to Cancelled
+    // ✅ FIXED: Update booking status to Cancelled using correct field name
     await base(BOOKINGS_TABLE).update(booking.id, {
-      'Status': 'Cancelled',
+      'Booking Status': 'Cancelled', // ✅ Was 'Status'
       'Cancellation Date': new Date().toISOString().split('T')[0],
       'Cancellation Fee': cancellationFee,
       'Cancellation Reason': session.metadata.reason || 'Late cancellation with fee',
@@ -63,12 +62,12 @@ exports.handler = async (event) => {
 
     // Send cancellation confirmation email
     const bookingData = {
-      bookingRef: booking.fields['Booking Ref'],
+      bookingRef: booking.fields['Booking Reference'], // ✅ Was 'Booking Ref'
       clientName: booking.fields['Client Name'],
       clientEmail: booking.fields['Client Email'],
       date: booking.fields['Date'],
       time: booking.fields['Time'],
-      service: booking.fields['Service'],
+      service: booking.fields['Service'], // ✅ This was already correct
       totalPrice: totalPrice
     };
 
