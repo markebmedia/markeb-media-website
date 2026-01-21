@@ -1094,14 +1094,19 @@
       </div>
     </div>
 
-    <!-- Reserved Bookings Section -->
-    <div class="admin-section" id="reserved">
-      <div class="calendar-container" id="reservedContainer">
-        <div style="text-align: center; padding: 40px;">
-          <div class="spinner"></div>
-        </div>
-      </div>
+   <!-- Reserved Bookings Section -->
+<div class="admin-section" id="reserved">
+  <div class="info-box" style="margin-bottom: 24px;">
+    <strong>💳 Reserved Bookings</strong><br>
+    These bookings have been reserved but require payment. You can either charge the customer's saved card or send them a payment link via email.
+  </div>
+
+  <div class="calendar-container" id="reservedContainer">
+    <div style="text-align: center; padding: 40px;">
+      <div class="spinner"></div>
     </div>
+  </div>
+</div>
 
     <!-- Customers Section -->
     <div class="admin-section" id="customers">
@@ -1445,28 +1450,134 @@
       }
     }
 
-    async function loadReservedBookings() {
-      const container = document.getElementById('reservedContainer');
-      container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+   async function loadReservedBookings() {
+  const container = document.getElementById('reservedContainer');
+  container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
 
-      try {
-        const response = await fetch('/.netlify/functions/admin-bookings', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentStatus: 'Reserved' })
-        });
+  try {
+    const response = await fetch('/.netlify/functions/admin-bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paymentStatus: 'Reserved' })
+    });
 
-        const data = await response.json();
+    const data = await response.json();
 
-        if (data.success) {
-          renderBookingsTable(data.bookings, '', 'reservedContainer');
-        }
-
-      } catch (error) {
-        console.error('Error loading reserved bookings:', error);
-        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading reserved bookings</div>';
+    if (data.success) {
+      if (data.bookings.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 60px;">
+            <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
+            <h3 style="color: #64748b; margin-bottom: 8px;">All Caught Up!</h3>
+            <p style="color: #94a3b8;">No reserved bookings require payment</p>
+          </div>
+        `;
+      } else {
+        renderReservedBookingsTable(data.bookings);
       }
     }
+
+  } catch (error) {
+    console.error('Error loading reserved bookings:', error);
+    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading reserved bookings</div>';
+  }
+}
+
+// NEW FUNCTION: Render reserved bookings with payment actions
+function renderReservedBookingsTable(bookings) {
+  const container = document.getElementById('reservedContainer');
+  
+  // Sort by date (earliest first)
+  const sorted = bookings.sort((a, b) => {
+    const dateA = new Date(a.fields['Date']);
+    const dateB = new Date(b.fields['Date']);
+    return dateA - dateB;
+  });
+
+  let html = `
+    <div style="margin-bottom: 16px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; color: #92400e;">
+      <strong>⚠️ ${bookings.length} booking${bookings.length === 1 ? '' : 's'} awaiting payment</strong>
+    </div>
+    
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Date & Time</th>
+          <th>Client</th>
+          <th>Service</th>
+          <th>Amount</th>
+          <th>Reserved Date</th>
+          <th>Payment Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  sorted.forEach(booking => {
+    const totalPrice = (booking.fields['Total Price'] || 0).toFixed(2);
+    const reservedDate = booking.fields['Created Date'] || '-';
+    const hasPaymentMethod = booking.fields['Stripe Payment Method ID'] ? true : false;
+    
+    html += `
+      <tr>
+        <td data-label="Reference">
+          <strong>${booking.fields['Booking Reference']}</strong>
+        </td>
+        <td data-label="Date & Time">
+          ${booking.fields['Date']}<br>
+          <span style="color: #3b82f6; font-weight: 600;">${booking.fields['Time']}</span>
+        </td>
+        <td data-label="Client">
+          ${booking.fields['Client Name']}<br>
+          <small style="color: #64748b;">${booking.fields['Client Email']}</small>
+        </td>
+        <td data-label="Service">
+          ${booking.fields['Service Name'] || '-'}
+        </td>
+        <td data-label="Amount">
+          <span style="font-size: 18px; font-weight: 700; color: #f59e0b;">£${totalPrice}</span>
+        </td>
+        <td data-label="Reserved">
+          ${new Date(reservedDate).toLocaleDateString('en-GB')}
+        </td>
+        <td data-label="Actions">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            ${hasPaymentMethod ? `
+              <button class="btn btn-success btn-small" onclick="chargeReservedBooking('${booking.id}')" title="Charge the customer's saved card">
+                💳 Charge Card
+              </button>
+            ` : `
+              <span style="font-size: 11px; color: #94a3b8; font-style: italic;">No saved card</span>
+            `}
+            <button class="btn btn-primary btn-small" onclick='processPayment("${booking.id}", "${booking.fields['Booking Reference']}")' title="Email payment link to customer">
+              📧 Send Link
+            </button>
+            <button class="btn btn-secondary btn-small" onclick="viewBookingById('${booking.id}')" title="View full booking details">
+              👁️ View
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+
+  html += `
+      </tbody>
+    </table>
+    
+    <div style="margin-top: 24px; padding: 16px; background: #eff6ff; border: 2px solid #3b82f6; border-radius: 12px;">
+      <h4 style="margin: 0 0 12px 0; color: #1e40af;">💡 Payment Options</h4>
+      <ul style="margin: 0; padding-left: 20px; color: #1e40af; line-height: 1.8;">
+        <li><strong>Charge Card:</strong> Instantly charge the customer's saved payment method (if available)</li>
+        <li><strong>Send Link:</strong> Email a secure payment link to the customer</li>
+        <li><strong>View:</strong> See full booking details and additional options</li>
+      </ul>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
 
     function renderBookingsTable(bookings, search = '', containerId = 'bookingsContainer') {
       const container = document.getElementById(containerId);
@@ -1682,64 +1793,88 @@
       modal.classList.add('active');
     }
 
-    async function processPayment(bookingId, bookingRef) {
-      if (!confirm(`Send payment link for booking ${bookingRef}?`)) return;
+   async function processPayment(bookingId, bookingRef) {
+  if (!confirm(`Send payment link for booking ${bookingRef}?\n\nThe customer will receive an email with a secure payment link.`)) return;
 
-      try {
-        const response = await fetch('/.netlify/functions/process-reserved-payment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bookingId, bookingRef })
-        });
+  // Show loading state
+  const btn = event.target;
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '⏳ Sending...';
+  btn.disabled = true;
 
-        const data = await response.json();
+  try {
+    const response = await fetch('/.netlify/functions/process-reserved-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId, bookingRef })
+    });
 
-        if (data.success) {
-          alert(`✓ Payment link sent successfully!\n\nLink: ${data.paymentLink}`);
-          closeModal('bookingModal');
-          loadBookings();
-          loadDashboardStats();
-        } else {
-          alert(`Error: ${data.error}`);
-        }
+    const data = await response.json();
 
-      } catch (error) {
-        console.error('Error processing payment:', error);
-        alert('Error sending payment link');
-      }
+    if (data.success) {
+      alert(`✅ Payment link sent successfully!\n\nEmail sent to customer\n\nPayment URL:\n${data.paymentLink}`);
+      closeModal('bookingModal');
+      loadBookings();
+      loadReservedBookings();
+      loadDashboardStats();
+    } else {
+      alert(`❌ Error: ${data.error}`);
+      btn.innerHTML = originalText;
+      btn.disabled = false;
     }
+
+  } catch (error) {
+    console.error('Error processing payment:', error);
+    alert('❌ Error sending payment link');
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+}
 
     // ===== ADMIN BOOKING ACTIONS =====
-    async function chargeReservedBooking(bookingId) {
-      const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
-      if (!booking) return alert('Booking data not found');
+   async function chargeReservedBooking(bookingId) {
+  const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
+  if (!booking) return alert('Booking data not found');
 
-      if (!confirm(`Charge reserved booking?\n\nClient: ${booking.fields['Client Name']}\nAmount: £${(booking.fields['Total Price'] || 0).toFixed(2)}`)) return;
-      
-      try {
-        const response = await fetch('/.netlify/functions/charge-card', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bookingId })
-        });
+  const clientName = booking.fields['Client Name'];
+  const amount = (booking.fields['Total Price'] || 0).toFixed(2);
+  
+  if (!confirm(`Charge ${clientName}'s saved card?\n\nAmount: £${amount}\n\nThis will immediately charge their payment method and send a confirmation email.`)) return;
+  
+  // Show loading state
+  const btn = event.target;
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '⏳ Processing...';
+  btn.disabled = true;
 
-        const data = await response.json();
+  try {
+    const response = await fetch('/.netlify/functions/charge-card', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId })
+    });
 
-        if (data.success) {
-          alert(`✅ Payment charged!\n\nAmount: £${data.amount.toFixed(2)}\n\nConfirmation email sent.`);
-          closeModal('bookingModal');
-          loadBookings();
-          loadReservedBookings();
-          loadDashboardStats();
-          loadCalendar();
-        } else {
-          alert(`❌ Error: ${data.error || 'Failed to charge card'}`);
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Failed to charge card.');
-      }
+    const data = await response.json();
+
+    if (data.success) {
+      alert(`✅ Payment Successful!\n\nCharged: £${data.amount.toFixed(2)}\nClient: ${clientName}\n\nConfirmation email sent automatically.`);
+      closeModal('bookingModal');
+      loadBookings();
+      loadReservedBookings();
+      loadDashboardStats();
+      loadCalendar();
+    } else {
+      alert(`❌ Payment Failed\n\n${data.error || 'Failed to charge card'}\n\nThe customer's card may have been declined. Try sending a payment link instead.`);
+      btn.innerHTML = originalText;
+      btn.disabled = false;
     }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('❌ Failed to charge card.\n\nThere was a system error. Please try again or send a payment link instead.');
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+}
 
     function showAdminReschedule(bookingId) {
       const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
