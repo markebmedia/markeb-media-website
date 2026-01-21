@@ -1515,8 +1515,9 @@ function renderPendingBookingsTable(bookings) {
           <th>Client</th>
           <th>Service</th>
           <th>Amount</th>
-          <th>Reserved Date</th>
-          <th>Payment Actions</th>
+<th>Reserved Date</th>
+<th>Booking Status</th>
+<th>Payment Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -1549,6 +1550,11 @@ function renderPendingBookingsTable(bookings) {
         <td data-label="Pending">
           ${new Date(pendingDate).toLocaleDateString('en-GB')}
         </td>
+        <td data-label="Booking Status">
+  <span class="status-badge status-${(booking.fields['Booking Status'] || 'booked').toLowerCase()}">
+    ${booking.fields['Booking Status'] || 'Booked'}
+  </span>
+</td>
         <td data-label="Actions">
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             ${hasPaymentMethod ? `
