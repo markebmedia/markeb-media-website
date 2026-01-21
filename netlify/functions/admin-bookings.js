@@ -1,7 +1,8 @@
 // netlify/functions/admin-bookings.js
-// Admin function to retrieve all bookings with customer information and drive times
+// UPDATED: Uses consistent "Pending" status (not "Reserved")
+
 exports.handler = async (event, context) => {
-  console.log('=== Admin Bookings Function ===');
+  console.log('=== Admin Bookings Function (Updated) ===');
   console.log('Method:', event.httpMethod);
   
   const headers = {
@@ -51,12 +52,13 @@ exports.handler = async (event, context) => {
       filters.push(`{Booking Status} = '${status}'`);
     }
     
-    // Handle payment status - look for "Reserved", "Pending", OR BLANK/EMPTY
+    // ✅ FIXED: Handle payment status consistently
     if (paymentStatus) {
-      if (paymentStatus === 'Reserved') {
-        // Look for "Reserved", "Pending", OR empty/blank Payment Status
-        filters.push(`OR({Payment Status} = 'Reserved', {Payment Status} = 'Pending', {Payment Status} = BLANK())`);
+      if (paymentStatus === 'Pending') {
+        // Look for "Pending" OR empty/blank Payment Status
+        filters.push(`OR({Payment Status} = 'Pending', {Payment Status} = BLANK())`);
       } else {
+        // Exact match for Paid, Refunded, etc.
         filters.push(`{Payment Status} = '${paymentStatus}'`);
       }
     }
@@ -127,14 +129,21 @@ exports.handler = async (event, context) => {
       const clientEmail = booking.fields['Client Email'];
       const customer = clientEmail ? customersMap[clientEmail.toLowerCase()] : null;
       
+      // ✅ FIXED: Check for Pending status (including blank)
+      const paymentStatus = booking.fields['Payment Status'] || 'Pending';
+      const isPending = paymentStatus === 'Pending' || !booking.fields['Payment Status'];
+      
       return {
         ...booking,
         customerData: customer || null,
         hasAccount: !!customer,
-        canReserve: customer?.allowReserve || false
+        canReserve: customer?.allowReserve || false,
+        paymentStatus: paymentStatus, // Normalize blank to "Pending"
+        isPending: isPending
       };
     });
 
+    // ✅ FIXED: Updated stats calculation
     return {
       statusCode: 200,
       headers,
@@ -147,11 +156,11 @@ exports.handler = async (event, context) => {
           withAccount: enhancedBookings.filter(b => b.hasAccount).length,
           withoutAccount: enhancedBookings.filter(b => !b.hasAccount).length,
           paid: enhancedBookings.filter(b => b.fields['Payment Status'] === 'Paid').length,
-          reserved: enhancedBookings.filter(b => 
-            b.fields['Payment Status'] === 'Reserved' || 
+          pending: enhancedBookings.filter(b => 
             b.fields['Payment Status'] === 'Pending' || 
             !b.fields['Payment Status']
           ).length,
+          refunded: enhancedBookings.filter(b => b.fields['Payment Status'] === 'Refunded').length,
           cancelled: enhancedBookings.filter(b => b.fields['Booking Status'] === 'Cancelled').length,
           upcoming: enhancedBookings.filter(b => {
             const bookingDate = new Date(b.fields['Date']);

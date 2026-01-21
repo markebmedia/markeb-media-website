@@ -1,15 +1,25 @@
 // netlify/functions/create-booking.js
-const Airtable = require('airtable');
-const { sendBookingConfirmation } = require('./email-service');
-
-const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+// UPDATED: Now sets paymentStatus correctly based on payment option
 
 exports.handler = async (event, context) => {
+  console.log('=== Create Booking Function (Updated) ===');
+  console.log('Method:', event.httpMethod);
+  
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Method not allowed' })
+      headers,
+      body: JSON.stringify({ success: false, error: 'Method not allowed' })
     };
   }
 
@@ -17,111 +27,132 @@ exports.handler = async (event, context) => {
     const bookingData = JSON.parse(event.body);
     
     console.log('Received booking data:', {
+      postcode: bookingData.postcode,
       region: bookingData.region,
-      mediaSpecialist: bookingData.mediaSpecialist,
-      postcode: bookingData.postcode
+      date: bookingData.date,
+      time: bookingData.time,
+      service: bookingData.service,
+      paymentOption: bookingData.paymentOption
     });
 
-    const bookingRef = `BK-${Date.now()}`;
+    // Generate booking reference
+    const timestamp = Date.now();
+    const bookingRef = `BK-${timestamp}`;
 
-    const addonsString = bookingData.addons && bookingData.addons.length > 0
-      ? bookingData.addons.map(a => a.name).join(', ')
+    // ✅ FIXED: Set payment status based on payment option
+    let paymentStatus;
+    let bookingStatus;
+    
+    if (bookingData.paymentOption === 'pay-now') {
+      // This shouldn't happen in create-booking (should go through Stripe webhook)
+      // But if it does, mark as Paid
+      paymentStatus = 'Paid';
+      bookingStatus = 'Confirmed';
+    } else if (bookingData.paymentOption === 'reserve') {
+      // Card on file, payment pending
+      paymentStatus = 'Pending';
+      bookingStatus = 'Reserved';
+    } else {
+      // Fallback
+      paymentStatus = 'Pending';
+      bookingStatus = 'Booked';
+    }
+
+    // Prepare add-ons data
+    const addonsText = bookingData.addons && bookingData.addons.length > 0
+      ? bookingData.addons.map(a => `${a.name} (+£${a.price.toFixed(2)})`).join('\n')
       : '';
 
-    // ✅ FIX: Capitalize region for Airtable ("north" → "North")
-    const capitalizedRegion = bookingData.region.charAt(0).toUpperCase() + bookingData.region.slice(1);
+    const addonsPrice = bookingData.addonsPrice || 0;
 
-    console.log('Creating booking with capitalized region:', capitalizedRegion);
-
-    // Create booking record
-    const record = await base('Bookings').create([
-      {
-       fields: {
-  'Booking Reference': bookingRef,
-  'Postcode': bookingData.postcode,
-  'Property Address': bookingData.propertyAddress,
-  'Region': capitalizedRegion,
-  'Media Specialist': bookingData.mediaSpecialist,
-  'Date': bookingData.date,
-  'Time': bookingData.time,
-  'Service': bookingData.serviceId,
-  'Service Name': bookingData.service,
-  'Duration (mins)': bookingData.duration,
-  'Bedrooms': bookingData.bedrooms || 0,
-  'Base Price': bookingData.basePrice,
-  'Extra Bedroom Fee': bookingData.extraBedroomFee || 0,
-  'Add-ons': addonsString,
-  'Add-ons Price': bookingData.addonsPrice || 0,
-  'Total Price': bookingData.totalPrice,
-  'Client Name': bookingData.clientName,
-  'Client Email': bookingData.clientEmail,
-  'Client Phone': bookingData.clientPhone,
-  'Client Notes': bookingData.clientNotes || '',
-  
-  // ✅ SIMPLIFIED: Just one status field
-  'Booking Status': 'Booked',  // Options: Booked, Completed, Cancelled, No Show
-  
-  // ✅ FIXED: Payment status based on payment option
-  'Payment Status': bookingData.paymentOption === 'pay-now' ? 'Paid' : 'Pending',
-  'Payment Method': bookingData.paymentOption === 'pay-now' ? 'Stripe' : 'Card on File',
-  
-  // Stripe Payment Method (only for "reserve" option)
-  'Stripe Payment Method ID': bookingData.stripePaymentMethodId || '',
-  'Cardholder Name': bookingData.cardholderName || '',
-  'Card Last 4': bookingData.cardLast4 || '',
-  'Card Brand': bookingData.cardBrand || '',
-  'Card Expiry': bookingData.cardExpiry || '',
-  
-  'Created Date': new Date().toISOString(),
-  'Cancellation Allowed Until': new Date(new Date(bookingData.date).getTime() - 24 * 60 * 60 * 1000).toISOString()
-}
+    // Prepare Airtable record
+    const airtableRecord = {
+      fields: {
+        'Booking Reference': bookingRef,
+        'Date': bookingData.date,
+        'Time': bookingData.time,
+        'Postcode': bookingData.postcode,
+        'Property Address': bookingData.propertyAddress,
+        'Region': bookingData.region,
+        'Media Specialist': bookingData.mediaSpecialist,
+        'Service': bookingData.service,
+        'Service ID': bookingData.serviceId,
+        'Duration (mins)': bookingData.duration,
+        'Bedrooms': bookingData.bedrooms || 0,
+        'Base Price': bookingData.basePrice,
+        'Extra Bedroom Fee': bookingData.extraBedroomFee || 0,
+        'Add-Ons': addonsText,
+        'Add-Ons Price': addonsPrice,
+        'Total Price': bookingData.totalPrice,
+        'Client Name': bookingData.clientName,
+        'Client Email': bookingData.clientEmail,
+        'Client Phone': bookingData.clientPhone,
+        'Client Notes': bookingData.clientNotes || '',
+        
+        // ✅ CRITICAL: Set both Booking Status AND Payment Status
+        'Booking Status': bookingStatus,
+        'Payment Status': paymentStatus,
+        
+        // ✅ Store Stripe Payment Method details (for reserved bookings)
+        'Stripe Payment Method ID': bookingData.stripePaymentMethodId || '',
+        'Cardholder Name': bookingData.cardholderName || '',
+        'Card Last 4': bookingData.cardLast4 || '',
+        'Card Brand': bookingData.cardBrand || '',
+        'Card Expiry': bookingData.cardExpiry || '',
+        
+        // Metadata
+        'Created Date': new Date().toISOString(),
+        'Last Modified': new Date().toISOString()
       }
-    ]);
+    };
 
-    console.log('✅ Booking created successfully:', record[0].id, bookingRef);
+    console.log('Creating Airtable record with payment status:', paymentStatus);
 
-    // Send confirmation email
-    try {
-      await sendBookingConfirmation({
-        clientName: bookingData.clientName,
-        clientEmail: bookingData.clientEmail,
-        bookingRef: bookingRef,
-        date: bookingData.date,
-        time: bookingData.time,
-        service: bookingData.service,
-        propertyAddress: bookingData.propertyAddress,
-        mediaSpecialist: bookingData.mediaSpecialist, // ✅ FIX: Changed from Media Specialist to mediaSpecialist
-        totalPrice: bookingData.totalPrice,
-        duration: bookingData.duration
-      });
-      console.log('Confirmation email sent to:', bookingData.clientEmail);
-    } catch (emailError) {
-      console.error('Failed to send confirmation email:', emailError);
-      // Don't fail the booking if email fails
+    // Create booking in Airtable
+    const airtableUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Bookings`;
+    
+    const response = await fetch(airtableUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(airtableRecord)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Airtable error:', errorData);
+      throw new Error(`Airtable API error: ${response.status}`);
     }
+
+    const airtableResult = await response.json();
+    console.log('Booking created successfully:', bookingRef);
+
+    // Send confirmation email (if you have email setup)
+    // await sendBookingConfirmationEmail(bookingData, bookingRef);
 
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({
         success: true,
-        bookingId: record[0].id,
         bookingRef: bookingRef,
-        message: 'Booking reserved successfully'
+        recordId: airtableResult.id,
+        paymentStatus: paymentStatus,
+        message: paymentStatus === 'Paid' 
+          ? 'Booking confirmed and paid' 
+          : 'Booking reserved - payment pending'
       })
     };
 
   } catch (error) {
-    console.error('❌ Error creating booking:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack
-    });
-    
+    console.error('Error creating booking:', error);
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({
+        success: false,
         error: 'Failed to create booking',
         details: error.message
       })
