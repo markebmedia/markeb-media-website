@@ -69,26 +69,30 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // ✅ FIXED: Only wrap in AND() if there are actually filters
-    let filterFormula = '';
+    // ✅ FIXED: Build filter formula properly
+    let filterFormula = undefined;
     if (filters.length > 1) {
       filterFormula = `AND(${filters.join(', ')})`;
     } else if (filters.length === 1) {
       filterFormula = filters[0];
     }
 
-    console.log('Filter formula:', filterFormula);
+    console.log('Filter formula:', filterFormula || 'NONE');
+
+    // ✅ FIXED: Only include filterByFormula if it exists
+    const selectOptions = {
+      sort: [
+        { field: 'Date', direction: 'desc' },
+        { field: 'Time', direction: 'asc' }
+      ]
+    };
+    
+    if (filterFormula) {
+      selectOptions.filterByFormula = filterFormula;
+    }
 
     // Fetch bookings from Airtable
-    const bookings = await base('Bookings')
-      .select({
-        filterByFormula: filterFormula || undefined,
-        sort: [
-          { field: 'Date', direction: 'desc' },
-          { field: 'Time', direction: 'asc' }
-        ]
-      })
-      .all();
+    const bookings = await base('Bookings').select(selectOptions).all();
 
     console.log(`Found ${bookings.length} bookings`);
 
