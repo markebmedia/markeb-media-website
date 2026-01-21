@@ -1464,13 +1464,15 @@
 
   <body>
   <!-- Password Protection Modal -->
-  <div class="password-modal" id="passwordModal">
-    <div class="password-dialog">
-      <div class="password-header">
-        <div class="password-logo">🛡️</div>
-        <h2>Admin Access Required</h2>
-        <p>Enter the admin code to continue</p>
+<div class="password-modal" id="passwordModal">
+  <div class="password-dialog">
+    <div class="password-header">
+      <div class="password-logo">
+        <img src="Markeb Media Logo (2).PNG" alt="Markeb Media" style="width: 80px; height: auto;">
       </div>
+      <h2>Admin Access Required</h2>
+      <p>Enter the admin code to continue</p>
+    </div>
       
       <div class="password-body">
         <form id="passwordForm" onsubmit="checkPassword(event)">
@@ -1504,9 +1506,11 @@
   <!-- Mobile Menu Button -->
   <button class="mobile-menu-btn" onclick="toggleSidebar()">☰ Menu</button>
 
-  <!-- Sidebar Navigation -->
-  <div class="admin-sidebar" id="adminSidebar">
-    <div class="admin-logo">🛡️ MARKEB ADMIN</div>
+ <!-- Sidebar Navigation -->
+<div class="admin-sidebar" id="adminSidebar">
+  <div class="admin-logo">
+    <img src="/public/images/Markeb Media Logo (2).png" alt="Markeb Media" style="height: 80px; width: auto;">
+  </div>
 
     <div class="nav-section">
       <div class="nav-section-title">Overview</div>
@@ -2344,7 +2348,12 @@ const statusClass =
     const data = await response.json();
 
     if (data.success) {
-      if (data.bookings.length === 0) {
+      // Filter out cancelled bookings
+      const activeBookings = data.bookings.filter(booking => 
+        booking.fields['Booking Status'] !== 'Cancelled'
+      );
+
+      if (activeBookings.length === 0) {
         container.innerHTML = `
           <div style="text-align: center; padding: 60px;">
             <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
@@ -2353,7 +2362,7 @@ const statusClass =
           </div>
         `;
       } else {
-        renderPendingBookingsTable(data.bookings);
+        renderPendingBookingsTable(activeBookings);
       }
     }
 
