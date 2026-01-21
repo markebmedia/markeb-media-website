@@ -51,11 +51,11 @@ exports.handler = async (event, context) => {
       filters.push(`{Booking Status} = '${status}'`);
     }
     
-    // Handle both "Pending" and "Reserved" payment statuses
+    // Handle payment status - look for "Reserved", "Pending", OR BLANK/EMPTY
     if (paymentStatus) {
       if (paymentStatus === 'Reserved') {
-        // Look for BOTH "Reserved" AND "Pending" (since bookings may use either)
-        filters.push(`OR({Payment Status} = 'Reserved', {Payment Status} = 'Pending')`);
+        // Look for "Reserved", "Pending", OR empty/blank Payment Status
+        filters.push(`OR({Payment Status} = 'Reserved', {Payment Status} = 'Pending', {Payment Status} = BLANK())`);
       } else {
         filters.push(`{Payment Status} = '${paymentStatus}'`);
       }
@@ -147,7 +147,11 @@ exports.handler = async (event, context) => {
           withAccount: enhancedBookings.filter(b => b.hasAccount).length,
           withoutAccount: enhancedBookings.filter(b => !b.hasAccount).length,
           paid: enhancedBookings.filter(b => b.fields['Payment Status'] === 'Paid').length,
-          reserved: enhancedBookings.filter(b => b.fields['Payment Status'] === 'Reserved' || b.fields['Payment Status'] === 'Pending').length,
+          reserved: enhancedBookings.filter(b => 
+            b.fields['Payment Status'] === 'Reserved' || 
+            b.fields['Payment Status'] === 'Pending' || 
+            !b.fields['Payment Status']
+          ).length,
           cancelled: enhancedBookings.filter(b => b.fields['Booking Status'] === 'Cancelled').length,
           upcoming: enhancedBookings.filter(b => {
             const bookingDate = new Date(b.fields['Date']);
