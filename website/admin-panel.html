@@ -4,7 +4,9 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Panel - Markeb Media</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
@@ -14,22 +16,7 @@
       color: #1e293b;
     }
 
-    .mobile-menu-btn {
-      display: none;
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 999;
-      background: #3b82f6;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 16px;
-      cursor: pointer;
-      font-size: 20px;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
-
+    /* Sidebar Navigation */
     .admin-sidebar {
       position: fixed;
       left: 0;
@@ -96,6 +83,7 @@
       text-align: center;
     }
 
+    /* Main Content */
     .admin-main {
       margin-left: 260px;
       min-height: 100vh;
@@ -135,6 +123,7 @@
       font-size: 14px;
     }
 
+    /* Sections */
     .admin-section {
       display: none;
     }
@@ -143,6 +132,7 @@
       display: block;
     }
 
+    /* Stats Cards */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -171,6 +161,7 @@
       font-weight: 500;
     }
 
+    /* Tables */
     .data-table {
       width: 100%;
       background: #fff;
@@ -202,6 +193,7 @@
       background: #f8fafc;
     }
 
+    /* Buttons */
     .btn {
       padding: 10px 20px;
       border-radius: 8px;
@@ -271,6 +263,7 @@
       cursor: not-allowed;
     }
 
+    /* Calendar */
     .calendar-container {
       background: #fff;
       border: 2px solid #e2e8f0;
@@ -335,6 +328,7 @@
       border: 1px solid #e2e8f0;
     }
 
+    /* Month View */
     .calendar-grid.month {
       grid-template-columns: repeat(7, 1fr);
     }
@@ -396,6 +390,56 @@
       background: #ef4444;
     }
 
+    /* Week View */
+    .calendar-grid.week {
+      grid-template-columns: 80px repeat(7, 1fr);
+    }
+
+    .calendar-time-slot {
+      background: #f8fafc;
+      padding: 8px;
+      font-size: 12px;
+      color: #64748b;
+      text-align: right;
+      border-right: 2px solid #e2e8f0;
+    }
+
+    .calendar-week-slot {
+      background: #fff;
+      padding: 4px;
+      min-height: 60px;
+      position: relative;
+    }
+
+    /* Day View */
+    .calendar-grid.day {
+      grid-template-columns: 80px 1fr;
+    }
+
+    /* Drive Time Badge */
+    .drive-time-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .drive-time-badge.warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .drive-time-badge.error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* Toggle Switch */
     .toggle-switch {
       position: relative;
       display: inline-block;
@@ -441,6 +485,7 @@
       transform: translateX(24px);
     }
 
+    /* Filters */
     .filters-bar {
       background: #fff;
       border: 2px solid #e2e8f0;
@@ -475,6 +520,7 @@
       cursor: pointer;
     }
 
+    /* Loading */
     .spinner {
       margin: 30px auto;
       width: 50px;
@@ -489,6 +535,7 @@
       to { transform: rotate(360deg); }
     }
 
+    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -583,6 +630,7 @@
       text-align: right;
     }
 
+    /* Status Badges */
     .status-badge {
       display: inline-block;
       padding: 4px 12px;
@@ -622,6 +670,57 @@
       color: #991b1b;
     }
 
+    /* Region Dropdown */
+    .region-select {
+      padding: 8px 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: #0f172a;
+      cursor: pointer;
+      transition: all .2s ease;
+      min-width: 140px;
+      max-width: 180px;
+    }
+
+    .region-select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .region-select:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: #f8f9fa;
+    }
+
+    .region-select:hover:not(:disabled) {
+      border-color: #cbd5e1;
+    }
+
+    /* Region badge */
+    .region-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #eff6ff;
+      color: #1e40af;
+      border: 2px solid #bfdbfe;
+    }
+
+    .region-badge.empty {
+      background: #f1f5f9;
+      color: #64748b;
+      border-color: #e2e8f0;
+      font-style: italic;
+    }
+
+    /* Info/Warning boxes */
     .info-box {
       background: #eff6ff;
       border: 2px solid #3b82f6;
@@ -652,6 +751,7 @@
       font-size: 14px;
     }
 
+    /* Action buttons grid */
     .action-buttons-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -659,6 +759,7 @@
       margin-top: 24px;
     }
 
+    /* Rewards section */
     .rewards-section {
       background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
       border: 2px solid #f59e0b;
@@ -701,9 +802,10 @@
       transition: width 0.3s ease;
     }
 
+    /* Responsive */
     @media (max-width: 1024px) {
       .mobile-menu-btn {
-        display: block;
+        display: block !important;
       }
 
       .admin-sidebar {
@@ -828,11 +930,29 @@
         border-radius: 0;
       }
     }
+
+    .mobile-menu-btn {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 999;
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
   </style>
 </head>
 <body>
+  <!-- Mobile Menu Button -->
   <button class="mobile-menu-btn" onclick="toggleSidebar()">☰ Menu</button>
 
+  <!-- Sidebar Navigation -->
   <div class="admin-sidebar" id="adminSidebar">
     <div class="admin-logo">🛡️ MARKEB ADMIN</div>
 
@@ -869,14 +989,6 @@
     </div>
 
     <div class="nav-section">
-      <div class="nav-section-title">Rewards</div>
-      <div class="nav-item" onclick="showSection('rewards')">
-        <span class="nav-icon">🎁</span>
-        Milestone Emails
-      </div>
-    </div>
-
-    <div class="nav-section">
       <div class="nav-section-title">Tools</div>
       <div class="nav-item" onclick="window.open('uk-client-map.html', '_blank')">
         <span class="nav-icon">🗺️</span>
@@ -885,7 +997,9 @@
     </div>
   </div>
 
+  <!-- Main Content -->
   <div class="admin-main">
+    <!-- Header -->
     <div class="admin-header">
       <div>
         <div class="admin-title">Admin Panel</div>
@@ -1002,28 +1116,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Rewards/Milestone Emails Section -->
-    <div class="admin-section" id="rewards">
-      <div class="calendar-container">
-        <h3 style="margin-bottom: 24px;">🎁 Milestone Rewards Management</h3>
-        
-        <div class="info-box">
-          <strong>📧 Milestone Email System:</strong> Automatically send reward emails when customers hit booking milestones (3, 5, 10 bookings).
-        </div>
-
-        <div class="filters-bar">
-          <input type="text" class="filter-input" id="rewardsSearch" placeholder="Search by customer name or email...">
-          <button class="btn btn-primary" onclick="loadRewardsCustomers()">🔍 Search</button>
-        </div>
-
-        <div id="rewardsContainer">
-          <div style="text-align: center; padding: 40px;">
-            <div class="spinner"></div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Booking Detail Modal -->
@@ -1033,7 +1125,9 @@
         <h3 id="bookingModalTitle">Booking Details</h3>
         <button class="modal-close" onclick="closeModal('bookingModal')">&times;</button>
       </div>
-      <div class="modal-body" id="bookingModalBody"></div>
+      <div class="modal-body" id="bookingModalBody">
+        <!-- Content will be populated by JavaScript -->
+      </div>
     </div>
   </div>
 
@@ -1044,976 +1138,1142 @@
         <h3 id="customerModalTitle">Customer Details</h3>
         <button class="modal-close" onclick="closeModal('customerModal')">&times;</button>
       </div>
-      <div class="modal-body" id="customerModalBody"></div>
+      <div class="modal-body" id="customerModalBody">
+        <!-- Content will be populated by JavaScript -->
+      </div>
     </div>
   </div>
 
   <script>
-let currentView = 'month';
-let currentDate = new Date();
-let allBookings = [];
-let allCustomers = [];
-let currentBooking = null;
+    // Global state
+    let currentView = 'month';
+    let currentDate = new Date();
+    let allBookings = [];
+    let allCustomers = [];
+    let currentBooking = null;
 
-document.addEventListener('DOMContentLoaded', () => {
-  loadDashboardStats();
-  loadCalendar();
-  loadBookings();
-  loadReservedBookings();
-  loadCustomers();
-  loadRewardsCustomers();
-});
+    // UK REGIONS - All UK counties and regions
+    const UK_REGIONS = [
+      // England - North West
+      'Cheshire', 'Cumbria', 'Greater Manchester', 'Lancashire', 'Merseyside',
+      // England - North East
+      'County Durham', 'Northumberland', 'Tyne and Wear',
+      // England - Yorkshire and the Humber
+      'East Riding of Yorkshire', 'North Yorkshire', 'South Yorkshire', 'West Yorkshire',
+      // England - East Midlands
+      'Derbyshire', 'Leicestershire', 'Lincolnshire', 'Northamptonshire', 'Nottinghamshire', 'Rutland',
+      // England - West Midlands
+      'Herefordshire', 'Shropshire', 'Staffordshire', 'Warwickshire', 'West Midlands', 'Worcestershire',
+      // England - East of England
+      'Bedfordshire', 'Cambridgeshire', 'Essex', 'Hertfordshire', 'Norfolk', 'Suffolk',
+      // England - South East
+      'Berkshire', 'Buckinghamshire', 'East Sussex', 'Hampshire', 'Isle of Wight', 'Kent', 'Oxfordshire', 'Surrey', 'West Sussex',
+      // England - South West
+      'Bristol', 'Cornwall', 'Devon', 'Dorset', 'Gloucestershire', 'Somerset', 'Wiltshire',
+      // England - London
+      'Greater London',
+      // Scotland
+      'Aberdeenshire', 'Angus', 'Argyll and Bute', 'City of Edinburgh', 'Clackmannanshire', 
+      'Dumfries and Galloway', 'Dundee City', 'East Ayrshire', 'East Dunbartonshire', 'East Lothian',
+      'East Renfrewshire', 'Falkirk', 'Fife', 'Glasgow City', 'Highland', 'Inverclyde',
+      'Midlothian', 'Moray', 'North Ayrshire', 'North Lanarkshire', 'Orkney Islands',
+      'Perth and Kinross', 'Renfrewshire', 'Scottish Borders', 'Shetland Islands', 'South Ayrshire',
+      'South Lanarkshire', 'Stirling', 'West Dunbartonshire', 'West Lothian', 'Western Isles',
+      // Wales
+      'Anglesey', 'Blaenau Gwent', 'Bridgend', 'Caerphilly', 'Cardiff', 'Carmarthenshire',
+      'Ceredigion', 'Conwy', 'Denbighshire', 'Flintshire', 'Gwynedd', 'Merthyr Tydfil',
+      'Monmouthshire', 'Neath Port Talbot', 'Newport', 'Pembrokeshire', 'Powys', 'Rhondda Cynon Taf',
+      'Swansea', 'Torfaen', 'Vale of Glamorgan', 'Wrexham',
+      // Northern Ireland
+      'Antrim', 'Armagh', 'Down', 'Fermanagh', 'Londonderry', 'Tyrone'
+    ].sort();
 
-// ===== NAVIGATION =====
-function showSection(sectionId) {
-  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  
-  document.getElementById(sectionId).classList.add('active');
-  
-  const navItem = [...document.querySelectorAll('.nav-item')].find(n => 
-    n.getAttribute('onclick')?.includes(`showSection('${sectionId}')`)
-  );
-  if (navItem) navItem.classList.add('active');
-
-  if (window.innerWidth <= 1024) {
-    document.getElementById('adminSidebar').classList.remove('open');
-  }
-}
-
-function toggleSidebar() {
-  const sidebar = document.getElementById('adminSidebar');
-  sidebar.classList.toggle('open');
-  
-  if (sidebar.classList.contains('open')) {
-    document.addEventListener('click', closeSidebarOutside);
-  } else {
-    document.removeEventListener('click', closeSidebarOutside);
-  }
-}
-
-function closeSidebarOutside(event) {
-  const sidebar = document.getElementById('adminSidebar');
-  const menuBtn = document.querySelector('.mobile-menu-btn');
-  
-  if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
-    sidebar.classList.remove('open');
-    document.removeEventListener('click', closeSidebarOutside);
-  }
-}
-
-function closeModal(modalId) {
-  document.getElementById(modalId).classList.remove('active');
-}
-
-// ===== DASHBOARD STATS =====
-async function loadDashboardStats() {
-  try {
-    const response = await fetch('/.netlify/functions/admin-bookings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({})
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDashboardStats();
+      loadCalendar();
+      loadBookings();
+      loadReservedBookings();
+      loadCustomers();
     });
 
-    const data = await response.json();
-    
-    if (data.success) {
-      document.getElementById('totalBookings').textContent = data.stats.total;
-      document.getElementById('upcomingBookings').textContent = data.stats.upcoming;
-      document.getElementById('reservedBookings').textContent = data.stats.reserved;
-    }
-
-    const customersResponse = await fetch('/.netlify/functions/admin-users');
-    const customersData = await customersResponse.json();
-    
-    if (customersData.success) {
-      document.getElementById('totalCustomers').textContent = customersData.total;
-    }
-
-  } catch (error) {
-    console.error('Error loading dashboard stats:', error);
-  }
-}
-
-// ===== CALENDAR FUNCTIONS =====
-function setCalendarView(view) {
-  currentView = view;
-  document.querySelectorAll('.calendar-view-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.view === view);
-  });
-  loadCalendar();
-}
-
-function previousPeriod() {
-  if (currentView === 'month') {
-    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
-  } else if (currentView === 'week') {
-    currentDate = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
-  } else {
-    currentDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
-  }
-  loadCalendar();
-}
-
-function nextPeriod() {
-  if (currentView === 'month') {
-    currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-  } else if (currentView === 'week') {
-    currentDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-  } else {
-    currentDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
-  }
-  loadCalendar();
-}
-
-async function loadCalendar() {
-  const grid = document.getElementById('calendarGrid');
-  const currentEl = document.getElementById('calendarCurrent');
-  const region = document.getElementById('calendarRegion')?.value || '';
-
-  grid.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
-
-  try {
-    let startDate, endDate;
-
-    if (currentView === 'month') {
-      const year = currentDate.getFullYear();
-      const month = currentDate.getMonth();
-      startDate = new Date(year, month, 1).toISOString().split('T')[0];
-      endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
+    // Navigation
+    function showSection(sectionId) {
+      document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       
-      currentEl.textContent = currentDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-    } else if (currentView === 'week') {
-      const tempDate = new Date(currentDate);
-      const day = tempDate.getDay();
-      const diff = tempDate.getDate() - day + (day === 0 ? -6 : 1);
-      const monday = new Date(tempDate.setDate(diff));
-      const sunday = new Date(monday);
-      sunday.setDate(monday.getDate() + 6);
+      document.getElementById(sectionId).classList.add('active');
       
-      startDate = monday.toISOString().split('T')[0];
-      endDate = sunday.toISOString().split('T')[0];
-      
-      currentEl.textContent = `Week of ${monday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })} - ${sunday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' })}`;
-    } else {
-      startDate = currentDate.toISOString().split('T')[0];
-      endDate = startDate;
-      
-      currentEl.textContent = currentDate.toLocaleDateString('en-GB', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-    }
+      const navItem = [...document.querySelectorAll('.nav-item')].find(n => 
+        n.getAttribute('onclick')?.includes(`showSection('${sectionId}')`)
+      );
+      if (navItem) navItem.classList.add('active');
 
-    const response = await fetch('/.netlify/functions/admin-bookings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ startDate, endDate, region })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      if (currentView === 'month') {
-        renderMonthView(data.bookings);
-      } else if (currentView === 'week') {
-        renderWeekView(data.bookings);
-      } else {
-        renderDayView(data.bookings);
+      if (window.innerWidth <= 1024) {
+        document.getElementById('adminSidebar').classList.remove('open');
       }
     }
 
-  } catch (error) {
-    console.error('Error loading calendar:', error);
-    grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading calendar</div>';
-  }
-}
-
-function renderMonthView(bookings) {
-  const grid = document.getElementById('calendarGrid');
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
-  
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const daysInMonth = lastDay.getDate();
-  const startingDayOfWeek = firstDay.getDay() || 7;
-
-  let html = '<div class="calendar-grid month">';
-  
-  ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(day => {
-    html += `<div class="calendar-day-header">${day}</div>`;
-  });
-
-  for (let i = 1; i < startingDayOfWeek; i++) {
-    html += '<div class="calendar-day other-month"></div>';
-  }
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const dayBookings = bookings.filter(b => b.fields['Date'] === dateStr);
-    
-    const today = new Date();
-    const isToday = dateStr === today.toISOString().split('T')[0];
-    
-    html += `<div class="calendar-day ${isToday ? 'today' : ''}">`;
-    html += `<div class="calendar-day-number">${day}</div>`;
-    
-    dayBookings.forEach(booking => {
-      const statusClass = booking.fields['Payment Status'] === 'Reserved' ? 'reserved' : 
-                          booking.fields['Booking Status'] === 'Cancelled' ? 'cancelled' : '';
-      html += `<div class="calendar-booking ${statusClass}" onclick="viewBookingById('${booking.id}')">${booking.fields['Time']} ${booking.fields['Client Name']}</div>`;
-    });
-    
-    html += '</div>';
-  }
-
-  html += '</div>';
-  grid.innerHTML = html;
-}
-
-function renderWeekView(bookings) {
-  const grid = document.getElementById('calendarGrid');
-  grid.innerHTML = '<div style="padding: 40px; text-align: center;">Week view coming soon...</div>';
-}
-
-function renderDayView(bookings) {
-  const grid = document.getElementById('calendarGrid');
-  grid.innerHTML = '<div style="padding: 40px; text-align: center;">Day view coming soon...</div>';
-}
-
-// ===== BOOKINGS FUNCTIONS =====
-async function loadBookings() {
-  const container = document.getElementById('bookingsContainer');
-  container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
-
-  try {
-    const search = document.getElementById('bookingSearch')?.value || '';
-    const region = document.getElementById('bookingRegion')?.value || '';
-    const status = document.getElementById('bookingStatus')?.value || '';
-
-    const response = await fetch('/.netlify/functions/admin-bookings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ region, status })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      allBookings = data.bookings;
-      renderBookingsTable(allBookings, search);
+    function toggleSidebar() {
+      const sidebar = document.getElementById('adminSidebar');
+      sidebar.classList.toggle('open');
+      
+      if (sidebar.classList.contains('open')) {
+        document.addEventListener('click', closeSidebarOutside);
+      } else {
+        document.removeEventListener('click', closeSidebarOutside);
+      }
     }
 
-  } catch (error) {
-    console.error('Error loading bookings:', error);
-    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading bookings</div>';
-  }
-}
-
-async function loadReservedBookings() {
-  const container = document.getElementById('reservedContainer');
-  container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
-
-  try {
-    const response = await fetch('/.netlify/functions/admin-bookings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ paymentStatus: 'Reserved' })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      renderBookingsTable(data.bookings, '', 'reservedContainer');
+    function closeSidebarOutside(event) {
+      const sidebar = document.getElementById('adminSidebar');
+      const menuBtn = document.querySelector('.mobile-menu-btn');
+      
+      if (!sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+        sidebar.classList.remove('open');
+        document.removeEventListener('click', closeSidebarOutside);
+      }
     }
 
-  } catch (error) {
-    console.error('Error loading reserved bookings:', error);
-    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading reserved bookings</div>';
-  }
-}
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
 
-function renderBookingsTable(bookings, search = '', containerId = 'bookingsContainer') {
-  const container = document.getElementById(containerId);
-  
-  let filtered = bookings;
-  if (search) {
-    const term = search.toLowerCase();
-    filtered = bookings.filter(b => 
-      (b.fields['Client Name'] || '').toLowerCase().includes(term) ||
-      (b.fields['Client Email'] || '').toLowerCase().includes(term) ||
-      (b.fields['Property Address'] || '').toLowerCase().includes(term) ||
-      (b.fields['Booking Reference'] || '').toLowerCase().includes(term)
-    );
-  }
+    // Dashboard Stats
+    async function loadDashboardStats() {
+      try {
+        const response = await fetch('/.netlify/functions/admin-bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
 
-  if (filtered.length === 0) {
-    container.innerHTML = '<div style="text-align: center; padding: 40px;">No bookings found</div>';
-    return;
-  }
-
-  let html = `
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Reference</th>
-          <th>Date & Time</th>
-          <th>Client</th>
-          <th>Address</th>
-          <th>Service</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-
-  filtered.forEach(booking => {
-    html += `
-      <tr>
-        <td data-label="Reference"><strong>${booking.fields['Booking Reference']}</strong></td>
-        <td data-label="Date & Time">${booking.fields['Date']}<br>${booking.fields['Time']}</td>
-        <td data-label="Client">
-          ${booking.fields['Client Name']}<br>
-          <small style="color: #64748b;">${booking.fields['Client Email']}</small>
-        </td>
-        <td data-label="Address">${booking.fields['Property Address'] || '-'}</td>
-        <td data-label="Service">${booking.fields['Service Name'] || '-'}</td>
-        <td data-label="Status">
-          <span class="status-badge status-${(booking.fields['Payment Status'] || '').toLowerCase()}">
-            ${booking.fields['Payment Status'] || '-'}
-          </span>
-        </td>
-        <td data-label="Actions">
-          <button class="btn btn-primary btn-small" onclick="viewBookingById('${booking.id}')">
-            View
-          </button>
-        </td>
-      </tr>
-    `;
-  });
-
-  html += '</tbody></table>';
-  container.innerHTML = html;
-}
-
-// ===== VIEW BOOKING WITH ADMIN ACTIONS =====
-function viewBookingById(bookingId) {
-  const booking = allBookings.find(b => b.id === bookingId);
-  if (!booking) {
-    alert('Booking not found');
-    return;
-  }
-  viewBooking(booking);
-}
-
-function viewBooking(booking) {
-  currentBooking = booking;
-  const modal = document.getElementById('bookingModal');
-  const title = document.getElementById('bookingModalTitle');
-  const body = document.getElementById('bookingModalBody');
-
-  title.textContent = `Booking ${booking.fields['Booking Reference']}`;
-
-  const isCancelled = booking.fields['Booking Status'] === 'Cancelled';
-  const isReserved = booking.fields['Payment Status'] === 'Reserved' || booking.fields['Payment Status'] === 'Pending';
-
-  body.innerHTML = `
-    <div class="detail-item">
-      <span class="detail-label">Reference</span>
-      <span class="detail-value">${booking.fields['Booking Reference']}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Date & Time</span>
-      <span class="detail-value">${booking.fields['Date']} at ${booking.fields['Time']}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Client Name</span>
-      <span class="detail-value">${booking.fields['Client Name']}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Client Email</span>
-      <span class="detail-value">${booking.fields['Client Email']}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Property Address</span>
-      <span class="detail-value">${booking.fields['Property Address'] || '-'}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Service</span>
-      <span class="detail-value">${booking.fields['Service Name'] || '-'}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Total Price</span>
-      <span class="detail-value">£${(booking.fields['Total Price'] || 0).toFixed(2)}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Payment Status</span>
-      <span class="detail-value">
-        <span class="status-badge status-${(booking.fields['Payment Status'] || '').toLowerCase()}">
-          ${booking.fields['Payment Status'] || '-'}
-        </span>
-      </span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Booking Status</span>
-      <span class="detail-value">
-        <span class="status-badge status-${isCancelled ? 'cancelled' : 'active'}">
-          ${booking.fields['Booking Status'] || 'Booked'}
-        </span>
-      </span>
-    </div>
-    
-    ${!isCancelled ? `
-      <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
+        const data = await response.json();
         
-        <div style="margin-bottom: 20px; padding: 16px; background: #f8fafc; border-radius: 8px;">
-          <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-            <span style="font-weight: 600; color: #64748b; font-size: 14px;">📧 Send Email Notifications</span>
-            <span class="toggle-switch">
-              <input type="checkbox" id="sendEmailToggle" checked>
-              <span class="toggle-slider"></span>
+        if (data.success) {
+          document.getElementById('totalBookings').textContent = data.stats.total;
+          document.getElementById('upcomingBookings').textContent = data.stats.upcoming;
+          document.getElementById('reservedBookings').textContent = data.stats.reserved;
+        }
+
+        // Load customer count
+        const customersResponse = await fetch('/.netlify/functions/admin-users');
+        const customersData = await customersResponse.json();
+        
+        if (customersData.success) {
+          document.getElementById('totalCustomers').textContent = customersData.total;
+        }
+
+      } catch (error) {
+        console.error('Error loading dashboard stats:', error);
+      }
+    }
+
+    // Calendar Functions
+    function setCalendarView(view) {
+      currentView = view;
+      document.querySelectorAll('.calendar-view-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === view);
+      });
+      loadCalendar();
+    }
+
+    function previousPeriod() {
+      if (currentView === 'month') {
+        currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+      } else if (currentView === 'week') {
+        currentDate = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+      } else {
+        currentDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
+      }
+      loadCalendar();
+    }
+
+    function nextPeriod() {
+      if (currentView === 'month') {
+        currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+      } else if (currentView === 'week') {
+        currentDate = new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+      } else {
+        currentDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+      }
+      loadCalendar();
+    }
+
+    async function loadCalendar() {
+      const grid = document.getElementById('calendarGrid');
+      const currentEl = document.getElementById('calendarCurrent');
+      const region = document.getElementById('calendarRegion')?.value || '';
+
+      grid.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+
+      try {
+        let startDate, endDate;
+
+        if (currentView === 'month') {
+          const year = currentDate.getFullYear();
+          const month = currentDate.getMonth();
+          startDate = new Date(year, month, 1).toISOString().split('T')[0];
+          endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
+          
+          currentEl.textContent = currentDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+        } else if (currentView === 'week') {
+          const tempDate = new Date(currentDate);
+          const day = tempDate.getDay();
+          const diff = tempDate.getDate() - day + (day === 0 ? -6 : 1);
+          const monday = new Date(tempDate.setDate(diff));
+          const sunday = new Date(monday);
+          sunday.setDate(monday.getDate() + 6);
+          
+          startDate = monday.toISOString().split('T')[0];
+          endDate = sunday.toISOString().split('T')[0];
+          
+          currentEl.textContent = `Week of ${monday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })} - ${sunday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+        } else {
+          startDate = currentDate.toISOString().split('T')[0];
+          endDate = startDate;
+          
+          currentEl.textContent = currentDate.toLocaleDateString('en-GB', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+        }
+
+        const response = await fetch('/.netlify/functions/admin-bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ startDate, endDate, region })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          if (currentView === 'month') {
+            renderMonthView(data.bookings);
+          } else if (currentView === 'week') {
+            renderWeekView(data.bookings);
+          } else {
+            renderDayView(data.bookings);
+          }
+        }
+
+      } catch (error) {
+        console.error('Error loading calendar:', error);
+        grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading calendar</div>';
+      }
+    }
+
+    function renderMonthView(bookings) {
+      const grid = document.getElementById('calendarGrid');
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startingDayOfWeek = firstDay.getDay() || 7; // 1=Monday, 7=Sunday
+
+      let html = '<div class="calendar-grid month">';
+      
+      // Day headers
+      ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(day => {
+        html += `<div class="calendar-day-header">${day}</div>`;
+      });
+
+      // Empty cells before first day
+      for (let i = 1; i < startingDayOfWeek; i++) {
+        html += '<div class="calendar-day other-month"></div>';
+      }
+
+      // Days of month
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayBookings = bookings.filter(b => b.fields['Date'] === dateStr);
+        
+        const today = new Date();
+        const isToday = dateStr === today.toISOString().split('T')[0];
+        
+        html += `<div class="calendar-day ${isToday ? 'today' : ''}">`;
+        html += `<div class="calendar-day-number">${day}</div>`;
+        
+        dayBookings.forEach(booking => {
+          const statusClass = booking.fields['Payment Status'] === 'Reserved' ? 'reserved' : 
+                              booking.fields['Booking Status'] === 'Cancelled' ? 'cancelled' : '';
+          html += `<div class="calendar-booking ${statusClass}" onclick="viewBookingById('${booking.id}')">${booking.fields['Time']} ${booking.fields['Client Name']}</div>`;
+        });
+        
+        html += '</div>';
+      }
+
+      html += '</div>';
+      grid.innerHTML = html;
+    }
+
+    function renderWeekView(bookings) {
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '<div style="padding: 40px; text-align: center;">Week view coming soon...</div>';
+    }
+
+    function renderDayView(bookings) {
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '<div style="padding: 40px; text-align: center;">Day view coming soon...</div>';
+    }
+
+    // Bookings Functions
+    async function loadBookings() {
+      const container = document.getElementById('bookingsContainer');
+      container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+
+      try {
+        const search = document.getElementById('bookingSearch')?.value || '';
+        const region = document.getElementById('bookingRegion')?.value || '';
+        const status = document.getElementById('bookingStatus')?.value || '';
+
+        const response = await fetch('/.netlify/functions/admin-bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ region, status })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          allBookings = data.bookings;
+          renderBookingsTable(allBookings, search);
+        }
+
+      } catch (error) {
+        console.error('Error loading bookings:', error);
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading bookings</div>';
+      }
+    }
+
+    async function loadReservedBookings() {
+      const container = document.getElementById('reservedContainer');
+      container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+
+      try {
+        const response = await fetch('/.netlify/functions/admin-bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentStatus: 'Reserved' })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          renderBookingsTable(data.bookings, '', 'reservedContainer');
+        }
+
+      } catch (error) {
+        console.error('Error loading reserved bookings:', error);
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading reserved bookings</div>';
+      }
+    }
+
+    function renderBookingsTable(bookings, search = '', containerId = 'bookingsContainer') {
+      const container = document.getElementById(containerId);
+      
+      let filtered = bookings;
+      if (search) {
+        const term = search.toLowerCase();
+        filtered = bookings.filter(b => 
+          (b.fields['Client Name'] || '').toLowerCase().includes(term) ||
+          (b.fields['Client Email'] || '').toLowerCase().includes(term) ||
+          (b.fields['Property Address'] || '').toLowerCase().includes(term) ||
+          (b.fields['Booking Reference'] || '').toLowerCase().includes(term)
+        );
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 40px;">No bookings found</div>';
+        return;
+      }
+
+      let html = `
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Date & Time</th>
+              <th>Client</th>
+              <th>Address</th>
+              <th>Service</th>
+              <th>Status</th>
+              <th>Drive Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      filtered.forEach(booking => {
+        const driveTimeInfo = booking.driveTimeInfo;
+        const driveTimeBadge = driveTimeInfo ? `
+          <span class="drive-time-badge ${driveTimeInfo.hasConflict ? 'error' : driveTimeInfo.bufferTime.surplus < 15 ? 'warning' : ''}">
+            🚗 ${driveTimeInfo.driveTimeFormatted} ${driveTimeInfo.hasConflict ? '⚠️' : ''}
+          </span>
+        ` : '-';
+
+        html += `
+          <tr>
+            <td data-label="Reference"><strong>${booking.fields['Booking Reference']}</strong></td>
+            <td data-label="Date & Time">${booking.fields['Date']}<br>${booking.fields['Time']}</td>
+            <td data-label="Client">
+              ${booking.fields['Client Name']}<br>
+              <small style="color: #64748b;">${booking.fields['Client Email']}</small>
+            </td>
+            <td data-label="Address">${booking.fields['Property Address'] || '-'}</td>
+            <td data-label="Service">${booking.fields['Service Name'] || '-'}</td>
+            <td data-label="Status">
+              <span class="status-badge status-${(booking.fields['Payment Status'] || '').toLowerCase()}">
+                ${booking.fields['Payment Status'] || '-'}
+              </span>
+            </td>
+            <td data-label="Drive Time">${driveTimeBadge}</td>
+            <td data-label="Actions">
+              <button class="btn btn-primary btn-small" onclick="viewBookingById('${booking.id}')">
+                View
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function viewBookingById(bookingId) {
+      const booking = allBookings.find(b => b.id === bookingId);
+      if (!booking) {
+        alert('Booking not found');
+        return;
+      }
+      viewBooking(booking);
+    }
+
+    function viewBooking(booking) {
+      currentBooking = booking;
+      const modal = document.getElementById('bookingModal');
+      const title = document.getElementById('bookingModalTitle');
+      const body = document.getElementById('bookingModalBody');
+
+      title.textContent = `Booking ${booking.fields['Booking Reference']}`;
+
+      const driveTimeSection = booking.driveTimeInfo ? `
+        <div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 12px; padding: 16px; margin: 16px 0;">
+          <h4 style="margin: 0 0 12px 0; color: #1e40af;">🚗 Drive Time Information</h4>
+          <div class="detail-item">
+            <span class="detail-label">From Previous Booking</span>
+            <span class="detail-value">${booking.driveTimeInfo.fromBooking}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Drive Time</span>
+            <span class="detail-value">${booking.driveTimeInfo.driveTimeFormatted}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Previous End Time</span>
+            <span class="detail-value">${booking.driveTimeInfo.previousBookingEndTime}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Current Start Time</span>
+            <span class="detail-value">${booking.driveTimeInfo.currentBookingStartTime}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Buffer Time</span>
+            <span class="detail-value">
+              ${booking.driveTimeInfo.bufferTime.available} min 
+              (${booking.driveTimeInfo.bufferTime.sufficient ? '✓ Sufficient' : '⚠️ Tight Schedule'})
             </span>
-          </label>
-        </div>
-
-        <div class="action-buttons-grid">
-          
-          ${isReserved ? `
-            <button class="btn btn-success" onclick="chargeReservedBooking('${booking.id}')" style="width: 100%; justify-content: center;">
-              💳 Charge Card
-            </button>
-          ` : ''}
-          
-          <button class="btn btn-primary" onclick="showAdminReschedule('${booking.id}')" style="width: 100%; justify-content: center;">
-            📅 Reschedule
-          </button>
-          
-          <button class="btn btn-secondary" onclick="showModifyService('${booking.id}')" style="width: 100%; justify-content: center;">
-            ✏️ Modify Service
-          </button>
-          
-          <button class="btn btn-danger" onclick="showAdminCancel('${booking.id}')" style="width: 100%; justify-content: center;">
-            ❌ Cancel
-          </button>
-        </div>
-
-        <div class="info-box" style="margin-top: 16px;">
-          <strong>ℹ️ Admin Actions:</strong> These bypass normal restrictions and can modify any booking.
-        </div>
-      </div>
-    ` : `
-      <div style="margin-top: 24px; padding: 16px; background: #fee2e2; border: 2px solid #ef4444; border-radius: 12px; text-align: center; color: #991b1b;">
-        <strong>❌ This booking has been cancelled</strong>
-      </div>
-    `}
-  `;
-
-  modal.classList.add('active');
-}
-
-// ===== ADMIN ACTIONS =====
-async function chargeReservedBooking(bookingId) {
-  const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
-  if (!booking) return alert('Booking data not found');
-
-  if (!confirm(`Charge reserved booking?\n\nClient: ${booking.fields['Client Name']}\nAmount: £${(booking.fields['Total Price'] || 0).toFixed(2)}`)) return;
-  
-  try {
-    const response = await fetch('/.netlify/functions/charge-card', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bookingId })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      alert(`✅ Payment charged!\n\nAmount: £${data.amount.toFixed(2)}\n\nConfirmation email sent.`);
-      closeModal('bookingModal');
-      loadBookings();
-      loadDashboardStats();
-      loadCalendar();
-    } else {
-      alert(`❌ Error: ${data.error || 'Failed to charge card'}`);
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('❌ Failed to charge card.');
-  }
-}
-
-function showAdminReschedule(bookingId) {
-  const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
-  if (!booking) return;
-  
-  const sendEmail = document.getElementById('sendEmailToggle')?.checked ?? true;
-  
-  const newDate = prompt('Enter new date (YYYY-MM-DD):', booking.fields['Date']);
-  if (!newDate || !newDate.match(/^\d{4}-\d{2}-\d{2}$/)) return;
-  
-  const newTime = prompt('Enter new time (HH:MM):', booking.fields['Time']);
-  if (!newTime || !newTime.match(/^\d{2}:\d{2}$/)) return;
-  
-  if (!confirm(`Reschedule to ${newDate} at ${newTime}?\n\nSend email: ${sendEmail ? 'Yes' : 'No'}`)) return;
-  
-  adminRescheduleBooking(bookingId, newDate, newTime, sendEmail);
-}
-
-async function adminRescheduleBooking(bookingId, newDate, newTime, sendEmail) {
-  try {
-    const response = await fetch('/.netlify/functions/admin-reschedule-booking', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bookingId, newDate, newTime, sendEmail })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      alert(`✅ Rescheduled!\n\n${newDate} at ${newTime}\n\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`);
-      closeModal('bookingModal');
-      loadBookings();
-      loadCalendar();
-    } else {
-      alert(`❌ Error: ${data.error}`);
-    }
-  } catch (error) {
-    alert('❌ Failed to reschedule.');
-  }
-}
-
-function showAdminCancel(bookingId) {
-  const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
-  if (!booking) return;
-  
-  const sendEmail = document.getElementById('sendEmailToggle')?.checked ?? true;
-  const reason = prompt('Reason:') || 'Admin cancelled';
-  
-  if (!confirm(`Cancel booking?\n\nClient: ${booking.fields['Client Name']}\nReason: ${reason}\n\nSend email: ${sendEmail ? 'Yes' : 'No'}`)) return;
-  
-  adminCancelBooking(bookingId, reason, sendEmail);
-}
-
-async function adminCancelBooking(bookingId, reason, sendEmail) {
-  try {
-    const response = await fetch('/.netlify/functions/admin-cancel-booking', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bookingId, reason, sendEmail })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      let msg = `✅ Cancelled!\n\n`;
-      if (data.cancellationCharge > 0) msg += `Fee: £${data.cancellationCharge.toFixed(2)}\n`;
-      if (data.refundProcessed) msg += `Refund: £${data.refundAmount.toFixed(2)}\n`;
-      msg += `\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`;
-      alert(msg);
-      closeModal('bookingModal');
-      loadBookings();
-      loadCalendar();
-    } else {
-      alert(`❌ Error: ${data.error}`);
-    }
-  } catch (error) {
-    alert('❌ Failed to cancel.');
-  }
-}
-
-function showModifyService(bookingId) {
-  const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
-  if (!booking) return;
-  
-  const sendEmail = document.getElementById('sendEmailToggle')?.checked ?? true;
-  
-  const newServiceName = prompt('New service name:');
-  if (!newServiceName) return;
-  
-  const newPrice = parseFloat(prompt('New base price (£):'));
-  if (isNaN(newPrice)) return;
-  
-  const newDuration = parseInt(prompt('Duration (mins):', '60'));
-  if (isNaN(newDuration)) return;
-  
-  if (!confirm(`Change service?\n\nNew: ${newServiceName} (£${newPrice})\n\nSend email: ${sendEmail ? 'Yes' : 'No'}`)) return;
-  
-  adminModifyService(bookingId, newServiceName, newPrice, newDuration, sendEmail);
-}
-
-async function adminModifyService(bookingId, newServiceName, newServicePrice, newServiceDuration, sendEmail) {
-  try {
-    const response = await fetch('/.netlify/functions/admin-modify-service', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        bookingId,
-        newServiceId: newServiceName.toLowerCase().replace(/\s+/g, '-'),
-        newServiceName,
-        newServicePrice,
-        newServiceDuration,
-        sendEmail
-      })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      alert(`✅ Modified!\n\nNew: ${data.newService} (£${data.newPrice.toFixed(2)})\n\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`);
-      closeModal('bookingModal');
-      loadBookings();
-    } else {
-      alert(`❌ Error: ${data.error}`);
-    }
-  } catch (error) {
-    alert('❌ Failed to modify service.');
-  }
-}
-
-// ===== CUSTOMERS =====
-async function loadCustomers() {
-  const container = document.getElementById('customersContainer');
-  container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
-
-  try {
-    const response = await fetch('/.netlify/functions/admin-users');
-    const data = await response.json();
-
-    if (data.success) {
-      allCustomers = data.users;
-      renderCustomersTable(allCustomers);
-    }
-
-  } catch (error) {
-    console.error('Error loading customers:', error);
-    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading customers</div>';
-  }
-}
-
-function renderCustomersTable(customers) {
-  const container = document.getElementById('customersContainer');
-  const search = document.getElementById('customerSearch')?.value || '';
-
-  let filtered = customers;
-  if (search) {
-    const term = search.toLowerCase();
-    filtered = customers.filter(c => 
-      (c.fields['Name'] || '').toLowerCase().includes(term) ||
-      (c.fields['Email'] || '').toLowerCase().includes(term) ||
-      (c.fields['Company'] || '').toLowerCase().includes(term)
-    );
-  }
-
-  if (filtered.length === 0) {
-    container.innerHTML = '<div style="text-align: center; padding: 40px;">No customers found</div>';
-    return;
-  }
-
-  let html = `
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Company</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-
-  filtered.forEach(customer => {
-    html += `
-      <tr>
-        <td data-label="Name"><strong>${customer.fields['Name']}</strong></td>
-        <td data-label="Email">${customer.fields['Email']}</td>
-        <td data-label="Company">${customer.fields['Company'] || '-'}</td>
-        <td data-label="Status">
-          <span class="status-badge status-${(customer.fields['Account Status'] || '').toLowerCase()}">
-            ${customer.fields['Account Status'] || '-'}
-          </span>
-        </td>
-        <td data-label="Actions">
-          <button class="btn btn-primary btn-small" onclick="viewCustomerById('${customer.id}')">
-            View
-          </button>
-        </td>
-      </tr>
-    `;
-  });
-
-  html += '</tbody></table>';
-  container.innerHTML = html;
-}
-
-function viewCustomerById(customerId) {
-  const customer = allCustomers.find(c => c.id === customerId);
-  if (!customer) {
-    alert('Customer not found');
-    return;
-  }
-  
-  const modal = document.getElementById('customerModal');
-  const title = document.getElementById('customerModalTitle');
-  const body = document.getElementById('customerModalBody');
-
-  title.textContent = customer.fields['Name'];
-
-  const requiresBankDetails = customer.fields['Requires Bank Details'] !== false;
-
-  body.innerHTML = `
-    <div class="detail-item">
-      <span class="detail-label">Name</span>
-      <span class="detail-value">${customer.fields['Name']}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Email</span>
-      <span class="detail-value">${customer.fields['Email']}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Company</span>
-      <span class="detail-value">${customer.fields['Company'] || '-'}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Phone</span>
-      <span class="detail-value">${customer.fields['Phone'] || '-'}</span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Account Status</span>
-      <span class="detail-value">
-        <span class="status-badge status-${(customer.fields['Account Status'] || '').toLowerCase()}">
-          ${customer.fields['Account Status'] || '-'}
-        </span>
-      </span>
-    </div>
-    <div class="detail-item">
-      <span class="detail-label">Total Bookings</span>
-      <span class="detail-value">${customer.fields['Total Bookings'] || 0}</span>
-    </div>
-    
-    <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
-      <div style="margin-bottom: 20px; padding: 16px; background: #f8fafc; border-radius: 8px;">
-        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-          <span style="font-weight: 600; color: #64748b; font-size: 14px;">💳 Requires Bank Details</span>
-          <span class="toggle-switch">
-            <input type="checkbox" id="requiresBankDetailsToggle" ${requiresBankDetails ? 'checked' : ''} onchange="toggleBankDetailsRequirement('${customer.id}')">
-            <span class="toggle-slider"></span>
-          </span>
-        </label>
-        <div style="font-size: 12px; color: #64748b; margin-top: 8px;">
-          When disabled, customer can book without providing bank details
-        </div>
-      </div>
-
-      <div class="action-buttons-grid">
-        <button class="btn btn-primary" onclick="impersonateCustomer('${customer.id}')" style="width: 100%; justify-content: center;">
-          🔐 Access Account
-        </button>
-        <button class="btn btn-secondary" onclick="editCustomer('${customer.id}')" style="width: 100%; justify-content: center;">
-          ✏️ Edit Customer
-        </button>
-      </div>
-    </div>
-  `;
-
-  modal.classList.add('active');
-}
-
-async function toggleBankDetailsRequirement(customerId) {
-  const toggle = document.getElementById('requiresBankDetailsToggle');
-  const requiresBankDetails = toggle.checked;
-  
-  try {
-    const response = await fetch('/.netlify/functions/update-customer-settings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        customerId,
-        requiresBankDetails
-      })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      alert(`✅ Bank details requirement ${requiresBankDetails ? 'enabled' : 'disabled'}`);
-      loadCustomers();
-    } else {
-      alert(`❌ Error: ${data.error}`);
-      toggle.checked = !requiresBankDetails;
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('❌ Failed to update setting');
-    toggle.checked = !requiresBankDetails;
-  }
-}
-
-async function impersonateCustomer(customerId) {
-  if (!confirm('Access this customer\'s account? You will be logged in as this user.')) return;
-  
-  try {
-    const response = await fetch('/.netlify/functions/admin-impersonate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ customerId })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      window.open(data.dashboardUrl, '_blank');
-    } else {
-      alert(`❌ Error: ${data.error}`);
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('❌ Failed to access account');
-  }
-}
-
-function editCustomer(customerId) {
-  alert('Edit customer functionality coming soon...');
-}
-
-// ===== REWARDS / MILESTONE EMAILS =====
-async function loadRewardsCustomers() {
-  const container = document.getElementById('rewardsContainer');
-  container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
-
-  try {
-    const search = document.getElementById('rewardsSearch')?.value || '';
-    
-    const response = await fetch('/.netlify/functions/admin-rewards-customers', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ search })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      renderRewardsTable(data.customers);
-    } else {
-      container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading rewards data</div>';
-    }
-
-  } catch (error) {
-    console.error('Error loading rewards customers:', error);
-    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading rewards data</div>';
-  }
-}
-
-function renderRewardsTable(customers) {
-  const container = document.getElementById('rewardsContainer');
-
-  if (!customers || customers.length === 0) {
-    container.innerHTML = '<div style="text-align: center; padding: 40px;">No customers found</div>';
-    return;
-  }
-
-  let html = `
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Customer</th>
-          <th>Email</th>
-          <th>Total Bookings</th>
-          <th>Milestones</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-
-  customers.forEach(customer => {
-    const bookings = customer.fields['Total Bookings'] || 0;
-    const milestones = [];
-    
-    if (bookings >= 3) milestones.push('3️⃣');
-    if (bookings >= 5) milestones.push('5️⃣');
-    if (bookings >= 10) milestones.push('🔟');
-    
-    const nextMilestone = bookings < 3 ? 3 : bookings < 5 ? 5 : bookings < 10 ? 10 : null;
-    const progress = nextMilestone ? ((bookings / nextMilestone) * 100).toFixed(0) : 100;
-
-    html += `
-      <tr>
-        <td data-label="Customer"><strong>${customer.fields['Name']}</strong></td>
-        <td data-label="Email">${customer.fields['Email']}</td>
-        <td data-label="Total Bookings">
-          <div style="font-size: 20px; font-weight: 700; color: #3b82f6;">${bookings}</div>
-          ${nextMilestone ? `
-            <div style="margin-top: 4px;">
-              <div style="font-size: 11px; color: #64748b;">Next: ${nextMilestone} (${progress}%)</div>
-              <div class="progress-bar-container" style="margin-top: 4px;">
-                <div class="progress-bar" style="width: ${progress}%"></div>
-              </div>
+          </div>
+          ${booking.driveTimeInfo.hasConflict ? `
+            <div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 12px; margin-top: 12px; color: #991b1b;">
+              <strong>⚠️ Schedule Conflict:</strong> Insufficient time between bookings
             </div>
-          ` : '<div style="font-size: 11px; color: #10b981;">🎉 All milestones reached!</div>'}
-        </td>
-        <td data-label="Milestones">
-          <div style="font-size: 24px;">${milestones.join(' ') || '—'}</div>
-        </td>
-        <td data-label="Actions">
-          <button class="btn btn-warning btn-small" onclick="sendMilestoneEmail('${customer.id}', ${bookings})" ${bookings < 3 ? 'disabled' : ''}>
-            📧 Send Milestone Email
-          </button>
-        </td>
-      </tr>
-    `;
-  });
+          ` : ''}
+        </div>
+      ` : '';
 
-  html += '</tbody></table>';
-  container.innerHTML = html;
-}
+      const isReserved = booking.fields['Payment Status'] === 'Reserved';
 
-async function sendMilestoneEmail(customerId, bookings) {
-  const customer = allCustomers.find(c => c.id === customerId);
-  if (!customer) return alert('Customer not found');
-  
-  const milestone = bookings >= 10 ? 10 : bookings >= 5 ? 5 : bookings >= 3 ? 3 : null;
-  if (!milestone) return alert('No milestone reached yet');
-  
-  if (!confirm(`Send ${milestone}-booking milestone email to ${customer.fields['Name']}?`)) return;
-  
-  try {
-    const response = await fetch('/.netlify/functions/send-milestone-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        customerId,
-        milestone
-      })
+      body.innerHTML = `
+        <div class="detail-item">
+          <span class="detail-label">Reference</span>
+          <span class="detail-value">${booking.fields['Booking Reference']}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Date & Time</span>
+          <span class="detail-value">${booking.fields['Date']} at ${booking.fields['Time']}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Client Name</span>
+          <span class="detail-value">${booking.fields['Client Name']}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Client Email</span>
+          <span class="detail-value">${booking.fields['Client Email']}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Property Address</span>
+          <span class="detail-value">${booking.fields['Property Address'] || '-'}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Service</span>
+          <span class="detail-value">${booking.fields['Service Name'] || '-'}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Payment Status</span>
+          <span class="detail-value">
+            <span class="status-badge status-${(booking.fields['Payment Status'] || '').toLowerCase()}">
+              ${booking.fields['Payment Status'] || '-'}
+            </span>
+          </span>
+        </div>
+        ${driveTimeSection}
+        ${isReserved ? `
+          <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
+            <button class="btn btn-success" onclick='processPayment("${booking.id}", "${booking.fields['Booking Reference']}")' style="width: 100%;">
+              💳 Send Payment Link
+            </button>
+          </div>
+        ` : ''}
+      `;
+
+      modal.classList.add('active');
+    }
+
+    async function processPayment(bookingId, bookingRef) {
+      if (!confirm(`Send payment link for booking ${bookingRef}?`)) return;
+
+      try {
+        const response = await fetch('/.netlify/functions/process-reserved-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId, bookingRef })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert(`✓ Payment link sent successfully!\n\nLink: ${data.paymentLink}`);
+          closeModal('bookingModal');
+          loadBookings();
+          loadDashboardStats();
+        } else {
+          alert(`Error: ${data.error}`);
+        }
+
+      } catch (error) {
+        console.error('Error processing payment:', error);
+        alert('Error sending payment link');
+      }
+    }
+
+    // Customers Functions
+    async function loadCustomers() {
+      const container = document.getElementById('customersContainer');
+      container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+
+      try {
+        const response = await fetch('/.netlify/functions/admin-users');
+        const data = await response.json();
+
+        if (data.success) {
+          allCustomers = data.users;
+          renderCustomersTable(allCustomers);
+        }
+
+      } catch (error) {
+        console.error('Error loading customers:', error);
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading customers</div>';
+      }
+    }
+
+    function renderCustomersTable(customers) {
+      const container = document.getElementById('customersContainer');
+      const search = document.getElementById('customerSearch')?.value || '';
+
+      let filtered = customers;
+      if (search) {
+        const term = search.toLowerCase();
+        filtered = customers.filter(c => 
+          (c.fields['Name'] || '').toLowerCase().includes(term) ||
+          (c.fields['Email'] || '').toLowerCase().includes(term) ||
+          (c.fields['Company'] || '').toLowerCase().includes(term)
+        );
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 40px;">No customers found</div>';
+        return;
+      }
+
+      let html = `
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Company</th>
+              <th>Region</th>
+              <th>Status</th>
+              <th>Email Alerts</th>
+              <th>Reserve Privilege</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      filtered.forEach(customer => {
+        const allowReserve = customer.fields['Allow Reserve Without Payment'] === true;
+        const emailNotifications = customer.fields['Email Notifications Enabled'] === true;
+
+        html += `
+          <tr>
+            <td data-label="Name"><strong>${customer.fields['Name']}</strong></td>
+            <td data-label="Email">${customer.fields['Email']}</td>
+            <td data-label="Company">${customer.fields['Company'] || '-'}</td>
+            <td data-label="Region">
+              <select 
+                class="region-select" 
+                data-user-email="${customer.fields['Email']}" 
+                data-record-id="${customer.id}"
+                data-original-value="${customer.fields['Region'] || ''}"
+                onchange="updateUserRegion(this)"
+              >
+                <option value="">Select Region...</option>
+                ${UK_REGIONS.map(region => `
+                  <option value="${region}" ${customer.fields['Region'] === region ? 'selected' : ''}>
+                    ${region}
+                  </option>
+                `).join('')}
+              </select>
+            </td>
+            <td data-label="Status">
+              <span class="status-badge status-${(customer.fields['Account Status'] || '').toLowerCase()}">
+                ${customer.fields['Account Status'] || '-'}
+              </span>
+            </td>
+            <td data-label="Email Alerts">
+              <label class="toggle-switch">
+                <input 
+                  type="checkbox" 
+                  ${emailNotifications ? 'checked' : ''} 
+                  onchange='toggleEmailNotifications("${customer.fields['Email']}", this.checked, "${customer.id}")'
+                >
+                <span class="toggle-slider"></span>
+              </label>
+            </td>
+            <td data-label="Reserve Privilege">
+              <label class="toggle-switch">
+                <input 
+                  type="checkbox" 
+                  ${allowReserve ? 'checked' : ''} 
+                  onchange='toggleReservePrivilege("${customer.id}", "${customer.fields['Email']}", this.checked)'
+                >
+                <span class="toggle-slider"></span>
+              </label>
+            </td>
+            <td data-label="Actions">
+              <button class="btn btn-primary btn-small" onclick='viewCustomer(${JSON.stringify(customer).replace(/'/g, "&#39;")})'>
+                View
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function viewCustomer(customer) {
+      const modal = document.getElementById('customerModal');
+      const title = document.getElementById('customerModalTitle');
+      const body = document.getElementById('customerModalBody');
+
+      title.textContent = customer.fields['Name'];
+
+      const allowReserve = customer.fields['Allow Reserve Without Payment'] === true;
+      const emailNotificationsEnabled = customer.fields['Email Notifications Enabled'] === true;
+      const emailNotificationsStatus = emailNotificationsEnabled ? 'Enabled' : 'Disabled';
+      const emailNotificationsColor = emailNotificationsEnabled ? '#10b981' : '#ef4444';
+
+      body.innerHTML = `
+        <div class="warning-box">
+          ⚠️ <strong>Security Note:</strong> Passwords are hashed and cannot be viewed for security reasons.
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">👤 Full Name</span>
+          <span class="detail-value">${customer.fields['Name']}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">📧 Email Address</span>
+          <span class="detail-value">${customer.fields['Email']}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">🏢 Company</span>
+          <span class="detail-value">${customer.fields['Company'] || 'N/A'}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">📍 Region</span>
+          <span class="detail-value">
+            ${customer.fields['Region'] ? 
+              `<span class="region-badge">${customer.fields['Region']}</span>` : 
+              '<span class="region-badge empty">Not set</span>'
+            }
+          </span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">📅 Account Created</span>
+          <span class="detail-value">${customer.fields['Created Date']}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">✅ Account Status</span>
+          <span class="detail-value">
+            <span class="status-badge status-${(customer.fields['Account Status'] || '').toLowerCase()}">
+              ${customer.fields['Account Status'] || 'Unknown'}
+            </span>
+          </span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">📬 Milestone Emails</span>
+          <span class="detail-value">
+            <span style="color: ${emailNotificationsColor}; font-weight: 600;">
+              ${emailNotificationsStatus}
+            </span>
+          </span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">💳 Allow Reserve Without Payment</span>
+          <span class="detail-value">
+            <label class="toggle-switch">
+              <input 
+                type="checkbox" 
+                ${allowReserve ? 'checked' : ''} 
+                onchange='toggleReservePrivilege("${customer.id}", "${customer.fields['Email']}", this.checked)'
+              >
+              <span class="toggle-slider"></span>
+            </label>
+          </span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">🔐 Password</span>
+          <span class="detail-value" style="color: #64748b; font-style: italic;">Encrypted (not visible)</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">🆔 Record ID</span>
+          <span class="detail-value" style="font-family: monospace; font-size: 12px;">${customer.id}</span>
+        </div>
+
+        <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+            <button class="btn btn-danger" style="flex: 1;" onclick='redeemPoints("${customer.fields['Email']}", "${customer.fields['Name']}")'>
+              ⭐ Redeem Points
+            </button>
+            <button class="btn btn-primary" style="flex: 1;" onclick='impersonateUser("${customer.fields['Email']}")'>
+              🔑 Login as ${customer.fields['Name']}
+            </button>
+            <button class="btn btn-secondary" style="flex: 1;" onclick='checkMilestone("${customer.fields['Email']}", "${customer.fields['Name']}")'>
+              📧 Check Milestone
+            </button>
+          </div>
+          
+          <div style="padding: 16px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px;">
+            <div style="font-weight: 600; color: #065f46; margin-bottom: 12px; font-size: 14px;">➕ Manually Add Points</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input 
+                type="number" 
+                id="manualPoints-${customer.id}" 
+                placeholder="Enter points amount" 
+                min="1"
+                style="flex: 1; padding: 10px 14px; border: 2px solid #10b981; border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif;"
+              >
+              <button class="btn btn-primary" style="white-space: nowrap;" onclick='addManualPoints("${customer.fields['Email']}", "${customer.fields['Name']}", "${customer.id}")'>
+                ➕ Add Points
+              </button>
+            </div>
+            <div style="font-size: 12px; color: #047857; margin-top: 8px;">Use this to add bonus/promotional points to the account</div>
+          </div>
+        </div>
+      `;
+
+      modal.classList.add('active');
+    }
+
+    async function toggleReservePrivilege(recordId, email, enabled) {
+      try {
+        const response = await fetch('/.netlify/functions/update-reserve-privilege', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ recordId, email, enabled })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          console.log(`✓ Reserve privilege ${enabled ? 'enabled' : 'disabled'} for ${email}`);
+          // Update local cache
+          const customer = allCustomers.find(c => c.id === recordId);
+          if (customer) {
+            customer.fields['Allow Reserve Without Payment'] = enabled;
+          }
+        } else {
+          alert(`Error: ${data.message}`);
+          // Revert toggle
+          event.target.checked = !enabled;
+        }
+
+      } catch (error) {
+        console.error('Error toggling reserve privilege:', error);
+        alert('Error updating privilege');
+        event.target.checked = !enabled;
+      }
+    }
+
+    async function updateUserRegion(selectElement) {
+      const email = selectElement.dataset.userEmail;
+      const recordId = selectElement.dataset.recordId;
+      const region = selectElement.value;
+      
+      const originalValue = selectElement.dataset.originalValue || '';
+      selectElement.disabled = true;
+      
+      try {
+        const response = await fetch('/.netlify/functions/update-user-region', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userEmail: email,
+            recordId: recordId,
+            region: region
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update region');
+        }
+
+        const result = await response.json();
+
+        // Update the user in allCustomers array
+        const userIndex = allCustomers.findIndex(u => u.fields['Email'] === email);
+        if (userIndex !== -1) {
+          allCustomers[userIndex].fields['Region'] = region;
+        }
+
+        // Store new value
+        selectElement.dataset.originalValue = region;
+        selectElement.disabled = false;
+        
+        console.log(`✅ Region updated to "${region}" for ${email}`);
+
+      } catch (error) {
+        console.error('Error updating region:', error);
+        alert(`❌ Failed to update region: ${error.message}`);
+        
+        // Revert selection
+        selectElement.value = originalValue;
+        selectElement.disabled = false;
+      }
+    }
+
+    async function toggleEmailNotifications(email, enabled, recordId) {
+      try {
+        // Show loading state
+        const toggleInput = event.target;
+        toggleInput.disabled = true;
+
+        const response = await fetch('/.netlify/functions/toggle-email-notifications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            userEmail: email,
+            enabled: enabled,
+            recordId: recordId
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update email notification settings');
+        }
+
+        const result = await response.json();
+        
+        // Update the user in allCustomers array
+        const userIndex = allCustomers.findIndex(u => u.fields['Email'] === email);
+        if (userIndex !== -1) {
+          allCustomers[userIndex].fields['Email Notifications Enabled'] = enabled;
+        }
+
+        // Show success message briefly
+        const statusText = enabled ? 'enabled' : 'disabled';
+        console.log(`✅ Email notifications ${statusText} for ${email}`);
+        
+        toggleInput.disabled = false;
+
+      } catch (error) {
+        console.error('Error toggling email notifications:', error);
+        alert(`❌ Failed to update email notifications: ${error.message}`);
+        
+        // Revert the toggle
+        event.target.checked = !enabled;
+        event.target.disabled = false;
+      }
+    }
+
+    function impersonateUser(email) {
+      const user = allCustomers.find(c => c.fields['Email'] === email);
+      if (!user) {
+        alert('User data not found');
+        return;
+      }
+
+      if (confirm(`Login as ${user.fields['Name']}?\n\nThis will open their dashboard in a new tab.`)) {
+        const sessionData = {
+          email: email,
+          name: user.fields['Name'] || 'Client',
+          company: user.fields['Company'] || '',
+          timestamp: Date.now(),
+          expires: Date.now() + (24 * 60 * 60 * 1000),
+          adminImpersonation: true
+        };
+
+        const token = btoa(JSON.stringify(sessionData));
+        
+        const baseUrl = window.location.origin;
+        const dashboardUrl = baseUrl + '/website/dashboard.html?admin_session=' + encodeURIComponent(token) + 
+                            '&admin_email=' + encodeURIComponent(email) +
+                            '&admin_name=' + encodeURIComponent(user.fields['Name'] || 'Client') +
+                            '&admin_company=' + encodeURIComponent(user.fields['Company'] || '');
+        
+        window.open(dashboardUrl, '_blank');
+        alert(`✓ Logged in as ${user.fields['Name']}`);
+      }
+    }
+
+    // Real-time search
+    document.getElementById('bookingSearch')?.addEventListener('input', (e) => {
+      renderBookingsTable(allBookings, e.target.value);
     });
 
-    const data = await response.json();
+    document.getElementById('customerSearch')?.addEventListener('input', (e) => {
+      renderCustomersTable(allCustomers);
+    });
 
-    if (data.success) {
-      alert(`✅ Milestone email sent to ${customer.fields['Email']}!`);
-    } else {
-      alert(`❌ Error: ${data.error}`);
+    // Rewards and Points Management
+    async function redeemPoints(email, name) {
+      if (!email) {
+        alert('Email address is required');
+        return;
+      }
+      
+      const user = allCustomers.find(u => u.fields['Email'] === email);
+      if (!user) {
+        alert('User data not found');
+        return;
+      }
+      
+      try {
+        // Get booking points from Acuity
+        const acuityResponse = await fetch('/.netlify/functions/acuity-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userEmail: email })
+        });
+        
+        if (!acuityResponse.ok) {
+          throw new Error('Failed to fetch Acuity data');
+        }
+
+        const acuityData = await acuityResponse.json();
+        const bookingPoints = Math.floor(acuityData.totalInvestment ?? 0);
+        
+        // Get manual points AND baseline from Airtable
+        const manualPointsResponse = await fetch('/.netlify/functions/get-manual-points', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userEmail: email })
+        });
+        
+        const manualPointsData = await manualPointsResponse.json();
+        const manualPoints = manualPointsData?.manualPoints || 0;
+        const lastRedemptionBaseline = manualPointsData?.lastRedemptionBaseline || 0;
+        
+        // Calculate NET booking points (subtract baseline) and total points
+        const netBookingPoints = Math.max(0, bookingPoints - lastRedemptionBaseline);
+        const currentPoints = netBookingPoints + manualPoints;
+        const pointsValue = (currentPoints / 100).toFixed(2);
+
+        if (currentPoints === 0) {
+          alert(`${name} has no points to redeem.`);
+          return;
+        }
+
+        // Ask how many points to redeem
+        const pointsToRedeem = prompt(`How many points would you like to redeem for ${name}?\n\nAvailable: ${currentPoints} pts (£${pointsValue})\n  • Net Booking Points: ${netBookingPoints}\n  • Manual Points: ${manualPoints}\n\nEnter amount (or leave blank to redeem all):`);
+        
+        if (pointsToRedeem === null) {
+          return; // User cancelled
+        }
+
+        let finalPointsToRedeem = currentPoints; // Default: redeem all
+        
+        if (pointsToRedeem.trim() !== '') {
+          finalPointsToRedeem = parseInt(pointsToRedeem);
+          
+          if (isNaN(finalPointsToRedeem) || finalPointsToRedeem <= 0) {
+            alert('Please enter a valid number greater than 0.');
+            return;
+          }
+          
+          if (finalPointsToRedeem > currentPoints) {
+            alert(`Cannot redeem ${finalPointsToRedeem} points. Only ${currentPoints} points available.`);
+            return;
+          }
+        }
+
+        const finalValue = (finalPointsToRedeem / 100).toFixed(2);
+
+        if (!confirm(`Confirm redemption for ${name}?\n\nRedeeming: ${finalPointsToRedeem} pts (£${finalValue})\nRemaining: ${currentPoints - finalPointsToRedeem} pts\n\nContinue?`)) {
+          return;
+        }
+
+        // Call the redemption endpoint
+        const response = await fetch('/.netlify/functions/redeem-points', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            userEmail: email,
+            redeemedPoints: finalPointsToRedeem,
+            redeemedValue: finalValue,
+            acuityTotalInvestment: acuityData.totalInvestment,
+            currentTotalPoints: currentPoints
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to redeem points');
+        }
+
+        const result = await response.json();
+        
+        alert(`✅ Points redeemed successfully!\n\n${name} redeemed ${finalPointsToRedeem} points (£${finalValue})\n\nRemaining: ${currentPoints - finalPointsToRedeem} points`);
+        
+        // Refresh the user list and close modal
+        loadCustomers();
+        closeModal('customerModal');
+
+      } catch (error) {
+        console.error('Error redeeming points:', error);
+        alert(`❌ Failed to redeem points: ${error.message}\n\nPlease try again.`);
+      }
     }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('❌ Failed to send milestone email');
-  }
-}
 
-// Real-time search
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('bookingSearch')?.addEventListener('input', (e) => {
-    renderBookingsTable(allBookings, e.target.value);
-  });
+    async function addManualPoints(email, name, userId) {
+      const input = document.getElementById(`manualPoints-${userId}`);
+      const pointsToAdd = parseInt(input.value);
+      
+      if (!pointsToAdd || pointsToAdd <= 0) {
+        alert('Please enter a valid points amount (greater than 0)');
+        return;
+      }
+      
+      if (!confirm(`Add ${pointsToAdd} bonus points to ${name}?\n\nThis will be recorded as a manual adjustment and will increase their total points balance.`)) {
+        return;
+      }
+      
+      try {
+        const response = await fetch('/.netlify/functions/add-manual-points', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            userEmail: email,
+            pointsToAdd: pointsToAdd,
+            addedBy: 'Admin',
+            reason: 'Manual adjustment'
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to add points');
+        }
+        
+        const result = await response.json();
+        alert(`✅ Successfully added ${pointsToAdd} points to ${name}!\n\nNew total: ${result.newTotal} points`);
+        
+        // Clear input and refresh
+        input.value = '';
+        loadCustomers();
+        closeModal('customerModal');
+        
+      } catch (error) {
+        console.error('Error adding points:', error);
+        alert(`❌ Failed to add points: ${error.message}\n\nPlease try again.`);
+      }
+    }
 
-  document.getElementById('customerSearch')?.addEventListener('input', () => {
-    renderCustomersTable(allCustomers);
-  });
+    async function checkMilestone(email, name) {
+      if (!email) {
+        alert('Email address is required');
+        return;
+      }
+      
+      if (!confirm(`Check milestone for ${name}?\n\nThis will check if they've reached a new milestone and send an email if applicable.`)) {
+        return;
+      }
+      
+      try {
+        const response = await fetch('/.netlify/functions/check-milestone', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userEmail: email })
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to check milestone');
+        }
+        
+        const result = await response.json();
+        
+        if (result.skipped) {
+          alert(`ℹ️ Email notifications are disabled for ${name}`);
+        } else if (result.emailSent) {
+          alert(`✅ Milestone email sent to ${name}!\n\nMilestone: ${result.milestone.tier} (${result.milestone.points} points)\nCurrent Balance: ${result.currentBalance} points`);
+        } else {
+          alert(`ℹ️ No new milestone reached for ${name}\n\nCurrent Balance: ${result.currentBalance} points\nLast Milestone: ${result.lastMilestoneReached} points`);
+        }
+        
+        // Refresh user list
+        loadCustomers();
+        
+      } catch (error) {
+        console.error('Error checking milestone:', error);
+        alert(`❌ Failed to check milestone: ${error.message}\n\nPlease try again.`);
+      }
+    }
 
-  document.getElementById('rewardsSearch')?.addEventListener('input', () => {
-    loadRewardsCustomers();
-  });
-});
+    // Scroll input into view when keyboard appears on mobile/tablet
+    if (window.innerWidth <= 1024) {
+      document.addEventListener('focusin', function(e) {
+        if (e.target.matches('input[type="number"]')) {
+          setTimeout(() => {
+            e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 300);
+        }
+      });
+    }
   </script>
 </body>
 </html>
