@@ -102,7 +102,6 @@ exports.handler = async (event, context) => {
         
         // Metadata
         'Created Date': new Date().toISOString(),
-        'Last Modified': new Date().toISOString()
       }
     };
 
