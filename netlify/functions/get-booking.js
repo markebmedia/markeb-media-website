@@ -47,7 +47,7 @@ exports.handler = async (event, context) => {
     const bookingDateTime = new Date(`${fields['Date']}T${fields['Time']}:00`);
     const now = new Date();
     const hoursUntilBooking = (bookingDateTime - now) / (1000 * 60 * 60);
-    
+
     // Can only cancel if not already cancelled AND more than 24 hours away
     const canCancel = !isCancelled && hoursUntilBooking > 24;
     const canReschedule = !isCancelled && hoursUntilBooking > 24;
@@ -71,7 +71,7 @@ exports.handler = async (event, context) => {
         bedrooms: fields['Bedrooms'],
         totalPrice: fields['Total Price'],
         bookingStatus: bookingStatus,
-        paymentStatus: fields['Status'],
+        paymentStatus: fields['Payment Status'],  // ← FIXED: Was 'Status', now 'Payment Status'
         clientName: fields['Client Name'],
         clientEmail: fields['Client Email'],
         clientPhone: fields['Client Phone'],
