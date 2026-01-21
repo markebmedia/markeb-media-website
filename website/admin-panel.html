@@ -1399,7 +1399,7 @@
         html += `<div class="calendar-day-number">${day}</div>`;
         
         dayBookings.forEach(booking => {
-          const statusClass = booking.fields['Payment Status'] === 'Reserved' ? 'reserved' : 
+          const statusClass = booking.fields['Payment Status'] === 'Pending' ? 'Pending' : 
                               booking.fields['Booking Status'] === 'Cancelled' ? 'cancelled' : '';
           html += `<div class="calendar-booking ${statusClass}" onclick="viewBookingById('${booking.id}')">${booking.fields['Time']} ${booking.fields['Client Name']}</div>`;
         });
@@ -1458,7 +1458,7 @@
     const response = await fetch('/.netlify/functions/admin-bookings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ paymentStatus: 'Reserved' })
+      body: JSON.stringify({ paymentStatus: 'Pending' })
     });
 
     const data = await response.json();
@@ -1533,7 +1533,7 @@ function renderReservedBookingsTable(bookings) {
           <small style="color: #64748b;">${booking.fields['Client Email']}</small>
         </td>
         <td data-label="Service">
-          ${booking.fields['Service Name'] || '-'}
+          ${booking.fields['Service'] || '-'}
         </td>
         <td data-label="Amount">
           <span style="font-size: 18px; font-weight: 700; color: #f59e0b;">£${totalPrice}</span>
@@ -1632,7 +1632,7 @@ function renderReservedBookingsTable(bookings) {
               <small style="color: #64748b;">${booking.fields['Client Email']}</small>
             </td>
             <td data-label="Address">${booking.fields['Property Address'] || '-'}</td>
-            <td data-label="Service">${booking.fields['Service Name'] || '-'}</td>
+            <td data-label="Service">${booking.fields['Service'] || '-'}</td>
             <td data-label="Status">
               <span class="status-badge status-${(booking.fields['Payment Status'] || '').toLowerCase()}">
                 ${booking.fields['Payment Status'] || '-'}
@@ -1703,7 +1703,7 @@ function renderReservedBookingsTable(bookings) {
         </div>
       ` : '';
 
-      const isReserved = booking.fields['Payment Status'] === 'Reserved';
+      const isReserved = booking.fields['Payment Status'] === 'Pending';
       const isCancelled = booking.fields['Booking Status'] === 'Cancelled';
 
       body.innerHTML = `
@@ -1729,7 +1729,7 @@ function renderReservedBookingsTable(bookings) {
         </div>
         <div class="detail-item">
           <span class="detail-label">Service</span>
-          <span class="detail-value">${booking.fields['Service Name'] || '-'}</span>
+          <span class="detail-value">${booking.fields['Service'] || '-'}</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Total Price</span>
@@ -1961,7 +1961,7 @@ function renderReservedBookingsTable(bookings) {
       
       const sendEmail = document.getElementById('sendEmailToggle')?.checked ?? true;
       
-      const newServiceName = prompt('New service name:');
+      const newServiceName = prompt('New Service:');
       if (!newServiceName) return;
       
       const newPrice = parseFloat(prompt('New base price (£):'));
