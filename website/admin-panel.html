@@ -382,7 +382,7 @@
       background: #2563eb;
     }
 
-    .calendar-booking.reserved {
+    .calendar-booking.pending {
       background: #f59e0b;
     }
 
@@ -650,7 +650,7 @@
       color: #92400e;
     }
 
-    .status-reserved {
+    .status-pending {
       background: #fef3c7;
       color: #92400e;
     }
@@ -974,9 +974,9 @@
         <span class="nav-icon">📋</span>
         All Bookings
       </div>
-      <div class="nav-item" onclick="showSection('reserved')">
+      <div class="nav-item" onclick="showSection('pending')">
         <span class="nav-icon">💳</span>
-        Reserved (Need Payment)
+        Pending (Need Payment)
       </div>
     </div>
 
@@ -1020,7 +1020,7 @@
           <div class="stat-label">Upcoming</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="reservedBookings">-</div>
+          <div class="stat-value" id="pendingBookings">-</div>
           <div class="stat-label">Need Payment</div>
         </div>
         <div class="stat-card">
@@ -1094,14 +1094,14 @@
       </div>
     </div>
 
-   <!-- Reserved Bookings Section -->
-<div class="admin-section" id="reserved">
+   <!-- Pending Bookings Section -->
+<div class="admin-section" id="pending">
   <div class="info-box" style="margin-bottom: 24px;">
     <strong>💳 Reserved Bookings</strong><br>
     These bookings have been reserved but require payment. You can either charge the customer's saved card or send them a payment link via email.
   </div>
 
-  <div class="calendar-container" id="reservedContainer">
+  <div class="calendar-container" id="pendingContainer">
     <div style="text-align: center; padding: 40px;">
       <div class="spinner"></div>
     </div>
@@ -1198,7 +1198,7 @@
       loadDashboardStats();
       loadCalendar();
       loadBookings();
-      loadReservedBookings();
+      loadPendingBookings();
       loadCustomers();
     });
 
@@ -1258,7 +1258,7 @@
         if (data.success) {
           document.getElementById('totalBookings').textContent = data.stats.total;
           document.getElementById('upcomingBookings').textContent = data.stats.upcoming;
-          document.getElementById('reservedBookings').textContent = data.stats.reserved;
+          document.getElementById('pendingBookings').textContent = data.stats.pending;
         }
 
         // Load customer count
@@ -1350,6 +1350,7 @@
         const data = await response.json();
 
         if (data.success) {
+          allBookings = data.bookings; // ✅ critical so View works from calendar
           if (currentView === 'month') {
             renderMonthView(data.bookings);
           } else if (currentView === 'week') {
@@ -1399,8 +1400,15 @@
         html += `<div class="calendar-day-number">${day}</div>`;
         
         dayBookings.forEach(booking => {
-          const statusClass = booking.fields['Payment Status'] === 'Pending' ? 'Pending' : 
-                              booking.fields['Booking Status'] === 'Cancelled' ? 'cancelled' : '';
+       const paymentStatus = booking.fields['Payment Status'] || 'Pending';
+
+const statusClass =
+  booking.fields['Booking Status'] === 'Cancelled'
+    ? 'cancelled'
+    : paymentStatus === 'Pending'
+    ? 'pending'
+    : '';
+
           html += `<div class="calendar-booking ${statusClass}" onclick="viewBookingById('${booking.id}')">${booking.fields['Time']} ${booking.fields['Client Name']}</div>`;
         });
         
@@ -1450,8 +1458,8 @@
       }
     }
 
-   async function loadReservedBookings() {
-  const container = document.getElementById('reservedContainer');
+   async function loadPendingBookings() {
+  const container = document.getElementById('pendingContainer');
   container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
 
   try {
@@ -1473,7 +1481,7 @@
           </div>
         `;
       } else {
-        renderReservedBookingsTable(data.bookings);
+        renderPendingBookingsTable(data.bookings);
       }
     }
 
@@ -1483,9 +1491,9 @@
   }
 }
 
-// NEW FUNCTION: Render reserved bookings with payment actions
-function renderReservedBookingsTable(bookings) {
-  const container = document.getElementById('reservedContainer');
+// NEW FUNCTION: Render pending bookings with payment actions
+function renderPendingBookingsTable(bookings) {
+  const container = document.getElementById('pendingContainer');
   
   // Sort by date (earliest first)
   const sorted = bookings.sort((a, b) => {
@@ -1516,7 +1524,7 @@ function renderReservedBookingsTable(bookings) {
 
   sorted.forEach(booking => {
     const totalPrice = (booking.fields['Total Price'] || 0).toFixed(2);
-    const reservedDate = booking.fields['Created Date'] || '-';
+    const pendingDate = booking.fields['Created Date'] || '-';
     const hasPaymentMethod = booking.fields['Stripe Payment Method ID'] ? true : false;
     
     html += `
@@ -1538,21 +1546,21 @@ function renderReservedBookingsTable(bookings) {
         <td data-label="Amount">
           <span style="font-size: 18px; font-weight: 700; color: #f59e0b;">£${totalPrice}</span>
         </td>
-        <td data-label="Reserved">
-          ${new Date(reservedDate).toLocaleDateString('en-GB')}
+        <td data-label="Pending">
+          ${new Date(pendingDate).toLocaleDateString('en-GB')}
         </td>
         <td data-label="Actions">
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             ${hasPaymentMethod ? `
-              <button class="btn btn-success btn-small" onclick="chargeReservedBooking('${booking.id}')" title="Charge the customer's saved card">
+              <button class="btn btn-success btn-small" onclick="chargePendingBooking('${booking.id}')" title="Charge the customer's saved card">
                 💳 Charge Card
               </button>
             ` : `
               <span style="font-size: 11px; color: #94a3b8; font-style: italic;">No saved card</span>
             `}
-            <button class="btn btn-primary btn-small" onclick='processPayment("${booking.id}", "${booking.fields['Booking Reference']}")' title="Email payment link to customer">
-              📧 Send Link
-            </button>
+            <button class="btn btn-primary btn-small" onclick='processPayment("${booking.id}", "${booking.fields['Booking Reference']}", this)' title="Email payment link to customer">
+  📧 Send Link
+</button>
             <button class="btn btn-secondary btn-small" onclick="viewBookingById('${booking.id}')" title="View full booking details">
               👁️ View
             </button>
@@ -1634,10 +1642,14 @@ function renderReservedBookingsTable(bookings) {
             <td data-label="Address">${booking.fields['Property Address'] || '-'}</td>
             <td data-label="Service">${booking.fields['Service'] || '-'}</td>
             <td data-label="Status">
-              <span class="status-badge status-${(booking.fields['Payment Status'] || '').toLowerCase()}">
-                ${booking.fields['Payment Status'] || '-'}
-              </span>
-            </td>
+  <span class="status-badge status-${(booking.fields['Booking Status'] || 'booked').toLowerCase()}">
+    ${booking.fields['Booking Status'] || 'Booked'}
+  </span>
+  <br>
+  <span class="status-badge status-${(booking.fields['Payment Status'] || 'pending').toLowerCase()}" style="font-size: 11px;">
+    💳 ${booking.fields['Payment Status'] || 'Pending'}
+  </span>
+</td>
             <td data-label="Drive Time">${driveTimeBadge}</td>
             <td data-label="Actions">
               <button class="btn btn-primary btn-small" onclick="viewBookingById('${booking.id}')">
@@ -1703,7 +1715,7 @@ function renderReservedBookingsTable(bookings) {
         </div>
       ` : '';
 
-      const isReserved = booking.fields['Payment Status'] === 'Pending';
+      const isPending = booking.fields['Payment Status'] === 'Pending';
       const isCancelled = booking.fields['Booking Status'] === 'Cancelled';
 
       body.innerHTML = `
@@ -1757,8 +1769,8 @@ function renderReservedBookingsTable(bookings) {
           <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
             <div class="action-buttons-grid">
               
-              ${isReserved ? `
-                <button class="btn btn-success" onclick="chargeReservedBooking('${booking.id}')" style="width: 100%; justify-content: center;">
+              ${isPending ? `
+                <button class="btn btn-success" onclick="chargePendingBooking('${booking.id}')" style="width: 100%; justify-content: center;">
                   💳 Charge Card
                 </button>
                 <button class="btn btn-primary" onclick='processPayment("${booking.id}", "${booking.fields['Booking Reference']}")' style="width: 100%; justify-content: center;">
@@ -1815,7 +1827,7 @@ function renderReservedBookingsTable(bookings) {
       alert(`✅ Payment link sent successfully!\n\nEmail sent to customer\n\nPayment URL:\n${data.paymentLink}`);
       closeModal('bookingModal');
       loadBookings();
-      loadReservedBookings();
+      loadPendingBookings();
       loadDashboardStats();
     } else {
       alert(`❌ Error: ${data.error}`);
@@ -1832,9 +1844,21 @@ function renderReservedBookingsTable(bookings) {
 }
 
     // ===== ADMIN BOOKING ACTIONS =====
-   async function chargeReservedBooking(bookingId) {
+ async function chargePendingBooking(bookingId) {
   const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
   if (!booking) return alert('Booking data not found');
+
+  // ✅ Check payment status on frontend first
+  if (booking.fields['Payment Status'] !== 'Pending') {
+    alert(`❌ Cannot charge card\n\nThis booking is not in "Pending" status.\nCurrent status: ${booking.fields['Payment Status'] || 'Unknown'}\n\nOnly bookings with "Pending" payment status can be charged.`);
+    return;
+  }
+
+  // ✅ Check if payment method exists
+  if (!booking.fields['Stripe Payment Method ID']) {
+    alert(`❌ No payment method on file\n\nThis booking does not have a saved card.\n\nPlease use "Send Payment Link" instead.`);
+    return;
+  }
 
   const clientName = booking.fields['Client Name'];
   const amount = (booking.fields['Total Price'] || 0).toFixed(2);
@@ -1855,22 +1879,25 @@ function renderReservedBookingsTable(bookings) {
     });
 
     const data = await response.json();
+    
+    console.log('Charge card response:', data); // Debug log
 
     if (data.success) {
       alert(`✅ Payment Successful!\n\nCharged: £${data.amount.toFixed(2)}\nClient: ${clientName}\n\nConfirmation email sent automatically.`);
       closeModal('bookingModal');
       loadBookings();
-      loadReservedBookings();
+      loadPendingBookings();
       loadDashboardStats();
       loadCalendar();
     } else {
-      alert(`❌ Payment Failed\n\n${data.error || 'Failed to charge card'}\n\nThe customer's card may have been declined. Try sending a payment link instead.`);
+      // Display the exact error from backend
+      alert(`❌ Payment Failed\n\n${data.error || 'Unknown error'}\n\n${data.userMessage || 'Please try sending a payment link instead.'}`);
       btn.innerHTML = originalText;
       btn.disabled = false;
     }
   } catch (error) {
-    console.error('Error:', error);
-    alert('❌ Failed to charge card.\n\nThere was a system error. Please try again or send a payment link instead.');
+    console.error('Error charging card:', error);
+    alert('❌ System Error\n\nFailed to process payment. Please try again or contact support.');
     btn.innerHTML = originalText;
     btn.disabled = false;
   }
