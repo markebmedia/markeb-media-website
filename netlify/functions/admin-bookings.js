@@ -34,7 +34,7 @@ exports.handler = async (event, context) => {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { startDate, endDate, region, status } = body;
+    const { startDate, endDate, region, status, paymentStatus } = body;
 
     // Build filter formula
     let filters = [];
@@ -49,6 +49,16 @@ exports.handler = async (event, context) => {
     
     if (status) {
       filters.push(`{Booking Status} = '${status}'`);
+    }
+    
+    // Handle both "Pending" and "Reserved" payment statuses
+    if (paymentStatus) {
+      if (paymentStatus === 'Reserved') {
+        // Look for BOTH "Reserved" AND "Pending" (since bookings may use either)
+        filters.push(`OR({Payment Status} = 'Reserved', {Payment Status} = 'Pending')`);
+      } else {
+        filters.push(`{Payment Status} = '${paymentStatus}'`);
+      }
     }
 
     const filterFormula = filters.length > 0 
@@ -137,7 +147,7 @@ exports.handler = async (event, context) => {
           withAccount: enhancedBookings.filter(b => b.hasAccount).length,
           withoutAccount: enhancedBookings.filter(b => !b.hasAccount).length,
           paid: enhancedBookings.filter(b => b.fields['Payment Status'] === 'Paid').length,
-          reserved: enhancedBookings.filter(b => b.fields['Payment Status'] === 'Reserved').length,
+          reserved: enhancedBookings.filter(b => b.fields['Payment Status'] === 'Reserved' || b.fields['Payment Status'] === 'Pending').length,
           cancelled: enhancedBookings.filter(b => b.fields['Booking Status'] === 'Cancelled').length,
           upcoming: enhancedBookings.filter(b => {
             const bookingDate = new Date(b.fields['Date']);
