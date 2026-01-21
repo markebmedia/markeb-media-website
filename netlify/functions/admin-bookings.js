@@ -59,17 +59,23 @@ exports.handler = async (event, context) => {
       filters.push(`{Booking Status} = '${status}'`);
     }
     
-    // Handle payment status filter
+    // ✅ FIXED: Handle payment status filter with proper Airtable syntax
     if (paymentStatus) {
       if (paymentStatus === 'Pending') {
         // Include both explicit "Pending" and empty/blank values
-        filters.push(`OR({Payment Status} = 'Pending', {Payment Status} = BLANK())`);
+        filters.push(`OR({Payment Status} = 'Pending', {Payment Status} = '')`);
       } else {
         filters.push(`{Payment Status} = '${paymentStatus}'`);
       }
     }
 
-    const filterFormula = filters.length > 0 ? `AND(${filters.join(', ')})` : '';
+    // ✅ FIXED: Only wrap in AND() if there are actually filters
+    let filterFormula = '';
+    if (filters.length > 1) {
+      filterFormula = `AND(${filters.join(', ')})`;
+    } else if (filters.length === 1) {
+      filterFormula = filters[0];
+    }
 
     console.log('Filter formula:', filterFormula);
 
