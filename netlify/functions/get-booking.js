@@ -72,7 +72,17 @@ exports.handler = async (event, context) => {
     const canCancel = !isCancelled && hoursUntilBooking > 24;
     const canReschedule = !isCancelled && hoursUntilBooking > 24;
 
-    // ✅ MATCH FIELDS TO CREATE-BOOKING.JS
+    // Parse add-ons from JSON string to array
+    let addonsArray = [];
+    try {
+      const addonsString = fields['Add-Ons'] || '[]';
+      addonsArray = JSON.parse(addonsString);
+    } catch (e) {
+      console.error('Error parsing add-ons:', e);
+      addonsArray = [];
+    }
+
+    // Return booking data aligned with create-booking.js
     return {
       statusCode: 200,
       headers,
@@ -81,17 +91,17 @@ exports.handler = async (event, context) => {
         bookingRef: fields['Booking Reference'],
         postcode: fields['Postcode'],
         propertyAddress: fields['Property Address'],
-        region: fields['Region'], // Already capitalized in Airtable (North/South)
+        region: fields['Region'],
         mediaSpecialist: fields['Media Specialist'],
         date: fields['Date'],
         time: fields['Time'],
-        service: fields['Service'], // ✅ FIXED: Was 'Service Name', now matches create-booking
+        service: fields['Service'],
         serviceId: fields['Service ID'],
         duration: fields['Duration (mins)'],
         bedrooms: fields['Bedrooms'] || 0,
         basePrice: fields['Base Price'],
         extraBedroomFee: fields['Extra Bedroom Fee'] || 0,
-        addons: fields['Add-Ons'] || '',
+        addons: addonsArray,
         addonsPrice: fields['Add-ons Price'] || 0,
         totalPrice: fields['Total Price'],
         bookingStatus: bookingStatus,
