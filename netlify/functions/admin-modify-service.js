@@ -1,15 +1,24 @@
 // netlify/functions/admin-modify-service.js
 const Airtable = require('airtable');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { Resend } = require('resend');
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 exports.handler = async (event, context) => {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
+      headers,
       body: JSON.stringify({ error: 'Method not allowed' })
     };
   }
@@ -29,6 +38,7 @@ exports.handler = async (event, context) => {
     if (!bookingId || !newServiceId || !newServiceName || newServicePrice === undefined) {
       return {
         statusCode: 400,
+        headers,
         body: JSON.stringify({ error: 'Missing required fields' })
       };
     }
@@ -43,9 +53,14 @@ exports.handler = async (event, context) => {
     if (fields['Booking Status'] === 'Cancelled') {
       return {
         statusCode: 400,
+        headers,
         body: JSON.stringify({ error: 'Cannot modify a cancelled booking' })
       };
     }
+
+    // Store old values
+    const oldService = fields['Service']; // ✅ FIXED: Was 'Service Name'
+    const oldTotalPrice = fields['Total Price'];
 
     // Calculate new total price
     const baseBedrooms = 4;
@@ -59,11 +74,10 @@ exports.handler = async (event, context) => {
     
     if (newAddons && Array.isArray(newAddons) && newAddons.length > 0) {
       addonsPrice = newAddons.reduce((sum, addon) => sum + (addon.price || 0), 0);
-      addonsString = newAddons.map(a => a.name).join(', ');
+      addonsString = newAddons.map(a => `${a.name} (+£${a.price.toFixed(2)})`).join('\n');
     }
 
     const newTotalPrice = newServicePrice + extraBedroomFee + addonsPrice;
-    const oldTotalPrice = fields['Total Price'];
     const priceDifference = newTotalPrice - oldTotalPrice;
 
     const isPaidBooking = fields['Payment Status'] === 'Paid';
@@ -94,7 +108,7 @@ exports.handler = async (event, context) => {
               bookingRef: fields['Booking Reference'],
               bookingId: bookingId,
               type: 'service_upgrade',
-              oldService: fields['Service Name'],
+              oldService: oldService,
               newService: newServiceName
             }
           });
@@ -117,7 +131,7 @@ exports.handler = async (event, context) => {
                 bookingRef: fields['Booking Reference'],
                 bookingId: bookingId,
                 type: 'service_downgrade',
-                oldService: fields['Service Name'],
+                oldService: oldService,
                 newService: newServiceName
               }
             });
@@ -131,6 +145,7 @@ exports.handler = async (event, context) => {
         console.error('Stripe error:', stripeError);
         return {
           statusCode: 500,
+          headers,
           body: JSON.stringify({ 
             error: 'Failed to process payment adjustment',
             details: stripeError.message 
@@ -139,23 +154,23 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // Update booking in Airtable
+    // ✅ Update booking in Airtable - MATCH CREATE-BOOKING FIELDS
     await base('Bookings').update(bookingId, {
-      'Service': newServiceId,
-      'Service Name': newServiceName,
+      'Service': newServiceName, // ✅ FIXED: 'Service' not 'Service Name'
+      'Service ID': newServiceId,
       'Duration (mins)': newServiceDuration || fields['Duration (mins)'],
       'Bedrooms': actualBedrooms,
       'Base Price': newServicePrice,
       'Extra Bedroom Fee': extraBedroomFee,
-      'Add-ons': addonsString,
-      'Add-ons Price': addonsPrice,
+      'Add-Ons': addonsString, // ✅ Capital O to match create-booking
+      'Add-ons Price': addonsPrice, // ✅ Lowercase o to match create-booking
       'Total Price': newTotalPrice,
       'Service Modified': true,
       'Service Modified Date': new Date().toISOString(),
-      'Previous Service': fields['Service Name'],
+      'Previous Service': oldService,
       'Previous Price': oldTotalPrice,
-      'Price Adjustment': priceDifference,
-      'Last Modified': new Date().toISOString()
+      'Price Adjustment': priceDifference
+      // ❌ REMOVED: 'Last Modified' (computed field)
     });
 
     console.log(`✅ Service modified for booking ${fields['Booking Reference']}`);
@@ -171,7 +186,7 @@ exports.handler = async (event, context) => {
           time: fields['Time'],
           propertyAddress: fields['Property Address'],
           mediaSpecialist: fields['Media Specialist'],
-          oldService: fields['Service Name'],
+          oldService: oldService,
           newService: newServiceName,
           oldPrice: oldTotalPrice,
           newPrice: newTotalPrice,
@@ -188,14 +203,11 @@ exports.handler = async (event, context) => {
 
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers,
       body: JSON.stringify({
         success: true,
         message: 'Service modified successfully',
-        oldService: fields['Service Name'],
+        oldService: oldService,
         newService: newServiceName,
         oldPrice: oldTotalPrice,
         newPrice: newTotalPrice,
@@ -210,10 +222,7 @@ exports.handler = async (event, context) => {
     console.error('Error modifying service:', error);
     return {
       statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers,
       body: JSON.stringify({ 
         error: 'Failed to modify service',
         details: error.message 
@@ -224,6 +233,15 @@ exports.handler = async (event, context) => {
 
 // Send service modification email
 async function sendServiceModificationEmail(data) {
+  // Check if Resend is configured
+  if (!process.env.RESEND_API_KEY) {
+    console.log('Resend not configured - skipping email');
+    return;
+  }
+
+  const { Resend } = require('resend');
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
   const {
     clientName,
     clientEmail,
@@ -290,7 +308,7 @@ async function sendServiceModificationEmail(data) {
       <p>If you have any questions about this change, please don't hesitate to contact us.</p>
       
       <p style="margin-top: 30px;">
-        <a href="https://markebmedia.com/manage-booking?ref=${bookingRef}&email=${encodeURIComponent(clientEmail)}" 
+        <a href="https://markebmedia.com/manage-booking.html?ref=${bookingRef}&email=${encodeURIComponent(clientEmail)}" 
            style="background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
           Manage Your Booking
         </a>

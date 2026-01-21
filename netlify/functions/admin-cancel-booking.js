@@ -1,10 +1,8 @@
 // netlify/functions/admin-cancel-booking.js
 const Airtable = require('airtable');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { Resend } = require('resend');
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -103,7 +101,7 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // Update booking in Airtable
+    // ✅ Update booking in Airtable - REMOVE 'Last Modified' (computed field)
     await base('Bookings').update(bookingId, {
       'Booking Status': 'Cancelled',
       'Cancellation Date': new Date().toISOString(),
@@ -111,8 +109,7 @@ exports.handler = async (event, context) => {
       'Cancelled By': 'Admin',
       'Cancellation Fee': cancellationCharge,
       'Refund Amount': refundAmount,
-      'Refund Processed': refundProcessed,
-      'Last Modified': new Date().toISOString()
+      'Refund Processed': refundProcessed
     });
 
     console.log(`✅ Booking ${fields['Booking Reference']} cancelled by admin`);
@@ -127,7 +124,7 @@ exports.handler = async (event, context) => {
           bookingRef: fields['Booking Reference'],
           date: fields['Date'],
           time: fields['Time'],
-          service: fields['Service Name'],
+          service: fields['Service'], // ✅ FIXED: Was 'Service Name', now 'Service'
           propertyAddress: fields['Property Address'],
           cancellationReason: reason,
           cancellationCharge: cancellationCharge,
@@ -174,6 +171,15 @@ exports.handler = async (event, context) => {
 
 // Send cancellation confirmation email
 async function sendCancellationEmail(data) {
+  // Check if Resend is configured
+  if (!process.env.RESEND_API_KEY) {
+    console.log('Resend not configured - skipping email');
+    return;
+  }
+
+  const { Resend } = require('resend');
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
   const {
     clientName,
     clientEmail,
@@ -256,7 +262,7 @@ async function sendCancellationEmail(data) {
       </p>
       
       <p style="margin-top: 20px;">
-        <a href="https://markebmedia.com/booking" 
+        <a href="https://markebmedia.com/booking.html" 
            style="background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
           Book Again
         </a>

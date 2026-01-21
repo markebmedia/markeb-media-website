@@ -1,8 +1,10 @@
 // netlify/functions/admin-bookings.js
-// UPDATED: Uses consistent "Pending" status (not "Reserved")
+// Fetches bookings for admin panel with drive time calculations
+
+const Airtable = require('airtable');
 
 exports.handler = async (event, context) => {
-  console.log('=== Admin Bookings Function (Updated) ===');
+  console.log('=== Admin Bookings Function ===');
   console.log('Method:', event.httpMethod);
   
   const headers = {
@@ -37,11 +39,16 @@ exports.handler = async (event, context) => {
     const body = JSON.parse(event.body || '{}');
     const { startDate, endDate, region, status, paymentStatus } = body;
 
-    // Build filter formula
+    console.log('Filters:', { startDate, endDate, region, status, paymentStatus });
+
+    // Initialize Airtable
+    const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+
+    // Build filter formula - MATCH FIELD NAMES FROM CREATE-BOOKING.JS
     let filters = [];
     
     if (startDate && endDate) {
-      filters.push(`AND(IS_AFTER({Date}, '${startDate}'), IS_BEFORE({Date}, '${endDate}'))`);
+      filters.push(`AND(IS_AFTER({Date}, DATEADD('${startDate}', -1, 'days')), IS_BEFORE({Date}, DATEADD('${endDate}', 1, 'days')))`);
     }
     
     if (region) {
@@ -52,121 +59,56 @@ exports.handler = async (event, context) => {
       filters.push(`{Booking Status} = '${status}'`);
     }
     
-    // ✅ FIXED: Handle payment status consistently
+    // Handle payment status filter
     if (paymentStatus) {
       if (paymentStatus === 'Pending') {
-        // Look for "Pending" OR empty/blank Payment Status
+        // Include both explicit "Pending" and empty/blank values
         filters.push(`OR({Payment Status} = 'Pending', {Payment Status} = BLANK())`);
       } else {
-        // Exact match for Paid, Refunded, etc.
         filters.push(`{Payment Status} = '${paymentStatus}'`);
       }
     }
 
-    const filterFormula = filters.length > 0 
-      ? `AND(${filters.join(', ')})` 
-      : '';
+    const filterFormula = filters.length > 0 ? `AND(${filters.join(', ')})` : '';
+
+    console.log('Filter formula:', filterFormula);
 
     // Fetch bookings from Airtable
-    const bookingsUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Bookings?${filterFormula ? `filterByFormula=${encodeURIComponent(filterFormula)}&` : ''}sort[0][field]=Date&sort[0][direction]=desc&sort[1][field]=Time&sort[1][direction]=asc`;
+    const bookings = await base('Bookings')
+      .select({
+        filterByFormula: filterFormula || undefined,
+        sort: [
+          { field: 'Date', direction: 'desc' },
+          { field: 'Time', direction: 'asc' }
+        ]
+      })
+      .all();
+
+    console.log(`Found ${bookings.length} bookings`);
+
+    // Calculate statistics
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
     
-    const bookingsResponse = await fetch(bookingsUrl, {
-      headers: {
-        'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    const stats = {
+      total: bookings.length,
+      upcoming: bookings.filter(b => b.fields['Date'] >= today && b.fields['Booking Status'] !== 'Cancelled').length,
+      pending: bookings.filter(b => 
+        b.fields['Payment Status'] === 'Pending' && 
+        b.fields['Booking Status'] !== 'Cancelled'
+      ).length
+    };
 
-    if (!bookingsResponse.ok) {
-      throw new Error(`Airtable API error: ${bookingsResponse.status}`);
-    }
-
-    const bookingsData = await bookingsResponse.json();
-    const bookings = bookingsData.records || [];
-
-    // Fetch customer data for each unique email
-    const uniqueEmails = [...new Set(bookings.map(b => b.fields['Client Email']).filter(Boolean))];
-    
-    const customersMap = {};
-    
-    if (uniqueEmails.length > 0) {
-      // Fetch all customers
-      const usersUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE || 'Markeb Media Users'}`;
-      
-      const usersResponse = await fetch(usersUrl, {
-        headers: {
-          'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (usersResponse.ok) {
-        const usersData = await usersResponse.json();
-        const users = usersData.records || [];
-        
-        // Create a map of email -> customer data
-        users.forEach(user => {
-          const email = user.fields['Email'];
-          if (email) {
-            customersMap[email.toLowerCase()] = {
-              id: user.id,
-              name: user.fields['Name'],
-              company: user.fields['Company'],
-              region: user.fields['Region'],
-              accountStatus: user.fields['Account Status'],
-              allowReserve: user.fields['Allow Reserve Without Payment'] === true
-            };
-          }
-        });
-      }
-    }
-
-    // Calculate drive times between same-day bookings
+    // Calculate drive times between consecutive bookings
     const bookingsWithDriveTimes = await calculateDriveTimes(bookings);
 
-    // Enhance bookings with customer data
-    const enhancedBookings = bookingsWithDriveTimes.map(booking => {
-      const clientEmail = booking.fields['Client Email'];
-      const customer = clientEmail ? customersMap[clientEmail.toLowerCase()] : null;
-      
-      // ✅ FIXED: Check for Pending status (including blank)
-      const paymentStatus = booking.fields['Payment Status'] || 'Pending';
-      const isPending = paymentStatus === 'Pending' || !booking.fields['Payment Status'];
-      
-      return {
-        ...booking,
-        customerData: customer || null,
-        hasAccount: !!customer,
-        canReserve: customer?.allowReserve || false,
-        paymentStatus: paymentStatus, // Normalize blank to "Pending"
-        isPending: isPending
-      };
-    });
-
-    // ✅ FIXED: Updated stats calculation
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        bookings: enhancedBookings,
-        total: enhancedBookings.length,
-        stats: {
-          total: enhancedBookings.length,
-          withAccount: enhancedBookings.filter(b => b.hasAccount).length,
-          withoutAccount: enhancedBookings.filter(b => !b.hasAccount).length,
-          paid: enhancedBookings.filter(b => b.fields['Payment Status'] === 'Paid').length,
-          pending: enhancedBookings.filter(b => 
-            b.fields['Payment Status'] === 'Pending' || 
-            !b.fields['Payment Status']
-          ).length,
-          refunded: enhancedBookings.filter(b => b.fields['Payment Status'] === 'Refunded').length,
-          cancelled: enhancedBookings.filter(b => b.fields['Booking Status'] === 'Cancelled').length,
-          upcoming: enhancedBookings.filter(b => {
-            const bookingDate = new Date(b.fields['Date']);
-            return bookingDate >= new Date() && b.fields['Booking Status'] !== 'Cancelled';
-          }).length
-        }
+        bookings: bookingsWithDriveTimes,
+        stats: stats
       })
     };
 
@@ -175,170 +117,164 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ 
-        success: false, 
-        message: 'Failed to load bookings',
-        error: error.message 
+      body: JSON.stringify({
+        success: false,
+        error: 'Failed to fetch bookings',
+        details: error.message
       })
     };
   }
 };
 
-// Calculate drive times between bookings on the same day
+// Calculate drive times between consecutive bookings
 async function calculateDriveTimes(bookings) {
   if (!process.env.GOOGLE_MAPS_API_KEY) {
-    console.warn('Google Maps API key not configured - skipping drive time calculations');
+    console.log('No Google Maps API key - skipping drive time calculations');
     return bookings.map(b => ({ ...b, driveTimeInfo: null }));
   }
 
-  // Group bookings by date and region
-  const bookingsByDateAndRegion = {};
+  // Group bookings by date and media specialist
+  const grouped = {};
   
   bookings.forEach(booking => {
     const date = booking.fields['Date'];
-    const region = booking.fields['Region'];
-    const key = `${date}-${region}`;
+    const specialist = booking.fields['Media Specialist'];
+    const key = `${date}-${specialist}`;
     
-    if (!bookingsByDateAndRegion[key]) {
-      bookingsByDateAndRegion[key] = [];
+    if (!grouped[key]) {
+      grouped[key] = [];
     }
     
-    bookingsByDateAndRegion[key].push(booking);
+    grouped[key].push(booking);
   });
 
-  // Calculate drive times for each group
-  const results = [];
-  
-  for (const [key, dayBookings] of Object.entries(bookingsByDateAndRegion)) {
-    // Sort by time
-    dayBookings.sort((a, b) => {
-      const timeA = a.fields['Time'] || '00:00';
-      const timeB = b.fields['Time'] || '00:00';
+  // Sort each group by time
+  Object.keys(grouped).forEach(key => {
+    grouped[key].sort((a, b) => {
+      const timeA = a.fields['Time'];
+      const timeB = b.fields['Time'];
       return timeA.localeCompare(timeB);
     });
+  });
 
-    // Calculate drive time from previous booking
+  // Calculate drive times
+  const results = [];
+  
+  for (const key of Object.keys(grouped)) {
+    const dayBookings = grouped[key];
+    
     for (let i = 0; i < dayBookings.length; i++) {
       const currentBooking = dayBookings[i];
       let driveTimeInfo = null;
-
+      
       if (i > 0) {
         const previousBooking = dayBookings[i - 1];
-        
-        // Get postcodes
-        const fromPostcode = extractPostcode(previousBooking.fields['Property Address'] || previousBooking.fields['Postcode']);
-        const toPostcode = extractPostcode(currentBooking.fields['Property Address'] || currentBooking.fields['Postcode']);
-        
-        if (fromPostcode && toPostcode && fromPostcode !== toPostcode) {
-          try {
-            const driveTime = await calculateDriveTime(fromPostcode, toPostcode);
-            
-            driveTimeInfo = {
-              fromBooking: previousBooking.fields['Booking Reference'],
-              fromAddress: previousBooking.fields['Property Address'],
-              fromPostcode: fromPostcode,
-              toPostcode: toPostcode,
-              driveTimeMinutes: driveTime,
-              driveTimeFormatted: formatDriveTime(driveTime),
-              previousBookingEndTime: calculateEndTime(previousBooking.fields['Time'], previousBooking.fields['Duration (mins)'] || 60),
-              currentBookingStartTime: currentBooking.fields['Time'],
-              bufferTime: calculateBufferTime(previousBooking, currentBooking, driveTime),
-              hasConflict: checkTimeConflict(previousBooking, currentBooking, driveTime)
-            };
-          } catch (error) {
-            console.error('Error calculating drive time:', error);
-          }
-        }
+        driveTimeInfo = await calculateDriveTimeBetweenBookings(previousBooking, currentBooking);
       }
-
+      
       results.push({
         ...currentBooking,
-        driveTimeInfo: driveTimeInfo
+        driveTimeInfo
       });
     }
   }
-
+  
   return results;
 }
 
-// Extract postcode from address string
-function extractPostcode(address) {
-  if (!address) return null;
-  
-  // UK postcode regex
-  const postcodeRegex = /([A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2})/i;
-  const match = address.match(postcodeRegex);
-  
-  return match ? match[0].trim().toUpperCase() : null;
-}
+// Calculate drive time between two bookings
+async function calculateDriveTimeBetweenBookings(previousBooking, currentBooking) {
+  try {
+    const origin = previousBooking.fields['Postcode'];
+    const destination = currentBooking.fields['Postcode'];
+    
+    if (!origin || !destination) {
+      return null;
+    }
 
-// Calculate drive time using Google Maps Distance Matrix API
-async function calculateDriveTime(fromPostcode, toPostcode) {
-  const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(fromPostcode)}&destinations=${encodeURIComponent(toPostcode)}&mode=driving&key=${process.env.GOOGLE_MAPS_API_KEY}`;
-  
-  const response = await fetch(url);
-  const data = await response.json();
-  
-  if (data.status === 'OK' && data.rows[0]?.elements[0]?.status === 'OK') {
-    const durationSeconds = data.rows[0].elements[0].duration.value;
-    return Math.ceil(durationSeconds / 60); // Convert to minutes
+    // Call Google Maps Distance Matrix API
+    const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origin)}&destinations=${encodeURIComponent(destination)}&mode=driving&key=${process.env.GOOGLE_MAPS_API_KEY}`;
+    
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    if (data.status !== 'OK' || !data.rows[0]?.elements[0]) {
+      return null;
+    }
+    
+    const element = data.rows[0].elements[0];
+    
+    if (element.status !== 'OK') {
+      return null;
+    }
+    
+    const driveTimeMinutes = Math.ceil(element.duration.value / 60);
+    const driveTimeFormatted = formatDuration(driveTimeMinutes);
+    
+    // Calculate time gap between bookings
+    const previousEndTime = calculateEndTime(
+      previousBooking.fields['Time'],
+      previousBooking.fields['Duration (mins)']
+    );
+    
+    const currentStartTime = currentBooking.fields['Time'];
+    const gapMinutes = calculateTimeGap(previousEndTime, currentStartTime);
+    
+    // Calculate buffer time (gap - drive time)
+    const bufferMinutes = gapMinutes - driveTimeMinutes;
+    
+    return {
+      fromBooking: previousBooking.fields['Property Address'],
+      driveTimeMinutes,
+      driveTimeFormatted,
+      previousBookingEndTime: previousEndTime,
+      currentBookingStartTime: currentStartTime,
+      gapMinutes,
+      bufferTime: {
+        available: gapMinutes,
+        required: driveTimeMinutes,
+        surplus: bufferMinutes,
+        sufficient: bufferMinutes >= 15 // At least 15min buffer is ideal
+      },
+      hasConflict: bufferMinutes < 0 // Negative buffer = overlap
+    };
+    
+  } catch (error) {
+    console.error('Error calculating drive time:', error);
+    return null;
   }
-  
-  throw new Error('Unable to calculate drive time');
 }
 
-// Format drive time for display
-function formatDriveTime(minutes) {
-  if (minutes < 60) {
-    return `${minutes} min`;
-  }
-  
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  return `${hours}h ${mins}m`;
-}
-
-// Calculate end time of a booking
+// Helper: Calculate end time given start time and duration
 function calculateEndTime(startTime, durationMinutes) {
   const [hours, minutes] = startTime.split(':').map(Number);
-  const totalMinutes = hours * 60 + minutes + durationMinutes + 45; // Add 45min buffer after
+  const startMinutes = hours * 60 + minutes;
+  const endMinutes = startMinutes + durationMinutes;
   
-  const endHours = Math.floor(totalMinutes / 60) % 24;
-  const endMinutes = totalMinutes % 60;
+  const endHours = Math.floor(endMinutes / 60);
+  const endMins = endMinutes % 60;
   
-  return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
+  return `${String(endHours).padStart(2, '0')}:${String(endMins).padStart(2, '0')}`;
 }
 
-// Calculate buffer time between bookings
-function calculateBufferTime(previousBooking, currentBooking, driveTimeMinutes) {
-  const prevEndTime = calculateEndTime(
-    previousBooking.fields['Time'], 
-    previousBooking.fields['Duration (mins)'] || 60
-  );
+// Helper: Calculate time gap in minutes
+function calculateTimeGap(time1, time2) {
+  const [h1, m1] = time1.split(':').map(Number);
+  const [h2, m2] = time2.split(':').map(Number);
   
-  const [prevHours, prevMins] = prevEndTime.split(':').map(Number);
-  const [currHours, currMins] = currentBooking.fields['Time'].split(':').map(Number);
+  const minutes1 = h1 * 60 + m1;
+  const minutes2 = h2 * 60 + m2;
   
-  const prevEndTotalMins = prevHours * 60 + prevMins;
-  const currStartTotalMins = currHours * 60 + currMins;
-  
-  const availableBuffer = currStartTotalMins - prevEndTotalMins;
-  const requiredBuffer = driveTimeMinutes;
-  
-  return {
-    available: availableBuffer,
-    required: requiredBuffer,
-    surplus: availableBuffer - requiredBuffer,
-    sufficient: availableBuffer >= requiredBuffer
-  };
+  return minutes2 - minutes1;
 }
 
-// Check if there's a time conflict
-function checkTimeConflict(previousBooking, currentBooking, driveTimeMinutes) {
-  const buffer = calculateBufferTime(previousBooking, currentBooking, driveTimeMinutes);
+// Helper: Format duration
+function formatDuration(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
   
-  // Need: drive time + 45 min setup buffer
-  const minimumRequired = driveTimeMinutes + 45;
-  
-  return buffer.available < minimumRequired;
+  if (hours > 0) {
+    return `${hours}h ${mins}m`;
+  }
+  return `${mins}m`;
 }

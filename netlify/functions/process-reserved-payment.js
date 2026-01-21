@@ -39,8 +39,8 @@ exports.handler = async (event, context) => {
     const booking = await base('Bookings').find(bookingId);
     const fields = booking.fields;
 
-    // Verify it's a reserved booking
-    if (fields['Payment Status'] !== 'Reserved') {
+    // ✅ FIXED: Check Booking Status (not Payment Status)
+    if (fields['Booking Status'] !== 'Reserved') {
       return {
         statusCode: 400,
         headers,
@@ -58,7 +58,7 @@ exports.handler = async (event, context) => {
           price_data: {
             currency: 'gbp',
             product_data: {
-              name: fields['Service Name'] || 'Property Photography',
+              name: fields['Service'] || 'Property Photography', // ✅ FIXED: Was 'Service Name'
               description: `Booking ${fields['Booking Reference']} - ${fields['Date']} at ${fields['Time']}`
             },
             unit_amount: Math.round(fields['Total Price'] * 100) // Convert to pence
@@ -124,7 +124,7 @@ exports.handler = async (event, context) => {
                   </tr>
                   <tr>
                     <td style="padding: 8px 0; color: #64748b; font-size: 14px; font-weight: 600;">Service:</td>
-                    <td style="padding: 8px 0; text-align: right; color: #0f172a; font-size: 14px;">${fields['Service Name']}</td>
+                    <td style="padding: 8px 0; text-align: right; color: #0f172a; font-size: 14px;">${fields['Service']}</td>
                   </tr>
                   <tr>
                     <td style="padding: 8px 0; color: #64748b; font-size: 14px; font-weight: 600;">Date:</td>
