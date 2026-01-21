@@ -1593,6 +1593,7 @@
       ` : '';
 
       const isReserved = booking.fields['Payment Status'] === 'Reserved';
+      const isCancelled = booking.fields['Booking Status'] === 'Cancelled';
 
       body.innerHTML = `
         <div class="detail-item">
@@ -1620,6 +1621,10 @@
           <span class="detail-value">${booking.fields['Service Name'] || '-'}</span>
         </div>
         <div class="detail-item">
+          <span class="detail-label">Total Price</span>
+          <span class="detail-value">£${(booking.fields['Total Price'] || 0).toFixed(2)}</span>
+        </div>
+        <div class="detail-item">
           <span class="detail-label">Payment Status</span>
           <span class="detail-value">
             <span class="status-badge status-${(booking.fields['Payment Status'] || '').toLowerCase()}">
@@ -1627,14 +1632,51 @@
             </span>
           </span>
         </div>
+        <div class="detail-item">
+          <span class="detail-label">Booking Status</span>
+          <span class="detail-value">
+            <span class="status-badge status-${isCancelled ? 'cancelled' : 'active'}">
+              ${booking.fields['Booking Status'] || 'Booked'}
+            </span>
+          </span>
+        </div>
         ${driveTimeSection}
-        ${isReserved ? `
+        
+        ${!isCancelled ? `
           <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
-            <button class="btn btn-success" onclick='processPayment("${booking.id}", "${booking.fields['Booking Reference']}")' style="width: 100%;">
-              💳 Send Payment Link
-            </button>
+            <div class="action-buttons-grid">
+              
+              ${isReserved ? `
+                <button class="btn btn-success" onclick="chargeReservedBooking('${booking.id}')" style="width: 100%; justify-content: center;">
+                  💳 Charge Card
+                </button>
+                <button class="btn btn-primary" onclick='processPayment("${booking.id}", "${booking.fields['Booking Reference']}")' style="width: 100%; justify-content: center;">
+                  📧 Send Payment Link
+                </button>
+              ` : ''}
+              
+              <button class="btn btn-primary" onclick="showAdminReschedule('${booking.id}')" style="width: 100%; justify-content: center;">
+                📅 Reschedule
+              </button>
+              
+              <button class="btn btn-secondary" onclick="showModifyService('${booking.id}')" style="width: 100%; justify-content: center;">
+                ✏️ Modify Service
+              </button>
+              
+              <button class="btn btn-danger" onclick="showAdminCancel('${booking.id}')" style="width: 100%; justify-content: center;">
+                ❌ Cancel
+              </button>
+            </div>
+
+            <div class="info-box" style="margin-top: 16px;">
+              <strong>ℹ️ Admin Actions:</strong> These actions will automatically send email notifications to customers.
+            </div>
           </div>
-        ` : ''}
+        ` : `
+          <div style="margin-top: 24px; padding: 16px; background: #fee2e2; border: 2px solid #ef4444; border-radius: 12px; text-align: center; color: #991b1b;">
+            <strong>❌ This booking has been cancelled</strong>
+          </div>
+        `}
       `;
 
       modal.classList.add('active');
@@ -1664,6 +1706,166 @@
       } catch (error) {
         console.error('Error processing payment:', error);
         alert('Error sending payment link');
+      }
+    }
+
+    // ===== ADMIN BOOKING ACTIONS =====
+    async function chargeReservedBooking(bookingId) {
+      const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
+      if (!booking) return alert('Booking data not found');
+
+      if (!confirm(`Charge reserved booking?\n\nClient: ${booking.fields['Client Name']}\nAmount: £${(booking.fields['Total Price'] || 0).toFixed(2)}`)) return;
+      
+      try {
+        const response = await fetch('/.netlify/functions/charge-card', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert(`✅ Payment charged!\n\nAmount: £${data.amount.toFixed(2)}\n\nConfirmation email sent.`);
+          closeModal('bookingModal');
+          loadBookings();
+          loadReservedBookings();
+          loadDashboardStats();
+          loadCalendar();
+        } else {
+          alert(`❌ Error: ${data.error || 'Failed to charge card'}`);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Failed to charge card.');
+      }
+    }
+
+    function showAdminReschedule(bookingId) {
+      const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
+      if (!booking) return;
+      
+      const sendEmail = document.getElementById('sendEmailToggle')?.checked ?? true;
+      
+      const newDate = prompt('Enter new date (YYYY-MM-DD):', booking.fields['Date']);
+      if (!newDate || !newDate.match(/^\d{4}-\d{2}-\d{2}$/)) return;
+      
+      const newTime = prompt('Enter new time (HH:MM):', booking.fields['Time']);
+      if (!newTime || !newTime.match(/^\d{2}:\d{2}$/)) return;
+      
+      if (!confirm(`Reschedule to ${newDate} at ${newTime}?\n\nSend email: ${sendEmail ? 'Yes' : 'No'}`)) return;
+      
+      adminRescheduleBooking(bookingId, newDate, newTime, sendEmail);
+    }
+
+    async function adminRescheduleBooking(bookingId, newDate, newTime, sendEmail) {
+      try {
+        const response = await fetch('/.netlify/functions/admin-reschedule-booking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId, newDate, newTime, sendEmail })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert(`✅ Rescheduled!\n\n${newDate} at ${newTime}\n\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`);
+          closeModal('bookingModal');
+          loadBookings();
+          loadCalendar();
+        } else {
+          alert(`❌ Error: ${data.error}`);
+        }
+      } catch (error) {
+        alert('❌ Failed to reschedule.');
+      }
+    }
+
+    function showAdminCancel(bookingId) {
+      const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
+      if (!booking) return;
+      
+      const sendEmail = document.getElementById('sendEmailToggle')?.checked ?? true;
+      const reason = prompt('Reason:') || 'Admin cancelled';
+      
+      if (!confirm(`Cancel booking?\n\nClient: ${booking.fields['Client Name']}\nReason: ${reason}\n\nSend email: ${sendEmail ? 'Yes' : 'No'}`)) return;
+      
+      adminCancelBooking(bookingId, reason, sendEmail);
+    }
+
+    async function adminCancelBooking(bookingId, reason, sendEmail) {
+      try {
+        const response = await fetch('/.netlify/functions/admin-cancel-booking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId, reason, sendEmail })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          let msg = `✅ Cancelled!\n\n`;
+          if (data.cancellationCharge > 0) msg += `Fee: £${data.cancellationCharge.toFixed(2)}\n`;
+          if (data.refundProcessed) msg += `Refund: £${data.refundAmount.toFixed(2)}\n`;
+          msg += `\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`;
+          alert(msg);
+          closeModal('bookingModal');
+          loadBookings();
+          loadCalendar();
+        } else {
+          alert(`❌ Error: ${data.error}`);
+        }
+      } catch (error) {
+        alert('❌ Failed to cancel.');
+      }
+    }
+
+    function showModifyService(bookingId) {
+      const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
+      if (!booking) return;
+      
+      const sendEmail = document.getElementById('sendEmailToggle')?.checked ?? true;
+      
+      const newServiceName = prompt('New service name:');
+      if (!newServiceName) return;
+      
+      const newPrice = parseFloat(prompt('New base price (£):'));
+      if (isNaN(newPrice)) return;
+      
+      const newDuration = parseInt(prompt('Duration (mins):', '60'));
+      if (isNaN(newDuration)) return;
+      
+      if (!confirm(`Change service?\n\nNew: ${newServiceName} (£${newPrice})\n\nSend email: ${sendEmail ? 'Yes' : 'No'}`)) return;
+      
+      adminModifyService(bookingId, newServiceName, newPrice, newDuration, sendEmail);
+    }
+
+    async function adminModifyService(bookingId, newServiceName, newServicePrice, newServiceDuration, sendEmail) {
+      try {
+        const response = await fetch('/.netlify/functions/admin-modify-service', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bookingId,
+            newServiceId: newServiceName.toLowerCase().replace(/\s+/g, '-'),
+            newServiceName,
+            newServicePrice,
+            newServiceDuration,
+            sendEmail
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert(`✅ Modified!\n\nNew: ${data.newService} (£${data.newPrice.toFixed(2)})\n\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`);
+          closeModal('bookingModal');
+          loadBookings();
+        } else {
+          alert(`❌ Error: ${data.error}`);
+        }
+      } catch (error) {
+        alert('❌ Failed to modify service.');
       }
     }
 
