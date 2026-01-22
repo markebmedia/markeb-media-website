@@ -166,7 +166,7 @@ exports.handler = async (event, context) => {
       'Add-Ons Price': addonsPrice, // ✅ Lowercase o to match create-booking
       'Total Price': newTotalPrice,
       'Service Modified': true,
-      'Service Modified Date': new Date().toISOString(),
+      'Service Modified Date': new Date().toISOString().split('T')[0],
       'Previous Service': oldService,
       'Previous Price': oldTotalPrice,
       'Price Adjustment': priceDifference
