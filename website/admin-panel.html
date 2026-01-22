@@ -1692,23 +1692,33 @@
     <form id="adminBookingForm">
       <!-- Customer Selection -->
       <div class="form-group">
-        <label class="form-label">Customer *</label>
-        <select id="bookingCustomer" class="form-input" required onchange="populateCustomerDetails()">
-          <option value="">-- Select Customer --</option>
-          <!-- Populated from allCustomers -->
-        </select>
-      </div>
+  <label class="form-label">Customer</label>
+  <input 
+    type="text" 
+    id="bookingCustomer" 
+    class="form-input" 
+    list="customersList" 
+    placeholder="Type name or select from list..."
+    onchange="populateCustomerDetails()"
+  >
+  <datalist id="customersList">
+    <!-- Populated from allCustomers -->
+  </datalist>
+  <small style="color: #64748b; font-size: 12px; margin-top: 4px; display: block;">
+    💡 Select existing customer or type manually for new customers
+  </small>
+</div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Customer Name *</label>
-          <input type="text" id="bookingClientName" class="form-input" required readonly>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Customer Email *</label>
-          <input type="email" id="bookingClientEmail" class="form-input" required readonly>
-        </div>
-      </div>
+<div class="form-row">
+  <div class="form-group">
+    <label class="form-label">Customer Name *</label>
+    <input type="text" id="bookingClientName" class="form-input" required>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Customer Email *</label>
+    <input type="email" id="bookingClientEmail" class="form-input" required>
+  </div>
+</div>
 
       <!-- Region Selection -->
       <div class="form-group">
@@ -1756,9 +1766,9 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Postcode *</label>
-          <input type="text" id="bookingPostcode" class="form-input" required placeholder="e.g. M1 1AA">
-        </div>
+  <label class="form-label">Postcode *</label>
+  <input type="text" id="bookingPostcode" class="form-input" required placeholder="e.g. M1 1AA" onchange="checkAdminAvailability()">
+</div>
         <div class="form-group">
           <label class="form-label">Access Instructions</label>
           <input type="text" id="bookingAccess" class="form-input" placeholder="Key location, gate code, etc.">
@@ -2338,19 +2348,45 @@
     }
 
     // Auto-populate customer details
-    function populateCustomerDetails() {
-      const select = document.getElementById('bookingCustomer');
-      const selectedOption = select.options[select.selectedIndex];
-      
-      if (!selectedOption || !selectedOption.value) {
-        document.getElementById('bookingClientName').value = '';
-        document.getElementById('bookingClientEmail').value = '';
-        return;
-      }
-      
-      document.getElementById('bookingClientName').value = selectedOption.dataset.name;
-      document.getElementById('bookingClientEmail').value = selectedOption.value;
-    }
+    function populateCustomerDropdown() {
+  const datalist = document.getElementById('customersList');
+  if (!datalist) return;
+  
+  datalist.innerHTML = '';
+  allCustomers.forEach(customer => {
+    const option = document.createElement('option');
+    option.value = `${customer.fields['Name']} (${customer.fields['Email']})`;
+    option.setAttribute('data-email', customer.fields['Email']);
+    option.setAttribute('data-name', customer.fields['Name']);
+    datalist.appendChild(option);
+  });
+}
+
+function populateCustomerDetails() {
+  const input = document.getElementById('bookingCustomer');
+  const value = input.value;
+  
+  if (!value) {
+    document.getElementById('bookingClientName').value = '';
+    document.getElementById('bookingClientEmail').value = '';
+    return;
+  }
+  
+  // Try to find matching customer
+  const customer = allCustomers.find(c => 
+    value.includes(c.fields['Email']) || value === c.fields['Name']
+  );
+  
+  if (customer) {
+    // Existing customer selected
+    document.getElementById('bookingClientName').value = customer.fields['Name'];
+    document.getElementById('bookingClientEmail').value = customer.fields['Email'];
+  } else {
+    // Manual entry - clear fields so admin can type
+    document.getElementById('bookingClientName').value = '';
+    document.getElementById('bookingClientEmail').value = '';
+  }
+}
 
     // Load services based on region
     function loadServicesForRegion() {
@@ -2494,51 +2530,60 @@
     }
 
     // Check availability
-    async function checkAdminAvailability() {
-      const date = document.getElementById('bookingDate').value;
-      const time = document.getElementById('bookingTime').value;
-      const region = document.getElementById('bookingRegion').value;
-      const serviceSelect = document.getElementById('bookingService');
-      const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+   async function checkAdminAvailability() {
+  const date = document.getElementById('bookingDate').value;
+  const time = document.getElementById('bookingTime').value;
+  const region = document.getElementById('bookingRegion').value;
+  const postcode = document.getElementById('bookingPostcode').value;
+  const serviceSelect = document.getElementById('bookingService');
+  const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+  
+  if (!date || !time || !region || !selectedOption?.value || !postcode) return;
+  
+  const duration = parseInt(selectedOption.dataset.duration);
+  const resultsDiv = document.getElementById('availabilityResults');
+  resultsDiv.innerHTML = '<div style="text-align: center; padding: 16px;"><div class="spinner" style="width: 30px; height: 30px;"></div></div>';
+  resultsDiv.style.display = 'block';
+  
+  try {
+    const response = await fetch('/.netlify/functions/check-availability', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        postcode: postcode,
+        region: region, 
+        selectedDate: date
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.availableSlots) {
+      const selectedSlot = data.availableSlots.find(slot => slot.time === time);
       
-      if (!date || !time || !region || !selectedOption?.value) return;
-      
-      const duration = parseInt(selectedOption.dataset.duration);
-      const resultsDiv = document.getElementById('availabilityResults');
-      resultsDiv.innerHTML = '<div style="text-align: center; padding: 16px;"><div class="spinner" style="width: 30px; height: 30px;"></div></div>';
-      resultsDiv.style.display = 'block';
-      
-      try {
-        const response = await fetch('/.netlify/functions/check-availability', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ date, time, duration, region })
-        });
-        
-        const data = await response.json();
-        
-        if (data.available) {
-          resultsDiv.innerHTML = `
-            <div class="success-box">
-              ✅ <strong>Available!</strong> This time slot is free.
-            </div>
-          `;
-        } else {
-          resultsDiv.innerHTML = `
-            <div class="warning-box">
-              ⚠️ <strong>Conflict detected!</strong> ${data.message || 'Time slot may be busy'}
-            </div>
-          `;
-        }
-      } catch (error) {
-        console.error('Availability check error:', error);
+      if (selectedSlot && selectedSlot.available) {
+        resultsDiv.innerHTML = `
+          <div class="success-box">
+            ✅ <strong>Available!</strong> This time slot is free.
+          </div>
+        `;
+      } else {
         resultsDiv.innerHTML = `
           <div class="warning-box">
-            ⚠️ Could not check availability. Please verify manually.
+            ⚠️ <strong>Conflict detected!</strong> ${selectedSlot?.reason || 'Time slot may be busy'}
           </div>
         `;
       }
     }
+  } catch (error) {
+    console.error('Availability check error:', error);
+    resultsDiv.innerHTML = `
+      <div class="warning-box">
+        ⚠️ Could not check availability. Please verify manually.
+      </div>
+    `;
+  }
+}
 
     // Form submission
     document.getElementById('adminBookingForm')?.addEventListener('submit', async (e) => {
