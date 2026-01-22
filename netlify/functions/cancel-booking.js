@@ -79,15 +79,16 @@ exports.handler = async (event, context) => {
     const cancellationChargePercentage = 0;
     const refundAmount = totalPrice;
 
-    // Update booking status in Airtable
-    await base('Bookings').update(bookingId, {
-      'Booking Status': 'Cancelled',
-      'Cancellation Date': new Date().toISOString().split('T')[0],
-      'Cancellation Reason': reason || 'Customer requested',
-      'Cancellation Charge %': cancellationChargePercentage,
-      'Cancellation Charge': cancellationCharge,
-      'Refund Amount': refundAmount
-    });
+   // Update booking status in Airtable
+await base('Bookings').update(bookingId, {
+  'Booking Status': 'Cancelled',
+  'Cancellation Date': new Date().toISOString().split('T')[0],
+  'Cancellation Reason': reason || 'Customer requested',
+  'Cancellation Charge %': cancellationChargePercentage,
+  'Cancellation Charge': cancellationCharge,
+  'Refund Amount': refundAmount,
+  'Cancelled By': 'Client'
+});
 
     console.log(`✅ Booking ${fields['Booking Reference']} cancelled (free)`);
 
