@@ -85,7 +85,7 @@ await base('Bookings').update(bookingId, {
   'Cancellation Date': new Date().toISOString().split('T')[0],
   'Cancellation Reason': reason || 'Customer requested',
   'Cancellation Charge %': cancellationChargePercentage,
-  'Cancellation Charge': cancellationCharge,
+  'Cancellation Fee': cancellationCharge,
   'Refund Amount': refundAmount,
   'Cancelled By': 'Client'
 });
