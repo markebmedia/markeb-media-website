@@ -163,7 +163,7 @@ exports.handler = async (event, context) => {
       'Base Price': newServicePrice,
       'Extra Bedroom Fee': extraBedroomFee,
       'Add-Ons': addonsString, // ✅ Capital O to match create-booking
-      'Add-ons Price': addonsPrice, // ✅ Lowercase o to match create-booking
+      'Add-Ons Price': addonsPrice, // ✅ Lowercase o to match create-booking
       'Total Price': newTotalPrice,
       'Service Modified': true,
       'Service Modified Date': new Date().toISOString(),
