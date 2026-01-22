@@ -1264,6 +1264,87 @@
   }
 }
 
+/* ===== FORM STYLES ===== */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input:read-only {
+  background: #f8fafc;
+  cursor: not-allowed;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.bedroom-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #3b82f6;
+  background: #fff;
+  color: #3b82f6;
+  font-size: 24px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bedroom-btn:hover {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.bedroom-btn:active {
+  transform: scale(0.95);
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .button-group .btn {
+    width: 100%;
+  }
+}
+
 /* ===== PASSWORD PROTECTION STYLES ===== */
 .password-modal {
   position: fixed;
@@ -1520,7 +1601,11 @@
     </div>
 
     <div class="nav-section">
-      <div class="nav-section-title">Bookings</div>
+  <div class="nav-section-title">Bookings</div>
+  <div class="nav-item" onclick="showSection('create-booking')">
+    <span class="nav-icon">➕</span>
+    Create Booking
+  </div>
       <div class="nav-item" onclick="showSection('calendar')">
         <span class="nav-icon">📅</span>
         Calendar
@@ -1598,6 +1683,150 @@
         </div>
       </div>
     </div>
+
+    <!-- Create Booking Section -->
+<div class="admin-section" id="create-booking">
+  <div class="calendar-container">
+    <h2 style="margin-bottom: 24px;">Create New Booking</h2>
+    
+    <form id="adminBookingForm">
+      <!-- Customer Selection -->
+      <div class="form-group">
+        <label class="form-label">Customer *</label>
+        <select id="bookingCustomer" class="form-input" required onchange="populateCustomerDetails()">
+          <option value="">-- Select Customer --</option>
+          <!-- Populated from allCustomers -->
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Customer Name *</label>
+          <input type="text" id="bookingClientName" class="form-input" required readonly>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Customer Email *</label>
+          <input type="email" id="bookingClientEmail" class="form-input" required readonly>
+        </div>
+      </div>
+
+      <!-- Region Selection -->
+      <div class="form-group">
+        <label class="form-label">Region *</label>
+        <select id="bookingRegion" class="form-input" required onchange="loadServicesForRegion()">
+          <option value="">-- Select Region --</option>
+          <option value="North">North</option>
+          <option value="South">South</option>
+        </select>
+      </div>
+
+      <!-- Service Selection -->
+      <div class="form-group">
+        <label class="form-label">Service *</label>
+        <select id="bookingService" class="form-input" required onchange="updateBookingPrice()">
+          <option value="">-- Select Service --</option>
+        </select>
+      </div>
+
+      <!-- Bedrooms (conditional) -->
+      <div class="form-group" id="bookingBedroomsSection" style="display: none;">
+        <label class="form-label">Bedrooms</label>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <button type="button" class="bedroom-btn" onclick="adjustBookingBedrooms(-1)">-</button>
+          <div style="flex: 1; text-align: center;">
+            <div id="bookingBedroomCount" style="font-size: 32px; font-weight: 700; color: #3b82f6;">4</div>
+          </div>
+          <button type="button" class="bedroom-btn" onclick="adjustBookingBedrooms(1)">+</button>
+        </div>
+      </div>
+
+      <!-- Add-ons -->
+      <div id="bookingAddonsSection" style="display: none; margin-top: 24px;">
+        <label class="form-label">Add-Ons (Optional)</label>
+        <div id="bookingAddonCheckboxes" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Property Details -->
+      <div class="form-group">
+        <label class="form-label">Property Address *</label>
+        <input type="text" id="bookingAddress" class="form-input" required placeholder="Full property address">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Postcode *</label>
+          <input type="text" id="bookingPostcode" class="form-input" required placeholder="e.g. M1 1AA">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Access Instructions</label>
+          <input type="text" id="bookingAccess" class="form-input" placeholder="Key location, gate code, etc.">
+        </div>
+      </div>
+
+      <!-- Date & Time -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Date *</label>
+          <input type="date" id="bookingDate" class="form-input" required 
+                 min="${new Date().toISOString().split('T')[0]}"
+                 onchange="checkAdminAvailability()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Time *</label>
+          <select id="bookingTime" class="form-input" required onchange="checkAdminAvailability()">
+            <option value="">-- Select Time --</option>
+            ${generateTimeOptions()}
+          </select>
+        </div>
+      </div>
+
+      <!-- Availability Check Results -->
+      <div id="availabilityResults" style="display: none; margin: 16px 0;"></div>
+
+      <!-- Price Breakdown -->
+      <div id="bookingPriceBreakdown" style="background: #f8fafc; border-radius: 12px; padding: 20px; margin: 24px 0; display: none;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+          <span style="color: #64748b;">Service</span>
+          <span id="bookingServicePrice" style="font-weight: 600;">£0.00</span>
+        </div>
+        <div id="bookingBedroomRow" style="display: none; justify-content: space-between; margin-bottom: 12px;">
+          <span style="color: #64748b;">Extra bedrooms</span>
+          <span id="bookingBedroomFee" style="font-weight: 600;">£0.00</span>
+        </div>
+        <div id="bookingAddonsRow" style="display: none; justify-content: space-between; margin-bottom: 12px;">
+          <span style="color: #64748b;">Add-ons</span>
+          <span id="bookingAddonsFee" style="font-weight: 600;">£0.00</span>
+        </div>
+        <div style="border-top: 2px solid #e2e8f0; margin: 16px 0;"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 18px; font-weight: 700;">Total Price</span>
+          <span id="bookingTotalPrice" style="font-size: 24px; font-weight: 700; color: #3b82f6;">£0.00</span>
+        </div>
+      </div>
+
+      <!-- Payment Options -->
+      <div class="form-group">
+        <label class="form-label">Payment Status *</label>
+        <select id="bookingPaymentStatus" class="form-input" required>
+          <option value="Pending">Pending (Reserve without payment)</option>
+          <option value="Paid">Paid (Mark as paid manually)</option>
+        </select>
+      </div>
+
+      <!-- Submit Buttons -->
+      <div class="button-group" style="margin-top: 24px;">
+        <button type="button" class="btn btn-secondary" onclick="resetBookingForm()" style="flex: 1;">
+          Reset Form
+        </button>
+        <button type="submit" class="btn btn-success" style="flex: 2;">
+          Create Booking
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 
     <!-- Calendar Section -->
     <div class="admin-section" id="calendar">
@@ -2075,7 +2304,323 @@
       loadBookings();
       loadPendingBookings();
       loadCustomers();
+      
+      // Populate time options
+      const timeSelect = document.getElementById('bookingTime');
+      if (timeSelect) {
+        for (let hour = 9; hour <= 17; hour++) {
+          for (let minute of [0, 30]) {
+            if (hour === 17 && minute === 30) break;
+            const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+            timeSelect.innerHTML += `<option value="${timeStr}">${timeStr}</option>`;
+          }
+        }
+      }
     });
+
+    // ===== ADMIN BOOKING CREATION =====
+    
+    // Booking form state
+    let bookingFormData = {
+      bedrooms: 4,
+      selectedAddons: []
+    };
+
+    // Populate customer dropdown
+    function populateCustomerDropdown() {
+      const select = document.getElementById('bookingCustomer');
+      if (!select) return;
+      
+      select.innerHTML = '<option value="">-- Select Customer --</option>';
+      allCustomers.forEach(customer => {
+        select.innerHTML += `<option value="${customer.fields['Email']}" data-name="${customer.fields['Name']}" data-company="${customer.fields['Company'] || ''}">${customer.fields['Name']} (${customer.fields['Email']})</option>`;
+      });
+    }
+
+    // Auto-populate customer details
+    function populateCustomerDetails() {
+      const select = document.getElementById('bookingCustomer');
+      const selectedOption = select.options[select.selectedIndex];
+      
+      if (!selectedOption || !selectedOption.value) {
+        document.getElementById('bookingClientName').value = '';
+        document.getElementById('bookingClientEmail').value = '';
+        return;
+      }
+      
+      document.getElementById('bookingClientName').value = selectedOption.dataset.name;
+      document.getElementById('bookingClientEmail').value = selectedOption.value;
+    }
+
+    // Load services based on region
+    function loadServicesForRegion() {
+      const region = document.getElementById('bookingRegion').value;
+      const serviceSelect = document.getElementById('bookingService');
+      
+      if (!region) {
+        serviceSelect.innerHTML = '<option value="">-- Select Service --</option>';
+        return;
+      }
+      
+      const regionKey = region.toLowerCase();
+      const services = SERVICES_CATALOG[regionKey] || [];
+      
+      serviceSelect.innerHTML = '<option value="">-- Select Service --</option>';
+      services.forEach(service => {
+        serviceSelect.innerHTML += `
+          <option 
+            value="${service.id}" 
+            data-price="${service.price}"
+            data-duration="${service.duration}"
+            data-name="${service.name}"
+            data-property="${service.isPropertyService}"
+            data-addons='${JSON.stringify(service.availableAddons)}'
+          >
+            ${service.name} - £${service.price.toFixed(2)}
+          </option>
+        `;
+      });
+    }
+
+    // Update price and show/hide sections
+    function updateBookingPrice() {
+      const select = document.getElementById('bookingService');
+      const selectedOption = select.options[select.selectedIndex];
+      
+      if (!selectedOption || !selectedOption.value) {
+        document.getElementById('bookingPriceBreakdown').style.display = 'none';
+        document.getElementById('bookingBedroomsSection').style.display = 'none';
+        document.getElementById('bookingAddonsSection').style.display = 'none';
+        return;
+      }
+
+      const servicePrice = parseFloat(selectedOption.dataset.price);
+      const isPropertyService = selectedOption.dataset.property === 'true';
+      const availableAddons = JSON.parse(selectedOption.dataset.addons || '[]');
+
+      // Show/hide bedrooms section
+      document.getElementById('bookingBedroomsSection').style.display = isPropertyService ? 'block' : 'none';
+
+      // Show/hide addons section
+      if (availableAddons.length > 0) {
+        const addonContainer = document.getElementById('bookingAddonCheckboxes');
+        addonContainer.innerHTML = availableAddons.map(addonId => {
+          const addon = ADDONS_CATALOG[addonId];
+          if (!addon) return '';
+          
+          return `
+            <label style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #fff; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer;">
+              <input 
+                type="checkbox" 
+                value="${addon.id}" 
+                onchange="toggleBookingAddon('${addon.id}')"
+                style="width: 20px; height: 20px;"
+              >
+              <div style="flex: 1;">
+                <div style="font-weight: 600; margin-bottom: 4px;">${addon.name}</div>
+                <div style="font-size: 13px; color: #64748b;">${addon.description}</div>
+              </div>
+              <div style="font-weight: 700; color: #3b82f6;">
+                ${addon.price === 0 ? 'FREE' : `+£${addon.price.toFixed(2)}`}
+              </div>
+            </label>
+          `;
+        }).join('');
+        
+        document.getElementById('bookingAddonsSection').style.display = 'block';
+      } else {
+        document.getElementById('bookingAddonsSection').style.display = 'none';
+      }
+
+      bookingFormData.selectedAddons = [];
+      calculateBookingPrice();
+      document.getElementById('bookingPriceBreakdown').style.display = 'block';
+    }
+
+    function toggleBookingAddon(addonId) {
+      const index = bookingFormData.selectedAddons.indexOf(addonId);
+      if (index > -1) {
+        bookingFormData.selectedAddons.splice(index, 1);
+      } else {
+        bookingFormData.selectedAddons.push(addonId);
+      }
+      calculateBookingPrice();
+    }
+
+    function adjustBookingBedrooms(change) {
+      bookingFormData.bedrooms = Math.max(1, Math.min(15, bookingFormData.bedrooms + change));
+      document.getElementById('bookingBedroomCount').textContent = bookingFormData.bedrooms;
+      calculateBookingPrice();
+    }
+
+    function calculateBookingPrice() {
+      const select = document.getElementById('bookingService');
+      const selectedOption = select.options[select.selectedIndex];
+      
+      if (!selectedOption || !selectedOption.value) return;
+
+      const servicePrice = parseFloat(selectedOption.dataset.price);
+      const isPropertyService = selectedOption.dataset.property === 'true';
+      
+      const extraBedrooms = isPropertyService ? Math.max(0, bookingFormData.bedrooms - 4) : 0;
+      const bedroomFee = extraBedrooms * 30;
+
+      let addonsFee = 0;
+      bookingFormData.selectedAddons.forEach(addonId => {
+        const addon = ADDONS_CATALOG[addonId];
+        if (addon) addonsFee += addon.price;
+      });
+
+      const totalPrice = servicePrice + bedroomFee + addonsFee;
+
+      document.getElementById('bookingServicePrice').textContent = `£${servicePrice.toFixed(2)}`;
+      document.getElementById('bookingTotalPrice').textContent = `£${totalPrice.toFixed(2)}`;
+
+      const bedroomRow = document.getElementById('bookingBedroomRow');
+      if (bedroomFee > 0) {
+        bedroomRow.style.display = 'flex';
+        document.getElementById('bookingBedroomFee').textContent = `£${bedroomFee.toFixed(2)}`;
+      } else {
+        bedroomRow.style.display = 'none';
+      }
+
+      const addonsRow = document.getElementById('bookingAddonsRow');
+      if (addonsFee > 0) {
+        addonsRow.style.display = 'flex';
+        document.getElementById('bookingAddonsFee').textContent = `£${addonsFee.toFixed(2)}`;
+      } else {
+        addonsRow.style.display = 'none';
+      }
+    }
+
+    // Check availability
+    async function checkAdminAvailability() {
+      const date = document.getElementById('bookingDate').value;
+      const time = document.getElementById('bookingTime').value;
+      const region = document.getElementById('bookingRegion').value;
+      const serviceSelect = document.getElementById('bookingService');
+      const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+      
+      if (!date || !time || !region || !selectedOption?.value) return;
+      
+      const duration = parseInt(selectedOption.dataset.duration);
+      const resultsDiv = document.getElementById('availabilityResults');
+      resultsDiv.innerHTML = '<div style="text-align: center; padding: 16px;"><div class="spinner" style="width: 30px; height: 30px;"></div></div>';
+      resultsDiv.style.display = 'block';
+      
+      try {
+        const response = await fetch('/.netlify/functions/check-availability', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ date, time, duration, region })
+        });
+        
+        const data = await response.json();
+        
+        if (data.available) {
+          resultsDiv.innerHTML = `
+            <div class="success-box">
+              ✅ <strong>Available!</strong> This time slot is free.
+            </div>
+          `;
+        } else {
+          resultsDiv.innerHTML = `
+            <div class="warning-box">
+              ⚠️ <strong>Conflict detected!</strong> ${data.message || 'Time slot may be busy'}
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Availability check error:', error);
+        resultsDiv.innerHTML = `
+          <div class="warning-box">
+            ⚠️ Could not check availability. Please verify manually.
+          </div>
+        `;
+      }
+    }
+
+    // Form submission
+    document.getElementById('adminBookingForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const serviceSelect = document.getElementById('bookingService');
+      const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+      
+      if (!selectedOption || !selectedOption.value) {
+        alert('Please select a service');
+        return;
+      }
+
+      const formData = {
+        clientName: document.getElementById('bookingClientName').value,
+        clientEmail: document.getElementById('bookingClientEmail').value,
+        region: document.getElementById('bookingRegion').value,
+        serviceId: selectedOption.value,
+        serviceName: selectedOption.dataset.name,
+        servicePrice: parseFloat(selectedOption.dataset.price),
+        serviceDuration: parseInt(selectedOption.dataset.duration),
+        bedrooms: bookingFormData.bedrooms,
+        addons: bookingFormData.selectedAddons.map(id => ({
+          id,
+          name: ADDONS_CATALOG[id]?.name,
+          price: ADDONS_CATALOG[id]?.price
+        })),
+        propertyAddress: document.getElementById('bookingAddress').value,
+        postcode: document.getElementById('bookingPostcode').value,
+        accessInstructions: document.getElementById('bookingAccess').value || '',
+        date: document.getElementById('bookingDate').value,
+        time: document.getElementById('bookingTime').value,
+        paymentStatus: document.getElementById('bookingPaymentStatus').value,
+        createdBy: 'Admin'
+      };
+
+      if (!confirm(`Create booking for ${formData.clientName}?\n\nService: ${formData.serviceName}\nDate: ${formData.date} at ${formData.time}`)) {
+        return;
+      }
+
+      const btn = e.target.querySelector('button[type="submit"]');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '⏳ Creating...';
+      btn.disabled = true;
+
+      try {
+        const response = await fetch('/.netlify/functions/create-booking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert(`✅ Booking created successfully!\n\nReference: ${data.bookingReference}`);
+          resetBookingForm();
+          loadBookings();
+          loadCalendar();
+          loadDashboardStats();
+        } else {
+          alert(`❌ Error: ${data.error}`);
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      } catch (error) {
+        console.error('Booking creation error:', error);
+        alert('❌ Failed to create booking');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    });
+
+    function resetBookingForm() {
+      document.getElementById('adminBookingForm').reset();
+      bookingFormData = { bedrooms: 4, selectedAddons: [] };
+      document.getElementById('bookingBedroomCount').textContent = '4';
+      document.getElementById('bookingPriceBreakdown').style.display = 'none';
+      document.getElementById('availabilityResults').style.display = 'none';
+    }
+
+    // ===== END ADMIN BOOKING CREATION =====
 
     // Navigation
     function showSection(sectionId) {
@@ -3275,6 +3820,7 @@ async function confirmModifyService(bookingId) {
         if (data.success) {
           allCustomers = data.users;
           renderCustomersTable(allCustomers);
+          populateCustomerDropdown(); // ADD THIS LINE
         }
 
       } catch (error) {
