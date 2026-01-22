@@ -197,7 +197,7 @@ async function sendRescheduleEmail(data) {
       </div>
       
       <p style="margin-top: 30px;">
-        <a href="https://markebmedia.com/manage-booking.html?ref=${bookingRef}&email=${encodeURIComponent(clientEmail)}" 
+        <a href="https://markebmedia.com/website/manage-booking.html?ref=${bookingRef}&email=${encodeURIComponent(clientEmail)}" 
            style="background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
           Manage Your Booking
         </a>
