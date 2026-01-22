@@ -120,7 +120,15 @@ async function fetchBookingsForRegion(region, selectedDate) {
     console.log(`  - Region: ${capitalisedRegion} (original: ${region})`);
     
     // Use Airtable's IS_SAME() function for date comparison
-    const filterFormula = `AND({Region} = '${capitalisedRegion}', IS_SAME({Date}, '${selectedDate}', 'day'), {Booking Status} = 'Booked')`;
+    const filterFormula = `AND(
+  {Region} = '${capitalisedRegion}', 
+  IS_SAME({Date}, '${selectedDate}', 'day'), 
+  OR(
+    {Booking Status} = 'Booked',
+    {Booking Status} = 'Reserved',
+    {Booking Status} = 'Confirmed'
+  )
+)`;
     console.log(`  - Filter: ${filterFormula}`);
 
     // Query bookings for this specific region and date
