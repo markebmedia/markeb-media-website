@@ -130,7 +130,7 @@ exports.handler = async (event, context) => {
       'Date': newDate,
       'Time': newTime,
       'Rescheduled': true,
-      'Rescheduled By': 'Customer',
+      'Rescheduled By': 'Client',
       'Original Date': originalDate,
       'Original Time': originalTime,
       'Reschedule Date': new Date().toISOString().split('T')[0]
