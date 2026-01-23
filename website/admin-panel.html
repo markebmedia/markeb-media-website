@@ -5370,7 +5370,7 @@ async function saveDiscountCode(event) {
       'Discount Type': type,
       'Discount Value': value,
       'Status': status,
-      'Times Used': currentDiscountCode ? undefined : 0 // Only set on create
+      'Times Used': currentDiscountCode ? undefined : 0
     };
     
     if (validFrom) fields['Valid From'] = validFrom;
@@ -5381,25 +5381,27 @@ async function saveDiscountCode(event) {
     if (selectedRegions.length > 0) fields['Applicable Regions'] = selectedRegions;
     if (selectedServices.length > 0) fields['Applicable Services'] = selectedServices;
     
+    console.log('Sending to Airtable:', fields);
+    
     const response = await fetch('/.netlify/functions/airtable-proxy', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    method: currentDiscountCode ? 'PATCH' : 'POST',
-    table: 'DISCOUNT',
-    recordId: currentDiscountCode || null,
-    body: { fields }
-  })
-});
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: currentDiscountCode ? 'PATCH' : 'POST',
+        table: 'DISCOUNT',
+        recordId: currentDiscountCode || null,
+        body: { fields }
+      })
+    });
 
-const data = await response.json();
-console.log('Airtable response:', data); // ADD THIS
-
-if (!response.ok) {
-  console.error('Full error:', data); // ADD THIS
-  alert(`❌ Failed to save: ${data.error?.message || JSON.stringify(data)}`);
-  throw new Error('Failed to save discount code');
-}
+    const data = await response.json();
+    console.log('Airtable response status:', response.status);
+    console.log('Airtable response data:', data);
+    
+    if (!response.ok) {
+      alert(`❌ Airtable Error (${response.status}):\n${JSON.stringify(data, null, 2)}`);
+      throw new Error('Failed to save discount code');
+    }
     
     alert(`✅ Discount code "${code}" ${currentDiscountCode ? 'updated' : 'created'} successfully!`);
     closeModal('discountModal');
@@ -5407,7 +5409,7 @@ if (!response.ok) {
     
   } catch (error) {
     console.error('Error saving discount code:', error);
-    alert('❌ Failed to save discount code');
+    alert('❌ Failed to save discount code: ' + error.message);
   }
   
   btn.disabled = false;
