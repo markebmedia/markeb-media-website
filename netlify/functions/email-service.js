@@ -157,12 +157,16 @@ function getEmailLayout(content) {
   `;
 }
 
-// 1. Booking Confirmation (Reserve Without Payment)
+// 1. Booking Confirmation (Works for both Customer & Admin bookings)
 async function sendBookingConfirmation(booking) {
   const manageUrl = `${SITE_URL}${MANAGE_BOOKING_PATH}?ref=${booking.bookingRef}&email=${encodeURIComponent(booking.clientEmail)}`;
   
+  // Determine if payment is already completed or pending
+  const isPaid = booking.paymentStatus === 'Paid';
+  const isAdminBooking = booking.createdBy === 'Admin';
+  
   const content = `
-    <h2>🎉 Your Shoot is Reserved!</h2>
+    <h2>🎉 Your Shoot is ${isPaid ? 'Confirmed' : 'Reserved'}!</h2>
     <p>Hi ${booking.clientName},</p>
     <p>Great news! Your booking has been confirmed. We're looking forward to capturing amazing content for you.</p>
 
@@ -193,10 +197,21 @@ async function sendBookingConfirmation(booking) {
       </div>
     </div>
 
-    <div class="alert alert-warning">
-      <strong>💳 Payment After Shoot</strong><br>
-      We'll charge your card automatically once your content enters the editing stage.
-    </div>
+    ${isPaid ? `
+      <div class="alert alert-success">
+        <strong>✅ Payment Complete</strong><br>
+        Your payment of £${booking.totalPrice.toFixed(2)} has been received. You're all set!
+      </div>
+    ` : `
+      <div class="alert alert-warning">
+        <strong>💳 Payment ${isAdminBooking ? 'Pending' : 'After Shoot'}</strong><br>
+        ${isAdminBooking 
+          ? 'Payment will be collected as arranged.' 
+          : booking.cardLast4 
+            ? `We'll charge your card ending in ${booking.cardLast4} automatically once your content enters the editing stage.`
+            : 'We\'ll charge your card automatically once your content enters the editing stage.'}
+      </div>
+    `}
 
     <center>
       <a href="${manageUrl}" class="button">Manage Your Booking</a>
@@ -212,7 +227,7 @@ async function sendBookingConfirmation(booking) {
       <li><strong>${booking.mediaSpecialist}</strong> will arrive at your property at ${booking.time}</li>
       <li>The shoot will take approximately ${Math.floor(booking.duration / 60)} hour${booking.duration >= 120 ? 's' : ''}</li>
       <li>You'll receive your edited content within 48 hours</li>
-      <li>Payment will be collected automatically after your shoot</li>
+      ${!isPaid ? '<li>Payment will be collected automatically after your shoot</li>' : ''}
     </ul>
 
     <h3>Preparing for Your Shoot</h3>
@@ -229,13 +244,75 @@ async function sendBookingConfirmation(booking) {
 
   const emailHtml = getEmailLayout(content);
 
+  // Send to customer with BCC to office
   await resend.emails.send({
     from: FROM_EMAIL,
     to: booking.clientEmail,
-    bcc: BCC_EMAIL,
-    subject: `Booking Confirmed - ${booking.bookingRef}`,
+    bcc: BCC_EMAIL, // ✅ This ensures you ALWAYS get a copy
+    subject: `Booking ${isPaid ? 'Confirmed' : 'Reserved'} - ${booking.bookingRef}`,
     html: emailHtml
   });
+
+  // ✅ ADDITIONAL: Send internal notification to office for admin bookings
+  if (isAdminBooking) {
+    const internalContent = `
+      <h2>🔔 New Admin Booking Created</h2>
+      <p><strong>Admin created a new booking:</strong></p>
+
+      <div class="booking-details">
+        <div class="booking-details">
+      <div class="detail-row">
+        <span class="detail-label">Booking Reference</span>
+        <span class="detail-value">${booking.bookingRef}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Service</span>
+        <span class="detail-value">${booking.service}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Date & Time</span>
+        <span class="detail-value">${formatDate(booking.date)} at ${booking.time}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Property Address</span>
+        <span class="detail-value">${booking.propertyAddress}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Your Media Specialist</span>
+        <span class="detail-value">${booking.mediaSpecialist}</span>
+      </div>
+      ${booking.discountCode && booking.discountAmount > 0 ? `
+      <div class="detail-row">
+        <span class="detail-label">Discount (${booking.discountCode})</span>
+        <span class="detail-value" style="color: #10b981;">-£${booking.discountAmount.toFixed(2)}</span>
+      </div>
+      ` : ''}
+      <div class="detail-row">
+        <span class="detail-label">Total Amount</span>
+        <span class="detail-value">£${booking.totalPrice.toFixed(2)}</span>
+      </div>
+    </div>
+        <div class="detail-row">
+          <span class="detail-label">Payment Status</span>
+          <span class="detail-value">${booking.paymentStatus}</span>
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        <strong>📧 Customer email sent:</strong> Yes<br>
+        <strong>💳 Payment:</strong> ${booking.paymentStatus}
+      </div>
+    `;
+
+    const internalEmailHtml = getEmailLayout(internalContent);
+
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: BCC_EMAIL, // Send directly to office
+      subject: `[ADMIN BOOKING] ${booking.bookingRef} - ${booking.clientName}`,
+      html: internalEmailHtml
+    });
+  }
 }
 
 // 2. Payment Confirmation (Stripe)

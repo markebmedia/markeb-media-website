@@ -411,10 +411,60 @@
       position: relative;
     }
 
-    /* Day View */
-    .calendar-grid.day {
-      grid-template-columns: 80px 1fr;
-    }
+   /* Day View */
+.calendar-grid.day {
+  grid-template-columns: 80px 1fr;
+}
+
+/* Monthly Booking Counter */
+.calendar-booking-counter {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 2px solid #3b82f6;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.calendar-booking-counter-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.calendar-booking-counter-label {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+@media (max-width: 768px) {
+  .calendar-booking-counter {
+    padding: 12px;
+  }
+  
+  .calendar-booking-counter-value {
+    font-size: 24px;
+  }
+  
+  .calendar-booking-counter-label {
+    font-size: 13px;
+  }
+}
+
+/* Drive Time Badge */
+.drive-time-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #dbeafe;
+  color: #1e40af;
+}
 
     /* Drive Time Badge */
     .drive-time-badge {
@@ -1539,6 +1589,238 @@
     padding: 14px 16px;
   }
 }
+  /* ===== ENHANCED MOBILE STYLING FROM DASHBOARD ===== */
+
+/* Prevent zoom on input focus (iOS) */
+@media (max-width: 768px) {
+  input, select, textarea, button {
+    font-size: 16px !important; /* Prevents iOS zoom */
+  }
+}
+
+/* Touch-friendly tap targets */
+@media (pointer: coarse) {
+  .nav-item, .btn, .action-item, .filter-select, .filter-input {
+    min-height: 44px;
+    padding: 14px 20px;
+  }
+  
+  .btn-small {
+    min-height: 40px;
+    padding: 8px 14px;
+  }
+}
+
+/* Improved mobile header */
+@media (max-width: 768px) {
+  .admin-header {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    padding: 16px 20px;
+  }
+
+  .admin-title {
+    font-size: clamp(20px, 5.5vw, 24px);
+  }
+
+  .admin-subtitle {
+    font-size: 14px;
+  }
+
+  .admin-badge {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+/* Improved mobile sidebar */
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    width: 280px; /* Slightly wider on mobile for better touch targets */
+  }
+  
+  .nav-item {
+    padding: 14px 12px;
+    font-size: 15px;
+    gap: 14px;
+  }
+}
+
+/* Better calendar controls on mobile */
+@media (max-width: 480px) {
+  .calendar-header {
+    padding: 12px;
+  }
+
+  .calendar-nav {
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .calendar-current {
+    font-size: 14px;
+    min-width: 120px;
+  }
+
+  .btn.btn-small {
+    padding: 8px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+}
+
+/* Improved form inputs on mobile */
+@media (max-width: 768px) {
+  .form-input,
+  .filter-input,
+  .filter-select,
+  .region-select {
+    width: 100%;
+    min-width: 100%;
+    font-size: 16px; /* Prevent zoom */
+    padding: 14px 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* Better modal sizing on mobile */
+@media (max-width: 480px) {
+  .modal {
+    padding: 0;
+    align-items: flex-start;
+  }
+
+  .modal-dialog {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  .modal-header {
+    padding: 12px;
+    border-radius: 0;
+  }
+
+  .modal-header h3 {
+    font-size: 18px;
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+
+  .modal-body {
+    padding: 12px;
+  }
+
+  .detail-item {
+    padding: 10px 0;
+    font-size: 13px;
+  }
+}
+
+/* Better discount code form on mobile */
+@media (max-width: 768px) {
+  .button-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .button-group .btn {
+    width: 100%;
+  }
+
+  #serviceCheckboxes {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Improve stats grid on very small screens */
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+}
+
+/* Better data table on mobile */
+@media (max-width: 768px) {
+  .data-table {
+    font-size: 13px;
+  }
+
+  .data-table td {
+    padding: 6px 0;
+  }
+
+  .data-table td:before {
+    font-size: 10px;
+  }
+
+  /* Action buttons in mobile table view */
+  .data-table td[data-label="Actions"] {
+    padding-left: 0 !important;
+  }
+
+  .data-table td[data-label="Actions"] > div {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .data-table td[data-label="Actions"] .btn {
+    width: 100%;
+  }
+}
+
+/* Safe area insets for iOS */
+@media (max-width: 480px) {
+  .admin-sidebar {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .admin-main {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Prevent text from being too small */
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+
+  .admin-section {
+    font-size: 14px;
+  }
+
+  small, .small {
+    font-size: 12px;
+  }
+}
   </style>
 </head>
 <body>
@@ -1619,6 +1901,13 @@
         Pending (Need Payment)
       </div>
     </div>
+    <div class="nav-section">
+  <div class="nav-section-title">Marketing</div>
+  <div class="nav-item" onclick="showSection('discount-codes')">
+    <span class="nav-icon">🎁</span>
+    Discount Codes
+  </div>
+</div>
 
     <div class="nav-section">
       <div class="nav-section-title">Customers</div>
@@ -1717,6 +2006,34 @@
   <div class="form-group">
     <label class="form-label">Customer Email *</label>
     <input type="email" id="bookingClientEmail" class="form-input" required>
+  </div>
+</div>
+
+<!-- Discount Codes Section -->
+<div class="admin-section" id="discount-codes">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Discount Codes</h2>
+      <p style="color: #64748b; font-size: 14px;">Create and manage promotional discount codes</p>
+    </div>
+    <button class="btn btn-primary" onclick="showCreateDiscountModal()">
+      ➕ Create Discount Code
+    </button>
+  </div>
+
+  <div class="filters-bar">
+    <select class="filter-select" id="discountStatusFilter" onchange="loadDiscountCodes()">
+      <option value="">All Status</option>
+      <option value="Active">Active</option>
+      <option value="Inactive">Inactive</option>
+    </select>
+    <button class="btn btn-primary" onclick="loadDiscountCodes()">🔄 Refresh</button>
+  </div>
+
+  <div class="calendar-container" id="discountCodesContainer">
+    <div style="text-align: center; padding: 40px;">
+      <div class="spinner"></div>
+    </div>
   </div>
 </div>
 
@@ -1985,6 +2302,177 @@
     </div>
     <div class="modal-body" id="modifyServiceModalBody">
       <!-- Content populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<!-- Create/Edit Discount Code Modal -->
+<div class="modal" id="discountModal" onclick="closeModal('discountModal')">
+  <div class="modal-dialog" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 id="discountModalTitle">Create Discount Code</h3>
+      <button class="modal-close" onclick="closeModal('discountModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="discountForm" onsubmit="saveDiscountCode(event)">
+        
+        <!-- Code -->
+        <div class="form-group">
+          <label class="form-label" for="discountCode">Discount Code *</label>
+          <input 
+            type="text" 
+            id="discountCode" 
+            class="form-input" 
+            placeholder="e.g. SUMMER25"
+            style="text-transform: uppercase;"
+            maxlength="20"
+            required
+          />
+          <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+            Use uppercase letters and numbers only. No spaces.
+          </div>
+        </div>
+
+        <!-- Discount Type & Value -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="discountType">Discount Type *</label>
+            <select id="discountType" class="form-input" required onchange="updateDiscountValueLabel()">
+              <option value="">-- Select Type --</option>
+              <option value="Percentage">Percentage Off</option>
+              <option value="Fixed Amount">Fixed Amount Off</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="discountValue">
+              <span id="discountValueLabel">Discount Value *</span>
+            </label>
+            <input 
+              type="number" 
+              id="discountValue" 
+              class="form-input" 
+              placeholder="e.g. 25"
+              min="0"
+              step="0.01"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Status -->
+        <div class="form-group">
+          <label class="form-label" for="discountStatus">Status *</label>
+          <select id="discountStatus" class="form-input" required>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+
+        <!-- Valid From & Until -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="validFrom">Valid From</label>
+            <input 
+              type="date" 
+              id="validFrom" 
+              class="form-input"
+            />
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="validUntil">Valid Until</label>
+            <input 
+              type="date" 
+              id="validUntil" 
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <!-- Max Uses -->
+        <div class="form-group">
+          <label class="form-label" for="maxUses">Max Total Uses</label>
+          <input 
+            type="number" 
+            id="maxUses" 
+            class="form-input" 
+            placeholder="Leave blank for unlimited"
+            min="1"
+          />
+          <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+            Total number of times this code can be used across all customers
+          </div>
+        </div>
+
+        <!-- Min Purchase -->
+        <div class="form-group">
+          <label class="form-label" for="minPurchase">Minimum Purchase (£)</label>
+          <input 
+            type="number" 
+            id="minPurchase" 
+            class="form-input" 
+            placeholder="e.g. 100.00"
+            min="0"
+            step="0.01"
+          />
+          <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+            Minimum booking value required to use this code
+          </div>
+        </div>
+
+        <!-- Applicable Regions -->
+        <div class="form-group">
+          <label class="form-label">Applicable Regions</label>
+          <div style="display: flex; gap: 16px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" value="North" class="region-checkbox" style="width: 18px; height: 18px;">
+              <span>North</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" value="South" class="region-checkbox" style="width: 18px; height: 18px;">
+              <span>South</span>
+            </label>
+          </div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+            Leave unchecked for all regions
+          </div>
+        </div>
+
+        <!-- Applicable Services -->
+        <div class="form-group">
+          <label class="form-label">Applicable Services</label>
+          <div id="serviceCheckboxes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+            <!-- Populated dynamically -->
+          </div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+            Leave unchecked for all services
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group">
+          <label class="form-label" for="discountNotes">Internal Notes</label>
+          <textarea 
+            id="discountNotes" 
+            class="form-input" 
+            rows="3"
+            placeholder="e.g. Summer promotion 2025"
+          ></textarea>
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="button-group" style="margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('discountModal')" style="flex: 1;">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" id="saveDiscountBtn" style="flex: 2;">
+            <div class="loading-spinner"></div>
+            <span>Create Discount Code</span>
+          </button>
+        </div>
+
+      </form>
     </div>
   </div>
 </div>
@@ -2586,84 +3074,98 @@ function populateCustomerDetails() {
 }
 
     // Form submission
-    document.getElementById('adminBookingForm')?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const serviceSelect = document.getElementById('bookingService');
-      const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
-      
-      if (!selectedOption || !selectedOption.value) {
-        alert('Please select a service');
-        return;
-      }
+document.getElementById('adminBookingForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const serviceSelect = document.getElementById('bookingService');
+  const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+  
+  if (!selectedOption || !selectedOption.value) {
+    alert('Please select a service');
+    return;
+  }
 
-      const formData = {
-        clientName: document.getElementById('bookingClientName').value,
-        clientEmail: document.getElementById('bookingClientEmail').value,
-        region: document.getElementById('bookingRegion').value,
-        serviceId: selectedOption.value,
-        serviceName: selectedOption.dataset.name,
-        servicePrice: parseFloat(selectedOption.dataset.price),
-        serviceDuration: parseInt(selectedOption.dataset.duration),
-        bedrooms: bookingFormData.bedrooms,
-        addons: bookingFormData.selectedAddons.map(id => ({
-          id,
-          name: ADDONS_CATALOG[id]?.name,
-          price: ADDONS_CATALOG[id]?.price
-        })),
-        propertyAddress: document.getElementById('bookingAddress').value,
-        postcode: document.getElementById('bookingPostcode').value,
-        accessInstructions: document.getElementById('bookingAccess').value || '',
-        date: document.getElementById('bookingDate').value,
-        time: document.getElementById('bookingTime').value,
-        paymentStatus: document.getElementById('bookingPaymentStatus').value,
-        createdBy: 'Admin'
-      };
+  // In admin-panel.html, modify the form submission:
+  const formData = {
+    clientName: document.getElementById('bookingClientName').value,
+    clientEmail: document.getElementById('bookingClientEmail').value,
+    region: document.getElementById('bookingRegion').value,
+    
+    // ✅ Match create-booking.js expectations
+    service: selectedOption.dataset.name,
+    serviceId: selectedOption.value,
+    basePrice: parseFloat(selectedOption.dataset.price),
+    duration: parseInt(selectedOption.dataset.duration),
+    
+    bedrooms: bookingFormData.bedrooms,
+    extraBedroomFee: Math.max(0, bookingFormData.bedrooms - 4) * 30,
+    
+    addons: bookingFormData.selectedAddons.map(id => ({
+      id,
+      name: ADDONS_CATALOG[id]?.name,
+      price: ADDONS_CATALOG[id]?.price
+    })),
+    addonsPrice: bookingFormData.selectedAddons.reduce((sum, id) => 
+      sum + (ADDONS_CATALOG[id]?.price || 0), 0
+    ),
+    
+    propertyAddress: document.getElementById('bookingAddress').value,
+    postcode: document.getElementById('bookingPostcode').value,
+    accessInstructions: document.getElementById('bookingAccess').value || '',
+    
+    date: document.getElementById('bookingDate').value,
+    time: document.getElementById('bookingTime').value,
+    
+    // ✅ Add missing fields
+    mediaSpecialist: formData.region === 'North' ? 'Jodie' : 'Abbie/Maeve',
+    clientPhone: '', // Admin bookings might not have this
+    
+    // ✅ NEW: Add discount fields
+    discountCode: bookingFormData.discountCode || '',
+    discountAmount: bookingFormData.discountAmount || 0,
+    priceBeforeDiscount: bookingFormData.priceBeforeDiscount || bookingFormData.totalPrice,
+    totalPrice: bookingFormData.totalPrice,
+    
+    paymentStatus: document.getElementById('bookingPaymentStatus').value,
+    createdBy: 'Admin'
+  };
 
-      if (!confirm(`Create booking for ${formData.clientName}?\n\nService: ${formData.serviceName}\nDate: ${formData.date} at ${formData.time}`)) {
-        return;
-      }
+  if (!confirm(`Create booking for ${formData.clientName}?\n\nService: ${formData.service}\nDate: ${formData.date} at ${formData.time}`)) {
+    return;
+  }
 
-      const btn = e.target.querySelector('button[type="submit"]');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '⏳ Creating...';
-      btn.disabled = true;
+  const btn = e.target.querySelector('button[type="submit"]');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '⏳ Creating...';
+  btn.disabled = true;
 
-      try {
-        const response = await fetch('/.netlify/functions/create-booking', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          alert(`✅ Booking created successfully!\n\nReference: ${data.bookingReference}`);
-          resetBookingForm();
-          loadBookings();
-          loadCalendar();
-          loadDashboardStats();
-        } else {
-          alert(`❌ Error: ${data.error}`);
-          btn.innerHTML = originalText;
-          btn.disabled = false;
-        }
-      } catch (error) {
-        console.error('Booking creation error:', error);
-        alert('❌ Failed to create booking');
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-      }
+  try {
+    const response = await fetch('/.netlify/functions/create-booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
     });
 
-    function resetBookingForm() {
-      document.getElementById('adminBookingForm').reset();
-      bookingFormData = { bedrooms: 4, selectedAddons: [] };
-      document.getElementById('bookingBedroomCount').textContent = '4';
-      document.getElementById('bookingPriceBreakdown').style.display = 'none';
-      document.getElementById('availabilityResults').style.display = 'none';
+    const data = await response.json();
+
+    if (data.success) {
+      alert(`✅ Booking created successfully!\n\nReference: ${data.bookingRef}`);
+      resetBookingForm();
+      loadBookings();
+      loadCalendar();
+      loadDashboardStats();
+    } else {
+      alert(`❌ Error: ${data.error}`);
+      btn.innerHTML = originalText;
+      btn.disabled = false;
     }
+  } catch (error) {
+    console.error('Booking creation error:', error);
+    alert('❌ Failed to create booking');
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+});
 
     // ===== END ADMIN BOOKING CREATION =====
 
@@ -2832,57 +3334,66 @@ function populateCustomerDetails() {
     }
 
     function renderMonthView(bookings) {
-      const grid = document.getElementById('calendarGrid');
-      const year = currentDate.getFullYear();
-      const month = currentDate.getMonth();
-      
-      const firstDay = new Date(year, month, 1);
-      const lastDay = new Date(year, month + 1, 0);
-      const daysInMonth = lastDay.getDate();
-      const startingDayOfWeek = firstDay.getDay() || 7; // 1=Monday, 7=Sunday
+  const grid = document.getElementById('calendarGrid');
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+  const startingDayOfWeek = firstDay.getDay() || 7; // 1=Monday, 7=Sunday
 
-      let html = '<div class="calendar-grid month">';
-      
-      // Day headers
-      ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(day => {
-        html += `<div class="calendar-day-header">${day}</div>`;
-      });
+  // Calculate total bookings
+  const totalBookings = bookings.length;
 
-      // Empty cells before first day
-      for (let i = 1; i < startingDayOfWeek; i++) {
-        html += '<div class="calendar-day other-month"></div>';
-      }
+  let html = `
+    <div class="calendar-booking-counter">
+      <span class="calendar-booking-counter-value">${totalBookings}</span>
+      <span class="calendar-booking-counter-label">booking${totalBookings !== 1 ? 's' : ''} this month</span>
+    </div>
+    
+    <div class="calendar-grid month">
+  `;
+  
+  // Day headers
+  ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(day => {
+    html += `<div class="calendar-day-header">${day}</div>`;
+  });
 
-      // Days of month
-      for (let day = 1; day <= daysInMonth; day++) {
-        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const dayBookings = bookings.filter(b => b.fields['Date'] === dateStr);
-        
-        const today = new Date();
-        const isToday = dateStr === today.toISOString().split('T')[0];
-        
-        html += `<div class="calendar-day ${isToday ? 'today' : ''}">`;
-        html += `<div class="calendar-day-number">${day}</div>`;
-        
-        dayBookings.forEach(booking => {
-       const paymentStatus = booking.fields['Payment Status'] || 'Pending';
+  // Empty cells before first day
+  for (let i = 1; i < startingDayOfWeek; i++) {
+    html += '<div class="calendar-day other-month"></div>';
+  }
 
-const statusClass =
-  booking.fields['Booking Status'] === 'Cancelled'
-    ? 'cancelled'
-    : paymentStatus === 'Pending'
-    ? 'pending'
-    : '';
+  // Days of month
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dayBookings = bookings.filter(b => b.fields['Date'] === dateStr);
+    
+    const today = new Date();
+    const isToday = dateStr === today.toISOString().split('T')[0];
+    
+    html += `<div class="calendar-day ${isToday ? 'today' : ''}">`;
+    html += `<div class="calendar-day-number">${day}</div>`;
+    
+    dayBookings.forEach(booking => {
+      const paymentStatus = booking.fields['Payment Status'] || 'Pending';
+      const statusClass =
+        booking.fields['Booking Status'] === 'Cancelled'
+          ? 'cancelled'
+          : paymentStatus === 'Pending'
+          ? 'pending'
+          : '';
 
-          html += `<div class="calendar-booking ${statusClass}" onclick="viewBookingById('${booking.id}')">${booking.fields['Time']} ${booking.fields['Client Name']}</div>`;
-        });
-        
-        html += '</div>';
-      }
+      html += `<div class="calendar-booking ${statusClass}" onclick="viewBookingById('${booking.id}')">${booking.fields['Time']} ${booking.fields['Client Name']}</div>`;
+    });
+    
+    html += '</div>';
+  }
 
-      html += '</div>';
-      grid.innerHTML = html;
-    }
+  html += '</div>';
+  grid.innerHTML = html;
+}
 
     function renderWeekView(bookings) {
       const grid = document.getElementById('calendarGrid');
@@ -4461,6 +4972,375 @@ async function confirmModifyService(bookingId) {
         }
       });
     }
+
+    // ===== DISCOUNT CODES MANAGEMENT =====
+
+let allDiscountCodes = [];
+let currentDiscountCode = null;
+
+// All available service IDs
+const ALL_SERVICE_IDS = [
+  'complete-branding',
+  'branding-video',
+  'branding-photo',
+  'gold-package',
+  'silver-package',
+  'all-in-one-drone',
+  'property-video',
+  'property-photo',
+  'drone-video',
+  'drone-photo',
+  'property-speed-tours'
+];
+
+// Load Discount Codes
+async function loadDiscountCodes() {
+  const container = document.getElementById('discountCodesContainer');
+  container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+
+  try {
+    const statusFilter = document.getElementById('discountStatusFilter')?.value || '';
+    
+    let filterFormula = '';
+    if (statusFilter) {
+      filterFormula = `{Status} = "${statusFilter}"`;
+    }
+    
+    const url = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_TABLE}${filterFormula ? `?filterByFormula=${encodeURIComponent(filterFormula)}` : ''}`;
+
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        method: 'GET',
+        url: url
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.records) {
+      allDiscountCodes = data.records;
+      renderDiscountCodesTable(allDiscountCodes);
+    }
+
+  } catch (error) {
+    console.error('Error loading discount codes:', error);
+    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading discount codes</div>';
+  }
+}
+
+// Render Discount Codes Table
+function renderDiscountCodesTable(codes) {
+  const container = document.getElementById('discountCodesContainer');
+  
+  if (codes.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 60px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">🎁</div>
+        <h3 style="color: #64748b; margin-bottom: 8px;">No Discount Codes Yet</h3>
+        <p style="color: #94a3b8;">Create your first discount code to get started</p>
+      </div>
+    `;
+    return;
+  }
+
+  let html = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Type</th>
+          <th>Value</th>
+          <th>Status</th>
+          <th>Valid Period</th>
+          <th>Usage</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  codes.forEach(code => {
+    const fields = code.fields;
+    const discountType = fields['Discount Type'];
+    const discountValue = fields['Discount Value'];
+    const status = fields['Status'];
+    const maxUses = fields['Max Uses'] || '∞';
+    const timesUsed = fields['Times Used'] || 0;
+    
+    const validFrom = fields['Valid From'] ? new Date(fields['Valid From']).toLocaleDateString('en-GB') : '-';
+    const validUntil = fields['Valid Until'] ? new Date(fields['Valid Until']).toLocaleDateString('en-GB') : '-';
+    
+    const discountDisplay = discountType === 'Percentage' 
+      ? `${discountValue}% off` 
+      : `£${discountValue.toFixed(2)} off`;
+    
+    const usagePercent = maxUses !== '∞' ? Math.round((timesUsed / maxUses) * 100) : 0;
+    
+    html += `
+      <tr>
+        <td data-label="Code">
+          <strong style="font-size: 16px; font-family: monospace;">${fields['Code']}</strong>
+        </td>
+        <td data-label="Type">
+          <span class="status-badge" style="background: #dbeafe; color: #1e40af;">
+            ${discountType}
+          </span>
+        </td>
+        <td data-label="Value">
+          <strong>${discountDisplay}</strong>
+        </td>
+        <td data-label="Status">
+          <span class="status-badge status-${status.toLowerCase()}">
+            ${status}
+          </span>
+        </td>
+        <td data-label="Valid Period">
+          ${validFrom}<br>to ${validUntil}
+        </td>
+        <td data-label="Usage">
+          <div style="margin-bottom: 4px;">${timesUsed} / ${maxUses}</div>
+          ${maxUses !== '∞' ? `
+            <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
+              <div style="background: ${usagePercent >= 90 ? '#ef4444' : usagePercent >= 70 ? '#f59e0b' : '#10b981'}; height: 100%; width: ${usagePercent}%;"></div>
+            </div>
+          ` : ''}
+        </td>
+        <td data-label="Actions">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-primary btn-small" onclick="editDiscountCode('${code.id}')">
+              ✏️ Edit
+            </button>
+            <button class="btn btn-danger btn-small" onclick="deleteDiscountCode('${code.id}', '${fields['Code']}')">
+              🗑️ Delete
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// Show Create Discount Modal
+function showCreateDiscountModal() {
+  currentDiscountCode = null;
+  
+  document.getElementById('discountModalTitle').textContent = 'Create Discount Code';
+  document.getElementById('saveDiscountBtn').querySelector('span').textContent = 'Create Discount Code';
+  
+  // Reset form
+  document.getElementById('discountForm').reset();
+  
+  // Populate service checkboxes
+  populateServiceCheckboxes();
+  
+  // Show modal
+  document.getElementById('discountModal').classList.add('active');
+}
+
+// Populate Service Checkboxes
+function populateServiceCheckboxes() {
+  const container = document.getElementById('serviceCheckboxes');
+  
+  const serviceNames = {
+    'complete-branding': 'Complete Branding Package',
+    'branding-video': 'Branding Video',
+    'branding-photo': 'Branding Photo',
+    'gold-package': 'Gold Package',
+    'silver-package': 'Silver Package',
+    'all-in-one-drone': 'All In One Drone',
+    'property-video': 'Property Video',
+    'property-photo': 'Property Photo',
+    'drone-video': 'Drone Video',
+    'drone-photo': 'Drone Photo',
+    'property-speed-tours': 'Property Speed Tours'
+  };
+  
+  container.innerHTML = ALL_SERVICE_IDS.map(serviceId => `
+    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+      <input type="checkbox" value="${serviceId}" class="service-checkbox" style="width: 18px; height: 18px;">
+      <span style="font-size: 13px;">${serviceNames[serviceId] || serviceId}</span>
+    </label>
+  `).join('');
+}
+
+// Update Discount Value Label
+function updateDiscountValueLabel() {
+  const type = document.getElementById('discountType').value;
+  const label = document.getElementById('discountValueLabel');
+  
+  if (type === 'Percentage') {
+    label.textContent = 'Percentage (%) *';
+    document.getElementById('discountValue').placeholder = 'e.g. 25';
+    document.getElementById('discountValue').max = '100';
+  } else if (type === 'Fixed Amount') {
+    label.textContent = 'Amount (£) *';
+    document.getElementById('discountValue').placeholder = 'e.g. 50.00';
+    document.getElementById('discountValue').removeAttribute('max');
+  } else {
+    label.textContent = 'Discount Value *';
+  }
+}
+
+// Save Discount Code
+async function saveDiscountCode(event) {
+  event.preventDefault();
+  
+  const btn = document.getElementById('saveDiscountBtn');
+  const originalText = btn.querySelector('span').textContent;
+  btn.disabled = true;
+  btn.classList.add('loading');
+  
+  try {
+    // Get form values
+    const code = document.getElementById('discountCode').value.trim().toUpperCase();
+    const type = document.getElementById('discountType').value;
+    const value = parseFloat(document.getElementById('discountValue').value);
+    const status = document.getElementById('discountStatus').value;
+    const validFrom = document.getElementById('validFrom').value || null;
+    const validUntil = document.getElementById('validUntil').value || null;
+    const maxUses = document.getElementById('maxUses').value ? parseInt(document.getElementById('maxUses').value) : null;
+    const minPurchase = document.getElementById('minPurchase').value ? parseFloat(document.getElementById('minPurchase').value) : null;
+    const notes = document.getElementById('discountNotes').value.trim();
+    
+    // Get selected regions
+    const selectedRegions = Array.from(document.querySelectorAll('.region-checkbox:checked')).map(cb => cb.value);
+    
+    // Get selected services
+    const selectedServices = Array.from(document.querySelectorAll('.service-checkbox:checked')).map(cb => cb.value);
+    
+    // Prepare Airtable record
+    const fields = {
+      'Code': code,
+      'Discount Type': type,
+      'Discount Value': value,
+      'Status': status,
+      'Times Used': currentDiscountCode ? undefined : 0 // Only set on create
+    };
+    
+    if (validFrom) fields['Valid From'] = validFrom;
+    if (validUntil) fields['Valid Until'] = validUntil;
+    if (maxUses) fields['Max Uses'] = maxUses;
+    if (minPurchase) fields['Min Purchase'] = minPurchase;
+    if (notes) fields['Notes'] = notes;
+    if (selectedRegions.length > 0) fields['Applicable Regions'] = selectedRegions;
+    if (selectedServices.length > 0) fields['Applicable Services'] = selectedServices;
+    
+    let url, method;
+    if (currentDiscountCode) {
+      // Update existing
+      url = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_TABLE}/${currentDiscountCode}`;
+      method = 'PATCH';
+    } else {
+      // Create new
+      url = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_TABLE}`;
+      method = 'POST';
+    }
+    
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: method,
+        url: url,
+        body: { fields }
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to save discount code');
+    }
+    
+    alert(`✅ Discount code "${code}" ${currentDiscountCode ? 'updated' : 'created'} successfully!`);
+    closeModal('discountModal');
+    loadDiscountCodes();
+    
+  } catch (error) {
+    console.error('Error saving discount code:', error);
+    alert('❌ Failed to save discount code');
+  }
+  
+  btn.disabled = false;
+  btn.classList.remove('loading');
+  btn.querySelector('span').textContent = originalText;
+}
+
+// Edit Discount Code
+function editDiscountCode(codeId) {
+  const code = allDiscountCodes.find(c => c.id === codeId);
+  if (!code) return;
+  
+  currentDiscountCode = codeId;
+  const fields = code.fields;
+  
+  document.getElementById('discountModalTitle').textContent = 'Edit Discount Code';
+  document.getElementById('saveDiscountBtn').querySelector('span').textContent = 'Update Discount Code';
+  
+  // Populate form
+  document.getElementById('discountCode').value = fields['Code'];
+  document.getElementById('discountType').value = fields['Discount Type'];
+  document.getElementById('discountValue').value = fields['Discount Value'];
+  document.getElementById('discountStatus').value = fields['Status'];
+  document.getElementById('validFrom').value = fields['Valid From'] || '';
+  document.getElementById('validUntil').value = fields['Valid Until'] || '';
+  document.getElementById('maxUses').value = fields['Max Uses'] || '';
+  document.getElementById('minPurchase').value = fields['Min Purchase'] || '';
+  document.getElementById('discountNotes').value = fields['Notes'] || '';
+  
+  updateDiscountValueLabel();
+  
+  // Populate service checkboxes
+  populateServiceCheckboxes();
+  
+  // Check applicable regions
+  const applicableRegions = fields['Applicable Regions'] || [];
+  document.querySelectorAll('.region-checkbox').forEach(cb => {
+    cb.checked = applicableRegions.includes(cb.value);
+  });
+  
+  // Check applicable services
+  const applicableServices = fields['Applicable Services'] || [];
+  document.querySelectorAll('.service-checkbox').forEach(cb => {
+    cb.checked = applicableServices.includes(cb.value);
+  });
+  
+  document.getElementById('discountModal').classList.add('active');
+}
+
+// Delete Discount Code
+async function deleteDiscountCode(codeId, codeName) {
+  if (!confirm(`Delete discount code "${codeName}"?\n\nThis action cannot be undone.`)) {
+    return;
+  }
+  
+  try {
+    const url = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_TABLE}/${codeId}`;
+    
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'DELETE',
+        url: url
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to delete discount code');
+    }
+    
+    alert(`✅ Discount code "${codeName}" deleted successfully!`);
+    loadDiscountCodes();
+    
+  } catch (error) {
+    console.error('Error deleting discount code:', error);
+    alert('❌ Failed to delete discount code');
+  }
+}
   </script>
 </body>
 </html>

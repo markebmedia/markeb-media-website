@@ -728,6 +728,47 @@
           <div style="font-size: 12px; color: #94a3b8; text-align: right; margin-top: 4px;">Inc. VAT</div>
         </div>
 
+        <!-- Discount Code Section -->
+<div id="discountSection" style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px; padding: 20px; margin-bottom: 28px; display: none;">
+  <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 12px;">
+    🎁 Have a Discount Code?
+  </h3>
+  
+  <div style="display: flex; gap: 12px; align-items: start;">
+    <div style="flex: 1;">
+      <input 
+        type="text" 
+        id="discountCodeInput" 
+        class="form-input" 
+        placeholder="Enter code"
+        style="text-transform: uppercase; margin-bottom: 0;"
+      />
+      <div class="error-message" id="discountCodeError"></div>
+      <div id="discountSuccess" style="display: none; margin-top: 8px; color: #065f46; font-size: 13px; font-weight: 600;">
+        ✓ <span id="discountSuccessText"></span>
+      </div>
+    </div>
+    <button 
+      type="button" 
+      class="btn btn-primary" 
+      id="applyDiscountBtn"
+      onclick="applyDiscountCode()"
+      style="width: auto; padding: 14px 24px;"
+    >
+      Apply
+    </button>
+    <button 
+      type="button" 
+      class="btn btn-secondary" 
+      id="removeDiscountBtn"
+      onclick="removeDiscountCode()"
+      style="width: auto; padding: 14px 24px; display: none;"
+    >
+      Remove
+    </button>
+  </div>
+</div>
+
         <div class="button-group">
           <button type="button" class="btn btn-secondary" onclick="goToStep(1)" style="flex: 1;">
             Back
@@ -1879,6 +1920,7 @@
 
       renderAddons();
       calculatePrice();
+      showDiscountSection();
 
       document.getElementById('continueToCalendarBtn').disabled = false;
     }
@@ -2471,6 +2513,156 @@
     });
 
     console.log('Booking Platform with Add-Ons Initialized');
+
+    // Discount code state
+let appliedDiscount = null;
+
+// Show discount section when service is selected
+function showDiscountSection() {
+  if (bookingData.service) {
+    document.getElementById('discountSection').style.display = 'block';
+  }
+}
+
+// Apply Discount Code
+async function applyDiscountCode() {
+  const input = document.getElementById('discountCodeInput');
+  const code = input.value.trim().toUpperCase();
+  const errorMsg = document.getElementById('discountCodeError');
+  const successMsg = document.getElementById('discountSuccess');
+  const applyBtn = document.getElementById('applyDiscountBtn');
+  const removeBtn = document.getElementById('removeDiscountBtn');
+  
+  // Clear previous messages
+  errorMsg.classList.remove('show');
+  successMsg.style.display = 'none';
+  input.classList.remove('error');
+  
+  if (!code) {
+    input.classList.add('error');
+    errorMsg.textContent = 'Please enter a discount code';
+    errorMsg.classList.add('show');
+    return;
+  }
+  
+  // Show loading
+  applyBtn.disabled = true;
+  applyBtn.innerHTML = '<div class="loading-spinner"></div>';
+  
+  try {
+    const response = await fetch('/.netlify/functions/validate-discount-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code: code,
+        totalPrice: bookingData.totalPrice,
+        region: bookingData.region,
+        serviceId: bookingData.service?.id
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // Store discount data
+      appliedDiscount = {
+        code: data.code,
+        discountType: data.discountType,
+        discountValue: data.discountValue,
+        discountAmount: data.discountAmount,
+        originalPrice: data.originalPrice,
+        finalPrice: data.finalPrice,
+        recordId: data.recordId
+      };
+      
+      // Update booking data
+      bookingData.discountCode = data.code;
+      bookingData.discountAmount = data.discountAmount;
+      bookingData.priceBeforeDiscount = data.originalPrice;
+      bookingData.totalPrice = data.finalPrice;
+      
+      // Show success message
+      const discountText = data.discountType === 'Percentage' 
+        ? `${data.discountValue}% off (-£${data.discountAmount.toFixed(2)})`
+        : `£${data.discountAmount.toFixed(2)} off`;
+      
+      document.getElementById('discountSuccessText').textContent = discountText;
+      successMsg.style.display = 'block';
+      input.disabled = true;
+      applyBtn.style.display = 'none';
+      removeBtn.style.display = 'block';
+      
+      // Update price display
+      updatePriceWithDiscount();
+      
+    } else {
+      input.classList.add('error');
+      errorMsg.textContent = data.error;
+      errorMsg.classList.add('show');
+    }
+    
+  } catch (error) {
+    console.error('Error applying discount:', error);
+    input.classList.add('error');
+    errorMsg.textContent = 'Failed to apply discount code';
+    errorMsg.classList.add('show');
+  }
+  
+  applyBtn.disabled = false;
+  applyBtn.innerHTML = 'Apply';
+}
+
+// Remove Discount Code
+function removeDiscountCode() {
+  appliedDiscount = null;
+  bookingData.discountCode = null;
+  bookingData.discountAmount = 0;
+  bookingData.priceBeforeDiscount = 0;
+  
+  // Recalculate original price
+  calculatePrice();
+  
+  // Reset UI
+  document.getElementById('discountCodeInput').value = '';
+  document.getElementById('discountCodeInput').disabled = false;
+  document.getElementById('discountSuccess').style.display = 'none';
+  document.getElementById('applyDiscountBtn').style.display = 'block';
+  document.getElementById('removeDiscountBtn').style.display = 'none';
+  
+  // Remove discount row
+  const discountRow = document.getElementById('discountRow');
+  if (discountRow) discountRow.remove();
+}
+
+// Update Price Display with Discount
+function updatePriceWithDiscount() {
+  if (!appliedDiscount) return;
+  
+  // Add discount row to price breakdown
+  let discountRow = document.getElementById('discountRow');
+  if (!discountRow) {
+    const priceBreakdown = document.getElementById('priceBreakdown');
+    const divider = priceBreakdown.querySelector('[style*="border-top"]');
+    
+    discountRow = document.createElement('div');
+    discountRow.id = 'discountRow';
+    discountRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;';
+    discountRow.innerHTML = `
+      <span style="font-size: 14px; color: #10b981; font-weight: 600;">
+        Discount (${appliedDiscount.code})
+      </span>
+      <span style="font-size: 14px; font-weight: 600; color: #10b981;">
+        -£${appliedDiscount.discountAmount.toFixed(2)}
+      </span>
+    `;
+    
+    priceBreakdown.insertBefore(discountRow, divider);
+  }
+  
+  // Update total price
+  document.getElementById('totalPrice').textContent = `£${appliedDiscount.finalPrice.toFixed(2)}`;
+  document.getElementById('summaryTotal').textContent = `£${appliedDiscount.finalPrice.toFixed(2)}`;
+}
   </script>
 </body>
 </html>

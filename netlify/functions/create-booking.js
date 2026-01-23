@@ -140,8 +140,63 @@ console.log(`Final status - Payment: ${paymentStatus}, Booking: ${bookingStatus}
 
     const addonsPrice = bookingData.addonsPrice || 0;
 
+    // ✅ NEW: Handle discount code
+    let discountCodeId = null;
+    let discountAmount = 0;
+    let priceBeforeDiscount = bookingData.totalPrice;
+    let finalPrice = bookingData.totalPrice;
+
+    if (bookingData.discountCode) {
+      console.log('Discount code applied:', bookingData.discountCode);
+      
+      discountAmount = bookingData.discountAmount || 0;
+      priceBeforeDiscount = bookingData.priceBeforeDiscount || bookingData.totalPrice;
+      finalPrice = bookingData.totalPrice; // Already discounted in frontend
+      
+      // Increment usage count for discount code
+      try {
+        const discountFilterFormula = `UPPER({Code}) = "${bookingData.discountCode.toUpperCase()}"`;
+        const discountUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_TABLE}?filterByFormula=${encodeURIComponent(discountFilterFormula)}`;
+        
+        const discountResponse = await fetch(discountUrl, {
+          headers: {
+            'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
+          }
+        });
+        
+        const discountData = await discountResponse.json();
+        
+        if (discountData.records && discountData.records.length > 0) {
+          const discountRecord = discountData.records[0];
+          discountCodeId = discountRecord.id;
+          const currentUsage = discountRecord.fields['Times Used'] || 0;
+          
+          // Update usage count
+          const updateDiscountUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_TABLE}/${discountCodeId}`;
+          
+          await fetch(updateDiscountUrl, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              fields: {
+                'Times Used': currentUsage + 1
+              }
+            })
+          });
+          
+          console.log(`✓ Discount code usage updated: ${bookingData.discountCode}`);
+        }
+      } catch (discountError) {
+        console.error('Error updating discount code usage:', discountError);
+        // Don't fail the booking if discount update fails
+      }
+    }
+
     // Prepare Airtable record
-    const airtableRecord = {
+const airtableRecord = {
   fields: {
     'Booking Reference': bookingRef,
     'User': [userId],
@@ -159,28 +214,29 @@ console.log(`Final status - Payment: ${paymentStatus}, Booking: ${bookingStatus}
     'Extra Bedroom Fee': bookingData.extraBedroomFee || 0,
     'Add-Ons': addonsText,
     'Add-Ons Price': addonsPrice,
-    'Total Price': bookingData.totalPrice,
+    
+    // ✅ NEW: Discount fields
+    'Discount Code': bookingData.discountCode || '',
+    'Discount Amount': discountAmount,
+    'Price Before Discount': priceBeforeDiscount,
+    'Total Price': finalPrice, // ✅ Changed: now uses discounted price
+    
     'Client Name': bookingData.clientName,
     'Client Email': bookingData.clientEmail,
-    'Client Phone': bookingData.clientPhone || '', // ✅ ADD DEFAULT
+    'Client Phone': bookingData.clientPhone || '',
     'Client Notes': bookingData.clientNotes || '',
-    'Access Instructions': bookingData.accessInstructions || '', // ✅ ADD THIS for admin bookings
+    'Access Instructions': bookingData.accessInstructions || '',
     
-    // ✅ CRITICAL: Set both Booking Status AND Payment Status
     'Booking Status': bookingStatus,
     'Payment Status': paymentStatus,
     
-    // ✅ Store Stripe Payment Method details (for reserved bookings)
     'Stripe Payment Method ID': bookingData.stripePaymentMethodId || '',
     'Cardholder Name': bookingData.cardholderName || '',
     'Card Last 4': bookingData.cardLast4 || '',
     'Card Brand': bookingData.cardBrand || '',
     'Card Expiry': bookingData.cardExpiry || '',
     
-    // ✅ ADD: Track if created by admin
     'Created By': bookingData.createdBy || 'Customer',
-    
-    // Metadata
     'Created Date': new Date().toISOString(),
   }
 };
@@ -209,60 +265,33 @@ console.log(`Final status - Payment: ${paymentStatus}, Booking: ${bookingStatus}
     const airtableResult = await response.json();
     console.log('Booking created successfully:', bookingRef);
 
-    // ✅ NEW: Send confirmation email via Resend
+    // // ✅ Send confirmation email via Resend (for both customer and admin bookings)
     if (process.env.RESEND_API_KEY) {
       try {
-        const { Resend } = require('resend');
-        const resend = new Resend(process.env.RESEND_API_KEY);
+        const { sendBookingConfirmation } = require('./email-service');
 
-        const dateObj = new Date(bookingData.date + 'T12:00:00');
-        const formattedDate = dateObj.toLocaleDateString('en-GB', { 
-          weekday: 'long', 
-          day: 'numeric', 
-          month: 'long', 
-          year: 'numeric' 
-        });
+        const emailData = {
+          bookingRef: bookingRef,
+          clientName: bookingData.clientName,
+          clientEmail: bookingData.clientEmail,
+          service: bookingData.service,
+          date: bookingData.date,
+          time: bookingData.time,
+          propertyAddress: bookingData.propertyAddress,
+          mediaSpecialist: bookingData.mediaSpecialist,
+          totalPrice: finalPrice, // ✅ Changed: use discounted price
+          duration: bookingData.duration,
+          paymentStatus: paymentStatus,
+          bookingStatus: bookingStatus,
+          createdBy: bookingData.createdBy || 'Customer',
+          cardLast4: bookingData.cardLast4 || '',
+          discountCode: bookingData.discountCode || '', // ✅ NEW
+          discountAmount: discountAmount // ✅ NEW
+        };
 
-        await resend.emails.send({
-          from: 'Markeb Media <commercial@markebmedia.com>',
-          to: bookingData.clientEmail,
-          bcc: 'commercial@markebmedia.com',
-          subject: `Booking Confirmed - ${bookingRef}`,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #3b82f6;">Booking Confirmation</h2>
-              
-              <p>Hi ${bookingData.clientName},</p>
-              
-              <p>Your booking has been confirmed! Here are your details:</p>
-              
-              <div style="background: #f8fafc; border-radius: 8px; padding: 20px; margin: 20px 0;">
-                <p><strong>Booking Reference:</strong> ${bookingRef}</p>
-                <p><strong>Service:</strong> ${bookingData.service}</p>
-                <p><strong>Date:</strong> ${formattedDate}</p>
-                <p><strong>Time:</strong> ${bookingData.time}</p>
-                <p><strong>Address:</strong> ${bookingData.propertyAddress}</p>
-                <p><strong>Media Specialist:</strong> ${bookingData.mediaSpecialist}</p>
-                <p><strong>Total:</strong> £${bookingData.totalPrice.toFixed(2)}</p>
-              </div>
-              
-              ${bookingData.paymentOption === 'reserve' && bookingData.cardLast4 ? `
-                <div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 8px; padding: 16px; margin: 20px 0;">
-                  <p style="margin: 0;"><strong>Payment:</strong> Your card ending in ${bookingData.cardLast4} will be charged after we complete your shoot.</p>
-                </div>
-              ` : ''}
-              
-              <p>View your booking in your <a href="https://markebmedia.com/uc-dash.html" style="color: #3b82f6;">dashboard</a>.</p>
-              
-              <p style="color: #64748b;">
-                Best regards,<br>
-                The Markeb Media Team
-              </p>
-            </div>
-          `
-        });
-
+        await sendBookingConfirmation(emailData);
         console.log(`✓ Confirmation email sent to ${bookingData.clientEmail}`);
+
       } catch (emailError) {
         console.error('Error sending confirmation email:', emailError);
         // Don't fail the booking if email fails
