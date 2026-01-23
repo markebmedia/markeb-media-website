@@ -1,6 +1,5 @@
 // netlify/functions/airtable-proxy.js
 // Proxy for Airtable API calls from admin panel
-
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -21,7 +20,25 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { method, url, body } = JSON.parse(event.body);
+    const { method, url, table, recordId, body, filterFormula } = JSON.parse(event.body);
+
+    let finalUrl;
+
+    // NEW: Build URL from table name instead of full URL
+    if (table) {
+      const baseUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env[`AIRTABLE_${table.toUpperCase()}_TABLE`]}`;
+      
+      if (recordId) {
+        finalUrl = `${baseUrl}/${recordId}`;
+      } else if (filterFormula) {
+        finalUrl = `${baseUrl}?filterByFormula=${encodeURIComponent(filterFormula)}`;
+      } else {
+        finalUrl = baseUrl;
+      }
+    } else {
+      // Fallback: use provided URL (for backward compatibility)
+      finalUrl = url;
+    }
 
     const options = {
       method: method,
@@ -35,7 +52,7 @@ exports.handler = async (event, context) => {
       options.body = JSON.stringify(body);
     }
 
-    const response = await fetch(url, options);
+    const response = await fetch(finalUrl, options);
     const data = await response.json();
 
     return {
