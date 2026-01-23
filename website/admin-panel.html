@@ -5163,7 +5163,7 @@ async function loadDiscountCodes() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         method: 'GET',
-        table: 'DISCOUNT',
+        table: 'Discount Codes',
         filterFormula: statusFilter ? `{Status} = "${statusFilter}"` : null
       })
     });
@@ -5388,7 +5388,7 @@ async function saveDiscountCode(event) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         method: currentDiscountCode ? 'PATCH' : 'POST',
-        table: 'DISCOUNT',
+        table: 'Discount Codes',
         recordId: currentDiscountCode || null,
         body: { fields }
       })
@@ -5471,7 +5471,7 @@ async function deleteDiscountCode(codeId, codeName) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         method: 'DELETE',
-        table: 'DISCOUNT',
+        table: 'Discount Codes',
         recordId: codeId
       })
     });

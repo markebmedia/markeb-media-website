@@ -21,12 +21,28 @@ exports.handler = async (event, context) => {
 
   try {
     const { method, url, table, recordId, body, filterFormula } = JSON.parse(event.body);
-
     let finalUrl;
-
-    // NEW: Build URL from table name instead of full URL
+    
+    // Build URL from table name
     if (table) {
-      const baseUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env[`AIRTABLE_${table.toUpperCase()}_TABLE`]}`;
+      // Convert spaces to underscores for env var lookup
+      const envVarName = `AIRTABLE_${table.toUpperCase().replace(/\s+/g, '_')}_TABL`;
+      const tableId = process.env[envVarName];
+      
+      if (!tableId) {
+        console.error(`Table configuration not found: ${envVarName}`);
+        return {
+          statusCode: 500,
+          headers,
+          body: JSON.stringify({ 
+            success: false, 
+            error: `Table configuration not found: ${envVarName}`,
+            hint: `Please add ${envVarName} to your Netlify environment variables`
+          })
+        };
+      }
+      
+      const baseUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${tableId}`;
       
       if (recordId) {
         finalUrl = `${baseUrl}/${recordId}`;
@@ -68,7 +84,8 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({
         success: false,
-        error: 'Proxy request failed'
+        error: 'Proxy request failed',
+        details: error.message
       })
     };
   }
