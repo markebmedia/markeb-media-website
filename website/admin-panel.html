@@ -2092,6 +2092,29 @@
         </div>
       </div>
 
+      <!-- Discount Code -->
+      <div class="form-group">
+        <label class="form-label">Discount Code (Optional)</label>
+        <div style="display: flex; gap: 12px;">
+          <input 
+            type="text" 
+            id="bookingDiscountCode" 
+            class="form-input" 
+            placeholder="Enter discount code"
+            style="flex: 1; text-transform: uppercase;"
+          >
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            onclick="applyAdminDiscount()"
+            style="white-space: nowrap;"
+          >
+            Apply Code
+          </button>
+        </div>
+        <div id="discountMessage" style="margin-top: 8px; font-size: 13px;"></div>
+      </div>
+
       <!-- Payment Options -->
       <div class="form-group">
         <label class="form-label">Payment Status *</label>
@@ -2805,11 +2828,14 @@
 
     // ===== ADMIN BOOKING CREATION =====
     
-    // Booking form state
     let bookingFormData = {
-      bedrooms: 4,
-      selectedAddons: []
-    };
+  bedrooms: 4,
+  selectedAddons: [],
+  discountCode: '',
+  discountAmount: 0,
+  priceBeforeDiscount: 0,
+  totalPrice: 0
+};
 
     // Populate customer dropdown
     function populateCustomerDropdown() {
@@ -2965,44 +2991,188 @@ function populateCustomerDetails() {
     }
 
     function calculateBookingPrice() {
-      const select = document.getElementById('bookingService');
-      const selectedOption = select.options[select.selectedIndex];
+  const select = document.getElementById('bookingService');
+  const selectedOption = select.options[select.selectedIndex];
+  
+  if (!selectedOption || !selectedOption.value) return;
+
+  const servicePrice = parseFloat(selectedOption.dataset.price);
+  const isPropertyService = selectedOption.dataset.property === 'true';
+  
+  const extraBedrooms = isPropertyService ? Math.max(0, bookingFormData.bedrooms - 4) : 0;
+  const bedroomFee = extraBedrooms * 30;
+
+  let addonsFee = 0;
+  bookingFormData.selectedAddons.forEach(addonId => {
+    const addon = ADDONS_CATALOG[addonId];
+    if (addon) addonsFee += addon.price;
+  });
+
+  const subtotal = servicePrice + bedroomFee + addonsFee;
+  
+  // Reset discount when price changes
+  bookingFormData.discountCode = '';
+  bookingFormData.discountAmount = 0;
+  bookingFormData.priceBeforeDiscount = 0;
+  bookingFormData.totalPrice = subtotal;
+  
+  const codeInput = document.getElementById('bookingDiscountCode');
+  const messageDiv = document.getElementById('discountMessage');
+  if (codeInput) codeInput.value = '';
+  if (messageDiv) messageDiv.innerHTML = '';
+  
+  const discountRow = document.getElementById('bookingDiscountRow');
+  if (discountRow) discountRow.style.display = 'none';
+
+  document.getElementById('bookingServicePrice').textContent = `£${servicePrice.toFixed(2)}`;
+  document.getElementById('bookingTotalPrice').textContent = `£${subtotal.toFixed(2)}`;
+
+  const bedroomRow = document.getElementById('bookingBedroomRow');
+  if (bedroomFee > 0) {
+    bedroomRow.style.display = 'flex';
+    document.getElementById('bookingBedroomFee').textContent = `£${bedroomFee.toFixed(2)}`;
+  } else {
+    bedroomRow.style.display = 'none';
+  }
+
+  const addonsRow = document.getElementById('bookingAddonsRow');
+  if (addonsFee > 0) {
+    addonsRow.style.display = 'flex';
+    document.getElementById('bookingAddonsFee').textContent = `£${addonsFee.toFixed(2)}`;
+  } else {
+    addonsRow.style.display = 'none';
+  }
+}
+
+// Apply discount code in admin booking
+async function applyAdminDiscount() {
+  const codeInput = document.getElementById('bookingDiscountCode');
+  const code = codeInput.value.trim().toUpperCase();
+  const messageDiv = document.getElementById('discountMessage');
+  
+  if (!code) {
+    messageDiv.innerHTML = '<span style="color: #ef4444;">❌ Please enter a discount code</span>';
+    return;
+  }
+
+  const serviceSelect = document.getElementById('bookingService');
+  const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
+  
+  if (!selectedOption || !selectedOption.value) {
+    messageDiv.innerHTML = '<span style="color: #ef4444;">❌ Please select a service first</span>';
+    return;
+  }
+
+  const serviceId = selectedOption.value;
+  const region = document.getElementById('bookingRegion').value;
+
+  // Calculate current price
+  const servicePrice = parseFloat(selectedOption.dataset.price);
+  const isPropertyService = selectedOption.dataset.property === 'true';
+  const extraBedrooms = isPropertyService ? Math.max(0, bookingFormData.bedrooms - 4) : 0;
+  const bedroomFee = extraBedrooms * 30;
+  let addonsFee = 0;
+  bookingFormData.selectedAddons.forEach(addonId => {
+    const addon = ADDONS_CATALOG[addonId];
+    if (addon) addonsFee += addon.price;
+  });
+  const subtotal = servicePrice + bedroomFee + addonsFee;
+
+  messageDiv.innerHTML = '<span style="color: #3b82f6;">⏳ Validating code...</span>';
+
+  try {
+    const response = await fetch('/.netlify/functions/validate-discount-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code,
+        serviceId,
+        region,
+        totalPrice: subtotal
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      // Store discount info
+      bookingFormData.discountCode = code;
+      bookingFormData.discountAmount = data.discountAmount;
+      bookingFormData.priceBeforeDiscount = subtotal;
+      bookingFormData.totalPrice = data.finalPrice;
+
+      messageDiv.innerHTML = `
+        <span style="color: #10b981;">
+          ✅ Code "${code}" applied! Saving £${data.discountAmount.toFixed(2)}
+        </span>
+      `;
+
+      // Update price display
+      updateDiscountedPrice();
+    } else {
+      bookingFormData.discountCode = '';
+      bookingFormData.discountAmount = 0;
+      bookingFormData.priceBeforeDiscount = 0;
+      bookingFormData.totalPrice = subtotal;
+
+      messageDiv.innerHTML = `<span style="color: #ef4444;">❌ ${data.error}</span>`;
       
-      if (!selectedOption || !selectedOption.value) return;
-
-      const servicePrice = parseFloat(selectedOption.dataset.price);
-      const isPropertyService = selectedOption.dataset.property === 'true';
-      
-      const extraBedrooms = isPropertyService ? Math.max(0, bookingFormData.bedrooms - 4) : 0;
-      const bedroomFee = extraBedrooms * 30;
-
-      let addonsFee = 0;
-      bookingFormData.selectedAddons.forEach(addonId => {
-        const addon = ADDONS_CATALOG[addonId];
-        if (addon) addonsFee += addon.price;
-      });
-
-      const totalPrice = servicePrice + bedroomFee + addonsFee;
-
-      document.getElementById('bookingServicePrice').textContent = `£${servicePrice.toFixed(2)}`;
-      document.getElementById('bookingTotalPrice').textContent = `£${totalPrice.toFixed(2)}`;
-
-      const bedroomRow = document.getElementById('bookingBedroomRow');
-      if (bedroomFee > 0) {
-        bedroomRow.style.display = 'flex';
-        document.getElementById('bookingBedroomFee').textContent = `£${bedroomFee.toFixed(2)}`;
-      } else {
-        bedroomRow.style.display = 'none';
-      }
-
-      const addonsRow = document.getElementById('bookingAddonsRow');
-      if (addonsFee > 0) {
-        addonsRow.style.display = 'flex';
-        document.getElementById('bookingAddonsFee').textContent = `£${addonsFee.toFixed(2)}`;
-      } else {
-        addonsRow.style.display = 'none';
-      }
+      // Hide discount row if exists
+      const discountRow = document.getElementById('bookingDiscountRow');
+      if (discountRow) discountRow.style.display = 'none';
     }
+  } catch (error) {
+    console.error('Discount validation error:', error);
+    messageDiv.innerHTML = '<span style="color: #ef4444;">❌ Error validating code</span>';
+  }
+}
+
+function updateDiscountedPrice() {
+  if (bookingFormData.discountAmount > 0) {
+    // Show discount row
+    const discountRow = document.getElementById('bookingDiscountRow') || createDiscountRow();
+    discountRow.style.display = 'flex';
+    document.getElementById('bookingDiscountAmount').textContent = `-£${bookingFormData.discountAmount.toFixed(2)}`;
+    document.getElementById('bookingTotalPrice').textContent = `£${bookingFormData.totalPrice.toFixed(2)}`;
+  }
+}
+
+function createDiscountRow() {
+  const breakdown = document.getElementById('bookingPriceBreakdown');
+  const totalRow = breakdown.querySelector('[style*="border-top"]');
+  
+  const discountRow = document.createElement('div');
+  discountRow.id = 'bookingDiscountRow';
+  discountRow.style.cssText = 'display: none; justify-content: space-between; margin-bottom: 12px;';
+  discountRow.innerHTML = `
+    <span style="color: #10b981; font-weight: 600;">Discount (${bookingFormData.discountCode})</span>
+    <span id="bookingDiscountAmount" style="font-weight: 600; color: #10b981;">-£0.00</span>
+  `;
+  
+  breakdown.insertBefore(discountRow, totalRow);
+  return discountRow;
+}
+
+function resetBookingForm() {
+  document.getElementById('adminBookingForm').reset();
+  bookingFormData = {
+    bedrooms: 4,
+    selectedAddons: [],
+    discountCode: '',
+    discountAmount: 0,
+    priceBeforeDiscount: 0,
+    totalPrice: 0
+  };
+  document.getElementById('bookingBedroomCount').textContent = '4';
+  document.getElementById('bookingPriceBreakdown').style.display = 'none';
+  document.getElementById('bookingBedroomsSection').style.display = 'none';
+  document.getElementById('bookingAddonsSection').style.display = 'none';
+  document.getElementById('availabilityResults').style.display = 'none';
+  const discountMsg = document.getElementById('discountMessage');
+  if (discountMsg) discountMsg.innerHTML = '';
+  const discountRow = document.getElementById('bookingDiscountRow');
+  if (discountRow) discountRow.style.display = 'none';
+}
 
     // Check availability
    async function checkAdminAvailability() {
