@@ -5382,19 +5382,24 @@ async function saveDiscountCode(event) {
     if (selectedServices.length > 0) fields['Applicable Services'] = selectedServices;
     
     const response = await fetch('/.netlify/functions/airtable-proxy', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        method: currentDiscountCode ? 'PATCH' : 'POST',
-        table: 'DISCOUNT',
-        recordId: currentDiscountCode || null,
-        body: { fields }
-      })
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to save discount code');
-    }
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    method: currentDiscountCode ? 'PATCH' : 'POST',
+    table: 'DISCOUNT',
+    recordId: currentDiscountCode || null,
+    body: { fields }
+  })
+});
+
+const data = await response.json();
+console.log('Airtable response:', data); // ADD THIS
+
+if (!response.ok) {
+  console.error('Full error:', data); // ADD THIS
+  alert(`❌ Failed to save: ${data.error?.message || JSON.stringify(data)}`);
+  throw new Error('Failed to save discount code');
+}
     
     alert(`✅ Discount code "${code}" ${currentDiscountCode ? 'updated' : 'created'} successfully!`);
     closeModal('discountModal');
