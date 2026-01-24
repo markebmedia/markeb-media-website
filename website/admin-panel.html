@@ -1904,6 +1904,15 @@
       </div>
     </div>
 
+    <!-- In the sidebar navigation -->
+<div class="nav-section">
+  <div class="nav-section-title">Schedule</div>
+  <div class="nav-item" onclick="showSection('blocked-times')">
+    <span class="nav-icon">🚫</span>
+    Block Times
+  </div>
+</div>
+
     <div class="nav-section">
       <div class="nav-section-title">Tools</div>
       <div class="nav-item" onclick="window.open('uk-client-map.html', '_blank')">
@@ -2249,7 +2258,35 @@
         </div>
       </div>
     </div>
+  
+
+  <!-- Blocked Times Section -->
+<div class="admin-section" id="blocked-times">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Blocked Times</h2>
+      <p style="color: #64748b; font-size: 14px;">Block out dates and times when bookings cannot be made</p>
+    </div>
+    <button class="btn btn-primary" onclick="showCreateBlockModal()">
+      ➕ Block Time
+    </button>
   </div>
+
+  <div class="filters-bar">
+    <select class="filter-select" id="blockRegionFilter" onchange="loadBlockedTimes()">
+      <option value="">All Regions</option>
+      <option value="North">North</option>
+      <option value="South">South</option>
+    </select>
+    <button class="btn btn-primary" onclick="loadBlockedTimes()">🔄 Refresh</button>
+  </div>
+
+  <div class="calendar-container" id="blockedTimesContainer">
+    <div style="text-align: center; padding: 40px;">
+      <div class="spinner"></div>
+    </div>
+  </div>
+</div>
 
   <!-- Booking Detail Modal -->
   <div class="modal" id="bookingModal" onclick="closeModal('bookingModal')">
@@ -2482,11 +2519,118 @@
           </button>
         </div>
 
+        <!-- Block Time Modal -->
+<div class="modal" id="blockTimeModal" onclick="closeModal('blockTimeModal')">
+  <div class="modal-dialog" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Block Time Slot</h3>
+      <button class="modal-close" onclick="closeModal('blockTimeModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="blockTimeForm" onsubmit="saveBlockedTime(event)">
+        
+        <div class="form-group">
+          <label class="form-label" for="blockRegion">Region *</label>
+          <select id="blockRegion" class="form-input" required>
+            <option value="">-- Select Region --</option>
+            <option value="North">North (Jodie)</option>
+            <option value="South">South (Maeve)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="blockDate">Date *</label>
+          <input 
+            type="date" 
+            id="blockDate" 
+            class="form-input" 
+            required
+          />
+          <script>
+            // Set min date to today
+            document.getElementById('blockDate').min = new Date().toISOString().split('T')[0];
+          </script>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="blockStartTime">Start Time *</label>
+            <select id="blockStartTime" class="form-input" required>
+              <option value="">-- Select --</option>
+              <option value="09:00">09:00</option>
+              <option value="09:30">09:30</option>
+              <option value="10:00">10:00</option>
+              <option value="10:30">10:30</option>
+              <option value="11:00">11:00</option>
+              <option value="11:30">11:30</option>
+              <option value="12:00">12:00</option>
+              <option value="12:30">12:30</option>
+              <option value="13:00">13:00</option>
+              <option value="13:30">13:30</option>
+              <option value="14:00">14:00</option>
+              <option value="14:30">14:30</option>
+              <option value="15:00">15:00</option>
+              <option value="15:30">15:30</option>
+              <option value="16:00">16:00</option>
+              <option value="16:30">16:30</option>
+              <option value="17:00">17:00</option>
+              <option value="17:30">17:30</option>
+              <option value="18:00">18:00</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="blockEndTime">End Time *</label>
+            <select id="blockEndTime" class="form-input" required>
+              <option value="">-- Select --</option>
+              <option value="09:30">09:30</option>
+              <option value="10:00">10:00</option>
+              <option value="10:30">10:30</option>
+              <option value="11:00">11:00</option>
+              <option value="11:30">11:30</option>
+              <option value="12:00">12:00</option>
+              <option value="12:30">12:30</option>
+              <option value="13:00">13:00</option>
+              <option value="13:30">13:30</option>
+              <option value="14:00">14:00</option>
+              <option value="14:30">14:30</option>
+              <option value="15:00">15:00</option>
+              <option value="15:30">15:30</option>
+              <option value="16:00">16:00</option>
+              <option value="16:30">16:30</option>
+              <option value="17:00">17:00</option>
+              <option value="17:30">17:30</option>
+              <option value="18:00">18:00</option>
+              <option value="18:30">18:30</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="blockReason">Reason (Optional)</label>
+          <textarea 
+            id="blockReason" 
+            class="form-input" 
+            rows="3"
+            placeholder="e.g. Team meeting, Equipment maintenance, Personal time off"
+          ></textarea>
+        </div>
+
+        <div class="button-group" style="margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('blockTimeModal')" style="flex: 1;">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-danger" style="flex: 2;">
+            Block Time
+          </button>
+        </div>
+
       </form>
     </div>
   </div>
 </div>
 
+  
   <script>
     // ===== PASSWORD PROTECTION =====
     const ADMIN_CODE = 'MARKEB2546';
@@ -2812,7 +2956,9 @@
       loadBookings();
       loadPendingBookings();
       loadCustomers();
-      
+      loadDiscountCodes();
+      loadBlockedTimes();
+
       // Populate time options
       const timeSelect = document.getElementById('bookingTime');
       if (timeSelect) {
@@ -3242,21 +3388,27 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
     return;
   }
 
-  // In admin-panel.html, modify the form submission:
+  const region = document.getElementById('bookingRegion').value;
+  
+  // ✅ Calculate media specialist based on region
+  const mediaSpecialist = region === 'North' ? 'Jodie' : 'Maeve';
+
   const formData = {
     clientName: document.getElementById('bookingClientName').value,
     clientEmail: document.getElementById('bookingClientEmail').value,
-    region: document.getElementById('bookingRegion').value,
+    region: region,
     
-    // ✅ Match create-booking.js expectations
+    // ✅ Service details
     service: selectedOption.dataset.name,
     serviceId: selectedOption.value,
     basePrice: parseFloat(selectedOption.dataset.price),
     duration: parseInt(selectedOption.dataset.duration),
     
+    // ✅ Bedroom calculations
     bedrooms: bookingFormData.bedrooms,
     extraBedroomFee: Math.max(0, bookingFormData.bedrooms - 4) * 30,
     
+    // ✅ Add-ons
     addons: bookingFormData.selectedAddons.map(id => ({
       id,
       name: ADDONS_CATALOG[id]?.name,
@@ -3266,28 +3418,33 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
       sum + (ADDONS_CATALOG[id]?.price || 0), 0
     ),
     
+    // ✅ Property details
     propertyAddress: document.getElementById('bookingAddress').value,
     postcode: document.getElementById('bookingPostcode').value,
     accessInstructions: document.getElementById('bookingAccess').value || '',
     
+    // ✅ Date/Time
     date: document.getElementById('bookingDate').value,
     time: document.getElementById('bookingTime').value,
     
-    // ✅ Add missing fields
-    mediaSpecialist: formData.region === 'North' ? 'Jodie' : 'Abbie/Maeve',
+    // ✅ Media specialist
+    mediaSpecialist: mediaSpecialist,
+    
+    // ✅ Optional fields
     clientPhone: '', // Admin bookings might not have this
     
-    // ✅ NEW: Add discount fields
+    // ✅ Discount fields
     discountCode: bookingFormData.discountCode || '',
     discountAmount: bookingFormData.discountAmount || 0,
     priceBeforeDiscount: bookingFormData.priceBeforeDiscount || bookingFormData.totalPrice,
     totalPrice: bookingFormData.totalPrice,
     
+    // ✅ Payment & metadata
     paymentStatus: document.getElementById('bookingPaymentStatus').value,
     createdBy: 'Admin'
   };
 
-  if (!confirm(`Create booking for ${formData.clientName}?\n\nService: ${formData.service}\nDate: ${formData.date} at ${formData.time}`)) {
+  if (!confirm(`Create booking for ${formData.clientName}?\n\nService: ${formData.service}\nDate: ${formData.date} at ${formData.time}\nMedia Specialist: ${formData.mediaSpecialist}`)) {
     return;
   }
 
@@ -3306,7 +3463,7 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
     const data = await response.json();
 
     if (data.success) {
-      alert(`✅ Booking created successfully!\n\nReference: ${data.bookingRef}`);
+      alert(`✅ Booking created successfully!\n\nReference: ${data.bookingRef}\nMedia Specialist: ${formData.mediaSpecialist}`);
       resetBookingForm();
       loadBookings();
       loadCalendar();
@@ -5488,6 +5645,248 @@ async function deleteDiscountCode(codeId, codeName) {
     alert('❌ Failed to delete discount code');
   }
 }
+
+// ===== BLOCKED TIMES MANAGEMENT =====
+
+let allBlockedTimes = [];
+
+// Load Blocked Times
+async function loadBlockedTimes() {
+  const container = document.getElementById('blockedTimesContainer');
+  container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+
+  try {
+    const regionFilter = document.getElementById('blockRegionFilter')?.value || '';
+    
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'GET',
+        table: 'Blocked Times',
+        filterFormula: regionFilter ? `{Region} = "${regionFilter}"` : null,
+        sort: [{ field: 'Date', direction: 'asc' }]
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.records) {
+      allBlockedTimes = data.records;
+      renderBlockedTimesTable(allBlockedTimes);
+    }
+
+  } catch (error) {
+    console.error('Error loading blocked times:', error);
+    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading blocked times</div>';
+  }
+}
+
+// Render Blocked Times Table
+function renderBlockedTimesTable(blocks) {
+  const container = document.getElementById('blockedTimesContainer');
+  
+  if (blocks.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 60px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">🚫</div>
+        <h3 style="color: #64748b; margin-bottom: 8px;">No Blocked Times</h3>
+        <p style="color: #94a3b8;">Click "Block Time" to prevent bookings for specific dates and times</p>
+      </div>
+    `;
+    return;
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const upcomingBlocks = blocks.filter(b => new Date(b.fields['Date']) >= today);
+  const pastBlocks = blocks.filter(b => new Date(b.fields['Date']) < today);
+
+  let html = '';
+
+  if (upcomingBlocks.length > 0) {
+    html += `
+      <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 16px;">
+        📅 Upcoming Blocks (${upcomingBlocks.length})
+      </h3>
+      <table class="data-table" style="margin-bottom: 32px;">
+        <thead>
+          <tr>
+            <th>Region</th>
+            <th>Date</th>
+            <th>Time Blocked</th>
+            <th>Reason</th>
+            <th>Created By</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    upcomingBlocks.forEach(block => {
+      const fields = block.fields;
+      const date = new Date(fields['Date']);
+      const formattedDate = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+      
+      html += `
+        <tr>
+          <td data-label="Region">
+            <span class="region-badge ${fields['Region'].toLowerCase()}">${fields['Region']}</span>
+          </td>
+          <td data-label="Date">${formattedDate}</td>
+          <td data-label="Time Blocked">
+            <strong>${fields['Start Time']} - ${fields['End Time']}</strong>
+          </td>
+          <td data-label="Reason">${fields['Reason'] || '-'}</td>
+          <td data-label="Created By">${fields['Created By'] || 'Admin'}</td>
+          <td data-label="Actions">
+            <button class="btn btn-danger btn-small" onclick="deleteBlockedTime('${block.id}', '${fields['Date']}')">
+              🗑️ Remove
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+
+    html += '</tbody></table>';
+  }
+
+  if (pastBlocks.length > 0) {
+    html += `
+      <details style="margin-top: 24px;">
+        <summary style="font-size: 16px; font-weight: 700; color: #64748b; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 8px;">
+          📜 Past Blocks (${pastBlocks.length})
+        </summary>
+        <table class="data-table" style="margin-top: 16px;">
+          <thead>
+            <tr>
+              <th>Region</th>
+              <th>Date</th>
+              <th>Time Blocked</th>
+              <th>Reason</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    pastBlocks.forEach(block => {
+      const fields = block.fields;
+      const date = new Date(fields['Date']);
+      const formattedDate = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+      
+      html += `
+        <tr style="opacity: 0.6;">
+          <td data-label="Region">
+            <span class="region-badge ${fields['Region'].toLowerCase()}">${fields['Region']}</span>
+          </td>
+          <td data-label="Date">${formattedDate}</td>
+          <td data-label="Time Blocked">${fields['Start Time']} - ${fields['End Time']}</td>
+          <td data-label="Reason">${fields['Reason'] || '-'}</td>
+        </tr>
+      `;
+    });
+
+    html += `
+          </tbody>
+        </table>
+      </details>
+    `;
+  }
+
+  container.innerHTML = html;
+}
+
+// Show Create Block Modal
+function showCreateBlockModal() {
+  document.getElementById('blockTimeForm').reset();
+  document.getElementById('blockDate').min = new Date().toISOString().split('T')[0];
+  document.getElementById('blockTimeModal').classList.add('active');
+}
+
+// Save Blocked Time
+async function saveBlockedTime(event) {
+  event.preventDefault();
+  
+  const region = document.getElementById('blockRegion').value;
+  const date = document.getElementById('blockDate').value;
+  const startTime = document.getElementById('blockStartTime').value;
+  const endTime = document.getElementById('blockEndTime').value;
+  const reason = document.getElementById('blockReason').value.trim();
+  
+  if (startTime >= endTime) {
+    alert('❌ End time must be after start time');
+    return;
+  }
+  
+  if (!confirm(`Block ${region} region on ${date} from ${startTime} to ${endTime}?`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'POST',
+        table: 'Blocked Times',
+        body: {
+          fields: {
+            'Region': region,
+            'Date': date,
+            'Start Time': startTime,
+            'End Time': endTime,
+            'Reason': reason || '',
+            'Created By': 'Admin'
+          }
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to create blocked time');
+    }
+    
+    alert(`✅ Time blocked successfully!\n\n${region} - ${date}\n${startTime} to ${endTime}`);
+    closeModal('blockTimeModal');
+    loadBlockedTimes();
+    
+  } catch (error) {
+    console.error('Error creating blocked time:', error);
+    alert('❌ Failed to block time');
+  }
+}
+
+// Delete Blocked Time
+async function deleteBlockedTime(recordId, date) {
+  if (!confirm(`Remove this time block for ${date}?`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'DELETE',
+        table: 'Blocked Times',
+        recordId: recordId
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to delete blocked time');
+    }
+    
+    alert('✅ Time block removed successfully!');
+    loadBlockedTimes();
+    
+  } catch (error) {
+    console.error('Error deleting blocked time:', error);
+    alert('❌ Failed to remove time block');
+  }
+}
+
   </script>
 </body>
 </html>
