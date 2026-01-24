@@ -46,13 +46,22 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // ✅ NEW: Fetch blocked times for this region and date
+    const blockedTimes = await fetchBlockedTimes(region, selectedDate);
+    console.log(`Found ${blockedTimes.length} blocked time(s) for this date/region`);
+
     // Fetch existing bookings from Airtable for this region and date
     const bookings = await fetchBookingsForRegion(region, selectedDate);
-
     console.log(`Found ${bookings.length} existing bookings for this date/region`);
 
-    // If no bookings exist for this date, all slots are available
+    // ✅ If blocked times exist, apply them first
+    let availableSlots;
+    
     if (bookings.length === 0) {
+      // No bookings - just check blocked times
+      availableSlots = generateAllTimeSlots();
+      availableSlots = applyBlockedTimes(availableSlots, blockedTimes);
+      
       return {
         statusCode: 200,
         headers: {
@@ -60,14 +69,18 @@ exports.handler = async (event, context) => {
           'Access-Control-Allow-Origin': '*'
         },
         body: JSON.stringify({
-          availableSlots: generateAllTimeSlots(),
-          message: 'All slots available - no existing bookings'
+          availableSlots: availableSlots,
+          message: blockedTimes.length > 0 ? 'Some slots blocked by admin' : 'All slots available - no existing bookings',
+          blockedTimesCount: blockedTimes.length
         })
       };
     }
 
     // Calculate available time slots based on existing bookings and drive times
-    const availableSlots = await calculateAvailableSlots(postcode, bookings);
+    availableSlots = await calculateAvailableSlots(postcode, bookings);
+    
+    // ✅ Apply blocked times on top of booking conflicts
+    availableSlots = applyBlockedTimes(availableSlots, blockedTimes);
 
     return {
       statusCode: 200,
@@ -78,6 +91,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         availableSlots: availableSlots,
         existingBookings: bookings.length,
+        blockedTimesCount: blockedTimes.length,
         region: region,
         debug: {
           selectedDate,
@@ -85,6 +99,11 @@ exports.handler = async (event, context) => {
             time: b.startTime,
             postcode: b.postcode,
             duration: b.duration
+          })),
+          blockedTimes: blockedTimes.map(bt => ({
+            startTime: bt.startTime,
+            endTime: bt.endTime,
+            reason: bt.reason
           }))
         }
       })
@@ -105,6 +124,83 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+// ✅ NEW: Fetch blocked times from Airtable
+async function fetchBlockedTimes(region, selectedDate) {
+  try {
+    const Airtable = require('airtable');
+    const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+
+    // Capitalize region for Airtable (it stores "North" or "South")
+    const capitalizedRegion = region.charAt(0).toUpperCase() + region.slice(1).toLowerCase();
+    
+    console.log(`Querying Blocked Times with:`);
+    console.log(`  - Date: ${selectedDate}`);
+    console.log(`  - Region: ${capitalizedRegion}`);
+    
+    const filterFormula = `AND(
+      {Region} = '${capitalizedRegion}',
+      IS_SAME({Date}, '${selectedDate}', 'day')
+    )`;
+    
+    const records = await base('Blocked Times')
+      .select({
+        filterByFormula: filterFormula
+      })
+      .firstPage();
+
+    console.log(`Retrieved ${records.length} blocked time(s) from Airtable`);
+
+    const blockedTimes = records.map(record => {
+      const blocked = {
+        id: record.id,
+        startTime: record.fields['Start Time'],
+        endTime: record.fields['End Time'],
+        reason: record.fields['Reason'] || 'Time blocked by admin',
+        date: record.fields['Date'],
+        region: record.fields['Region']
+      };
+      
+      console.log(`  🚫 Blocked: ${blocked.startTime} - ${blocked.endTime} (${blocked.reason})`);
+      
+      return blocked;
+    });
+
+    return blockedTimes;
+
+  } catch (error) {
+    console.error('Error fetching blocked times from Airtable:', error);
+    // Don't throw - just return empty array so bookings still work
+    return [];
+  }
+}
+
+// ✅ NEW: Apply blocked times to slots
+function applyBlockedTimes(slots, blockedTimes) {
+  if (blockedTimes.length === 0) return slots;
+  
+  console.log(`\nApplying ${blockedTimes.length} blocked time(s) to slots:`);
+  
+  blockedTimes.forEach(blocked => {
+    const blockStartMinutes = timeToMinutes(blocked.startTime);
+    const blockEndMinutes = timeToMinutes(blocked.endTime);
+    
+    console.log(`  Blocking ${blocked.startTime} - ${blocked.endTime}`);
+    
+    slots.forEach(slot => {
+      const slotMinutes = timeToMinutes(slot.time);
+      
+      // Block slots that fall within the blocked time range
+      if (slotMinutes >= blockStartMinutes && slotMinutes < blockEndMinutes) {
+        console.log(`    ❌ Blocking ${slot.time}`);
+        slot.available = false;
+        slot.reason = blocked.reason;
+      }
+    });
+  });
+  
+  return slots;
+}
 
 // Fetch bookings from Airtable for specific region and date
 async function fetchBookingsForRegion(region, selectedDate) {
