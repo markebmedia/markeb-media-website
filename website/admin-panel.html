@@ -1624,6 +1624,219 @@ body {
     padding: 8px 14px;
   }
 }
+
+/* ===== ADD THIS TO YOUR ADMIN PANEL CSS ===== */
+
+/* Blocked time styling */
+.calendar-booking.blocked {
+  background: #ef4444 !important;
+  color: #fff;
+  font-weight: 600;
+  border: 2px solid #dc2626;
+}
+
+.calendar-booking.blocked:hover {
+  background: #dc2626 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+/* Calendar day hover state */
+.calendar-day:hover {
+  background: #f8fafc;
+}
+
+.calendar-day.today:hover {
+  background: #dbeafe;
+}
+
+/* Quick block modal styling */
+#quickBlockModal .modal-dialog {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== CALENDAR MOBILE FIXES - ADD TO YOUR <style> SECTION ===== */
+
+/* Fix calendar booking boxes overlapping on mobile */
+@media (max-width: 768px) {
+  
+  /* Make calendar day cells taller to fit content */
+  .calendar-grid.month .calendar-day {
+    min-height: 100px; /* Increased from 70px */
+    padding: 6px;
+    overflow: hidden;
+  }
+
+  /* Stack booking boxes properly */
+  .calendar-booking {
+    display: block;
+    width: 100%;
+    margin-bottom: 3px;
+    padding: 4px 6px;
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-radius: 4px;
+  }
+
+  /* Show only first 3 bookings, hide rest */
+  .calendar-day .calendar-booking:nth-child(n+5) {
+    display: none;
+  }
+
+  /* Add "more" indicator if there are hidden bookings */
+  .calendar-day:has(.calendar-booking:nth-child(5))::after {
+    content: '+more';
+    display: block;
+    font-size: 9px;
+    color: #64748b;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 2px;
+    padding: 2px;
+    background: #f1f5f9;
+    border-radius: 3px;
+  }
+
+  /* Calendar day number smaller */
+  .calendar-day-number {
+    font-size: 11px;
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+
+  /* Booking counter responsive */
+  .calendar-booking-counter {
+    padding: 10px;
+    margin-bottom: 12px;
+  }
+
+  .calendar-booking-counter-value {
+    font-size: 20px;
+  }
+
+  .calendar-booking-counter-label {
+    font-size: 12px;
+  }
+}
+
+/* Extra small phones - even more compact */
+@media (max-width: 480px) {
+  
+  .calendar-grid.month .calendar-day {
+    min-height: 60px;
+    padding: 3px;
+  }
+
+  /* Show dots instead of text for bookings on tiny screens */
+  .calendar-booking {
+    height: 8px;
+    padding: 0;
+    margin-bottom: 2px;
+    border-radius: 4px;
+    text-indent: -9999px; /* Hide text */
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  /* Different colors for status */
+  .calendar-booking:not(.pending):not(.cancelled):not(.blocked) {
+    background: #3b82f6; /* Regular booking - blue */
+  }
+
+  .calendar-booking.pending {
+    background: #f59e0b; /* Pending - orange */
+  }
+
+  .calendar-booking.cancelled {
+    background: #94a3b8; /* Cancelled - gray */
+  }
+
+  .calendar-booking.blocked {
+    background: #ef4444; /* Blocked - red */
+  }
+
+  /* Show max 4 dots */
+  .calendar-day .calendar-booking:nth-child(n+6) {
+    display: none;
+  }
+
+  /* More indicator */
+  .calendar-day:has(.calendar-booking:nth-child(6))::after {
+    content: '+';
+    font-size: 10px;
+    font-weight: 900;
+    color: #fff;
+    background: #64748b;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+
+  .calendar-day-number {
+    font-size: 10px;
+    margin-bottom: 3px;
+  }
+
+  /* Ultra compact booking counter */
+  .calendar-booking-counter {
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+
+  .calendar-booking-counter-value {
+    font-size: 18px;
+  }
+
+  .calendar-booking-counter-label {
+    font-size: 11px;
+  }
+}
+
+/* Optional: Add legend for mobile users */
+@media (max-width: 480px) {
+  .calendar-legend {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .calendar-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #64748b;
+  }
+
+  .calendar-legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -3300,21 +3513,30 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
     // ===== END ADMIN BOOKING CREATION =====
 
     // Navigation
-    function showSection(sectionId) {
-      document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      
-      document.getElementById(sectionId).classList.add('active');
-      
-      const navItem = [...document.querySelectorAll('.nav-item')].find(n => 
-        n.getAttribute('onclick')?.includes(`showSection('${sectionId}')`)
-      );
-      if (navItem) navItem.classList.add('active');
+   function showSection(sectionId) {
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  
+  document.getElementById(sectionId).classList.add('active');
+  
+  const navItem = [...document.querySelectorAll('.nav-item')].find(n => 
+    n.getAttribute('onclick')?.includes(`showSection('${sectionId}')`)
+  );
+  if (navItem) navItem.classList.add('active');
 
-      if (window.innerWidth <= 1024) {
-        document.getElementById('adminSidebar').classList.remove('open');
-      }
-    }
+  // ✅ Load data when switching to specific sections
+  if (sectionId === 'blocked-times') {
+    loadBlockedTimes();
+  }
+  
+  if (sectionId === 'discount-codes') {
+    loadDiscountCodes();
+  }
+
+  if (window.innerWidth <= 1024) {
+    document.getElementById('adminSidebar').classList.remove('open');
+  }
+}
 
     function toggleSidebar() {
       const sidebar = document.getElementById('adminSidebar');
@@ -3402,68 +3624,85 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
       loadCalendar();
     }
 
-    async function loadCalendar() {
-      const grid = document.getElementById('calendarGrid');
-      const currentEl = document.getElementById('calendarCurrent');
-      const region = document.getElementById('calendarRegion')?.value || '';
+    // ===== UPDATED CALENDAR FUNCTIONS WITH BLOCKED TIMES =====
 
-      grid.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+async function loadCalendar() {
+  const grid = document.getElementById('calendarGrid');
+  const currentEl = document.getElementById('calendarCurrent');
+  const region = document.getElementById('calendarRegion')?.value || '';
 
-      try {
-        let startDate, endDate;
+  grid.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
 
-        if (currentView === 'month') {
-          const year = currentDate.getFullYear();
-          const month = currentDate.getMonth();
-          startDate = new Date(year, month, 1).toISOString().split('T')[0];
-          endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
-          
-          currentEl.textContent = currentDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
-        } else if (currentView === 'week') {
-          const tempDate = new Date(currentDate);
-          const day = tempDate.getDay();
-          const diff = tempDate.getDate() - day + (day === 0 ? -6 : 1);
-          const monday = new Date(tempDate.setDate(diff));
-          const sunday = new Date(monday);
-          sunday.setDate(monday.getDate() + 6);
-          
-          startDate = monday.toISOString().split('T')[0];
-          endDate = sunday.toISOString().split('T')[0];
-          
-          currentEl.textContent = `Week of ${monday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })} - ${sunday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' })}`;
-        } else {
-          startDate = currentDate.toISOString().split('T')[0];
-          endDate = startDate;
-          
-          currentEl.textContent = currentDate.toLocaleDateString('en-GB', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-        }
+  try {
+    let startDate, endDate;
 
-        const response = await fetch('/.netlify/functions/admin-bookings', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ startDate, endDate, region })
-        });
+    if (currentView === 'month') {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      startDate = new Date(year, month, 1).toISOString().split('T')[0];
+      endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
+      
+      currentEl.textContent = currentDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    } else if (currentView === 'week') {
+      const tempDate = new Date(currentDate);
+      const day = tempDate.getDay();
+      const diff = tempDate.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(tempDate.setDate(diff));
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      
+      startDate = monday.toISOString().split('T')[0];
+      endDate = sunday.toISOString().split('T')[0];
+      
+      currentEl.textContent = `Week of ${monday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })} - ${sunday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+    } else {
+      startDate = currentDate.toISOString().split('T')[0];
+      endDate = startDate;
+      
+      currentEl.textContent = currentDate.toLocaleDateString('en-GB', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    }
 
-        const data = await response.json();
+    // ✅ Fetch BOTH bookings AND blocked times
+    const [bookingsResponse, blockedTimesResponse] = await Promise.all([
+      fetch('/.netlify/functions/admin-bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ startDate, endDate, region })
+      }),
+      fetch('/.netlify/functions/airtable-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          method: 'GET',
+          table: 'Blocked Times',
+          filterFormula: region ? `AND({Date} >= "${startDate}", {Date} <= "${endDate}", {Region} = "${region}")` : `AND({Date} >= "${startDate}", {Date} <= "${endDate}")`
+        })
+      })
+    ]);
 
-        if (data.success) {
-          allBookings = data.bookings; // ✅ critical so View works from calendar
-          if (currentView === 'month') {
-            renderMonthView(data.bookings);
-          } else if (currentView === 'week') {
-            renderWeekView(data.bookings);
-          } else {
-            renderDayView(data.bookings);
-          }
-        }
+    const bookingsData = await bookingsResponse.json();
+    const blockedTimesData = await blockedTimesResponse.json();
 
-      } catch (error) {
-        console.error('Error loading calendar:', error);
-        grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading calendar</div>';
+    if (bookingsData.success) {
+      allBookings = bookingsData.bookings;
+      const blockedTimes = blockedTimesData.records || [];
+      
+      if (currentView === 'month') {
+        renderMonthView(bookingsData.bookings, blockedTimes);
+      } else if (currentView === 'week') {
+        renderWeekView(bookingsData.bookings, blockedTimes);
+      } else {
+        renderDayView(bookingsData.bookings, blockedTimes);
       }
     }
 
-    function renderMonthView(bookings) {
+  } catch (error) {
+    console.error('Error loading calendar:', error);
+    grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading calendar</div>';
+  }
+}
+
+function renderMonthView(bookings, blockedTimes) {
   const grid = document.getElementById('calendarGrid');
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -3471,41 +3710,59 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const daysInMonth = lastDay.getDate();
-  const startingDayOfWeek = firstDay.getDay() || 7; // 1=Monday, 7=Sunday
+  const startingDayOfWeek = firstDay.getDay() || 7;
 
-  // Calculate total bookings
   const totalBookings = bookings.length;
+  const totalBlocks = blockedTimes.length;
 
   let html = `
     <div class="calendar-booking-counter">
       <span class="calendar-booking-counter-value">${totalBookings}</span>
-      <span class="calendar-booking-counter-label">booking${totalBookings !== 1 ? 's' : ''} this month</span>
+      <span class="calendar-booking-counter-label">booking${totalBookings !== 1 ? 's' : ''}</span>
+      ${totalBlocks > 0 ? `
+        <span style="margin-left: 16px; color: #ef4444; font-size: 14px;">
+          | 🚫 ${totalBlocks} blocked time${totalBlocks !== 1 ? 's' : ''}
+        </span>
+      ` : ''}
     </div>
     
     <div class="calendar-grid month">
   `;
   
-  // Day headers
   ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(day => {
     html += `<div class="calendar-day-header">${day}</div>`;
   });
 
-  // Empty cells before first day
   for (let i = 1; i < startingDayOfWeek; i++) {
     html += '<div class="calendar-day other-month"></div>';
   }
 
-  // Days of month
   for (let day = 1; day <= daysInMonth; day++) {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const dayBookings = bookings.filter(b => b.fields['Date'] === dateStr);
+    const dayBlocks = blockedTimes.filter(b => b.fields['Date'] === dateStr);
     
     const today = new Date();
     const isToday = dateStr === today.toISOString().split('T')[0];
     
-    html += `<div class="calendar-day ${isToday ? 'today' : ''}">`;
+    // ✅ Add click handler to create block
+    html += `<div class="calendar-day ${isToday ? 'today' : ''}" onclick="showQuickBlockModal('${dateStr}')" style="cursor: pointer;">`;
     html += `<div class="calendar-day-number">${day}</div>`;
     
+    // ✅ Show blocked times FIRST (red)
+    dayBlocks.forEach(block => {
+      const fields = block.fields;
+      html += `
+        <div class="calendar-booking blocked" 
+             onclick="event.stopPropagation(); viewBlockedTime('${block.id}')"
+             title="${fields['Reason'] || 'Blocked'}"
+             style="background: #ef4444; cursor: pointer;">
+          🚫 ${fields['Start Time']}-${fields['End Time']} ${fields['Region']}
+        </div>
+      `;
+    });
+    
+    // Show bookings
     dayBookings.forEach(booking => {
       const paymentStatus = booking.fields['Payment Status'] || 'Pending';
       const statusClass =
@@ -3515,7 +3772,7 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
           ? 'pending'
           : '';
 
-      html += `<div class="calendar-booking ${statusClass}" onclick="viewBookingById('${booking.id}')">${booking.fields['Time']} ${booking.fields['Client Name']}</div>`;
+      html += `<div class="calendar-booking ${statusClass}" onclick="event.stopPropagation(); viewBookingById('${booking.id}')">${booking.fields['Time']} ${booking.fields['Client Name']}</div>`;
     });
     
     html += '</div>';
@@ -3525,556 +3782,272 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
   grid.innerHTML = html;
 }
 
-    function renderWeekView(bookings) {
-      const grid = document.getElementById('calendarGrid');
-      grid.innerHTML = '<div style="padding: 40px; text-align: center;">Week view coming soon...</div>';
-    }
-
-    function renderDayView(bookings) {
-      const grid = document.getElementById('calendarGrid');
-      grid.innerHTML = '<div style="padding: 40px; text-align: center;">Day view coming soon...</div>';
-    }
-
-    // Bookings Functions
-    async function loadBookings() {
-      const container = document.getElementById('bookingsContainer');
-      container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
-
-      try {
-        const search = document.getElementById('bookingSearch')?.value || '';
-        const region = document.getElementById('bookingRegion')?.value || '';
-        const status = document.getElementById('bookingStatus')?.value || '';
-
-        const response = await fetch('/.netlify/functions/admin-bookings', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ region, status })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          allBookings = data.bookings;
-          renderBookingsTable(allBookings, search);
-        }
-
-      } catch (error) {
-        console.error('Error loading bookings:', error);
-        container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading bookings</div>';
-      }
-    }
-
-   async function loadPendingBookings() {
-  const container = document.getElementById('pendingContainer');
-  container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
-
-  try {
-    const response = await fetch('/.netlify/functions/admin-bookings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ paymentStatus: 'Pending' })
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      // Filter out cancelled bookings
-      const activeBookings = data.bookings.filter(booking => 
-        booking.fields['Booking Status'] !== 'Cancelled'
-      );
-
-      if (activeBookings.length === 0) {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 60px;">
-            <div style="font-size: 48px; margin-bottom: 16px;">✅</div>
-            <h3 style="color: #64748b; margin-bottom: 8px;">All Caught Up!</h3>
-            <p style="color: #94a3b8;">No reserved bookings require payment</p>
-          </div>
-        `;
-      } else {
-        renderPendingBookingsTable(activeBookings);
-      }
-    }
-
-  } catch (error) {
-    console.error('Error loading reserved bookings:', error);
-    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading reserved bookings</div>';
-  }
+function renderWeekView(bookings, blockedTimes) {
+  const grid = document.getElementById('calendarGrid');
+  grid.innerHTML = '<div style="padding: 40px; text-align: center;">Week view coming soon...</div>';
 }
 
-// NEW FUNCTION: Render pending bookings with payment actions
-function renderPendingBookingsTable(bookings) {
-  const container = document.getElementById('pendingContainer');
+function renderDayView(bookings, blockedTimes) {
+  const grid = document.getElementById('calendarGrid');
+  grid.innerHTML = '<div style="padding: 40px; text-align: center;">Day view coming soon...</div>';
+}
+
+// ===== QUICK BLOCK MODAL =====
+
+function showQuickBlockModal(dateStr) {
+  const date = new Date(dateStr);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   
-  // Sort by date (earliest first)
-  const sorted = bookings.sort((a, b) => {
-    const dateA = new Date(a.fields['Date']);
-    const dateB = new Date(b.fields['Date']);
-    return dateA - dateB;
-  });
+  if (date < today) {
+    alert('❌ Cannot block times in the past');
+    return;
+  }
+  
+  const modal = document.createElement('div');
+  modal.className = 'modal active';
+  modal.id = 'quickBlockModal';
+  modal.style.zIndex = '10000';
+  
+  modal.innerHTML = `
+    <div class="modal-dialog" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3>🚫 Block Time</h3>
+        <button class="modal-close" onclick="closeQuickBlockModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="quickBlockForm" onsubmit="saveQuickBlock(event, '${dateStr}')">
+          
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <div style="padding: 12px; background: #f8fafc; border-radius: 8px; font-weight: 600;">
+              ${date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </div>
+          </div>
 
-  let html = `
-    <div style="margin-bottom: 16px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; color: #92400e;">
-      <strong>⚠️ ${bookings.length} booking${bookings.length === 1 ? '' : 's'} awaiting payment</strong>
-    </div>
-    
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Reference</th>
-          <th>Date & Time</th>
-          <th>Client</th>
-          <th>Service</th>
-          <th>Amount</th>
-<th>Reserved Date</th>
-<th>Booking Status</th>
-<th>Payment Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+          <div class="form-group">
+            <label class="form-label" for="quickBlockRegion">Region *</label>
+            <select id="quickBlockRegion" class="form-input" required>
+              <option value="">-- Select Region --</option>
+              <option value="North">North</option>
+              <option value="South">South</option>
+            </select>
+          </div>
 
-  sorted.forEach(booking => {
-    const totalPrice = (booking.fields['Total Price'] || 0).toFixed(2);
-    const pendingDate = booking.fields['Created Date'] || '-';
-    const hasPaymentMethod = booking.fields['Stripe Payment Method ID'] ? true : false;
-    
-    html += `
-      <tr>
-        <td data-label="Reference">
-          <strong>${booking.fields['Booking Reference']}</strong>
-        </td>
-        <td data-label="Date & Time">
-          ${booking.fields['Date']}<br>
-          <span style="color: #3b82f6; font-weight: 600;">${booking.fields['Time']}</span>
-        </td>
-        <td data-label="Client">
-          ${booking.fields['Client Name']}<br>
-          <small style="color: #64748b;">${booking.fields['Client Email']}</small>
-        </td>
-        <td data-label="Service">
-          ${booking.fields['Service'] || '-'}
-        </td>
-        <td data-label="Amount">
-          <span style="font-size: 18px; font-weight: 700; color: #f59e0b;">£${totalPrice}</span>
-        </td>
-        <td data-label="Pending">
-          ${new Date(pendingDate).toLocaleDateString('en-GB')}
-        </td>
-        <td data-label="Booking Status">
-  <span class="status-badge status-${(booking.fields['Booking Status'] || 'booked').toLowerCase()}">
-    ${booking.fields['Booking Status'] || 'Booked'}
-  </span>
-</td>
-        <td data-label="Actions">
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            ${hasPaymentMethod ? `
-              <button class="btn btn-success btn-small" onclick="chargePendingBooking('${booking.id}')" title="Charge the customer's saved card">
-                💳 Charge Card
-              </button>
-            ` : `
-              <span style="font-size: 11px; color: #94a3b8; font-style: italic;">No saved card</span>
-            `}
-            <button class="btn btn-primary btn-small" onclick='processPayment("${booking.id}", "${booking.fields['Booking Reference']}", this)' title="Email payment link to customer">
-  📧 Send Link
-</button>
-            <button class="btn btn-secondary btn-small" onclick="viewBookingById('${booking.id}')" title="View full booking details">
-              👁️ View
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="quickBlockStartTime">Start Time *</label>
+              <select id="quickBlockStartTime" class="form-input" required>
+                <option value="">-- Select --</option>
+                ${generateTimeOptions('09:00')}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="quickBlockEndTime">End Time *</label>
+              <select id="quickBlockEndTime" class="form-input" required>
+                <option value="">-- Select --</option>
+                ${generateTimeOptions('18:00')}
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="quickBlockReason">Reason (Optional)</label>
+            <input 
+              type="text" 
+              id="quickBlockReason" 
+              class="form-input" 
+              placeholder="e.g., Team meeting, Weather, Equipment maintenance"
+            />
+          </div>
+
+          <div class="button-group" style="margin-top: 24px;">
+            <button type="button" class="btn btn-secondary" onclick="closeQuickBlockModal()" style="flex: 1;">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-danger" style="flex: 2;">
+              🚫 Block Time
             </button>
           </div>
-        </td>
-      </tr>
-    `;
-  });
-
-  html += `
-      </tbody>
-    </table>
-    
-    <div style="margin-top: 24px; padding: 16px; background: #eff6ff; border: 2px solid #3b82f6; border-radius: 12px;">
-      <h4 style="margin: 0 0 12px 0; color: #1e40af;">💡 Payment Options</h4>
-      <ul style="margin: 0; padding-left: 20px; color: #1e40af; line-height: 1.8;">
-        <li><strong>Charge Card:</strong> Instantly charge the customer's saved payment method (if available)</li>
-        <li><strong>Send Link:</strong> Email a secure payment link to the customer</li>
-        <li><strong>View:</strong> See full booking details and additional options</li>
-      </ul>
+        </form>
+      </div>
     </div>
   `;
-
-  container.innerHTML = html;
+  
+  document.body.appendChild(modal);
 }
 
-    function renderBookingsTable(bookings, search = '', containerId = 'bookingsContainer') {
-      const container = document.getElementById(containerId);
-      
-      let filtered = bookings;
-      if (search) {
-        const term = search.toLowerCase();
-        filtered = bookings.filter(b => 
-          (b.fields['Client Name'] || '').toLowerCase().includes(term) ||
-          (b.fields['Client Email'] || '').toLowerCase().includes(term) ||
-          (b.fields['Property Address'] || '').toLowerCase().includes(term) ||
-          (b.fields['Booking Reference'] || '').toLowerCase().includes(term)
-        );
-      }
+function closeQuickBlockModal() {
+  const modal = document.getElementById('quickBlockModal');
+  if (modal) modal.remove();
+}
 
-      if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align: center; padding: 40px;">No bookings found</div>';
-        return;
-      }
-
-      let html = `
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Reference</th>
-              <th>Date & Time</th>
-              <th>Client</th>
-              <th>Address</th>
-              <th>Service</th>
-              <th>Status</th>
-              <th>Drive Time</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
-      filtered.forEach(booking => {
-        const driveTimeInfo = booking.driveTimeInfo;
-        const driveTimeBadge = driveTimeInfo ? `
-          <span class="drive-time-badge ${driveTimeInfo.hasConflict ? 'error' : driveTimeInfo.bufferTime.surplus < 15 ? 'warning' : ''}">
-            🚗 ${driveTimeInfo.driveTimeFormatted} ${driveTimeInfo.hasConflict ? '⚠️' : ''}
-          </span>
-        ` : '-';
-
-        html += `
-          <tr>
-            <td data-label="Reference"><strong>${booking.fields['Booking Reference']}</strong></td>
-            <td data-label="Date & Time">${booking.fields['Date']}<br>${booking.fields['Time']}</td>
-            <td data-label="Client">
-              ${booking.fields['Client Name']}<br>
-              <small style="color: #64748b;">${booking.fields['Client Email']}</small>
-            </td>
-            <td data-label="Address">${booking.fields['Property Address'] || '-'}</td>
-            <td data-label="Service">${booking.fields['Service'] || '-'}</td>
-            <td data-label="Status">
-  <span class="status-badge status-${(booking.fields['Booking Status'] || 'booked').toLowerCase()}">
-    ${booking.fields['Booking Status'] || 'Booked'}
-  </span>
-  <br>
-  <span class="status-badge status-${(booking.fields['Payment Status'] || 'pending').toLowerCase()}" style="font-size: 11px;">
-    💳 ${booking.fields['Payment Status'] || 'Pending'}
-  </span>
-</td>
-            <td data-label="Drive Time">${driveTimeBadge}</td>
-            <td data-label="Actions">
-              <button class="btn btn-primary btn-small" onclick="viewBookingById('${booking.id}')">
-                View
-              </button>
-            </td>
-          </tr>
-        `;
-      });
-
-      html += '</tbody></table>';
-      container.innerHTML = html;
-    }
-
-    function viewBookingById(bookingId) {
-      const booking = allBookings.find(b => b.id === bookingId);
-      if (!booking) {
-        alert('Booking not found');
-        return;
-      }
-      viewBooking(booking);
-    }
-
-    function viewBooking(booking) {
-      currentBooking = booking;
-      const modal = document.getElementById('bookingModal');
-      const title = document.getElementById('bookingModalTitle');
-      const body = document.getElementById('bookingModalBody');
-
-      title.textContent = `Booking ${booking.fields['Booking Reference']}`;
-
-      const driveTimeSection = booking.driveTimeInfo ? `
-        <div style="background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 12px; padding: 16px; margin: 16px 0;">
-          <h4 style="margin: 0 0 12px 0; color: #1e40af;">🚗 Drive Time Information</h4>
-          <div class="detail-item">
-            <span class="detail-label">From Previous Booking</span>
-            <span class="detail-value">${booking.driveTimeInfo.fromBooking}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Drive Time</span>
-            <span class="detail-value">${booking.driveTimeInfo.driveTimeFormatted}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Previous End Time</span>
-            <span class="detail-value">${booking.driveTimeInfo.previousBookingEndTime}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Current Start Time</span>
-            <span class="detail-value">${booking.driveTimeInfo.currentBookingStartTime}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Buffer Time</span>
-            <span class="detail-value">
-              ${booking.driveTimeInfo.bufferTime.available} min 
-              (${booking.driveTimeInfo.bufferTime.sufficient ? '✓ Sufficient' : '⚠️ Tight Schedule'})
-            </span>
-          </div>
-          ${booking.driveTimeInfo.hasConflict ? `
-            <div style="background: #fee2e2; border: 2px solid #ef4444; border-radius: 8px; padding: 12px; margin-top: 12px; color: #991b1b;">
-              <strong>⚠️ Schedule Conflict:</strong> Insufficient time between bookings
-            </div>
-          ` : ''}
-        </div>
-      ` : '';
-
-      const isPending = booking.fields['Payment Status'] === 'Pending';
-      const isCancelled = booking.fields['Booking Status'] === 'Cancelled';
-
-      body.innerHTML = `
-        <div class="detail-item">
-          <span class="detail-label">Reference</span>
-          <span class="detail-value">${booking.fields['Booking Reference']}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Date & Time</span>
-          <span class="detail-value">${booking.fields['Date']} at ${booking.fields['Time']}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Client Name</span>
-          <span class="detail-value">${booking.fields['Client Name']}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Client Email</span>
-          <span class="detail-value">${booking.fields['Client Email']}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Property Address</span>
-          <span class="detail-value">${booking.fields['Property Address'] || '-'}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Service</span>
-          <span class="detail-value">${booking.fields['Service'] || '-'}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Total Price</span>
-          <span class="detail-value">£${(booking.fields['Total Price'] || 0).toFixed(2)}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Payment Status</span>
-          <span class="detail-value">
-            <span class="status-badge status-${(booking.fields['Payment Status'] || '').toLowerCase()}">
-              ${booking.fields['Payment Status'] || '-'}
-            </span>
-          </span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Booking Status</span>
-          <span class="detail-value">
-            <span class="status-badge status-${isCancelled ? 'cancelled' : 'active'}">
-              ${booking.fields['Booking Status'] || 'Booked'}
-            </span>
-          </span>
-        </div>
-        ${driveTimeSection}
-        
-        ${!isCancelled ? `
-          <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
-            <div class="action-buttons-grid">
-              
-              ${isPending ? `
-                <button class="btn btn-success" onclick="chargePendingBooking('${booking.id}')" style="width: 100%; justify-content: center;">
-                  💳 Charge Card
-                </button>
-                <button class="btn btn-primary" onclick='processPayment("${booking.id}", "${booking.fields['Booking Reference']}")' style="width: 100%; justify-content: center;">
-                  📧 Send Payment Link
-                </button>
-              ` : ''}
-              
-              <button class="btn btn-primary" onclick="showAdminReschedule('${booking.id}')" style="width: 100%; justify-content: center;">
-                📅 Reschedule
-              </button>
-              
-              <button class="btn btn-secondary" onclick="showModifyService('${booking.id}')" style="width: 100%; justify-content: center;">
-                ✏️ Modify Service
-              </button>
-              
-              <button class="btn btn-danger" onclick="showAdminCancel('${booking.id}')" style="width: 100%; justify-content: center;">
-                ❌ Cancel
-              </button>
-            </div>
-
-            <div class="info-box" style="margin-top: 16px;">
-              <strong>ℹ️ Admin Actions:</strong> These actions will automatically send email notifications to customers.
-            </div>
-          </div>
-        ` : `
-          <div style="margin-top: 24px; padding: 16px; background: #fee2e2; border: 2px solid #ef4444; border-radius: 12px; text-align: center; color: #991b1b;">
-            <strong>❌ This booking has been cancelled</strong>
-          </div>
-        `}
-      `;
-
-      modal.classList.add('active');
-    }
-
-   async function processPayment(bookingId, bookingRef) {
-  if (!confirm(`Send payment link for booking ${bookingRef}?\n\nThe customer will receive an email with a secure payment link.`)) return;
-
-  // Show loading state
-  const btn = event.target;
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '⏳ Sending...';
-  btn.disabled = true;
-
+async function saveQuickBlock(event, dateStr) {
+  event.preventDefault();
+  
+  const region = document.getElementById('quickBlockRegion').value;
+  const startTime = document.getElementById('quickBlockStartTime').value;
+  const endTime = document.getElementById('quickBlockEndTime').value;
+  const reason = document.getElementById('quickBlockReason').value.trim();
+  
+  if (startTime >= endTime) {
+    alert('❌ End time must be after start time');
+    return;
+  }
+  
   try {
-    const response = await fetch('/.netlify/functions/process-reserved-payment', {
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bookingId, bookingRef })
+      body: JSON.stringify({
+        method: 'POST',
+        table: 'Blocked Times',
+        body: {
+          fields: {
+            'Region': region,
+            'Date': dateStr,
+            'Start Time': startTime,
+            'End Time': endTime,
+            'Reason': reason || 'Admin block',
+            'Created By': 'Admin Calendar'
+          }
+        }
+      })
     });
-
-    const data = await response.json();
-
-    if (data.success) {
-      alert(`✅ Payment link sent successfully!\n\nEmail sent to customer\n\nPayment URL:\n${data.paymentLink}`);
-      closeModal('bookingModal');
-      loadBookings();
-      loadPendingBookings();
-      loadDashboardStats();
-    } else {
-      alert(`❌ Error: ${data.error}`);
-      btn.innerHTML = originalText;
-      btn.disabled = false;
+    
+    if (!response.ok) {
+      throw new Error('Failed to create blocked time');
     }
-
+    
+    alert(`✅ Time blocked!\n\n${region} - ${dateStr}\n${startTime} to ${endTime}`);
+    closeQuickBlockModal();
+    loadCalendar(); // Refresh calendar
+    
   } catch (error) {
-    console.error('Error processing payment:', error);
-    alert('❌ Error sending payment link');
-    btn.innerHTML = originalText;
-    btn.disabled = false;
+    console.error('Error creating blocked time:', error);
+    alert('❌ Failed to block time');
   }
 }
 
-    // ===== ADMIN BOOKING ACTIONS =====
-    async function chargePendingBooking(bookingId) {
-      const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
-      if (!booking) return alert('Booking data not found');
+// ===== VIEW BLOCKED TIME DETAILS =====
 
-      if (booking.fields['Payment Status'] !== 'Pending') {
-        alert(`❌ Cannot charge card\n\nThis booking is not in "Pending" status.\nCurrent status: ${booking.fields['Payment Status'] || 'Unknown'}\n\nOnly bookings with "Pending" payment status can be charged.`);
-        return;
-      }
-
-      if (!booking.fields['Stripe Payment Method ID']) {
-        alert(`❌ No payment method on file\n\nThis booking does not have a saved card.\n\nPlease use "Send Payment Link" instead.`);
-        return;
-      }
-
-      const clientName = booking.fields['Client Name'];
-      const amount = (booking.fields['Total Price'] || 0).toFixed(2);
-      
-      if (!confirm(`Charge ${clientName}'s saved card?\n\nAmount: £${amount}\n\nThis will immediately charge their payment method and send a confirmation email.`)) return;
-      
-      const btn = event.target;
-      const originalText = btn.innerHTML;
-      btn.innerHTML = '⏳ Processing...';
-      btn.disabled = true;
-
-      try {
-        const response = await fetch('/.netlify/functions/charge-card', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bookingId })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          alert(`✅ Payment Successful!\n\nCharged: £${data.amount.toFixed(2)}\nClient: ${clientName}\n\nConfirmation email sent automatically.`);
-          closeModal('bookingModal');
-          loadBookings();
-          loadPendingBookings();
-          loadDashboardStats();
-          loadCalendar();
-        } else {
-          alert(`❌ Payment Failed\n\n${data.error || 'Unknown error'}\n\n${data.userMessage || 'Please try sending a payment link instead.'}`);
-          btn.innerHTML = originalText;
-          btn.disabled = false;
-        }
-      } catch (error) {
-        console.error('Error charging card:', error);
-        alert('❌ System Error\n\nFailed to process payment. Please try again or contact support.');
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-      }
-    }
-
-    // Show Reschedule Modal
-function showAdminReschedule(bookingId) {
-  const booking = allBookings.find(b => b.id === bookingId) || currentBooking;
-  if (!booking) return;
+function viewBlockedTime(blockId) {
+  // Fetch from allBlockedTimes if available, or make API call
+  const modal = document.createElement('div');
+  modal.className = 'modal active';
+  modal.id = 'viewBlockModal';
+  modal.style.zIndex = '10000';
   
-  const modal = document.getElementById('rescheduleModal');
-  const modalBody = document.getElementById('rescheduleModalBody');
-  
-  modalBody.innerHTML = `
-    <div class="form-group">
-      <label class="form-label">Current Date & Time</label>
-      <div style="padding: 12px; background: #f8fafc; border-radius: 8px; font-weight: 600;">
-        ${booking.fields['Date']} at ${booking.fields['Time']}
+  // Fetch the block details
+  fetch('/.netlify/functions/airtable-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      method: 'GET',
+      table: 'Blocked Times',
+      recordId: blockId
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    const fields = data.fields;
+    const date = new Date(fields['Date']);
+    
+    modal.innerHTML = `
+      <div class="modal-dialog" style="max-width: 500px;">
+        <div class="modal-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+          <h3>🚫 Blocked Time</h3>
+          <button class="modal-close" onclick="closeViewBlockModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-item">
+            <span class="detail-label">Region</span>
+            <span class="detail-value">
+              <span class="region-badge ${fields['Region'].toLowerCase()}">${fields['Region']}</span>
+            </span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Date</span>
+            <span class="detail-value">${date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Time Blocked</span>
+            <span class="detail-value"><strong>${fields['Start Time']} - ${fields['End Time']}</strong></span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Reason</span>
+            <span class="detail-value">${fields['Reason'] || 'Not specified'}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Created By</span>
+            <span class="detail-value">${fields['Created By'] || 'Admin'}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Created Date</span>
+            <span class="detail-value">${new Date(fields['Created Date']).toLocaleDateString('en-GB')}</span>
+          </div>
+          
+          <div style="margin-top: 24px;">
+            <button class="btn btn-danger" style="width: 100%;" onclick="deleteBlockFromCalendar('${blockId}', '${fields['Date']}')">
+              🗑️ Remove Block
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label" for="rescheduleDate">New Date *</label>
-      <input 
-        type="date" 
-        id="rescheduleDate" 
-        class="form-input" 
-        value="${booking.fields['Date']}"
-        min="${new Date().toISOString().split('T')[0]}"
-      />
-    </div>
-
-    <div class="form-group">
-      <label class="form-label" for="rescheduleTime">New Time *</label>
-      <select id="rescheduleTime" class="form-input">
-        ${generateTimeOptions(booking.fields['Time'])}
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-        <input type="checkbox" id="rescheduleSendEmail" checked style="width: 20px; height: 20px;">
-        <span style="font-size: 14px; font-weight: 600;">Send email notification to customer</span>
-      </label>
-    </div>
-
-    <div class="button-group" style="margin-top: 24px;">
-      <button class="btn btn-secondary" onclick="closeModal('rescheduleModal')" style="flex: 1;">
-        Cancel
-      </button>
-      <button class="btn btn-primary" onclick="confirmReschedule('${bookingId}')" style="flex: 2;">
-        Confirm Reschedule
-      </button>
-    </div>
-  `;
-  
-  modal.classList.add('active');
+    `;
+    
+    document.body.appendChild(modal);
+  })
+  .catch(error => {
+    console.error('Error loading blocked time:', error);
+    alert('❌ Failed to load blocked time details');
+  });
 }
 
-function generateTimeOptions(currentTime) {
+function closeViewBlockModal() {
+  const modal = document.getElementById('viewBlockModal');
+  if (modal) modal.remove();
+}
+
+async function deleteBlockFromCalendar(recordId, date) {
+  if (!confirm(`Remove this time block for ${date}?`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'DELETE',
+        table: 'Blocked Times',
+        recordId: recordId
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to delete blocked time');
+    }
+    
+    alert('✅ Time block removed!');
+    closeViewBlockModal();
+    loadCalendar(); // Refresh calendar
+    
+  } catch (error) {
+    console.error('Error deleting blocked time:', error);
+    alert('❌ Failed to remove time block');
+  }
+}
+
+// Helper function (if not already present)
+function generateTimeOptions(selectedTime = '') {
   const times = [];
-  for (let hour = 9; hour <= 17; hour++) {
+  for (let hour = 9; hour <= 18; hour++) {
     for (let minute of [0, 30]) {
-      if (hour === 17 && minute === 30) break;
+      if (hour === 18 && minute === 30) break;
       const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-      const selected = timeStr === currentTime ? 'selected' : '';
+      const selected = timeStr === selectedTime ? 'selected' : '';
       times.push(`<option value="${timeStr}" ${selected}>${timeStr}</option>`);
     }
   }
