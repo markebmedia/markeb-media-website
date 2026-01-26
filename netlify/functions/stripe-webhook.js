@@ -99,47 +99,46 @@ exports.handler = async (event, context) => {
       const capitalizedRegion = metadata.region 
         ? metadata.region.charAt(0).toUpperCase() + metadata.region.slice(1).toLowerCase()
         : 'Unknown';
-
-      // ✅ CREATE booking with EXACT field names from create-booking.js
-      const bookingRecord = await base('Bookings').create([
-        {
-          fields: {
-            'Booking Reference': bookingRef,
-            'Date': metadata.date,
-            'Time': metadata.time,
-            'Postcode': metadata.postcode,
-            'Property Address': metadata.propertyAddress,
-            'Region': capitalizedRegion, // North or South
-            'Media Specialist': metadata.mediaSpecialist,
-            'Service': metadata.service, // ✅ Service NAME (not ID)
-            'Service ID': metadata.serviceId, // ✅ Service ID
-            'Duration (mins)': parseInt(metadata.duration) || 90,
-            'Bedrooms': bedrooms,
-            'Base Price': basePrice,
-            'Extra Bedroom Fee': extraBedroomFee,
-            'Add-Ons': addonsText, // ✅ Formatted with prices
-            'Add-ons Price': addonsPrice, // ✅ Lowercase 'o'
-            'Total Price': totalPrice,
-            'Client Name': metadata.clientName,
-            'Client Email': metadata.clientEmail,
-            'Client Phone': metadata.clientPhone,
-            'Client Notes': metadata.clientNotes || '',
-            
-            // ✅ Payment fields matching create-booking
-            'Booking Status': 'Confirmed',
-            'Payment Status': 'Paid',
-            'Payment Method': 'Stripe',
-            'Stripe Session ID': session.id,
-            'Stripe Payment Intent ID': session.payment_intent,
-            'Payment Date': new Date().toISOString(),
-            'Amount Paid': totalPrice,
-            
-            // Metadata
-            'Created Date': new Date().toISOString(),
-            'Cancellation Allowed Until': new Date(new Date(metadata.date).getTime() - 24 * 60 * 60 * 1000).toISOString()
-          }
-        }
-      ]);
+// ✅ CREATE booking with EXACT field names from create-booking.js
+const bookingRecord = await base('Bookings').create([
+  {
+    fields: {
+      'Booking Reference': bookingRef,
+      'Date': metadata.date,
+      'Time': metadata.time,
+      'Postcode': metadata.postcode,
+      'Property Address': metadata.propertyAddress,
+      'Region': capitalizedRegion,
+      'Media Specialist': metadata.mediaSpecialist,
+      'Service': metadata.service,
+      'Service ID': metadata.serviceId,
+      'Duration (mins)': parseInt(metadata.duration) || 90,
+      'Bedrooms': bedrooms,
+      'Base Price': basePrice,
+      'Extra Bedroom Fee': extraBedroomFee,
+      'Add-Ons': addonsText,
+      'Add-Ons Price': addonsPrice, // ✅ FIXED: Capital O
+      'Final Price': totalPrice, // ✅ FIXED: Changed from 'Total Price'
+      'Client Name': metadata.clientName,
+      'Client Email': metadata.clientEmail,
+      'Client Phone': metadata.clientPhone,
+      'Client Notes': metadata.clientNotes || '',
+      
+      // Payment fields
+      'Booking Status': 'Confirmed',
+      'Payment Status': 'Paid',
+      'Payment Method': 'Stripe',
+      'Stripe Session ID': session.id,
+      'Stripe Payment Intent ID': session.payment_intent,
+      'Payment Date': new Date().toISOString(),
+      'Amount Paid': totalPrice,
+      
+      // Metadata
+      'Created Date': new Date().toISOString(),
+      'Cancellation Allowed Until': new Date(new Date(metadata.date).getTime() - 24 * 60 * 60 * 1000).toISOString()
+    }
+  }
+]);
 
       console.log('✅ Booking created from webhook:', bookingRecord[0].id);
 
