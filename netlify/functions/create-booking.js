@@ -229,10 +229,10 @@ const airtableRecord = {
     'Add-Ons Price': addonsPrice,
     
     // ✅ FIXED: Only include discount fields if discount was applied
-    'Discount Code': discountAmount > 0 ? bookingData.discountCode : '',
-    'Discount Amount': discountAmount,
-    'Price Before Discount': priceBeforeDiscount,
-    'Total Price': finalPrice,
+'Discount Code': discountAmount > 0 ? bookingData.discountCode : '',
+'Discount Amount': discountAmount,
+'Price Before Discount': priceBeforeDiscount,
+'Final Price': finalPrice, // ✅ CHANGED from 'Total Price'
     
     'Client Name': bookingData.clientName,
     'Client Email': bookingData.clientEmail,
