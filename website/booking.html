@@ -2545,23 +2545,41 @@ async function applyDiscountCode() {
     return;
   }
   
+  if (!bookingData.service) {
+    input.classList.add('error');
+    errorMsg.textContent = 'Please select a service first';
+    errorMsg.classList.add('show');
+    return;
+  }
+  
   // Show loading
   applyBtn.disabled = true;
   applyBtn.innerHTML = '<div class="loading-spinner"></div>';
   
   try {
+    // ✅ FIXED: Capitalize region for Airtable lookup
+    const regionCapitalized = bookingData.region.charAt(0).toUpperCase() + bookingData.region.slice(1);
+    
+    console.log('Validating discount code:', {
+      code,
+      region: regionCapitalized,
+      serviceId: bookingData.service.id,
+      totalPrice: bookingData.totalPrice
+    });
+    
     const response = await fetch('/.netlify/functions/validate-discount-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         code: code,
         totalPrice: bookingData.totalPrice,
-        region: bookingData.region,
-        serviceId: bookingData.service?.id
+        region: regionCapitalized, // ✅ 'North' or 'South'
+        serviceId: bookingData.service.id
       })
     });
     
     const data = await response.json();
+    console.log('Discount validation response:', data);
     
     if (data.success) {
       // Store discount data
@@ -2597,17 +2615,18 @@ async function applyDiscountCode() {
       
     } else {
       input.classList.add('error');
-      errorMsg.textContent = data.error;
+      errorMsg.textContent = data.error || 'Invalid discount code';
       errorMsg.classList.add('show');
     }
     
   } catch (error) {
     console.error('Error applying discount:', error);
     input.classList.add('error');
-    errorMsg.textContent = 'Failed to apply discount code';
+    errorMsg.textContent = 'Failed to apply discount code. Please try again.';
     errorMsg.classList.add('show');
   }
   
+  // Reset button
   applyBtn.disabled = false;
   applyBtn.innerHTML = 'Apply';
 }
