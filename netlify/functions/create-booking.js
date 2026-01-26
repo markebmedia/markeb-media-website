@@ -141,59 +141,72 @@ console.log(`Final status - Payment: ${paymentStatus}, Booking: ${bookingStatus}
     const addonsPrice = bookingData.addonsPrice || 0;
 
     // ✅ NEW: Handle discount code
-    let discountCodeId = null;
-    let discountAmount = 0;
-    let priceBeforeDiscount = bookingData.totalPrice;
-    let finalPrice = bookingData.totalPrice;
+let discountCodeId = null;
+let discountAmount = 0;
+let priceBeforeDiscount = 0; // ✅ Changed: Default to 0, not totalPrice
+let finalPrice = bookingData.totalPrice;
 
-    if (bookingData.discountCode) {
-      console.log('Discount code applied:', bookingData.discountCode);
-      
-      discountAmount = bookingData.discountAmount || 0;
-      priceBeforeDiscount = bookingData.priceBeforeDiscount || bookingData.totalPrice;
-      finalPrice = bookingData.totalPrice; // Already discounted in frontend
-      
-      // Increment usage count for discount code
-      try {
-        const discountFilterFormula = `UPPER({Code}) = "${bookingData.discountCode.toUpperCase()}"`;
-        const discountUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_TABLE}?filterByFormula=${encodeURIComponent(discountFilterFormula)}`;
-        
-        const discountResponse = await fetch(discountUrl, {
-          headers: {
-            'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
-          }
-        });
-        
-        const discountData = await discountResponse.json();
-        
-        if (discountData.records && discountData.records.length > 0) {
-          const discountRecord = discountData.records[0];
-          discountCodeId = discountRecord.id;
-          const currentUsage = discountRecord.fields['Times Used'] || 0;
-          
-          // Update usage count
-          const updateDiscountUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_TABLE}/${discountCodeId}`;
-          
-          await fetch(updateDiscountUrl, {
-            method: 'PATCH',
-            headers: {
-              'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              fields: {
-                'Times Used': currentUsage + 1
-              }
-            })
-          });
-          
-          console.log(`✓ Discount code usage updated: ${bookingData.discountCode}`);
-        }
-      } catch (discountError) {
-        console.error('Error updating discount code usage:', discountError);
-        // Don't fail the booking if discount update fails
+if (bookingData.discountCode && bookingData.discountAmount > 0) {
+  console.log('Discount code applied:', bookingData.discountCode);
+  
+  discountAmount = bookingData.discountAmount || 0;
+  priceBeforeDiscount = bookingData.priceBeforeDiscount || (bookingData.totalPrice + discountAmount);
+  finalPrice = bookingData.totalPrice; // Already discounted in frontend
+  
+  console.log('Discount details:', {
+    code: bookingData.discountCode,
+    discountAmount,
+    priceBeforeDiscount,
+    finalPrice
+  });
+  
+  // Increment usage count for discount code
+  try {
+    const discountFilterFormula = `UPPER({Code}) = "${bookingData.discountCode.toUpperCase()}"`;
+    
+    // ✅ FIXED: Use correct env variable name
+    const discountUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_CODES_TABL}?filterByFormula=${encodeURIComponent(discountFilterFormula)}`;
+    
+    const discountResponse = await fetch(discountUrl, {
+      headers: {
+        'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
       }
+    });
+    
+    const discountData = await discountResponse.json();
+    
+    if (discountData.records && discountData.records.length > 0) {
+      const discountRecord = discountData.records[0];
+      discountCodeId = discountRecord.id;
+      const currentUsage = discountRecord.fields['Times Used'] || 0;
+      
+      // Update usage count
+      const updateDiscountUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_CODES_TABL}/${discountCodeId}`;
+      
+      await fetch(updateDiscountUrl, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          fields: {
+            'Times Used': currentUsage + 1
+          }
+        })
+      });
+      
+      console.log(`✓ Discount code usage updated: ${bookingData.discountCode} (${currentUsage} → ${currentUsage + 1})`);
+    } else {
+      console.warn('⚠️ Discount code record not found in Airtable:', bookingData.discountCode);
     }
+  } catch (discountError) {
+    console.error('Error updating discount code usage:', discountError);
+    // Don't fail the booking if discount update fails
+  }
+} else {
+  console.log('No discount code applied');
+}
 
     // Prepare Airtable record
 const airtableRecord = {
@@ -215,11 +228,11 @@ const airtableRecord = {
     'Add-Ons': addonsText,
     'Add-Ons Price': addonsPrice,
     
-    // ✅ NEW: Discount fields
-    'Discount Code': bookingData.discountCode || '',
+    // ✅ FIXED: Only include discount fields if discount was applied
+    'Discount Code': discountAmount > 0 ? bookingData.discountCode : '',
     'Discount Amount': discountAmount,
     'Price Before Discount': priceBeforeDiscount,
-    'Total Price': finalPrice, // ✅ Changed: now uses discounted price
+    'Total Price': finalPrice,
     
     'Client Name': bookingData.clientName,
     'Client Email': bookingData.clientEmail,
