@@ -2375,44 +2375,50 @@
     }
 
     // Create Booking
-    async function createBooking() {
-      const bookingPayload = {
-        postcode: bookingData.postcode,
-        propertyAddress: bookingData.propertyAddress,
-        region: bookingData.region, // ✅ FIXED: lowercase 'north' or 'south'
-        mediaSpecialist: bookingData.mediaSpecialist,
-        date: bookingData.selectedDate,
-        time: bookingData.selectedTime,
-        service: bookingData.service.name,
-        serviceId: bookingData.service.id,
-        duration: bookingData.service.duration + (bookingData.addonsDuration || 0),
-        bedrooms: bookingData.bedrooms,
-        basePrice: bookingData.basePrice,
-        extraBedroomFee: bookingData.extraBedroomFee,
-        addons: bookingData.selectedAddons.map(id => ({
-          id: id,
-          name: ADDONS[id].name,
-          price: ADDONS[id].price
-        })),
-        addonsPrice: bookingData.addonsPrice || 0,
-        totalPrice: bookingData.totalPrice,
-        clientName: bookingData.clientName,
-        clientEmail: bookingData.clientEmail,
-        clientPhone: bookingData.clientPhone,
-        clientNotes: bookingData.clientNotes,
-        paymentOption: bookingData.paymentOption,
-        
-        // Stripe Payment Method (card on file)
-        stripePaymentMethodId: bookingData.stripePaymentMethodId || '',
-        cardholderName: bookingData.cardholderName || '',
-        cardLast4: bookingData.cardLast4 || '',
-        cardBrand: bookingData.cardBrand || '',
-        cardExpiry: bookingData.cardExpiry || '',
-        
-        status: 'Booked'
-      };
-      
-      console.log('Creating booking with payload:', bookingPayload);
+async function createBooking() {
+  const bookingPayload = {
+    postcode: bookingData.postcode,
+    propertyAddress: bookingData.propertyAddress,
+    region: bookingData.region,
+    mediaSpecialist: bookingData.mediaSpecialist,
+    date: bookingData.selectedDate,
+    time: bookingData.selectedTime,
+    service: bookingData.service.name,
+    serviceId: bookingData.service.id,
+    duration: bookingData.service.duration + (bookingData.addonsDuration || 0),
+    bedrooms: bookingData.bedrooms,
+    basePrice: bookingData.basePrice,
+    extraBedroomFee: bookingData.extraBedroomFee,
+    addons: bookingData.selectedAddons.map(id => ({
+      id: id,
+      name: ADDONS[id].name,
+      price: ADDONS[id].price
+    })),
+    addonsPrice: bookingData.addonsPrice || 0,
+    
+    // ✅ ADD THESE DISCOUNT FIELDS
+    discountCode: bookingData.discountCode || '',
+    discountAmount: bookingData.discountAmount || 0,
+    priceBeforeDiscount: bookingData.priceBeforeDiscount || 0,
+    totalPrice: bookingData.totalPrice, // This should be the discounted price
+    
+    clientName: bookingData.clientName,
+    clientEmail: bookingData.clientEmail,
+    clientPhone: bookingData.clientPhone,
+    clientNotes: bookingData.clientNotes,
+    paymentOption: bookingData.paymentOption,
+    
+    // Stripe Payment Method (card on file)
+    stripePaymentMethodId: bookingData.stripePaymentMethodId || '',
+    cardholderName: bookingData.cardholderName || '',
+    cardLast4: bookingData.cardLast4 || '',
+    cardBrand: bookingData.cardBrand || '',
+    cardExpiry: bookingData.cardExpiry || '',
+    
+    status: 'Booked'
+  };
+  
+  console.log('Creating booking with payload:', bookingPayload);
       
       const response = await fetch('/.netlify/functions/create-booking', {
         method: 'POST',
