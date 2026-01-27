@@ -2249,130 +2249,163 @@
     });
 
     // Complete Booking
-    async function completeBooking() {
-      const name = document.getElementById('clientName').value.trim();
-      const email = document.getElementById('clientEmail').value.trim();
-      const phone = document.getElementById('clientPhone').value.trim();
-      const notes = document.getElementById('clientNotes').value.trim();
+async function completeBooking() {
+  const name = document.getElementById('clientName').value.trim();
+  const email = document.getElementById('clientEmail').value.trim();
+  const phone = document.getElementById('clientPhone').value.trim();
+  const notes = document.getElementById('clientNotes').value.trim();
 
-      // Clear previous errors
-      document.querySelectorAll('.form-input').forEach(input => input.classList.remove('error'));
-      document.querySelectorAll('.error-message').forEach(msg => msg.classList.remove('show'));
+  // Clear previous errors
+  document.querySelectorAll('.form-input').forEach(input => input.classList.remove('error'));
+  document.querySelectorAll('.error-message').forEach(msg => msg.classList.remove('show'));
 
-      let hasError = false;
+  let hasError = false;
 
-      // Validate name
-      if (!name || name.length < 2) {
-        document.getElementById('clientName').classList.add('error');
-        document.getElementById('nameError').classList.add('show');
-        hasError = true;
-      }
+  // Validate name
+  if (!name || name.length < 2) {
+    document.getElementById('clientName').classList.add('error');
+    document.getElementById('nameError').classList.add('show');
+    hasError = true;
+  }
 
-      // Validate email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!email || !emailRegex.test(email)) {
-        document.getElementById('clientEmail').classList.add('error');
-        document.getElementById('emailError').classList.add('show');
-        hasError = true;
-      }
+  // Validate email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email)) {
+    document.getElementById('clientEmail').classList.add('error');
+    document.getElementById('emailError').classList.add('show');
+    hasError = true;
+  }
 
-      // Validate phone
-      const phoneRegex = /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/;
-      if (!phone || !phoneRegex.test(phone.replace(/\s/g, ''))) {
-        document.getElementById('clientPhone').classList.add('error');
-        document.getElementById('phoneError').classList.add('show');
-        hasError = true;
-      }
+  // Validate phone
+  const phoneRegex = /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/;
+  if (!phone || !phoneRegex.test(phone.replace(/\s/g, ''))) {
+    document.getElementById('clientPhone').classList.add('error');
+    document.getElementById('phoneError').classList.add('show');
+    hasError = true;
+  }
 
-      // Create Stripe Payment Method if Reserve Without Payment
-      let paymentMethodId = null;
-      if (bookingData.paymentOption === 'reserve') {
-        const cardholderName = document.getElementById('cardholderName').value.trim();
-        
-        if (!cardholderName || cardholderName.length < 2) {
-          document.getElementById('cardholderName').classList.add('error');
-          document.getElementById('cardholderNameError').classList.add('show');
-          hasError = true;
-        }
-        
-        if (hasError) {
-          const firstError = document.querySelector('.form-input.error');
-          if (firstError) {
-            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-          return;
-        }
-        
-        // Show loading state
-        const submitBtn = document.getElementById('completeBookingBtn');
-        submitBtn.disabled = true;
-        submitBtn.classList.add('loading');
-        
-        try {
-          // Create payment method with Stripe
-          const { paymentMethod, error } = await stripe.createPaymentMethod({
-            type: 'card',
-            card: cardElement,
-            billing_details: {
-              name: cardholderName,
-              email: email
-            }
-          });
-          
-          if (error) {
-            throw new Error(error.message);
-          }
-          
-          paymentMethodId = paymentMethod.id;
-          
-          // Get card details for display
-          bookingData.cardholderName = cardholderName;
-          bookingData.cardLast4 = paymentMethod.card.last4;
-          bookingData.cardBrand = paymentMethod.card.brand;
-          bookingData.cardExpiry = `${paymentMethod.card.exp_month.toString().padStart(2, '0')}/${paymentMethod.card.exp_year.toString().slice(-2)}`;
-          bookingData.stripePaymentMethodId = paymentMethodId;
-          
-        } catch (error) {
-          console.error('Stripe error:', error);
-          document.getElementById('stripeCardError').textContent = error.message || 'Failed to save card details. Please try again.';
-          document.getElementById('stripeCardError').classList.add('show');
-          
-          submitBtn.disabled = false;
-          submitBtn.classList.remove('loading');
-          return;
-        }
-      }
-      
-      if (hasError) {
-        const firstError = document.querySelector('.form-input.error');
-        if (firstError) {
-          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        return;
-      }
-      
-      bookingData.clientName = name;
-      bookingData.clientEmail = email;
-      bookingData.clientPhone = phone;
-      bookingData.clientNotes = notes;
-      
-      const submitBtn = document.getElementById('completeBookingBtn');
-      submitBtn.classList.add('loading');
-      submitBtn.disabled = true;
-      
-      try {
-        if (bookingData.paymentOption === 'pay-now') {
-          await processStripePayment();
-        } else {
-          await createBooking();
-        }
-      } catch (error) {
-        console.error('Booking error:', error);
-        alert('Failed to create booking. Please try again.');
-        submitBtn.classList.remove('loading');
-        submitBtn.disabled = false;
-      }
+  if (hasError) {
+    const firstError = document.querySelector('.form-input.error');
+    if (firstError) {
+      firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+    return;
+  }
+
+  // ✅ NEW: Check if booking is free (£0 total) - SKIP ALL PAYMENT LOGIC
+  if (bookingData.totalPrice === 0) {
+    console.log('Total is £0 - creating free booking');
+    
+    bookingData.clientName = name;
+    bookingData.clientEmail = email;
+    bookingData.clientPhone = phone;
+    bookingData.clientNotes = notes;
+    bookingData.paymentOption = 'free';
+    
+    const submitBtn = document.getElementById('completeBookingBtn');
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+    
+    try {
+      await createBooking();
+    } catch (error) {
+      console.error('Booking error:', error);
+      alert('Failed to create booking. Please try again.');
+      submitBtn.classList.remove('loading');
+      submitBtn.disabled = false;
+    }
+    return; // Exit early - skip all card/payment logic below
+  }
+
+  // Create Stripe Payment Method if Reserve Without Payment
+  let paymentMethodId = null;
+  if (bookingData.paymentOption === 'reserve') {
+    const cardholderName = document.getElementById('cardholderName').value.trim();
+    
+    if (!cardholderName || cardholderName.length < 2) {
+      document.getElementById('cardholderName').classList.add('error');
+      document.getElementById('cardholderNameError').classList.add('show');
+      hasError = true;
+    }
+    
+    if (hasError) {
+      const firstError = document.querySelector('.form-input.error');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+    
+    // Show loading state
+    const submitBtn = document.getElementById('completeBookingBtn');
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+    
+    try {
+      // Create payment method with Stripe
+      const { paymentMethod, error } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+        billing_details: {
+          name: cardholderName,
+          email: email
+        }
+      });
+      
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      paymentMethodId = paymentMethod.id;
+      
+      // Get card details for display
+      bookingData.cardholderName = cardholderName;
+      bookingData.cardLast4 = paymentMethod.card.last4;
+      bookingData.cardBrand = paymentMethod.card.brand;
+      bookingData.cardExpiry = `${paymentMethod.card.exp_month.toString().padStart(2, '0')}/${paymentMethod.card.exp_year.toString().slice(-2)}`;
+      bookingData.stripePaymentMethodId = paymentMethodId;
+      
+    } catch (error) {
+      console.error('Stripe error:', error);
+      document.getElementById('stripeCardError').textContent = error.message || 'Failed to save card details. Please try again.';
+      document.getElementById('stripeCardError').classList.add('show');
+      
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('loading');
+      return;
+    }
+  }
+  
+  if (hasError) {
+    const firstError = document.querySelector('.form-input.error');
+    if (firstError) {
+      firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+  
+  bookingData.clientName = name;
+  bookingData.clientEmail = email;
+  bookingData.clientPhone = phone;
+  bookingData.clientNotes = notes;
+  
+  const submitBtn = document.getElementById('completeBookingBtn');
+  submitBtn.classList.add('loading');
+  submitBtn.disabled = true;
+  
+  try {
+    if (bookingData.paymentOption === 'pay-now') {
+      await processStripePayment();
+    } else {
+      await createBooking();
+    }
+  } catch (error) {
+    console.error('Booking error:', error);
+    alert('Failed to create booking. Please try again.');
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+  }
+}
 
     // Create Booking
 async function createBooking() {
@@ -2447,7 +2480,7 @@ async function createBooking() {
       await createBooking();
       return;
     }
-    
+
     const response = await fetch('/.netlify/functions/create-stripe-checkout', {
       method: 'POST',
       headers: {
