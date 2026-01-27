@@ -3495,13 +3495,14 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
     priceBeforeDiscount: bookingFormData.priceBeforeDiscount || totalPrice,
     totalPrice: totalPrice,
     
-    paymentOption: paymentStatus === 'Paid' ? 'pay-now' : 'reserve',
-    paymentStatus: paymentStatus,
+    paymentOption: 'reserve', // Admin always uses reserve, never Stripe
+    paymentStatus: paymentStatus, // Can be "Pending" or "Paid"
     status: 'Booked',
     createdBy: 'Admin'
   };
 
-  const confirmMsg = `Create booking for ${formData.clientName}?\n\nService: ${formData.service}\nDate: ${formData.date} at ${formData.time}\nMedia Specialist: ${formData.mediaSpecialist}\nTotal: £${totalPrice.toFixed(2)}${bookingFormData.discountCode ? `\nDiscount: ${bookingFormData.discountCode} (-£${bookingFormData.discountAmount.toFixed(2)})` : ''}`;
+  const statusText = paymentStatus === 'Paid' ? '✅ Already paid' : '⏳ Payment pending';
+  const confirmMsg = `Create booking for ${formData.clientName}?\n\nService: ${formData.service}\nDate: ${formData.date} at ${formData.time}\nMedia Specialist: ${formData.mediaSpecialist}\nTotal: £${totalPrice.toFixed(2)}${bookingFormData.discountCode ? `\nDiscount: ${bookingFormData.discountCode} (-£${bookingFormData.discountAmount.toFixed(2)})` : ''}\n\n${statusText}`;
   
   if (!confirm(confirmMsg)) {
     return;
@@ -3513,31 +3514,7 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
   btn.disabled = true;
 
   try {
-    // If "Pay Now" selected, create Stripe checkout session
-    if (paymentStatus === 'Paid') {
-      const stripeResponse = await fetch('/.netlify/functions/create-stripe-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      if (!stripeResponse.ok) {
-        throw new Error('Failed to create Stripe checkout');
-      }
-
-      const { url } = await stripeResponse.json();
-      
-      // Open Stripe checkout in new tab
-      window.open(url, '_blank');
-      alert('✅ Stripe checkout opened in new tab.\n\nComplete payment there. Booking will be created automatically upon successful payment.');
-      
-      resetBookingForm();
-      btn.innerHTML = originalText;
-      btn.disabled = false;
-      return;
-    }
-
-    // Otherwise, create booking directly (Reserve Without Payment)
+    // Admin bookings ALWAYS create directly, NEVER go to Stripe
     const response = await fetch('/.netlify/functions/create-booking', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -3547,19 +3524,18 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
     const data = await response.json();
 
     if (data.success) {
-      alert(`✅ Booking created successfully!\n\nReference: ${data.bookingRef}\nMedia Specialist: ${formData.mediaSpecialist}\nTotal: £${totalPrice.toFixed(2)}`);
+      alert(`✅ Booking created successfully!\n\nReference: ${data.bookingRef}\nMedia Specialist: ${formData.mediaSpecialist}\nTotal: £${totalPrice.toFixed(2)}\nPayment Status: ${paymentStatus}`);
       resetBookingForm();
       loadBookings();
       loadCalendar();
       loadDashboardStats();
     } else {
       alert(`❌ Error: ${data.error}`);
-      btn.innerHTML = originalText;
-      btn.disabled = false;
     }
   } catch (error) {
     console.error('Booking creation error:', error);
     alert('❌ Failed to create booking: ' + error.message);
+  } finally {
     btn.innerHTML = originalText;
     btn.disabled = false;
   }
@@ -4182,6 +4158,7 @@ function renderPendingBookingsTable(bookings) {
           <th>Service</th>
           <th>Date & Time</th>
           <th>Total</th>
+          <th>Payment Method</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -4190,6 +4167,7 @@ function renderPendingBookingsTable(bookings) {
 
   bookings.forEach(booking => {
     const fields = booking.fields;
+    const hasPaymentMethod = !!fields['Stripe Payment Method ID'];
     
     html += `
       <tr>
@@ -4208,9 +4186,19 @@ function renderPendingBookingsTable(bookings) {
         <td data-label="Total">
           <strong>£${(fields['Total Price'] || 0).toFixed(2)}</strong>
         </td>
+        <td data-label="Payment Method">
+          ${hasPaymentMethod 
+            ? '<span class="status-badge status-active">💳 Card on File</span>' 
+            : '<span class="status-badge" style="background: #fee2e2; color: #991b1b;">❌ No Card</span>'}
+        </td>
         <td data-label="Actions">
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="btn btn-success btn-small" onclick="markAsPaid('${booking.id}')">
+            ${hasPaymentMethod ? `
+              <button class="btn btn-success btn-small" onclick="chargeCard('${booking.id}', '${fields['Booking Reference']}', ${fields['Total Price']})">
+                💳 Charge Card
+              </button>
+            ` : ''}
+            <button class="btn btn-warning btn-small" onclick="markAsPaid('${booking.id}')">
               ✅ Mark Paid
             </button>
             <button class="btn btn-primary btn-small" onclick="viewBookingById('${booking.id}')">
@@ -4261,6 +4249,36 @@ async function markAsPaid(bookingId) {
   } catch (error) {
     console.error('Error marking as paid:', error);
     alert('❌ Failed to update payment status');
+  }
+}
+
+async function chargeCard(bookingId, bookingRef, amount) {
+  if (!confirm(`Charge card for booking ${bookingRef}?\n\nAmount: £${amount.toFixed(2)}\n\nThis will charge the customer's saved card immediately.`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/.netlify/functions/charge-card', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      alert(`✅ Card charged successfully!\n\nBooking: ${data.bookingRef}\nAmount: £${data.amount.toFixed(2)}\n\nConfirmation email sent to customer.`);
+      loadPendingBookings();
+      loadBookings();
+      loadCalendar();
+      loadDashboardStats();
+    } else {
+      alert(`❌ Payment Failed\n\n${data.userMessage || data.error}\n\nBooking: ${bookingRef}`);
+    }
+    
+  } catch (error) {
+    console.error('Error charging card:', error);
+    alert(`❌ Failed to charge card: ${error.message}`);
   }
 }
 

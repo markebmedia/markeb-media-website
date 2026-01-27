@@ -111,9 +111,25 @@ exports.handler = async (event, context) => {
       }
     }
 
+    // ✅ UPDATED: Use 'Final Price' instead of 'Total Price'
+    const finalPrice = fields['Final Price'] || 0;
+    
+    if (finalPrice <= 0) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ 
+          success: false, 
+          error: 'Invalid booking price',
+          bookingRef: fields['Booking Reference'],
+          userMessage: 'Cannot charge £0.00. Please check the booking details.'
+        })
+      };
+    }
+
     // Charge the card using Payment Intent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(fields['Total Price'] * 100),
+      amount: Math.round(finalPrice * 100),
       currency: 'gbp',
       payment_method: paymentMethodId,
       customer: customerId,
@@ -136,13 +152,13 @@ exports.handler = async (event, context) => {
 
     console.log('✅ Payment intent created:', paymentIntent.id, 'Status:', paymentIntent.status);
 
-    // ✅ Update booking - REMOVED 'Last Modified'
+    // Update booking
     await base('Bookings').update(bookingId, {
       'Payment Status': 'Paid',
       'Booking Status': 'Confirmed',
       'Stripe Payment Intent ID': paymentIntent.id,
       'Payment Date': new Date().toISOString(),
-      'Amount Paid': fields['Total Price']
+      'Amount Paid': finalPrice
     });
 
     console.log('✅ Booking updated - Payment Status: Paid');
@@ -152,6 +168,25 @@ exports.handler = async (event, context) => {
       try {
         const { Resend } = require('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
+
+        // ✅ Show discount info if applicable
+        const discountCode = fields['Discount Code'] || '';
+        const discountAmount = fields['Discount Amount'] || 0;
+        const priceBeforeDiscount = fields['Price Before Discount'] || finalPrice;
+        
+        let discountHTML = '';
+        if (discountCode && discountAmount > 0) {
+          discountHTML = `
+            <div style="margin-top: 16px; padding: 12px; background: #d1fae5; border-radius: 8px;">
+              <div style="font-size: 14px; color: #065f46; font-weight: 600;">🎁 Discount Applied</div>
+              <div style="font-size: 13px; color: #047857; margin-top: 4px;">
+                Code: <strong>${discountCode}</strong><br>
+                Original Price: <span style="text-decoration: line-through;">£${priceBeforeDiscount.toFixed(2)}</span><br>
+                You Saved: <strong>£${discountAmount.toFixed(2)}</strong>
+              </div>
+            </div>
+          `;
+        }
 
         await resend.emails.send({
           from: 'Markeb Media <commercial@markebmedia.com>',
@@ -172,8 +207,10 @@ exports.handler = async (event, context) => {
                 
                 <div style="background: #d1fae5; border: 2px solid #10b981; border-radius: 12px; padding: 20px; margin: 25px 0; text-align: center;">
                   <div style="font-size: 14px; color: #065f46; font-weight: 600;">PAYMENT RECEIVED</div>
-                  <div style="font-size: 36px; font-weight: 700; color: #065f46; margin-top: 8px;">£${fields['Total Price'].toFixed(2)}</div>
+                  <div style="font-size: 36px; font-weight: 700; color: #065f46; margin-top: 8px;">£${finalPrice.toFixed(2)}</div>
                 </div>
+                
+                ${discountHTML}
                 
                 <div style="background: #f8fafc; border-left: 4px solid #10b981; padding: 25px; margin: 25px 0;">
                   <h3 style="margin: 0 0 15px 0; font-size: 18px;">Booking Details</h3>
@@ -201,7 +238,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         success: true,
         message: 'Payment charged successfully',
-        amount: fields['Total Price'],
+        amount: finalPrice,
         paymentIntentId: paymentIntent.id,
         bookingRef: fields['Booking Reference']
       })
