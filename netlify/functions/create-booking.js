@@ -1,5 +1,5 @@
 // netlify/functions/create-booking.js
-// UPDATED: Now links bookings to authenticated users + sets paymentStatus correctly
+// UPDATED: Now links bookings to authenticated users + sets paymentStatus correctly + handles free bookings
 
 exports.handler = async (event, context) => {
   console.log('=== Create Booking Function (Updated with Auth) ===');
@@ -90,48 +90,55 @@ exports.handler = async (event, context) => {
       date: bookingData.date,
       time: bookingData.time,
       service: bookingData.service,
-      paymentOption: bookingData.paymentOption
+      paymentOption: bookingData.paymentOption,
+      totalPrice: bookingData.totalPrice
     });
 
     // Generate booking reference
     const timestamp = Date.now();
     const bookingRef = `BK-${timestamp}`;
 
-    // ✅ FIXED: Set payment status based on payment option OR admin override
-let paymentStatus;
-let bookingStatus;
+    // ✅ UPDATED: Set payment status based on payment option, admin override, or free booking
+    let paymentStatus;
+    let bookingStatus;
 
-// ✅ NEW: Check if this is an admin booking FIRST
-if (bookingData.createdBy === 'Admin') {
-  // ADMIN BOOKING - Use direct status control
-  console.log('Admin booking detected');
-  paymentStatus = bookingData.paymentStatus || 'Pending';
-  
-  if (paymentStatus === 'Paid') {
-    bookingStatus = 'Confirmed';
-  } else {
-    bookingStatus = 'Reserved';
-  }
-  
-  console.log(`Admin booking: Payment=${paymentStatus}, Booking=${bookingStatus}`);
-  
-// ✅ EXISTING: Customer bookings work EXACTLY as before
-} else if (bookingData.paymentOption === 'pay-now') {
-  // This shouldn't happen in create-booking (should go through Stripe webhook)
-  // But if it does, mark as Paid
-  paymentStatus = 'Paid';
-  bookingStatus = 'Confirmed';
-} else if (bookingData.paymentOption === 'reserve') {
-  // Card on file, payment pending
-  paymentStatus = 'Pending';
-  bookingStatus = 'Reserved';
-} else {
-  // Fallback
-  paymentStatus = 'Pending';
-  bookingStatus = 'Booked';
-}
+    // ✅ NEW: Check if this is an admin booking FIRST
+    if (bookingData.createdBy === 'Admin') {
+      // ADMIN BOOKING - Use direct status control
+      console.log('Admin booking detected');
+      paymentStatus = bookingData.paymentStatus || 'Pending';
+      
+      if (paymentStatus === 'Paid') {
+        bookingStatus = 'Confirmed';
+      } else {
+        bookingStatus = 'Reserved';
+      }
+      
+      console.log(`Admin booking: Payment=${paymentStatus}, Booking=${bookingStatus}`);
+      
+    // ✅ NEW: Handle free/100% discount bookings
+    } else if (bookingData.paymentOption === 'free' || bookingData.totalPrice === 0) {
+      paymentStatus = 'Paid'; // Mark as paid (£0 = nothing to pay)
+      bookingStatus = 'Confirmed';
+      console.log('Free booking (100% discount or £0 total) - marking as Paid/Confirmed');
+      
+    // ✅ EXISTING: Customer bookings work EXACTLY as before
+    } else if (bookingData.paymentOption === 'pay-now') {
+      // This shouldn't happen in create-booking (should go through Stripe webhook)
+      // But if it does, mark as Paid
+      paymentStatus = 'Paid';
+      bookingStatus = 'Confirmed';
+    } else if (bookingData.paymentOption === 'reserve') {
+      // Card on file, payment pending
+      paymentStatus = 'Pending';
+      bookingStatus = 'Reserved';
+    } else {
+      // Fallback
+      paymentStatus = 'Pending';
+      bookingStatus = 'Booked';
+    }
 
-console.log(`Final status - Payment: ${paymentStatus}, Booking: ${bookingStatus}`);
+    console.log(`Final status - Payment: ${paymentStatus}, Booking: ${bookingStatus}`);
 
     // Prepare add-ons data
     const addonsText = bookingData.addons && bookingData.addons.length > 0
@@ -140,120 +147,119 @@ console.log(`Final status - Payment: ${paymentStatus}, Booking: ${bookingStatus}
 
     const addonsPrice = bookingData.addonsPrice || 0;
 
-// ✅ NEW: Handle discount code
-let discountCodeId = null;
-let discountAmount = 0;
-let priceBeforeDiscount = 0;
-let finalPrice = bookingData.totalPrice;
+    // ✅ Handle discount code
+    let discountCodeId = null;
+    let discountAmount = 0;
+    let priceBeforeDiscount = 0;
+    let finalPrice = bookingData.totalPrice;
 
-if (bookingData.discountCode && bookingData.discountAmount > 0) {
-  console.log('Discount code applied:', bookingData.discountCode);
-  
-  discountAmount = bookingData.discountAmount || 0;
-  priceBeforeDiscount = bookingData.priceBeforeDiscount || (bookingData.totalPrice + discountAmount);
-  finalPrice = bookingData.totalPrice; // Already discounted in frontend
-  
-  console.log('Discount details:', {
-    code: bookingData.discountCode,
-    discountAmount,
-    priceBeforeDiscount,
-    finalPrice
-  });
-  
-  // Increment usage count for discount code
-  try {
-    const discountFilterFormula = `UPPER({Code}) = "${bookingData.discountCode.toUpperCase()}"`;
-    
-    // ✅ FIXED: Use correct env variable name
-    const discountUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_CODES_TABL}?filterByFormula=${encodeURIComponent(discountFilterFormula)}`;
-    
-    const discountResponse = await fetch(discountUrl, {
-      headers: {
-        'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
-      }
-    });
-    
-    const discountData = await discountResponse.json();
-    
-    if (discountData.records && discountData.records.length > 0) {
-      const discountRecord = discountData.records[0];
-      discountCodeId = discountRecord.id;
-      const currentUsage = discountRecord.fields['Times Used'] || 0;
+    if (bookingData.discountCode && bookingData.discountAmount > 0) {
+      console.log('Discount code applied:', bookingData.discountCode);
       
-      // Update usage count
-      const updateDiscountUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_CODES_TABL}/${discountCodeId}`;
+      discountAmount = bookingData.discountAmount || 0;
+      priceBeforeDiscount = bookingData.priceBeforeDiscount || (bookingData.totalPrice + discountAmount);
+      finalPrice = bookingData.totalPrice; // Already discounted in frontend
       
-      await fetch(updateDiscountUrl, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          fields: {
-            'Times Used': currentUsage + 1
-          }
-        })
+      console.log('Discount details:', {
+        code: bookingData.discountCode,
+        discountAmount,
+        priceBeforeDiscount,
+        finalPrice
       });
       
-      console.log(`✓ Discount code usage updated: ${bookingData.discountCode} (${currentUsage} → ${currentUsage + 1})`);
+      // Increment usage count for discount code
+      try {
+        const discountFilterFormula = `UPPER({Code}) = "${bookingData.discountCode.toUpperCase()}"`;
+        
+        const discountUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_CODES_TABL}?filterByFormula=${encodeURIComponent(discountFilterFormula)}`;
+        
+        const discountResponse = await fetch(discountUrl, {
+          headers: {
+            'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
+          }
+        });
+        
+        const discountData = await discountResponse.json();
+        
+        if (discountData.records && discountData.records.length > 0) {
+          const discountRecord = discountData.records[0];
+          discountCodeId = discountRecord.id;
+          const currentUsage = discountRecord.fields['Times Used'] || 0;
+          
+          // Update usage count
+          const updateDiscountUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_CODES_TABL}/${discountCodeId}`;
+          
+          await fetch(updateDiscountUrl, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              fields: {
+                'Times Used': currentUsage + 1
+              }
+            })
+          });
+          
+          console.log(`✓ Discount code usage updated: ${bookingData.discountCode} (${currentUsage} → ${currentUsage + 1})`);
+        } else {
+          console.warn('⚠️ Discount code record not found in Airtable:', bookingData.discountCode);
+        }
+      } catch (discountError) {
+        console.error('Error updating discount code usage:', discountError);
+        // Don't fail the booking if discount update fails
+      }
     } else {
-      console.warn('⚠️ Discount code record not found in Airtable:', bookingData.discountCode);
+      console.log('No discount code applied');
+      priceBeforeDiscount = finalPrice; // ✅ When no discount, priceBeforeDiscount = finalPrice
     }
-  } catch (discountError) {
-    console.error('Error updating discount code usage:', discountError);
-    // Don't fail the booking if discount update fails
-  }
-} else {
-  console.log('No discount code applied');
-  priceBeforeDiscount = finalPrice; // ✅ ADD THIS LINE
-}
 
     // Prepare Airtable record
-const airtableRecord = {
-  fields: {
-    'Booking Reference': bookingRef,
-    'User': [userId],
-    'Date': bookingData.date,
-    'Time': bookingData.time,
-    'Postcode': bookingData.postcode,
-    'Property Address': bookingData.propertyAddress,
-    'Region': bookingData.region,
-    'Media Specialist': bookingData.mediaSpecialist,
-    'Service': bookingData.service,
-    'Service ID': bookingData.serviceId,
-    'Duration (mins)': bookingData.duration,
-    'Bedrooms': bookingData.bedrooms || 0,
-    'Base Price': bookingData.basePrice,
-    'Extra Bedroom Fee': bookingData.extraBedroomFee || 0,
-    'Add-Ons': addonsText,
-    'Add-Ons Price': addonsPrice,
-    
-    // ✅ FIXED: Only include discount fields if discount was applied
-'Discount Code': discountAmount > 0 ? bookingData.discountCode : '',
-'Discount Amount': discountAmount,
-'Price Before Discount': priceBeforeDiscount,
-'Final Price': finalPrice, // ✅ CHANGED from 'Total Price'
-    
-    'Client Name': bookingData.clientName,
-    'Client Email': bookingData.clientEmail,
-    'Client Phone': bookingData.clientPhone || '',
-    'Client Notes': bookingData.clientNotes || '',
-    'Access Instructions': bookingData.accessInstructions || '',
-    
-    'Booking Status': bookingStatus,
-    'Payment Status': paymentStatus,
-    
-    'Stripe Payment Method ID': bookingData.stripePaymentMethodId || '',
-    'Cardholder Name': bookingData.cardholderName || '',
-    'Card Last 4': bookingData.cardLast4 || '',
-    'Card Brand': bookingData.cardBrand || '',
-    'Card Expiry': bookingData.cardExpiry || '',
-    
-    'Created By': bookingData.createdBy || 'Customer',
-    'Created Date': new Date().toISOString(),
-  }
-};
+    const airtableRecord = {
+      fields: {
+        'Booking Reference': bookingRef,
+        'User': [userId],
+        'Date': bookingData.date,
+        'Time': bookingData.time,
+        'Postcode': bookingData.postcode,
+        'Property Address': bookingData.propertyAddress,
+        'Region': bookingData.region,
+        'Media Specialist': bookingData.mediaSpecialist,
+        'Service': bookingData.service,
+        'Service ID': bookingData.serviceId,
+        'Duration (mins)': bookingData.duration,
+        'Bedrooms': bookingData.bedrooms || 0,
+        'Base Price': bookingData.basePrice,
+        'Extra Bedroom Fee': bookingData.extraBedroomFee || 0,
+        'Add-Ons': addonsText,
+        'Add-Ons Price': addonsPrice,
+        
+        // ✅ Discount fields
+        'Discount Code': discountAmount > 0 ? bookingData.discountCode : '',
+        'Discount Amount': discountAmount,
+        'Price Before Discount': priceBeforeDiscount,
+        'Final Price': finalPrice,
+        
+        'Client Name': bookingData.clientName,
+        'Client Email': bookingData.clientEmail,
+        'Client Phone': bookingData.clientPhone || '',
+        'Client Notes': bookingData.clientNotes || '',
+        'Access Instructions': bookingData.accessInstructions || '',
+        
+        'Booking Status': bookingStatus,
+        'Payment Status': paymentStatus,
+        
+        'Stripe Payment Method ID': bookingData.stripePaymentMethodId || '',
+        'Cardholder Name': bookingData.cardholderName || '',
+        'Card Last 4': bookingData.cardLast4 || '',
+        'Card Brand': bookingData.cardBrand || '',
+        'Card Expiry': bookingData.cardExpiry || '',
+        
+        'Created By': bookingData.createdBy || 'Customer',
+        'Created Date': new Date().toISOString(),
+      }
+    };
 
     console.log('Creating Airtable record with payment status:', paymentStatus);
     console.log('Airtable record Region field:', airtableRecord.fields.Region);
@@ -279,7 +285,7 @@ const airtableRecord = {
     const airtableResult = await response.json();
     console.log('Booking created successfully:', bookingRef);
 
-    // // ✅ Send confirmation email via Resend (for both customer and admin bookings)
+    // ✅ Send confirmation email via Resend (for both customer and admin bookings)
     if (process.env.RESEND_API_KEY) {
       try {
         const { sendBookingConfirmation } = require('./email-service');
@@ -293,14 +299,14 @@ const airtableRecord = {
           time: bookingData.time,
           propertyAddress: bookingData.propertyAddress,
           mediaSpecialist: bookingData.mediaSpecialist,
-          totalPrice: finalPrice, // ✅ Changed: use discounted price
+          totalPrice: finalPrice,
           duration: bookingData.duration,
           paymentStatus: paymentStatus,
           bookingStatus: bookingStatus,
           createdBy: bookingData.createdBy || 'Customer',
           cardLast4: bookingData.cardLast4 || '',
-          discountCode: bookingData.discountCode || '', // ✅ NEW
-          discountAmount: discountAmount // ✅ NEW
+          discountCode: bookingData.discountCode || '',
+          discountAmount: discountAmount
         };
 
         await sendBookingConfirmation(emailData);

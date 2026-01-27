@@ -2440,6 +2440,14 @@ async function createBooking() {
 
     async function processStripePayment() {
   try {
+    // ✅ NEW: If total is £0, skip Stripe and create booking directly
+    if (bookingData.totalPrice === 0) {
+      console.log('Total is £0 - creating booking without payment');
+      bookingData.paymentOption = 'free';
+      await createBooking();
+      return;
+    }
+    
     const response = await fetch('/.netlify/functions/create-stripe-checkout', {
       method: 'POST',
       headers: {
@@ -2477,7 +2485,7 @@ async function createBooking() {
         clientNotes: bookingData.clientNotes
       })
     });
-    
+
         if (!response.ok) {
           throw new Error('Failed to create checkout session');
         }
