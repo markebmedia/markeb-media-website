@@ -4149,23 +4149,47 @@ async function loadPendingBookings() {
   container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
 
   try {
+    // ✅ Fetch ALL bookings first (no filters)
     const response = await fetch('/.netlify/functions/admin-bookings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        status: 'Booked',
-        paymentStatus: 'Pending'
-      })
+      body: JSON.stringify({})  // Empty = get all bookings
     });
 
     const data = await response.json();
+    console.log('📊 All bookings fetched:', data.bookings?.length);
 
     if (data.success) {
-      renderPendingBookingsTable(data.bookings);
+      // ✅ Filter client-side for pending payments
+      const pendingBookings = data.bookings.filter(booking => {
+        const paymentStatus = booking.fields['Payment Status'];
+        const bookingStatus = booking.fields['Booking Status'];
+        
+        // Debug each booking
+        if (paymentStatus === 'Pending') {
+          console.log('Found pending:', {
+            ref: booking.fields['Booking Reference'],
+            paymentStatus,
+            bookingStatus
+          });
+        }
+        
+        // Include if:
+        // 1. Payment Status = "Pending"
+        // 2. Booking Status is active (not cancelled)
+        return paymentStatus === 'Pending' && 
+               bookingStatus !== 'Cancelled';
+      });
+      
+      console.log('💳 Pending bookings to display:', pendingBookings.length);
+      renderPendingBookingsTable(pendingBookings);
+    } else {
+      console.error('❌ API returned error:', data);
+      container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Failed to load bookings</div>';
     }
 
   } catch (error) {
-    console.error('Error loading pending bookings:', error);
+    console.error('❌ Error loading pending bookings:', error);
     container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading pending bookings</div>';
   }
 }
