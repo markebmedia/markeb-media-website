@@ -7,6 +7,9 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+<!-- Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+
   <style>
   /* ===== ADMIN PANEL STYLES - UPDATED WITH MOBILE FIXES ===== */
 
@@ -2662,6 +2665,10 @@ body {
 
   
   <script>
+    // ===== STRIPE INITIALIZATION =====
+const STRIPE_PUBLIC_KEY = 'pk_live_51QycLvQAVOs8qTDFVfXTNzuuhBnPjgZQSS3AH30NGMuSf3SxAWF9pLzYwL0ulj1wMMCC2jnhDyeqeop7BkWDfeZ400wT3Ko8aK';
+const stripe = Stripe(STRIPE_PUBLIC_KEY);
+
     // ===== PASSWORD PROTECTION =====
     const ADMIN_CODE = 'MARKEB2546';
     const SESSION_KEY = 'admin_authenticated';
@@ -3192,6 +3199,7 @@ function populateCustomerDetails() {
   bookingFormData.priceBeforeDiscount = 0;
   bookingFormData.totalPrice = subtotal;
   
+  // Clear discount UI
   const codeInput = document.getElementById('bookingDiscountCode');
   const messageDiv = document.getElementById('discountMessage');
   if (codeInput) codeInput.value = '';
@@ -3200,6 +3208,7 @@ function populateCustomerDetails() {
   const discountRow = document.getElementById('bookingDiscountRow');
   if (discountRow) discountRow.style.display = 'none';
 
+  // Update price display
   document.getElementById('bookingServicePrice').textContent = `£${servicePrice.toFixed(2)}`;
   document.getElementById('bookingTotalPrice').textContent = `£${subtotal.toFixed(2)}`;
 
@@ -3220,7 +3229,6 @@ function populateCustomerDetails() {
   }
 }
 
-// Apply discount code in admin booking
 async function applyAdminDiscount() {
   const codeInput = document.getElementById('bookingDiscountCode');
   const code = codeInput.value.trim().toUpperCase();
@@ -3242,7 +3250,7 @@ async function applyAdminDiscount() {
   const serviceId = selectedOption.value;
   const region = document.getElementById('bookingRegion').value;
 
-  // Calculate current price
+  // Calculate current price BEFORE discount
   const servicePrice = parseFloat(selectedOption.dataset.price);
   const isPropertyService = selectedOption.dataset.property === 'true';
   const extraBedrooms = isPropertyService ? Math.max(0, bookingFormData.bedrooms - 4) : 0;
@@ -3252,7 +3260,7 @@ async function applyAdminDiscount() {
     const addon = ADDONS_CATALOG[addonId];
     if (addon) addonsFee += addon.price;
   });
-  const subtotal = servicePrice + bedroomFee + addonsFee;
+  const priceBeforeDiscount = servicePrice + bedroomFee + addonsFee;
 
   messageDiv.innerHTML = '<span style="color: #3b82f6;">⏳ Validating code...</span>';
 
@@ -3264,7 +3272,7 @@ async function applyAdminDiscount() {
         code,
         serviceId,
         region,
-        totalPrice: subtotal
+        totalPrice: priceBeforeDiscount
       })
     });
 
@@ -3274,7 +3282,7 @@ async function applyAdminDiscount() {
       // Store discount info
       bookingFormData.discountCode = code;
       bookingFormData.discountAmount = data.discountAmount;
-      bookingFormData.priceBeforeDiscount = subtotal;
+      bookingFormData.priceBeforeDiscount = priceBeforeDiscount;
       bookingFormData.totalPrice = data.finalPrice;
 
       messageDiv.innerHTML = `
@@ -3289,11 +3297,10 @@ async function applyAdminDiscount() {
       bookingFormData.discountCode = '';
       bookingFormData.discountAmount = 0;
       bookingFormData.priceBeforeDiscount = 0;
-      bookingFormData.totalPrice = subtotal;
+      bookingFormData.totalPrice = priceBeforeDiscount;
 
       messageDiv.innerHTML = `<span style="color: #ef4444;">❌ ${data.error}</span>`;
       
-      // Hide discount row if exists
       const discountRow = document.getElementById('bookingDiscountRow');
       if (discountRow) discountRow.style.display = 'none';
     }
@@ -3305,8 +3312,24 @@ async function applyAdminDiscount() {
 
 function updateDiscountedPrice() {
   if (bookingFormData.discountAmount > 0) {
-    // Show discount row
-    const discountRow = document.getElementById('bookingDiscountRow') || createDiscountRow();
+    let discountRow = document.getElementById('bookingDiscountRow');
+    
+    if (!discountRow) {
+      // Create discount row if it doesn't exist
+      const breakdown = document.getElementById('bookingPriceBreakdown');
+      const totalRow = breakdown.querySelector('[style*="border-top"]');
+      
+      discountRow = document.createElement('div');
+      discountRow.id = 'bookingDiscountRow';
+      discountRow.style.cssText = 'display: flex; justify-content: space-between; margin-bottom: 12px;';
+      discountRow.innerHTML = `
+        <span style="color: #10b981; font-weight: 600;">Discount (${bookingFormData.discountCode})</span>
+        <span id="bookingDiscountAmount" style="font-weight: 600; color: #10b981;">-£0.00</span>
+      `;
+      
+      breakdown.insertBefore(discountRow, totalRow);
+    }
+    
     discountRow.style.display = 'flex';
     document.getElementById('bookingDiscountAmount').textContent = `-£${bookingFormData.discountAmount.toFixed(2)}`;
     document.getElementById('bookingTotalPrice').textContent = `£${bookingFormData.totalPrice.toFixed(2)}`;
@@ -3419,62 +3442,68 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
   }
 
   const region = document.getElementById('bookingRegion').value;
-  
-  // ✅ Calculate media specialist based on region
   const mediaSpecialist = region === 'North' ? 'Jodie' : 'Maeve';
+  const paymentStatus = document.getElementById('bookingPaymentStatus').value;
+
+  // Calculate pricing (use discounted total if discount applied)
+  const servicePrice = parseFloat(selectedOption.dataset.price);
+  const extraBedrooms = Math.max(0, bookingFormData.bedrooms - 4);
+  const extraBedroomFee = extraBedrooms * 30;
+  
+  let addonsPrice = 0;
+  bookingFormData.selectedAddons.forEach(addonId => {
+    const addon = ADDONS_CATALOG[addonId];
+    if (addon) addonsPrice += addon.price;
+  });
+
+  const subtotal = servicePrice + extraBedroomFee + addonsPrice;
+  const totalPrice = bookingFormData.totalPrice || subtotal;
 
   const formData = {
     clientName: document.getElementById('bookingClientName').value,
     clientEmail: document.getElementById('bookingClientEmail').value,
+    clientPhone: '',
+    clientNotes: '',
     region: region,
+    mediaSpecialist: mediaSpecialist,
     
-    // ✅ Service details
     service: selectedOption.dataset.name,
     serviceId: selectedOption.value,
-    basePrice: parseFloat(selectedOption.dataset.price),
+    basePrice: servicePrice,
     duration: parseInt(selectedOption.dataset.duration),
     
-    // ✅ Bedroom calculations
     bedrooms: bookingFormData.bedrooms,
-    extraBedroomFee: Math.max(0, bookingFormData.bedrooms - 4) * 30,
+    extraBedroomFee: extraBedroomFee,
     
-    // ✅ Add-ons
     addons: bookingFormData.selectedAddons.map(id => ({
       id,
       name: ADDONS_CATALOG[id]?.name,
       price: ADDONS_CATALOG[id]?.price
     })),
-    addonsPrice: bookingFormData.selectedAddons.reduce((sum, id) => 
-      sum + (ADDONS_CATALOG[id]?.price || 0), 0
-    ),
+    addonsPrice: addonsPrice,
     
-    // ✅ Property details
     propertyAddress: document.getElementById('bookingAddress').value,
     postcode: document.getElementById('bookingPostcode').value,
     accessInstructions: document.getElementById('bookingAccess').value || '',
     
-    // ✅ Date/Time
     date: document.getElementById('bookingDate').value,
     time: document.getElementById('bookingTime').value,
     
-    // ✅ Media specialist
-    mediaSpecialist: mediaSpecialist,
-    
-    // ✅ Optional fields
-    clientPhone: '', // Admin bookings might not have this
-    
-    // ✅ Discount fields
+    // Discount fields
     discountCode: bookingFormData.discountCode || '',
     discountAmount: bookingFormData.discountAmount || 0,
-    priceBeforeDiscount: bookingFormData.priceBeforeDiscount || bookingFormData.totalPrice,
-    totalPrice: bookingFormData.totalPrice,
+    priceBeforeDiscount: bookingFormData.priceBeforeDiscount || totalPrice,
+    totalPrice: totalPrice,
     
-    // ✅ Payment & metadata
-    paymentStatus: document.getElementById('bookingPaymentStatus').value,
+    paymentOption: paymentStatus === 'Paid' ? 'pay-now' : 'reserve',
+    paymentStatus: paymentStatus,
+    status: 'Booked',
     createdBy: 'Admin'
   };
 
-  if (!confirm(`Create booking for ${formData.clientName}?\n\nService: ${formData.service}\nDate: ${formData.date} at ${formData.time}\nMedia Specialist: ${formData.mediaSpecialist}`)) {
+  const confirmMsg = `Create booking for ${formData.clientName}?\n\nService: ${formData.service}\nDate: ${formData.date} at ${formData.time}\nMedia Specialist: ${formData.mediaSpecialist}\nTotal: £${totalPrice.toFixed(2)}${bookingFormData.discountCode ? `\nDiscount: ${bookingFormData.discountCode} (-£${bookingFormData.discountAmount.toFixed(2)})` : ''}`;
+  
+  if (!confirm(confirmMsg)) {
     return;
   }
 
@@ -3484,6 +3513,31 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
   btn.disabled = true;
 
   try {
+    // If "Pay Now" selected, create Stripe checkout session
+    if (paymentStatus === 'Paid') {
+      const stripeResponse = await fetch('/.netlify/functions/create-stripe-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (!stripeResponse.ok) {
+        throw new Error('Failed to create Stripe checkout');
+      }
+
+      const { url } = await stripeResponse.json();
+      
+      // Open Stripe checkout in new tab
+      window.open(url, '_blank');
+      alert('✅ Stripe checkout opened in new tab.\n\nComplete payment there. Booking will be created automatically upon successful payment.');
+      
+      resetBookingForm();
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+      return;
+    }
+
+    // Otherwise, create booking directly (Reserve Without Payment)
     const response = await fetch('/.netlify/functions/create-booking', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -3493,7 +3547,7 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
     const data = await response.json();
 
     if (data.success) {
-      alert(`✅ Booking created successfully!\n\nReference: ${data.bookingRef}\nMedia Specialist: ${formData.mediaSpecialist}`);
+      alert(`✅ Booking created successfully!\n\nReference: ${data.bookingRef}\nMedia Specialist: ${formData.mediaSpecialist}\nTotal: £${totalPrice.toFixed(2)}`);
       resetBookingForm();
       loadBookings();
       loadCalendar();
@@ -3505,7 +3559,7 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
     }
   } catch (error) {
     console.error('Booking creation error:', error);
-    alert('❌ Failed to create booking');
+    alert('❌ Failed to create booking: ' + error.message);
     btn.innerHTML = originalText;
     btn.disabled = false;
   }
