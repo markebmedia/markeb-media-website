@@ -1,4 +1,5 @@
 // netlify/functions/stripe-webhook.js
+// ✅ COMPLETE VERSION - Matches create-booking.js field structure
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Airtable = require('airtable');
 
@@ -79,6 +80,47 @@ exports.handler = async (event, context) => {
         service: metadata.service
       });
 
+      // ✅ NEW: Fetch user from Airtable to link booking
+      let userId = null;
+      try {
+        const userEmail = metadata.clientEmail;
+        const filterFormula = `LOWER({Email}) = "${userEmail.toLowerCase()}"`;
+        const userUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}?filterByFormula=${encodeURIComponent(filterFormula)}`;
+
+        const userResponse = await fetch(userUrl, {
+          headers: {
+            'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
+          }
+        });
+
+        const userResult = await userResponse.json();
+
+        if (userResult.records && userResult.records.length > 0) {
+          userId = userResult.records[0].id;
+          console.log(`✓ Found user: ${userEmail} (ID: ${userId})`);
+          
+          // ✅ Update user's last booking date
+          await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}/${userId}`, {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              fields: {
+                'Last Booking Date': new Date().toISOString().split('T')[0],
+                'Region': metadata.region ? metadata.region.charAt(0).toUpperCase() + metadata.region.slice(1).toLowerCase() : ''
+              }
+            })
+          });
+        } else {
+          console.warn(`⚠️ User not found for email: ${userEmail}`);
+        }
+      } catch (userError) {
+        console.error('Error fetching user:', userError);
+        // Don't fail the booking if user lookup fails
+      }
+
       // Parse add-ons
       const addons = JSON.parse(metadata.addons || '[]');
       const addonsText = addons.length > 0
@@ -88,62 +130,94 @@ exports.handler = async (event, context) => {
       // Calculate add-ons price
       const addonsPrice = addons.reduce((sum, a) => sum + parseFloat(a.price || 0), 0);
 
-      // Calculate prices (reconstruct from metadata)
-      const totalPrice = session.amount_total / 100;
+      // ✅ Extract discount information from metadata
+      const discountCode = metadata.discountCode || '';
+      const discountAmount = parseFloat(metadata.discountAmount || '0');
+      const priceBeforeDiscount = parseFloat(metadata.priceBeforeDiscount || '0');
+      
+      console.log('Discount info from metadata:', {
+        discountCode,
+        discountAmount,
+        priceBeforeDiscount
+      });
+
+      // Calculate prices
+      const totalPrice = session.amount_total / 100; // This is the amount actually paid (discounted)
       const bedrooms = parseInt(metadata.bedrooms) || 0;
       const extraBedrooms = Math.max(0, bedrooms - 4);
       const extraBedroomFee = extraBedrooms * 30;
-      const basePrice = totalPrice - extraBedroomFee - addonsPrice;
+      
+      // ✅ If discount applied, use priceBeforeDiscount to calculate basePrice
+      let basePrice;
+      if (discountAmount > 0 && priceBeforeDiscount > 0) {
+        basePrice = priceBeforeDiscount - extraBedroomFee - addonsPrice;
+      } else {
+        basePrice = totalPrice - extraBedroomFee - addonsPrice;
+      }
 
       // Capitalize region
       const capitalizedRegion = metadata.region 
         ? metadata.region.charAt(0).toUpperCase() + metadata.region.slice(1).toLowerCase()
         : 'Unknown';
-// ✅ CREATE booking with EXACT field names from create-booking.js
-const bookingRecord = await base('Bookings').create([
-  {
-    fields: {
-      'Booking Reference': bookingRef,
-      'Date': metadata.date,
-      'Time': metadata.time,
-      'Postcode': metadata.postcode,
-      'Property Address': metadata.propertyAddress,
-      'Region': capitalizedRegion,
-      'Media Specialist': metadata.mediaSpecialist,
-      'Service': metadata.service,
-      'Service ID': metadata.serviceId,
-      'Duration (mins)': parseInt(metadata.duration) || 90,
-      'Bedrooms': bedrooms,
-      'Base Price': basePrice,
-      'Extra Bedroom Fee': extraBedroomFee,
-      'Add-Ons': addonsText,
-      'Add-Ons Price': addonsPrice, // ✅ FIXED: Capital O
-      'Final Price': totalPrice, // ✅ FIXED: Changed from 'Total Price'
-      'Client Name': metadata.clientName,
-      'Client Email': metadata.clientEmail,
-      'Client Phone': metadata.clientPhone,
-      'Client Notes': metadata.clientNotes || '',
-      
-      // Payment fields
-      'Booking Status': 'Confirmed',
-      'Payment Status': 'Paid',
-      'Payment Method': 'Stripe',
-      'Stripe Session ID': session.id,
-      'Stripe Payment Intent ID': session.payment_intent,
-      'Payment Date': new Date().toISOString(),
-      'Amount Paid': totalPrice,
-      
-      // Metadata
-      'Created Date': new Date().toISOString(),
-      'Cancellation Allowed Until': new Date(new Date(metadata.date).getTime() - 24 * 60 * 60 * 1000).toISOString()
-    }
-  }
-]);
+
+      // ✅ CREATE booking with ALL fields matching create-booking.js
+      const bookingRecord = await base('Bookings').create([
+        {
+          fields: {
+            'Booking Reference': bookingRef,
+            'User': userId ? [userId] : [], // ✅ Link to user if found
+            'Date': metadata.date,
+            'Time': metadata.time,
+            'Postcode': metadata.postcode,
+            'Property Address': metadata.propertyAddress,
+            'Region': capitalizedRegion,
+            'Media Specialist': metadata.mediaSpecialist,
+            'Service': metadata.service,
+            'Service ID': metadata.serviceId,
+            'Duration (mins)': parseInt(metadata.duration) || 90,
+            'Bedrooms': bedrooms,
+            'Base Price': basePrice,
+            'Extra Bedroom Fee': extraBedroomFee,
+            'Add-Ons': addonsText,
+            'Add-Ons Price': addonsPrice,
+            
+            // ✅ Discount fields
+            'Discount Code': discountCode,
+            'Discount Amount': discountAmount,
+            'Price Before Discount': priceBeforeDiscount > 0 ? priceBeforeDiscount : totalPrice,
+            'Final Price': totalPrice, // The amount actually paid (after discount)
+            
+            'Client Name': metadata.clientName,
+            'Client Email': metadata.clientEmail,
+            'Client Phone': metadata.clientPhone || '',
+            'Client Notes': metadata.clientNotes || '',
+            'Access Instructions': metadata.accessInstructions || '', // ✅ Added
+            
+            // Payment fields
+            'Booking Status': 'Confirmed',
+            'Payment Status': 'Paid',
+            'Payment Method': 'Stripe',
+            'Stripe Session ID': session.id,
+            'Stripe Payment Intent ID': session.payment_intent,
+            'Payment Date': new Date().toISOString(),
+            'Amount Paid': totalPrice, // ✅ This is the discounted amount
+            
+            // ✅ Note: Card details not needed for Pay Now (only for Reserve)
+            // 'Stripe Payment Method ID', 'Cardholder Name', 'Card Last 4', etc.
+            // are only used when paymentOption = 'reserve'
+            
+            // Metadata
+            'Created By': 'Customer', // ✅ Added
+            'Created Date': new Date().toISOString(),
+            'Cancellation Allowed Until': new Date(new Date(metadata.date).getTime() - 24 * 60 * 60 * 1000).toISOString()
+          }
+        }
+      ]);
 
       console.log('✅ Booking created from webhook:', bookingRecord[0].id);
 
-      // Send payment confirmation email
-      await sendPaymentConfirmation(metadata, session, bookingRef);
+      // Send payment confirmation email with discount info
+      await sendPaymentConfirmation(metadata, session, bookingRef, discountCode, discountAmount);
 
       return {
         statusCode: 200,
@@ -174,7 +248,7 @@ const bookingRecord = await base('Bookings').create([
 };
 
 // Send payment confirmation email
-async function sendPaymentConfirmation(metadata, session, bookingRef) {
+async function sendPaymentConfirmation(metadata, session, bookingRef, discountCode = '', discountAmount = 0) {
   if (!process.env.RESEND_API_KEY) {
     console.log('Resend not configured - skipping email');
     return;
@@ -186,6 +260,14 @@ async function sendPaymentConfirmation(metadata, session, bookingRef) {
 
     const ref = bookingRef || metadata.bookingRef || 'N/A';
     const amountPaid = session.amount_total / 100;
+    
+    // ✅ Show discount in email if applied
+    const discountHTML = discountCode && discountAmount > 0 ? `
+      <div style="background: #d1fae5; border: 2px solid #10b981; border-radius: 8px; padding: 15px; margin: 15px 0;">
+        <div style="font-size: 14px; color: #065f46; font-weight: 600;">💰 DISCOUNT APPLIED</div>
+        <p style="margin: 8px 0 0 0; color: #065f46;"><strong>${discountCode}</strong> - Saved £${discountAmount.toFixed(2)}</p>
+      </div>
+    ` : '';
 
     await resend.emails.send({
       from: 'Markeb Media <commercial@markebmedia.com>',
@@ -203,6 +285,8 @@ async function sendPaymentConfirmation(metadata, session, bookingRef) {
             <p style="font-size: 16px; color: #333;">Hi <strong>${metadata.clientName}</strong>,</p>
             
             <p style="font-size: 16px; color: #333;">Your payment has been successfully processed and your booking is confirmed!</p>
+            
+            ${discountHTML}
             
             <div style="background: #d1fae5; border: 2px solid #10b981; border-radius: 12px; padding: 20px; margin: 25px 0; text-align: center;">
               <div style="font-size: 14px; color: #065f46; font-weight: 600;">PAYMENT RECEIVED</div>
