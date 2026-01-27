@@ -140,10 +140,10 @@ console.log(`Final status - Payment: ${paymentStatus}, Booking: ${bookingStatus}
 
     const addonsPrice = bookingData.addonsPrice || 0;
 
-    // ✅ NEW: Handle discount code
+// ✅ NEW: Handle discount code
 let discountCodeId = null;
 let discountAmount = 0;
-let priceBeforeDiscount = 0; // ✅ Changed: Default to 0, not totalPrice
+let priceBeforeDiscount = 0;
 let finalPrice = bookingData.totalPrice;
 
 if (bookingData.discountCode && bookingData.discountAmount > 0) {
@@ -206,6 +206,7 @@ if (bookingData.discountCode && bookingData.discountAmount > 0) {
   }
 } else {
   console.log('No discount code applied');
+  priceBeforeDiscount = finalPrice; // ✅ ADD THIS LINE
 }
 
     // Prepare Airtable record
