@@ -3903,11 +3903,15 @@ function renderBookingsTable(bookings, searchTerm = '') {
     const fields = booking.fields;
     const paymentStatus = fields['Payment Status'] || 'Pending';
     const bookingStatus = fields['Booking Status'] || 'Booked';
+    const finalPrice = fields['Final Price'] || 0;
+    const discountCode = fields['Discount Code'] || '';
+    const discountAmount = fields['Discount Amount'] || 0;
     
     html += `
       <tr>
         <td data-label="Reference">
           <strong>${fields['Booking Reference']}</strong>
+          ${discountCode ? `<br><small style="color: #10b981;">🎁 ${discountCode}</small>` : ''}
         </td>
         <td data-label="Client">
           ${fields['Client Name']}<br>
@@ -3922,7 +3926,8 @@ function renderBookingsTable(bookings, searchTerm = '') {
           <span class="region-badge ${(fields['Region'] || '').toLowerCase()}">${fields['Region']}</span>
         </td>
         <td data-label="Total">
-          <strong>£${(fields['Total Price'] || 0).toFixed(2)}</strong>
+          <strong>£${finalPrice.toFixed(2)}</strong>
+          ${discountAmount > 0 ? `<br><small style="color: #10b981;">-£${discountAmount.toFixed(2)} off</small>` : ''}
         </td>
         <td data-label="Payment">
           <span class="status-badge status-${paymentStatus.toLowerCase()}">
@@ -3967,6 +3972,13 @@ function viewBookingById(bookingId) {
   const date = new Date(fields['Date']);
   const formattedDate = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   
+  // ✅ Extract discount information
+  const totalPrice = fields['Final Price'] || 0;
+  const discountCode = fields['Discount Code'] || '';
+  const discountAmount = fields['Discount Amount'] || 0;
+  const priceBeforeDiscount = fields['Price Before Discount'] || totalPrice;
+  const hasDiscount = discountAmount > 0 && discountCode;
+  
   body.innerHTML = `
     <div class="detail-item">
       <span class="detail-label">📋 Reference</span>
@@ -4009,10 +4021,33 @@ function viewBookingById(bookingId) {
       <span class="detail-label">🏠 Property Address</span>
       <span class="detail-value">${fields['Property Address']}</span>
     </div>
-    
+
+    ${hasDiscount ? `
+      <div class="detail-item">
+        <span class="detail-label">🎁 Discount Code</span>
+        <span class="detail-value">
+          <strong style="color: #10b981;">${discountCode}</strong>
+        </span>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">💰 Original Price</span>
+        <span class="detail-value" style="text-decoration: line-through; color: #94a3b8;">
+          £${priceBeforeDiscount.toFixed(2)}
+        </span>
+      </div>
+      
+      <div class="detail-item">
+        <span class="detail-label">💚 Discount Applied</span>
+        <span class="detail-value" style="color: #10b981; font-weight: 700;">
+          -£${discountAmount.toFixed(2)}
+        </span>
+      </div>
+    ` : ''}
+
     <div class="detail-item">
-      <span class="detail-label">💷 Total Price</span>
-      <span class="detail-value"><strong style="font-size: 18px; color: #3b82f6;">£${(fields['Total Price'] || 0).toFixed(2)}</strong></span>
+      <span class="detail-label">💷 ${hasDiscount ? 'Final Price' : 'Total Price'}</span>
+      <span class="detail-value"><strong style="font-size: 18px; color: #3b82f6;">£${totalPrice.toFixed(2)}</strong></span>
     </div>
     
     <div class="detail-item">
@@ -4168,11 +4203,15 @@ function renderPendingBookingsTable(bookings) {
   bookings.forEach(booking => {
     const fields = booking.fields;
     const hasPaymentMethod = !!fields['Stripe Payment Method ID'];
+    const finalPrice = fields['Final Price'] || 0;
+    const discountCode = fields['Discount Code'] || '';
+    const discountAmount = fields['Discount Amount'] || 0;
     
     html += `
       <tr>
         <td data-label="Reference">
           <strong>${fields['Booking Reference']}</strong>
+          ${discountCode ? `<br><small style="color: #10b981;">🎁 ${discountCode}</small>` : ''}
         </td>
         <td data-label="Client">
           ${fields['Client Name']}<br>
@@ -4184,7 +4223,8 @@ function renderPendingBookingsTable(bookings) {
           <strong>${fields['Time']}</strong>
         </td>
         <td data-label="Total">
-          <strong>£${(fields['Total Price'] || 0).toFixed(2)}</strong>
+          <strong>£${finalPrice.toFixed(2)}</strong>
+          ${discountAmount > 0 ? `<br><small style="color: #10b981;">-£${discountAmount.toFixed(2)} off</small>` : ''}
         </td>
         <td data-label="Payment Method">
           ${hasPaymentMethod 
@@ -4194,7 +4234,7 @@ function renderPendingBookingsTable(bookings) {
         <td data-label="Actions">
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             ${hasPaymentMethod ? `
-              <button class="btn btn-success btn-small" onclick="chargeCard('${booking.id}', '${fields['Booking Reference']}', ${fields['Total Price']})">
+              <button class="btn btn-success btn-small" onclick="chargeCard('${booking.id}', '${fields['Booking Reference']}', ${finalPrice})">
                 💳 Charge Card
               </button>
             ` : ''}
@@ -4218,7 +4258,9 @@ async function markAsPaid(bookingId) {
   const booking = allBookings.find(b => b.id === bookingId);
   if (!booking) return;
   
-  if (!confirm(`Mark this booking as paid?\n\nClient: ${booking.fields['Client Name']}\nAmount: £${booking.fields['Total Price'].toFixed(2)}`)) {
+  const finalPrice = booking.fields['Final Price'] || 0;
+  
+  if (!confirm(`Mark this booking as paid?\n\nClient: ${booking.fields['Client Name']}\nAmount: £${finalPrice.toFixed(2)}`)) {
     return;
   }
   
@@ -4697,11 +4739,13 @@ function showModifyService(bookingId) {
   const region = booking.fields['Region'] === 'North' ? 'north' : 'south';
   const services = SERVICES_CATALOG[region] || SERVICES_CATALOG.south;
   
+  const currentPrice = booking.fields['Final Price'] || 0;
+  
   modalBody.innerHTML = `
     <div class="form-group">
       <label class="form-label">Current Service</label>
       <div style="padding: 12px; background: #f8fafc; border-radius: 8px; font-weight: 600;">
-        ${booking.fields['Service']} - £${(booking.fields['Total Price'] || 0).toFixed(2)}
+        ${booking.fields['Service']} - £${currentPrice.toFixed(2)}
       </div>
     </div>
 
