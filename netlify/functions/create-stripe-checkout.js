@@ -29,7 +29,9 @@ exports.handler = async (event, context) => {
       service: bookingData.service,
       region: bookingData.region,
       mediaSpecialist: bookingData.mediaSpecialist,
-      totalPrice: bookingData.totalPrice
+      totalPrice: bookingData.totalPrice,
+      discountCode: bookingData.discountCode || 'none',
+      discountAmount: bookingData.discountAmount || 0
     });
 
     // Validate required fields
@@ -41,55 +43,77 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Build line items for Stripe
+    // ✅ UPDATED: Build line items for Stripe with discount support
     const lineItems = [];
 
-    // Main service
-    lineItems.push({
-      price_data: {
-        currency: 'gbp',
-        product_data: {
-          name: bookingData.service,
-          description: `${bookingData.date} at ${bookingData.time} - ${bookingData.propertyAddress}`,
-        },
-        unit_amount: Math.round(bookingData.basePrice * 100), // Convert to pence
-      },
-      quantity: 1,
-    });
+    // Check if discount is applied
+    const hasDiscount = bookingData.discountCode && bookingData.discountAmount > 0;
 
-    // Extra bedrooms fee
-    if (bookingData.extraBedroomFee && bookingData.extraBedroomFee > 0) {
-      const extraBedrooms = bookingData.bedrooms - 4;
+    if (hasDiscount) {
+      // ✅ If discount applied, create a single line item with the final discounted price
+      const priceBeforeDiscount = bookingData.priceBeforeDiscount || (bookingData.totalPrice + bookingData.discountAmount);
+      
       lineItems.push({
         price_data: {
           currency: 'gbp',
           product_data: {
-            name: 'Extra Bedrooms',
-            description: `${extraBedrooms} additional bedroom(s) @ £30 each`,
+            name: bookingData.service,
+            description: `${bookingData.date} at ${bookingData.time} - ${bookingData.propertyAddress}\n\nOriginal Price: £${priceBeforeDiscount.toFixed(2)}\nDiscount (${bookingData.discountCode}): -£${bookingData.discountAmount.toFixed(2)}\nFinal Price: £${bookingData.totalPrice.toFixed(2)}`,
           },
-          unit_amount: Math.round(bookingData.extraBedroomFee * 100),
+          unit_amount: Math.round(bookingData.totalPrice * 100), // ✅ Use discounted total in pence
         },
         quantity: 1,
       });
-    }
-
-    // Add-ons
-    if (bookingData.addons && bookingData.addons.length > 0) {
-      bookingData.addons.forEach(addon => {
-        if (addon.price > 0) {
-          lineItems.push({
-            price_data: {
-              currency: 'gbp',
-              product_data: {
-                name: addon.name,
-                description: addon.description || '',
-              },
-              unit_amount: Math.round(addon.price * 100),
-            },
-            quantity: 1,
-          });
-        }
+    } else {
+      // ✅ No discount - itemize everything as before
+      
+      // Main service
+      lineItems.push({
+        price_data: {
+          currency: 'gbp',
+          product_data: {
+            name: bookingData.service,
+            description: `${bookingData.date} at ${bookingData.time} - ${bookingData.propertyAddress}`,
+          },
+          unit_amount: Math.round(bookingData.basePrice * 100), // Convert to pence
+        },
+        quantity: 1,
       });
+
+      // Extra bedrooms fee
+      if (bookingData.extraBedroomFee && bookingData.extraBedroomFee > 0) {
+        const extraBedrooms = bookingData.bedrooms - 4;
+        lineItems.push({
+          price_data: {
+            currency: 'gbp',
+            product_data: {
+              name: 'Extra Bedrooms',
+              description: `${extraBedrooms} additional bedroom(s) @ £30 each`,
+            },
+            unit_amount: Math.round(bookingData.extraBedroomFee * 100),
+          },
+          quantity: 1,
+        });
+      }
+
+      // Add-ons
+      if (bookingData.addons && bookingData.addons.length > 0) {
+        bookingData.addons.forEach(addon => {
+          if (addon.price > 0) {
+            lineItems.push({
+              price_data: {
+                currency: 'gbp',
+                product_data: {
+                  name: addon.name,
+                  description: addon.description || '',
+                },
+                unit_amount: Math.round(addon.price * 100),
+              },
+              quantity: 1,
+            });
+          }
+        });
+      }
     }
 
     // ✅ Determine if this is a new booking or existing booking payment
@@ -130,6 +154,11 @@ exports.handler = async (event, context) => {
         // Add-ons
         addons: JSON.stringify(bookingData.addons || []),
         
+        // ✅ NEW: Discount information
+        discountCode: bookingData.discountCode || '',
+        discountAmount: bookingData.discountAmount ? bookingData.discountAmount.toString() : '0',
+        priceBeforeDiscount: bookingData.priceBeforeDiscount ? bookingData.priceBeforeDiscount.toString() : '0',
+        
         // Payment type flag
         paymentType: isExistingBooking ? 'existing_booking' : 'new_booking'
       },
@@ -137,6 +166,8 @@ exports.handler = async (event, context) => {
     });
 
     console.log('✅ Stripe checkout session created:', session.id);
+    console.log('   Line items:', lineItems.length);
+    console.log('   Total amount:', bookingData.totalPrice);
 
     return {
       statusCode: 200,

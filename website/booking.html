@@ -2438,41 +2438,46 @@ async function createBooking() {
       window.location.href = `/booking-success?ref=${result.bookingRef}&email=${encodeURIComponent(bookingData.clientEmail)}`;
     }
 
-    // Process Stripe Payment
     async function processStripePayment() {
-      try {
-        const response = await fetch('/.netlify/functions/create-stripe-checkout', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            postcode: bookingData.postcode,
-            propertyAddress: bookingData.propertyAddress,
-            region: bookingData.region, // ✅ FIXED: lowercase
-            mediaSpecialist: bookingData.mediaSpecialist,
-            date: bookingData.selectedDate,
-            time: bookingData.selectedTime,
-            service: bookingData.service.name,
-            serviceId: bookingData.service.id,
-            duration: bookingData.service.duration + (bookingData.addonsDuration || 0),
-            bedrooms: bookingData.bedrooms,
-            basePrice: bookingData.basePrice,
-            extraBedroomFee: bookingData.extraBedroomFee,
-            addons: bookingData.selectedAddons.map(id => ({
-              id: id,
-              name: ADDONS[id].name,
-              price: ADDONS[id].price
-            })),
-            addonsPrice: bookingData.addonsPrice || 0,
-            totalPrice: bookingData.totalPrice,
-            clientName: bookingData.clientName,
-            clientEmail: bookingData.clientEmail,
-            clientPhone: bookingData.clientPhone,
-            clientNotes: bookingData.clientNotes
-          })
-        });
-
+  try {
+    const response = await fetch('/.netlify/functions/create-stripe-checkout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        postcode: bookingData.postcode,
+        propertyAddress: bookingData.propertyAddress,
+        region: bookingData.region,
+        mediaSpecialist: bookingData.mediaSpecialist,
+        date: bookingData.selectedDate,
+        time: bookingData.selectedTime,
+        service: bookingData.service.name,
+        serviceId: bookingData.service.id,
+        duration: bookingData.service.duration + (bookingData.addonsDuration || 0),
+        bedrooms: bookingData.bedrooms,
+        basePrice: bookingData.basePrice,
+        extraBedroomFee: bookingData.extraBedroomFee,
+        addons: bookingData.selectedAddons.map(id => ({
+          id: id,
+          name: ADDONS[id].name,
+          price: ADDONS[id].price
+        })),
+        addonsPrice: bookingData.addonsPrice || 0,
+        totalPrice: bookingData.totalPrice,
+        
+        // ✅ ADD THESE 3 LINES:
+        discountCode: bookingData.discountCode || '',
+        discountAmount: bookingData.discountAmount || 0,
+        priceBeforeDiscount: bookingData.priceBeforeDiscount || 0,
+        
+        clientName: bookingData.clientName,
+        clientEmail: bookingData.clientEmail,
+        clientPhone: bookingData.clientPhone,
+        clientNotes: bookingData.clientNotes
+      })
+    });
+    
         if (!response.ok) {
           throw new Error('Failed to create checkout session');
         }
