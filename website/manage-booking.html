@@ -262,66 +262,69 @@
       font-weight: 700;
     }
 
-    /* Calendar Styles */
-    .calendar-container {
-      background: #fff;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 24px;
-    }
+   /* Calendar Styles */
+.calendar-container {
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  max-width: 100%;
+  overflow: hidden;
+}
 
-    .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-    }
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
 
-    .calendar-nav-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      border: 2px solid #e2e8f0;
-      background: #fff;
-      cursor: pointer;
-      font-size: 18px;
-      font-weight: 700;
-      color: #64748b;
-      transition: all 0.2s ease;
-    }
+.calendar-nav-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  background: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
 
-    .calendar-nav-btn:hover {
-      border-color: #3b82f6;
-      color: #3b82f6;
-    }
+.calendar-nav-btn:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
 
-    .calendar-month-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #1e293b;
-    }
+.calendar-month-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+}
 
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
-    }
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
 
-    .calendar-day {
-      aspect-ratio: 1;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      background: #fff;
-      color: #1e293b;
-    }
+.calendar-day {
+  aspect-ratio: 1;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fff;
+  color: #1e293b;
+  min-width: 0;
+}
 
     .calendar-day.day-label {
       background: transparent;
@@ -487,28 +490,33 @@
       transform: scale(0.95);
     }
 
-    /* Mobile Responsive */
-    @media (max-width: 768px) {
-      .card {
-        padding: 24px;
-      }
+   /* Mobile Responsive */
+@media (max-width: 768px) {
+  .card {
+    padding: 24px;
+  }
 
-      .button-group {
-        grid-template-columns: 1fr;
-      }
+  .button-group {
+    grid-template-columns: 1fr;
+  }
 
-      .calendar-grid {
-        gap: 4px;
-      }
+  .calendar-container {
+    padding: 12px;  /* Further reduced on mobile */
+  }
 
-      .calendar-day {
-        font-size: 12px;
-      }
+  .calendar-grid {
+    gap: 4px;  /* Smaller gap on mobile */
+  }
 
-      .time-slot-grid {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      }
-    }
+  .calendar-day {
+    font-size: 12px;  /* Smaller text on mobile */
+    border-width: 1px;  /* Thinner borders on mobile */
+  }
+
+  .time-slot-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
 
   </style>
 </head>
@@ -634,8 +642,8 @@
           </div>
 
           <div id="rescheduleNoSlotsAvailable" class="alert alert-warning hidden">
-            <strong>⚠️ No Available Times:</strong> <span id="rescheduleNoSlotsReason">Please select a different date.</span>
-          </div>
+  <strong>📅 Fully Booked:</strong> <span id="rescheduleNoSlotsReason">All time slots are taken for this date. Please select a different date.</span>
+</div>
 
           <div id="rescheduleTimeSlotGrid" class="time-slot-grid hidden">
             <!-- Time slots will be inserted here -->
@@ -1245,36 +1253,37 @@
     }
 
     function renderRescheduleTimeSlots(slots) {
-      const grid = document.getElementById('rescheduleTimeSlotGrid');
-      const loadingEl = document.getElementById('rescheduleLoadingTimeSlots');
-      const noSlotsEl = document.getElementById('rescheduleNoSlotsAvailable');
-      
-      loadingEl.classList.add('hidden');
-      
-      const availableSlots = slots.filter(slot => slot.available);
-      
-      if (availableSlots.length === 0) {
-        noSlotsEl.classList.remove('hidden');
-        grid.classList.add('hidden');
-        
-        let reason = 'No available times on this date.';
-        if (slots[0]?.reason) {
-          reason = slots[0].reason;
-        }
-        document.getElementById('rescheduleNoSlotsReason').textContent = reason;
-        return;
-      }
-      
-      noSlotsEl.classList.add('hidden');
-      
-      const html = availableSlots.map(slot => {
-        const isSelected = rescheduleSelectedTime === slot.time;
-        return `<div class="time-slot ${isSelected ? 'selected' : ''}" onclick="selectRescheduleTime('${slot.time}')">${slot.time}</div>`;
-      }).join('');
-
-      grid.innerHTML = html;
-      grid.classList.remove('hidden');
+  const grid = document.getElementById('rescheduleTimeSlotGrid');
+  const loadingEl = document.getElementById('rescheduleLoadingTimeSlots');
+  const noSlotsEl = document.getElementById('rescheduleNoSlotsAvailable');
+  
+  loadingEl.classList.add('hidden');
+  
+  const availableSlots = slots.filter(slot => slot.available);
+  
+  if (availableSlots.length === 0) {
+    noSlotsEl.classList.remove('hidden');
+    grid.classList.add('hidden');
+    
+    let reason = 'All time slots are taken for this date. Please select a different date.';
+    if (slots[0]?.reason) {
+      reason = slots[0].reason;
     }
+    document.getElementById('rescheduleNoSlotsReason').textContent = reason;
+    return;
+  }
+  
+  // ✅ CRITICAL: Hide the warning when slots ARE available
+  noSlotsEl.classList.add('hidden');
+  
+  const html = availableSlots.map(slot => {
+    const isSelected = rescheduleSelectedTime === slot.time;
+    return `<div class="time-slot ${isSelected ? 'selected' : ''}" onclick="selectRescheduleTime('${slot.time}')">${slot.time}</div>`;
+  }).join('');
+  
+  grid.innerHTML = html;
+  grid.classList.remove('hidden');
+}
 
     function selectRescheduleTime(time) {
       rescheduleSelectedTime = time;
