@@ -262,7 +262,7 @@ async function sendCancellationEmail(data) {
       </p>
       
       <p style="margin-top: 20px;">
-        <a href="https://markebmedia.com/booking.html" 
+        <a href="https://markebmedia.com/website/booking.html" 
            style="background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
           Book Again
         </a>

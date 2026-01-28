@@ -227,7 +227,7 @@ exports.handler = async (event, context) => {
               <div style="padding: 40px 30px; background: #ffffff;">
                 <p style="font-size: 16px; color: #333;">Hi <strong>${fields['Client Name']}</strong>,</p>
                 
-                <p style="font-size: 16px; color: #333;">Your payment has been successfully processed and your booking is now confirmed!</p>
+                <p style="font-size: 16px; color: #333;">Your payment has been successfully processed!</p>
                 
                 <div style="background: #d1fae5; border: 2px solid #10b981; border-radius: 12px; padding: 20px; margin: 25px 0; text-align: center;">
                   <div style="font-size: 14px; color: #065f46; font-weight: 600;">PAYMENT RECEIVED</div>

@@ -2750,147 +2750,163 @@ const stripe = Stripe(STRIPE_PUBLIC_KEY);
 
    // ===== SERVICE & ADDON CATALOGS =====
     const SERVICES_CATALOG = {
-      north: [
-        {
-          id: 'complete-branding',
-          name: 'Complete Branding Package - Photo & Video',
-          price: 894.00,
-          duration: 300,
-          isPropertyService: false,
-          availableAddons: ['elevate-edit', 'add-branded-outro']
-        },
-        {
-          id: 'branding-video',
-          name: 'Branding Videography Session',
-          price: 534.00,
-          duration: 180,
-          isPropertyService: false,
-          availableAddons: ['elevate-edit', 'add-branded-outro']
-        },
-        {
-          id: 'branding-photo',
-          name: 'Branding Photography Session - 10 Signature Shots',
-          price: 414.00,
-          duration: 120,
-          isPropertyService: false,
-          availableAddons: []
-        },
-        {
-          id: 'gold-package',
-          name: 'Gold Package',
-          price: 600.00,
-          duration: 150,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'silver-package',
-          name: 'Silver Package',
-          price: 262.80,
-          duration: 90,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'all-in-one-drone',
-          name: 'All In One Drone',
-          price: 214.80,
-          duration: 45,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'property-video',
-          name: 'Property Videography',
-          price: 154.80,
-          duration: 60,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'property-photo',
-          name: 'Property Photography',
-          price: 118.80,
-          duration: 45,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
-        },
-        {
-          id: 'drone-video',
-          name: 'Property Drone Videography',
-          price: 130.80,
-          duration: 20,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'drone-photo',
-          name: 'Property Drone Photography',
-          price: 130.80,
-          duration: 20,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-video', 'property-speed-tours']
-        }
-      ],
-      south: [
-        {
-          id: 'gold-package',
-          name: 'Gold Package',
-          price: 600.00,
-          duration: 150,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'silver-package',
-          name: 'Silver Package',
-          price: 262.80,
-          duration: 90,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'all-in-one-drone',
-          name: 'All In One Drone',
-          price: 214.80,
-          duration: 45,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'property-video',
-          name: 'Property Videography',
-          price: 154.80,
-          duration: 60,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'property-photo',
-          name: 'Property Photography',
-          price: 118.80,
-          duration: 45,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
-        },
-        {
-          id: 'drone-video',
-          name: 'Property Drone Videography',
-          price: 130.80,
-          duration: 20,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
-        },
-        {
-          id: 'drone-photo',
-          name: 'Property Drone Photography',
-          price: 130.80,
-          duration: 20,
-          isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-video', 'property-speed-tours']
-        }
-      ]
-    };
+  north: [
+    {
+      id: 'complete-branding',
+      name: 'Complete Branding Package - Photo & Video',
+      price: 894.00,
+      duration: 300,
+      isPropertyService: false,
+      availableAddons: ['elevate-edit', 'add-branded-outro']
+    },
+    {
+      id: 'branding-video',
+      name: 'Branding Videography Session',
+      price: 534.00,
+      duration: 180,
+      isPropertyService: false,
+      availableAddons: ['elevate-edit', 'add-branded-outro']
+    },
+    {
+      id: 'branding-photo',
+      name: 'Branding Photography Session - 10 Signature Shots',
+      price: 414.00,
+      duration: 120,
+      isPropertyService: false,
+      availableAddons: []
+    },
+    {
+      id: 'gold-package',
+      name: 'Gold Package',
+      price: 600.00,
+      duration: 150,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+    },
+    {
+      id: 'silver-package',
+      name: 'Silver Package',
+      price: 262.80,
+      duration: 90,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+    },
+    {
+      id: 'bronze-package',
+      name: 'Bronze Package',
+      price: 202.80,
+      duration: 90,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-speed-tours']
+    },
+    {
+      id: 'all-in-one-drone',
+      name: 'All In One Drone',
+      price: 214.80,
+      duration: 45,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
+    },
+    {
+      id: 'property-video',
+      name: 'Property Videography',
+      price: 154.80,
+      duration: 60,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
+    },
+    {
+      id: 'property-photo',
+      name: 'Property Photography',
+      price: 118.80,
+      duration: 45,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
+    },
+    {
+      id: 'drone-video',
+      name: 'Property Drone Videography',
+      price: 130.80,
+      duration: 20,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
+    },
+    {
+      id: 'drone-photo',
+      name: 'Property Drone Photography',
+      price: 130.80,
+      duration: 20,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-video', 'property-speed-tours']
+    }
+  ],
+  south: [
+    {
+      id: 'gold-package',
+      name: 'Gold Package',
+      price: 600.00,
+      duration: 150,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+    },
+    {
+      id: 'silver-package',
+      name: 'Silver Package',
+      price: 262.80,
+      duration: 90,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+    },
+    {
+      id: 'bronze-package',
+      name: 'Bronze Package',
+      price: 202.80,
+      duration: 90,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-speed-tours']
+    },
+    {
+      id: 'all-in-one-drone',
+      name: 'All In One Drone',
+      price: 214.80,
+      duration: 45,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
+    },
+    {
+      id: 'property-video',
+      name: 'Property Videography',
+      price: 154.80,
+      duration: 60,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
+    },
+    {
+      id: 'property-photo',
+      name: 'Property Photography',
+      price: 118.80,
+      duration: 45,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
+    },
+    {
+      id: 'drone-video',
+      name: 'Property Drone Videography',
+      price: 130.80,
+      duration: 20,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
+    },
+    {
+      id: 'drone-photo',
+      name: 'Property Drone Photography',
+      price: 130.80,
+      duration: 20,
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-video', 'property-speed-tours']
+    }
+  ]
+};
 
     const ADDONS_CATALOG = {
       'standard-floor-plan': {
@@ -5650,6 +5666,7 @@ const ALL_SERVICE_IDS = [
   'branding-photo',
   'gold-package',
   'silver-package',
+  'bronze-package',
   'all-in-one-drone',
   'property-video',
   'property-photo',
@@ -5811,6 +5828,7 @@ function populateServiceCheckboxes() {
     'branding-photo': 'Branding Photo',
     'gold-package': 'Gold Package',
     'silver-package': 'Silver Package',
+    'bronze-package': 'Bronze Package',
     'all-in-one-drone': 'All In One Drone',
     'property-video': 'Property Video',
     'property-photo': 'Property Photo',

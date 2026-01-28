@@ -261,6 +261,255 @@
       font-size: 18px;
       font-weight: 700;
     }
+
+    /* Calendar Styles */
+    .calendar-container {
+      background: #fff;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .calendar-nav-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: 2px solid #e2e8f0;
+      background: #fff;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 700;
+      color: #64748b;
+      transition: all 0.2s ease;
+    }
+
+    .calendar-nav-btn:hover {
+      border-color: #3b82f6;
+      color: #3b82f6;
+    }
+
+    .calendar-month-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #fff;
+      color: #1e293b;
+    }
+
+    .calendar-day.day-label {
+      background: transparent;
+      border: none;
+      font-size: 12px;
+      font-weight: 700;
+      color: #94a3b8;
+      cursor: default;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .calendar-day.disabled {
+      background: #f8fafc;
+      color: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .calendar-day.other-month {
+      color: #cbd5e1;
+    }
+
+    .calendar-day:not(.disabled):not(.day-label):not(.other-month):hover {
+      border-color: #3b82f6;
+      background: #eff6ff;
+      transform: scale(1.05);
+    }
+
+    .calendar-day.selected {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      border-color: #3b82f6;
+      color: #fff;
+    }
+
+    .calendar-day.today {
+      border-color: #10b981;
+      font-weight: 700;
+    }
+
+    /* Time Slot Styles */
+    .time-slot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .time-slot {
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #fff;
+      color: #1e293b;
+    }
+
+    .time-slot:hover {
+      border-color: #3b82f6;
+      background: #eff6ff;
+      transform: translateY(-2px);
+    }
+
+    .time-slot.selected {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      border-color: #3b82f6;
+      color: #fff;
+    }
+
+    .time-slot.disabled {
+      background: #f8fafc;
+      color: #cbd5e1;
+      cursor: not-allowed;
+      border-color: #f1f5f9;
+    }
+
+    .time-slot.disabled:hover {
+      transform: none;
+      border-color: #f1f5f9;
+      background: #f8fafc;
+    }
+
+    /* Service Card Styles */
+    .service-card {
+      background: #fff;
+      border: 3px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .service-card:hover {
+      border-color: #3b82f6;
+      transform: translateX(4px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+
+    .service-card.selected {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+
+    .service-radio {
+      width: 24px;
+      height: 24px;
+      border: 3px solid #e2e8f0;
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .service-card:hover .service-radio {
+      border-color: #3b82f6;
+    }
+
+    .service-card.selected .service-radio {
+      border-color: #3b82f6;
+      background: #3b82f6;
+      position: relative;
+    }
+
+    .service-card.selected .service-radio::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    /* Bedroom Counter */
+    .bedroom-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      border: 2px solid #e2e8f0;
+      background: #fff;
+      font-size: 24px;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .bedroom-btn:hover {
+      border-color: #3b82f6;
+      color: #3b82f6;
+      transform: scale(1.05);
+    }
+
+    .bedroom-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .card {
+        padding: 24px;
+      }
+
+      .button-group {
+        grid-template-columns: 1fr;
+      }
+
+      .calendar-grid {
+        gap: 4px;
+      }
+
+      .calendar-day {
+        font-size: 12px;
+      }
+
+      .time-slot-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -336,56 +585,147 @@
         </div>
 
         <div class="button-group">
-          <button id="rescheduleBtn" class="btn btn-secondary" onclick="showRescheduleForm()">
-            📅 Reschedule
-          </button>
-          <button id="cancelBtn" class="btn btn-danger" onclick="showCancelForm()">
-            ✖️ Cancel Booking
-          </button>
-        </div>
-      </div>
+  <button id="modifyServiceBtn" class="btn btn-secondary" onclick="showModifyServiceForm()">
+    🛠️ Modify Service
+  </button>
+  <button id="rescheduleBtn" class="btn btn-secondary" onclick="showRescheduleForm()">
+    📅 Reschedule
+  </button>
+  <button id="cancelBtn" class="btn btn-danger" onclick="showCancelForm()">
+    ✖️ Cancel Booking
+  </button>
+</div>
 
-      <!-- Reschedule Form (hidden by default) -->
+      <!-- Reschedule Form with Calendar (hidden by default) -->
       <div id="rescheduleForm" class="card hidden">
         <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 16px; color: #1e293b;">
           Reschedule Your Booking
         </h2>
         <p style="color: #64748b; margin-bottom: 24px;">
-          Select a new date and time for your shoot. You can reschedule free of charge if it's more than 24 hours before your original booking.
+          Select a new date and time for your shoot. Free rescheduling available if more than 24 hours before your booking.
         </p>
-
-        <div class="alert alert-info">
-          <strong>Note:</strong> Availability is checked in real-time based on media specialist schedule and travel times between properties.
-        </div>
 
         <div id="reschedule24HourWarning" class="alert alert-warning hidden">
           <strong>⏰ Cannot Reschedule:</strong> Rescheduling requires 24 hours notice. Your booking is too close to reschedule.
         </div>
 
-        <label class="form-label">New Date</label>
-        <input type="date" id="newDate" class="form-input" onchange="checkRescheduleAvailability()" />
+        <!-- Calendar -->
+        <div class="calendar-container">
+          <div class="calendar-header">
+            <button type="button" class="calendar-nav-btn" onclick="changeRescheduleMonth(-1)">‹</button>
+            <h3 id="rescheduleCalendarMonth" class="calendar-month-title">Loading...</h3>
+            <button type="button" class="calendar-nav-btn" onclick="changeRescheduleMonth(1)">›</button>
+          </div>
 
-        <div id="availabilityLoading" class="hidden" style="text-align: center; padding: 20px; color: #64748b;">
-          <div class="loading-spinner" style="width: 32px; height: 32px; margin: 0 auto 12px;"></div>
-          <p>Checking availability...</p>
+          <div id="rescheduleCalendarGrid" class="calendar-grid">
+            <!-- Calendar days will be inserted here -->
+          </div>
         </div>
 
-        <div id="noSlotsAvailable" class="alert alert-warning hidden">
-          <strong>⚠️ No Available Times:</strong> <span id="noSlotsReason">Please select a different date.</span>
-        </div>
+        <!-- Time Slots -->
+        <div id="rescheduleTimeSlotSection" class="hidden">
+          <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 16px;">
+            Available Times for <span id="rescheduleSelectedDateDisplay"></span>
+          </h3>
 
-        <div id="timeSlotSection" class="hidden">
-          <label class="form-label">New Time</label>
-          <select id="newTime" class="form-input" onchange="enableRescheduleButton()">
-            <option value="">Select a time</option>
-          </select>
+          <div id="rescheduleLoadingTimeSlots" class="loading hidden">
+            <div class="loading-spinner" style="width: 32px; height: 32px;"></div>
+            <p>Checking availability...</p>
+          </div>
+
+          <div id="rescheduleNoSlotsAvailable" class="alert alert-warning hidden">
+            <strong>⚠️ No Available Times:</strong> <span id="rescheduleNoSlotsReason">Please select a different date.</span>
+          </div>
+
+          <div id="rescheduleTimeSlotGrid" class="time-slot-grid hidden">
+            <!-- Time slots will be inserted here -->
+          </div>
         </div>
 
         <div class="button-group">
           <button class="btn btn-secondary" onclick="hideRescheduleForm()">Cancel</button>
-          <button class="btn btn-primary" id="confirmRescheduleBtn" onclick="submitReschedule()" disabled>Confirm Reschedule</button>
+          <button class="btn btn-primary" id="confirmRescheduleBtn" onclick="submitReschedule()" disabled>
+            Confirm Reschedule
+          </button>
         </div>
       </div>
+
+     <!-- Modify Service Form -->
+      <div id="modifyServiceForm" class="card hidden">
+        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 16px; color: #1e293b;">
+          Modify Your Service
+        </h2>
+        <p style="color: #64748b; margin-bottom: 24px;">
+          Change your service, add extras, or adjust bedrooms. Price differences will be charged or refunded automatically.
+        </p>
+
+        <div class="alert alert-info">
+          <strong>💡 Note:</strong> Discounts will be preserved and recalculated based on your new service price.
+        </div>
+
+        <!-- Service Selection -->
+        <div id="modifyServiceCards" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px;">
+          <!-- Services will be dynamically inserted here -->
+        </div>
+
+        <!-- Bedroom Counter -->
+        <div id="modifyBedroomSection" style="display: none; margin-bottom: 28px;">
+          <label class="form-label">Number of Bedrooms</label>
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <button type="button" class="bedroom-btn" onclick="adjustModifyBedrooms(-1)">-</button>
+            <div style="flex: 1; text-align: center;">
+              <div id="modifyBedroomCount" style="font-size: 48px; font-weight: 700; color: #3b82f6;">4</div>
+              <div style="font-size: 13px; color: #64748b; margin-top: 4px;">bedrooms</div>
+            </div>
+            <button type="button" class="bedroom-btn" onclick="adjustModifyBedrooms(1)">+</button>
+          </div>
+          <div id="modifyBedroomFeeNotice" style="display: none; margin-top: 12px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
+            <strong>£30 per additional bedroom</strong> after the first 4 bedrooms
+          </div>
+        </div>
+
+        <!-- Add-Ons Section -->
+        <div id="modifyAddonsSection" style="display: none; margin-bottom: 28px;">
+          <h3 style="font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 12px;">
+            📦 Add-Ons
+          </h3>
+          <p style="font-size: 14px; color: #64748b; margin-bottom: 16px;">
+            Select optional add-ons to enhance your booking
+          </p>
+          <div id="modifyAddonsGrid" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Add-ons will be inserted here -->
+          </div>
+        </div>
+
+        <!-- Price Comparison -->
+        <div id="modifyPriceComparison" style="background: #f8fafc; border-radius: 12px; padding: 24px; margin-bottom: 28px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+            <span style="font-size: 14px; color: #64748b;">Current Price</span>
+            <span style="font-size: 14px; font-weight: 600; color: #64748b; text-decoration: line-through;" id="modifyCurrentPrice">£0.00</span>
+          </div>
+          <div id="modifyDiscountRow" style="display: none; justify-content: space-between; margin-bottom: 12px;">
+            <span style="font-size: 14px; color: #10b981;">Discount Applied</span>
+            <span style="font-size: 14px; font-weight: 600; color: #10b981;" id="modifyDiscountAmount">-£0.00</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+            <span style="font-size: 14px; color: #64748b;">New Price</span>
+            <span style="font-size: 14px; font-weight: 600; color: #1e293b;" id="modifyNewPrice">£0.00</span>
+          </div>
+          <div style="border-top: 2px solid #e2e8f0; padding-top: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 18px; font-weight: 700; color: #1e293b;">Price Difference</span>
+            <span style="font-size: 24px; font-weight: 700;" id="modifyPriceDifference">£0.00</span>
+          </div>
+          <div id="modifyPriceNote" style="font-size: 12px; color: #64748b; text-align: right; margin-top: 8px;"></div>
+        </div>
+
+        <div class="button-group">
+          <button class="btn btn-secondary" onclick="hideModifyServiceForm()">Cancel</button>
+          <button class="btn btn-primary" id="confirmModifyBtn" onclick="submitModifyService()" disabled>
+            Confirm Changes
+          </button>
+        </div>
+      </div>
+
 
       <!-- Cancel Form (hidden by default) -->
       <div id="cancelForm" class="card hidden">
@@ -436,6 +776,225 @@
   <script>
     const stripe = Stripe('pk_live_51QycLvQAVOs8qTDFVfXTNzuuhBnPjgZQSS3AH30NGMuSf3SxAWF9pLzYwL0ulj1wMMCC2jnhDyeqeop7BkWDfeZ400wT3Ko8aK');
     let bookingData = null;
+    let modifyData = {
+      bedrooms: 4,
+      selectedAddons: [],
+      selectedService: null
+    };
+    let rescheduleCalendarDate = new Date();
+    let rescheduleSelectedDate = null;
+    let rescheduleSelectedTime = null;
+
+    // ===== SERVICE & ADDON CATALOGS =====
+    const SERVICES = {
+      north: [
+        {
+          id: 'complete-branding',
+          name: 'Complete Branding Package - Photo & Video',
+          price: 894.00,
+          duration: 300,
+          isPropertyService: false,
+          availableAddons: ['elevate-edit', 'add-branded-outro']
+        },
+        {
+          id: 'branding-video',
+          name: 'Branding Videography Session',
+          price: 534.00,
+          duration: 180,
+          isPropertyService: false,
+          availableAddons: ['elevate-edit', 'add-branded-outro']
+        },
+        {
+          id: 'branding-photo',
+          name: 'Branding Photography Session - 10 Signature Shots',
+          price: 414.00,
+          duration: 120,
+          isPropertyService: false,
+          availableAddons: []
+        },
+        {
+          id: 'gold-package',
+          name: 'Gold Package',
+          price: 600.00,
+          duration: 150,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'silver-package',
+          name: 'Silver Package',
+          price: 262.80,
+          duration: 90,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'bronze-package',
+          name: 'Bronze Package',
+          price: 202.80,
+          duration: 90,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-speed-tours']
+        },
+        {
+          id: 'all-in-one-drone',
+          name: 'All In One Drone',
+          price: 214.80,
+          duration: 45,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'property-video',
+          name: 'Property Videography',
+          price: 154.80,
+          duration: 60,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'property-photo',
+          name: 'Property Photography',
+          price: 118.80,
+          duration: 45,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
+        },
+        {
+          id: 'drone-video',
+          name: 'Property Drone Videography',
+          price: 130.80,
+          duration: 20,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'drone-photo',
+          name: 'Property Drone Photography',
+          price: 130.80,
+          duration: 20,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-video', 'property-speed-tours']
+        }
+      ],
+      south: [
+        {
+          id: 'gold-package',
+          name: 'Gold Package',
+          price: 600.00,
+          duration: 150,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'silver-package',
+          name: 'Silver Package',
+          price: 262.80,
+          duration: 90,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'bronze-package',
+          name: 'Bronze Package',
+          price: 202.80,
+          duration: 90,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-speed-tours']
+        },
+        {
+          id: 'all-in-one-drone',
+          name: 'All In One Drone',
+          price: 214.80,
+          duration: 45,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'property-video',
+          name: 'Property Videography',
+          price: 154.80,
+          duration: 60,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'property-photo',
+          name: 'Property Photography',
+          price: 118.80,
+          duration: 45,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
+        },
+        {
+          id: 'drone-video',
+          name: 'Property Drone Videography',
+          price: 130.80,
+          duration: 20,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
+        },
+        {
+          id: 'drone-photo',
+          name: 'Property Drone Photography',
+          price: 130.80,
+          duration: 20,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'property-video', 'property-drone-video', 'property-speed-tours']
+        }
+      ]
+    };
+
+    const ADDONS = {
+      'standard-floor-plan': {
+        id: 'standard-floor-plan',
+        name: 'Standard Floor Plan',
+        price: 24.00,
+        description: '2D floor plan to help buyers visualize the property layout'
+      },
+      'plus-floor-plan': {
+        id: 'plus-floor-plan',
+        name: 'Plus Floor Plan',
+        price: 36.00,
+        description: 'Enhanced 2D floor plan with measurements and room labels'
+      },
+      'elevate-edit': {
+        id: 'elevate-edit',
+        name: 'Elevate Your Edit',
+        price: 75.00,
+        description: 'Transform your video with premium editing including dynamic transitions, bold captions, spotlight features'
+      },
+      'property-drone-photo': {
+        id: 'property-drone-photo',
+        name: 'Property Drone Photography',
+        price: 130.80,
+        description: 'Up to 10 stunning aerial photographs'
+      },
+      'property-drone-video': {
+        id: 'property-drone-video',
+        name: 'Property Drone Videography',
+        price: 130.80,
+        description: 'Up to 30-second cinematic aerial showcase'
+      },
+      'property-video': {
+        id: 'property-video',
+        name: 'Property Videography',
+        price: 154.80,
+        description: 'Shot in 4K to captivate viewers and drive enquiries'
+      },
+      'property-speed-tours': {
+        id: 'property-speed-tours',
+        name: 'Property Speed Tours',
+        price: 60.00,
+        description: 'Quick walkthrough video tour of the property'
+      },
+      'add-branded-outro': {
+        id: 'add-branded-outro',
+        name: 'Add Branded Outro To Video',
+        price: 0.00,
+        description: 'Add your branded outro to any video content'
+      }
+    };
 
     // Get booking reference and email from URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -510,9 +1069,11 @@
 
       // Disable buttons if booking is in the past or already cancelled
       if (booking.bookingStatus === 'Cancelled') {
+        document.getElementById('modifyServiceBtn').style.display = 'none';
         document.getElementById('rescheduleBtn').style.display = 'none';
         document.getElementById('cancelBtn').style.display = 'none';
       } else if (hoursUntil < 0) {
+        document.getElementById('modifyServiceBtn').disabled = true;
         document.getElementById('rescheduleBtn').disabled = true;
         document.getElementById('rescheduleBtn').textContent = '📅 Shoot Completed';
         document.getElementById('cancelBtn').disabled = true;
@@ -522,11 +1083,6 @@
         document.getElementById('rescheduleBtn').disabled = true;
         document.getElementById('rescheduleBtn').textContent = '📅 Too Late to Reschedule';
       }
-
-      // Set min date for reschedule (tomorrow)
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      document.getElementById('newDate').min = tomorrow.toISOString().split('T')[0];
     }
 
     function showNotFound() {
@@ -534,62 +1090,131 @@
       document.getElementById('notFoundState').classList.remove('hidden');
     }
 
+    // ===== RESCHEDULE WITH CALENDAR =====
+    
     function showRescheduleForm() {
       // Check if within 24 hours
       if (bookingData.hoursUntilBooking < 24) {
         document.getElementById('reschedule24HourWarning').classList.remove('hidden');
+        document.getElementById('confirmRescheduleBtn').disabled = true;
       } else {
         document.getElementById('reschedule24HourWarning').classList.add('hidden');
       }
       
       document.getElementById('rescheduleForm').classList.remove('hidden');
       document.getElementById('rescheduleForm').scrollIntoView({ behavior: 'smooth' });
+      
+      // Initialize calendar
+      rescheduleCalendarDate = new Date();
+      rescheduleSelectedDate = null;
+      rescheduleSelectedTime = null;
+      renderRescheduleCalendar();
     }
 
     function hideRescheduleForm() {
       document.getElementById('rescheduleForm').classList.add('hidden');
-      document.getElementById('newDate').value = '';
-      document.getElementById('newTime').innerHTML = '<option value="">Select a time</option>';
-      document.getElementById('timeSlotSection').classList.add('hidden');
-      document.getElementById('noSlotsAvailable').classList.add('hidden');
+      document.getElementById('rescheduleTimeSlotSection').classList.add('hidden');
       document.getElementById('confirmRescheduleBtn').disabled = true;
+      rescheduleSelectedDate = null;
+      rescheduleSelectedTime = null;
     }
 
-    // ✅ FIXED: Check availability using the booking's stored postcode
-    async function checkRescheduleAvailability() {
-      const newDate = document.getElementById('newDate').value;
-      
-      if (!newDate) return;
+    function changeRescheduleMonth(direction) {
+      rescheduleCalendarDate.setMonth(rescheduleCalendarDate.getMonth() + direction);
+      renderRescheduleCalendar();
+    }
 
-      // ✅ Use the postcode stored with the booking (not extracted from address)
-      const postcode = bookingData.postcode;
+    function renderRescheduleCalendar() {
+      const year = rescheduleCalendarDate.getFullYear();
+      const month = rescheduleCalendarDate.getMonth();
       
-      if (!postcode) {
-        alert('Unable to determine booking postcode. Please contact support.');
-        return;
-      }
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      document.getElementById('rescheduleCalendarMonth').textContent = `${monthNames[month]} ${year}`;
 
-      console.log('Checking availability for reschedule:', {
-        postcode: postcode,
-        region: bookingData.region,
-        date: newDate
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startDay = firstDay.getDay();
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const maxDate = new Date();
+      maxDate.setDate(maxDate.getDate() + 60);
+      maxDate.setHours(23, 59, 59, 999);
+
+      const grid = document.getElementById('rescheduleCalendarGrid');
+      let html = '';
+
+      const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      dayLabels.forEach(label => {
+        html += `<div class="calendar-day day-label">${label}</div>`;
       });
 
-      // Show loading state
-      document.getElementById('availabilityLoading').classList.remove('hidden');
-      document.getElementById('timeSlotSection').classList.add('hidden');
-      document.getElementById('noSlotsAvailable').classList.add('hidden');
+      for (let i = 0; i < startDay; i++) {
+        html += `<div class="calendar-day disabled other-month"></div>`;
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        date.setHours(0, 0, 0, 0);
+        
+        const isPast = date < today;
+        const isTooFarAhead = date > maxDate;
+        const isSunday = date.getDay() === 0;
+        const isSaturday = date.getDay() === 6;
+        const isDisabled = isPast || isTooFarAhead || isSunday || isSaturday;
+        const isToday = date.getTime() === today.getTime();
+        const isSelected = rescheduleSelectedDate && date.toISOString().split('T')[0] === rescheduleSelectedDate;
+
+        let classes = 'calendar-day';
+        if (isDisabled) classes += ' disabled';
+        if (isToday) classes += ' today';
+        if (isSelected) classes += ' selected';
+
+        const dateString = date.toISOString().split('T')[0];
+        html += `<div class="${classes}" onclick="${isDisabled ? '' : `selectRescheduleDate('${dateString}')`}">${day}</div>`;
+      }
+
+      grid.innerHTML = html;
+    }
+
+    async function selectRescheduleDate(dateString) {
+      rescheduleSelectedDate = dateString;
+      rescheduleSelectedTime = null;
+
+      renderRescheduleCalendar();
+
+      document.getElementById('rescheduleTimeSlotSection').classList.remove('hidden');
+      document.getElementById('rescheduleLoadingTimeSlots').classList.remove('hidden');
+      document.getElementById('rescheduleTimeSlotGrid').classList.add('hidden');
+      document.getElementById('rescheduleNoSlotsAvailable').classList.add('hidden');
       document.getElementById('confirmRescheduleBtn').disabled = true;
 
+      const date = new Date(dateString + 'T12:00:00');
+      const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+      document.getElementById('rescheduleSelectedDateDisplay').textContent = date.toLocaleDateString('en-GB', options);
+
+      await loadRescheduleTimeSlots(dateString);
+
+      document.getElementById('rescheduleTimeSlotSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    async function loadRescheduleTimeSlots(dateString) {
       try {
-        // ✅ SAME CALL AS BOOKING.HTML - region will be normalised server-side
+        console.log('Loading reschedule time slots:', {
+          postcode: bookingData.postcode,
+          region: bookingData.region,
+          selectedDate: dateString
+        });
+
         const response = await fetch('/.netlify/functions/check-availability', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            postcode: postcode,
-            region: bookingData.region.toLowerCase(), // ensure lowercase
-            selectedDate: newDate
+            postcode: bookingData.postcode,
+            region: bookingData.region,
+            selectedDate: dateString
           })
         });
 
@@ -598,81 +1223,80 @@
         }
 
         const data = await response.json();
-        
         console.log('Availability response:', data);
 
-        // Hide loading
-        document.getElementById('availabilityLoading').classList.add('hidden');
-
-        // Filter available slots
-        const availableSlots = data.availableSlots.filter(slot => slot.available);
-
-        if (availableSlots.length === 0) {
-          // No slots available
-          document.getElementById('noSlotsAvailable').classList.remove('hidden');
-          
-          // Determine reason
-          let reason = 'No available times on this date.';
-          if (data.message) {
-            reason = data.message;
-          } else if (data.availableSlots[0]?.reason) {
-            reason = data.availableSlots[0].reason;
-          }
-          
-          document.getElementById('noSlotsReason').textContent = reason;
-          document.getElementById('timeSlotSection').classList.add('hidden');
-        } else {
-          // Populate time slots
-          document.getElementById('noSlotsAvailable').classList.add('hidden');
-          document.getElementById('timeSlotSection').classList.remove('hidden');
-          
-          const timeSelect = document.getElementById('newTime');
-          timeSelect.innerHTML = '<option value="">Select a time</option>';
-          
-          availableSlots.forEach(slot => {
-            const option = document.createElement('option');
-            option.value = slot.time;
-            option.textContent = formatTime(slot.time);
-            timeSelect.appendChild(option);
-          });
-        }
+        renderRescheduleTimeSlots(data.availableSlots);
 
       } catch (error) {
-        console.error('Error checking availability:', error);
-        document.getElementById('availabilityLoading').classList.add('hidden');
-        alert('Failed to check availability. Please try again.');
+        console.error('Error loading time slots:', error);
+        
+        // Fallback to all slots
+        const fallbackSlots = [];
+        for (let hour = 9; hour <= 15; hour++) {
+          for (let minute of [0, 30]) {
+            if (hour === 15 && minute === 30) break;
+            const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+            fallbackSlots.push({ time: timeString, available: true });
+          }
+        }
+        
+        renderRescheduleTimeSlots(fallbackSlots);
       }
     }
 
-    // ✅ Enable reschedule button when time selected
-    function enableRescheduleButton() {
-      const newTime = document.getElementById('newTime').value;
-      document.getElementById('confirmRescheduleBtn').disabled = !newTime;
+    function renderRescheduleTimeSlots(slots) {
+      const grid = document.getElementById('rescheduleTimeSlotGrid');
+      const loadingEl = document.getElementById('rescheduleLoadingTimeSlots');
+      const noSlotsEl = document.getElementById('rescheduleNoSlotsAvailable');
+      
+      loadingEl.classList.add('hidden');
+      
+      const availableSlots = slots.filter(slot => slot.available);
+      
+      if (availableSlots.length === 0) {
+        noSlotsEl.classList.remove('hidden');
+        grid.classList.add('hidden');
+        
+        let reason = 'No available times on this date.';
+        if (slots[0]?.reason) {
+          reason = slots[0].reason;
+        }
+        document.getElementById('rescheduleNoSlotsReason').textContent = reason;
+        return;
+      }
+      
+      noSlotsEl.classList.add('hidden');
+      
+      const html = availableSlots.map(slot => {
+        const isSelected = rescheduleSelectedTime === slot.time;
+        return `<div class="time-slot ${isSelected ? 'selected' : ''}" onclick="selectRescheduleTime('${slot.time}')">${slot.time}</div>`;
+      }).join('');
+
+      grid.innerHTML = html;
+      grid.classList.remove('hidden');
     }
 
-    // ✅ Format time to 12-hour format
-    function formatTime(time24) {
-      const [hours, minutes] = time24.split(':');
-      const hour = parseInt(hours);
-      const ampm = hour >= 12 ? 'PM' : 'AM';
-      const hour12 = hour % 12 || 12;
-      return `${hour12}:${minutes} ${ampm}`;
+    function selectRescheduleTime(time) {
+      rescheduleSelectedTime = time;
+      renderRescheduleTimeSlots(
+        Array.from(document.querySelectorAll('#rescheduleTimeSlotGrid .time-slot')).map(el => ({
+          time: el.textContent.trim(),
+          available: true
+        }))
+      );
+      document.getElementById('confirmRescheduleBtn').disabled = false;
     }
 
     async function submitReschedule() {
-      const newDate = document.getElementById('newDate').value;
-      const newTime = document.getElementById('newTime').value;
-
-      if (!newDate || !newTime) {
+      if (!rescheduleSelectedDate || !rescheduleSelectedTime) {
         alert('Please select both a date and time');
         return;
       }
 
-      if (!confirm(`Are you sure you want to reschedule to ${newDate} at ${formatTime(newTime)}?`)) {
+      if (!confirm(`Reschedule to ${rescheduleSelectedDate} at ${rescheduleSelectedTime}?`)) {
         return;
       }
 
-      // Show loading state
       const confirmBtn = document.getElementById('confirmRescheduleBtn');
       confirmBtn.disabled = true;
       confirmBtn.textContent = 'Rescheduling...';
@@ -683,8 +1307,8 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             bookingRef: bookingData.bookingRef,
-            newDate: newDate,
-            newTime: newTime,
+            newDate: rescheduleSelectedDate,
+            newTime: rescheduleSelectedTime,
             clientEmail: bookingData.clientEmail
           })
         });
@@ -694,54 +1318,317 @@
           throw new Error(error.error || 'Failed to reschedule');
         }
 
-        // Redirect to success page
-        window.location.href = `/reschedule-success.html?ref=${bookingData.bookingRef}&date=${newDate}&time=${newTime}&email=${encodeURIComponent(bookingData.clientEmail)}`;
+        window.location.href = `/reschedule-success.html?ref=${bookingData.bookingRef}&date=${rescheduleSelectedDate}&time=${rescheduleSelectedTime}&email=${encodeURIComponent(bookingData.clientEmail)}`;
 
       } catch (error) {
         console.error('Reschedule error:', error);
         alert(`Failed to reschedule: ${error.message}`);
-        
-        // Reset button
         confirmBtn.disabled = false;
         confirmBtn.textContent = 'Confirm Reschedule';
       }
     }
 
+    // ===== MODIFY SERVICE =====
+    
+    function showModifyServiceForm() {
+      document.getElementById('modifyServiceForm').classList.remove('hidden');
+      document.getElementById('modifyServiceForm').scrollIntoView({ behavior: 'smooth' });
+      
+      // Reset modify data
+      modifyData = {
+        bedrooms: bookingData.bedrooms || 4,
+        selectedAddons: [],
+        selectedService: null
+      };
+      
+      document.getElementById('modifyBedroomCount').textContent = modifyData.bedrooms;
+      document.getElementById('modifyCurrentPrice').textContent = `£${bookingData.totalPrice.toFixed(2)}`;
+      
+      renderModifyServices();
+    }
+
+    function hideModifyServiceForm() {
+      document.getElementById('modifyServiceForm').classList.add('hidden');
+      modifyData = { bedrooms: 4, selectedAddons: [], selectedService: null };
+      document.getElementById('confirmModifyBtn').disabled = true;
+    }
+
+    function renderModifyServices() {
+      const region = bookingData.region.toLowerCase();
+      const services = SERVICES[region] || SERVICES.south;
+      const container = document.getElementById('modifyServiceCards');
+
+      const servicesHTML = services.map(service => `
+        <div class="service-card" data-service-id="${service.id}" onclick="selectModifyService('${service.id}')">
+          <div style="flex: 1;">
+            <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 6px;">
+              ${service.name}
+            </h3>
+            <p style="font-size: 14px; color: #64748b; line-height: 1.5; margin-bottom: 12px;">
+              ${service.isPropertyService ? 'Property service' : 'Personal branding'}
+            </p>
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <span style="font-size: 13px; color: #94a3b8;">
+                ${Math.floor(service.duration / 60)}h ${service.duration % 60}m
+              </span>
+              <span style="font-size: 20px; font-weight: 700; color: #3b82f6;">
+                £${service.price.toFixed(2)}
+              </span>
+            </div>
+          </div>
+          <div class="service-radio"></div>
+        </div>
+      `).join('');
+
+      container.innerHTML = servicesHTML;
+    }
+
+    function selectModifyService(serviceId) {
+      const region = bookingData.region.toLowerCase();
+      const services = SERVICES[region] || SERVICES.south;
+      const service = services.find(s => s.id === serviceId);
+
+      if (!service) return;
+
+      modifyData.selectedService = service;
+      modifyData.selectedAddons = [];
+
+      document.querySelectorAll('#modifyServiceCards .service-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      document.querySelector(`#modifyServiceCards [data-service-id="${serviceId}"]`).classList.add('selected');
+
+      const bedroomSection = document.getElementById('modifyBedroomSection');
+      if (service.isPropertyService) {
+        bedroomSection.style.display = 'block';
+        modifyData.bedrooms = bookingData.bedrooms || 4;
+        document.getElementById('modifyBedroomCount').textContent = modifyData.bedrooms;
+      } else {
+        bedroomSection.style.display = 'none';
+        modifyData.bedrooms = 0;
+      }
+
+      renderModifyAddons();
+      calculateModifyPrice();
+    }
+
+    function renderModifyAddons() {
+      const service = modifyData.selectedService;
+      if (!service || !service.availableAddons || service.availableAddons.length === 0) {
+        document.getElementById('modifyAddonsSection').style.display = 'none';
+        return;
+      }
+
+      const container = document.getElementById('modifyAddonsGrid');
+      const addonsHTML = service.availableAddons.map(addonId => {
+        const addon = ADDONS[addonId];
+        if (!addon) return '';
+
+        const isSelected = modifyData.selectedAddons.includes(addonId);
+
+        return `
+          <div class="service-card ${isSelected ? 'selected' : ''}" 
+               data-addon-id="${addon.id}" 
+               onclick="toggleModifyAddon('${addon.id}')"
+               style="padding: 16px;">
+            <div style="flex: 1;">
+              <h4 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">
+                ${addon.name}
+              </h4>
+              <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 8px;">
+                ${addon.description}
+              </p>
+              <span style="font-size: 18px; font-weight: 700; color: #3b82f6;">
+                ${addon.price === 0 ? 'FREE' : `+£${addon.price.toFixed(2)}`}
+              </span>
+            </div>
+            <div class="service-radio"></div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = addonsHTML;
+      document.getElementById('modifyAddonsSection').style.display = 'block';
+    }
+
+    function toggleModifyAddon(addonId) {
+      const index = modifyData.selectedAddons.indexOf(addonId);
+      
+      if (index > -1) {
+        modifyData.selectedAddons.splice(index, 1);
+      } else {
+        modifyData.selectedAddons.push(addonId);
+      }
+
+      renderModifyAddons();
+      calculateModifyPrice();
+    }
+
+    function adjustModifyBedrooms(change) {
+      const currentBedrooms = modifyData.bedrooms;
+      const newBedrooms = Math.max(1, Math.min(15, currentBedrooms + change));
+      
+      modifyData.bedrooms = newBedrooms;
+      document.getElementById('modifyBedroomCount').textContent = newBedrooms;
+
+      const feeNotice = document.getElementById('modifyBedroomFeeNotice');
+      if (newBedrooms > 4) {
+        feeNotice.style.display = 'block';
+      } else {
+        feeNotice.style.display = 'none';
+      }
+
+      calculateModifyPrice();
+    }
+
+    function calculateModifyPrice() {
+      if (!modifyData.selectedService) {
+        document.getElementById('confirmModifyBtn').disabled = true;
+        return;
+      }
+
+      const basePrice = modifyData.selectedService.price;
+      const extraRooms = modifyData.bedrooms > 4 ? modifyData.bedrooms - 4 : 0;
+      const extraBedroomFee = extraRooms * 30;
+      
+      let addonsPrice = 0;
+      modifyData.selectedAddons.forEach(addonId => {
+        const addon = ADDONS[addonId];
+        if (addon) addonsPrice += addon.price;
+      });
+
+      const newTotalPrice = basePrice + extraBedroomFee + addonsPrice;
+      const currentPrice = bookingData.totalPrice;
+      const priceDifference = newTotalPrice - currentPrice;
+
+      // Update UI
+      document.getElementById('modifyNewPrice').textContent = `£${newTotalPrice.toFixed(2)}`;
+      
+      const diffEl = document.getElementById('modifyPriceDifference');
+      diffEl.textContent = `${priceDifference >= 0 ? '+' : ''}£${priceDifference.toFixed(2)}`;
+      diffEl.style.color = priceDifference >= 0 ? '#ef4444' : '#10b981';
+
+      const noteEl = document.getElementById('modifyPriceNote');
+      if (priceDifference > 0) {
+        noteEl.textContent = 'Additional charge will be applied';
+        noteEl.style.color = '#ef4444';
+      } else if (priceDifference < 0) {
+        noteEl.textContent = 'Refund will be processed';
+        noteEl.style.color = '#10b981';
+      } else {
+        noteEl.textContent = 'No price change';
+        noteEl.style.color = '#64748b';
+      }
+
+      // Show discount if exists
+      if (bookingData.discountCode) {
+        document.getElementById('modifyDiscountRow').style.display = 'flex';
+        document.getElementById('modifyDiscountAmount').textContent = `-£${bookingData.discountAmount.toFixed(2)}`;
+      }
+
+      document.getElementById('confirmModifyBtn').disabled = false;
+    }
+
+    async function submitModifyService() {
+      if (!modifyData.selectedService) {
+        alert('Please select a service');
+        return;
+      }
+
+      const service = modifyData.selectedService;
+      const extraRooms = modifyData.bedrooms > 4 ? modifyData.bedrooms - 4 : 0;
+      const extraBedroomFee = extraRooms * 30;
+      
+      let addonsPrice = 0;
+      const addonsArray = modifyData.selectedAddons.map(addonId => {
+        const addon = ADDONS[addonId];
+        if (addon) addonsPrice += addon.price;
+        return {
+          id: addonId,
+          name: addon?.name || '',
+          price: addon?.price || 0
+        };
+      });
+
+      const newTotalPrice = service.price + extraBedroomFee + addonsPrice;
+      const priceDifference = newTotalPrice - bookingData.totalPrice;
+
+      if (!confirm(`Modify service to ${service.name}?\n\nPrice difference: ${priceDifference >= 0 ? '+' : ''}£${priceDifference.toFixed(2)}`)) {
+        return;
+      }
+
+      const confirmBtn = document.getElementById('confirmModifyBtn');
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Processing...';
+
+      try {
+        const response = await fetch('/.netlify/functions/modify-booking-service', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bookingId: bookingData.id,
+            bookingRef: bookingData.bookingRef,
+            clientEmail: bookingData.clientEmail,
+            newServiceId: service.id,
+            newServiceName: service.name,
+            newServicePrice: service.price,
+            newServiceDuration: service.duration,
+            bedrooms: modifyData.bedrooms,
+            extraBedroomFee: extraBedroomFee,
+            addons: addonsArray,
+            addonsPrice: addonsPrice,
+            totalPrice: newTotalPrice
+          })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to modify service');
+        }
+
+        const result = await response.json();
+        alert(`✅ Service updated successfully!\n\nNew service: ${service.name}\nTotal: £${newTotalPrice.toFixed(2)}`);
+        window.location.reload();
+
+      } catch (error) {
+        console.error('Modify service error:', error);
+        alert(`Failed to modify service: ${error.message}`);
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm Changes';
+      }
+    }
+
+    // ===== CANCELLATION =====
+    
     function showCancelForm() {
       const hoursUntil = bookingData.hoursUntilBooking;
       const totalPrice = bookingData.totalPrice;
       
-      // Determine cancellation fee based on timing
       let cancellationFee = 0;
       let feePercentage = 0;
       let feeText = '';
       
       if (hoursUntil < 24 && hoursUntil >= 0) {
-        // Within 24 hours but not same day
         feePercentage = 50;
         cancellationFee = totalPrice * 0.5;
-        feeText = `Cancelling within 24 hours of your booking incurs a <strong>50% charge (£${cancellationFee.toFixed(2)})</strong>.`;
+        feeText = `Cancelling within 24 hours incurs a <strong>50% charge (£${cancellationFee.toFixed(2)})</strong>.`;
       } else if (hoursUntil < 0) {
-        // Same day or past
         feePercentage = 100;
         cancellationFee = totalPrice;
         feeText = `Same-day cancellations are charged in full <strong>(£${cancellationFee.toFixed(2)})</strong>.`;
       }
       
-      // Update UI based on cancellation fee
       if (cancellationFee > 0) {
         document.getElementById('cancellationFeeWarning').classList.remove('hidden');
         document.getElementById('cancellationFeeText').innerHTML = feeText;
         document.getElementById('freeCancellation').classList.add('hidden');
         
-        // Show payment breakdown
         document.getElementById('cancellationPaymentBreakdown').classList.remove('hidden');
         document.getElementById('cancelOriginalAmount').textContent = `£${totalPrice.toFixed(2)}`;
         document.getElementById('cancelFeeLabel').textContent = `Cancellation Fee (${feePercentage}%):`;
         document.getElementById('cancelFeeAmount').textContent = `£${cancellationFee.toFixed(2)}`;
         document.getElementById('cancelTotalCharge').textContent = `£${cancellationFee.toFixed(2)}`;
         
-        // Update button text
         document.getElementById('cancelButtonText').textContent = `Pay £${cancellationFee.toFixed(2)} & Cancel`;
       } else {
         document.getElementById('cancellationFeeWarning').classList.add('hidden');
@@ -763,30 +1650,24 @@
       const hoursUntil = bookingData.hoursUntilBooking;
       const totalPrice = bookingData.totalPrice;
       
-      // Calculate cancellation fee
       let cancellationFee = 0;
       if (hoursUntil < 24 && hoursUntil >= 0) {
-        cancellationFee = totalPrice * 0.5; // 50% fee
+        cancellationFee = totalPrice * 0.5;
       } else if (hoursUntil < 0) {
-        cancellationFee = totalPrice; // 100% fee
+        cancellationFee = totalPrice;
       }
       
       const requiresPayment = cancellationFee > 0;
       
       if (requiresPayment) {
-        // Confirm payment requirement
-        if (!confirm(`This cancellation requires a fee of £${cancellationFee.toFixed(2)}. You will be redirected to complete payment. Continue?`)) {
+        if (!confirm(`This cancellation requires a fee of £${cancellationFee.toFixed(2)}. Continue?`)) {
           return;
         }
-        
-        // Process cancellation with payment via Stripe
         await processCancellationWithPayment(cancellationFee, reason);
       } else {
-        // Free cancellation
-        if (!confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
+        if (!confirm('Are you sure you want to cancel this booking?')) {
           return;
         }
-        
         await processFreeCancellation(reason);
       }
     }
@@ -810,8 +1691,6 @@
         }
 
         const result = await response.json();
-        
-        // Redirect to Stripe Checkout for cancellation payment
         window.location.href = result.checkoutUrl;
 
       } catch (error) {
@@ -838,7 +1717,7 @@
         }
 
         const result = await response.json();
-        alert(`✅ Booking cancelled successfully. ${result.refundNote}`);
+        alert(`✅ Booking cancelled successfully. ${result.refundNote || ''}`);
         window.location.reload();
 
       } catch (error) {
