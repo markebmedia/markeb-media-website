@@ -122,20 +122,19 @@ exports.handler = async (event, context) => {
         console.log('✅ Payment method already attached');
       }
     } catch (attachError) {
-      console.error('⚠️ Error attaching payment method:', attachError);
-      
-      // If attachment fails, payment method is likely invalid/expired/already used elsewhere
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: 'Payment method is invalid or expired',
-          userMessage: 'The saved payment method cannot be used. It may have been used elsewhere or expired. Please send a payment link to the customer instead.',
-          bookingRef: fields['Booking Reference']
-        })
-      };
-    }
+  console.error('⚠️ Error attaching payment method:', attachError);
+  
+  return {
+    statusCode: 400,
+    headers,
+    body: JSON.stringify({
+      success: false,
+      error: 'Payment method cannot be used',
+      userMessage: 'This payment method was saved incorrectly and cannot be charged. Please use "Mark as Paid" if they paid another way, or send them a new payment link.',
+      bookingRef: fields['Booking Reference']
+    })
+  };
+}
 
     // Get final price
     const finalPrice = fields['Final Price'] || 0;
