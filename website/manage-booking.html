@@ -1039,7 +1039,7 @@
       
       document.getElementById('detailAddress').textContent = booking.propertyAddress;
       document.getElementById('detailMediaSpecialist').textContent = booking.mediaSpecialist;
-      document.getElementById('detailTotal').textContent = `£${booking.totalPrice.toFixed(2)}`;
+      document.getElementById('detailTotal').textContent = `£${booking.finalPrice.toFixed(2)}`;
 
       // Set status badge
       const statusBadge = document.getElementById('bookingStatus');
@@ -1342,7 +1342,7 @@
       };
       
       document.getElementById('modifyBedroomCount').textContent = modifyData.bedrooms;
-      document.getElementById('modifyCurrentPrice').textContent = `£${bookingData.totalPrice.toFixed(2)}`;
+      document.getElementById('modifyCurrentPrice').textContent = `£${bookingData.finalPrice.toFixed(2)}`;
       
       renderModifyServices();
     }
@@ -1498,7 +1498,7 @@
       });
 
       const newTotalPrice = basePrice + extraBedroomFee + addonsPrice;
-      const currentPrice = bookingData.totalPrice;
+      const currentPrice = bookingData.finalPrice;
       const priceDifference = newTotalPrice - currentPrice;
 
       // Update UI
@@ -1601,45 +1601,65 @@
     // ===== CANCELLATION =====
     
     function showCancelForm() {
-      const hoursUntil = bookingData.hoursUntilBooking;
-      const totalPrice = bookingData.totalPrice;
-      
-      let cancellationFee = 0;
-      let feePercentage = 0;
-      let feeText = '';
-      
-      if (hoursUntil < 24 && hoursUntil >= 0) {
-        feePercentage = 50;
-        cancellationFee = totalPrice * 0.5;
-        feeText = `Cancelling within 24 hours incurs a <strong>50% charge (£${cancellationFee.toFixed(2)})</strong>.`;
-      } else if (hoursUntil < 0) {
-        feePercentage = 100;
-        cancellationFee = totalPrice;
-        feeText = `Same-day cancellations are charged in full <strong>(£${cancellationFee.toFixed(2)})</strong>.`;
-      }
-      
-      if (cancellationFee > 0) {
-        document.getElementById('cancellationFeeWarning').classList.remove('hidden');
-        document.getElementById('cancellationFeeText').innerHTML = feeText;
-        document.getElementById('freeCancellation').classList.add('hidden');
-        
-        document.getElementById('cancellationPaymentBreakdown').classList.remove('hidden');
-        document.getElementById('cancelOriginalAmount').textContent = `£${totalPrice.toFixed(2)}`;
-        document.getElementById('cancelFeeLabel').textContent = `Cancellation Fee (${feePercentage}%):`;
-        document.getElementById('cancelFeeAmount').textContent = `£${cancellationFee.toFixed(2)}`;
-        document.getElementById('cancelTotalCharge').textContent = `£${cancellationFee.toFixed(2)}`;
-        
-        document.getElementById('cancelButtonText').textContent = `Pay £${cancellationFee.toFixed(2)} & Cancel`;
-      } else {
-        document.getElementById('cancellationFeeWarning').classList.add('hidden');
-        document.getElementById('freeCancellation').classList.remove('hidden');
-        document.getElementById('cancellationPaymentBreakdown').classList.add('hidden');
-        document.getElementById('cancelButtonText').textContent = 'Confirm Free Cancellation';
-      }
-      
-      document.getElementById('cancelForm').classList.remove('hidden');
-      document.getElementById('cancelForm').scrollIntoView({ behavior: 'smooth' });
-    }
+  const hoursUntil = bookingData.hoursUntilBooking;
+  const totalPrice = bookingData.finalPrice;
+  
+  console.log('Cancel form opened:', {
+    hoursUntil: hoursUntil,
+    totalPrice: totalPrice,
+    bookingDate: bookingData.date,
+    bookingTime: bookingData.time
+  });
+  
+  let cancellationFee = 0;
+  let feePercentage = 0;
+  let feeText = '';
+  
+  // Determine fee based on hours until booking
+  if (hoursUntil < 0) {
+    // Past booking time - 100% fee
+    feePercentage = 100;
+    cancellationFee = totalPrice;
+    feeText = `This booking has passed. Cancelling after the shoot time incurs the <strong>full charge (£${cancellationFee.toFixed(2)})</strong>.`;
+  } else if (hoursUntil < 24) {
+    // Within 24 hours - 50% fee
+    feePercentage = 50;
+    cancellationFee = totalPrice * 0.5;
+    feeText = `You have <strong>${hoursUntil} hours</strong> until your shoot. Cancelling within 24 hours incurs a <strong>50% fee (£${cancellationFee.toFixed(2)})</strong>.`;
+  }
+  
+  console.log('Cancellation calculation:', {
+    fee: cancellationFee,
+    percentage: feePercentage,
+    requiresPayment: cancellationFee > 0
+  });
+  
+  // Show appropriate UI based on fee
+  if (cancellationFee > 0) {
+    // PAID CANCELLATION
+    document.getElementById('cancellationFeeWarning').classList.remove('hidden');
+    document.getElementById('cancellationFeeText').innerHTML = feeText;
+    document.getElementById('freeCancellation').classList.add('hidden');
+    
+    // Show payment breakdown
+    document.getElementById('cancellationPaymentBreakdown').classList.remove('hidden');
+    document.getElementById('cancelOriginalAmount').textContent = `£${totalPrice.toFixed(2)}`;
+    document.getElementById('cancelFeeLabel').textContent = `Cancellation Fee (${feePercentage}%):`;
+    document.getElementById('cancelFeeAmount').textContent = `£${cancellationFee.toFixed(2)}`;
+    document.getElementById('cancelTotalCharge').textContent = `£${cancellationFee.toFixed(2)}`;
+    
+    document.getElementById('cancelButtonText').textContent = `Pay £${cancellationFee.toFixed(2)} & Cancel`;
+  } else {
+    // FREE CANCELLATION
+    document.getElementById('cancellationFeeWarning').classList.add('hidden');
+    document.getElementById('freeCancellation').classList.remove('hidden');
+    document.getElementById('cancellationPaymentBreakdown').classList.add('hidden');
+    document.getElementById('cancelButtonText').textContent = 'Confirm Free Cancellation';
+  }
+  
+  document.getElementById('cancelForm').classList.remove('hidden');
+  document.getElementById('cancelForm').scrollIntoView({ behavior: 'smooth' });
+}
 
     function hideCancelForm() {
       document.getElementById('cancelForm').classList.add('hidden');
@@ -1648,7 +1668,7 @@
     async function submitCancellation() {
       const reason = document.getElementById('cancelReason').value;
       const hoursUntil = bookingData.hoursUntilBooking;
-      const totalPrice = bookingData.totalPrice;
+      const totalPrice = bookingData.finalPrice;
       
       let cancellationFee = 0;
       if (hoursUntil < 24 && hoursUntil >= 0) {
