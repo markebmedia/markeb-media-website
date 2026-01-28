@@ -93,7 +93,7 @@ exports.handler = async (event, context) => {
       'Bedrooms': bedrooms,
       'Extra Bedroom Fee': extraBedroomFee,
       'Add-Ons': JSON.stringify(addons),
-      'Add-ons Price': addonsPrice,
+      'Add-Ons Price': addonsPrice,
       'Total Price': totalPrice,
       'Price Before Discount': priceBeforeDiscount,
       'Discount Amount': newDiscountAmount,
