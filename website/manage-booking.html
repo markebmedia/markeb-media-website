@@ -1217,14 +1217,15 @@
         });
 
         const response = await fetch('/.netlify/functions/check-availability', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            postcode: bookingData.postcode,
-            region: bookingData.region,
-            selectedDate: dateString
-          })
-        });
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    postcode: bookingData.postcode,
+    region: bookingData.region,
+    selectedDate: dateString,
+    isAdmin: false  // ✅ ADD THIS LINE
+  })
+});
 
         if (!response.ok) {
           throw new Error('Failed to check availability');
