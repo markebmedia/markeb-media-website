@@ -4278,6 +4278,7 @@ function renderPendingBookingsTable(bookings) {
   container.innerHTML = html;
 }
 
+// ===== MARK AS PAID FUNCTION - CORRECTED =====
 async function markAsPaid(bookingId) {
   const booking = allBookings.find(b => b.id === bookingId);
   if (!booking) return;
@@ -4295,7 +4296,7 @@ async function markAsPaid(bookingId) {
       body: JSON.stringify({
         method: 'PATCH',
         table: 'Bookings',
-        recordId: bookingId,
+        recordId: bookingId,  // ✅ Using recordId
         body: {
           fields: {
             'Payment Status': 'Paid'
@@ -4304,17 +4305,22 @@ async function markAsPaid(bookingId) {
       })
     });
     
+    const data = await response.json();
+    
     if (!response.ok) {
-      throw new Error('Failed to update payment status');
+      console.error('Airtable error:', data);
+      throw new Error(data.error?.message || 'Failed to update payment status');
     }
     
     alert('✅ Booking marked as paid!');
     loadPendingBookings();
+    loadBookings();
+    loadCalendar();
     loadDashboardStats();
     
   } catch (error) {
     console.error('Error marking as paid:', error);
-    alert('❌ Failed to update payment status');
+    alert('❌ Failed to update payment status: ' + error.message);
   }
 }
 
@@ -4489,13 +4495,11 @@ async function saveQuickBlock(event, dateStr) {
 // ===== VIEW BLOCKED TIME DETAILS =====
 
 function viewBlockedTime(blockId) {
-  // Fetch from allBlockedTimes if available, or make API call
   const modal = document.createElement('div');
   modal.className = 'modal active';
   modal.id = 'viewBlockModal';
   modal.style.zIndex = '10000';
   
-  // Fetch the block details
   fetch('/.netlify/functions/airtable-proxy', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -4582,17 +4586,19 @@ async function deleteBlockFromCalendar(recordId, date) {
       })
     });
     
+    const data = await response.json();
+    
     if (!response.ok) {
-      throw new Error('Failed to delete blocked time');
+      throw new Error(data.error?.message || 'Failed to delete blocked time');
     }
     
     alert('✅ Time block removed!');
     closeViewBlockModal();
-    loadCalendar(); // Refresh calendar
+    loadCalendar();
     
   } catch (error) {
     console.error('Error deleting blocked time:', error);
-    alert('❌ Failed to remove time block');
+    alert('❌ Failed to remove time block: ' + error.message);
   }
 }
 
@@ -5270,34 +5276,32 @@ async function confirmModifyService(bookingId) {
     }
 
     async function toggleReservePrivilege(recordId, email, enabled) {
-      try {
-        const response = await fetch('/.netlify/functions/update-reserve-privilege', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ recordId, email, enabled })
-        });
+  try {
+    const response = await fetch('/.netlify/functions/update-reserve-privilege', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recordId, email, enabled })
+    });
 
-        const data = await response.json();
+    const data = await response.json();
 
-        if (data.success) {
-          console.log(`✓ Reserve privilege ${enabled ? 'enabled' : 'disabled'} for ${email}`);
-          // Update local cache
-          const customer = allCustomers.find(c => c.id === recordId);
-          if (customer) {
-            customer.fields['Allow Reserve Without Payment'] = enabled;
-          }
-        } else {
-          alert(`Error: ${data.message}`);
-          // Revert toggle
-          event.target.checked = !enabled;
-        }
-
-      } catch (error) {
-        console.error('Error toggling reserve privilege:', error);
-        alert('Error updating privilege');
-        event.target.checked = !enabled;
+    if (data.success) {
+      console.log(`✓ Reserve privilege ${enabled ? 'enabled' : 'disabled'} for ${email}`);
+      const customer = allCustomers.find(c => c.id === recordId);
+      if (customer) {
+        customer.fields['Allow Reserve Without Payment'] = enabled;
       }
+    } else {
+      alert(`Error: ${data.message}`);
+      event.target.checked = !enabled;
     }
+
+  } catch (error) {
+    console.error('Error toggling reserve privilege:', error);
+    alert('Error updating privilege');
+    event.target.checked = !enabled;
+  }
+}
 
     async function updateUserRegion(selectElement) {
       const email = selectElement.dataset.userEmail;
@@ -5851,7 +5855,6 @@ async function saveDiscountCode(event) {
   btn.classList.add('loading');
   
   try {
-    // Get form values
     const code = document.getElementById('discountCode').value.trim().toUpperCase();
     const type = document.getElementById('discountType').value;
     const value = parseFloat(document.getElementById('discountValue').value);
@@ -5862,13 +5865,9 @@ async function saveDiscountCode(event) {
     const minPurchase = document.getElementById('minPurchase').value ? parseFloat(document.getElementById('minPurchase').value) : null;
     const notes = document.getElementById('discountNotes').value.trim();
     
-    // Get selected regions
     const selectedRegions = Array.from(document.querySelectorAll('.region-checkbox:checked')).map(cb => cb.value);
-    
-    // Get selected services
     const selectedServices = Array.from(document.querySelectorAll('.service-checkbox:checked')).map(cb => cb.value);
     
-    // Prepare Airtable record
     const fields = {
       'Code': code,
       'Discount Type': type,
@@ -5893,7 +5892,7 @@ async function saveDiscountCode(event) {
       body: JSON.stringify({
         method: currentDiscountCode ? 'PATCH' : 'POST',
         table: 'Discount Codes',
-        recordId: currentDiscountCode || null,
+        recordId: currentDiscountCode || undefined,
         body: { fields }
       })
     });
@@ -5903,8 +5902,8 @@ async function saveDiscountCode(event) {
     console.log('Airtable response data:', data);
     
     if (!response.ok) {
-      alert(`❌ Airtable Error (${response.status}):\n${JSON.stringify(data, null, 2)}`);
-      throw new Error('Failed to save discount code');
+      console.error('Airtable Error:', data);
+      throw new Error(data.error?.message || 'Failed to save discount code');
     }
     
     alert(`✅ Discount code "${code}" ${currentDiscountCode ? 'updated' : 'created'} successfully!`);
@@ -5980,8 +5979,10 @@ async function deleteDiscountCode(codeId, codeName) {
       })
     });
     
+    const data = await response.json();
+    
     if (!response.ok) {
-      throw new Error('Failed to delete discount code');
+      throw new Error(data.error?.message || 'Failed to delete discount code');
     }
     
     alert(`✅ Discount code "${codeName}" deleted successfully!`);
@@ -5989,7 +5990,7 @@ async function deleteDiscountCode(codeId, codeName) {
     
   } catch (error) {
     console.error('Error deleting discount code:', error);
-    alert('❌ Failed to delete discount code');
+    alert('❌ Failed to delete discount code: ' + error.message);
   }
 }
 
@@ -6221,8 +6222,10 @@ async function deleteBlockedTime(recordId, date) {
       })
     });
     
+    const data = await response.json();
+    
     if (!response.ok) {
-      throw new Error('Failed to delete blocked time');
+      throw new Error(data.error?.message || 'Failed to delete blocked time');
     }
     
     alert('✅ Time block removed successfully!');
@@ -6230,7 +6233,7 @@ async function deleteBlockedTime(recordId, date) {
     
   } catch (error) {
     console.error('Error deleting blocked time:', error);
-    alert('❌ Failed to remove time block');
+    alert('❌ Failed to remove time block: ' + error.message);
   }
 }
 
