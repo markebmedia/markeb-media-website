@@ -10,7 +10,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { postcode, region, selectedDate } = JSON.parse(event.body);
+    const { postcode, region, selectedDate, isAdmin } = JSON.parse(event.body);
 
     if (!postcode || !region || !selectedDate) {
       return {
@@ -27,24 +27,22 @@ exports.handler = async (event, context) => {
     const hoursDifference = (selectedDateObj - now) / (1000 * 60 * 60);
 
     // Block if date is within 24 hours from now
-    if (hoursDifference < 24) {
-      console.log(`Date is within 24 hours (${hoursDifference.toFixed(1)} hours) - blocking all slots`);
-      return {
-        statusCode: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify({
-          availableSlots: generateAllTimeSlots().map(slot => ({
-            ...slot,
-            available: false,
-            reason: 'Bookings require 24 hours notice'
-          })),
-          message: 'Bookings require 24 hours notice'
-        })
-      };
-    }
+if (hoursDifference < 24) {
+  console.log(`Date is within 24 hours (${hoursDifference.toFixed(1)} hours) - blocking all slots`);
+  return {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    },
+    body: JSON.stringify({
+      availableSlots: generateAllTimeSlots().map(slot => ({
+        ...slot,
+        available: false
+      }))
+    })
+  };
+}
 
     // ✅ NEW: Fetch blocked times for this region and date
     const blockedTimes = await fetchBlockedTimes(region, selectedDate);
@@ -77,7 +75,7 @@ exports.handler = async (event, context) => {
     }
 
     // Calculate available time slots based on existing bookings and drive times
-    availableSlots = await calculateAvailableSlots(postcode, bookings);
+    availableSlots = await calculateAvailableSlots(postcode, bookings, isAdmin);
     
     // ✅ Apply blocked times on top of booking conflicts
     availableSlots = applyBlockedTimes(availableSlots, blockedTimes);
@@ -292,7 +290,7 @@ function generateAllTimeSlots() {
 }
 
 // Calculate available time slots based on drive times and existing bookings
-async function calculateAvailableSlots(userPostcode, existingBookings) {
+async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin) {
   const allSlots = generateAllTimeSlots();
   const maxDriveMinutes = 45; // Max drive time to determine if booking can happen on this day
   const fixedBufferMinutes = 45; // Fixed buffer time before AND after each booking
@@ -351,23 +349,25 @@ async function calculateAvailableSlots(userPostcode, existingBookings) {
     console.log(`  Buffer after: ${minutesToTime(bookingEndMinutes)}-${minutesToTime(bufferEndMinutes)} (${fixedBufferMinutes} min)`);
     console.log(`  Total blocked: ${minutesToTime(bufferStartMinutes)}-${minutesToTime(bufferEndMinutes)}`);
     
-    allSlots.forEach(slot => {
-      const slotMinutes = timeToMinutes(slot.time);
-      
-      // Block slots that fall within: buffer before + booking + buffer after
-      if (slotMinutes >= bufferStartMinutes && slotMinutes < bufferEndMinutes) {
-        console.log(`    ❌ Blocking ${slot.time}`);
-        slot.available = false;
-        
-        if (slotMinutes < bookingStartMinutes) {
-          slot.reason = `Buffer time before booking at ${booking.startTime}`;
-        } else if (slotMinutes < bookingEndMinutes) {
-          slot.reason = `Specialist already booked at ${booking.startTime}`;
-        } else {
-          slot.reason = `Buffer time after booking at ${booking.startTime}`;
-        }
+  allSlots.forEach(slot => {
+  const slotMinutes = timeToMinutes(slot.time);
+  
+  // Block slots that fall within: buffer before + booking + buffer after
+  if (slotMinutes >= bufferStartMinutes && slotMinutes < bufferEndMinutes) {
+    console.log(`    ❌ Blocking ${slot.time}`);
+    slot.available = false;
+    
+    if (isAdmin) {
+      if (slotMinutes < bookingStartMinutes) {
+        slot.reason = `Buffer time before booking at ${booking.startTime}`;
+      } else if (slotMinutes < bookingEndMinutes) {
+        slot.reason = `Specialist already booked at ${booking.startTime}`;
+      } else {
+        slot.reason = `Buffer time after booking at ${booking.startTime}`;
       }
-    });
+    }
+  }
+});
   }
   
   const availableCount = allSlots.filter(s => s.available).length;
