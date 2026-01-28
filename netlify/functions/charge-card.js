@@ -86,15 +86,11 @@ exports.handler = async (event, context) => {
         customerId = customers.data[0].id;
         console.log('Found existing customer:', customerId);
       } else {
-        // Create new customer
+        // Create new customer (WITHOUT payment_method - we attach it separately)
         const customer = await stripe.customers.create({
           email: fields['Client Email'],
           name: fields['Client Name'],
           phone: fields['Client Phone'],
-          payment_method: paymentMethodId,
-          invoice_settings: {
-            default_payment_method: paymentMethodId
-          },
           metadata: {
             bookingRef: fields['Booking Reference'],
             source: 'markeb-media-booking',
@@ -111,7 +107,37 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // ✅ UPDATED: Use 'Final Price' instead of 'Total Price'
+    // ✅ CRITICAL FIX: Attach payment method to customer BEFORE charging
+    console.log('Attaching payment method to customer...');
+    try {
+      const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+      
+      // Only attach if not already attached to this customer
+      if (!paymentMethod.customer || paymentMethod.customer !== customerId) {
+        await stripe.paymentMethods.attach(paymentMethodId, {
+          customer: customerId,
+        });
+        console.log('✅ Payment method attached to customer');
+      } else {
+        console.log('✅ Payment method already attached');
+      }
+    } catch (attachError) {
+      console.error('⚠️ Error attaching payment method:', attachError);
+      
+      // If attachment fails, payment method is likely invalid/expired/already used elsewhere
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: 'Payment method is invalid or expired',
+          userMessage: 'The saved payment method cannot be used. It may have been used elsewhere or expired. Please send a payment link to the customer instead.',
+          bookingRef: fields['Booking Reference']
+        })
+      };
+    }
+
+    // Get final price
     const finalPrice = fields['Final Price'] || 0;
     
     if (finalPrice <= 0) {
@@ -169,7 +195,6 @@ exports.handler = async (event, context) => {
         const { Resend } = require('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
 
-        // ✅ Show discount info if applicable
         const discountCode = fields['Discount Code'] || '';
         const discountAmount = fields['Discount Amount'] || 0;
         const priceBeforeDiscount = fields['Price Before Discount'] || finalPrice;
