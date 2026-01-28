@@ -169,30 +169,39 @@
   </div>
 
   <script>
-    // Get session ID from URL
+    // Get parameters from URL
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session_id');
     const bookingRef = urlParams.get('ref');
     const email = urlParams.get('email');
 
     if (bookingRef && email) {
-      // Direct booking (reserved without payment)
+      // Direct booking (reserved without payment or paid)
       document.getElementById('bookingRef').textContent = bookingRef;
-      document.getElementById('manageLink').href = `/manage-booking.html?ref=${bookingRef}&email=${encodeURIComponent(email)}`;
+      document.getElementById('manageLink').href = `/website/manage-booking.html?ref=${bookingRef}&email=${encodeURIComponent(email)}`;
     } else if (sessionId) {
       // Stripe payment - fetch booking details from session
       fetchBookingFromSession(sessionId);
     } else {
       document.getElementById('bookingRef').textContent = 'Check your email for details';
+      // Hide manage link if no booking info
+      document.getElementById('manageLink').style.display = 'none';
     }
 
     async function fetchBookingFromSession(sessionId) {
       try {
-        // This would call a function to get booking details from Stripe session
-        // For now, show generic message
-        document.getElementById('bookingRef').textContent = 'Check your email for details';
+        const response = await fetch(`/.netlify/functions/get-booking-from-session?session_id=${sessionId}`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('bookingRef').textContent = data.bookingRef;
+          document.getElementById('manageLink').href = `/website/manage-booking.html?ref=${data.bookingRef}&email=${encodeURIComponent(data.email)}`;
+        } else {
+          document.getElementById('bookingRef').textContent = 'Check your email for details';
+        }
       } catch (error) {
         console.error('Error fetching booking:', error);
+        document.getElementById('bookingRef').textContent = 'Check your email for details';
       }
     }
   </script>

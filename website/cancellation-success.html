@@ -105,11 +105,22 @@
       font-size: 16px;
       text-decoration: none;
       transition: all 0.2s ease;
+      margin: 4px;
     }
 
     .btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+      box-shadow: none;
     }
 
     .footer {
@@ -118,6 +129,13 @@
       border-top: 2px solid #e2e8f0;
       color: #64748b;
       font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .btn {
+        display: block;
+        margin: 8px 0;
+      }
     }
   </style>
 </head>
@@ -131,7 +149,7 @@
       <div class="icon">⚠️</div>
 
       <h1>Booking Cancelled</h1>
-      
+
       <p class="booking-ref">
         Reference: <strong id="bookingRef">Loading...</strong>
       </p>
@@ -145,7 +163,10 @@
         <p>The cancellation fee has been charged to your payment method. This is in accordance with our cancellation policy for late cancellations.</p>
       </div>
 
-      <a href="/booking" class="btn">Book a New Shoot</a>
+      <div style="margin-bottom: 24px;">
+        <a href="/website/booking.html" class="btn">Book a New Shoot</a>
+        <a href="/" class="btn btn-secondary">Back to Home</a>
+      </div>
 
       <div class="footer">
         <p>Questions? Contact us at <a href="mailto:commercial@markebmedia.com" style="color: #3b82f6; text-decoration: none;">commercial@markebmedia.com</a></p>

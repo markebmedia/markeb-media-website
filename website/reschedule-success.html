@@ -162,6 +162,13 @@
       display: block;
       margin-bottom: 8px;
     }
+
+    @media (max-width: 600px) {
+      .btn {
+        display: block;
+        margin: 8px 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -204,7 +211,7 @@
 
       <div style="margin-top: 32px;">
         <a href="#" id="manageBookingLink" class="btn">View Booking Details</a>
-        <a href="/booking" class="btn btn-secondary">Book Another Shoot</a>
+        <a href="/website/booking.html" class="btn btn-secondary">Book Another Shoot</a>
       </div>
 
       <div class="footer">
@@ -213,7 +220,7 @@
     </div>
   </div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script>
     // Get URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const bookingRef = urlParams.get('ref');
@@ -243,3 +250,15 @@
       const hour12 = hour % 12 || 12;
       document.getElementById('newTime').textContent = `${hour12}:${minutes} ${ampm}`;
     }
+
+    // Set manage booking link
+    if (bookingRef && email) {
+      document.getElementById('manageBookingLink').href = 
+        `/website/manage-booking.html?ref=${bookingRef}&email=${encodeURIComponent(email)}`;
+    } else {
+      // Hide the button if we don't have the details
+      document.getElementById('manageBookingLink').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
