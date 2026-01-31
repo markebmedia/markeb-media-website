@@ -3506,10 +3506,10 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
     time: document.getElementById('bookingTime').value,
     
     // Discount fields
-    discountCode: bookingFormData.discountCode || '',
-    discountAmount: bookingFormData.discountAmount || 0,
-    priceBeforeDiscount: bookingFormData.priceBeforeDiscount || totalPrice,
-    totalPrice: bookingData.totalPrice,
+  discountCode: bookingFormData.discountCode || '',
+  discountAmount: bookingFormData.discountAmount || 0,
+  priceBeforeDiscount: bookingFormData.priceBeforeDiscount || totalPrice,
+  totalPrice: bookingFormData.totalPrice || totalPrice,  // ✅ FIXED LINE
     
     paymentOption: 'reserve', // Admin always uses reserve, never Stripe
     paymentStatus: paymentStatus, // Can be "Pending" or "Paid"
