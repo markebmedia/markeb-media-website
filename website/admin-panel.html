@@ -3509,7 +3509,7 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
     discountCode: bookingFormData.discountCode || '',
     discountAmount: bookingFormData.discountAmount || 0,
     priceBeforeDiscount: bookingFormData.priceBeforeDiscount || totalPrice,
-    totalPrice: totalPrice,
+    totalPrice: bookingFormData.totalPrice || totalPrice,
     
     paymentOption: 'reserve', // Admin always uses reserve, never Stripe
     paymentStatus: paymentStatus, // Can be "Pending" or "Paid"
