@@ -148,24 +148,24 @@ exports.handler = async (event, context) => {
     const addonsPrice = bookingData.addonsPrice || 0;
 
     // ✅ Handle discount code
-    let discountCodeId = null;
-    let discountAmount = 0;
-    let priceBeforeDiscount = 0;
-    let finalPrice = bookingData.totalPrice;
+let discountCodeId = null;
+let discountAmount = 0;
+let priceBeforeDiscount = 0;
+let finalPrice = bookingData.totalPrice;
 
-    if (bookingData.discountCode && bookingData.discountAmount > 0) {
-      console.log('Discount code applied:', bookingData.discountCode);
-      
-      discountAmount = bookingData.discountAmount || 0;
-      priceBeforeDiscount = bookingData.priceBeforeDiscount || (bookingData.totalPrice + discountAmount);
-      finalPrice = bookingData.totalPrice; // Already discounted in frontend
-      
-      console.log('Discount details:', {
-        code: bookingData.discountCode,
-        discountAmount,
-        priceBeforeDiscount,
-        finalPrice
-      });
+if (bookingData.discountCode && bookingData.discountAmount > 0) {
+  console.log('Discount code applied:', bookingData.discountCode);
+  
+  discountAmount = bookingData.discountAmount || 0;
+  priceBeforeDiscount = bookingData.priceBeforeDiscount || (bookingData.totalPrice + discountAmount);
+  finalPrice = priceBeforeDiscount - discountAmount; // ✅ FIXED - calculate discounted price
+  
+  console.log('Discount details:', {
+    code: bookingData.discountCode,
+    discountAmount,
+    priceBeforeDiscount,
+    finalPrice
+  });
       
       // Increment usage count for discount code
       try {
