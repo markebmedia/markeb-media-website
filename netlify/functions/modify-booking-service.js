@@ -111,86 +111,53 @@ exports.handler = async (event, context) => {
     let paymentDetails = null;
 
     if (Math.abs(priceDifference) > 0.01) {
-      const paymentStatus = booking.fields['Payment Status'];
-      
-      if (priceDifference > 0 && paymentStatus === 'Paid') {
-        // Additional charge needed
-        paymentAction = 'charge';
-        
-        const stripeCustomerId = booking.fields['Stripe Customer ID'];
-        const stripePaymentMethodId = booking.fields['Stripe Payment Method ID'];
+  const paymentStatus = booking.fields['Payment Status'];
+  
+  if (priceDifference > 0) {
+    // Price increased - don't auto-charge, just update
+    paymentAction = 'price_increased';
+    paymentDetails = { 
+      additionalAmount: priceDifference,
+      note: 'Price updated - manual charge required if needed'
+    };
+    
+    console.log(`Price increased by £${priceDifference.toFixed(2)} - no auto-charge`);
 
-        if (stripeCustomerId && stripePaymentMethodId) {
-          try {
-            // Charge the additional amount
-            const paymentIntent = await stripe.paymentIntents.create({
-              amount: Math.round(priceDifference * 100),
-              currency: 'gbp',
-              customer: stripeCustomerId,
-              payment_method: stripePaymentMethodId,
-              off_session: true,
-              confirm: true,
-              description: `Service modification charge for ${bookingRef}`,
-              metadata: {
-                bookingRef: bookingRef,
-                type: 'service_modification',
-                originalPrice: oldFinalPrice.toFixed(2),
-                newPrice: newFinalPrice.toFixed(2)
-              }
-            });
+  } else if (priceDifference < 0 && paymentStatus === 'Paid') {
+    // Price decreased and already paid - process refund
+    paymentAction = 'refund';
+    
+    const stripePaymentIntentId = booking.fields['Stripe Payment Intent ID'];
 
-            paymentDetails = {
-              chargeAmount: priceDifference,
-              paymentIntentId: paymentIntent.id
-            };
-
-            console.log('✅ Additional charge processed:', paymentIntent.id);
-
-          } catch (error) {
-            console.error('⚠️ Payment charge failed:', error);
-            paymentAction = 'charge_failed';
-            paymentDetails = { error: error.message };
+    if (stripePaymentIntentId) {
+      try {
+        const refund = await stripe.refunds.create({
+          payment_intent: stripePaymentIntentId,
+          amount: Math.round(Math.abs(priceDifference) * 100),
+          reason: 'requested_by_customer',
+          metadata: {
+            bookingRef: bookingRef,
+            type: 'service_modification',
+            originalPrice: oldFinalPrice.toFixed(2),
+            newPrice: newFinalPrice.toFixed(2)
           }
-        } else {
-          paymentAction = 'charge_required';
-          paymentDetails = { amount: priceDifference };
-        }
+        });
 
-      } else if (priceDifference < 0 && paymentStatus === 'Paid') {
-        // Refund needed
-        paymentAction = 'refund';
-        
-        const stripePaymentIntentId = booking.fields['Stripe Payment Intent ID'];
+        paymentDetails = {
+          refundAmount: Math.abs(priceDifference),
+          refundId: refund.id
+        };
 
-        if (stripePaymentIntentId) {
-          try {
-            const refund = await stripe.refunds.create({
-              payment_intent: stripePaymentIntentId,
-              amount: Math.round(Math.abs(priceDifference) * 100),
-              reason: 'requested_by_customer',
-              metadata: {
-                bookingRef: bookingRef,
-                type: 'service_modification',
-                originalPrice: oldFinalPrice.toFixed(2),
-                newPrice: newFinalPrice.toFixed(2)
-              }
-            });
+        console.log('✅ Refund processed:', refund.id);
 
-            paymentDetails = {
-              refundAmount: Math.abs(priceDifference),
-              refundId: refund.id
-            };
-
-            console.log('✅ Refund processed:', refund.id);
-
-          } catch (error) {
-            console.error('⚠️ Refund failed:', error);
-            paymentAction = 'refund_failed';
-            paymentDetails = { error: error.message };
-          }
-        }
+      } catch (error) {
+        console.error('⚠️ Refund failed:', error);
+        paymentAction = 'refund_failed';
+        paymentDetails = { error: error.message };
       }
     }
+  }
+}
 
     // Send confirmation email
     if (process.env.RESEND_API_KEY) {
