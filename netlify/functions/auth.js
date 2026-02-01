@@ -1,4 +1,5 @@
 // netlify/functions/auth.js - Netlify serverless function for authentication
+// UPDATED: Now creates Dropbox company folder on user registration
 const bcrypt = require('bcryptjs');
 const { Resend } = require('resend');
 
@@ -452,6 +453,21 @@ async function handleRegister(event, headers) {
             const errorData = await createResponse.json();
             console.error('Airtable create error:', errorData);
             throw new Error('Failed to create user account');
+        }
+
+        const createResult = await createResponse.json();
+        console.log('User account created successfully');
+
+        // ✅ NEW: Create company folder in Dropbox
+        try {
+            const { createFolder } = require('./dropbox-helper');
+            const companyFolderPath = `/Markeb Media Client Folder/${company.trim()}`;
+            
+            await createFolder(companyFolderPath);
+            console.log(`✓ Dropbox company folder created: ${companyFolderPath}`);
+        } catch (dropboxError) {
+            console.error('Failed to create company folder in Dropbox:', dropboxError);
+            // Don't fail registration if folder creation fails
         }
 
         // Send welcome email (non-blocking - don't wait for it)

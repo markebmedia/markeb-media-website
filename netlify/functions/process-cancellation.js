@@ -1,8 +1,8 @@
 // netlify/functions/process-cancellation.js
+// UPDATED: Now moves bookings from Active Bookings to Cancelled Bookings
 const Airtable = require('airtable');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { sendCancellationConfirmation } = require('./email-service');
-
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 const BOOKINGS_TABLE = 'Bookings';
 
@@ -13,7 +13,7 @@ exports.handler = async (event) => {
 
   try {
     const { bookingRef, sessionId } = JSON.parse(event.body);
-
+    
     if (!bookingRef || !sessionId) {
       return {
         statusCode: 400,
@@ -31,10 +31,10 @@ exports.handler = async (event) => {
       };
     }
 
-    // ✅ FIXED: Find booking in Airtable using correct field name
+    // Find booking in Airtable
     const records = await base(BOOKINGS_TABLE)
       .select({
-        filterByFormula: `{Booking Reference} = '${bookingRef}'`, // ✅ Was 'Booking Ref'
+        filterByFormula: `{Booking Reference} = '${bookingRef}'`,
         maxRecords: 1
       })
       .firstPage();
@@ -51,23 +51,70 @@ exports.handler = async (event) => {
     const totalPrice = parseFloat(booking.fields['Total Price'] || 0);
     const refundAmount = totalPrice - cancellationFee;
 
-    // ✅ FIXED: Update booking status to Cancelled using correct field name
+    // Update booking status to Cancelled
     await base(BOOKINGS_TABLE).update(booking.id, {
-      'Booking Status': 'Cancelled', // ✅ Was 'Status'
+      'Booking Status': 'Cancelled',
       'Cancellation Date': new Date().toISOString().split('T')[0],
       'Cancellation Fee': cancellationFee,
       'Cancellation Reason': session.metadata.reason || 'Late cancellation with fee',
       'Stripe Cancellation Payment ID': session.payment_intent
     });
 
+    console.log(`✅ Booking ${bookingRef} cancelled with paid fee`);
+
+    // ✅ NEW: Move Active Booking to Cancelled Bookings
+    try {
+      // Find the Active Booking record
+      const activeBookings = await base('tblRgcv7M9dUU3YuL')
+        .select({
+          filterByFormula: `{Booking ID} = '${bookingRef}'`,
+          maxRecords: 1
+        })
+        .firstPage();
+
+      if (activeBookings && activeBookings.length > 0) {
+        const activeBooking = activeBookings[0];
+        const activeBookingData = activeBooking.fields;
+        
+        // Create record in Cancelled Bookings table
+        await base('Cancelled Bookings').create({
+          'Project Address': activeBookingData['Project Address'],
+          'Customer Name': activeBookingData['Customer Name'],
+          'Service Type': activeBookingData['Service Type'],
+          'Shoot Date': activeBookingData['Shoot Date'],
+          'Status': 'Cancelled',
+          'Email Address': activeBookingData['Email Address'],
+          'Phone Number': activeBookingData['Phone Number'],
+          'Booking ID': activeBookingData['Booking ID'],
+          'Delivery Link': activeBookingData['Delivery Link'],
+          'Region': activeBookingData['Region'],
+          'Media Specialist': activeBookingData['Media Specialist'],
+          'Cancellation Date': new Date().toISOString().split('T')[0],
+          'Cancellation Reason': session.metadata.reason || 'Late cancellation with fee'
+        });
+        
+        console.log(`✓ Booking moved to Cancelled Bookings table`);
+        
+        // Delete from Active Bookings table
+        await base('tblRgcv7M9dUU3YuL').destroy(activeBooking.id);
+        console.log(`✓ Booking removed from Active Bookings table`);
+        
+      } else {
+        console.log(`⚠️ No Active Booking found for ${bookingRef}`);
+      }
+    } catch (activeBookingError) {
+      console.error('Error moving Active Booking to Cancelled:', activeBookingError);
+      // Don't fail the cancellation if Active Booking move fails
+    }
+
     // Send cancellation confirmation email
     const bookingData = {
-      bookingRef: booking.fields['Booking Reference'], // ✅ Was 'Booking Ref'
+      bookingRef: booking.fields['Booking Reference'],
       clientName: booking.fields['Client Name'],
       clientEmail: booking.fields['Client Email'],
       date: booking.fields['Date'],
       time: booking.fields['Time'],
-      service: booking.fields['Service'], // ✅ This was already correct
+      service: booking.fields['Service'],
       totalPrice: totalPrice
     };
 

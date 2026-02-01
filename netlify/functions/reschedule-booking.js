@@ -1,4 +1,5 @@
 // netlify/functions/reschedule-booking.js
+// UPDATED: Now syncs date changes to Active Bookings table
 // Reschedules a booking to a new date/time after checking availability
 // Uses the booking's existing postcode from Airtable (no need to re-enter address)
 
@@ -82,9 +83,9 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // ✅ Use the booking's existing postcode and region (already in Airtable)
+    // Use the booking's existing postcode and region
     const postcode = fields['Postcode'];
-    const region = fields['Region']; // Already capitalized (North/South)
+    const region = fields['Region'];
 
     if (!postcode || !region) {
       return {
@@ -99,13 +100,13 @@ exports.handler = async (event, context) => {
 
     console.log(`Using existing booking data: postcode=${postcode}, region=${region}`);
 
-    // ✅ Check availability using the SAME logic as check-availability.js
+    // Check availability
     const availabilityCheck = await checkAvailabilityForReschedule(
       postcode, 
       region, 
       newDate, 
       newTime,
-      booking.id // Exclude this booking from availability check
+      booking.id
     );
 
     if (!availabilityCheck.available) {
@@ -137,6 +138,30 @@ exports.handler = async (event, context) => {
     });
 
     console.log(`✅ Booking ${bookingRef} rescheduled successfully`);
+
+    // ✅ NEW: Update Active Bookings record to match
+    try {
+      const activeBookings = await base('tblRgcv7M9dUU3YuL')
+        .select({
+          filterByFormula: `{Booking ID} = '${bookingRef}'`,
+          maxRecords: 1
+        })
+        .firstPage();
+
+      if (activeBookings && activeBookings.length > 0) {
+        const activeBookingId = activeBookings[0].id;
+        
+        await base('tblRgcv7M9dUU3YuL').update(activeBookingId, {
+          'Shoot Date': newDate
+        });
+        
+        console.log(`✓ Active Booking synced with rescheduled date`);
+      } else {
+        console.log(`⚠️ No Active Booking found for ${bookingRef}`);
+      }
+    } catch (activeBookingError) {
+      console.error('Error syncing Active Booking:', activeBookingError);
+    }
 
     // Send confirmation email
     if (process.env.RESEND_API_KEY) {
@@ -173,7 +198,7 @@ exports.handler = async (event, context) => {
   }
 };
 
-// ✅ Check availability using SAME logic as check-availability.js
+// Check availability using SAME logic as check-availability.js
 async function checkAvailabilityForReschedule(postcode, region, selectedDate, requestedTime, excludeBookingId) {
   try {
     // Check 24-hour notice

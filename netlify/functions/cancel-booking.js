@@ -92,6 +92,53 @@ await base('Bookings').update(bookingId, {
 
     console.log(`✅ Booking ${fields['Booking Reference']} cancelled (free)`);
 
+    // ✅ NEW: Move Active Booking from Active Bookings to Cancelled Bookings table
+    try {
+      const bookingRef = fields['Booking Reference'];
+      
+      // Find the Active Booking record by Booking ID
+      const activeBookings = await base('tblRgcv7M9dUU3YuL')
+        .select({
+          filterByFormula: `{Booking ID} = '${bookingRef}'`,
+          maxRecords: 1
+        })
+        .firstPage();
+
+      if (activeBookings && activeBookings.length > 0) {
+        const activeBooking = activeBookings[0];
+        const activeBookingData = activeBooking.fields;
+        
+        // Create record in Cancelled Bookings table (copy all fields)
+        await base('Cancelled Bookings').create({
+          'Project Address': activeBookingData['Project Address'],
+          'Customer Name': activeBookingData['Customer Name'],
+          'Service Type': activeBookingData['Service Type'],
+          'Shoot Date': activeBookingData['Shoot Date'],
+          'Status': 'Cancelled',
+          'Email Address': activeBookingData['Email Address'],
+          'Phone Number': activeBookingData['Phone Number'],
+          'Booking ID': activeBookingData['Booking ID'],
+          'Delivery Link': activeBookingData['Delivery Link'],
+          'Region': activeBookingData['Region'],
+          'Media Specialist': activeBookingData['Media Specialist'],
+          'Cancellation Date': new Date().toISOString().split('T')[0],
+          'Cancellation Reason': reason || 'Customer requested'
+        });
+        
+        console.log(`✓ Booking moved to Cancelled Bookings table`);
+        
+        // Delete from Active Bookings table
+        await base('tblRgcv7M9dUU3YuL').destroy(activeBooking.id);
+        console.log(`✓ Booking removed from Active Bookings table`);
+        
+      } else {
+        console.log(`⚠️ No Active Booking found for ${bookingRef}`);
+      }
+    } catch (activeBookingError) {
+      console.error('Error moving Active Booking to Cancelled:', activeBookingError);
+      // Don't fail the cancellation if Active Booking move fails
+    }
+
     // Determine refund note
     let refundNote = '';
     if (fields['Payment Status'] === 'Paid') { // ✅ FIXED: Was 'Status'
