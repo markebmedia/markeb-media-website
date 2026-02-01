@@ -1,8 +1,8 @@
 // netlify/functions/create-booking.js
-// UPDATED: Now links bookings to authenticated users + sets paymentStatus correctly + handles free bookings
+// UPDATED: Now links bookings to authenticated users + sets paymentStatus correctly + handles free bookings + creates Active Bookings with Dropbox folders
 
 exports.handler = async (event, context) => {
-  console.log('=== Create Booking Function (Updated with Auth) ===');
+  console.log('=== Create Booking Function (Updated with Auth + Active Bookings) ===');
   console.log('Method:', event.httpMethod);
   
   const headers = {
@@ -316,6 +316,41 @@ if (bookingData.discountCode && bookingData.discountAmount > 0) {
         console.error('Error sending confirmation email:', emailError);
         // Don't fail the booking if email fails
       }
+    }
+
+    // ✅ NEW: Create Active Booking record + Dropbox folders (QC Delivery + Raw Client)
+    try {
+      const { createActiveBooking } = require('./create-active-booking');
+      
+      const activeBookingData = {
+        bookingRef: bookingRef,
+        propertyAddress: bookingData.propertyAddress,
+        clientName: bookingData.clientName,
+        clientEmail: bookingData.clientEmail,
+        clientPhone: bookingData.clientPhone,
+        service: bookingData.service,
+        date: bookingData.date,
+        time: bookingData.time,
+        region: bookingData.region,
+        mediaSpecialist: bookingData.mediaSpecialist,
+        bookingStatus: bookingStatus,
+        paymentStatus: paymentStatus
+      };
+
+      const activeBookingResult = await createActiveBooking(activeBookingData);
+      
+      if (activeBookingResult.success) {
+        console.log(`✓ Active Booking created with ID: ${activeBookingResult.activeBookingId}`);
+        console.log(`✓ QC Delivery folder created with link: ${activeBookingResult.dropboxLink}`);
+        console.log(`✓ Raw Client folders created for company`);
+      } else {
+        console.error('⚠️ Active Booking creation failed:', activeBookingResult.error);
+        // Don't fail the main booking if Active Booking creation fails
+      }
+
+    } catch (activeBookingError) {
+      console.error('Error creating Active Booking:', activeBookingError);
+      // Don't fail the booking if Active Booking creation fails
     }
 
     return {

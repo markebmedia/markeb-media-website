@@ -1,4 +1,5 @@
 // netlify/functions/modify-booking-service.js
+// UPDATED: Now syncs changes to Active Bookings table
 const Airtable = require('airtable');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
@@ -106,58 +107,85 @@ exports.handler = async (event, context) => {
 
     console.log('✅ Booking updated successfully');
 
+    // ✅ NEW: Update Active Bookings record to match
+    try {
+      const bookingRefValue = bookingRef || booking.fields['Booking Reference'];
+      
+      const activeBookings = await base('tblRgcv7M9dUU3YuL')
+        .select({
+          filterByFormula: `{Booking ID} = '${bookingRefValue}'`,
+          maxRecords: 1
+        })
+        .firstPage();
+
+      if (activeBookings && activeBookings.length > 0) {
+        const activeBookingId = activeBookings[0].id;
+        
+        await base('tblRgcv7M9dUU3YuL').update(activeBookingId, {
+          'Service Type': newServiceName,
+          'Shoot Date': booking.fields['Date']
+        });
+        
+        console.log(`✓ Active Booking synced with modified service`);
+      } else {
+        console.log(`⚠️ No Active Booking found for ${bookingRefValue}`);
+      }
+    } catch (activeBookingError) {
+      console.error('Error syncing Active Booking:', activeBookingError);
+    }
+
     // Handle payment difference
     let paymentAction = 'none';
     let paymentDetails = null;
 
     if (Math.abs(priceDifference) > 0.01) {
-  const paymentStatus = booking.fields['Payment Status'];
-  
-  if (priceDifference > 0) {
-    // Price increased - don't auto-charge, just update
-    paymentAction = 'price_increased';
-    paymentDetails = { 
-      additionalAmount: priceDifference,
-      note: 'Price updated - manual charge required if needed'
-    };
-    
-    console.log(`Price increased by £${priceDifference.toFixed(2)} - no auto-charge`);
-
-  } else if (priceDifference < 0 && paymentStatus === 'Paid') {
-    // Price decreased and already paid - process refund
-    paymentAction = 'refund';
-    
-    const stripePaymentIntentId = booking.fields['Stripe Payment Intent ID'];
-
-    if (stripePaymentIntentId) {
-      try {
-        const refund = await stripe.refunds.create({
-          payment_intent: stripePaymentIntentId,
-          amount: Math.round(Math.abs(priceDifference) * 100),
-          reason: 'requested_by_customer',
-          metadata: {
-            bookingRef: bookingRef,
-            type: 'service_modification',
-            originalPrice: oldFinalPrice.toFixed(2),
-            newPrice: newFinalPrice.toFixed(2)
-          }
-        });
-
-        paymentDetails = {
-          refundAmount: Math.abs(priceDifference),
-          refundId: refund.id
+      const paymentStatus = booking.fields['Payment Status'];
+      
+      if (priceDifference > 0) {
+        // Price increased - don't auto-charge, just update
+        paymentAction = 'price_increased';
+        paymentDetails = { 
+          additionalAmount: priceDifference,
+          note: 'Price updated - manual charge required if needed'
         };
+        
+        console.log(`Price increased by £${priceDifference.toFixed(2)} - no auto-charge`);
 
-        console.log('✅ Refund processed:', refund.id);
+      } else if (priceDifference < 0 && paymentStatus === 'Paid') {
+        // Price decreased and already paid - process refund
+        paymentAction = 'refund';
+        
+        const stripePaymentIntentId = booking.fields['Stripe Payment Intent ID'];
 
-      } catch (error) {
-        console.error('⚠️ Refund failed:', error);
-        paymentAction = 'refund_failed';
-        paymentDetails = { error: error.message };
+        if (stripePaymentIntentId) {
+          try {
+            const refund = await stripe.refunds.create({
+              payment_intent: stripePaymentIntentId,
+              amount: Math.round(Math.abs(priceDifference) * 100),
+              reason: 'requested_by_customer',
+              metadata: {
+                bookingRef: bookingRef,
+                type: 'service_modification',
+                originalPrice: oldFinalPrice.toFixed(2),
+                newPrice: newFinalPrice.toFixed(2)
+              }
+            });
+
+            paymentDetails = {
+              refundAmount: Math.abs(priceDifference),
+              refundId: refund.id
+            };
+
+            console.log('✅ Refund processed:', refund.id);
+
+          } catch (error) {
+            console.error('⚠️ Refund failed:', error);
+            paymentAction = 'refund_failed';
+            paymentDetails = { error: error.message };
+          }
+        }
       }
     }
-  }
-}
 
     // Send confirmation email
     if (process.env.RESEND_API_KEY) {

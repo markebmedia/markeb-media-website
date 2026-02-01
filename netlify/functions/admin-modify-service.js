@@ -1,4 +1,5 @@
 // netlify/functions/admin-modify-service.js
+// UPDATED: Now syncs changes to Active Bookings table
 const Airtable = require('airtable');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
@@ -64,11 +65,11 @@ exports.handler = async (event, context) => {
     const oldService = fields['Service'];
     const oldFinalPrice = fields['Final Price'] || fields['Total Price'];
 
-    // ✅ Get discount info if it exists
+    // Get discount info if it exists
     const discountCode = fields['Discount Code'] || '';
     const hasDiscount = discountCode && fields['Discount Amount'] > 0;
     
-    // Calculate price before discount (what they would have paid without discount)
+    // Calculate price before discount
     const baseBedrooms = 4;
     const actualBedrooms = bedrooms || fields['Bedrooms'] || 0;
     const extraBedrooms = Math.max(0, actualBedrooms - baseBedrooms);
@@ -77,41 +78,29 @@ exports.handler = async (event, context) => {
 
     const priceBeforeDiscount = newServicePrice + extraBedroomFee + newAddonsPrice;
 
-    // ✅ Apply discount if one exists
+    // Apply discount if one exists
     let discountAmount = 0;
     let finalPrice = priceBeforeDiscount;
 
     if (hasDiscount) {
-      const discountType = fields['Discount Type'] || 'Fixed Amount'; // Need to store this
+      const discountType = fields['Discount Type'] || 'Fixed Amount';
       const discountValue = fields['Discount Value'] || fields['Discount Amount'];
 
-      // Recalculate discount based on new price
       if (discountType === 'Percentage') {
         discountAmount = Math.round((priceBeforeDiscount * discountValue) / 100 * 100) / 100;
       } else {
-        // Fixed amount - use original discount amount
         discountAmount = discountValue;
       }
 
-      // Make sure discount doesn't exceed total
       discountAmount = Math.min(discountAmount, priceBeforeDiscount);
       finalPrice = priceBeforeDiscount - discountAmount;
 
       console.log(`Discount applied: ${discountCode} (${discountType}) = -£${discountAmount.toFixed(2)}`);
     } else {
-      // No discount - use the total price passed from frontend
       finalPrice = totalPrice;
     }
 
     const priceDifference = finalPrice - oldFinalPrice;
-
-    console.log('Price calculation:', {
-      oldFinalPrice,
-      priceBeforeDiscount,
-      discountAmount,
-      finalPrice,
-      priceDifference
-    });
 
     // Prepare add-ons string
     let addonsString = '';
@@ -131,10 +120,8 @@ exports.handler = async (event, context) => {
         const paymentMethodId = fields['Stripe Payment Method ID'];
         
         if (priceDifference > 0) {
-          // UPGRADE: Charge the difference
           console.log(`Charging additional £${priceDifference.toFixed(2)}`);
           
-          // Create or find customer
           let finalCustomerId = customerId;
           if (!finalCustomerId) {
             const customers = await stripe.customers.list({
@@ -154,7 +141,6 @@ exports.handler = async (event, context) => {
             }
           }
 
-          // Attach payment method if needed
           if (paymentMethodId) {
             try {
               const pm = await stripe.paymentMethods.retrieve(paymentMethodId);
@@ -191,7 +177,6 @@ exports.handler = async (event, context) => {
           console.log(`✅ Additional charge created: ${paymentIntent.id}`);
 
         } else if (priceDifference < 0) {
-          // DOWNGRADE: Refund the difference
           const refundAmount = Math.abs(priceDifference);
           console.log(`Refunding £${refundAmount.toFixed(2)}`);
           
@@ -227,7 +212,7 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // ✅ Update booking in Airtable with discount fields preserved
+    // Update booking in Airtable
     const updateFields = {
       'Service': newServiceName,
       'Service ID': newServiceId,
@@ -246,7 +231,6 @@ exports.handler = async (event, context) => {
       'Price Adjustment': priceDifference
     };
 
-    // ✅ Update discount amount if discount exists
     if (hasDiscount) {
       updateFields['Discount Amount'] = discountAmount;
     }
@@ -254,6 +238,33 @@ exports.handler = async (event, context) => {
     await base('Bookings').update(bookingId, updateFields);
 
     console.log(`✅ Service modified for booking ${fields['Booking Reference']}`);
+
+    // ✅ NEW: Update Active Bookings record to match
+    try {
+      const bookingRef = fields['Booking Reference'];
+      
+      const activeBookings = await base('tblRgcv7M9dUU3YuL')
+        .select({
+          filterByFormula: `{Booking ID} = '${bookingRef}'`,
+          maxRecords: 1
+        })
+        .firstPage();
+
+      if (activeBookings && activeBookings.length > 0) {
+        const activeBookingId = activeBookings[0].id;
+        
+        await base('tblRgcv7M9dUU3YuL').update(activeBookingId, {
+          'Service Type': newServiceName,
+          'Shoot Date': fields['Date']
+        });
+        
+        console.log(`✓ Active Booking synced with modified service`);
+      } else {
+        console.log(`⚠️ No Active Booking found for ${bookingRef}`);
+      }
+    } catch (activeBookingError) {
+      console.error('Error syncing Active Booking:', activeBookingError);
+    }
 
     // Send service modification email (if enabled)
     if (sendEmail) {
@@ -359,7 +370,6 @@ async function sendServiceModificationEmail(data) {
     `;
   }
 
-  // ✅ Add discount info if applicable
   let discountHTML = '';
   if (discountCode && discountAmount > 0) {
     discountHTML = `

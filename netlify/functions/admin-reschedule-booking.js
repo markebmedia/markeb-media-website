@@ -1,4 +1,5 @@
 // netlify/functions/admin-reschedule-booking.js
+// UPDATED: Now syncs date changes to Active Bookings table
 const Airtable = require('airtable');
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
@@ -56,7 +57,7 @@ exports.handler = async (event, context) => {
     const newBookingDateTime = new Date(`${newDate}T${newTime}`);
     const cancellationDeadline = new Date(newBookingDateTime.getTime() - 24 * 60 * 60 * 1000);
 
-    // ✅ Update booking in Airtable - REMOVE 'Last Modified' (computed field)
+    // Update booking in Airtable
     await base('Bookings').update(bookingId, {
       'Date': newDate,
       'Time': newTime,
@@ -70,6 +71,32 @@ exports.handler = async (event, context) => {
 
     console.log(`✅ Booking ${fields['Booking Reference']} rescheduled successfully by admin`);
 
+    // ✅ NEW: Update Active Bookings record to match
+    try {
+      const bookingRef = fields['Booking Reference'];
+      
+      const activeBookings = await base('tblRgcv7M9dUU3YuL')
+        .select({
+          filterByFormula: `{Booking ID} = '${bookingRef}'`,
+          maxRecords: 1
+        })
+        .firstPage();
+
+      if (activeBookings && activeBookings.length > 0) {
+        const activeBookingId = activeBookings[0].id;
+        
+        await base('tblRgcv7M9dUU3YuL').update(activeBookingId, {
+          'Shoot Date': newDate
+        });
+        
+        console.log(`✓ Active Booking synced with rescheduled date`);
+      } else {
+        console.log(`⚠️ No Active Booking found for ${bookingRef}`);
+      }
+    } catch (activeBookingError) {
+      console.error('Error syncing Active Booking:', activeBookingError);
+    }
+
     // Send reschedule confirmation email (if enabled)
     let emailSent = false;
     if (sendEmail) {
@@ -82,7 +109,7 @@ exports.handler = async (event, context) => {
           originalTime: originalTime,
           newDate: newDate,
           newTime: newTime,
-          service: fields['Service'], // ✅ FIXED: Was 'Service Name'
+          service: fields['Service'],
           propertyAddress: fields['Property Address'],
           mediaSpecialist: fields['Media Specialist'],
           totalPrice: fields['Total Price']
