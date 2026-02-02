@@ -41,8 +41,18 @@ async function createActiveBooking(bookingData) {
     console.log(`✓ Found company: ${companyName}`);
 
     // Step 2: Create Dropbox folder structures (QC Delivery + Raw Client folders)
-    console.log('Creating Dropbox folders...');
-    const dropboxResult = await createBookingFolders(bookingData.propertyAddress, companyName);
+console.log('Creating Dropbox folders...');
+
+// ✅ Sanitize property address - remove leading/trailing spaces and invalid characters
+const sanitizedAddress = bookingData.propertyAddress
+  .trim()
+  .replace(/[<>:"/\\|?*]/g, '') // Remove invalid filesystem characters
+  .replace(/\s+/g, ' '); // Replace multiple spaces with single space
+
+console.log('Original address:', bookingData.propertyAddress);
+console.log('Sanitized address:', sanitizedAddress);
+
+const dropboxResult = await createBookingFolders(sanitizedAddress, companyName);
     
     console.log('✓ Dropbox folders created:', {
       qcFolder: dropboxResult.qcFolder.main,
@@ -53,9 +63,9 @@ async function createActiveBooking(bookingData) {
     // Step 3: Create Active Bookings record in Airtable
     console.log('Creating Active Bookings record...');
     
-    const activeBookingRecord = {
+   const activeBookingRecord = {
   fields: {
-    'Project Address': `${bookingData.propertyAddress}, ${bookingData.postcode}`,
+    'Project Address': `${sanitizedAddress}, ${bookingData.postcode}`, // ✅ Use sanitized
     'Customer Name': bookingData.clientName,
     'Service Type': bookingData.addOns 
       ? `${bookingData.service}, ${bookingData.addOns}` 
