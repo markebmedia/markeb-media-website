@@ -83,7 +83,7 @@ await base('Cancelled Bookings').create({
   'Service Type': activeBookingData['Service Type'],
   'Shoot Date': activeBookingData['Shoot Date'],
   'Status': 'Cancelled',
-  'Email Address': activeBookingData['Email Address'],
+  'Email': activeBookingData['Email Address'],
   'Phone Number': activeBookingData['Phone Number'],
   'Booking ID': activeBookingData['Booking ID'],
   'Region': activeBookingData['Region'],

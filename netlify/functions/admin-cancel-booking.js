@@ -138,13 +138,13 @@ await base('Cancelled Bookings').create({
   'Service Type': activeBookingData['Service Type'],
   'Shoot Date': activeBookingData['Shoot Date'],
   'Status': 'Cancelled',
-  'Email Address': activeBookingData['Email Address'],
+  'Email': activeBookingData['Email Address'],  // ✅ CHANGED
   'Phone Number': activeBookingData['Phone Number'],
   'Booking ID': activeBookingData['Booking ID'],
   'Region': activeBookingData['Region'],
   'Media Specialist': activeBookingData['Media Specialist'],
   'Cancellation Date': new Date().toISOString().split('T')[0],
-  'Cancellation Reason': reason
+  'Cancellation Reason': reason  // or whatever the specific version uses
 });
         
         console.log(`✓ Admin cancelled booking moved to Cancelled Bookings table`);
