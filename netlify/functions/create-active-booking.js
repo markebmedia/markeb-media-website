@@ -54,23 +54,24 @@ async function createActiveBooking(bookingData) {
     console.log('Creating Active Bookings record...');
     
     const activeBookingRecord = {
-      fields: {
-        'Project Address': bookingData.propertyAddress,
-        'Customer Name': bookingData.clientName,
-        'Service Type': bookingData.service,
-        'Shoot Date': bookingData.date,
-        'Status': 'Booked',
-        'Email Address': bookingData.clientEmail,
-        'Phone Number': bookingData.clientPhone || '',
-        'Booking ID': bookingData.bookingRef,
-        'Delivery Link': dropboxResult.sharedLink,
-        // Additional fields that might be useful
-        'Booking Status': bookingData.bookingStatus,
-        'Payment Status': bookingData.paymentStatus,
-        'Region': bookingData.region,
-        'Media Specialist': bookingData.mediaSpecialist,
-      }
-    };
+  fields: {
+    'Project Address': `${bookingData.propertyAddress}, ${bookingData.postcode}`,
+    'Customer Name': bookingData.clientName,
+    'Service Type': bookingData.addOns 
+      ? `${bookingData.service}, ${bookingData.addOns}` 
+      : bookingData.service,
+    'Shoot Date': bookingData.date,
+    'Status': 'Booked',
+    'Delivery Link': dropboxResult.sharedLink, // This gets the QC Ready folder link
+    'Email Address': bookingData.clientEmail,
+    'Phone Number': bookingData.clientPhone || '',
+    'Booking ID': bookingData.bookingRef,
+    // Optional additional fields if they exist in Active Bookings:
+    'Payment Status': bookingData.paymentStatus,
+    'Region': bookingData.region,
+    'Media Specialist': bookingData.mediaSpecialist,
+  }
+};
 
     const airtableUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/tblRgcv7M9dUU3YuL`;
     
