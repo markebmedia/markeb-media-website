@@ -119,7 +119,8 @@ async function createSharedLink(path) {
     const listData = await listResponse.json();
     if (listData.links && listData.links.length > 0) {
       console.log(`✓ Using existing shared link for: ${path}`);
-      return listData.links[0].url;
+      // Convert preview link to download link
+      return listData.links[0].url.replace('dl=0', 'dl=1');
     }
   }
 
@@ -147,7 +148,8 @@ async function createSharedLink(path) {
 
   const data = await response.json();
   console.log(`✓ Created shared link for: ${path}`);
-  return data.url;
+  // Convert preview link to download link
+  return data.url.replace('dl=0', 'dl=1');
 }
 
 /**
