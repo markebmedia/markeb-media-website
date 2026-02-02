@@ -132,21 +132,20 @@ exports.handler = async (event, context) => {
         const activeBookingData = activeBooking.fields;
         
         // Create record in Cancelled Bookings table
-        await base('Cancelled Bookings').create({
-          'Project Address': activeBookingData['Project Address'],
-          'Customer Name': activeBookingData['Customer Name'],
-          'Service Type': activeBookingData['Service Type'],
-          'Shoot Date': activeBookingData['Shoot Date'],
-          'Status': 'Cancelled',
-          'Email Address': activeBookingData['Email Address'],
-          'Phone Number': activeBookingData['Phone Number'],
-          'Booking ID': activeBookingData['Booking ID'],
-          'Delivery Link': activeBookingData['Delivery Link'],
-          'Region': activeBookingData['Region'],
-          'Media Specialist': activeBookingData['Media Specialist'],
-          'Cancellation Date': new Date().toISOString().split('T')[0],
-          'Cancellation Reason': reason
-        });
+await base('Cancelled Bookings').create({
+  'Project Address': activeBookingData['Project Address'],
+  'Customer Name': activeBookingData['Customer Name'],
+  'Service Type': activeBookingData['Service Type'],
+  'Shoot Date': activeBookingData['Shoot Date'],
+  'Status': 'Cancelled',
+  'Email Address': activeBookingData['Email Address'],
+  'Phone Number': activeBookingData['Phone Number'],
+  'Booking ID': activeBookingData['Booking ID'],
+  'Region': activeBookingData['Region'],
+  'Media Specialist': activeBookingData['Media Specialist'],
+  'Cancellation Date': new Date().toISOString().split('T')[0],
+  'Cancellation Reason': reason
+});
         
         console.log(`✓ Admin cancelled booking moved to Cancelled Bookings table`);
         
