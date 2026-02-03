@@ -34,7 +34,7 @@ exports.handler = async (event, context) => {
     const payload = JSON.parse(event.body);
     
     // Extract data from Airtable webhook payload
-    const { status, customerName, trackingCode, deliveryLink, email } = payload;
+    const { status, customerName, trackingCode, deliveryLink, email, projectAddress } = payload;
 
     if (!status || !customerName || !trackingCode || !email) {
       return {
@@ -54,12 +54,12 @@ exports.handler = async (event, context) => {
 
     switch (status) {
       case 'Editing':
-        await sendEditingEmail(customerName, trackingCode, email);
+        await sendEditingEmail(customerName, trackingCode, projectAddress, email);
         emailSent = true;
         break;
 
       case 'Quality Control':
-        await sendQualityControlEmail(customerName, trackingCode, email);
+        await sendQualityControlEmail(customerName, trackingCode, projectAddress, email);
         emailSent = true;
         break;
 
@@ -71,7 +71,7 @@ exports.handler = async (event, context) => {
             body: JSON.stringify({ error: 'Delivery link required for Ready for Delivery status' })
           };
         }
-        await sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, email);
+        await sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, projectAddress, email);
         emailSent = true;
         break;
 
@@ -114,7 +114,7 @@ exports.handler = async (event, context) => {
   }
 };
 
-// Email Layout Wrapper (same as other emails)
+// Email Layout Wrapper
 function getEmailLayout(content) {
   return `
 <!DOCTYPE html>
@@ -223,16 +223,18 @@ ${content}
 }
 
 // 1. Editing Status Email
-async function sendEditingEmail(customerName, trackingCode, email) {
+async function sendEditingEmail(customerName, trackingCode, projectAddress, email) {
   const content = `
-    <h2>📸 Great News — Your Content Has Moved Into Editing!</h2>
+    <h2>📸 Your Content is Being Edited</h2>
     <p>Hi ${customerName},</p>
     
-    <p>Great news — your content has moved into the editing phase!</p>
+    <p>We are pleased to let you know that we are currently editing the content for <strong>${projectAddress}</strong>.</p>
     
-    <p>Our post-production team is now carefully enhancing your visuals to ensure every image reflects your unique personality and professional presence. We're committed to delivering polished, confident visuals that represents your brand at its absolute best.</p>
+    <p>Our team is meticulously enhancing your visuals to ensure they reflect the property in the best possible light — sharp, refined, and market-ready.</p>
     
-    <p>Your final gallery will be ready soon. While we're perfecting your branding content, you have exclusive access to track progress here:</p>
+    <p><strong>You're one step closer to getting ${projectAddress} on the market.</strong></p>
+    
+    <p>As an added benefit, you can track every stage of your marketing through your personalised dashboard giving you complete visibility from shoot to delivery:</p>
     
     <center>
       <a href="${DASHBOARD_URL}" class="button">Track Your Project</a>
@@ -243,9 +245,9 @@ async function sendEditingEmail(customerName, trackingCode, email) {
       <span style="font-size: 18px; font-weight: bold;">${trackingCode}</span>
     </div>
     
-    <p>Have questions as we work through your edits? Just hit reply — we're here to help.</p>
+    <p>Questions about your marketing? Reply anytime we're always here to help.</p>
     
-    <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+    <p>Warm regards,<br><strong>Markeb Media Team</strong></p>
   `;
 
   const emailHtml = getEmailLayout(content);
@@ -254,24 +256,24 @@ async function sendEditingEmail(customerName, trackingCode, email) {
     from: FROM_EMAIL,
     to: email,
     bcc: BCC_EMAIL,
-    subject: `Your Content is Being Edited - ${trackingCode}`,
+    subject: `Your Content is Being Edited - ${projectAddress}`,
     html: emailHtml
   });
 }
 
 // 2. Quality Control Status Email
-async function sendQualityControlEmail(customerName, trackingCode, email) {
+async function sendQualityControlEmail(customerName, trackingCode, projectAddress, email) {
   const content = `
-    <h2>🔍 Your Content is in Quality Control!</h2>
+    <h2>🔍 Your Content is in Quality Control</h2>
     <p>Hi ${customerName},</p>
     
-    <p>Your content is in quality control!</p>
+    <p>We are pleased to let you know that we are currently performing the final quality control on the content for <strong>${projectAddress}</strong>.</p>
     
-    <p>Our team is meticulously reviewing every detail to ensure your visuals are polished, cohesive, and perfectly aligned with your professional image. We're making sure everything is ready to elevate your brand presence.</p>
+    <p>Our team is thoroughly reviewing every detail to ensure your content is flawless, on-brand, and ready for delivery.</p>
     
-    <p><strong>You're just one step away from receiving your content!</strong></p>
+    <p><strong>${projectAddress} is just one step away from going live on the market!</strong></p>
     
-    <p>You have exclusive access to track your project's progress anytime here:</p>
+    <p>You have exclusive access to your personalised dashboard where you can track your marketing progress, request revisions, and view your content calendar:</p>
     
     <center>
       <a href="${DASHBOARD_URL}" class="button">Track Your Project</a>
@@ -282,9 +284,9 @@ async function sendQualityControlEmail(customerName, trackingCode, email) {
       <span style="font-size: 18px; font-weight: bold;">${trackingCode}</span>
     </div>
     
-    <p>Questions or need assistance? Simply reply to this email — we're always here to help.</p>
+    <p>Questions about your marketing? Reply anytime we're always here to help.</p>
     
-    <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+    <p>Warm regards,<br><strong>Markeb Media Team</strong></p>
   `;
 
   const emailHtml = getEmailLayout(content);
@@ -293,18 +295,18 @@ async function sendQualityControlEmail(customerName, trackingCode, email) {
     from: FROM_EMAIL,
     to: email,
     bcc: BCC_EMAIL,
-    subject: `Your Content is in Quality Control - ${trackingCode}`,
+    subject: `Your Content is in Quality Control - ${projectAddress}`,
     html: emailHtml
   });
 }
 
 // 3. Ready for Delivery Status Email
-async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, email) {
+async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, projectAddress, email) {
   const content = `
     <h2>🎉 Your Content is Now Ready!</h2>
     <p>Hi ${customerName},</p>
     
-    <p>Your branding content is now ready! 🎉</p>
+    <p>Your content for <strong>${projectAddress}</strong> is now ready 🎉</p>
     
     <div class="alert alert-success">
       <strong>📥 Download Link:</strong><br>
@@ -323,9 +325,9 @@ async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLin
     
     <p>We're happy to help.</p>
     
-    <p>Thank you for trusting us with your brand story!</p>
+    <p>Thanks again for choosing Markeb Media — if you need anything else, don't hesitate to get in touch.</p>
     
-    <p>Warm regards,<br><strong>The Markeb Media Team</strong></p>
+    <p>Kind regards,<br><strong>Markeb Media Team</strong></p>
   `;
 
   const emailHtml = getEmailLayout(content);
@@ -334,7 +336,7 @@ async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLin
     from: FROM_EMAIL,
     to: email,
     bcc: BCC_EMAIL,
-    subject: `Your Content is Ready! - ${trackingCode}`,
+    subject: `Your Content is Ready! - ${projectAddress}`,
     html: emailHtml
   });
 }
