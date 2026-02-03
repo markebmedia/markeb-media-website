@@ -44,10 +44,11 @@ function getEmailLayout(content) {
       background-color: #ffffff;
     }
     .header {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      padding: 40px 20px;
-      text-align: center;
-    }
+  background-color: #3b82f6;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  padding: 40px 20px;
+  text-align: center;
+}
     .header img {
       max-width: 200px;
       width: 100%;
@@ -90,15 +91,16 @@ function getEmailLayout(content) {
       max-width: 60%;
     }
     .button {
-      display: inline-block;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #ffffff !important;
-      padding: 14px 32px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: 600;
-      margin: 20px 0;
-    }
+  display: inline-block;
+  background-color: #3b82f6;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff !important;
+  padding: 14px 32px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  margin: 20px 0;
+}
     .alert {
       padding: 16px;
       border-radius: 8px;
@@ -144,7 +146,7 @@ function getEmailLayout(content) {
     <div class="footer">
       <p>
         <strong>Markeb Media</strong><br>
-        Professional Property Photography<br>
+        Professional Property Media, Marketing & Technology Solution<br>
         <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
       </p>
       <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">
