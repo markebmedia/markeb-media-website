@@ -2165,61 +2165,68 @@
     }
 
     // Load Available Time Slots
-    async function loadAvailableTimeSlots(dateString) {
-      try {
-        console.log('Loading time slots with data:', {
-          postcode: bookingData.postcode,
-          region: bookingData.region,
-          selectedDate: dateString
+async function loadAvailableTimeSlots(dateString) {
+  try {
+    // ✅ Calculate total duration (service + addons)
+    const serviceDuration = bookingData.service ? bookingData.service.duration : 90;
+    const addonsDuration = bookingData.addonsDuration || 0;
+    const totalDuration = serviceDuration + addonsDuration;
+
+    console.log('Loading time slots with data:', {
+      postcode: bookingData.postcode,
+      region: bookingData.region,
+      selectedDate: dateString,
+      duration: totalDuration // ✅ ADD THIS
+    });
+
+    const response = await fetch('/.netlify/functions/check-availability', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        postcode: bookingData.postcode,
+        region: bookingData.region,
+        selectedDate: dateString,
+        duration: totalDuration // ✅ ADD THIS LINE
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to check availability');
+    }
+
+    const data = await response.json();
+    console.log('Availability check response:', data);
+
+    renderTimeSlots(data.availableSlots);
+  } catch (error) {
+    console.error('Error loading time slots:', error);
+    
+    const fallbackSlots = [];
+    for (let hour = 9; hour <= 15; hour++) {
+      for (let minute of [0, 30]) {
+        if (hour === 15 && minute === 30) break;
+        
+        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        fallbackSlots.push({
+          time: timeString,
+          available: true
         });
-
-        const response = await fetch('/.netlify/functions/check-availability', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            postcode: bookingData.postcode,
-            region: bookingData.region, // ✅ FIXED: lowercase 'north' or 'south'
-            selectedDate: dateString
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to check availability');
-        }
-
-        const data = await response.json();
-        console.log('Availability check response:', data);
-
-        renderTimeSlots(data.availableSlots);
-      } catch (error) {
-        console.error('Error loading time slots:', error);
-        
-        const fallbackSlots = [];
-        for (let hour = 9; hour <= 15; hour++) {
-          for (let minute of [0, 30]) {
-            if (hour === 15 && minute === 30) break;
-            
-            const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-            fallbackSlots.push({
-              time: timeString,
-              available: true
-            });
-          }
-        }
-        
-        renderTimeSlots(fallbackSlots);
-        
-        document.getElementById('loadingTimeSlots').innerHTML = 
-          '<p style="color: #f59e0b;">Could not verify availability. Showing all time slots.</p>';
-        
-        setTimeout(() => {
-          document.getElementById('loadingTimeSlots').style.display = 'none';
-          document.getElementById('timeSlotGrid').style.display = 'grid';
-        }, 1000);
       }
     }
+    
+    renderTimeSlots(fallbackSlots);
+    
+    document.getElementById('loadingTimeSlots').innerHTML = 
+      '<p style="color: #f59e0b;">Could not verify availability. Showing all time slots.</p>';
+    
+    setTimeout(() => {
+      document.getElementById('loadingTimeSlots').style.display = 'none';
+      document.getElementById('timeSlotGrid').style.display = 'grid';
+    }, 1000);
+  }
+}
 
     // Render Time Slots
     function renderTimeSlots(slots) {

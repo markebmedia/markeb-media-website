@@ -3390,7 +3390,7 @@ function resetBookingForm() {
 }
 
     // Check availability
-   async function checkAdminAvailability() {
+ async function checkAdminAvailability() {
   const date = document.getElementById('bookingDate').value;
   const time = document.getElementById('bookingTime').value;
   const region = document.getElementById('bookingRegion').value;
@@ -3412,7 +3412,8 @@ function resetBookingForm() {
       body: JSON.stringify({ 
         postcode: postcode,
         region: region, 
-        selectedDate: date
+        selectedDate: date,
+        duration: duration  // ✅ ADD THIS LINE
       })
     });
     

@@ -10,7 +10,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { postcode, region, selectedDate, isAdmin } = JSON.parse(event.body);
+    const { postcode, region, selectedDate, isAdmin, duration } = JSON.parse(event.body); // ✅ ADD duration
 
     if (!postcode || !region || !selectedDate) {
       return {
@@ -19,7 +19,9 @@ exports.handler = async (event, context) => {
       };
     }
 
-    console.log(`Checking availability for: postcode=${postcode}, region=${region}, date=${selectedDate}`);
+    // ✅ Default duration to 90 minutes if not provided
+    const bookingDuration = duration || 90;
+    console.log(`Checking availability for: postcode=${postcode}, region=${region}, date=${selectedDate}, duration=${bookingDuration}min`);
 
     // Check if the selected date is within 24 hours
     const selectedDateObj = new Date(selectedDate + 'T00:00:00');
@@ -27,22 +29,22 @@ exports.handler = async (event, context) => {
     const hoursDifference = (selectedDateObj - now) / (1000 * 60 * 60);
 
     // Block if date is within 24 hours from now
-if (hoursDifference < 24) {
-  console.log(`Date is within 24 hours (${hoursDifference.toFixed(1)} hours) - blocking all slots`);
-  return {
-    statusCode: 200,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    },
-    body: JSON.stringify({
-      availableSlots: generateAllTimeSlots().map(slot => ({
-        ...slot,
-        available: false
-      }))
-    })
-  };
-}
+    if (hoursDifference < 24) {
+      console.log(`Date is within 24 hours (${hoursDifference.toFixed(1)} hours) - blocking all slots`);
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({
+          availableSlots: generateAllTimeSlots().map(slot => ({
+            ...slot,
+            available: false
+          }))
+        })
+      };
+    }
 
     // ✅ NEW: Fetch blocked times for this region and date
     const blockedTimes = await fetchBlockedTimes(region, selectedDate);
@@ -56,9 +58,10 @@ if (hoursDifference < 24) {
     let availableSlots;
     
     if (bookings.length === 0) {
-      // No bookings - just check blocked times
+      // No bookings - just check blocked times and duration
       availableSlots = generateAllTimeSlots();
       availableSlots = applyBlockedTimes(availableSlots, blockedTimes);
+      availableSlots = applyDurationConstraints(availableSlots, bookingDuration, []); // ✅ Check duration even with no bookings
       
       return {
         statusCode: 200,
@@ -75,7 +78,7 @@ if (hoursDifference < 24) {
     }
 
     // Calculate available time slots based on existing bookings and drive times
-    availableSlots = await calculateAvailableSlots(postcode, bookings, isAdmin);
+    availableSlots = await calculateAvailableSlots(postcode, bookings, isAdmin, bookingDuration); // ✅ Pass duration
     
     // ✅ Apply blocked times on top of booking conflicts
     availableSlots = applyBlockedTimes(availableSlots, blockedTimes);
@@ -93,6 +96,7 @@ if (hoursDifference < 24) {
         region: region,
         debug: {
           selectedDate,
+          requestedDuration: bookingDuration,
           bookingDetails: bookings.map(b => ({
             time: b.startTime,
             postcode: b.postcode,
@@ -200,6 +204,46 @@ function applyBlockedTimes(slots, blockedTimes) {
   return slots;
 }
 
+// ✅ NEW: Apply duration constraints - block slots where YOUR booking would overrun
+function applyDurationConstraints(slots, bookingDuration, existingBookings) {
+  console.log(`\nApplying duration constraints (${bookingDuration} min booking):`);
+  
+  const fixedBufferMinutes = 45;
+  const endOfDayMinutes = timeToMinutes('15:30'); // Last possible end time
+  
+  slots.forEach(slot => {
+    if (!slot.available) return; // Skip already blocked slots
+    
+    const slotStartMinutes = timeToMinutes(slot.time);
+    const slotEndMinutes = slotStartMinutes + bookingDuration;
+    const slotEndWithBuffer = slotEndMinutes + fixedBufferMinutes;
+    
+    // Check if booking would run past end of day
+    if (slotEndMinutes > endOfDayMinutes) {
+      console.log(`  ❌ ${slot.time}: Would finish at ${minutesToTime(slotEndMinutes)} (past 3:30 PM)`);
+      slot.available = false;
+      slot.reason = 'Booking would run past available hours';
+      return;
+    }
+    
+    // Check if booking + buffer would conflict with any existing booking
+    for (const booking of existingBookings) {
+      const bookingStartMinutes = timeToMinutes(booking.startTime);
+      const bookingBufferStart = bookingStartMinutes - fixedBufferMinutes;
+      
+      // If YOUR booking end + buffer would overlap with existing booking's buffer start
+      if (slotEndWithBuffer > bookingBufferStart && slotStartMinutes < bookingStartMinutes) {
+        console.log(`  ❌ ${slot.time}: Would finish at ${minutesToTime(slotEndMinutes)} + buffer (${minutesToTime(slotEndWithBuffer)}), conflicts with booking at ${booking.startTime}`);
+        slot.available = false;
+        slot.reason = `Would conflict with booking at ${booking.startTime}`;
+        return;
+      }
+    }
+  });
+  
+  return slots;
+}
+
 // Fetch bookings from Airtable for specific region and date
 async function fetchBookingsForRegion(region, selectedDate) {
   try {
@@ -290,12 +334,12 @@ function generateAllTimeSlots() {
 }
 
 // Calculate available time slots based on drive times and existing bookings
-async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin) {
+async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin, bookingDuration) { // ✅ Add bookingDuration parameter
   const allSlots = generateAllTimeSlots();
   const maxDriveMinutes = 45; // Max drive time to determine if booking can happen on this day
   const fixedBufferMinutes = 45; // Fixed buffer time before AND after each booking
   
-  console.log(`\nCalculating availability for ${existingBookings.length} existing bookings`);
+  console.log(`\nCalculating availability for ${existingBookings.length} existing bookings with ${bookingDuration}min duration`);
   
   // STEP 1: Check if user's location is within 45 min drive of ALL existing bookings
   // This determines IF the booking can happen on this day
@@ -349,26 +393,29 @@ async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin) 
     console.log(`  Buffer after: ${minutesToTime(bookingEndMinutes)}-${minutesToTime(bufferEndMinutes)} (${fixedBufferMinutes} min)`);
     console.log(`  Total blocked: ${minutesToTime(bufferStartMinutes)}-${minutesToTime(bufferEndMinutes)}`);
     
-  allSlots.forEach(slot => {
-  const slotMinutes = timeToMinutes(slot.time);
-  
-  // Block slots that fall within: buffer before + booking + buffer after
-  if (slotMinutes >= bufferStartMinutes && slotMinutes < bufferEndMinutes) {
-    console.log(`    ❌ Blocking ${slot.time}`);
-    slot.available = false;
-    
-    if (isAdmin) {
-      if (slotMinutes < bookingStartMinutes) {
-        slot.reason = `Buffer time before booking at ${booking.startTime}`;
-      } else if (slotMinutes < bookingEndMinutes) {
-        slot.reason = `Specialist already booked at ${booking.startTime}`;
-      } else {
-        slot.reason = `Buffer time after booking at ${booking.startTime}`;
+    allSlots.forEach(slot => {
+      const slotMinutes = timeToMinutes(slot.time);
+      
+      // Block slots that fall within: buffer before + booking + buffer after
+      if (slotMinutes >= bufferStartMinutes && slotMinutes < bufferEndMinutes) {
+        console.log(`    ❌ Blocking ${slot.time}`);
+        slot.available = false;
+        
+        if (isAdmin) {
+          if (slotMinutes < bookingStartMinutes) {
+            slot.reason = `Buffer time before booking at ${booking.startTime}`;
+          } else if (slotMinutes < bookingEndMinutes) {
+            slot.reason = `Specialist already booked at ${booking.startTime}`;
+          } else {
+            slot.reason = `Buffer time after booking at ${booking.startTime}`;
+          }
+        }
       }
-    }
+    });
   }
-});
-  }
+  
+  // ✅ STEP 3: Apply duration constraints - check if YOUR booking would conflict
+  allSlots = applyDurationConstraints(allSlots, bookingDuration, existingBookings);
   
   const availableCount = allSlots.filter(s => s.available).length;
   console.log(`\n✓ Final result: ${availableCount} available, ${allSlots.length - availableCount} blocked\n`);
