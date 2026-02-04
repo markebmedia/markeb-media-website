@@ -47,7 +47,7 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({
           success: true,
-          skipPayment: false,  // ✅ NEW: can they skip payment entirely?
+          skipPayment: false,
           isNewCustomer: true
         })
       };
@@ -61,7 +61,7 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({
         success: true,
-        skipPayment: skipPayment,  // ✅ NEW: can they skip payment entirely?
+        skipPayment: skipPayment,
         isNewCustomer: false
       })
     };

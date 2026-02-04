@@ -1,4 +1,4 @@
-// netlify/functions/check-reserve-privilege.js
+// netlify/functions/update-reserve-privilege.js
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -19,61 +19,44 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { email } = JSON.parse(event.body);
+    const { recordId, email, enabled } = JSON.parse(event.body);
 
-    if (!email) {
+    if (!recordId || !email) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ success: false, error: 'Email required' })
+        body: JSON.stringify({ success: false, error: 'Record ID and email required' })
       };
     }
 
     const Airtable = require('airtable');
     const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-    // Find user by email
-    const records = await base(process.env.AIRTABLE_USER_TABLE || 'Markeb Media Users')
-      .select({
-        filterByFormula: `{Email} = '${email}'`,
-        maxRecords: 1
-      })
-      .firstPage();
+    // Update the user record
+    await base(process.env.AIRTABLE_USER_TABLE || 'Markeb Media Users').update(recordId, {
+      'Allow Reserve Without Payment': enabled
+    });
 
-    if (records.length === 0) {
-      // New customer - no privilege by default
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          success: true,
-          skipPayment: false,  // ✅ CHANGED from 'allowed'
-          isNewCustomer: true
-        })
-      };
-    }
-
-    const user = records[0];
-    const skipPayment = user.fields['Allow Reserve Without Payment'] === true;
+    console.log(`✓ Updated record ${recordId} - Skip Payment: ${enabled}`);
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        skipPayment: skipPayment,  // ✅ CHANGED from 'allowed'
-        isNewCustomer: false
+        message: `Reserve privilege ${enabled ? 'enabled' : 'disabled'} for ${email}`
       })
     };
 
   } catch (error) {
-    console.error('Error checking reserve privilege:', error);
+    console.error('Error updating reserve privilege:', error);
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ 
-        success: false, 
-        error: error.message 
+      body: JSON.stringify({
+        success: false,
+        message: 'Failed to update privilege',
+        error: error.message
       })
     };
   }
