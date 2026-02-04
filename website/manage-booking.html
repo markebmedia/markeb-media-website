@@ -1268,38 +1268,35 @@
     }
 
     function renderRescheduleTimeSlots(slots) {
-      const grid = document.getElementById('rescheduleTimeSlotGrid');
-      const loadingEl = document.getElementById('rescheduleLoadingTimeSlots');
-      const noSlotsEl = document.getElementById('rescheduleNoSlotsAvailable');
-      
-      loadingEl.classList.add('hidden');
-      
-      const availableSlots = slots.filter(slot => slot.available);
-      
-      if (availableSlots.length === 0) {
-        // ✅ Show "no slots" message ONLY when truly no slots
-        noSlotsEl.classList.remove('hidden');
-        grid.classList.add('hidden');
-        
-        let reason = 'All time slots are taken for this date. Please select a different date.';
-        if (slots[0]?.reason) {
-          reason = slots[0].reason;
-        }
-        document.getElementById('rescheduleNoSlotsReason').textContent = reason;
-        return;
-      }
-      
-      // ✅ CRITICAL: Hide warning when slots ARE available
-      noSlotsEl.classList.add('hidden');
-      
-      const html = availableSlots.map(slot => {
-        const isSelected = rescheduleSelectedTime === slot.time;
-        return `<div class="time-slot ${isSelected ? 'selected' : ''}" onclick="selectRescheduleTime('${slot.time}')">${slot.time}</div>`;
-      }).join('');
-      
-      grid.innerHTML = html;
-      grid.classList.remove('hidden');
-    }
+  const grid = document.getElementById('rescheduleTimeSlotGrid');
+  const loadingEl = document.getElementById('rescheduleLoadingTimeSlots');
+  const noSlotsEl = document.getElementById('rescheduleNoSlotsAvailable');
+  
+  loadingEl.classList.add('hidden');
+  
+  const availableSlots = slots.filter(slot => slot.available);
+  
+  if (availableSlots.length === 0) {
+    // ✅ Show "Fully Booked" message WITHOUT the conflict details
+    noSlotsEl.classList.remove('hidden');
+    grid.classList.add('hidden');
+    
+    // ✅ Generic message only
+    document.getElementById('rescheduleNoSlotsReason').textContent = 'All time slots are taken for this date. Please select a different date.';
+    return;
+  }
+  
+  // ✅ Hide warning when slots ARE available
+  noSlotsEl.classList.add('hidden');
+  
+  const html = availableSlots.map(slot => {
+    const isSelected = rescheduleSelectedTime === slot.time;
+    return `<div class="time-slot ${isSelected ? 'selected' : ''}" onclick="selectRescheduleTime('${slot.time}')">${slot.time}</div>`;
+  }).join('');
+  
+  grid.innerHTML = html;
+  grid.classList.remove('hidden');
+}
 
     function selectRescheduleTime(time) {
       rescheduleSelectedTime = time;
