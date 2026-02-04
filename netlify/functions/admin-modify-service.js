@@ -284,7 +284,8 @@ exports.handler = async (event, context) => {
           priceDifference: priceDifference,
           paymentAction: paymentAction,
           discountCode: discountCode,
-          discountAmount: discountAmount
+          discountAmount: discountAmount,
+          region: fields['Region'] // ✅ Pass region
         });
         console.log(`Service modification email sent to ${fields['Client Email']}`);
       } catch (emailError) {
@@ -349,7 +350,8 @@ async function sendServiceModificationEmail(data) {
     priceDifference,
     paymentAction,
     discountCode,
-    discountAmount
+    discountAmount,
+    region
   } = data;
 
   let paymentMessage = '';
@@ -430,10 +432,23 @@ async function sendServiceModificationEmail(data) {
     </div>
   `;
 
+  // ✅ Determine BCC recipients based on region
+  const bccRecipients = ['commercial@markebmedia.com'];
+  
+  if (region) {
+    if (region.toLowerCase() === 'north') {
+      bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
+      console.log('✓ BCC: Adding Jodie (North region)');
+    } else if (region.toLowerCase() === 'south') {
+      bccRecipients.push('Maeve.Darley@markebmedia.com');
+      console.log('✓ BCC: Adding Maeve (South region)');
+    }
+  }
+
   await resend.emails.send({
     from: 'Markeb Media <commercial@markebmedia.com>',
     to: clientEmail,
-    bcc: 'commercial@markebmedia.com',
+    bcc: bccRecipients, // ✅ Array of BCC recipients
     subject: `Service Updated - ${bookingRef}`,
     html: html
   });

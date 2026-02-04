@@ -193,7 +193,7 @@ async function sendBookingConfirmation(booking) {
       </div>
       <div class="detail-row">
         <span class="detail-label">Property Address</span>
-        <span class="detail-value">${booking.propertyAddress}</span>
+        <span class="detail-value">${booking.propertyAddress}${booking.postcode ? `, ${booking.postcode}` : ''}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Your Media Specialist</span>
@@ -259,11 +259,24 @@ async function sendBookingConfirmation(booking) {
 
   const emailHtml = getEmailLayout(content);
 
-  // Send to customer with BCC to office
+  // ✅ Determine BCC recipients based on region
+  const bccRecipients = [BCC_EMAIL]; // Always include office email
+  
+  if (booking.region) {
+    if (booking.region.toLowerCase() === 'north') {
+      bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
+      console.log('✓ BCC: Adding Jodie (North region)');
+    } else if (booking.region.toLowerCase() === 'south') {
+      bccRecipients.push('Maeve.Darley@markebmedia.com');
+      console.log('✓ BCC: Adding Maeve (South region)');
+    }
+  }
+
+  // Send to customer with BCC to office and regional media specialist
   await resend.emails.send({
     from: FROM_EMAIL,
     to: booking.clientEmail,
-    bcc: BCC_EMAIL, // ✅ This ensures you ALWAYS get a copy
+    bcc: bccRecipients, // ✅ Array of BCC recipients
     subject: `Booking ${isPaid ? 'Confirmed' : 'Reserved'} - ${booking.bookingRef}`,
     html: emailHtml
   });
@@ -290,7 +303,7 @@ async function sendBookingConfirmation(booking) {
       </div>
       <div class="detail-row">
         <span class="detail-label">Property Address</span>
-        <span class="detail-value">${booking.propertyAddress}</span>
+        <span class="detail-value">${booking.propertyAddress}${booking.postcode ? `, ${booking.postcode}` : ''}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Your Media Specialist</span>
@@ -354,7 +367,7 @@ async function sendPaymentConfirmation(booking) {
       </div>
       <div class="detail-row">
         <span class="detail-label">Property Address</span>
-        <span class="detail-value">${booking.propertyAddress}</span>
+        <span class="detail-value">${booking.propertyAddress}${booking.postcode ? `, ${booking.postcode}` : ''}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Your Media Specialist</span>
@@ -439,7 +452,7 @@ async function sendRescheduleConfirmation(booking, oldDate, oldTime) {
       </div>
       <div class="detail-row">
         <span class="detail-label">Property Address</span>
-        <span class="detail-value">${booking.propertyAddress}</span>
+        <span class="detail-value">${booking.propertyAddress}${booking.postcode ? `, ${booking.postcode}` : ''}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Your Media Specialist</span>
@@ -543,7 +556,7 @@ async function sendReminderEmail(booking) {
       </div>
       <div class="detail-row">
         <span class="detail-label">Property Address</span>
-        <span class="detail-value">${booking.propertyAddress}</span>
+        <span class="detail-value">${booking.propertyAddress}${booking.postcode ? `, ${booking.postcode}` : ''}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Your Media Specialist</span>
@@ -634,7 +647,7 @@ async function sendServiceModificationConfirmation(booking, oldService, oldPrice
       </div>
       <div class="detail-row">
         <span class="detail-label">Property Address</span>
-        <span class="detail-value">${booking.propertyAddress}</span>
+        <span class="detail-value">${booking.propertyAddress}${booking.postcode ? `, ${booking.postcode}` : ''}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Your Media Specialist</span>

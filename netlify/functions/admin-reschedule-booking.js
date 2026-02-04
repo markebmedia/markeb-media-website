@@ -112,7 +112,8 @@ exports.handler = async (event, context) => {
           service: fields['Service'],
           propertyAddress: fields['Property Address'],
           mediaSpecialist: fields['Media Specialist'],
-          totalPrice: fields['Total Price']
+          totalPrice: fields['Total Price'],
+          region: fields['Region'] // ✅ Pass region
         });
         console.log(`Reschedule email sent to ${fields['Client Email']}`);
         emailSent = true;
@@ -173,7 +174,8 @@ async function sendRescheduleEmail(data) {
     service,
     propertyAddress,
     mediaSpecialist,
-    totalPrice
+    totalPrice,
+    region
   } = data;
 
   const formattedOriginalDate = new Date(originalDate).toLocaleDateString('en-GB', {
@@ -242,10 +244,23 @@ async function sendRescheduleEmail(data) {
     </div>
   `;
 
+  // ✅ Determine BCC recipients based on region
+  const bccRecipients = ['commercial@markebmedia.com'];
+  
+  if (region) {
+    if (region.toLowerCase() === 'north') {
+      bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
+      console.log('✓ BCC: Adding Jodie (North region)');
+    } else if (region.toLowerCase() === 'south') {
+      bccRecipients.push('Maeve.Darley@markebmedia.com');
+      console.log('✓ BCC: Adding Maeve (South region)');
+    }
+  }
+
   await resend.emails.send({
     from: 'Markeb Media <commercial@markebmedia.com>',
     to: clientEmail,
-    bcc: 'commercial@markebmedia.com',
+    bcc: bccRecipients, // ✅ Array of BCC recipients
     subject: `Booking Rescheduled - ${bookingRef}`,
     html: html
   });

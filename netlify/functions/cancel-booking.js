@@ -79,16 +79,16 @@ exports.handler = async (event, context) => {
     const cancellationChargePercentage = 0;
     const refundAmount = totalPrice;
 
-   // Update booking status in Airtable
-await base('Bookings').update(bookingId, {
-  'Booking Status': 'Cancelled',
-  'Cancellation Date': new Date().toISOString().split('T')[0],
-  'Cancellation Reason': reason || 'Customer requested',
-  'Cancellation Charge %': cancellationChargePercentage,
-  'Cancellation Fee': cancellationCharge,
-  'Refund Amount': refundAmount,
-  'Cancelled By': 'Client'
-});
+    // Update booking status in Airtable
+    await base('Bookings').update(bookingId, {
+      'Booking Status': 'Cancelled',
+      'Cancellation Date': new Date().toISOString().split('T')[0],
+      'Cancellation Reason': reason || 'Customer requested',
+      'Cancellation Charge %': cancellationChargePercentage,
+      'Cancellation Fee': cancellationCharge,
+      'Refund Amount': refundAmount,
+      'Cancelled By': 'Client'
+    });
 
     console.log(`✅ Booking ${fields['Booking Reference']} cancelled (free)`);
 
@@ -109,20 +109,20 @@ await base('Bookings').update(bookingId, {
         const activeBookingData = activeBooking.fields;
         
         // Create record in Cancelled Bookings table (copy all fields)
-await base('Cancelled Bookings').create({
-  'Project Address': activeBookingData['Project Address'],
-  'Customer Name': activeBookingData['Customer Name'],
-  'Service Type': activeBookingData['Service Type'],
-  'Shoot Date': activeBookingData['Shoot Date'],
-  'Status': 'Cancelled',
-  'Email': activeBookingData['Email Address'],
-  'Phone Number': activeBookingData['Phone Number'],
-  'Booking ID': activeBookingData['Booking ID'],
-  'Region': activeBookingData['Region'],
-  'Media Specialist': activeBookingData['Media Specialist'],
-  'Cancellation Date': new Date().toISOString().split('T')[0],
-  'Cancellation Reason': reason || 'Customer requested'
-});
+        await base('Cancelled Bookings').create({
+          'Project Address': activeBookingData['Project Address'],
+          'Customer Name': activeBookingData['Customer Name'],
+          'Service Type': activeBookingData['Service Type'],
+          'Shoot Date': activeBookingData['Shoot Date'],
+          'Status': 'Cancelled',
+          'Email': activeBookingData['Email Address'],
+          'Phone Number': activeBookingData['Phone Number'],
+          'Booking ID': activeBookingData['Booking ID'],
+          'Region': activeBookingData['Region'],
+          'Media Specialist': activeBookingData['Media Specialist'],
+          'Cancellation Date': new Date().toISOString().split('T')[0],
+          'Cancellation Reason': reason || 'Customer requested'
+        });
         
         console.log(`✓ Booking moved to Cancelled Bookings table`);
         
@@ -140,7 +140,7 @@ await base('Cancelled Bookings').create({
 
     // Determine refund note
     let refundNote = '';
-    if (fields['Payment Status'] === 'Paid') { // ✅ FIXED: Was 'Status'
+    if (fields['Payment Status'] === 'Paid') {
       refundNote = 'A full refund will be processed to your original payment method within 5-7 business days.';
     } else {
       refundNote = 'Your reservation has been released.';
@@ -152,10 +152,23 @@ await base('Cancelled Bookings').create({
         const { Resend } = require('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
 
+        // ✅ Determine BCC recipients based on region
+        const bccRecipients = ['commercial@markebmedia.com'];
+        
+        if (fields['Region']) {
+          if (fields['Region'].toLowerCase() === 'north') {
+            bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
+            console.log('✓ BCC: Adding Jodie (North region)');
+          } else if (fields['Region'].toLowerCase() === 'south') {
+            bccRecipients.push('Maeve.Darley@markebmedia.com');
+            console.log('✓ BCC: Adding Maeve (South region)');
+          }
+        }
+
         await resend.emails.send({
           from: 'Markeb Media <commercial@markebmedia.com>',
           to: clientEmail,
-          bcc: 'commercial@markebmedia.com',
+          bcc: bccRecipients, // ✅ Array of BCC recipients
           subject: `Booking Cancelled - ${fields['Booking Reference']}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

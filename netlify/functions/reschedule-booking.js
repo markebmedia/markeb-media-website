@@ -366,10 +366,23 @@ async function sendRescheduleEmail(fields, newDate, newTime, originalDate, origi
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
 
+  // ✅ Determine BCC recipients based on region
+  const bccRecipients = ['commercial@markebmedia.com'];
+  
+  if (fields['Region']) {
+    if (fields['Region'].toLowerCase() === 'north') {
+      bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
+      console.log('✓ BCC: Adding Jodie (North region)');
+    } else if (fields['Region'].toLowerCase() === 'south') {
+      bccRecipients.push('Maeve.Darley@markebmedia.com');
+      console.log('✓ BCC: Adding Maeve (South region)');
+    }
+  }
+
   await resend.emails.send({
     from: 'Markeb Media <commercial@markebmedia.com>',
     to: fields['Client Email'],
-    bcc: 'commercial@markebmedia.com',
+    bcc: bccRecipients, // ✅ Array of BCC recipients
     subject: `Booking Rescheduled - ${fields['Booking Reference']}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
