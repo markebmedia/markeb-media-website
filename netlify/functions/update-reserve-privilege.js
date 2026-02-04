@@ -47,21 +47,21 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({
           success: true,
-          allowed: false,
+          skipPayment: false,  // ✅ CHANGED from 'allowed'
           isNewCustomer: true
         })
       };
     }
 
     const user = records[0];
-    const allowed = user.fields['Allow Reserve Without Payment'] === true;
+    const skipPayment = user.fields['Allow Reserve Without Payment'] === true;
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        allowed: allowed,
+        skipPayment: skipPayment,  // ✅ CHANGED from 'allowed'
         isNewCustomer: false
       })
     };

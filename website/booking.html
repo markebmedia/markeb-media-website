@@ -996,36 +996,46 @@
           </div>
         </div>
 
-        <!-- Payment Options -->
-        <div style="margin-bottom: 28px;">
-          <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 16px;">
-            Payment Options
-          </h3>
-          
-          <div class="payment-option" onclick="selectPaymentOption('reserve')" style="display: none;">
-  <div style="flex: 1;">
-    <div style="font-weight: 700; font-size: 16px; color: #1e293b; margin-bottom: 4px;">
-      Reserve Without Payment
+       <!-- Payment Options -->
+<div style="margin-bottom: 28px;" id="paymentOptionsSection">
+  <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 16px;">
+    Payment Options
+  </h3>
+  
+  <div class="payment-option" onclick="selectPaymentOption('pay-now')">
+    <div style="flex: 1;">
+      <div style="font-weight: 700; font-size: 16px; color: #1e293b; margin-bottom: 4px;">
+        Pay Now
+      </div>
+      <div style="font-size: 13px; color: #64748b;">
+        Secure payment via Stripe. Your booking is confirmed immediately.
+      </div>
     </div>
-    <div style="font-size: 13px; color: #64748b;">
-      Save your card details. We'll charge after completing your shoot.
-    </div>
+    <div class="payment-radio"></div>
   </div>
-  <div class="payment-radio"></div>
+
+  <div class="payment-option" onclick="selectPaymentOption('reserve')" style="display: none;">
+    <div style="flex: 1;">
+      <div style="font-weight: 700; font-size: 16px; color: #1e293b; margin-bottom: 4px;">
+        Reserve Without Payment
+      </div>
+      <div style="font-size: 13px; color: #64748b;">
+        Save your card details. We'll charge after completing your shoot.
+      </div>
+    </div>
+    <div class="payment-radio"></div>
+  </div>
 </div>
 
-          <div class="payment-option" onclick="selectPaymentOption('reserve')">
-            <div style="flex: 1;">
-              <div style="font-weight: 700; font-size: 16px; color: #1e293b; margin-bottom: 4px;">
-                Reserve Without Payment
-              </div>
-              <div style="font-size: 13px; color: #64748b;">
-                Save your card details. We'll charge after completing your shoot.
-              </div>
-            </div>
-            <div class="payment-radio"></div>
-          </div>
-        </div>
+<!-- Skip Payment Message (shown when toggle is ON) -->
+<div id="skipPaymentMessage" style="display: none; margin-bottom: 28px;">
+  <div class="info-box success">
+    <div class="info-box-title">✅ Trusted Customer</div>
+    <div class="info-box-text">
+      No payment required now. We'll invoice you after completing your shoot.
+    </div>
+  </div>
+</div>
 
         <!-- Stripe Card Elements Section (only shown for Reserve Without Payment) -->
         <div id="stripeCardSection" style="display: none; margin-bottom: 28px;">
@@ -2257,23 +2267,76 @@ async function loadAvailableTimeSlots(dateString) {
       document.getElementById('continueToDetailsBtn').disabled = false;
     }
     // Event listeners for form validation
-    document.addEventListener('DOMContentLoaded', function() {
-      const nameField = document.getElementById('clientName');
-      const emailField = document.getElementById('clientEmail');
-      const phoneField = document.getElementById('clientPhone');
+document.addEventListener('DOMContentLoaded', function() {
+  const nameField = document.getElementById('clientName');
+  const emailField = document.getElementById('clientEmail');
+  const phoneField = document.getElementById('clientPhone');
+  
+  if (nameField) nameField.addEventListener('input', validateStep4Form);
+  if (emailField) emailField.addEventListener('input', validateStep4Form);
+  if (phoneField) phoneField.addEventListener('input', validateStep4Form);
+
+  const checkboxes = ['termsRevisions', 'termsItemRemovalConfirm', 'termsAccess', 'termsHygieneConfirm', 'termsAgree'];
+  checkboxes.forEach(id => {
+    const checkbox = document.getElementById(id);
+    if (checkbox) checkbox.addEventListener('change', validateStep4Form);
+  });
+
+  // ✅ NEW: Check reserve privilege when email is entered
+  if (emailField) {
+    emailField.addEventListener('blur', async function() {
+      const email = this.value.trim();
       
-      if (nameField) nameField.addEventListener('input', validateStep4Form);
-      if (emailField) emailField.addEventListener('input', validateStep4Form);
-      if (phoneField) phoneField.addEventListener('input', validateStep4Form);
-
-      const checkboxes = ['termsRevisions', 'termsItemRemovalConfirm', 'termsAccess', 'termsHygieneConfirm', 'termsAgree'];
-      checkboxes.forEach(id => {
-        const checkbox = document.getElementById(id);
-        if (checkbox) checkbox.addEventListener('change', validateStep4Form);
-      });
+      if (!email || !email.includes('@')) {
+        return;
+      }
+      
+      try {
+        const response = await fetch('/.netlify/functions/check-reserve-privilege', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          const paymentSection = document.getElementById('paymentOptionsSection');
+          const skipMessage = document.getElementById('skipPaymentMessage');
+          
+          if (data.skipPayment) {
+            // ✅ TOGGLE ON: Hide payment options, show trusted message
+            paymentSection.style.display = 'none';
+            skipMessage.style.display = 'block';
+            
+            // Auto-select "book-without-payment" mode
+            bookingData.paymentOption = 'book-without-payment';
+            
+          } else {
+            // ❌ TOGGLE OFF: Show normal payment options
+            paymentSection.style.display = 'block';
+            skipMessage.style.display = 'none';
+            
+            // Reset payment option
+            bookingData.paymentOption = null;
+            document.querySelectorAll('.payment-option').forEach(opt => {
+              opt.classList.remove('selected');
+            });
+          }
+          
+          validateStep4Form();
+        }
+      } catch (error) {
+        console.error('Error checking reserve privilege:', error);
+        // On error, show normal payment options
+        document.getElementById('paymentOptionsSection').style.display = 'block';
+        document.getElementById('skipPaymentMessage').style.display = 'none';
+      }
     });
+  }
+});
 
-    // Complete Booking
+ // Complete Booking
 async function completeBooking() {
   const name = document.getElementById('clientName').value.trim();
   const email = document.getElementById('clientEmail').value.trim();
@@ -2317,7 +2380,31 @@ async function completeBooking() {
     return;
   }
 
-  // ✅ NEW: Check if booking is free (£0 total) - SKIP ALL PAYMENT LOGIC
+  // ✅ NEW: Check if they can skip payment entirely (trusted customer)
+  if (bookingData.paymentOption === 'book-without-payment') {
+    console.log('Trusted customer - booking without payment');
+    
+    bookingData.clientName = name;
+    bookingData.clientEmail = email;
+    bookingData.clientPhone = phone;
+    bookingData.clientNotes = notes;
+    
+    const submitBtn = document.getElementById('completeBookingBtn');
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+    
+    try {
+      await createBooking(); // Create booking with Payment Status = "Pending"
+    } catch (error) {
+      console.error('Booking error:', error);
+      alert('Failed to create booking. Please try again.');
+      submitBtn.classList.remove('loading');
+      submitBtn.disabled = false;
+    }
+    return; // ✅ Exit early - skip all payment/Stripe logic below
+  }
+
+  // ✅ EXISTING: Check if booking is free (£0 total) - SKIP ALL PAYMENT LOGIC
   if (bookingData.totalPrice === 0) {
     console.log('Total is £0 - creating free booking');
     
