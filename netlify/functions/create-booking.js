@@ -287,36 +287,37 @@ if (bookingData.discountCode && bookingData.discountAmount > 0) {
 
     // ✅ Send confirmation email via Resend (for both customer and admin bookings)
     if (process.env.RESEND_API_KEY) {
-      try {
-        const { sendBookingConfirmation } = require('./email-service');
-
-        const emailData = {
-          bookingRef: bookingRef,
-          clientName: bookingData.clientName,
-          clientEmail: bookingData.clientEmail,
-          service: bookingData.service,
-          date: bookingData.date,
-          time: bookingData.time,
-          propertyAddress: bookingData.propertyAddress,
-          mediaSpecialist: bookingData.mediaSpecialist,
-          totalPrice: finalPrice,
-          duration: bookingData.duration,
-          paymentStatus: paymentStatus,
-          bookingStatus: bookingStatus,
-          createdBy: bookingData.createdBy || 'Customer',
-          cardLast4: bookingData.cardLast4 || '',
-          discountCode: bookingData.discountCode || '',
-          discountAmount: discountAmount
-        };
-
-        await sendBookingConfirmation(emailData);
-        console.log(`✓ Confirmation email sent to ${bookingData.clientEmail}`);
-
-      } catch (emailError) {
-        console.error('Error sending confirmation email:', emailError);
-        // Don't fail the booking if email fails
-      }
-    }
+  try {
+    const { sendBookingConfirmation } = require('./email-service');
+    
+    const emailData = {
+      bookingRef: bookingRef,
+      clientName: bookingData.clientName,
+      clientEmail: bookingData.clientEmail,
+      service: bookingData.service,
+      date: bookingData.date,
+      time: bookingData.time,
+      propertyAddress: bookingData.propertyAddress,
+      mediaSpecialist: bookingData.mediaSpecialist,
+      totalPrice: finalPrice,
+      duration: bookingData.duration,
+      paymentStatus: paymentStatus,
+      bookingStatus: bookingStatus,
+      createdBy: bookingData.createdBy || 'Customer',
+      cardLast4: bookingData.cardLast4 || '',
+      discountCode: bookingData.discountCode || '',
+      discountAmount: discountAmount,
+      trackingCode: trackingCode // ✅ ADD THIS LINE
+    };
+    
+    await sendBookingConfirmation(emailData);
+    console.log(`✓ Confirmation email sent to ${bookingData.clientEmail}`);
+    
+  } catch (emailError) {
+    console.error('Error sending confirmation email:', emailError);
+    // Don't fail the booking if email fails
+  }
+}
 
     // ✅ NEW: Create Active Booking record + Dropbox folders (QC Delivery + Raw Client)
     try {
