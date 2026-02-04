@@ -202,10 +202,23 @@ exports.handler = async (event, context) => {
           paymentNote = `<p style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 16px; margin: 16px 0;"><strong>Payment Required:</strong> An additional £${priceDifference.toFixed(2)} is due. We'll contact you to collect payment.</p>`;
         }
 
+        // ✅ Determine BCC recipients based on region
+        const bccRecipients = ['commercial@markebmedia.com'];
+        
+        if (booking.fields['Region']) {
+          if (booking.fields['Region'].toLowerCase() === 'north') {
+            bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
+            console.log('✓ BCC: Adding Jodie (North region)');
+          } else if (booking.fields['Region'].toLowerCase() === 'south') {
+            bccRecipients.push('Maeve.Darley@markebmedia.com');
+            console.log('✓ BCC: Adding Maeve (South region)');
+          }
+        }
+
         await resend.emails.send({
           from: 'Markeb Media <commercial@markebmedia.com>',
           to: clientEmail,
-          bcc: 'commercial@markebmedia.com',
+          bcc: bccRecipients, // ✅ Array of BCC recipients
           subject: `Booking Modified - ${bookingRef}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

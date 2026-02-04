@@ -148,24 +148,24 @@ exports.handler = async (event, context) => {
     const addonsPrice = bookingData.addonsPrice || 0;
 
     // ✅ Handle discount code
-let discountCodeId = null;
-let discountAmount = 0;
-let priceBeforeDiscount = 0;
-let finalPrice = bookingData.totalPrice;
+    let discountCodeId = null;
+    let discountAmount = 0;
+    let priceBeforeDiscount = 0;
+    let finalPrice = bookingData.totalPrice;
 
-if (bookingData.discountCode && bookingData.discountAmount > 0) {
-  console.log('Discount code applied:', bookingData.discountCode);
-  
-  discountAmount = bookingData.discountAmount || 0;
-  priceBeforeDiscount = bookingData.priceBeforeDiscount || (bookingData.totalPrice + discountAmount);
-  finalPrice = priceBeforeDiscount - discountAmount; // ✅ FIXED - calculate discounted price
-  
-  console.log('Discount details:', {
-    code: bookingData.discountCode,
-    discountAmount,
-    priceBeforeDiscount,
-    finalPrice
-  });
+    if (bookingData.discountCode && bookingData.discountAmount > 0) {
+      console.log('Discount code applied:', bookingData.discountCode);
+      
+      discountAmount = bookingData.discountAmount || 0;
+      priceBeforeDiscount = bookingData.priceBeforeDiscount || (bookingData.totalPrice + discountAmount);
+      finalPrice = priceBeforeDiscount - discountAmount; // ✅ FIXED - calculate discounted price
+      
+      console.log('Discount details:', {
+        code: bookingData.discountCode,
+        discountAmount,
+        priceBeforeDiscount,
+        finalPrice
+      });
       
       // Increment usage count for discount code
       try {
@@ -285,47 +285,16 @@ if (bookingData.discountCode && bookingData.discountAmount > 0) {
     const airtableResult = await response.json();
     console.log('Booking created successfully:', bookingRef);
 
-    // ✅ Send confirmation email via Resend (for both customer and admin bookings)
-    if (process.env.RESEND_API_KEY) {
-  try {
-    const { sendBookingConfirmation } = require('./email-service');
-    
-    const emailData = {
-      bookingRef: bookingRef,
-      clientName: bookingData.clientName,
-      clientEmail: bookingData.clientEmail,
-      service: bookingData.service,
-      date: bookingData.date,
-      time: bookingData.time,
-      propertyAddress: bookingData.propertyAddress,
-      mediaSpecialist: bookingData.mediaSpecialist,
-      totalPrice: finalPrice,
-      duration: bookingData.duration,
-      paymentStatus: paymentStatus,
-      bookingStatus: bookingStatus,
-      createdBy: bookingData.createdBy || 'Customer',
-      cardLast4: bookingData.cardLast4 || '',
-      discountCode: bookingData.discountCode || '',
-      discountAmount: discountAmount,
-      trackingCode: trackingCode // ✅ ADD THIS LINE
-    };
-    
-    await sendBookingConfirmation(emailData);
-    console.log(`✓ Confirmation email sent to ${bookingData.clientEmail}`);
-    
-  } catch (emailError) {
-    console.error('Error sending confirmation email:', emailError);
-    // Don't fail the booking if email fails
-  }
-}
-
     // ✅ NEW: Create Active Booking record + Dropbox folders (QC Delivery + Raw Client)
+    let trackingCode = ''; // ✅ Declare tracking code variable
+    
     try {
       const { createActiveBooking } = require('./create-active-booking');
       
       const activeBookingData = {
         bookingRef: bookingRef,
         propertyAddress: bookingData.propertyAddress,
+        postcode: bookingData.postcode, // ✅ ADD postcode
         clientName: bookingData.clientName,
         clientEmail: bookingData.clientEmail,
         clientPhone: bookingData.clientPhone,
@@ -341,7 +310,9 @@ if (bookingData.discountCode && bookingData.discountAmount > 0) {
       const activeBookingResult = await createActiveBooking(activeBookingData);
       
       if (activeBookingResult.success) {
+        trackingCode = activeBookingResult.trackingCode || ''; // ✅ Capture tracking code
         console.log(`✓ Active Booking created with ID: ${activeBookingResult.activeBookingId}`);
+        console.log(`✓ Tracking Code: ${trackingCode}`); // ✅ Log tracking code
         console.log(`✓ QC Delivery folder created with link: ${activeBookingResult.dropboxLink}`);
         console.log(`✓ Raw Client folders created for company`);
       } else {
@@ -352,6 +323,41 @@ if (bookingData.discountCode && bookingData.discountAmount > 0) {
     } catch (activeBookingError) {
       console.error('Error creating Active Booking:', activeBookingError);
       // Don't fail the booking if Active Booking creation fails
+    }
+
+    // ✅ Send confirmation email via Resend (MOVED HERE - after Active Booking creation)
+    if (process.env.RESEND_API_KEY) {
+      try {
+        const { sendBookingConfirmation } = require('./email-service');
+        
+        const emailData = {
+          bookingRef: bookingRef,
+          clientName: bookingData.clientName,
+          clientEmail: bookingData.clientEmail,
+          service: bookingData.service,
+          date: bookingData.date,
+          time: bookingData.time,
+          propertyAddress: bookingData.propertyAddress,
+          postcode: bookingData.postcode, // ✅ ADD postcode
+          mediaSpecialist: bookingData.mediaSpecialist,
+          totalPrice: finalPrice,
+          duration: bookingData.duration,
+          paymentStatus: paymentStatus,
+          bookingStatus: bookingStatus,
+          createdBy: bookingData.createdBy || 'Customer',
+          cardLast4: bookingData.cardLast4 || '',
+          discountCode: bookingData.discountCode || '',
+          discountAmount: discountAmount,
+          trackingCode: trackingCode // ✅ Include tracking code
+        };
+        
+        await sendBookingConfirmation(emailData);
+        console.log(`✓ Confirmation email sent to ${bookingData.clientEmail}`);
+        
+      } catch (emailError) {
+        console.error('Error sending confirmation email:', emailError);
+        // Don't fail the booking if email fails
+      }
     }
 
     return {

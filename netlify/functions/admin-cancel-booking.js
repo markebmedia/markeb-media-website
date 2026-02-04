@@ -132,20 +132,20 @@ exports.handler = async (event, context) => {
         const activeBookingData = activeBooking.fields;
         
         // Create record in Cancelled Bookings table
-await base('Cancelled Bookings').create({
-  'Project Address': activeBookingData['Project Address'],
-  'Customer Name': activeBookingData['Customer Name'],
-  'Service Type': activeBookingData['Service Type'],
-  'Shoot Date': activeBookingData['Shoot Date'],
-  'Status': 'Cancelled',
-  'Email': activeBookingData['Email Address'],  // ✅ CHANGED
-  'Phone Number': activeBookingData['Phone Number'],
-  'Booking ID': activeBookingData['Booking ID'],
-  'Region': activeBookingData['Region'],
-  'Media Specialist': activeBookingData['Media Specialist'],
-  'Cancellation Date': new Date().toISOString().split('T')[0],
-  'Cancellation Reason': reason  // or whatever the specific version uses
-});
+        await base('Cancelled Bookings').create({
+          'Project Address': activeBookingData['Project Address'],
+          'Customer Name': activeBookingData['Customer Name'],
+          'Service Type': activeBookingData['Service Type'],
+          'Shoot Date': activeBookingData['Shoot Date'],
+          'Status': 'Cancelled',
+          'Email': activeBookingData['Email Address'],
+          'Phone Number': activeBookingData['Phone Number'],
+          'Booking ID': activeBookingData['Booking ID'],
+          'Region': activeBookingData['Region'],
+          'Media Specialist': activeBookingData['Media Specialist'],
+          'Cancellation Date': new Date().toISOString().split('T')[0],
+          'Cancellation Reason': reason
+        });
         
         console.log(`✓ Admin cancelled booking moved to Cancelled Bookings table`);
         
@@ -177,7 +177,8 @@ await base('Cancelled Bookings').create({
           cancellationCharge: cancellationCharge,
           refundAmount: refundAmount,
           refundProcessed: refundProcessed,
-          totalPrice: fields['Total Price']
+          totalPrice: fields['Total Price'],
+          region: fields['Region'] // ✅ Pass region
         });
         console.log(`Cancellation email sent to ${fields['Client Email']}`);
         emailSent = true;
@@ -239,7 +240,8 @@ async function sendCancellationEmail(data) {
     cancellationCharge,
     refundAmount,
     refundProcessed,
-    totalPrice
+    totalPrice,
+    region
   } = data;
 
   const formattedDate = new Date(date).toLocaleDateString('en-GB', {
@@ -326,10 +328,23 @@ async function sendCancellationEmail(data) {
     </div>
   `;
 
+  // ✅ Determine BCC recipients based on region
+  const bccRecipients = ['commercial@markebmedia.com'];
+  
+  if (region) {
+    if (region.toLowerCase() === 'north') {
+      bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
+      console.log('✓ BCC: Adding Jodie (North region)');
+    } else if (region.toLowerCase() === 'south') {
+      bccRecipients.push('Maeve.Darley@markebmedia.com');
+      console.log('✓ BCC: Adding Maeve (South region)');
+    }
+  }
+
   await resend.emails.send({
     from: 'Markeb Media <commercial@markebmedia.com>',
     to: clientEmail,
-    bcc: 'commercial@markebmedia.com',
+    bcc: bccRecipients, // ✅ Array of BCC recipients
     subject: `Booking Cancelled - ${bookingRef}`,
     html: html
   });
