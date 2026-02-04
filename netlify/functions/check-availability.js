@@ -10,7 +10,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { postcode, region, selectedDate, isAdmin, duration } = JSON.parse(event.body); // ✅ ADD duration
+    const { postcode, region, selectedDate, isAdmin, duration } = JSON.parse(event.body);
 
     if (!postcode || !region || !selectedDate) {
       return {
@@ -46,7 +46,7 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // ✅ NEW: Fetch blocked times for this region and date
+    // ✅ Fetch blocked times for this region and date
     const blockedTimes = await fetchBlockedTimes(region, selectedDate);
     console.log(`Found ${blockedTimes.length} blocked time(s) for this date/region`);
 
@@ -61,7 +61,7 @@ exports.handler = async (event, context) => {
       // No bookings - just check blocked times and duration
       availableSlots = generateAllTimeSlots();
       availableSlots = applyBlockedTimes(availableSlots, blockedTimes);
-      availableSlots = applyDurationConstraints(availableSlots, bookingDuration, []); // ✅ Check duration even with no bookings
+      availableSlots = applyDurationConstraints(availableSlots, bookingDuration, []);
       
       return {
         statusCode: 200,
@@ -78,7 +78,7 @@ exports.handler = async (event, context) => {
     }
 
     // Calculate available time slots based on existing bookings and drive times
-    availableSlots = await calculateAvailableSlots(postcode, bookings, isAdmin, bookingDuration); // ✅ Pass duration
+    availableSlots = await calculateAvailableSlots(postcode, bookings, isAdmin, bookingDuration);
     
     // ✅ Apply blocked times on top of booking conflicts
     availableSlots = applyBlockedTimes(availableSlots, blockedTimes);
@@ -127,7 +127,7 @@ exports.handler = async (event, context) => {
   }
 };
 
-// ✅ NEW: Fetch blocked times from Airtable
+// ✅ Fetch blocked times from Airtable
 async function fetchBlockedTimes(region, selectedDate) {
   try {
     const Airtable = require('airtable');
@@ -177,7 +177,7 @@ async function fetchBlockedTimes(region, selectedDate) {
   }
 }
 
-// ✅ NEW: Apply blocked times to slots
+// ✅ Apply blocked times to slots
 function applyBlockedTimes(slots, blockedTimes) {
   if (blockedTimes.length === 0) return slots;
   
@@ -204,7 +204,7 @@ function applyBlockedTimes(slots, blockedTimes) {
   return slots;
 }
 
-// ✅ NEW: Apply duration constraints - block slots where YOUR booking would overrun
+// ✅ Apply duration constraints - block slots where YOUR booking would overrun
 function applyDurationConstraints(slots, bookingDuration, existingBookings) {
   console.log(`\nApplying duration constraints (${bookingDuration} min booking):`);
   
@@ -334,15 +334,14 @@ function generateAllTimeSlots() {
 }
 
 // Calculate available time slots based on drive times and existing bookings
-async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin, bookingDuration) { // ✅ Add bookingDuration parameter
-  const allSlots = generateAllTimeSlots();
-  const maxDriveMinutes = 45; // Max drive time to determine if booking can happen on this day
-  const fixedBufferMinutes = 45; // Fixed buffer time before AND after each booking
+async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin, bookingDuration) {
+  let allSlots = generateAllTimeSlots(); // ✅ CHANGED: const → let
+  const maxDriveMinutes = 45;
+  const fixedBufferMinutes = 45;
   
   console.log(`\nCalculating availability for ${existingBookings.length} existing bookings with ${bookingDuration}min duration`);
   
   // STEP 1: Check if user's location is within 45 min drive of ALL existing bookings
-  // This determines IF the booking can happen on this day
   for (const booking of existingBookings) {
     if (!booking.postcode) {
       console.log(`⚠ Skipping booking at ${booking.startTime} - no postcode available`);
@@ -363,11 +362,10 @@ async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin, 
           slot.reason = `Too far from existing booking at ${booking.startTime} (${driveTime} min drive - max ${maxDriveMinutes} min)`;
         });
         
-        return allSlots; // Return immediately - entire day blocked
+        return allSlots;
       }
     } catch (error) {
       console.error('❌ Error calculating drive time:', error);
-      // If we can't calculate drive time, be conservative and block the day
       allSlots.forEach(slot => {
         slot.available = false;
         slot.reason = 'Unable to verify drive time';
@@ -377,7 +375,6 @@ async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin, 
   }
   
   // STEP 2: User is within 45 min of all bookings
-  // Now block: 45 min BEFORE + booking duration + 45 min AFTER
   console.log('\n✓ User is within 45 min of all existing bookings');
   console.log(`Blocking: ${fixedBufferMinutes} min before + booking + ${fixedBufferMinutes} min after:\n`);
   
@@ -385,8 +382,8 @@ async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin, 
     const bookingStartMinutes = timeToMinutes(booking.startTime);
     const bookingEndMinutes = bookingStartMinutes + booking.duration;
     
-    const bufferStartMinutes = bookingStartMinutes - fixedBufferMinutes; // 45 min BEFORE
-    const bufferEndMinutes = bookingEndMinutes + fixedBufferMinutes;     // 45 min AFTER
+    const bufferStartMinutes = bookingStartMinutes - fixedBufferMinutes;
+    const bufferEndMinutes = bookingEndMinutes + fixedBufferMinutes;
     
     console.log(`  Buffer before: ${minutesToTime(bufferStartMinutes)}-${booking.startTime} (${fixedBufferMinutes} min)`);
     console.log(`  Booking: ${booking.startTime}-${minutesToTime(bookingEndMinutes)} (${booking.duration} min)`);
@@ -396,7 +393,6 @@ async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin, 
     allSlots.forEach(slot => {
       const slotMinutes = timeToMinutes(slot.time);
       
-      // Block slots that fall within: buffer before + booking + buffer after
       if (slotMinutes >= bufferStartMinutes && slotMinutes < bufferEndMinutes) {
         console.log(`    ❌ Blocking ${slot.time}`);
         slot.available = false;
@@ -414,7 +410,7 @@ async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin, 
     });
   }
   
-  // ✅ STEP 3: Apply duration constraints - check if YOUR booking would conflict
+  // ✅ STEP 3: Apply duration constraints
   allSlots = applyDurationConstraints(allSlots, bookingDuration, existingBookings);
   
   const availableCount = allSlots.filter(s => s.available).length;
@@ -453,7 +449,6 @@ async function getDriveTime(fromPostcode, toPostcode) {
       throw new Error(`No route found: ${element?.status || 'Unknown error'}`);
     }
     
-    // Return duration in minutes (use duration_in_traffic if available)
     const duration = element.duration_in_traffic || element.duration;
     const durationMinutes = Math.ceil(duration.value / 60);
     
