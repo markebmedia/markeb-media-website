@@ -41,27 +41,27 @@ exports.handler = async (event, context) => {
       .firstPage();
 
     if (records.length === 0) {
-      // New customer - no privilege by default
+      // New customer - no privilege
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({
           success: true,
-          allowed: false,
+          skipPayment: false,  // ✅ NEW: can they skip payment entirely?
           isNewCustomer: true
         })
       };
     }
 
     const user = records[0];
-    const allowed = user.fields['Allow Reserve Without Payment'] === true;
+    const skipPayment = user.fields['Allow Reserve Without Payment'] === true;
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        allowed: allowed,
+        skipPayment: skipPayment,  // ✅ NEW: can they skip payment entirely?
         isNewCustomer: false
       })
     };

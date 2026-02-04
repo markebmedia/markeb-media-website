@@ -102,28 +102,34 @@ exports.handler = async (event, context) => {
     let paymentStatus;
     let bookingStatus;
 
-    // ✅ NEW: Check if this is an admin booking FIRST
-    if (bookingData.createdBy === 'Admin') {
-      // ADMIN BOOKING - Use direct status control
-      console.log('Admin booking detected');
-      paymentStatus = bookingData.paymentStatus || 'Pending';
-      
-      if (paymentStatus === 'Paid') {
-        bookingStatus = 'Confirmed';
-      } else {
-        bookingStatus = 'Reserved';
-      }
-      
-      console.log(`Admin booking: Payment=${paymentStatus}, Booking=${bookingStatus}`);
-      
-    // ✅ NEW: Handle free/100% discount bookings
-    } else if (bookingData.paymentOption === 'free' || bookingData.totalPrice === 0) {
-      paymentStatus = 'Paid'; // Mark as paid (£0 = nothing to pay)
-      bookingStatus = 'Confirmed';
-      console.log('Free booking (100% discount or £0 total) - marking as Paid/Confirmed');
-      
-    // ✅ EXISTING: Customer bookings work EXACTLY as before
-    } else if (bookingData.paymentOption === 'pay-now') {
+   // ✅ NEW: Check if this is an admin booking FIRST
+if (bookingData.createdBy === 'Admin') {
+  // ADMIN BOOKING - Use direct status control
+  console.log('Admin booking detected');
+  paymentStatus = bookingData.paymentStatus || 'Pending';
+  
+  if (paymentStatus === 'Paid') {
+    bookingStatus = 'Confirmed';
+  } else {
+    bookingStatus = 'Reserved';
+  }
+  
+  console.log(`Admin booking: Payment=${paymentStatus}, Booking=${bookingStatus}`);
+  
+// ✅ NEW: Handle trusted customers who can book without payment
+} else if (bookingData.paymentOption === 'book-without-payment') {
+  paymentStatus = 'Pending';
+  bookingStatus = 'Confirmed'; // Booking is confirmed, payment comes later
+  console.log('Trusted customer - booking without payment (invoice later)');
+  
+// ✅ NEW: Handle free/100% discount bookings
+} else if (bookingData.paymentOption === 'free' || bookingData.totalPrice === 0) {
+  paymentStatus = 'Paid'; // Mark as paid (£0 = nothing to pay)
+  bookingStatus = 'Confirmed';
+  console.log('Free booking (100% discount or £0 total) - marking as Paid/Confirmed');
+  
+// ✅ EXISTING: Customer bookings work EXACTLY as before
+} else if (bookingData.paymentOption === 'pay-now') {
       // This shouldn't happen in create-booking (should go through Stripe webhook)
       // But if it does, mark as Paid
       paymentStatus = 'Paid';
