@@ -5098,7 +5098,7 @@ async function confirmModifyService(bookingId) {
               <th>Region</th>
               <th>Status</th>
               <th>Email Alerts</th>
-              <th>Reserve Privilege</th>
+              <th>Skip Payment</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -5145,7 +5145,7 @@ async function confirmModifyService(bookingId) {
                 <span class="toggle-slider"></span>
               </label>
             </td>
-            <td data-label="Reserve Privilege">
+            <td data-label="Skip Payment">
               <label class="toggle-switch">
                 <input 
                   type="checkbox" 
@@ -5233,19 +5233,24 @@ async function confirmModifyService(bookingId) {
           </span>
         </div>
 
-        <div class="detail-item">
-          <span class="detail-label">💳 Allow Reserve Without Payment</span>
-          <span class="detail-value">
-            <label class="toggle-switch">
-              <input 
-                type="checkbox" 
-                ${allowReserve ? 'checked' : ''} 
-                onchange='toggleReservePrivilege("${customer.id}", "${customer.fields['Email']}", this.checked)'
-              >
-              <span class="toggle-slider"></span>
-            </label>
-          </span>
-        </div>
+       <div class="detail-item">
+  <span class="detail-label">🚫 Skip Payment Requirement</span>
+  <span class="detail-value">
+    <label class="toggle-switch">
+      <input 
+        type="checkbox" 
+        ${allowReserve ? 'checked' : ''} 
+        onchange='toggleReservePrivilege("${customer.id}", "${customer.fields['Email']}", this.checked)'
+      >
+      <span class="toggle-slider"></span>
+    </label>
+    <br>
+    <small style="color: #64748b; font-size: 12px; margin-top: 4px; display: block;">
+      ✅ Enabled = Customer books without payment details (invoice later)<br>
+      ❌ Disabled = Customer must pay or save card details
+    </small>
+  </span>
+</div>
 
         <div class="detail-item">
           <span class="detail-label">🔐 Password</span>
