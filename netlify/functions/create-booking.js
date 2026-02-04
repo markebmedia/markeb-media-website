@@ -330,26 +330,27 @@ exports.handler = async (event, context) => {
       try {
         const { sendBookingConfirmation } = require('./email-service');
         
-        const emailData = {
-          bookingRef: bookingRef,
-          clientName: bookingData.clientName,
-          clientEmail: bookingData.clientEmail,
-          service: bookingData.service,
-          date: bookingData.date,
-          time: bookingData.time,
-          propertyAddress: bookingData.propertyAddress,
-          postcode: bookingData.postcode, // ✅ ADD postcode
-          mediaSpecialist: bookingData.mediaSpecialist,
-          totalPrice: finalPrice,
-          duration: bookingData.duration,
-          paymentStatus: paymentStatus,
-          bookingStatus: bookingStatus,
-          createdBy: bookingData.createdBy || 'Customer',
-          cardLast4: bookingData.cardLast4 || '',
-          discountCode: bookingData.discountCode || '',
-          discountAmount: discountAmount,
-          trackingCode: trackingCode // ✅ Include tracking code
-        };
+       const emailData = {
+  bookingRef: bookingRef,
+  clientName: bookingData.clientName,
+  clientEmail: bookingData.clientEmail,
+  service: bookingData.service,
+  date: bookingData.date,
+  time: bookingData.time,
+  propertyAddress: bookingData.propertyAddress,
+  postcode: bookingData.postcode,
+  mediaSpecialist: bookingData.mediaSpecialist,
+  totalPrice: finalPrice,
+  duration: bookingData.duration,
+  paymentStatus: paymentStatus,
+  bookingStatus: bookingStatus,
+  createdBy: bookingData.createdBy || 'Customer',
+  cardLast4: bookingData.cardLast4 || '',
+  discountCode: bookingData.discountCode || '',
+  discountAmount: discountAmount,
+  trackingCode: trackingCode,
+  region: bookingData.region // ✅ ADD THIS LINE - Required for BCC to Jodie/Maeve
+};
         
         await sendBookingConfirmation(emailData);
         console.log(`✓ Confirmation email sent to ${bookingData.clientEmail}`);

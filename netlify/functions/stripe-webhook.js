@@ -53,6 +53,10 @@ exports.handler = async (event, context) => {
         const bookingRef = metadata.bookingRef;
         const cancellationFee = parseFloat(metadata.cancellationFee);
         
+        // Fetch booking to get region
+        const booking = await base('Bookings').find(bookingId);
+        const region = booking.fields['Region'];
+        
         // Update main booking to Cancelled
         await base('Bookings').update(bookingId, {
           'Booking Status': 'Cancelled',
@@ -109,8 +113,8 @@ exports.handler = async (event, context) => {
           console.error('Error moving Active Booking:', activeBookingError);
         }
         
-        // Send cancellation confirmation email
-        await sendCancellationConfirmation(metadata, session, cancellationFee);
+        // Send cancellation confirmation email with region
+        await sendCancellationConfirmation(metadata, session, cancellationFee, region);
         
         return {
           statusCode: 200,
@@ -273,8 +277,8 @@ exports.handler = async (event, context) => {
 
       console.log('✅ Booking created from webhook:', bookingRecord[0].id);
 
-      // Send payment confirmation email
-      await sendPaymentConfirmation(metadata, session, bookingRef, discountCode, discountAmount);
+      // Send payment confirmation email with region
+      await sendPaymentConfirmation(metadata, session, bookingRef, discountCode, discountAmount, capitalizedRegion);
 
       return {
         statusCode: 200,
@@ -300,7 +304,7 @@ exports.handler = async (event, context) => {
 };
 
 // Send payment confirmation email
-async function sendPaymentConfirmation(metadata, session, bookingRef, discountCode = '', discountAmount = 0) {
+async function sendPaymentConfirmation(metadata, session, bookingRef, discountCode = '', discountAmount = 0, region = '') {
   if (!process.env.RESEND_API_KEY) {
     console.log('Resend not configured - skipping email');
     return;
@@ -320,10 +324,23 @@ async function sendPaymentConfirmation(metadata, session, bookingRef, discountCo
       </div>
     ` : '';
 
+    // ✅ Determine BCC recipients based on region
+    const bccRecipients = ['commercial@markebmedia.com'];
+    
+    if (region) {
+      if (region.toLowerCase() === 'north') {
+        bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
+        console.log('✓ BCC: Adding Jodie (North region)');
+      } else if (region.toLowerCase() === 'south') {
+        bccRecipients.push('Maeve.Darley@markebmedia.com');
+        console.log('✓ BCC: Adding Maeve (South region)');
+      }
+    }
+
     await resend.emails.send({
       from: 'Markeb Media <commercial@markebmedia.com>',
       to: metadata.clientEmail,
-      bcc: 'commercial@markebmedia.com',
+      bcc: bccRecipients, // ✅ Array of BCC recipients
       subject: `Payment Confirmed - ${ref}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -364,8 +381,8 @@ async function sendPaymentConfirmation(metadata, session, bookingRef, discountCo
   }
 }
 
-// ✅ NEW: Send cancellation confirmation email
-async function sendCancellationConfirmation(metadata, session, cancellationFee) {
+// ✅ Send cancellation confirmation email
+async function sendCancellationConfirmation(metadata, session, cancellationFee, region = '') {
   if (!process.env.RESEND_API_KEY) {
     console.log('Resend not configured - skipping email');
     return;
@@ -377,10 +394,23 @@ async function sendCancellationConfirmation(metadata, session, cancellationFee) 
 
     const refundAmount = parseFloat(metadata.originalTotalPrice) - cancellationFee;
 
+    // ✅ Determine BCC recipients based on region
+    const bccRecipients = ['commercial@markebmedia.com'];
+    
+    if (region) {
+      if (region.toLowerCase() === 'north') {
+        bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
+        console.log('✓ BCC: Adding Jodie (North region)');
+      } else if (region.toLowerCase() === 'south') {
+        bccRecipients.push('Maeve.Darley@markebmedia.com');
+        console.log('✓ BCC: Adding Maeve (South region)');
+      }
+    }
+
     await resend.emails.send({
       from: 'Markeb Media <commercial@markebmedia.com>',
       to: metadata.clientEmail,
-      bcc: 'commercial@markebmedia.com',
+      bcc: bccRecipients, // ✅ Array of BCC recipients
       subject: `Booking Cancelled - ${metadata.bookingRef}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

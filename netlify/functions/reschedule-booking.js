@@ -1,5 +1,5 @@
 // netlify/functions/reschedule-booking.js
-// UPDATED: Now syncs date changes to Active Bookings table
+// UPDATED: Now syncs date changes to Active Bookings table + FIXED booking status filter
 // Reschedules a booking to a new date/time after checking availability
 // Uses the booking's existing postcode from Airtable (no need to re-enter address)
 
@@ -268,11 +268,28 @@ async function checkAvailabilityForReschedule(postcode, region, selectedDate, re
   }
 }
 
-// Fetch bookings (excluding current booking being rescheduled)
+// ✅ FIXED: Fetch bookings (excluding current booking being rescheduled)
 async function fetchBookingsForRegion(region, selectedDate, excludeBookingId) {
   const filterFormula = excludeBookingId
-    ? `AND({Region} = '${region}', IS_SAME({Date}, '${selectedDate}', 'day'), {Booking Status} = 'Booked', RECORD_ID() != '${excludeBookingId}')`
-    : `AND({Region} = '${region}', IS_SAME({Date}, '${selectedDate}', 'day'), {Booking Status} = 'Booked')`;
+    ? `AND(
+        {Region} = '${region}', 
+        IS_SAME({Date}, '${selectedDate}', 'day'), 
+        OR(
+          {Booking Status} = 'Booked',
+          {Booking Status} = 'Reserved',
+          {Booking Status} = 'Confirmed'
+        ),
+        RECORD_ID() != '${excludeBookingId}'
+      )`
+    : `AND(
+        {Region} = '${region}', 
+        IS_SAME({Date}, '${selectedDate}', 'day'), 
+        OR(
+          {Booking Status} = 'Booked',
+          {Booking Status} = 'Reserved',
+          {Booking Status} = 'Confirmed'
+        )
+      )`;
 
   const records = await base('Bookings')
     .select({
@@ -382,7 +399,7 @@ async function sendRescheduleEmail(fields, newDate, newTime, originalDate, origi
   await resend.emails.send({
     from: 'Markeb Media <commercial@markebmedia.com>',
     to: fields['Client Email'],
-    bcc: bccRecipients, // ✅ Array of BCC recipients
+    bcc: bccRecipients,
     subject: `Booking Rescheduled - ${fields['Booking Reference']}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
