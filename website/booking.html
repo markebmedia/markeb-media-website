@@ -2282,7 +2282,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (checkbox) checkbox.addEventListener('change', validateStep4Form);
   });
 
-  // ✅ NEW: Check reserve privilege when email is entered
+ // ✅ Check privilege when email is entered
   if (emailField) {
     emailField.addEventListener('blur', async function() {
       const email = this.value.trim();
@@ -2303,34 +2303,43 @@ document.addEventListener('DOMContentLoaded', function() {
         if (data.success) {
           const paymentSection = document.getElementById('paymentOptionsSection');
           const skipMessage = document.getElementById('skipPaymentMessage');
+          const reserveOption = document.querySelector('.payment-option[onclick*="reserve"]');
           
           if (data.skipPayment) {
-            // ✅ TOGGLE ON: Hide payment options, show trusted message
+            // ✅ TRUSTED CUSTOMER: Hide all payment options, show trusted message
             paymentSection.style.display = 'none';
             skipMessage.style.display = 'block';
-            
-            // Auto-select "book-without-payment" mode
             bookingData.paymentOption = 'book-without-payment';
             
-          } else {
-            // ❌ TOGGLE OFF: Show normal payment options
+          } else if (data.isNewCustomer) {
+            // ❌ NEW CUSTOMER: Show Pay Now ONLY (hide Reserve)
             paymentSection.style.display = 'block';
             skipMessage.style.display = 'none';
-            
-            // Reset payment option
+            if (reserveOption) reserveOption.style.display = 'none';
             bookingData.paymentOption = null;
-            document.querySelectorAll('.payment-option').forEach(opt => {
-              opt.classList.remove('selected');
-            });
+            
+          } else {
+            // ✅ EXISTING CUSTOMER: Show BOTH Pay Now and Reserve
+            paymentSection.style.display = 'block';
+            skipMessage.style.display = 'none';
+            if (reserveOption) reserveOption.style.display = 'flex';
+            bookingData.paymentOption = null;
           }
+          
+          // Reset selections
+          document.querySelectorAll('.payment-option').forEach(opt => {
+            opt.classList.remove('selected');
+          });
           
           validateStep4Form();
         }
       } catch (error) {
         console.error('Error checking reserve privilege:', error);
-        // On error, show normal payment options
+        // On error, show normal payment options (Pay Now only for safety)
         document.getElementById('paymentOptionsSection').style.display = 'block';
         document.getElementById('skipPaymentMessage').style.display = 'none';
+        const reserveOption = document.querySelector('.payment-option[onclick*="reserve"]');
+        if (reserveOption) reserveOption.style.display = 'none';
       }
     });
   }
@@ -2846,61 +2855,6 @@ function updatePriceWithDiscount() {
   document.getElementById('totalPrice').textContent = `£${appliedDiscount.finalPrice.toFixed(2)}`;
   document.getElementById('summaryTotal').textContent = `£${appliedDiscount.finalPrice.toFixed(2)}`;
 }
-// ===== CHECK RESERVE PRIVILEGE WHEN EMAIL ENTERED =====
-document.addEventListener('DOMContentLoaded', function() {
-  const emailField = document.getElementById('clientEmail');
-  
-  if (emailField) {
-    emailField.addEventListener('blur', async function() {
-      const email = this.value.trim();
-      
-      if (!email || !email.includes('@')) {
-        return; // Invalid email, skip check
-      }
-      
-      try {
-        const response = await fetch('/.netlify/functions/check-reserve-privilege', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-          const reserveOption = document.querySelector('.payment-option[onclick*="reserve"]');
-          
-          if (data.allowed) {
-            // Show reserve option
-            if (reserveOption) {
-              reserveOption.style.display = 'flex';
-            }
-          } else {
-            // Hide reserve option for new customers or customers without privilege
-            if (reserveOption) {
-              reserveOption.style.display = 'none';
-            }
-            
-            // If reserve was already selected, reset to pay-now
-            if (bookingData.paymentOption === 'reserve') {
-              bookingData.paymentOption = null;
-              document.querySelectorAll('.payment-option').forEach(opt => {
-                opt.classList.remove('selected');
-              });
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error checking reserve privilege:', error);
-        // On error, hide reserve option to be safe
-        const reserveOption = document.querySelector('.payment-option[onclick*="reserve"]');
-        if (reserveOption) {
-          reserveOption.style.display = 'none';
-        }
-      }
-    });
-  }
-});
   </script>
 </body>
 </html>
