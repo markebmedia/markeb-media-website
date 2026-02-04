@@ -177,6 +177,12 @@ async function sendBookingConfirmation(booking) {
         <span class="detail-label">Booking Reference</span>
         <span class="detail-value">${booking.bookingRef}</span>
       </div>
+      ${booking.trackingCode ? `
+      <div class="detail-row">
+        <span class="detail-label">Tracking Code</span>
+        <span class="detail-value"><strong>${booking.trackingCode}</strong></span>
+      </div>
+      ` : ''}
       <div class="detail-row">
         <span class="detail-label">Service</span>
         <span class="detail-value">${booking.service}</span>
@@ -223,6 +229,13 @@ async function sendBookingConfirmation(booking) {
       <strong>📅 Need to Reschedule?</strong><br>
       You can reschedule or cancel free of charge up to 24 hours before your shoot.
     </div>
+
+    ${booking.trackingCode ? `
+    <div class="alert alert-info">
+      <strong>📦 Track Your Content</strong><br>
+      Use tracking code <strong>${booking.trackingCode}</strong> to follow your content through production and delivery.
+    </div>
+    ` : ''}
 
     <h3>What to Expect</h3>
     <ul>

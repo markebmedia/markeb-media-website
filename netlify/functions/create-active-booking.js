@@ -52,7 +52,7 @@ const sanitizedAddress = bookingData.propertyAddress
 console.log('Original address:', bookingData.propertyAddress);
 console.log('Sanitized address:', sanitizedAddress);
 
-const dropboxResult = await createBookingFolders(sanitizedAddress, companyName);
+const dropboxResult = await createBookingFolders(sanitizedAddress, companyName, bookingData.postcode); // ✅ ADD postcode here
     
     console.log('✓ Dropbox folders created:', {
       qcFolder: dropboxResult.qcFolder.main,
@@ -60,10 +60,10 @@ const dropboxResult = await createBookingFolders(sanitizedAddress, companyName);
       sharedLink: dropboxResult.sharedLink
     });
 
-    // Step 3: Create Active Bookings record in Airtable
-    console.log('Creating Active Bookings record...');
-    
-   const activeBookingRecord = {
+  // Step 3: Create Active Bookings record in Airtable
+console.log('Creating Active Bookings record...');
+
+const activeBookingRecord = {
   fields: {
     'Project Address': `${sanitizedAddress}, ${bookingData.postcode}`, // ✅ Use sanitized
     'Customer Name': bookingData.clientName,
@@ -83,35 +83,40 @@ const dropboxResult = await createBookingFolders(sanitizedAddress, companyName);
   }
 };
 
-    const airtableUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/tblRgcv7M9dUU3YuL`;
-    
-    const response = await fetch(airtableUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(activeBookingRecord)
-    });
+const airtableUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/tblRgcv7M9dUU3YuL`;
 
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Airtable error creating Active Booking:', errorData);
-      throw new Error(`Airtable API error: ${response.status}`);
-    }
+const response = await fetch(airtableUrl, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(activeBookingRecord)
+});
 
-    const airtableResult = await response.json();
-    console.log('✓ Active Booking created:', airtableResult.id);
+if (!response.ok) {
+  const errorData = await response.text();
+  console.error('Airtable error creating Active Booking:', errorData);
+  throw new Error(`Airtable API error: ${response.status}`);
+}
 
-    return {
-      success: true,
-      activeBookingId: airtableResult.id,
-      dropboxLink: dropboxResult.sharedLink,
-      folders: {
-        qc: dropboxResult.qcFolder,
-        raw: dropboxResult.rawFolder
-      }
-    };
+const airtableResult = await response.json();
+console.log('✓ Active Booking created:', airtableResult.id);
+
+// ✅ FETCH THE TRACKING CODE from the created record
+const trackingCode = airtableResult.fields['Tracking Code'] || '';
+console.log('✓ Tracking Code:', trackingCode);
+
+return {
+  success: true,
+  activeBookingId: airtableResult.id,
+  trackingCode: trackingCode, // ✅ ADD THIS LINE
+  dropboxLink: dropboxResult.sharedLink,
+  folders: {
+    qc: dropboxResult.qcFolder,
+    raw: dropboxResult.rawFolder
+  }
+};
 
   } catch (error) {
     console.error('Error creating Active Booking:', error);

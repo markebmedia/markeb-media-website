@@ -156,13 +156,17 @@ async function createSharedLink(path) {
  * Creates the complete folder structure for a booking
  * @param {string} propertyAddress - The property address (used as folder name)
  * @param {string} companyName - The company name from Users table
+ * @param {string} postcode - The property postcode
  * @returns {Object} { qcFolder, rawFolder, sharedLink }
  */
-async function createBookingFolders(propertyAddress, companyName) {
+async function createBookingFolders(propertyAddress, companyName, postcode = '') {
   try {
+    // ✅ Create full address with postcode
+    const fullAddress = postcode ? `${propertyAddress}, ${postcode}` : propertyAddress;
+    
     // ===== QC DELIVERY FOLDER (for client downloads) =====
     const qcBasePath = '/Markeb Media - QC Delivery Link';
-    const qcMainFolder = `${qcBasePath}/${propertyAddress}`;
+    const qcMainFolder = `${qcBasePath}/${fullAddress}`; // ✅ Use full address
     const qcPhotoFolder = `${qcMainFolder}/Photo`;
     const qcVideoFolder = `${qcMainFolder}/Video`;
 
@@ -178,10 +182,10 @@ async function createBookingFolders(propertyAddress, companyName) {
     // ===== RAW CLIENT FOLDER (for internal team) =====
     const rawBasePath = '/Markeb Media Client Folder';
     const rawCompanyFolder = `${rawBasePath}/${companyName}`;
-    const rawPropertyFolder = `${rawCompanyFolder}/${propertyAddress}`;
+    const rawPropertyFolder = `${rawCompanyFolder}/${fullAddress}`; // ✅ Use full address
     const rawDroneFolder = `${rawPropertyFolder}/Drone`;
-    const rawOutsourcePhotoFolder = `${rawPropertyFolder}/Outsource Photo - ${propertyAddress}`;
-    const rawOutsourceVideoFolder = `${rawPropertyFolder}/Outsource Video - ${propertyAddress}`;
+    const rawOutsourcePhotoFolder = `${rawPropertyFolder}/Outsource Photo - ${fullAddress}`; // ✅ Use full address
+    const rawOutsourceVideoFolder = `${rawPropertyFolder}/Outsource Video - ${fullAddress}`; // ✅ Use full address
     const rawClipsFolder = `${rawPropertyFolder}/Raw Clips`;
 
     console.log('Creating Raw Client folders...');
