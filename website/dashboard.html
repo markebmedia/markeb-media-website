@@ -1792,13 +1792,13 @@
             </div>
             <div class="card-content">
               <div class="action-grid">
-                <div class="action-item" onclick="showSection('booking')">
-                  <div class="action-icon">+</div>
-                  <div>
-                    <div style="font-weight: 500;">Book New Shoot</div>
-                    <div style="font-size: 12px; color: #64748b;">Schedule photos and videos</div>
-                  </div>
-                </div>
+                <div class="action-item" onclick="window.location.href='./booking.html'">
+  <div class="action-icon">+</div>
+  <div>
+    <div style="font-weight: 500;">Book New Shoot</div>
+    <div style="font-size: 12px; color: #64748b;">Schedule photos and videos</div>
+  </div>
+</div>
                 <div class="action-item" onclick="showSection('tracking')">
                   <div class="action-icon">▲</div>
                   <div>
@@ -1854,23 +1854,45 @@
       </div>
 
       <!-- BOOKING -->
-      <div id="booking" class="section">
-        <div class="booking-container">
-          <div class="booking-header">
-            <h2 class="booking-title">Book Your Shoot</h2>
-            <p class="booking-description">Schedule your professional shoots. Choose your preferred date and time, and we'll handle the rest.</p>
-          </div>
-          <div class="booking-iframe-container">
-            <iframe 
-              src="https://app.acuityscheduling.com/schedule.php?owner=32946394&ref=embedded_csp" 
-              title="Schedule Appointment" 
-              class="booking-iframe"
-              frameBorder="0" 
-              allow="payment">
-            </iframe>
-          </div>
+<div id="booking" class="section">
+  <div class="card" style="padding:24px">
+    <div class="card-header">
+      <h2 class="card-title">Book Your Shoot</h2>
+      <p class="card-subtitle">Schedule your professional property marketing shoots</p>
+    </div>
+    <div class="card-content" style="text-align: center; padding: 60px 24px;">
+      <div style="font-size: 64px; margin-bottom: 24px;">📸</div>
+      <h3 style="font-size: 24px; font-weight: 700; color: #1e293b; margin-bottom: 16px;">
+        Ready to book your next shoot?
+      </h3>
+      <p style="font-size: 16px; color: #64748b; margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+        Our streamlined booking system makes it easy to schedule photography, videography, and drone services for your properties.
+      </p>
+      <button class="btn btn-primary" onclick="window.location.href='./booking.html'" style="font-size: 18px; padding: 16px 40px;">
+        <span style="font-size: 20px; margin-right: 8px;">→</span> Start New Booking
+      </button>
+      
+      <!-- Quick Info -->
+      <div style="margin-top: 48px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; max-width: 700px; margin-left: auto; margin-right: auto;">
+        <div style="padding: 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+          <div style="font-size: 24px; margin-bottom: 8px;">⚡</div>
+          <div style="font-weight: 600; color: #1e293b; margin-bottom: 4px;">Fast Booking</div>
+          <div style="font-size: 13px; color: #64748b;">Complete in under 3 minutes</div>
+        </div>
+        <div style="padding: 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+          <div style="font-size: 24px; margin-bottom: 8px;">📅</div>
+          <div style="font-weight: 600; color: #1e293b; margin-bottom: 4px;">Flexible Scheduling</div>
+          <div style="font-size: 13px; color: #64748b;">Book up to 60 days ahead</div>
+        </div>
+        <div style="padding: 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+          <div style="font-size: 24px; margin-bottom: 8px;">✓</div>
+          <div style="font-weight: 600; color: #1e293b; margin-bottom: 4px;">Instant Confirmation</div>
+          <div style="font-size: 13px; color: #64748b;">Get your booking confirmed instantly</div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
 
       <!-- GALLERY -->
       <div id="gallery" class="section">
@@ -2453,15 +2475,16 @@ async function loadAcuityMetrics(email){
     
   if(!user?.email) return;
 
-      const list=document.getElementById('activityList');
-      list.innerHTML=`<div class="activity-item"><div class="activity-icon">+</div><div class="activity-content"><div class="activity-title">Signed in</div><div class="activity-time">${new Date().toLocaleString('en-GB')}</div></div></div>`;
+  const list=document.getElementById('activityList');
+  list.innerHTML=`<div class="activity-item"><div class="activity-icon">+</div><div class="activity-content"><div class="activity-title">Signed in</div><div class="activity-time">${new Date().toLocaleString('en-GB')}</div></div></div>`;
 
-      await Promise.all([
-        loadAcuityMetrics(user.email),
-        loadAirtableProjectMetrics(user.email),
-        loadMemberSince(user.email),
-      ]);
-    }
+  await Promise.all([
+    loadAcuityMetrics(user.email),
+    loadAirtableProjectMetrics(user.email),
+    loadMemberSince(user.email),
+    loadRecentBookings() // ✅ ADD THIS LINE
+  ]);
+}
 
     /* === Content Tracking (serverless) === */
     async function trackBooking() {
@@ -3168,7 +3191,7 @@ function contactSocialMedia() {
   window.open('https://markebmedia.com/contact', '_blank');
 }
 
-    /* boot */
+   /* boot */
 document.addEventListener('DOMContentLoaded', async ()=>{
   // Check if this is an admin impersonation session
   const isAdminSession = localStorage.getItem('admin_impersonation') === 'true';
@@ -3223,18 +3246,52 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   });
 });
 
-    function logoutAll(){
-      if(window.AirtableAPI?.logoutUser){ AirtableAPI.logoutUser(); }
-      else{ localStorage.clear(); window.location.href='../login.html'; }
-    }
+function logoutAll(){
+  if(window.AirtableAPI?.logoutUser){ AirtableAPI.logoutUser(); }
+  else{ localStorage.clear(); window.location.href='../login.html'; }
+}
 
-    /* Dynamic copyright year */
-    (function(){
-      const startYear = 2025;
-      const currentYear = new Date().getFullYear();
-      const yearText = (currentYear > startYear) ? `${startYear}–${currentYear}` : `${startYear}`;
-      document.getElementById('footerCopyright').textContent = `© ${yearText} Markeb Media. All rights reserved.`;
-    })();
+/* Dynamic copyright year */
+(function(){
+  const startYear = 2025;
+  const currentYear = new Date().getFullYear();
+  const yearText = (currentYear > startYear) ? `${startYear}–${currentYear}` : `${startYear}`;
+  document.getElementById('footerCopyright').textContent = `© ${yearText} Markeb Media. All rights reserved.`;
+})();
+
+async function loadRecentBookings() {
+  try {
+    const user = window.AirtableAPI?.getCurrentUser?.() || null;
+    if (!user?.email) return;
+    
+    // This would call your booking endpoint
+    const response = await fetch('/.netlify/functions/get-user-bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail: user.email })
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      // Update the activity list with recent bookings
+      const list = document.getElementById('activityList');
+      data.bookings?.forEach(booking => {
+        const row = document.createElement('div');
+        row.className = 'activity-item';
+        row.innerHTML = `
+          <div class="activity-icon">📅</div>
+          <div class="activity-content">
+            <div class="activity-title">${booking.service} - ${booking.propertyAddress}</div>
+            <div class="activity-time">Booked for ${booking.date} at ${booking.time}</div>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+  } catch (error) {
+    console.warn('Error loading recent bookings:', error);
+  }
+}
   </script>
   
 </body>
