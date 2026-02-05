@@ -1773,31 +1773,55 @@
 
   <div class="content-area">
 
-      <!-- DASHBOARD -->
-     <div id="dashboard" class="section active">
+     <!-- DASHBOARD -->
+<div id="dashboard" class="section active">
   <div class="metrics-grid">
     <div class="metric-card">
-      <div class="metric-header"><div class="metric-icon">■</div></div>
+      <div class="metric-header">
+        <div class="metric-icon">
+          <i data-lucide="calendar-check" style="width: 24px; height: 24px;"></i>
+        </div>
+      </div>
       <div class="metric-value" id="totalBookings">0</div>
       <div class="metric-label">Total Bookings</div>
     </div>
+    
     <div class="metric-card">
-      <div class="metric-header"><div class="metric-icon">£</div></div>
+      <div class="metric-header">
+        <div class="metric-icon">
+          <i data-lucide="pound-sterling" style="width: 24px; height: 24px;"></i>
+        </div>
+      </div>
       <div class="metric-value" id="totalSpending">£0</div>
       <div class="metric-label">Total Investment</div>
     </div>
+    
     <div class="metric-card" style="cursor: pointer;" onclick="toggleRewardDisplay()" onmouseenter="showRewardValue()" onmouseleave="showRewardPoints()">
-  <div class="metric-header"><div class="metric-icon">★</div></div>
-  <div class="metric-value" id="rewardPoints">0 pts</div>
-  <div class="metric-label">Reward Points</div>
-</div>
+      <div class="metric-header">
+        <div class="metric-icon">
+          <i data-lucide="star" style="width: 24px; height: 24px;"></i>
+        </div>
+      </div>
+      <div class="metric-value" id="rewardPoints">0 pts</div>
+      <div class="metric-label">Reward Points</div>
+    </div>
+    
     <div class="metric-card">
-      <div class="metric-header"><div class="metric-icon">✓</div></div>
+      <div class="metric-header">
+        <div class="metric-icon">
+          <i data-lucide="check-circle" style="width: 24px; height: 24px;"></i>
+        </div>
+      </div>
       <div class="metric-value" id="completedProjects">0</div>
       <div class="metric-label">Completed Projects</div>
     </div>
+    
     <div class="metric-card">
-      <div class="metric-header"><div class="metric-icon">#</div></div>
+      <div class="metric-header">
+        <div class="metric-icon">
+          <i data-lucide="calendar-days" style="width: 24px; height: 24px;"></i>
+        </div>
+      </div>
       <div class="metric-value" id="memberSince">—</div>
       <div class="metric-label">Member Since</div>
     </div>
@@ -1829,30 +1853,38 @@
   </div>
 </div>
                 <div class="action-item" onclick="showSection('tracking')">
-                  <div class="action-icon">▲</div>
-                  <div>
-                    <div style="font-weight: 500;">Track Content</div>
-                    <div style="font-size: 12px; color: #64748b;">Monitor content progress</div>
-                  </div>
-                </div>
-                <div class="action-item" onclick="openCopyryta()">
-                  <div class="action-icon">◇</div>
-                  <div>
-                    <div style="font-weight: 500;">CopyRyta AI</div>
-                    <div style="font-size: 12px; color: #64748b;">AI copywriting tool</div>
-                  </div>
-                </div>
-                <div class="action-item" onclick="showSection('amend')">
-                  <div class="action-icon">△</div>
-                  <div>
-                    <div style="font-weight: 500;">Request Amendment</div>
-                    <div style="font-size: 12px; color: #64748b;">Make adjustments to your content</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+  <div class="action-icon">
+    <i data-lucide="activity" style="width: 20px; height: 20px;"></i>
+  </div>
+  <div>
+    <div style="font-weight: 500;">Track Content</div>
+    <div style="font-size: 12px; color: #64748b;">Monitor content progress</div>
+  </div>
+</div>
+
+<div class="action-item" onclick="openCopyryta()">
+  <div class="action-icon">
+    <i data-lucide="sparkles" style="width: 20px; height: 20px;"></i>
+  </div>
+  <div>
+    <div style="font-weight: 500;">CopyRyta AI</div>
+    <div style="font-size: 12px; color: #64748b;">AI copywriting tool</div>
+  </div>
+</div>
+
+<div class="action-item" onclick="showSection('amend')">
+  <div class="action-icon">
+    <i data-lucide="pencil" style="width: 20px; height: 20px;"></i>
+  </div>
+  <div>
+    <div style="font-weight: 500;">Request Amendment</div>
+    <div style="font-size: 12px; color: #64748b;">Make adjustments to your content</div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+</div>
 
         <!-- BRANDING SESSIONS PROMO BANNER -->
         <div class="branding-promo">
