@@ -1726,50 +1726,53 @@
 </div>
 
   <div class="main-content">
-   <div class="header">
-  <div class="header-left">
-    <h1 class="page-title" id="pageTitle">Welcome back</h1>
-    <p class="page-subtitle" id="pageSubtitle">Here's what's happening with your projects</p>
-  </div>
-  <div class="header-right">
-    <div class="user-info" id="userInfoDropdown">
-      <div class="user-avatar" id="userAvatar">M</div>
-      <div class="user-details">
-        <h4 id="userName">Loading...</h4>
-        <p id="userEmail">Loading...</p>
+  <div class="header">
+    <div class="header-left">
+      <h1 class="page-title" id="pageTitle">Welcome back</h1>
+      <p class="page-subtitle" id="pageSubtitle">Here's what's happening with your projects</p>
+    </div>
+    <div class="header-right">
+      <div class="user-info" id="userInfoDropdown">
+        <div class="user-avatar" id="userAvatar">M</div>
+        <div class="user-details">
+          <h4 id="userName">Loading...</h4>
+          <p id="userEmail">Loading...</p>
+        </div>
+      </div>
+      
+      <!-- Dropdown Menu -->
+      <div class="dropdown-overlay" id="dropdownOverlay"></div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="dropdown-header">
+          <div class="dropdown-header-name" id="dropdownName">Loading...</div>
+          <div class="dropdown-header-email" id="dropdownEmail">Loading...</div>
+        </div>
+        <div class="dropdown-menu">
+          <div class="dropdown-item" onclick="showSection('settings'); toggleDropdown();">
+            <i data-lucide="settings" style="width: 20px; height: 20px;"></i>
+            <span>Settings</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item" onclick="showSection('terms'); toggleDropdown();">
+            <i data-lucide="file-text" style="width: 20px; height: 20px;"></i>
+            <span>Terms & Conditions</span>
+          </div>
+          <div class="dropdown-item" onclick="showSection('privacy'); toggleDropdown();">
+            <i data-lucide="lock" style="width: 20px; height: 20px;"></i>
+            <span>Privacy Policy</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <div class="dropdown-item danger" onclick="logoutAll()">
+            <i data-lucide="log-out" style="width: 20px; height: 20px;"></i>
+            <span>Logout</span>
+          </div>
+        </div>
       </div>
     </div>
-    
-    <!-- Dropdown Menu -->
-<div class="dropdown-overlay" id="dropdownOverlay"></div>
-<div class="user-dropdown" id="userDropdown">
-  <div class="dropdown-header">
-    <div class="dropdown-header-name" id="dropdownName">Loading...</div>
-    <div class="dropdown-header-email" id="dropdownEmail">Loading...</div>
   </div>
-  <div class="dropdown-menu">
-    <div class="dropdown-item" onclick="showSection('settings'); toggleDropdown();">
-      <i data-lucide="settings" style="width: 20px; height: 20px;"></i>
-      <span>Settings</span>
-    </div>
-    <div class="dropdown-divider"></div>
-    <div class="dropdown-item" onclick="showSection('terms'); toggleDropdown();">
-      <i data-lucide="file-text" style="width: 20px; height: 20px;"></i>
-      <span>Terms & Conditions</span>
-    </div>
-    <div class="dropdown-item" onclick="showSection('privacy'); toggleDropdown();">
-      <i data-lucide="lock" style="width: 20px; height: 20px;"></i>
-      <span>Privacy Policy</span>
-    </div>
-    <div class="dropdown-divider"></div>
-    <div class="dropdown-item danger" onclick="logoutAll()">
-      <i data-lucide="log-out" style="width: 20px; height: 20px;"></i>
-      <span>Logout</span>
-    </div>
-  </div>
-</div>
 
-    <div class="content-area">
+  <div class="content-area">
+
       <!-- DASHBOARD -->
      <div id="dashboard" class="section active">
   <div class="metrics-grid">
