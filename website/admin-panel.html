@@ -10,6 +10,9 @@
 <!-- Stripe.js -->
 <script src="https://js.stripe.com/v3/"></script>
 
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
   /* ===== ADMIN PANEL STYLES - UPDATED WITH MOBILE FIXES ===== */
 
@@ -83,9 +86,9 @@ body {
 }
 
 .nav-icon {
-  font-size: 18px;
   width: 20px;
-  text-align: center;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 /* Main Content */
@@ -1893,73 +1896,73 @@ body {
     <img src="/public/images/Markeb Media Logo (2).png" alt="Markeb Media" style="height: 80px; width: auto;">
   </div>
 
-    <div class="nav-section">
-      <div class="nav-section-title">Overview</div>
-      <div class="nav-item active" onclick="showSection('dashboard')">
-        <span class="nav-icon">📊</span>
-        Dashboard
-      </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Overview</div>
+    <div class="nav-item active" onclick="showSection('dashboard')">
+      <i data-lucide="layout-dashboard" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      Dashboard
     </div>
-
-    <div class="nav-section">
-  <div class="nav-section-title">Bookings</div>
-  <div class="nav-item" onclick="showSection('create-booking')">
-    <span class="nav-icon">➕</span>
-    Create Booking
   </div>
-      <div class="nav-item" onclick="showSection('calendar')">
-        <span class="nav-icon">📅</span>
-        Calendar
-      </div>
-      <div class="nav-item" onclick="showSection('bookings')">
-        <span class="nav-icon">📋</span>
-        All Bookings
-      </div>
-      <div class="nav-item" onclick="showSection('pending')">
-        <span class="nav-icon">💳</span>
-        Pending (Need Payment)
-      </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Bookings</div>
+    <div class="nav-item" onclick="showSection('create-booking')">
+      <i data-lucide="plus-circle" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      Create Booking
     </div>
-    <div class="nav-section">
-  <div class="nav-section-title">Marketing</div>
-  <div class="nav-item" onclick="showSection('discount-codes')">
-    <span class="nav-icon">🎁</span>
-    Discount Codes
+    <div class="nav-item" onclick="showSection('calendar')">
+      <i data-lucide="calendar" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      Calendar
+    </div>
+    <div class="nav-item" onclick="showSection('bookings')">
+      <i data-lucide="clipboard-list" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      All Bookings
+    </div>
+    <div class="nav-item" onclick="showSection('pending')">
+      <i data-lucide="credit-card" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      Pending (Need Payment)
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Marketing</div>
+    <div class="nav-item" onclick="showSection('discount-codes')">
+      <i data-lucide="gift" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      Discount Codes
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Customers</div>
+    <div class="nav-item" onclick="showSection('customers')">
+      <i data-lucide="users" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      All Customers
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Schedule</div>
+    <div class="nav-item" onclick="showSection('blocked-times')">
+      <i data-lucide="ban" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      Block Times
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-title">Tools</div>
+    <div class="nav-item" onclick="window.open('uk-client-map.html', '_blank')">
+      <i data-lucide="map" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      UK Map
+    </div>
+  </div>
+
+  <div class="nav-section" style="margin-top: auto; padding-top: 24px; border-top: 2px solid #e2e8f0;">
+    <div class="nav-item" onclick="adminLogout()" style="color: #ef4444;">
+      <i data-lucide="log-out" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      Logout
+    </div>
   </div>
 </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">Customers</div>
-      <div class="nav-item" onclick="showSection('customers')">
-        <span class="nav-icon">👥</span>
-        All Customers
-      </div>
-    </div>
-
-    <!-- In the sidebar navigation -->
-<div class="nav-section">
-  <div class="nav-section-title">Schedule</div>
-  <div class="nav-item" onclick="showSection('blocked-times')">
-    <span class="nav-icon">🚫</span>
-    Block Times
-  </div>
-</div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">Tools</div>
-      <div class="nav-item" onclick="window.open('uk-client-map.html', '_blank')">
-        <span class="nav-icon">🗺️</span>
-        UK Map
-      </div>
-    </div>
-
-<div class="nav-section" style="margin-top: auto; padding-top: 24px; border-top: 2px solid #e2e8f0;">
-  <div class="nav-item" onclick="adminLogout()" style="color: #ef4444;">
-    <span class="nav-icon">🚪</span>
-    Logout
-  </div>
-</div>
-  </div>
 
   <!-- Main Content -->
   <div class="admin-main">
@@ -3561,7 +3564,7 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
     // ===== END ADMIN BOOKING CREATION =====
 
     // Navigation
-   function showSection(sectionId) {
+  function showSection(sectionId) {
   document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   
@@ -3572,7 +3575,7 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
   );
   if (navItem) navItem.classList.add('active');
 
-  // ✅ Load data when switching to specific sections
+  // Load data when switching to specific sections
   if (sectionId === 'blocked-times') {
     loadBlockedTimes();
   }
@@ -3584,6 +3587,9 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
   if (window.innerWidth <= 1024) {
     document.getElementById('adminSidebar').classList.remove('open');
   }
+  
+  // Reinitialize Lucide icons after DOM changes
+  lucide.createIcons();
 }
 
     function toggleSidebar() {
@@ -6259,6 +6265,16 @@ async function deleteBlockedTime(recordId, date) {
     console.error('Error deleting blocked time:', error);
     alert('❌ Failed to remove time block: ' + error.message);
   }
+}
+
+// Initialize all Lucide icons
+document.addEventListener('DOMContentLoaded', function() {
+  lucide.createIcons();
+});
+
+// Re-initialize icons after dynamic content changes
+function reinitializeLucideIcons() {
+  lucide.createIcons();
 }
 
   </script>
