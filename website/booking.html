@@ -557,6 +557,61 @@
   </style>
 </head>
 <body>
+
+  <!-- ✅ ADD BACK BUTTON HERE -->
+  <button onclick="window.location.href='./dashboard.html'" 
+          class="back-to-dashboard-btn"
+          title="Return to Dashboard">
+    <span style="font-size: 18px;">←</span>
+    <span class="back-btn-text">Dashboard</span>
+  </button>
+
+  <style>
+    .back-to-dashboard-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 9999;
+      padding: 12px 20px;
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .back-to-dashboard-btn:hover {
+      background: #f8fafc;
+      border-color: #3b82f6;
+      color: #3b82f6;
+      transform: translateX(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      .back-to-dashboard-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+      }
+      
+      .back-btn-text {
+        display: none;
+      }
+      
+      .back-to-dashboard-btn span:first-child {
+        font-size: 20px;
+      }
+    }
+  </style>
+
   <div class="booking-container">
     <!-- Header -->
     <div class="booking-header">
