@@ -34,6 +34,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 
+<script src="https://unpkg.com/lucide@latest"></script>
+
   <style>
   /* Base */
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -65,10 +67,21 @@
 }
 
 
-  .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; color: #64748b; text-decoration: none; font-weight: 500; transition: all .2s ease; cursor: pointer; }
+  .nav-item { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  padding: 12px 16px; 
+  margin-bottom: 8px; 
+  border-radius: 8px; 
+  color: #64748b; 
+  text-decoration: none; 
+  font-weight: 500; 
+  transition: all .2s ease; 
+  cursor: pointer; 
+}
   .nav-item:hover, .nav-item.active { background: #f1f5f9; color: #0f172a; }
-  .nav-item.active { background: #3b82f6; color: #fff; }
-  .nav-icon { width: 20px; height: 20px; font-size: 16px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+  .nav-item.active { background: #3b82f6; color: #fff; } 
 
   .mobile-toggle { display: none; position: fixed; top: 20px; left: 20px; z-index: 101; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.1); }
   .mobile-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); z-index: 99; }
@@ -1681,21 +1694,48 @@
   <div class="mobile-overlay" onclick="closeSidebar()"></div>
 
   <div class="sidebar">
-    <div class="logo">
-      <img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" />
-    </div>
-    <nav>
-      <div class="nav-item active" onclick="showSection('dashboard')"><div class="nav-icon">●</div>Dashboard</div>
-      <div class="nav-item" onclick="showSection('booking')"><div class="nav-icon">+</div>Book Shoot</div>
-      <div class="nav-item" onclick="showSection('gallery')"><div class="nav-icon">□</div>Gallery</div>
-      <div class="nav-item" onclick="openCopyryta()"><div class="nav-icon">◇</div>CopyRyta AI</div>
-      <div class="nav-item" onclick="showSection('tracking')"><div class="nav-icon">▲</div>Content Tracking</div>
-      <div class="nav-item" onclick="showSection('calendar')"><div class="nav-icon">□</div>Content Calendar</div>
-      <div class="nav-item" onclick="showSection('amend')"><div class="nav-icon">△</div>Request Amendment</div>
-      <div class="nav-item" onclick="contactSupport()"><div class="nav-icon">@</div>Support</div>
-      <div class="nav-item" onclick="logoutAll()" style="margin-top: 40px; color: #ef4444;"><div class="nav-icon">←</div>Logout</div>
-    </nav>
+  <div class="logo">
+    <img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" />
   </div>
+  <nav>
+    <div class="nav-item active" onclick="showSection('dashboard')">
+      <i data-lucide="layout-dashboard" style="width: 20px; height: 20px;"></i>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="showSection('booking')">
+      <i data-lucide="calendar-plus" style="width: 20px; height: 20px;"></i>
+      Book Shoot
+    </div>
+    <div class="nav-item" onclick="showSection('gallery')">
+      <i data-lucide="images" style="width: 20px; height: 20px;"></i>
+      Gallery
+    </div>
+    <div class="nav-item" onclick="openCopyryta()">
+      <i data-lucide="sparkles" style="width: 20px; height: 20px;"></i>
+      CopyRyta AI
+    </div>
+    <div class="nav-item" onclick="showSection('tracking')">
+      <i data-lucide="activity" style="width: 20px; height: 20px;"></i>
+      Content Tracking
+    </div>
+    <div class="nav-item" onclick="showSection('calendar')">
+      <i data-lucide="calendar" style="width: 20px; height: 20px;"></i>
+      Content Calendar
+    </div>
+    <div class="nav-item" onclick="showSection('amend')">
+      <i data-lucide="pencil" style="width: 20px; height: 20px;"></i>
+      Request Amendment
+    </div>
+    <div class="nav-item" onclick="contactSupport()">
+      <i data-lucide="help-circle" style="width: 20px; height: 20px;"></i>
+      Support
+    </div>
+    <div class="nav-item" onclick="logoutAll()" style="margin-top: 40px; color: #ef4444;">
+      <i data-lucide="log-out" style="width: 20px; height: 20px;"></i>
+      Logout
+    </div>
+  </nav>
+</div>
 
   <div class="main-content">
    <div class="header">
@@ -1713,32 +1753,30 @@
     </div>
     
     <!-- Dropdown Menu -->
-    <div class="dropdown-overlay" id="dropdownOverlay"></div>
-    <div class="user-dropdown" id="userDropdown">
-      <div class="dropdown-header">
-        <div class="dropdown-header-name" id="dropdownName">Loading...</div>
-        <div class="dropdown-header-email" id="dropdownEmail">Loading...</div>
-      </div>
-      <div class="dropdown-menu">
-        <div class="dropdown-item" onclick="showSection('settings'); toggleDropdown();">
-          <div class="dropdown-item-icon">○</div>
-          <span>Settings</span>
-        </div>
-        <div class="dropdown-divider"></div>
-        <div class="dropdown-item" onclick="showSection('terms'); toggleDropdown();">
-          <div class="dropdown-item-icon">📄</div>
-          <span>Terms & Conditions</span>
-        </div>
-        <div class="dropdown-item" onclick="showSection('privacy'); toggleDropdown();">
-          <div class="dropdown-item-icon">🔒</div>
-          <span>Privacy Policy</span>
-        </div>
-        <div class="dropdown-divider"></div>
-        <div class="dropdown-item danger" onclick="logoutAll()">
-          <div class="dropdown-item-icon">←</div>
-          <span>Logout</span>
-        </div>
-      </div>
+<div class="dropdown-overlay" id="dropdownOverlay"></div>
+<div class="user-dropdown" id="userDropdown">
+  <div class="dropdown-header">
+    <div class="dropdown-header-name" id="dropdownName">Loading...</div>
+    <div class="dropdown-header-email" id="dropdownEmail">Loading...</div>
+  </div>
+  <div class="dropdown-menu">
+    <div class="dropdown-item" onclick="showSection('settings'); toggleDropdown();">
+      <i data-lucide="settings" style="width: 20px; height: 20px;"></i>
+      <span>Settings</span>
+    </div>
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-item" onclick="showSection('terms'); toggleDropdown();">
+      <i data-lucide="file-text" style="width: 20px; height: 20px;"></i>
+      <span>Terms & Conditions</span>
+    </div>
+    <div class="dropdown-item" onclick="showSection('privacy'); toggleDropdown();">
+      <i data-lucide="lock" style="width: 20px; height: 20px;"></i>
+      <span>Privacy Policy</span>
+    </div>
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-item danger" onclick="logoutAll()">
+      <i data-lucide="log-out" style="width: 20px; height: 20px;"></i>
+      <span>Logout</span>
     </div>
   </div>
 </div>
@@ -3291,6 +3329,11 @@ async function loadRecentBookings() {
     console.warn('Error loading recent bookings:', error);
   }
 }
+ </script>
+  
+  <script>
+    // Initialize all Lucide icons
+    lucide.createIcons();
   </script>
   
 </body>
