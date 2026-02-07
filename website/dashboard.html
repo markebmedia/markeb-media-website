@@ -2428,17 +2428,40 @@ function showRewardPoints() {
 
 async function loadAcuityMetrics(email){
   try{
-    const data=await fetchJSON(NETLIFY_ENDPOINTS.acuity,{ userEmail: email });
-    document.getElementById('totalBookings').textContent=data.totalBookings ?? 0;
-    document.getElementById('totalSpending').textContent=fmtGBP(data.totalInvestment ?? 0);
+    // ✅ UPDATED: Get booking data from YOUR Airtable booking system
+    let airtableTotalInvestment = 0;
+    let totalBookingsCount = 0;
     
-    // Get manual points AND baseline from endpoint
+    const bookingsResponse = await fetch('/.netlify/functions/admin-bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ search: email })
+    });
+    
+    if (bookingsResponse.ok) {
+      const bookingsData = await bookingsResponse.json();
+      
+      if (bookingsData.success && bookingsData.bookings) {
+        const customerBookings = bookingsData.bookings.filter(b => 
+          b.fields['Client Email']?.toLowerCase() === email.toLowerCase()
+        );
+        
+        totalBookingsCount = customerBookings.length;
+        
+        airtableTotalInvestment = customerBookings
+          .filter(b => b.fields['Payment Status'] === 'Paid' && b.fields['Booking Status'] !== 'Cancelled')
+          .reduce((sum, booking) => sum + (booking.fields['Final Price'] || 0), 0);
+      }
+    }
+    
+    const bookingPoints = Math.floor(airtableTotalInvestment);
+    
+    // Get manual points and baseline
     const pointsData = await fetchJSON('/.netlify/functions/get-manual-points', { userEmail: email });
     const manualPoints = pointsData?.manualPoints || 0;
     const lastRedemptionBaseline = pointsData?.lastRedemptionBaseline || 0;
     
-    // Calculate points from bookings (subtract baseline) and add manual points
-    const bookingPoints = Math.floor(data.totalInvestment ?? 0);
+    // Calculate total points
     const netBookingPoints = Math.max(0, bookingPoints - lastRedemptionBaseline);
     const totalPoints = netBookingPoints + manualPoints;
     const pointsValue = totalPoints / 100;
@@ -2446,20 +2469,40 @@ async function loadAcuityMetrics(email){
     // Store for toggle functionality
     rewardPointsData = { points: totalPoints, value: pointsValue };
     
-    // Display points by default
+    // ✅ UPDATE DASHBOARD METRICS
+    document.getElementById('totalBookings').textContent = totalBookingsCount;
+    document.getElementById('totalSpending').textContent = fmtGBP(airtableTotalInvestment);
     document.getElementById('rewardPoints').textContent = totalPoints.toLocaleString('en-GB') + ' pts';
     
-    const list=document.getElementById('activityList');
-    const appts=Array.isArray(data.appointments)?data.appointments.slice(0,5):[];
-    appts.forEach(a=>{
-      const when=a.datetime||a.time||a.date||'';
-      const title=a.type||a.calendar||'Appointment';
-      const row=document.createElement('div');
-      row.className='activity-item';
-      row.innerHTML=`<div class="activity-icon">■</div><div class="activity-content"><div class="activity-title">${title}</div><div class="activity-time">${when}</div></div>`;
-      list.appendChild(row);
-    });
-  }catch(e){console.warn('Acuity metrics error:',e.message);}
+    // ✅ ADD RECENT BOOKINGS TO ACTIVITY LIST
+    const list = document.getElementById('activityList');
+    if (bookingsData?.bookings) {
+      const recentBookings = bookingsData.bookings
+        .filter(b => b.fields['Client Email']?.toLowerCase() === email.toLowerCase())
+        .slice(0, 5);
+      
+      recentBookings.forEach(booking => {
+        const fields = booking.fields;
+        const date = fields['Date'] ? new Date(fields['Date']).toLocaleDateString('en-GB') : 'TBD';
+        const address = fields['Property Address'] || 'Property booking';
+        const status = fields['Booking Status'] || 'Scheduled';
+        
+        const row = document.createElement('div');
+        row.className = 'activity-item';
+        row.innerHTML = `
+          <div class="activity-icon">📅</div>
+          <div class="activity-content">
+            <div class="activity-title">${address}</div>
+            <div class="activity-time">${date} • ${status}</div>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+    
+  } catch(e) {
+    console.warn('Booking metrics error:', e.message);
+  }
 }
 
     async function loadAirtableProjectMetrics(email){
