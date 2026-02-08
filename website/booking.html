@@ -1508,7 +1508,7 @@
     async function fetchAddressesFromPostcode(postcode) {
       const cleanPostcode = postcode.replace(/\s/g, '');
       
-     const response = await fetch('/.netlify/functions/get-address', {
+     const response = await fetch('/.netlify/functions/ideal-postcodes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
