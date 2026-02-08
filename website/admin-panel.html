@@ -1941,6 +1941,14 @@ body {
   </div>
 
   <div class="nav-section">
+  <div class="nav-section-title">Communications</div>
+  <div class="nav-item" onclick="showSection('market-updates')">
+    <i data-lucide="mail" class="nav-icon" style="width: 20px; height: 20px;"></i>
+    Market Updates
+  </div>
+</div>
+
+  <div class="nav-section">
     <div class="nav-section-title">Schedule</div>
     <div class="nav-item" onclick="showSection('blocked-times')">
       <i data-lucide="ban" class="nav-icon" style="width: 20px; height: 20px;"></i>
@@ -2323,6 +2331,269 @@ body {
   </div>
 </div>
 
+<!-- Market Updates Section -->
+<div class="admin-section" id="market-updates">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+    <div>
+      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Market Updates</h2>
+      <p style="color: #64748b; font-size: 14px;">Send property market insights to opted-in estate agents by region</p>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid" style="margin-bottom: 24px;">
+    <div class="stat-card">
+      <div class="stat-value" id="totalOptedIn">-</div>
+      <div class="stat-label">Total Opted In</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="northOptedIn">-</div>
+      <div class="stat-label">North Region</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="southOptedIn">-</div>
+      <div class="stat-label">South Region</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="lastSentDate">-</div>
+      <div class="stat-label">Last Sent</div>
+    </div>
+  </div>
+
+  <!-- Send Controls -->
+  <div class="calendar-container">
+    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">📧 Send Market Update</h3>
+    
+    <div class="info-box" style="margin-bottom: 24px;">
+      💡 <strong>How it works:</strong> Select a region and compose your market update. Only customers who have opted in for market updates in that region will receive the email.
+    </div>
+
+    <form id="marketUpdateForm">
+      <div class="form-group">
+  <label class="form-label" for="marketUpdateRegion">Select Region *</label>
+  <select id="marketUpdateRegion" class="form-input" required onchange="updateMarketRecipientCount()">
+    <option value="">-- Select Region --</option>
+    
+    <optgroup label="Your Service Regions">
+      <option value="Yorkshire">Yorkshire</option>
+      <option value="Cheshire">Cheshire</option>
+      <option value="London">London</option>
+      <option value="Essex">Essex</option>
+      <option value="Manchester">Manchester</option>
+      <option value="West Midlands">West Midlands</option>
+      <option value="Leicester">Leicester</option>
+    </optgroup>
+    
+    <optgroup label="England - North">
+      <option value="Cumbria">Cumbria</option>
+      <option value="Durham">Durham</option>
+      <option value="Lancashire">Lancashire</option>
+      <option value="Merseyside">Merseyside</option>
+      <option value="Northumberland">Northumberland</option>
+      <option value="North Yorkshire">North Yorkshire</option>
+      <option value="South Yorkshire">South Yorkshire</option>
+      <option value="Tyne and Wear">Tyne and Wear</option>
+      <option value="West Yorkshire">West Yorkshire</option>
+    </optgroup>
+    
+    <optgroup label="England - Midlands">
+      <option value="Derbyshire">Derbyshire</option>
+      <option value="Herefordshire">Herefordshire</option>
+      <option value="Leicestershire">Leicestershire</option>
+      <option value="Lincolnshire">Lincolnshire</option>
+      <option value="Northamptonshire">Northamptonshire</option>
+      <option value="Nottinghamshire">Nottinghamshire</option>
+      <option value="Rutland">Rutland</option>
+      <option value="Shropshire">Shropshire</option>
+      <option value="Staffordshire">Staffordshire</option>
+      <option value="Warwickshire">Warwickshire</option>
+      <option value="Worcestershire">Worcestershire</option>
+    </optgroup>
+    
+    <optgroup label="England - East">
+      <option value="Bedfordshire">Bedfordshire</option>
+      <option value="Cambridgeshire">Cambridgeshire</option>
+      <option value="Hertfordshire">Hertfordshire</option>
+      <option value="Norfolk">Norfolk</option>
+      <option value="Suffolk">Suffolk</option>
+    </optgroup>
+    
+    <optgroup label="England - South East">
+      <option value="Berkshire">Berkshire</option>
+      <option value="Buckinghamshire">Buckinghamshire</option>
+      <option value="East Sussex">East Sussex</option>
+      <option value="Hampshire">Hampshire</option>
+      <option value="Isle of Wight">Isle of Wight</option>
+      <option value="Kent">Kent</option>
+      <option value="Oxfordshire">Oxfordshire</option>
+      <option value="Surrey">Surrey</option>
+      <option value="West Sussex">West Sussex</option>
+    </optgroup>
+    
+    <optgroup label="England - South West">
+      <option value="Bristol">Bristol</option>
+      <option value="Cornwall">Cornwall</option>
+      <option value="Devon">Devon</option>
+      <option value="Dorset">Dorset</option>
+      <option value="Gloucestershire">Gloucestershire</option>
+      <option value="Somerset">Somerset</option>
+      <option value="Wiltshire">Wiltshire</option>
+    </optgroup>
+    
+    <optgroup label="Scotland">
+      <option value="Aberdeenshire">Aberdeenshire</option>
+      <option value="Angus">Angus</option>
+      <option value="Argyll and Bute">Argyll and Bute</option>
+      <option value="City of Edinburgh">Edinburgh</option>
+      <option value="Clackmannanshire">Clackmannanshire</option>
+      <option value="Dumfries and Galloway">Dumfries and Galloway</option>
+      <option value="Dundee City">Dundee</option>
+      <option value="East Ayrshire">East Ayrshire</option>
+      <option value="East Dunbartonshire">East Dunbartonshire</option>
+      <option value="East Lothian">East Lothian</option>
+      <option value="East Renfrewshire">East Renfrewshire</option>
+      <option value="Falkirk">Falkirk</option>
+      <option value="Fife">Fife</option>
+      <option value="Glasgow City">Glasgow</option>
+      <option value="Highland">Highland</option>
+      <option value="Inverclyde">Inverclyde</option>
+      <option value="Midlothian">Midlothian</option>
+      <option value="Moray">Moray</option>
+      <option value="North Ayrshire">North Ayrshire</option>
+      <option value="North Lanarkshire">North Lanarkshire</option>
+      <option value="Orkney Islands">Orkney Islands</option>
+      <option value="Perth and Kinross">Perth and Kinross</option>
+      <option value="Renfrewshire">Renfrewshire</option>
+      <option value="Scottish Borders">Scottish Borders</option>
+      <option value="Shetland Islands">Shetland Islands</option>
+      <option value="South Ayrshire">South Ayrshire</option>
+      <option value="South Lanarkshire">South Lanarkshire</option>
+      <option value="Stirling">Stirling</option>
+      <option value="West Dunbartonshire">West Dunbartonshire</option>
+      <option value="West Lothian">West Lothian</option>
+      <option value="Western Isles">Western Isles</option>
+    </optgroup>
+    
+    <optgroup label="Wales">
+      <option value="Anglesey">Anglesey</option>
+      <option value="Blaenau Gwent">Blaenau Gwent</option>
+      <option value="Bridgend">Bridgend</option>
+      <option value="Caerphilly">Caerphilly</option>
+      <option value="Cardiff">Cardiff</option>
+      <option value="Carmarthenshire">Carmarthenshire</option>
+      <option value="Ceredigion">Ceredigion</option>
+      <option value="Conwy">Conwy</option>
+      <option value="Denbighshire">Denbighshire</option>
+      <option value="Flintshire">Flintshire</option>
+      <option value="Gwynedd">Gwynedd</option>
+      <option value="Merthyr Tydfil">Merthyr Tydfil</option>
+      <option value="Monmouthshire">Monmouthshire</option>
+      <option value="Neath Port Talbot">Neath Port Talbot</option>
+      <option value="Newport">Newport</option>
+      <option value="Pembrokeshire">Pembrokeshire</option>
+      <option value="Powys">Powys</option>
+      <option value="Rhondda Cynon Taf">Rhondda Cynon Taf</option>
+      <option value="Swansea">Swansea</option>
+      <option value="Torfaen">Torfaen</option>
+      <option value="Vale of Glamorgan">Vale of Glamorgan</option>
+      <option value="Wrexham">Wrexham</option>
+    </optgroup>
+    
+    <optgroup label="Northern Ireland">
+      <option value="Antrim">Antrim</option>
+      <option value="Armagh">Armagh</option>
+      <option value="Down">Down</option>
+      <option value="Fermanagh">Fermanagh</option>
+      <option value="Londonderry">Londonderry</option>
+      <option value="Tyrone">Tyrone</option>
+    </optgroup>
+  </select>
+  <div id="recipientCount" style="font-size: 13px; color: #64748b; margin-top: 8px;">
+    Select a region to see recipient count
+  </div>
+</div>
+
+<!-- Add this ABOVE the subject field -->
+<div style="margin-bottom: 24px;">
+  <button type="button" class="btn btn-primary" onclick="autoFetchMarketData()" id="fetchDataBtn">
+    📊 Auto-Fetch Market Data & Generate Content
+  </button>
+  <div id="dataPreview" style="margin-top: 16px;"></div>
+</div>
+
+      <div class="form-group">
+        <label class="form-label" for="marketUpdateSubject">Email Subject *</label>
+        <input 
+          type="text" 
+          id="marketUpdateSubject" 
+          class="form-input" 
+          placeholder="e.g., Property Market Update - [Region] - [Month Year]"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="marketUpdateContent">Email Content *</label>
+        <textarea 
+          id="marketUpdateContent" 
+          class="form-input" 
+          rows="12"
+          placeholder="Compose your market update here...
+
+Example:
+Hey [Name],
+
+Here's what's happening in the [Region] property market:
+
+📊 KEY STATS
+- Average sale price: £XXX,XXX (↑X% vs last month)
+- Median time to sell: XX days
+- Transaction volume: XXX properties
+
+🎯 WHAT THIS MEANS FOR YOU
+[Your insights and interpretation]
+
+💡 VALUATION INSIGHT
+[Specific actionable advice for estate agents]
+
+Best regards,
+Markeb Media Team"
+          required
+        ></textarea>
+        <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+          💡 Use [Name] to personalize with customer name
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+          <input type="checkbox" id="marketUpdatePreview" style="width: 20px; height: 20px;">
+          <span style="font-size: 14px; font-weight: 600;">Send test email to myself first</span>
+        </label>
+      </div>
+
+      <div class="button-group" style="margin-top: 24px;">
+        <button type="button" class="btn btn-secondary" onclick="resetMarketUpdateForm()" style="flex: 1;">
+          Reset
+        </button>
+        <button type="submit" class="btn btn-primary" style="flex: 2;">
+          📧 Send Market Update
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Send History -->
+  <div class="calendar-container" style="margin-top: 24px;">
+    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">📜 Send History</h3>
+    <div id="marketUpdateHistory">
+      <div style="text-align: center; padding: 40px;">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
   <!-- Booking Detail Modal -->
   <div class="modal" id="bookingModal" onclick="closeModal('bookingModal')">
     <div class="modal-dialog" onclick="event.stopPropagation()">
@@ -2676,6 +2947,9 @@ const stripe = Stripe(STRIPE_PUBLIC_KEY);
     const ADMIN_CODE = 'MARKEB2546';
     const SESSION_KEY = 'admin_authenticated';
     const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
+
+    // ===== GLOBAL VARIABLES ===== 
+    let currentMarketData = null;  // ✅ ADD THIS LINE HERE
 
     // Check if already authenticated
     function isAuthenticated() {
@@ -6276,6 +6550,274 @@ document.addEventListener('DOMContentLoaded', function() {
 // Re-initialize icons after dynamic content changes
 function reinitializeLucideIcons() {
   lucide.createIcons();
+}
+
+// ===== MARKET UPDATES FUNCTIONS =====
+
+async function loadMarketUpdateStats() {
+  try {
+    // Get all customers with market updates opted in
+    const response = await fetch('/.netlify/functions/admin-users');
+    const data = await response.json();
+
+    if (data.success) {
+      const optedIn = data.users.filter(u => u.fields['Market Updates Opt In'] === true);
+      
+      const northCount = optedIn.filter(u => 
+        ['Yorkshire', 'Cheshire', 'Manchester'].includes(u.fields['Region'])
+      ).length;
+      
+      const southCount = optedIn.filter(u => 
+        ['London', 'Essex', 'West Midlands', 'Leicester'].includes(u.fields['Region'])
+      ).length;
+
+      document.getElementById('totalOptedIn').textContent = optedIn.length;
+      document.getElementById('northOptedIn').textContent = northCount;
+      document.getElementById('southOptedIn').textContent = southCount;
+    }
+
+    // Load last sent date (you'll need to track this in Airtable)
+    // For now, placeholder:
+    document.getElementById('lastSentDate').textContent = 'Never';
+
+  } catch (error) {
+    console.error('Error loading market update stats:', error);
+  }
+}
+
+function updateMarketRecipientCount() {
+  const region = document.getElementById('marketUpdateRegion').value;
+  const recipientDiv = document.getElementById('recipientCount');
+  
+  if (!region) {
+    recipientDiv.innerHTML = 'Select a region to see recipient count';
+    return;
+  }
+
+  const optedIn = allCustomers.filter(u => 
+    u.fields['Market Updates Opt In'] === true && 
+    u.fields['Region'] === region
+  );
+
+  recipientDiv.innerHTML = `
+    <span style="color: #10b981; font-weight: 600;">
+      ✅ Will send to ${optedIn.length} customer${optedIn.length !== 1 ? 's' : ''} in ${region}
+    </span>
+  `;
+}
+
+function resetMarketUpdateForm() {
+  document.getElementById('marketUpdateForm').reset();
+  document.getElementById('recipientCount').innerHTML = 'Select a region to see recipient count';
+  document.getElementById('dataPreview').innerHTML = '';  // ✅ ADD THIS LINE
+  currentMarketData = null;  // ✅ ADD THIS LINE
+}
+
+// Find this section and UPDATE it:
+document.getElementById('marketUpdateForm')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const region = document.getElementById('marketUpdateRegion').value;
+  const subject = document.getElementById('marketUpdateSubject').value;
+  const content = document.getElementById('marketUpdateContent').value;
+  const sendPreview = document.getElementById('marketUpdatePreview').checked;
+
+  const recipients = allCustomers.filter(u => 
+    u.fields['Market Updates Opt In'] === true && 
+    u.fields['Region'] === region
+  );
+
+  if (recipients.length === 0) {
+    alert('❌ No opted-in customers found in this region');
+    return;
+  }
+
+  const confirmMsg = sendPreview 
+    ? `Send test email to yourself first?` 
+    : `Send market update to ${recipients.length} customer${recipients.length !== 1 ? 's' : ''} in ${region}?\n\nThis cannot be undone.`;
+
+  if (!confirm(confirmMsg)) {
+    return;
+  }
+
+  const btn = e.target.querySelector('button[type="submit"]');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '⏳ Sending...';
+  btn.disabled = true;
+
+  try {
+    const response = await fetch('/.netlify/functions/send-market-updates', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        region,
+        subject,
+        content,
+        sendPreview,
+        recipients: recipients.map(r => ({
+          email: r.fields['Email'],
+          name: r.fields['Name']
+        })),
+        marketData: currentMarketData  // ✅ ADD THIS LINE
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert(`✅ Market update sent!\n\nSent to: ${data.sentCount} recipient${data.sentCount !== 1 ? 's' : ''}\nRegion: ${region}`);
+      resetMarketUpdateForm();
+      loadMarketUpdateStats();
+      currentMarketData = null;  // ✅ ADD THIS LINE
+    } else {
+      alert(`❌ Error: ${data.error}`);
+    }
+  } catch (error) {
+    console.error('Error sending market update:', error);
+    alert('❌ Failed to send market update: ' + error.message);
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+});
+
+// Load stats when section is shown
+const originalShowSection = showSection;
+showSection = function(sectionId) {
+  originalShowSection(sectionId);
+  
+  if (sectionId === 'market-updates') {
+    loadMarketUpdateStats();
+  }
+};
+
+// ===== AUTO-FETCH MARKET DATA =====
+
+async function autoFetchMarketData() {
+  const region = document.getElementById('marketUpdateRegion').value;
+  
+  if (!region) {
+    alert('⚠️ Please select a region first');
+    document.getElementById('marketUpdateRegion').focus();
+    return;
+  }
+  
+  const btn = document.getElementById('fetchDataBtn');
+  const preview = document.getElementById('dataPreview');
+  
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Fetching market data...';
+  preview.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="spinner" style="width: 40px; height: 40px;"></div></div>';
+  
+  try {
+    // Fetch market data from API
+    const response = await fetch('/.netlify/functions/fetch-market-data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ region })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      const data = result.data;
+      currentMarketData = data;
+      
+      // Auto-fill subject
+      const month = new Date(data.currentMonth).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+      document.getElementById('marketUpdateSubject').value = `${region} Property Market Update - ${month}`;
+      
+      // Generate content with data
+      const content = generateMarketUpdateContent(data);
+      document.getElementById('marketUpdateContent').value = content;
+      
+      // Show preview with charts
+      preview.innerHTML = `
+        <div class="success-box">
+          <strong>✅ Market data fetched for ${region}!</strong>
+          
+          <div style="margin-top: 16px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+            <div style="text-align: center;">
+              <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">£${data.averagePrice.toLocaleString()}</div>
+              <div style="font-size: 12px; color: #64748b;">Average Price</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 24px; font-weight: 700; color: ${data.annualChange > 0 ? '#10b981' : '#ef4444'};">
+                ${data.annualChange > 0 ? '+' : ''}${data.annualChange.toFixed(1)}%
+              </div>
+              <div style="font-size: 12px; color: #64748b;">Annual Change</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">${data.salesVolume.toLocaleString()}</div>
+              <div style="font-size: 12px; color: #64748b;">Sales Volume</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 24px; font-weight: 700; color: #f59e0b;">
+                ${data.marketHealth.emoji} ${data.marketHealth.score}/100
+              </div>
+              <div style="font-size: 12px; color: #64748b;">Market Health</div>
+            </div>
+          </div>
+          
+          <div style="margin-top: 16px; padding: 12px; background: #eff6ff; border-radius: 8px; font-size: 13px;">
+            <strong>Market Status:</strong> ${data.marketHealth.status}<br>
+            <strong>Data Source:</strong> UK House Price Index (HM Land Registry)<br>
+            <strong>Period:</strong> Last 12 months
+          </div>
+        </div>
+      `;
+      
+    } else {
+      throw new Error(result.error || 'Failed to fetch market data');
+    }
+    
+  } catch (error) {
+    console.error('Error fetching market data:', error);
+    preview.innerHTML = `
+      <div class="warning-box">
+        ❌ <strong>Failed to fetch market data</strong><br>
+        ${error.message}<br><br>
+        You can still compose the email manually.
+      </div>
+    `;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '📊 Auto-Fetch Market Data & Generate Content';
+  }
+}
+
+function generateMarketUpdateContent(data) {
+  const month = new Date(data.currentMonth).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  const priceChange = data.annualChange > 0 ? 'up' : 'down';
+  const priceIcon = data.annualChange > 0 ? '📈' : '📉';
+  
+  return `Hey [Name],
+
+Here's what's happening in the ${data.region} property market for ${month}:
+
+📊 KEY STATS
+- Average sale price: £${data.averagePrice.toLocaleString()} (${priceIcon} ${Math.abs(data.annualChange).toFixed(1)}% vs last year)
+- Transaction volume: ${data.salesVolume.toLocaleString()} properties
+- Monthly change: ${data.monthlyChange > 0 ? '+' : ''}${data.monthlyChange.toFixed(1)}%
+- Market health: ${data.marketHealth.status} (${data.marketHealth.score}/100)
+
+🎯 WHAT THIS MEANS FOR YOU
+${data.annualChange > 0 
+  ? `With prices ${priceChange} ${Math.abs(data.annualChange).toFixed(1)}% year-on-year, this is a strong seller's market. Properties are moving quickly, and quality presentation is more important than ever.`
+  : `The market is adjusting with a ${Math.abs(data.annualChange).toFixed(1)}% annual decrease. In this climate, exceptional photography and videography can be the difference between a quick sale and a listing that sits.`
+}
+
+💡 VALUATION INSIGHT
+${data.salesVolume > 5000 
+  ? 'High transaction volume indicates strong buyer activity. Properties with professional media are commanding premium prices.'
+  : 'With fewer transactions, standing out is critical. Professional content can help your listings capture the limited buyer pool.'
+}
+
+📸 How Markeb Media Can Help
+In ${data.marketHealth.status.toLowerCase()} markets like this, professional property content isn't optional—it's essential. Our ${data.region} team is ready to make your listings shine.
+
+Best regards,
+Markeb Media Team`;
 }
 
   </script>
