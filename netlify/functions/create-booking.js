@@ -1,8 +1,8 @@
 // netlify/functions/create-booking.js
-// UPDATED: Now links bookings to authenticated users + sets paymentStatus correctly + handles free bookings + creates Active Bookings with Dropbox folders
+// UPDATED: Now links bookings to authenticated users + sets paymentStatus correctly + handles free bookings + creates Active Bookings with Dropbox folders + SUPPORTS GUEST BOOKINGS
 
 exports.handler = async (event, context) => {
-  console.log('=== Create Booking Function (Updated with Auth + Active Bookings) ===');
+  console.log('=== Create Booking Function (Updated with Auth + Active Bookings + Guest Support) ===');
   console.log('Method:', event.httpMethod);
   
   const headers = {
@@ -26,7 +26,7 @@ exports.handler = async (event, context) => {
   try {
     const bookingData = JSON.parse(event.body);
     
-    // ✅ NEW: Verify user exists and get their record ID
+    // ✅ Verify user email exists
     const userEmail = bookingData.clientEmail;
     
     if (!userEmail) {
@@ -37,7 +37,7 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // ✅ NEW: Fetch user from Airtable
+    // ✅ NEW: Fetch user from Airtable (but allow guest bookings if not found)
     const filterFormula = `LOWER({Email}) = "${userEmail.toLowerCase()}"`;
     const userUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}?filterByFormula=${encodeURIComponent(filterFormula)}`;
 
@@ -49,33 +49,35 @@ exports.handler = async (event, context) => {
 
     const userResult = await userResponse.json();
 
+    // ✅ NEW: Try to find existing user, but proceed as guest if not found
+    let userId = null;
+
     if (userResult.records && userResult.records.length > 0) {
-  userId = user.id; // Link to existing user if found
-} else {
-  console.log('Guest booking - proceeding without user link'); // ✅ ALLOWED
-}
-
-    const user = userResult.records[0];
-    const userId = user.id;
-
-    console.log(`✓ Found user: ${userEmail} (ID: ${userId})`);
-
-    // ✅ NEW: Update user's last booking date and region
-    const updateUserUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}/${userId}`;
-    
-    await fetch(updateUserUrl, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        fields: {
-          'Last Booking Date': new Date().toISOString().split('T')[0],
-          'Region': bookingData.region ? bookingData.region.charAt(0).toUpperCase() + bookingData.region.slice(1).toLowerCase() : ''
-        }
-      })
-    });
+      const user = userResult.records[0];
+      userId = user.id;
+      console.log(`✓ Found existing user: ${userEmail} (ID: ${userId})`);
+      
+      // ✅ Update user's last booking date and region
+      const updateUserUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}/${userId}`;
+      
+      await fetch(updateUserUrl, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          fields: {
+            'Last Booking Date': new Date().toISOString().split('T')[0],
+            'Region': bookingData.region ? bookingData.region.charAt(0).toUpperCase() + bookingData.region.slice(1).toLowerCase() : ''
+          }
+        })
+      });
+      
+    } else {
+      console.log(`⚠️ User not found for email: ${userEmail} - proceeding as GUEST booking (no user link)`);
+      // userId remains null - this is a guest booking
+    }
 
     // ✅ Capitalize region to match Airtable Single Select options (North/South)
     if (bookingData.region) {
@@ -89,7 +91,8 @@ exports.handler = async (event, context) => {
       time: bookingData.time,
       service: bookingData.service,
       paymentOption: bookingData.paymentOption,
-      totalPrice: bookingData.totalPrice
+      totalPrice: bookingData.totalPrice,
+      userType: userId ? 'Registered' : 'Guest'
     });
 
     // Generate booking reference
@@ -100,34 +103,34 @@ exports.handler = async (event, context) => {
     let paymentStatus;
     let bookingStatus;
 
-   // ✅ NEW: Check if this is an admin booking FIRST
-if (bookingData.createdBy === 'Admin') {
-  // ADMIN BOOKING - Use direct status control
-  console.log('Admin booking detected');
-  paymentStatus = bookingData.paymentStatus || 'Pending';
-  
-  if (paymentStatus === 'Paid') {
-    bookingStatus = 'Confirmed';
-  } else {
-    bookingStatus = 'Reserved';
-  }
-  
-  console.log(`Admin booking: Payment=${paymentStatus}, Booking=${bookingStatus}`);
-  
-// ✅ NEW: Handle trusted customers who can book without payment
-} else if (bookingData.paymentOption === 'book-without-payment') {
-  paymentStatus = 'Pending';
-  bookingStatus = 'Confirmed'; // Booking is confirmed, payment comes later
-  console.log('Trusted customer - booking without payment (invoice later)');
-  
-// ✅ NEW: Handle free/100% discount bookings
-} else if (bookingData.paymentOption === 'free' || bookingData.totalPrice === 0) {
-  paymentStatus = 'Paid'; // Mark as paid (£0 = nothing to pay)
-  bookingStatus = 'Confirmed';
-  console.log('Free booking (100% discount or £0 total) - marking as Paid/Confirmed');
-  
-// ✅ EXISTING: Customer bookings work EXACTLY as before
-} else if (bookingData.paymentOption === 'pay-now') {
+    // ✅ Check if this is an admin booking FIRST
+    if (bookingData.createdBy === 'Admin') {
+      // ADMIN BOOKING - Use direct status control
+      console.log('Admin booking detected');
+      paymentStatus = bookingData.paymentStatus || 'Pending';
+      
+      if (paymentStatus === 'Paid') {
+        bookingStatus = 'Confirmed';
+      } else {
+        bookingStatus = 'Reserved';
+      }
+      
+      console.log(`Admin booking: Payment=${paymentStatus}, Booking=${bookingStatus}`);
+      
+    // ✅ Handle trusted customers who can book without payment
+    } else if (bookingData.paymentOption === 'book-without-payment') {
+      paymentStatus = 'Pending';
+      bookingStatus = 'Confirmed'; // Booking is confirmed, payment comes later
+      console.log('Trusted customer - booking without payment (invoice later)');
+      
+    // ✅ Handle free/100% discount bookings
+    } else if (bookingData.paymentOption === 'free' || bookingData.totalPrice === 0) {
+      paymentStatus = 'Paid'; // Mark as paid (£0 = nothing to pay)
+      bookingStatus = 'Confirmed';
+      console.log('Free booking (100% discount or £0 total) - marking as Paid/Confirmed');
+      
+    // ✅ EXISTING: Customer bookings work EXACTLY as before
+    } else if (bookingData.paymentOption === 'pay-now') {
       // This shouldn't happen in create-booking (should go through Stripe webhook)
       // But if it does, mark as Paid
       paymentStatus = 'Paid';
@@ -162,7 +165,7 @@ if (bookingData.createdBy === 'Admin') {
       
       discountAmount = bookingData.discountAmount || 0;
       priceBeforeDiscount = bookingData.priceBeforeDiscount || (bookingData.totalPrice + discountAmount);
-      finalPrice = priceBeforeDiscount - discountAmount; // ✅ FIXED - calculate discounted price
+      finalPrice = priceBeforeDiscount - discountAmount;
       
       console.log('Discount details:', {
         code: bookingData.discountCode,
@@ -216,14 +219,17 @@ if (bookingData.createdBy === 'Admin') {
       }
     } else {
       console.log('No discount code applied');
-      priceBeforeDiscount = finalPrice; // ✅ When no discount, priceBeforeDiscount = finalPrice
+      priceBeforeDiscount = finalPrice;
     }
 
     // Prepare Airtable record
     const airtableRecord = {
       fields: {
         'Booking Reference': bookingRef,
-        'User': [userId],
+        
+        // ✅ UPDATED: Only link to User if userId exists (registered customer)
+        ...(userId && { 'User': [userId] }),
+        
         'Date': bookingData.date,
         'Time': bookingData.time,
         'Postcode': bookingData.postcode,
@@ -267,6 +273,7 @@ if (bookingData.createdBy === 'Admin') {
 
     console.log('Creating Airtable record with payment status:', paymentStatus);
     console.log('Airtable record Region field:', airtableRecord.fields.Region);
+    console.log('User linked:', userId ? 'Yes' : 'No (Guest)');
 
     // Create booking in Airtable
     const airtableUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Bookings`;
@@ -290,7 +297,7 @@ if (bookingData.createdBy === 'Admin') {
     console.log('Booking created successfully:', bookingRef);
 
     // ✅ NEW: Create Active Booking record + Dropbox folders (QC Delivery + Raw Client)
-    let trackingCode = ''; // ✅ Declare tracking code variable
+    let trackingCode = '';
     
     try {
       const { createActiveBooking } = require('./create-active-booking');
@@ -298,7 +305,7 @@ if (bookingData.createdBy === 'Admin') {
       const activeBookingData = {
         bookingRef: bookingRef,
         propertyAddress: bookingData.propertyAddress,
-        postcode: bookingData.postcode, // ✅ ADD postcode
+        postcode: bookingData.postcode,
         clientName: bookingData.clientName,
         clientEmail: bookingData.clientEmail,
         clientPhone: bookingData.clientPhone,
@@ -314,9 +321,9 @@ if (bookingData.createdBy === 'Admin') {
       const activeBookingResult = await createActiveBooking(activeBookingData);
       
       if (activeBookingResult.success) {
-        trackingCode = activeBookingResult.trackingCode || ''; // ✅ Capture tracking code
+        trackingCode = activeBookingResult.trackingCode || '';
         console.log(`✓ Active Booking created with ID: ${activeBookingResult.activeBookingId}`);
-        console.log(`✓ Tracking Code: ${trackingCode}`); // ✅ Log tracking code
+        console.log(`✓ Tracking Code: ${trackingCode}`);
         console.log(`✓ QC Delivery folder created with link: ${activeBookingResult.dropboxLink}`);
         console.log(`✓ Raw Client folders created for company`);
       } else {
@@ -334,27 +341,27 @@ if (bookingData.createdBy === 'Admin') {
       try {
         const { sendBookingConfirmation } = require('./email-service');
         
-       const emailData = {
-  bookingRef: bookingRef,
-  clientName: bookingData.clientName,
-  clientEmail: bookingData.clientEmail,
-  service: bookingData.service,
-  date: bookingData.date,
-  time: bookingData.time,
-  propertyAddress: bookingData.propertyAddress,
-  postcode: bookingData.postcode,
-  mediaSpecialist: bookingData.mediaSpecialist,
-  totalPrice: finalPrice,
-  duration: bookingData.duration,
-  paymentStatus: paymentStatus,
-  bookingStatus: bookingStatus,
-  createdBy: bookingData.createdBy || 'Customer',
-  cardLast4: bookingData.cardLast4 || '',
-  discountCode: bookingData.discountCode || '',
-  discountAmount: discountAmount,
-  trackingCode: trackingCode,
-  region: bookingData.region // ✅ ADD THIS LINE - Required for BCC to Jodie/Maeve
-};
+        const emailData = {
+          bookingRef: bookingRef,
+          clientName: bookingData.clientName,
+          clientEmail: bookingData.clientEmail,
+          service: bookingData.service,
+          date: bookingData.date,
+          time: bookingData.time,
+          propertyAddress: bookingData.propertyAddress,
+          postcode: bookingData.postcode,
+          mediaSpecialist: bookingData.mediaSpecialist,
+          totalPrice: finalPrice,
+          duration: bookingData.duration,
+          paymentStatus: paymentStatus,
+          bookingStatus: bookingStatus,
+          createdBy: bookingData.createdBy || 'Customer',
+          cardLast4: bookingData.cardLast4 || '',
+          discountCode: bookingData.discountCode || '',
+          discountAmount: discountAmount,
+          trackingCode: trackingCode,
+          region: bookingData.region
+        };
         
         await sendBookingConfirmation(emailData);
         console.log(`✓ Confirmation email sent to ${bookingData.clientEmail}`);
@@ -373,6 +380,7 @@ if (bookingData.createdBy === 'Admin') {
         bookingRef: bookingRef,
         recordId: airtableResult.id,
         paymentStatus: paymentStatus,
+        userType: userId ? 'registered' : 'guest',
         message: paymentStatus === 'Paid' 
           ? 'Booking confirmed and paid' 
           : 'Booking reserved - payment pending'
