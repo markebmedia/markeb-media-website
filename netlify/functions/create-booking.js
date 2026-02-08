@@ -49,13 +49,11 @@ exports.handler = async (event, context) => {
 
     const userResult = await userResponse.json();
 
-    if (!userResult.records || userResult.records.length === 0) {
-      return {
-        statusCode: 401,
-        headers,
-        body: JSON.stringify({ success: false, error: 'User not found. Please log in first.' })
-      };
-    }
+    if (userResult.records && userResult.records.length > 0) {
+  userId = user.id; // Link to existing user if found
+} else {
+  console.log('Guest booking - proceeding without user link'); // ✅ ALLOWED
+}
 
     const user = userResult.records[0];
     const userId = user.id;
