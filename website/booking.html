@@ -1539,96 +1539,110 @@
       return parts.join(', ');
     }
 
-    // New function to show address section with dropdown or manual entry
-    function showAddressSection(addresses) {
-      const addressSection = document.getElementById('addressSection');
+   // New function to show address section with dropdown or manual entry
+function showAddressSection(addresses) {
+  const addressSection = document.getElementById('addressSection');
+  
+  if (addresses && addresses.length > 0) {
+    addressSection.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" for="addressSelect">Select Your Property Address *</label>
+        <select 
+          id="addressSelect" 
+          class="form-input" 
+          style="cursor: pointer;"
+        >
+          <option value="">-- Select an address --</option>
+          ${addresses.map((addr, index) => `
+            <option value="${index}">
+              ${formatAddress(addr)}
+            </option>
+          `).join('')}
+          <option value="manual">Enter address manually</option>
+        </select>
+        <div class="error-message" id="addressSelectError">Please select an address</div>
+      </div>
       
-      if (addresses && addresses.length > 0) {
-        addressSection.innerHTML = `
-          <div class="form-group">
-            <label class="form-label" for="addressSelect">Select Your Property Address *</label>
-            <select 
-              id="addressSelect" 
-              class="form-input" 
-              style="cursor: pointer;"
-              onchange="handleAddressSelection()"
-            >
-              <option value="">-- Select an address --</option>
-              ${addresses.map((addr, index) => `
-                <option value="${index}">
-                  ${formatAddress(addr)}
-                </option>
-              `).join('')}
-              <option value="manual">Enter address manually</option>
-            </select>
-            <div class="error-message" id="addressSelectError">Please select an address</div>
+      <div id="manualAddressEntry" style="display: none;">
+        <div class="form-group">
+          <label class="form-label" for="propertyAddress">Full Property Address *</label>
+          <input 
+            type="text" 
+            id="propertyAddress" 
+            class="form-input" 
+            placeholder="e.g. 123 High Street, Leicester"
+          />
+          <div style="font-size: 12px; color: #64748b; margin-top: 6px;">
+            This helps us plan the best route and ensure accurate timing
           </div>
-          
-          <div id="manualAddressEntry" style="display: none;">
-            <div class="form-group">
-              <label class="form-label" for="propertyAddress">Full Property Address *</label>
-              <input 
-                type="text" 
-                id="propertyAddress" 
-                class="form-input" 
-                placeholder="e.g. 123 High Street, Leicester"
-              />
-              <div style="font-size: 12px; color: #64748b; margin-top: 6px;">
-                This helps us plan the best route and ensure accurate timing
-              </div>
-              <div class="error-message" id="addressError">Please enter the property address</div>
-            </div>
-          </div>
-        `;
-        
-        bookingData.availableAddresses = addresses;
-      } else {
-        addressSection.innerHTML = `
-          <div class="form-group">
-            <label class="form-label" for="propertyAddress">Full Property Address *</label>
-            <input 
-              type="text" 
-              id="propertyAddress" 
-              class="form-input" 
-              placeholder="e.g. 123 High Street, Leicester"
-            />
-            <div style="font-size: 12px; color: #64748b; margin-top: 6px;">
-              This helps us plan the best route and ensure accurate timing
-            </div>
-            <div class="error-message" id="addressError">Please enter the property address</div>
-          </div>
-        `;
+          <div class="error-message" id="addressError">Please enter the property address</div>
+        </div>
+      </div>
+    `;
+    
+    bookingData.availableAddresses = addresses;
+    
+    // ✅ ADD EVENT LISTENER AFTER CREATING THE SELECT ELEMENT
+    setTimeout(() => {
+      const selectElement = document.getElementById('addressSelect');
+      if (selectElement) {
+        selectElement.addEventListener('change', handleAddressSelection);
       }
-      
-      addressSection.style.display = 'block';
-    }
+    }, 100);
+    
+  } else {
+    addressSection.innerHTML = `
+      <div class="form-group">
+        <label class="form-label" for="propertyAddress">Full Property Address *</label>
+        <input 
+          type="text" 
+          id="propertyAddress" 
+          class="form-input" 
+          placeholder="e.g. 123 High Street, Leicester"
+        />
+        <div style="font-size: 12px; color: #64748b; margin-top: 6px;">
+          This helps us plan the best route and ensure accurate timing
+        </div>
+        <div class="error-message" id="addressError">Please enter the property address</div>
+      </div>
+    `;
+  }
+  
+  addressSection.style.display = 'block';
+}
 
     // New function to handle address selection
-    function handleAddressSelection() {
-      const select = document.getElementById('addressSelect');
-      const selectedValue = select.value;
-      const manualEntry = document.getElementById('manualAddressEntry');
-      const errorMsg = document.getElementById('addressSelectError');
-      
-      errorMsg.classList.remove('show');
-      select.classList.remove('error');
-      
-      if (selectedValue === 'manual') {
-        manualEntry.style.display = 'block';
-        bookingData.propertyAddress = '';
-        
-        setTimeout(() => {
-          document.getElementById('propertyAddress').focus();
-        }, 100);
-      } else if (selectedValue !== '') {
-        manualEntry.style.display = 'none';
-        const address = bookingData.availableAddresses[parseInt(selectedValue)];
-        bookingData.propertyAddress = formatAddress(address);
-      } else {
-        manualEntry.style.display = 'none';
-        bookingData.propertyAddress = '';
+function handleAddressSelection() {
+  const select = document.getElementById('addressSelect');
+  const selectedValue = select.value;
+  const manualEntry = document.getElementById('manualAddressEntry');
+  const errorMsg = document.getElementById('addressSelectError');
+  
+  errorMsg.classList.remove('show');
+  select.classList.remove('error');
+  
+  if (selectedValue === 'manual') {
+    manualEntry.style.display = 'block';
+    bookingData.propertyAddress = '';
+    
+    setTimeout(() => {
+      const manualInput = document.getElementById('propertyAddress');
+      if (manualInput) {
+        manualInput.focus();
       }
-    }
+    }, 100);
+  } else if (selectedValue !== '') {
+    manualEntry.style.display = 'none';
+    const address = bookingData.availableAddresses[parseInt(selectedValue)];
+    bookingData.propertyAddress = formatAddress(address);
+    
+    // ✅ OPTIONAL: Log to verify it's working
+    console.log('Address selected:', bookingData.propertyAddress);
+  } else {
+    manualEntry.style.display = 'none';
+    bookingData.propertyAddress = '';
+  }
+}
 
     async function checkPostcode() {
       const postcodeInput = document.getElementById('postcode');
