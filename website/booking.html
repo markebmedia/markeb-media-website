@@ -1645,99 +1645,115 @@ function handleAddressSelection() {
 }
 
     async function checkPostcode() {
-      const postcodeInput = document.getElementById('postcode');
-      const postcode = postcodeInput.value;
-      const errorMsg = document.getElementById('postcodeError');
-      const checkBtn = document.getElementById('checkPostcodeBtn');
-      const regionInfo = document.getElementById('regionInfo');
-      const unavailableInfo = document.getElementById('unavailableInfo');
+  const postcodeInput = document.getElementById('postcode');
+  const postcode = postcodeInput.value;
+  const errorMsg = document.getElementById('postcodeError');
+  const checkBtn = document.getElementById('checkPostcodeBtn');
+  const regionInfo = document.getElementById('regionInfo');
+  const unavailableInfo = document.getElementById('unavailableInfo');
 
-      postcodeInput.classList.remove('error');
-      errorMsg.classList.remove('show');
-      regionInfo.classList.remove('show');
-      unavailableInfo.classList.remove('show');
+  postcodeInput.classList.remove('error');
+  errorMsg.classList.remove('show');
+  regionInfo.classList.remove('show');
+  unavailableInfo.classList.remove('show');
 
-      if (!validatePostcode(postcode)) {
-        postcodeInput.classList.add('error');
-        errorMsg.classList.add('show');
-        return;
-      }
+  if (!validatePostcode(postcode)) {
+    postcodeInput.classList.add('error');
+    errorMsg.classList.add('show');
+    return;
+  }
 
-      checkBtn.classList.add('loading');
-      checkBtn.disabled = true;
+  checkBtn.classList.add('loading');
+  checkBtn.disabled = true;
 
-      try {
-        // Fetch addresses from GetAddress.io
-        const addresses = await fetchAddressesFromPostcode(postcode);
+  try {
+    console.log('🔍 Fetching addresses for:', postcode);
+    
+    // Fetch addresses from GetAddress.io
+    const addresses = await fetchAddressesFromPostcode(postcode);
+    
+    console.log('✅ Addresses received:', addresses);
+    console.log('📊 Number of addresses:', addresses ? addresses.length : 0);
+    
+    const result = determineRegion(postcode);
+
+    bookingData.postcode = postcode.toUpperCase();
+    bookingData.region = result.region;
+    bookingData.mediaSpecialist = result.mediaSpecialist.name;
+
+    console.log('Region determined:', {
+      postcode: bookingData.postcode,
+      region: bookingData.region,
+      mediaSpecialist: bookingData.mediaSpecialist,
+      isServiceable: result.isServiceable
+    });
+
+    if (result.isServiceable) {
+      const regionBadge = document.getElementById('regionBadge');
+      regionBadge.className = `region-badge ${result.region}`;
+      regionBadge.textContent = result.region.toUpperCase();
+      
+      document.getElementById('mediaSpecialistName').textContent = result.mediaSpecialist.name;
+      regionInfo.classList.add('show');
+
+      console.log('📝 Calling showAddressSection with addresses:', addresses);
+      
+      // Show address section with dropdown if addresses found
+      showAddressSection(addresses);
+      
+      console.log('🔍 Checking if addressSelect exists:', !!document.getElementById('addressSelect'));
+      console.log('🔍 addressSection display:', document.getElementById('addressSection').style.display);
+      
+      document.getElementById('checkPostcodeBtn').style.display = 'none';
+      document.getElementById('continueWithAddressBtn').style.display = 'block';
+
+      setTimeout(() => {
+        const addressSelect = document.getElementById('addressSelect');
+        console.log('🎯 After timeout - addressSelect exists:', !!addressSelect);
         
-        const result = determineRegion(postcode);
-
-        // ✅ FIXED: Store ALL region data in bookingData (lowercase)
-        bookingData.postcode = postcode.toUpperCase();
-        bookingData.region = result.region; // 'north' or 'south' (lowercase)
-        bookingData.mediaSpecialist = result.mediaSpecialist.name; // 'Jodie' or 'Maeve'
-
-        console.log('Region determined:', {
-          postcode: bookingData.postcode,
-          region: bookingData.region,
-          mediaSpecialist: bookingData.mediaSpecialist,
-          isServiceable: result.isServiceable
-        });
-
-        if (result.isServiceable) {
-          const regionBadge = document.getElementById('regionBadge');
-          regionBadge.className = `region-badge ${result.region}`;
-          regionBadge.textContent = result.region.toUpperCase();
-          
-          document.getElementById('mediaSpecialistName').textContent = result.mediaSpecialist.name;
-          regionInfo.classList.add('show');
-
-          // Show address section with dropdown if addresses found
-          showAddressSection(addresses);
-          
-          document.getElementById('checkPostcodeBtn').style.display = 'none';
-          document.getElementById('continueWithAddressBtn').style.display = 'block';
-
-          setTimeout(() => {
-            const addressSelect = document.getElementById('addressSelect');
-            if (addressSelect) {
-              addressSelect.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-              addressSelect.focus();
-            } else {
-              document.getElementById('propertyAddress').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-              document.getElementById('propertyAddress').focus();
-            }
-          }, 500);
+        if (addressSelect) {
+          addressSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => addressSelect.focus(), 300);
         } else {
-          unavailableInfo.classList.add('show');
+          const manualInput = document.getElementById('propertyAddress');
+          console.log('🎯 Manual input exists:', !!manualInput);
+          if (manualInput) {
+            manualInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => manualInput.focus(), 300);
+          }
         }
-      } catch (error) {
-        console.error('Error fetching addresses:', error);
-        // Fallback to manual entry if API fails
-        const result = determineRegion(postcode);
-        bookingData.postcode = postcode.toUpperCase();
-        bookingData.region = result.region;
-        bookingData.mediaSpecialist = result.mediaSpecialist?.name || '';
-
-        if (result.isServiceable) {
-          const regionBadge = document.getElementById('regionBadge');
-          regionBadge.className = `region-badge ${result.region}`;
-          regionBadge.textContent = result.region.toUpperCase();
-          
-          document.getElementById('mediaSpecialistName').textContent = result.mediaSpecialist.name;
-          regionInfo.classList.add('show');
-
-          // Show manual address entry
-          showAddressSection([]);
-          
-          document.getElementById('checkPostcodeBtn').style.display = 'none';
-          document.getElementById('continueWithAddressBtn').style.display = 'block';
-        }
-      }
-
-      checkBtn.classList.remove('loading');
-      checkBtn.disabled = false;
+      }, 800);
+    } else {
+      unavailableInfo.classList.add('show');
     }
+  } catch (error) {
+    console.error('❌ Error in checkPostcode:', error);
+    console.log('📍 Falling back to manual entry');
+    
+    const result = determineRegion(postcode);
+    bookingData.postcode = postcode.toUpperCase();
+    bookingData.region = result.region;
+    bookingData.mediaSpecialist = result.mediaSpecialist?.name || '';
+
+    if (result.isServiceable) {
+      const regionBadge = document.getElementById('regionBadge');
+      regionBadge.className = `region-badge ${result.region}`;
+      regionBadge.textContent = result.region.toUpperCase();
+      
+      document.getElementById('mediaSpecialistName').textContent = result.mediaSpecialist.name;
+      regionInfo.classList.add('show');
+
+      // Show manual address entry
+      showAddressSection([]);
+      
+      document.getElementById('checkPostcodeBtn').style.display = 'none';
+      document.getElementById('continueWithAddressBtn').style.display = 'block';
+    }
+  }
+
+  checkBtn.classList.remove('loading');
+  checkBtn.disabled = false;
+}
 
     // ✅ FIXED: Proper address validation
     function proceedToServiceSelection() {
