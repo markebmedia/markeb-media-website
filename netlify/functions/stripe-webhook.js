@@ -1,5 +1,5 @@
 // netlify/functions/stripe-webhook.js
-// UPDATED: Now uses proper email service, creates Active Bookings, and handles discounts
+// UPDATED: Guest bookings enabled, uses Airtable SDK properly
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Airtable = require('airtable');
 
@@ -45,7 +45,7 @@ exports.handler = async (event, context) => {
     try {
       const metadata = session.metadata;
       
-      // ✅ NEW: Check if this is a cancellation payment
+      // ✅ Check if this is a cancellation payment
       if (metadata.cancellationType) {
         console.log('Processing paid cancellation:', metadata.bookingRef);
         
@@ -162,44 +162,34 @@ exports.handler = async (event, context) => {
         service: metadata.service
       });
 
-      // ✅ Fetch user from Airtable to link booking
+      // ✅ Fetch user from Airtable to link booking (GUEST BOOKINGS ALLOWED)
       let userId = null;
       try {
         const userEmail = metadata.clientEmail;
         const filterFormula = `LOWER({Email}) = "${userEmail.toLowerCase()}"`;
-        const userUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}?filterByFormula=${encodeURIComponent(filterFormula)}`;
+        
+        const users = await base(process.env.AIRTABLE_USER_TABLE)
+          .select({
+            filterByFormula: filterFormula,
+            maxRecords: 1
+          })
+          .firstPage();
 
-        const userResponse = await fetch(userUrl, {
-          headers: {
-            'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
-          }
-        });
-
-        const userResult = await userResponse.json();
-
-        if (userResult.records && userResult.records.length > 0) {
-          userId = userResult.records[0].id;
+        if (users && users.length > 0) {
+          userId = users[0].id;
           console.log(`✓ Found user: ${userEmail} (ID: ${userId})`);
           
           // Update user's last booking date
-          await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}/${userId}`, {
-            method: 'PATCH',
-            headers: {
-              'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              fields: {
-                'Last Booking Date': new Date().toISOString().split('T')[0],
-                'Region': metadata.region ? metadata.region.charAt(0).toUpperCase() + metadata.region.slice(1).toLowerCase() : ''
-              }
-            })
+          await base(process.env.AIRTABLE_USER_TABLE).update(userId, {
+            'Last Booking Date': new Date().toISOString().split('T')[0],
+            'Region': metadata.region ? metadata.region.charAt(0).toUpperCase() + metadata.region.slice(1).toLowerCase() : ''
           });
         } else {
-          console.warn(`⚠️ User not found for email: ${userEmail}`);
+          console.log(`⚠️ User not found - proceeding with guest booking: ${userEmail}`);
         }
       } catch (userError) {
         console.error('Error fetching user:', userError);
+        // Continue with guest booking
       }
 
       // Parse add-ons
@@ -215,33 +205,24 @@ exports.handler = async (event, context) => {
       const discountAmount = parseFloat(metadata.discountAmount || '0');
       const priceBeforeDiscount = parseFloat(metadata.priceBeforeDiscount || '0');
 
-      // ✅ NEW: Increment discount code usage
+      // ✅ Increment discount code usage
       if (discountCode && discountAmount > 0) {
         try {
           const discountFilterFormula = `UPPER({Code}) = "${discountCode.toUpperCase()}"`;
-          const discountUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_CODES_TABL}?filterByFormula=${encodeURIComponent(discountFilterFormula)}`;
           
-          const discountResponse = await fetch(discountUrl, {
-            headers: { 'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}` }
-          });
+          const discounts = await base(process.env.AIRTABLE_DISCOUNT_CODES_TABL)
+            .select({
+              filterByFormula: discountFilterFormula,
+              maxRecords: 1
+            })
+            .firstPage();
           
-          const discountData = await discountResponse.json();
-          
-          if (discountData.records && discountData.records.length > 0) {
-            const discountRecord = discountData.records[0];
+          if (discounts && discounts.length > 0) {
+            const discountRecord = discounts[0];
             const currentUsage = discountRecord.fields['Times Used'] || 0;
             
-            const updateDiscountUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_CODES_TABL}/${discountRecord.id}`;
-            
-            await fetch(updateDiscountUrl, {
-              method: 'PATCH',
-              headers: {
-                'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                fields: { 'Times Used': currentUsage + 1 }
-              })
+            await base(process.env.AIRTABLE_DISCOUNT_CODES_TABL).update(discountRecord.id, {
+              'Times Used': currentUsage + 1
             });
             
             console.log(`✓ Discount code usage updated: ${discountCode} (${currentUsage} → ${currentUsage + 1})`);
@@ -273,7 +254,7 @@ exports.handler = async (event, context) => {
         {
           fields: {
             'Booking Reference': bookingRef,
-            'User': userId ? [userId] : [],
+            'User': userId ? [userId] : [], // ✅ Only link if user exists
             'Date': metadata.date,
             'Time': metadata.time,
             'Postcode': metadata.postcode,
@@ -317,7 +298,7 @@ exports.handler = async (event, context) => {
 
       console.log('✅ Booking created from webhook:', bookingRecord[0].id);
 
-      // ✅ NEW: Create Active Booking + Dropbox folders
+      // ✅ Create Active Booking + Dropbox folders
       let trackingCode = '';
       
       try {
@@ -345,17 +326,14 @@ exports.handler = async (event, context) => {
           trackingCode = activeBookingResult.trackingCode || '';
           console.log(`✓ Active Booking created with ID: ${activeBookingResult.activeBookingId}`);
           console.log(`✓ Tracking Code: ${trackingCode}`);
-          console.log(`✓ QC Delivery folder created with link: ${activeBookingResult.dropboxLink}`);
-          console.log(`✓ Raw Client folders created for company`);
-        } else {
-          console.error('⚠️ Active Booking creation failed:', activeBookingResult.error);
+          console.log(`✓ QC Delivery folder created`);
         }
 
       } catch (activeBookingError) {
         console.error('Error creating Active Booking:', activeBookingError);
       }
 
-      // ✅ NEW: Send proper booking confirmation email using email-service.js
+      // ✅ Send booking confirmation email
       await sendNewBookingConfirmation(metadata, session, bookingRef, discountCode, discountAmount, capitalizedRegion, trackingCode);
 
       return {
@@ -381,7 +359,7 @@ exports.handler = async (event, context) => {
   };
 };
 
-// ✅ NEW: Send booking confirmation for new "Pay Now" bookings
+// ✅ Send booking confirmation for new "Pay Now" bookings
 async function sendNewBookingConfirmation(metadata, session, bookingRef, discountCode = '', discountAmount = 0, region = '', trackingCode = '') {
   if (!process.env.RESEND_API_KEY) {
     console.log('Resend not configured - skipping email');
@@ -421,7 +399,7 @@ async function sendNewBookingConfirmation(metadata, session, bookingRef, discoun
   }
 }
 
-// ✅ UPDATED: Send payment confirmation for existing bookings (admin payment link)
+// ✅ Send payment confirmation for existing bookings
 async function sendExistingBookingPaymentConfirmation(bookingFields, session) {
   if (!process.env.RESEND_API_KEY) {
     console.log('Resend not configured - skipping email');
@@ -472,10 +450,8 @@ async function sendCancellationConfirmation(metadata, session, cancellationFee, 
     if (region) {
       if (region.toLowerCase() === 'north') {
         bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
-        console.log('✓ BCC: Adding Jodie (North region)');
       } else if (region.toLowerCase() === 'south') {
         bccRecipients.push('Maeve.Darley@markebmedia.com');
-        console.log('✓ BCC: Adding Maeve (South region)');
       }
     }
 

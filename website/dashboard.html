@@ -2431,6 +2431,7 @@ async function loadAcuityMetrics(email){
     // ✅ UPDATED: Get booking data from YOUR Airtable booking system
     let airtableTotalInvestment = 0;
     let totalBookingsCount = 0;
+    let bookingsData = null; // ✅ DECLARE HERE (outside the if block)
     
     const bookingsResponse = await fetch('/.netlify/functions/admin-bookings', {
       method: 'POST',
@@ -2439,7 +2440,7 @@ async function loadAcuityMetrics(email){
     });
     
     if (bookingsResponse.ok) {
-      const bookingsData = await bookingsResponse.json();
+      bookingsData = await bookingsResponse.json(); // ✅ ASSIGN HERE (no const)
       
       if (bookingsData.success && bookingsData.bookings) {
         const customerBookings = bookingsData.bookings.filter(b => 
@@ -2476,7 +2477,7 @@ async function loadAcuityMetrics(email){
     
     // ✅ ADD RECENT BOOKINGS TO ACTIVITY LIST
     const list = document.getElementById('activityList');
-    if (bookingsData?.bookings) {
+    if (bookingsData?.bookings) { // ✅ NOW bookingsData is accessible here
       const recentBookings = bookingsData.bookings
         .filter(b => b.fields['Client Email']?.toLowerCase() === email.toLowerCase())
         .slice(0, 5);
@@ -2499,7 +2500,6 @@ async function loadAcuityMetrics(email){
         list.appendChild(row);
       });
     }
-    
   } catch(e) {
     console.warn('Booking metrics error:', e.message);
   }
