@@ -1,5 +1,5 @@
 // netlify/functions/stripe-webhook.js
-// UPDATED: Now handles cancellation payments and moves bookings to Cancelled Bookings table
+// UPDATED: Now uses proper email service, creates Active Bookings, and handles discounts
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Airtable = require('airtable');
 
@@ -127,6 +127,10 @@ exports.handler = async (event, context) => {
       if (metadata.bookingId) {
         console.log('Updating existing booking:', metadata.bookingId);
         
+        // Fetch the booking to get all details for email
+        const booking = await base('Bookings').find(metadata.bookingId);
+        const bookingFields = booking.fields;
+        
         // UPDATE existing booking from Pending → Paid
         await base('Bookings').update(metadata.bookingId, {
           'Payment Status': 'Paid',
@@ -139,8 +143,8 @@ exports.handler = async (event, context) => {
         
         console.log('✅ Booking updated to Paid');
         
-        // Send payment confirmation email
-        await sendPaymentConfirmation(metadata, session);
+        // ✅ Send proper payment confirmation email
+        await sendExistingBookingPaymentConfirmation(bookingFields, session);
         
         return {
           statusCode: 200,
@@ -211,6 +215,42 @@ exports.handler = async (event, context) => {
       const discountAmount = parseFloat(metadata.discountAmount || '0');
       const priceBeforeDiscount = parseFloat(metadata.priceBeforeDiscount || '0');
 
+      // ✅ NEW: Increment discount code usage
+      if (discountCode && discountAmount > 0) {
+        try {
+          const discountFilterFormula = `UPPER({Code}) = "${discountCode.toUpperCase()}"`;
+          const discountUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_CODES_TABL}?filterByFormula=${encodeURIComponent(discountFilterFormula)}`;
+          
+          const discountResponse = await fetch(discountUrl, {
+            headers: { 'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}` }
+          });
+          
+          const discountData = await discountResponse.json();
+          
+          if (discountData.records && discountData.records.length > 0) {
+            const discountRecord = discountData.records[0];
+            const currentUsage = discountRecord.fields['Times Used'] || 0;
+            
+            const updateDiscountUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_DISCOUNT_CODES_TABL}/${discountRecord.id}`;
+            
+            await fetch(updateDiscountUrl, {
+              method: 'PATCH',
+              headers: {
+                'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                fields: { 'Times Used': currentUsage + 1 }
+              })
+            });
+            
+            console.log(`✓ Discount code usage updated: ${discountCode} (${currentUsage} → ${currentUsage + 1})`);
+          }
+        } catch (discountError) {
+          console.error('Error updating discount code:', discountError);
+        }
+      }
+
       // Calculate prices
       const totalPrice = session.amount_total / 100;
       const bedrooms = parseInt(metadata.bedrooms) || 0;
@@ -277,8 +317,46 @@ exports.handler = async (event, context) => {
 
       console.log('✅ Booking created from webhook:', bookingRecord[0].id);
 
-      // Send payment confirmation email with region
-      await sendPaymentConfirmation(metadata, session, bookingRef, discountCode, discountAmount, capitalizedRegion);
+      // ✅ NEW: Create Active Booking + Dropbox folders
+      let trackingCode = '';
+      
+      try {
+        const { createActiveBooking } = require('./create-active-booking');
+        
+        const activeBookingData = {
+          bookingRef: bookingRef,
+          propertyAddress: metadata.propertyAddress,
+          postcode: metadata.postcode,
+          clientName: metadata.clientName,
+          clientEmail: metadata.clientEmail,
+          clientPhone: metadata.clientPhone,
+          service: metadata.service,
+          date: metadata.date,
+          time: metadata.time,
+          region: capitalizedRegion,
+          mediaSpecialist: metadata.mediaSpecialist,
+          bookingStatus: 'Confirmed',
+          paymentStatus: 'Paid'
+        };
+
+        const activeBookingResult = await createActiveBooking(activeBookingData);
+        
+        if (activeBookingResult.success) {
+          trackingCode = activeBookingResult.trackingCode || '';
+          console.log(`✓ Active Booking created with ID: ${activeBookingResult.activeBookingId}`);
+          console.log(`✓ Tracking Code: ${trackingCode}`);
+          console.log(`✓ QC Delivery folder created with link: ${activeBookingResult.dropboxLink}`);
+          console.log(`✓ Raw Client folders created for company`);
+        } else {
+          console.error('⚠️ Active Booking creation failed:', activeBookingResult.error);
+        }
+
+      } catch (activeBookingError) {
+        console.error('Error creating Active Booking:', activeBookingError);
+      }
+
+      // ✅ NEW: Send proper booking confirmation email using email-service.js
+      await sendNewBookingConfirmation(metadata, session, bookingRef, discountCode, discountAmount, capitalizedRegion, trackingCode);
 
       return {
         statusCode: 200,
@@ -303,79 +381,73 @@ exports.handler = async (event, context) => {
   };
 };
 
-// Send payment confirmation email
-async function sendPaymentConfirmation(metadata, session, bookingRef, discountCode = '', discountAmount = 0, region = '') {
+// ✅ NEW: Send booking confirmation for new "Pay Now" bookings
+async function sendNewBookingConfirmation(metadata, session, bookingRef, discountCode = '', discountAmount = 0, region = '', trackingCode = '') {
   if (!process.env.RESEND_API_KEY) {
     console.log('Resend not configured - skipping email');
     return;
   }
 
   try {
-    const { Resend } = require('resend');
-    const resend = new Resend(process.env.RESEND_API_KEY);
-
-    const ref = bookingRef || metadata.bookingRef || 'N/A';
-    const amountPaid = session.amount_total / 100;
+    const { sendBookingConfirmation } = require('./email-service');
     
-    const discountHTML = discountCode && discountAmount > 0 ? `
-      <div style="background: #d1fae5; border: 2px solid #10b981; border-radius: 8px; padding: 15px; margin: 15px 0;">
-        <div style="font-size: 14px; color: #065f46; font-weight: 600;">💰 DISCOUNT APPLIED</div>
-        <p style="margin: 8px 0 0 0; color: #065f46;"><strong>${discountCode}</strong> - Saved £${discountAmount.toFixed(2)}</p>
-      </div>
-    ` : '';
-
-    // ✅ Determine BCC recipients based on region
-    const bccRecipients = ['commercial@markebmedia.com'];
+    const emailData = {
+      bookingRef: bookingRef,
+      clientName: metadata.clientName,
+      clientEmail: metadata.clientEmail,
+      service: metadata.service,
+      date: metadata.date,
+      time: metadata.time,
+      propertyAddress: metadata.propertyAddress,
+      postcode: metadata.postcode,
+      mediaSpecialist: metadata.mediaSpecialist,
+      totalPrice: session.amount_total / 100,
+      duration: parseInt(metadata.duration) || 90,
+      paymentStatus: 'Paid',
+      bookingStatus: 'Confirmed',
+      createdBy: 'Customer',
+      cardLast4: '',
+      discountCode: discountCode,
+      discountAmount: discountAmount,
+      trackingCode: trackingCode,
+      region: region
+    };
     
-    if (region) {
-      if (region.toLowerCase() === 'north') {
-        bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
-        console.log('✓ BCC: Adding Jodie (North region)');
-      } else if (region.toLowerCase() === 'south') {
-        bccRecipients.push('Maeve.Darley@markebmedia.com');
-        console.log('✓ BCC: Adding Maeve (South region)');
-      }
-    }
+    await sendBookingConfirmation(emailData);
+    console.log(`✓ Booking confirmation email sent to ${metadata.clientEmail}`);
+    
+  } catch (emailError) {
+    console.error('⚠️ Failed to send booking confirmation:', emailError);
+  }
+}
 
-    await resend.emails.send({
-      from: 'Markeb Media <commercial@markebmedia.com>',
-      to: metadata.clientEmail,
-      bcc: bccRecipients, // ✅ Array of BCC recipients
-      subject: `Payment Confirmed - ${ref}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; padding: 40px 30px; text-align: center; border-radius: 8px 8px 0 0;">
-            <div style="font-size: 48px; margin-bottom: 10px;">✅</div>
-            <h1 style="margin: 0; font-size: 32px; font-weight: 700;">Payment Confirmed!</h1>
-          </div>
-          
-          <div style="padding: 40px 30px; background: #ffffff;">
-            <p style="font-size: 16px; color: #333;">Hi <strong>${metadata.clientName}</strong>,</p>
-            <p style="font-size: 16px; color: #333;">Your payment has been successfully processed and your booking is confirmed!</p>
-            
-            ${discountHTML}
-            
-            <div style="background: #d1fae5; border: 2px solid #10b981; border-radius: 12px; padding: 20px; margin: 25px 0; text-align: center;">
-              <div style="font-size: 14px; color: #065f46; font-weight: 600;">PAYMENT RECEIVED</div>
-              <div style="font-size: 36px; font-weight: 700; color: #065f46; margin-top: 8px;">£${amountPaid.toFixed(2)}</div>
-            </div>
-            
-            <div style="background: #f8fafc; border-left: 4px solid #10b981; padding: 25px; margin: 25px 0;">
-              <h3 style="margin: 0 0 15px 0; font-size: 18px;">Booking Details</h3>
-              <p><strong>Reference:</strong> ${ref}</p>
-              <p><strong>Service:</strong> ${metadata.service}</p>
-              <p><strong>Date:</strong> ${metadata.date} at ${metadata.time}</p>
-              <p><strong>Property:</strong> ${metadata.propertyAddress}</p>
-              <p><strong>Media Specialist:</strong> ${metadata.mediaSpecialist}</p>
-            </div>
-            
-            <p style="font-size: 16px; color: #333;">Thank you for choosing Markeb Media!</p>
-          </div>
-        </div>
-      `
-    });
+// ✅ UPDATED: Send payment confirmation for existing bookings (admin payment link)
+async function sendExistingBookingPaymentConfirmation(bookingFields, session) {
+  if (!process.env.RESEND_API_KEY) {
+    console.log('Resend not configured - skipping email');
+    return;
+  }
 
-    console.log('✅ Payment confirmation email sent');
+  try {
+    const { sendPaymentConfirmation } = require('./email-service');
+    
+    const emailData = {
+      bookingRef: bookingFields['Booking Reference'],
+      clientName: bookingFields['Client Name'],
+      clientEmail: bookingFields['Client Email'],
+      service: bookingFields['Service'],
+      date: bookingFields['Date'],
+      time: bookingFields['Time'],
+      propertyAddress: bookingFields['Property Address'],
+      postcode: bookingFields['Postcode'],
+      mediaSpecialist: bookingFields['Media Specialist'],
+      amountPaid: session.amount_total / 100,
+      duration: bookingFields['Duration (mins)']
+    };
+    
+    await sendPaymentConfirmation(emailData);
+    console.log(`✓ Payment confirmation email sent to ${bookingFields['Client Email']}`);
+    
   } catch (emailError) {
     console.error('⚠️ Failed to send payment confirmation:', emailError);
   }
@@ -410,7 +482,7 @@ async function sendCancellationConfirmation(metadata, session, cancellationFee, 
     await resend.emails.send({
       from: 'Markeb Media <commercial@markebmedia.com>',
       to: metadata.clientEmail,
-      bcc: bccRecipients, // ✅ Array of BCC recipients
+      bcc: bccRecipients,
       subject: `Booking Cancelled - ${metadata.bookingRef}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
