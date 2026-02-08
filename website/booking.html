@@ -2691,7 +2691,8 @@ async function createBooking() {
         clientName: bookingData.clientName,
         clientEmail: bookingData.clientEmail,
         clientPhone: bookingData.clientPhone,
-        clientNotes: bookingData.clientNotes
+        clientNotes: bookingData.clientNotes,
+        source: new URLSearchParams(window.location.search).get('source') || 'booking_page' // ✅ ADD THIS LINE
       })
     });
 

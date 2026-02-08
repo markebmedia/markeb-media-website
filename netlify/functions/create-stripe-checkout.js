@@ -31,7 +31,8 @@ exports.handler = async (event, context) => {
       mediaSpecialist: bookingData.mediaSpecialist,
       totalPrice: bookingData.totalPrice,
       discountCode: bookingData.discountCode || 'none',
-      discountAmount: bookingData.discountAmount || 0
+      discountAmount: bookingData.discountAmount || 0,
+      source: bookingData.source || 'booking_page' // ✅ NEW: Track source
     });
 
     // Validate required fields
@@ -42,6 +43,22 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({ error: 'Missing required booking data' })
       };
     }
+
+    // ✅ NEW: Determine redirect URLs based on source
+    const isDashboard = bookingData.source === 'dashboard';
+    
+    const successUrl = isDashboard
+      ? `${process.env.URL}/website/dashboard.html?view=bookings&payment=success&session_id={CHECKOUT_SESSION_ID}`
+      : `${process.env.URL}/booking-success.html?session_id={CHECKOUT_SESSION_ID}`;
+    
+    const cancelUrl = isDashboard
+      ? `${process.env.URL}/website/dashboard.html?view=bookings&payment=cancelled`
+      : `${process.env.URL}/booking.html?cancelled=true`;
+
+    console.log('✓ Redirect URLs:', {
+      success: successUrl,
+      cancel: cancelUrl
+    });
 
     // ✅ UPDATED: Build line items for Stripe with discount support
     const lineItems = [];
@@ -124,8 +141,8 @@ exports.handler = async (event, context) => {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${process.env.URL}/booking-success.html?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.URL}/booking.html?cancelled=true`,
+      success_url: successUrl, // ✅ Dynamic based on source
+      cancel_url: cancelUrl,   // ✅ Dynamic based on source
       metadata: {
         // ✅ If existing booking (admin payment link), include bookingId
         ...(isExistingBooking && { 
@@ -160,7 +177,10 @@ exports.handler = async (event, context) => {
         priceBeforeDiscount: bookingData.priceBeforeDiscount ? bookingData.priceBeforeDiscount.toString() : '0',
         
         // Payment type flag
-        paymentType: isExistingBooking ? 'existing_booking' : 'new_booking'
+        paymentType: isExistingBooking ? 'existing_booking' : 'new_booking',
+        
+        // ✅ NEW: Source tracking
+        source: bookingData.source || 'booking_page'
       },
       customer_email: bookingData.clientEmail,
     });
@@ -168,6 +188,7 @@ exports.handler = async (event, context) => {
     console.log('✅ Stripe checkout session created:', session.id);
     console.log('   Line items:', lineItems.length);
     console.log('   Total amount:', bookingData.totalPrice);
+    console.log('   Source:', bookingData.source || 'booking_page');
 
     return {
       statusCode: 200,

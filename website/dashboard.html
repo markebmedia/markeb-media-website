@@ -1901,9 +1901,9 @@
               </div>
               
               <div class="branding-promo-cta">
-                <button class="btn-branding-primary" onclick="window.open('https://markebmediabookings.as.me/?appointmentType=category:Branding%20Session', '_blank')">
-                  Book Your Session →
-                </button>
+                <button class="btn-branding-primary" onclick="window.location.href='./booking.html?source=dashboard'">
+  Book Your Session →
+</button>
                 <button class="btn-branding-secondary" onclick="showBrandingInfo()">
                   Learn More
                 </button>
@@ -1928,7 +1928,7 @@
       <p style="font-size: 16px; color: #64748b; margin-bottom: 32px; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.6;">
         Our streamlined booking system makes it easy to schedule photography, videography, and drone services for your properties.
       </p>
-      <button class="btn btn-primary" onclick="window.location.href='./booking.html'" style="font-size: 18px; padding: 16px 40px;">
+      <button class="btn btn-primary" onclick="window.location.href='./booking.html?source=dashboard'" style="font-size: 18px; padding: 16px 40px;">
         <span style="font-size: 20px; margin-right: 8px;">→</span> Start New Booking
       </button>
       
@@ -3313,6 +3313,31 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   populateHeaderUser();
   setDashboardGreeting();
   loadDashboardData();
+
+  // Handle payment return from Stripe
+const urlParams = new URLSearchParams(window.location.search);
+const paymentStatus = urlParams.get('payment');
+const sessionId = urlParams.get('session_id');
+
+if (paymentStatus === 'success' && sessionId) {
+  // Show success message
+  setTimeout(() => {
+    alert('✅ Payment successful! Your booking is confirmed.');
+    // Clean up URL
+    window.history.replaceState({}, '', '/website/dashboard.html');
+    // Reload dashboard data
+    loadDashboardData();
+  }, 500);
+}
+
+if (paymentStatus === 'cancelled') {
+  // Show cancelled message
+  setTimeout(() => {
+    alert('⚠️ Payment cancelled. You can try booking again anytime.');
+    // Clean up URL
+    window.history.replaceState({}, '', '/website/dashboard.html');
+  }, 500);
+}
   
   /* Dropdown menu event listeners */
   
