@@ -3,102 +3,164 @@ const fetch = require('node-fetch');
 // UK House Price Index SPARQL Endpoint
 const SPARQL_ENDPOINT = 'https://landregistry.data.gov.uk/landregistry/query';
 
-// Complete mapping of all UK regions to official HPI region codes
+// ✅ CORRECTED: Complete mapping of UK regions to official HPI region codes
 const REGION_CODE_MAP = {
-  // Your Service Regions
-  'Cheshire': 'E06000050',
+  // ===== YOUR SERVICE REGIONS (CORRECTED) =====
+  'Cheshire East': 'E06000049',
+  'Cheshire West and Chester': 'E06000050',
   'Greater London': 'E12000007',
   'Greater Manchester': 'E11000001',
   'Essex': 'E10000012',
   'West Midlands': 'E11000005',
   'Leicestershire': 'E10000018',
   
-  // Yorkshire & Humber
+  // ===== YORKSHIRE & HUMBER =====
   'South Yorkshire': 'E11000003',
   'West Yorkshire': 'E11000006',
   'North Yorkshire': 'E10000023',
   'East Riding of Yorkshire': 'E06000011',
+  'York': 'E06000014',
   
-  // North West England
+  // ===== NORTH WEST ENGLAND =====
   'Cumbria': 'E10000006',
   'Lancashire': 'E10000017',
   'Merseyside': 'E11000002',
+  'Blackburn with Darwen': 'E06000008',
+  'Blackpool': 'E06000009',
+  'Halton': 'E06000006',
+  'Warrington': 'E06000007',
   
-  // North East England
+  // ===== NORTH EAST ENGLAND =====
   'County Durham': 'E06000047',
   'Northumberland': 'E06000057',
   'Tyne and Wear': 'E11000007',
   
-  // Midlands
+  // ===== MIDLANDS =====
   'Derbyshire': 'E10000007',
+  'Derby': 'E06000015',
   'Herefordshire': 'E06000019',
   'Lincolnshire': 'E10000019',
   'Northamptonshire': 'E10000021',
   'Nottinghamshire': 'E10000024',
+  'Nottingham': 'E06000018',
   'Rutland': 'E06000017',
   'Shropshire': 'E06000051',
+  'Telford and Wrekin': 'E06000020',
   'Staffordshire': 'E10000028',
+  'Stoke-on-Trent': 'E06000021',
   'Warwickshire': 'E10000031',
   'Worcestershire': 'E10000034',
   
-  // East England
-  'Bedfordshire': 'E06000055',
+  // ===== EAST ENGLAND =====
+  'Bedford': 'E06000055',
+  'Central Bedfordshire': 'E06000056',
   'Cambridgeshire': 'E10000003',
+  'Peterborough': 'E06000031',
   'Hertfordshire': 'E10000015',
   'Norfolk': 'E10000020',
   'Suffolk': 'E10000029',
   
-  // South East England
-  'Berkshire': 'E06000037',
-  'Buckinghamshire': 'E10000002',
+  // ===== SOUTH EAST ENGLAND =====
+  'Berkshire': 'E10000002',
+  'Buckinghamshire': 'E06000060',
   'East Sussex': 'E10000011',
+  'Brighton and Hove': 'E06000043',
   'Hampshire': 'E10000014',
+  'Portsmouth': 'E06000044',
+  'Southampton': 'E06000045',
   'Isle of Wight': 'E06000046',
   'Kent': 'E10000016',
+  'Medway': 'E06000035',
   'Oxfordshire': 'E10000025',
   'Surrey': 'E10000030',
   'West Sussex': 'E10000032',
   
-  // South West England
+  // ===== SOUTH WEST ENGLAND =====
   'Bristol': 'E06000023',
   'Cornwall': 'E06000052',
   'Devon': 'E10000008',
+  'Plymouth': 'E06000026',
+  'Torbay': 'E06000027',
   'Dorset': 'E06000059',
+  'Bournemouth, Christchurch and Poole': 'E06000058',
   'Gloucestershire': 'E10000013',
   'Somerset': 'E10000027',
+  'Bath and North East Somerset': 'E06000022',
+  'North Somerset': 'E06000024',
+  'South Gloucestershire': 'E06000025',
   'Wiltshire': 'E06000054',
+  'Swindon': 'E06000030',
   
-  // Scotland
-  'City of Edinburgh': 'S12000036',
-  'Glasgow City': 'S12000049',
+  // ===== SCOTLAND =====
+  'Aberdeen City': 'S12000033',
   'Aberdeenshire': 'S12000034',
   'Angus': 'S12000041',
+  'Argyll and Bute': 'S12000035',
+  'City of Edinburgh': 'S12000036',
+  'Clackmannanshire': 'S12000005',
   'Dumfries and Galloway': 'S12000006',
+  'Dundee City': 'S12000042',
+  'East Ayrshire': 'S12000008',
+  'East Dunbartonshire': 'S12000045',
+  'East Lothian': 'S12000010',
+  'East Renfrewshire': 'S12000011',
+  'Falkirk': 'S12000014',
   'Fife': 'S12000015',
+  'Glasgow City': 'S12000049',
   'Highland': 'S12000017',
+  'Inverclyde': 'S12000018',
+  'Midlothian': 'S12000019',
+  'Moray': 'S12000020',
+  'North Ayrshire': 'S12000021',
   'North Lanarkshire': 'S12000050',
+  'Orkney Islands': 'S12000023',
   'Perth and Kinross': 'S12000048',
+  'Renfrewshire': 'S12000038',
   'Scottish Borders': 'S12000026',
+  'Shetland Islands': 'S12000027',
+  'South Ayrshire': 'S12000028',
   'South Lanarkshire': 'S12000029',
   'Stirling': 'S12000030',
+  'West Dunbartonshire': 'S12000039',
+  'West Lothian': 'S12000040',
+  'Na h-Eileanan Siar': 'S12000013',
   
-  // Wales
+  // ===== WALES =====
+  'Isle of Anglesey': 'W06000001',
+  'Blaenau Gwent': 'W06000019',
+  'Bridgend': 'W06000013',
+  'Caerphilly': 'W06000018',
   'Cardiff': 'W06000015',
-  'Swansea': 'W06000011',
-  'Newport': 'W06000022',
   'Carmarthenshire': 'W06000010',
   'Ceredigion': 'W06000008',
+  'Conwy': 'W06000003',
+  'Denbighshire': 'W06000004',
+  'Flintshire': 'W06000005',
   'Gwynedd': 'W06000002',
+  'Merthyr Tydfil': 'W06000024',
+  'Monmouthshire': 'W06000021',
+  'Neath Port Talbot': 'W06000012',
+  'Newport': 'W06000022',
   'Pembrokeshire': 'W06000009',
   'Powys': 'W06000023',
+  'Rhondda Cynon Taf': 'W06000016',
+  'Swansea': 'W06000011',
+  'Torfaen': 'W06000020',
+  'Vale of Glamorgan': 'W06000014',
+  'Wrexham': 'W06000006',
   
-  // Northern Ireland
-  'Antrim': 'N09000001',
-  'Armagh': 'N09000002',
-  'Down': 'N09000003',
-  'Fermanagh': 'N09000004',
-  'Londonderry': 'N09000005',
-  'Tyrone': 'N09000006'
+  // ===== NORTHERN IRELAND =====
+  'Antrim and Newtownabbey': 'N09000001',
+  'Ards and North Down': 'N09000011',
+  'Armagh City, Banbridge and Craigavon': 'N09000002',
+  'Belfast': 'N09000003',
+  'Causeway Coast and Glens': 'N09000004',
+  'Derry City and Strabane': 'N09000005',
+  'Fermanagh and Omagh': 'N09000006',
+  'Lisburn and Castlereagh': 'N09000007',
+  'Mid and East Antrim': 'N09000008',
+  'Mid Ulster': 'N09000009',
+  'Newry, Mourne and Down': 'N09000010'
 };
 
 async function getMarketData(region) {

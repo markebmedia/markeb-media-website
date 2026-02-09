@@ -18,6 +18,9 @@
   <!-- Leaflet Heat Map -->
   <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.min.js"></script>
   
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
   <style>
     /* CSS Variables for Light/Dark Mode */
     :root {
@@ -86,6 +89,9 @@
       font-weight: 700;
       color: #0f172a;
       margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
     .header-subtitle {
@@ -712,15 +718,20 @@
     <!-- Header -->
     <div class="header">
       <div class="header-content">
-        <h1>🗺️ UK Client Distribution Map</h1>
+        <h1>
+          <i data-lucide="map" style="width: 32px; height: 32px;"></i>
+          UK Client Distribution Map
+        </h1>
         <p class="header-subtitle">Advanced analytics and geographic visualization</p>
       </div>
       <div class="header-actions">
         <button class="btn btn-secondary" onclick="window.location.href='admin-panel.html'">
-          ⬅️ Back to Admin Panel
+          <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+          Back to Admin Panel
         </button>
         <button class="btn btn-primary" onclick="loadMapData()">
-          🔄 Refresh Data
+          <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+          Refresh Data
         </button>
       </div>
     </div>
@@ -754,17 +765,22 @@
       <!-- Control Panel (Left Sidebar) -->
       <div class="sidebar">
         <div class="control-panel">
-          <h3>⚙️ Map Controls</h3>
+          <h3>
+            <i data-lucide="settings" style="width: 18px; height: 18px;"></i>
+            Map Controls
+          </h3>
           
           <!-- View Mode -->
           <div class="control-section">
             <div class="control-label">View Mode</div>
             <div class="view-toggle">
               <button class="view-btn active" onclick="setViewMode('markers')" id="viewMarkers">
-                📍 Markers
+                <i data-lucide="map-pin" style="width: 16px; height: 16px;"></i>
+                Markers
               </button>
               <button class="view-btn" onclick="setViewMode('heatmap')" id="viewHeatmap">
-                🔥 Heat Map
+                <i data-lucide="flame" style="width: 16px; height: 16px;"></i>
+                Heat Map
               </button>
             </div>
           </div>
@@ -826,7 +842,10 @@
         <!-- Region List -->
         <div class="region-list">
           <h3>
-            <span>📍 Regions</span>
+            <span style="display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="map-pin" style="width: 18px; height: 18px;"></i>
+              Regions
+            </span>
             <span id="regionTotal" style="color: #94a3b8; font-size: 14px; font-weight: 500;">-</span>
           </h3>
           <div id="regionListContainer">
@@ -851,11 +870,16 @@
       <div class="sidebar">
         <div class="client-detail-panel" id="clientDetailPanel">
           <h3>
-            <span id="detailPanelTitle">👥 All Clients</span>
+            <span id="detailPanelTitle" style="display: flex; align-items: center; gap: 8px;">
+              <i data-lucide="users" style="width: 18px; height: 18px;"></i>
+              All Clients
+            </span>
           </h3>
           <div id="clientDetailContent">
             <div class="empty-state">
-              <div class="empty-state-icon">🗺️</div>
+              <div class="empty-state-icon">
+                <i data-lucide="map" style="width: 48px; height: 48px; color: #64748b; opacity: 0.5;"></i>
+              </div>
               <div class="empty-state-text">Click a region or marker to view clients</div>
             </div>
           </div>
@@ -865,81 +889,164 @@
   </div>
 
   <script>
-    // UK Region coordinates (approximate centers)
+    // ✅ UPDATED: UK Region coordinates matching new HPI codes
     const REGION_COORDS = {
-      'Leicestershire': [52.6369, -1.1398],
-      'Derbyshire': [53.1235, -1.5650],
-      'Nottinghamshire': [53.1000, -0.9900],
+      // Your Service Regions
+      'Cheshire East': [53.1603, -2.2119],
+      'Cheshire West and Chester': [53.1905, -2.8909],
       'Greater London': [51.5074, -0.1278],
       'Greater Manchester': [53.4808, -2.2426],
-      'West Midlands': [52.4862, -1.8904],
-      'Hampshire': [51.0577, -1.3081],
-      'Kent': [51.2787, 0.5217],
       'Essex': [51.7341, 0.4700],
-      'Surrey': [51.3148, -0.5600],
-      'Lancashire': [53.7632, -2.7044],
-      'Hertfordshire': [51.8090, -0.2376],
-      'Berkshire': [51.4543, -1.0000],
-      'Staffordshire': [52.8700, -2.0800],
-      'Cheshire': [53.2000, -2.5300],
-      'West Yorkshire': [53.7900, -1.7500],
+      'West Midlands': [52.4862, -1.8904],
+      'Leicestershire': [52.6369, -1.1398],
+      
+      // Yorkshire & Humber
       'South Yorkshire': [53.5400, -1.3500],
-      'Norfolk': [52.6295, 0.7100],
-      'Oxfordshire': [51.7612, -1.2500],
-      'Lincolnshire': [53.2307, -0.5406],
-      'Suffolk': [52.1872, 0.9708],
-      'Cambridgeshire': [52.2053, 0.1218],
-      'Worcestershire': [52.2500, -2.2200],
-      'Devon': [50.7184, -3.5339],
-      'Gloucestershire': [51.8642, -2.2381],
-      'Somerset': [51.1054, -2.9260],
-      'Dorset': [50.7480, -2.3440],
-      'Wiltshire': [51.3493, -1.9927],
-      'Cornwall': [50.2660, -5.0527],
-      'East Sussex': [50.9085, 0.2500],
-      'West Sussex': [50.9200, -0.6000],
-      'Bedfordshire': [52.0406, -0.4547],
-      'Northamptonshire': [52.2700, -0.8700],
-      'Warwickshire': [52.2819, -1.5849],
-      'Shropshire': [52.7069, -2.7464],
-      'Herefordshire': [52.0564, -2.7160],
-      'Buckinghamshire': [51.8133, -0.8084],
-      'City of Edinburgh': [55.9533, -3.1883],
-      'Glasgow City': [55.8642, -4.2518],
-      'Fife': [56.2079, -3.1498],
-      'Highland': [57.4778, -4.2247],
-      'Aberdeenshire': [57.1497, -2.5943],
-      'Perth and Kinross': [56.3950, -4.2373],
-      'Dumfries and Galloway': [55.0700, -3.6053],
-      'Scottish Borders': [55.5446, -2.7820],
-      'South Lanarkshire': [55.6743, -3.7819],
-      'North Lanarkshire': [55.8667, -3.9667],
-      'Angus': [56.6500, -2.8667],
-      'Stirling': [56.1165, -3.9369],
-      'Cardiff': [51.4816, -3.1791],
-      'Swansea': [51.6214, -3.9436],
-      'Newport': [51.5842, -2.9977],
-      'Gwynedd': [52.9167, -4.1333],
-      'Powys': [52.3333, -3.3333],
-      'Carmarthenshire': [51.8567, -4.3123],
-      'Pembrokeshire': [51.6730, -4.9094],
-      'Ceredigion': [52.4167, -3.9667],
-      'Antrim': [54.7167, -6.2167],
-      'Down': [54.3167, -5.7167],
-      'Armagh': [54.3500, -6.6500],
-      'Londonderry': [54.9958, -7.3086],
-      'Tyrone': [54.6000, -7.3000],
-      'Fermanagh': [54.3500, -7.6333],
-      'Bristol': [51.4545, -2.5879],
-      'Cumbria': [54.5772, -2.7974],
-      'Northumberland': [55.2083, -2.0784],
-      'County Durham': [54.7753, -1.5849],
-      'Tyne and Wear': [54.9783, -1.6178],
+      'West Yorkshire': [53.7900, -1.7500],
       'North Yorkshire': [54.2766, -1.4090],
       'East Riding of Yorkshire': [53.8429, -0.4380],
+      'York': [53.9600, -1.0873],
+      
+      // North West England
+      'Cumbria': [54.5772, -2.7974],
+      'Lancashire': [53.7632, -2.7044],
+      'Merseyside': [53.4106, -2.9779],
+      'Blackburn with Darwen': [53.7480, -2.4820],
+      'Blackpool': [53.8175, -3.0357],
+      'Halton': [53.3340, -2.7350],
+      'Warrington': [53.3900, -2.5970],
+      
+      // North East England
+      'County Durham': [54.7753, -1.5849],
+      'Northumberland': [55.2083, -2.0784],
+      'Tyne and Wear': [54.9783, -1.6178],
+      
+      // Midlands
+      'Derbyshire': [53.1235, -1.5650],
+      'Derby': [52.9219, -1.4746],
+      'Herefordshire': [52.0564, -2.7160],
+      'Lincolnshire': [53.2307, -0.5406],
+      'Northamptonshire': [52.2700, -0.8700],
+      'Nottinghamshire': [53.1000, -0.9900],
+      'Nottingham': [52.9548, -1.1581],
       'Rutland': [52.6558, -0.6389],
+      'Shropshire': [52.7069, -2.7464],
+      'Telford and Wrekin': [52.6766, -2.4469],
+      'Staffordshire': [52.8700, -2.0800],
+      'Stoke-on-Trent': [53.0027, -2.1794],
+      'Warwickshire': [52.2819, -1.5849],
+      'Worcestershire': [52.2500, -2.2200],
+      
+      // East England
+      'Bedford': [52.1363, -0.4667],
+      'Central Bedfordshire': [52.0029, -0.2982],
+      'Cambridgeshire': [52.2053, 0.1218],
+      'Peterborough': [52.5695, -0.2405],
+      'Hertfordshire': [51.8090, -0.2376],
+      'Norfolk': [52.6295, 0.7100],
+      'Suffolk': [52.1872, 0.9708],
+      
+      // South East England
+      'Berkshire': [51.4543, -1.0000],
+      'Brighton and Hove': [50.8225, -0.1372],
+      'Buckinghamshire': [51.8133, -0.8084],
+      'East Sussex': [50.9085, 0.2500],
+      'Hampshire': [51.0577, -1.3081],
+      'Portsmouth': [50.8198, -1.0880],
+      'Southampton': [50.9097, -1.4044],
       'Isle of Wight': [50.6938, -1.3047],
-      'Merseyside': [53.4106, -2.9779]
+      'Kent': [51.2787, 0.5217],
+      'Medway': [51.4021, 0.5501],
+      'Oxfordshire': [51.7612, -1.2500],
+      'Surrey': [51.3148, -0.5600],
+      'West Sussex': [50.9200, -0.6000],
+      
+      // South West England
+      'Bath and North East Somerset': [51.3811, -2.3590],
+      'Bournemouth, Christchurch and Poole': [50.7192, -1.8808],
+      'Bristol': [51.4545, -2.5879],
+      'Cornwall': [50.2660, -5.0527],
+      'Devon': [50.7184, -3.5339],
+      'Plymouth': [50.3755, -4.1427],
+      'Torbay': [50.4619, -3.5253],
+      'Dorset': [50.7480, -2.3440],
+      'Gloucestershire': [51.8642, -2.2381],
+      'North Somerset': [51.3877, -2.7780],
+      'Somerset': [51.1054, -2.9260],
+      'South Gloucestershire': [51.5260, -2.4729],
+      'Swindon': [51.5558, -1.7797],
+      'Wiltshire': [51.3493, -1.9927],
+      
+      // Scotland
+      'Aberdeen City': [57.1497, -2.0943],
+      'Aberdeenshire': [57.1497, -2.5943],
+      'Angus': [56.6500, -2.8667],
+      'Argyll and Bute': [56.4155, -5.4760],
+      'City of Edinburgh': [55.9533, -3.1883],
+      'Clackmannanshire': [56.1072, -3.7508],
+      'Dumfries and Galloway': [55.0700, -3.6053],
+      'Dundee City': [56.4620, -2.9707],
+      'East Ayrshire': [55.4530, -4.2680],
+      'East Dunbartonshire': [55.9747, -4.2010],
+      'East Lothian': [55.9380, -2.7710],
+      'East Renfrewshire': [55.7703, -4.3370],
+      'Falkirk': [56.0019, -3.7839],
+      'Fife': [56.2079, -3.1498],
+      'Glasgow City': [55.8642, -4.2518],
+      'Highland': [57.4778, -4.2247],
+      'Inverclyde': [55.9463, -4.6760],
+      'Midlothian': [55.8282, -3.1076],
+      'Moray': [57.6495, -3.3150],
+      'Na h-Eileanan Siar': [58.2000, -6.3800],
+      'North Ayrshire': [55.6430, -4.7590],
+      'North Lanarkshire': [55.8667, -3.9667],
+      'Orkney Islands': [59.0000, -3.0000],
+      'Perth and Kinross': [56.3950, -4.2373],
+      'Renfrewshire': [55.8456, -4.5331],
+      'Scottish Borders': [55.5446, -2.7820],
+      'Shetland Islands': [60.5000, -1.2500],
+      'South Ayrshire': [55.4583, -4.6290],
+      'South Lanarkshire': [55.6743, -3.7819],
+      'Stirling': [56.1165, -3.9369],
+      'West Dunbartonshire': [55.9446, -4.5660],
+      'West Lothian': [55.9027, -3.5478],
+      
+      // Wales
+      'Isle of Anglesey': [53.2860, -4.3655],
+      'Blaenau Gwent': [51.7878, -3.2041],
+      'Bridgend': [51.5042, -3.5769],
+      'Caerphilly': [51.5784, -3.2184],
+      'Cardiff': [51.4816, -3.1791],
+      'Carmarthenshire': [51.8567, -4.3123],
+      'Ceredigion': [52.4167, -3.9667],
+      'Conwy': [53.2810, -3.8290],
+      'Denbighshire': [53.1840, -3.4200],
+      'Flintshire': [53.2460, -3.1420],
+      'Gwynedd': [52.9167, -4.1333],
+      'Merthyr Tydfil': [51.7485, -3.3783],
+      'Monmouthshire': [51.8116, -2.7160],
+      'Neath Port Talbot': [51.6609, -3.7837],
+      'Newport': [51.5842, -2.9977],
+      'Pembrokeshire': [51.6730, -4.9094],
+      'Powys': [52.3333, -3.3333],
+      'Rhondda Cynon Taf': [51.6587, -3.4313],
+      'Swansea': [51.6214, -3.9436],
+      'Torfaen': [51.7006, -3.0344],
+      'Vale of Glamorgan': [51.4061, -3.4800],
+      'Wrexham': [53.0465, -2.9930],
+      
+      // Northern Ireland
+      'Antrim and Newtownabbey': [54.7167, -6.2167],
+      'Ards and North Down': [54.5950, -5.6940],
+      'Armagh City, Banbridge and Craigavon': [54.3500, -6.4000],
+      'Belfast': [54.5973, -5.9301],
+      'Causeway Coast and Glens': [55.1340, -6.6530],
+      'Derry City and Strabane': [54.9958, -7.3086],
+      'Fermanagh and Omagh': [54.4500, -7.6500],
+      'Lisburn and Castlereagh': [54.5162, -6.0581],
+      'Mid and East Antrim': [54.8640, -6.0290],
+      'Mid Ulster': [54.6000, -6.7500],
+      'Newry, Mourne and Down': [54.1750, -6.3390]
     };
 
     const UK_REGIONS = Object.keys(REGION_COORDS).sort();
@@ -960,6 +1067,7 @@
       initMap();
       loadMapData();
       initDateFilters();
+      lucide.createIcons(); // Initialize Lucide icons
     });
 
     function initMap() {
@@ -1130,16 +1238,21 @@
             
             marker.bindPopup(`
               <div class="popup-title">${user.fields['Name']}</div>
-              <div class="popup-info">🏢 ${user.fields['Company'] || 'N/A'}</div>
-              <div class="popup-info">📧 ${user.fields['Email']}</div>
-              <div class="popup-info">📍 ${region}</div>
-              <div class="popup-info">📅 Joined: ${formatDate(user.fields['Created Date'])}</div>
+              <div class="popup-info"><i data-lucide="building" style="width: 14px; height: 14px;"></i> ${user.fields['Company'] || 'N/A'}</div>
+              <div class="popup-info"><i data-lucide="mail" style="width: 14px; height: 14px;"></i> ${user.fields['Email']}</div>
+              <div class="popup-info"><i data-lucide="map-pin" style="width: 14px; height: 14px;"></i> ${region}</div>
+              <div class="popup-info"><i data-lucide="calendar" style="width: 14px; height: 14px;"></i> Joined: ${formatDate(user.fields['Created Date'])}</div>
               <div class="popup-clients">
                 <span class="client-badge ${user.fields['Account Status'] === 'Active' ? 'badge-active' : 'badge-inactive'}">
                   ${user.fields['Account Status'] || 'Unknown'}
                 </span>
               </div>
             `);
+
+            // Reinitialize icons in popup after it opens
+            marker.on('popupopen', () => {
+              lucide.createIcons();
+            });
 
             markerCluster.addLayer(marker);
           }
@@ -1291,24 +1404,28 @@
       const panelTitle = document.getElementById('detailPanelTitle');
       const panelContent = document.getElementById('clientDetailContent');
 
-      panelTitle.innerHTML = `📍 ${region} <span style="color: #94a3b8; font-size: 14px; font-weight: 500;">(${clients.length})</span>`;
+      panelTitle.innerHTML = `<i data-lucide="map-pin" style="width: 18px; height: 18px;"></i> ${region} <span style="color: #94a3b8; font-size: 14px; font-weight: 500;">(${clients.length})</span>`;
+      lucide.createIcons();
 
       if (clients.length === 0) {
         panelContent.innerHTML = `
           <div class="empty-state">
-            <div class="empty-state-icon">📭</div>
+            <div class="empty-state-icon">
+              <i data-lucide="inbox" style="width: 48px; height: 48px; color: #64748b; opacity: 0.5;"></i>
+            </div>
             <div class="empty-state-text">No clients in ${region} yet</div>
           </div>
         `;
+        lucide.createIcons();
         return;
       }
 
       const clientCards = clients.map(client => `
         <div class="client-card">
           <div class="client-name">${client.fields['Name']}</div>
-          <div class="client-info">🏢 ${client.fields['Company'] || 'N/A'}</div>
-          <div class="client-info">📧 ${client.fields['Email']}</div>
-          <div class="client-info">📅 Joined: ${formatDate(client.fields['Created Date'])}</div>
+          <div class="client-info"><i data-lucide="building" style="width: 14px; height: 14px;"></i> ${client.fields['Company'] || 'N/A'}</div>
+          <div class="client-info"><i data-lucide="mail" style="width: 14px; height: 14px;"></i> ${client.fields['Email']}</div>
+          <div class="client-info"><i data-lucide="calendar" style="width: 14px; height: 14px;"></i> Joined: ${formatDate(client.fields['Created Date'])}</div>
           <span class="client-badge ${client.fields['Account Status'] === 'Active' ? 'badge-active' : 'badge-inactive'}">
             ${client.fields['Account Status'] || 'Unknown'}
           </span>
@@ -1316,21 +1433,26 @@
       `).join('');
 
       panelContent.innerHTML = clientCards;
+      lucide.createIcons();
     }
 
     function showAllClients() {
       const panelTitle = document.getElementById('detailPanelTitle');
       const panelContent = document.getElementById('clientDetailContent');
 
-      panelTitle.innerHTML = `👥 All Clients <span style="color: #94a3b8; font-size: 14px; font-weight: 500;">(${filteredClientData.length})</span>`;
+      panelTitle.innerHTML = `<i data-lucide="users" style="width: 18px; height: 18px;"></i> All Clients <span style="color: #94a3b8; font-size: 14px; font-weight: 500;">(${filteredClientData.length})</span>`;
+      lucide.createIcons();
 
       if (filteredClientData.length === 0) {
         panelContent.innerHTML = `
           <div class="empty-state">
-            <div class="empty-state-icon">📭</div>
+            <div class="empty-state-icon">
+              <i data-lucide="inbox" style="width: 48px; height: 48px; color: #64748b; opacity: 0.5;"></i>
+            </div>
             <div class="empty-state-text">No clients found</div>
           </div>
         `;
+        lucide.createIcons();
         return;
       }
 
@@ -1340,9 +1462,9 @@
         .map(client => `
           <div class="client-card" onclick="flyToRegion('${client.fields['Region']}')">
             <div class="client-name">${client.fields['Name']}</div>
-            <div class="client-info">🏢 ${client.fields['Company'] || 'N/A'}</div>
-            <div class="client-info">📍 ${client.fields['Region']}</div>
-            <div class="client-info">📅 ${formatDate(client.fields['Created Date'])}</div>
+            <div class="client-info"><i data-lucide="building" style="width: 14px; height: 14px;"></i> ${client.fields['Company'] || 'N/A'}</div>
+            <div class="client-info"><i data-lucide="map-pin" style="width: 14px; height: 14px;"></i> ${client.fields['Region']}</div>
+            <div class="client-info"><i data-lucide="calendar" style="width: 14px; height: 14px;"></i> ${formatDate(client.fields['Created Date'])}</div>
             <span class="client-badge ${client.fields['Account Status'] === 'Active' ? 'badge-active' : 'badge-inactive'}">
               ${client.fields['Account Status'] || 'Unknown'}
             </span>
@@ -1354,6 +1476,8 @@
       if (filteredClientData.length > 50) {
         panelContent.innerHTML += `<div style="text-align: center; padding: 20px; color: #94a3b8; font-size: 13px;">Showing 50 of ${filteredClientData.length} clients</div>`;
       }
+      
+      lucide.createIcons();
     }
 
     function formatDate(dateString) {

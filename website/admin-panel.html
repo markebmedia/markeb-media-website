@@ -1843,6 +1843,87 @@ body {
   }
 }
 
+/* Template Card Styles */
+.template-card {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.template-card:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.template-card:active {
+  transform: translateY(0);
+}
+
+.recipient-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.recipient-checkbox-item:hover {
+  background: #f8fafc;
+}
+
+.recipient-checkbox-item:last-child {
+  border-bottom: none;
+}
+
+.recipient-checkbox-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.recipient-info {
+  flex: 1;
+}
+
+.recipient-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.recipient-details {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.recipient-badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-active {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.badge-inactive {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
   </style>
 </head>
 <body>
@@ -1941,10 +2022,14 @@ body {
   </div>
 
   <div class="nav-section">
-  <div class="nav-section-title">Communications</div>
+  <div class="nav-section-title">COMMUNICATIONS</div>
   <div class="nav-item" onclick="showSection('market-updates')">
-    <i data-lucide="mail" class="nav-icon" style="width: 20px; height: 20px;"></i>
+    <i data-lucide="trending-up" class="nav-icon"></i>
     Market Updates
+  </div>
+  <div class="nav-item" onclick="showSection('email-broadcast')">
+    <i data-lucide="send" class="nav-icon"></i>
+    Email Broadcast
   </div>
 </div>
 
@@ -2368,8 +2453,7 @@ body {
       💡 <strong>How it works:</strong> Select a region and compose your market update. Only customers who have opted in for market updates in that region will receive the email.
     </div>
 
-    <form id="marketUpdateForm">
-      <div class="form-group">
+    <div class="form-group">
   <label class="form-label" for="marketUpdateRegion">Select Region(s) *</label>
   <select 
     id="marketUpdateRegion" 
@@ -2381,7 +2465,8 @@ body {
     style="height: auto; min-height: 200px;"
   >
     <optgroup label="🎯 Your Service Regions">
-      <option value="Cheshire">Cheshire</option>
+      <option value="Cheshire East">Cheshire East</option>
+      <option value="Cheshire West and Chester">Cheshire West and Chester</option>
       <option value="Greater London">Greater London</option>
       <option value="Greater Manchester">Greater Manchester</option>
       <option value="Essex">Essex</option>
@@ -2389,17 +2474,22 @@ body {
       <option value="Leicestershire">Leicestershire</option>
     </optgroup>
     
-    <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - Yorkshire">
+    <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - Yorkshire & Humber">
       <option value="South Yorkshire">South Yorkshire</option>
       <option value="West Yorkshire">West Yorkshire</option>
       <option value="North Yorkshire">North Yorkshire</option>
       <option value="East Riding of Yorkshire">East Riding of Yorkshire</option>
+      <option value="York">York</option>
     </optgroup>
     
     <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - North West">
       <option value="Cumbria">Cumbria</option>
       <option value="Lancashire">Lancashire</option>
       <option value="Merseyside">Merseyside</option>
+      <option value="Blackburn with Darwen">Blackburn with Darwen</option>
+      <option value="Blackpool">Blackpool</option>
+      <option value="Halton">Halton</option>
+      <option value="Warrington">Warrington</option>
     </optgroup>
     
     <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - North East">
@@ -2410,20 +2500,26 @@ body {
     
     <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - Midlands">
       <option value="Derbyshire">Derbyshire</option>
+      <option value="Derby">Derby</option>
       <option value="Herefordshire">Herefordshire</option>
       <option value="Lincolnshire">Lincolnshire</option>
       <option value="Northamptonshire">Northamptonshire</option>
       <option value="Nottinghamshire">Nottinghamshire</option>
+      <option value="Nottingham">Nottingham</option>
       <option value="Rutland">Rutland</option>
       <option value="Shropshire">Shropshire</option>
+      <option value="Telford and Wrekin">Telford and Wrekin</option>
       <option value="Staffordshire">Staffordshire</option>
+      <option value="Stoke-on-Trent">Stoke-on-Trent</option>
       <option value="Warwickshire">Warwickshire</option>
       <option value="Worcestershire">Worcestershire</option>
     </optgroup>
     
     <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - East">
-      <option value="Bedfordshire">Bedfordshire</option>
+      <option value="Bedford">Bedford</option>
+      <option value="Central Bedfordshire">Central Bedfordshire</option>
       <option value="Cambridgeshire">Cambridgeshire</option>
+      <option value="Peterborough">Peterborough</option>
       <option value="Hertfordshire">Hertfordshire</option>
       <option value="Norfolk">Norfolk</option>
       <option value="Suffolk">Suffolk</option>
@@ -2433,9 +2529,13 @@ body {
       <option value="Berkshire">Berkshire</option>
       <option value="Buckinghamshire">Buckinghamshire</option>
       <option value="East Sussex">East Sussex</option>
+      <option value="Brighton and Hove">Brighton and Hove</option>
       <option value="Hampshire">Hampshire</option>
+      <option value="Portsmouth">Portsmouth</option>
+      <option value="Southampton">Southampton</option>
       <option value="Isle of Wight">Isle of Wight</option>
       <option value="Kent">Kent</option>
+      <option value="Medway">Medway</option>
       <option value="Oxfordshire">Oxfordshire</option>
       <option value="Surrey">Surrey</option>
       <option value="West Sussex">West Sussex</option>
@@ -2445,45 +2545,91 @@ body {
       <option value="Bristol">Bristol</option>
       <option value="Cornwall">Cornwall</option>
       <option value="Devon">Devon</option>
+      <option value="Plymouth">Plymouth</option>
+      <option value="Torbay">Torbay</option>
       <option value="Dorset">Dorset</option>
+      <option value="Bournemouth, Christchurch and Poole">Bournemouth, Christchurch and Poole</option>
       <option value="Gloucestershire">Gloucestershire</option>
       <option value="Somerset">Somerset</option>
+      <option value="Bath and North East Somerset">Bath and North East Somerset</option>
+      <option value="North Somerset">North Somerset</option>
+      <option value="South Gloucestershire">South Gloucestershire</option>
       <option value="Wiltshire">Wiltshire</option>
+      <option value="Swindon">Swindon</option>
     </optgroup>
     
     <optgroup label="🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland">
-      <option value="City of Edinburgh">Edinburgh</option>
-      <option value="Glasgow City">Glasgow</option>
+      <option value="Aberdeen City">Aberdeen City</option>
       <option value="Aberdeenshire">Aberdeenshire</option>
       <option value="Angus">Angus</option>
+      <option value="Argyll and Bute">Argyll and Bute</option>
+      <option value="City of Edinburgh">City of Edinburgh</option>
+      <option value="Clackmannanshire">Clackmannanshire</option>
       <option value="Dumfries and Galloway">Dumfries and Galloway</option>
+      <option value="Dundee City">Dundee City</option>
+      <option value="East Ayrshire">East Ayrshire</option>
+      <option value="East Dunbartonshire">East Dunbartonshire</option>
+      <option value="East Lothian">East Lothian</option>
+      <option value="East Renfrewshire">East Renfrewshire</option>
+      <option value="Falkirk">Falkirk</option>
       <option value="Fife">Fife</option>
+      <option value="Glasgow City">Glasgow City</option>
       <option value="Highland">Highland</option>
+      <option value="Inverclyde">Inverclyde</option>
+      <option value="Midlothian">Midlothian</option>
+      <option value="Moray">Moray</option>
+      <option value="North Ayrshire">North Ayrshire</option>
       <option value="North Lanarkshire">North Lanarkshire</option>
+      <option value="Orkney Islands">Orkney Islands</option>
       <option value="Perth and Kinross">Perth and Kinross</option>
+      <option value="Renfrewshire">Renfrewshire</option>
       <option value="Scottish Borders">Scottish Borders</option>
+      <option value="Shetland Islands">Shetland Islands</option>
+      <option value="South Ayrshire">South Ayrshire</option>
       <option value="South Lanarkshire">South Lanarkshire</option>
       <option value="Stirling">Stirling</option>
+      <option value="West Dunbartonshire">West Dunbartonshire</option>
+      <option value="West Lothian">West Lothian</option>
+      <option value="Na h-Eileanan Siar">Na h-Eileanan Siar</option>
     </optgroup>
     
     <optgroup label="🏴󠁧󠁢󠁷󠁬󠁳󠁿 Wales">
+      <option value="Isle of Anglesey">Isle of Anglesey</option>
+      <option value="Blaenau Gwent">Blaenau Gwent</option>
+      <option value="Bridgend">Bridgend</option>
+      <option value="Caerphilly">Caerphilly</option>
       <option value="Cardiff">Cardiff</option>
-      <option value="Swansea">Swansea</option>
-      <option value="Newport">Newport</option>
       <option value="Carmarthenshire">Carmarthenshire</option>
       <option value="Ceredigion">Ceredigion</option>
+      <option value="Conwy">Conwy</option>
+      <option value="Denbighshire">Denbighshire</option>
+      <option value="Flintshire">Flintshire</option>
       <option value="Gwynedd">Gwynedd</option>
+      <option value="Merthyr Tydfil">Merthyr Tydfil</option>
+      <option value="Monmouthshire">Monmouthshire</option>
+      <option value="Neath Port Talbot">Neath Port Talbot</option>
+      <option value="Newport">Newport</option>
       <option value="Pembrokeshire">Pembrokeshire</option>
       <option value="Powys">Powys</option>
+      <option value="Rhondda Cynon Taf">Rhondda Cynon Taf</option>
+      <option value="Swansea">Swansea</option>
+      <option value="Torfaen">Torfaen</option>
+      <option value="Vale of Glamorgan">Vale of Glamorgan</option>
+      <option value="Wrexham">Wrexham</option>
     </optgroup>
     
     <optgroup label="Northern Ireland">
-      <option value="Antrim">Antrim</option>
-      <option value="Armagh">Armagh</option>
-      <option value="Down">Down</option>
-      <option value="Fermanagh">Fermanagh</option>
-      <option value="Londonderry">Londonderry</option>
-      <option value="Tyrone">Tyrone</option>
+      <option value="Antrim and Newtownabbey">Antrim and Newtownabbey</option>
+      <option value="Ards and North Down">Ards and North Down</option>
+      <option value="Armagh City, Banbridge and Craigavon">Armagh City, Banbridge and Craigavon</option>
+      <option value="Belfast">Belfast</option>
+      <option value="Causeway Coast and Glens">Causeway Coast and Glens</option>
+      <option value="Derry City and Strabane">Derry City and Strabane</option>
+      <option value="Fermanagh and Omagh">Fermanagh and Omagh</option>
+      <option value="Lisburn and Castlereagh">Lisburn and Castlereagh</option>
+      <option value="Mid and East Antrim">Mid and East Antrim</option>
+      <option value="Mid Ulster">Mid Ulster</option>
+      <option value="Newry, Mourne and Down">Newry, Mourne and Down</option>
     </optgroup>
   </select>
   <div style="font-size: 12px; color: #64748b; margin-top: 8px;">
@@ -2574,6 +2720,223 @@ Markeb Media Team"
     </div>
   </div>
 </div>
+
+<!-- EMAIL BROADCAST SECTION -->
+<div id="email-broadcast" class="section" style="display: none;">
+  
+  <!-- Stats Cards -->
+  <div class="stats-grid" style="margin-bottom: 32px;">
+    <div class="stat-card">
+      <div class="stat-value" id="broadcastTotalUsers">-</div>
+      <div class="stat-label">Dashboard Users</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="broadcastSelected">0</div>
+      <div class="stat-label">Selected Recipients</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="broadcastLastSent">Never</div>
+      <div class="stat-label">Last Broadcast</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="broadcastTotalSent">0</div>
+      <div class="stat-label">Total Sent</div>
+    </div>
+  </div>
+
+  <!-- Select Recipients -->
+  <div class="calendar-container" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="font-size: 18px; font-weight: 700;">
+        <i data-lucide="users" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle;"></i>
+        Select Recipients
+      </h3>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-secondary btn-small" onclick="selectAllBroadcastRecipients()">
+          Select All
+        </button>
+        <button class="btn btn-secondary btn-small" onclick="deselectAllBroadcastRecipients()">
+          Deselect All
+        </button>
+      </div>
+    </div>
+    
+    <!-- Search & Filter -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 20px;">
+      <input type="text" id="broadcastRecipientSearch" class="form-input" placeholder="Search by name, company, or email..." oninput="filterBroadcastRecipients()">
+      <select id="broadcastRecipientFilter" class="form-input" onchange="filterBroadcastRecipients()">
+        <option value="all">All Users</option>
+        <option value="active">Active Only</option>
+        <option value="email-enabled">Email Notifications On</option>
+      </select>
+    </div>
+
+    <!-- Recipient List -->
+    <div id="broadcastRecipientList" style="max-height: 400px; overflow-y: auto; border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px; background: #fff;">
+      <div style="text-align: center; padding: 40px; color: #94a3b8;">
+        <div class="spinner"></div>
+        <p style="margin-top: 12px;">Loading users...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Template Selection -->
+  <div class="calendar-container" style="margin-bottom: 24px;">
+    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">
+      <i data-lucide="layout-template" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle;"></i>
+      Choose Template
+    </h3>
+    
+    <div class="info-box" style="margin-bottom: 24px;">
+      <strong>Merge tags available:</strong> <code>[Name]</code>, <code>[Company]</code>, <code>[Email]</code><br>
+      Each recipient receives an individual email (not CC'd or BCC'd together).
+    </div>
+
+    <!-- Template Buttons -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin-bottom: 24px;">
+      
+      <div class="template-card" onclick="loadBroadcastTemplate('availability')">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+          <i data-lucide="calendar-check" style="width: 24px; height: 24px; color: #3b82f6;"></i>
+          <strong style="font-size: 15px;">Availability Reminder</strong>
+        </div>
+        <p style="font-size: 13px; color: #64748b; margin: 0;">
+          Auto-generates available dates from booking calendar
+        </p>
+      </div>
+
+      <div class="template-card" onclick="loadBroadcastTemplate('feature-announcement')">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+          <i data-lucide="sparkles" style="width: 24px; height: 24px; color: #10b981;"></i>
+          <strong style="font-size: 15px;">New Feature</strong>
+        </div>
+        <p style="font-size: 13px; color: #64748b; margin: 0;">
+          Announce new dashboard features
+        </p>
+      </div>
+
+      <div class="template-card" onclick="loadBroadcastTemplate('seasonal-offer')">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+          <i data-lucide="gift" style="width: 24px; height: 24px; color: #f59e0b;"></i>
+          <strong style="font-size: 15px;">Seasonal Offer</strong>
+        </div>
+        <p style="font-size: 13px; color: #64748b; margin: 0;">
+          Holiday discounts and promotions
+        </p>
+      </div>
+
+      <div class="template-card" onclick="loadBroadcastTemplate('tips-advice')">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+          <i data-lucide="lightbulb" style="width: 24px; height: 24px; color: #8b5cf6;"></i>
+          <strong style="font-size: 15px;">Tips & Advice</strong>
+        </div>
+        <p style="font-size: 13px; color: #64748b; margin: 0;">
+          Property marketing tips
+        </p>
+      </div>
+
+      <div class="template-card" onclick="loadBroadcastTemplate('company-news')">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+          <i data-lucide="newspaper" style="width: 24px; height: 24px; color: #ef4444;"></i>
+          <strong style="font-size: 15px;">Company News</strong>
+        </div>
+        <p style="font-size: 13px; color: #64748b; margin: 0;">
+          Team updates and achievements
+        </p>
+      </div>
+
+      <div class="template-card" onclick="loadBroadcastTemplate('custom')">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+          <i data-lucide="pencil" style="width: 24px; height: 24px; color: #64748b;"></i>
+          <strong style="font-size: 15px;">Custom Email</strong>
+        </div>
+        <p style="font-size: 13px; color: #64748b; margin: 0;">
+          Write your own message
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Email Composer (shown after template selection) -->
+    <div id="broadcastComposer" style="display: none;">
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label class="form-label">
+          Email Subject <span style="color: #ef4444;">*</span>
+        </label>
+        <input type="text" id="broadcastSubject" class="form-input" placeholder="e.g., Book Your Spring Property Shoot Today!" required>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label class="form-label">
+          Email Content <span style="color: #ef4444;">*</span>
+        </label>
+        <textarea id="broadcastContent" class="form-input" rows="14" placeholder="Hi [Name],
+
+We wanted to reach out..." required></textarea>
+        <div style="font-size: 12px; color: #64748b; margin-top: 8px;">
+          HTML allowed: <code>&lt;strong&gt;</code>, <code>&lt;br&gt;</code>, <code>&lt;a href=""&gt;</code>, <code>&lt;ul&gt;</code>, <code>&lt;li&gt;</code>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label class="form-label">
+          Preview (with first recipient's data)
+        </label>
+        <button class="btn btn-secondary btn-small" onclick="updateBroadcastPreview()" style="margin-bottom: 12px;">
+          Refresh Preview
+        </button>
+        <div id="broadcastPreview" style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 24px; min-height: 200px;">
+          <div style="text-align: center; color: #94a3b8;">
+            Select a template or enter content to preview
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="sendBroadcastEmail()" id="sendBroadcastBtn">
+          <i data-lucide="send" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i>
+          Send to <span id="sendBroadcastCount">0</span> Recipients
+        </button>
+        
+        <button class="btn btn-secondary" onclick="sendTestBroadcast()">
+          <i data-lucide="flask-conical" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i>
+          Send Test to Yourself
+        </button>
+        
+        <button class="btn btn-secondary" onclick="clearBroadcastForm()">
+          <i data-lucide="x" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i>
+          Clear
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Broadcast History -->
+  <div class="calendar-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="font-size: 18px; font-weight: 700;">
+        <i data-lucide="history" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle;"></i>
+        Broadcast History
+      </h3>
+      <button class="btn btn-secondary btn-small" onclick="clearBroadcastHistory()">
+        Clear History
+      </button>
+    </div>
+    <div id="broadcastHistoryContainer">
+      <div style="text-align: center; padding: 40px; color: #94a3b8;">
+        <i data-lucide="clock" style="width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+        <p>No broadcasts sent yet</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- END EMAIL BROADCAST SECTION -->
 
   <!-- Booking Detail Modal -->
   <div class="modal" id="bookingModal" onclick="closeModal('bookingModal')">
@@ -3224,41 +3587,167 @@ const stripe = Stripe(STRIPE_PUBLIC_KEY);
     let allCustomers = [];
     let currentBooking = null;
 
-    // UK REGIONS - All UK counties and regions
-    const UK_REGIONS = [
-      // England - North West
-      'Cheshire', 'Cumbria', 'Greater Manchester', 'Lancashire', 'Merseyside',
-      // England - North East
-      'County Durham', 'Northumberland', 'Tyne and Wear',
-      // England - Yorkshire and the Humber
-      'East Riding of Yorkshire', 'North Yorkshire', 'South Yorkshire', 'West Yorkshire',
-      // England - East Midlands
-      'Derbyshire', 'Leicestershire', 'Lincolnshire', 'Northamptonshire', 'Nottinghamshire', 'Rutland',
-      // England - West Midlands
-      'Herefordshire', 'Shropshire', 'Staffordshire', 'Warwickshire', 'West Midlands', 'Worcestershire',
-      // England - East of England
-      'Bedfordshire', 'Cambridgeshire', 'Essex', 'Hertfordshire', 'Norfolk', 'Suffolk',
-      // England - South East
-      'Berkshire', 'Buckinghamshire', 'East Sussex', 'Hampshire', 'Isle of Wight', 'Kent', 'Oxfordshire', 'Surrey', 'West Sussex',
-      // England - South West
-      'Bristol', 'Cornwall', 'Devon', 'Dorset', 'Gloucestershire', 'Somerset', 'Wiltshire',
-      // England - London
-      'Greater London',
-      // Scotland
-      'Aberdeenshire', 'Angus', 'Argyll and Bute', 'City of Edinburgh', 'Clackmannanshire', 
-      'Dumfries and Galloway', 'Dundee City', 'East Ayrshire', 'East Dunbartonshire', 'East Lothian',
-      'East Renfrewshire', 'Falkirk', 'Fife', 'Glasgow City', 'Highland', 'Inverclyde',
-      'Midlothian', 'Moray', 'North Ayrshire', 'North Lanarkshire', 'Orkney Islands',
-      'Perth and Kinross', 'Renfrewshire', 'Scottish Borders', 'Shetland Islands', 'South Ayrshire',
-      'South Lanarkshire', 'Stirling', 'West Dunbartonshire', 'West Lothian', 'Western Isles',
-      // Wales
-      'Anglesey', 'Blaenau Gwent', 'Bridgend', 'Caerphilly', 'Cardiff', 'Carmarthenshire',
-      'Ceredigion', 'Conwy', 'Denbighshire', 'Flintshire', 'Gwynedd', 'Merthyr Tydfil',
-      'Monmouthshire', 'Neath Port Talbot', 'Newport', 'Pembrokeshire', 'Powys', 'Rhondda Cynon Taf',
-      'Swansea', 'Torfaen', 'Vale of Glamorgan', 'Wrexham',
-      // Northern Ireland
-      'Antrim', 'Armagh', 'Down', 'Fermanagh', 'Londonderry', 'Tyrone'
-    ].sort();
+   // UK REGIONS - All UK counties and regions (matching HPI API codes)
+const UK_REGIONS = [
+  // ===== ENGLAND - NORTH WEST =====
+  'Cheshire East',
+  'Cheshire West and Chester',
+  'Cumbria',
+  'Greater Manchester',
+  'Lancashire',
+  'Merseyside',
+  'Blackburn with Darwen',
+  'Blackpool',
+  'Halton',
+  'Warrington',
+  
+  // ===== ENGLAND - NORTH EAST =====
+  'County Durham',
+  'Northumberland',
+  'Tyne and Wear',
+  
+  // ===== ENGLAND - YORKSHIRE & HUMBER =====
+  'East Riding of Yorkshire',
+  'North Yorkshire',
+  'South Yorkshire',
+  'West Yorkshire',
+  'York',
+  
+  // ===== ENGLAND - EAST MIDLANDS =====
+  'Derby',
+  'Derbyshire',
+  'Leicestershire',
+  'Lincolnshire',
+  'Northamptonshire',
+  'Nottingham',
+  'Nottinghamshire',
+  'Rutland',
+  
+  // ===== ENGLAND - WEST MIDLANDS =====
+  'Herefordshire',
+  'Shropshire',
+  'Staffordshire',
+  'Stoke-on-Trent',
+  'Telford and Wrekin',
+  'Warwickshire',
+  'West Midlands',
+  'Worcestershire',
+  
+  // ===== ENGLAND - EAST OF ENGLAND =====
+  'Bedford',
+  'Cambridgeshire',
+  'Central Bedfordshire',
+  'Essex',
+  'Hertfordshire',
+  'Norfolk',
+  'Peterborough',
+  'Suffolk',
+  
+  // ===== ENGLAND - SOUTH EAST =====
+  'Berkshire',
+  'Brighton and Hove',
+  'Buckinghamshire',
+  'East Sussex',
+  'Hampshire',
+  'Isle of Wight',
+  'Kent',
+  'Medway',
+  'Oxfordshire',
+  'Portsmouth',
+  'Southampton',
+  'Surrey',
+  'West Sussex',
+  
+  // ===== ENGLAND - SOUTH WEST =====
+  'Bath and North East Somerset',
+  'Bournemouth, Christchurch and Poole',
+  'Bristol',
+  'Cornwall',
+  'Devon',
+  'Dorset',
+  'Gloucestershire',
+  'North Somerset',
+  'Plymouth',
+  'Somerset',
+  'South Gloucestershire',
+  'Swindon',
+  'Torbay',
+  'Wiltshire',
+  
+  // ===== ENGLAND - LONDON =====
+  'Greater London',
+  
+  // ===== SCOTLAND =====
+  'Aberdeen City',
+  'Aberdeenshire',
+  'Angus',
+  'Argyll and Bute',
+  'City of Edinburgh',
+  'Clackmannanshire',
+  'Dumfries and Galloway',
+  'Dundee City',
+  'East Ayrshire',
+  'East Dunbartonshire',
+  'East Lothian',
+  'East Renfrewshire',
+  'Falkirk',
+  'Fife',
+  'Glasgow City',
+  'Highland',
+  'Inverclyde',
+  'Midlothian',
+  'Moray',
+  'Na h-Eileanan Siar',
+  'North Ayrshire',
+  'North Lanarkshire',
+  'Orkney Islands',
+  'Perth and Kinross',
+  'Renfrewshire',
+  'Scottish Borders',
+  'Shetland Islands',
+  'South Ayrshire',
+  'South Lanarkshire',
+  'Stirling',
+  'West Dunbartonshire',
+  'West Lothian',
+  
+  // ===== WALES =====
+  'Blaenau Gwent',
+  'Bridgend',
+  'Caerphilly',
+  'Cardiff',
+  'Carmarthenshire',
+  'Ceredigion',
+  'Conwy',
+  'Denbighshire',
+  'Flintshire',
+  'Gwynedd',
+  'Isle of Anglesey',
+  'Merthyr Tydfil',
+  'Monmouthshire',
+  'Neath Port Talbot',
+  'Newport',
+  'Pembrokeshire',
+  'Powys',
+  'Rhondda Cynon Taf',
+  'Swansea',
+  'Torfaen',
+  'Vale of Glamorgan',
+  'Wrexham',
+  
+  // ===== NORTHERN IRELAND =====
+  'Antrim and Newtownabbey',
+  'Ards and North Down',
+  'Armagh City, Banbridge and Craigavon',
+  'Belfast',
+  'Causeway Coast and Glens',
+  'Derry City and Strabane',
+  'Fermanagh and Omagh',
+  'Lisburn and Castlereagh',
+  'Mid and East Antrim',
+  'Mid Ulster',
+  'Newry, Mourne and Down'
+].sort();
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
@@ -6543,16 +7032,181 @@ async function loadMarketUpdateStats() {
     if (data.success) {
       const optedIn = data.users.filter(u => u.fields['Market Updates Opt In'] === true);
       
-      // Count service regions
-      const serviceRegions = ['Cheshire', 'Greater London', 'Greater Manchester', 'Essex', 'West Midlands', 'Leicestershire'];
-      const yorkshireRegions = ['South Yorkshire', 'West Yorkshire', 'North Yorkshire', 'East Riding of Yorkshire'];
+      // ✅ NORTH = Everything above Birmingham
+      const northRegions = [
+        // Your Core Service Regions (North)
+        'Cheshire East', 
+        'Cheshire West and Chester',
+        'Greater Manchester', 
+        'West Midlands', 
+        'Leicestershire',
+        
+        // North West England
+        'Cumbria',
+        'Lancashire',
+        'Merseyside',
+        'Blackburn with Darwen',
+        'Blackpool',
+        'Halton',
+        'Warrington',
+        
+        // North East England
+        'County Durham',
+        'Northumberland',
+        'Tyne and Wear',
+        
+        // Yorkshire & Humber
+        'South Yorkshire', 
+        'West Yorkshire', 
+        'North Yorkshire', 
+        'East Riding of Yorkshire',
+        'York',
+        
+        // Midlands (above Birmingham line)
+        'Derbyshire',
+        'Derby',
+        'Lincolnshire',
+        'Nottinghamshire',
+        'Nottingham',
+        'Rutland',
+        'Shropshire',
+        'Telford and Wrekin',
+        'Staffordshire',
+        'Stoke-on-Trent',
+        
+        // Scotland (all of it)
+        'Aberdeen City',
+        'Aberdeenshire',
+        'Angus',
+        'Argyll and Bute',
+        'City of Edinburgh',
+        'Clackmannanshire',
+        'Dumfries and Galloway',
+        'Dundee City',
+        'East Ayrshire',
+        'East Dunbartonshire',
+        'East Lothian',
+        'East Renfrewshire',
+        'Falkirk',
+        'Fife',
+        'Glasgow City',
+        'Highland',
+        'Inverclyde',
+        'Midlothian',
+        'Moray',
+        'North Ayrshire',
+        'North Lanarkshire',
+        'Orkney Islands',
+        'Perth and Kinross',
+        'Renfrewshire',
+        'Scottish Borders',
+        'Shetland Islands',
+        'South Ayrshire',
+        'South Lanarkshire',
+        'Stirling',
+        'West Dunbartonshire',
+        'West Lothian',
+        'Na h-Eileanan Siar',
+        
+        // North Wales
+        'Isle of Anglesey',
+        'Conwy',
+        'Denbighshire',
+        'Flintshire',
+        'Gwynedd',
+        'Wrexham'
+      ];
       
-      const serviceCount = optedIn.filter(u => serviceRegions.includes(u.fields['Region'])).length;
-      const yorkshireCount = optedIn.filter(u => yorkshireRegions.includes(u.fields['Region'])).length;
+      // ✅ SOUTH = Everything below Birmingham
+      const southRegions = [
+        // Your Core Service Regions (South)
+        'Greater London',
+        'Essex',
+        
+        // Midlands (below Birmingham line)
+        'Herefordshire',
+        'Warwickshire',
+        'Worcestershire',
+        'Northamptonshire',
+        
+        // East England
+        'Bedford',
+        'Central Bedfordshire',
+        'Cambridgeshire',
+        'Peterborough',
+        'Hertfordshire',
+        'Norfolk',
+        'Suffolk',
+        
+        // South East England
+        'Berkshire',
+        'Buckinghamshire',
+        'East Sussex',
+        'Brighton and Hove',
+        'Hampshire',
+        'Portsmouth',
+        'Southampton',
+        'Isle of Wight',
+        'Kent',
+        'Medway',
+        'Oxfordshire',
+        'Surrey',
+        'West Sussex',
+        
+        // South West England
+        'Bristol',
+        'Cornwall',
+        'Devon',
+        'Plymouth',
+        'Torbay',
+        'Dorset',
+        'Bournemouth, Christchurch and Poole',
+        'Gloucestershire',
+        'Somerset',
+        'Bath and North East Somerset',
+        'North Somerset',
+        'South Gloucestershire',
+        'Wiltshire',
+        'Swindon',
+        
+        // South Wales
+        'Blaenau Gwent',
+        'Bridgend',
+        'Caerphilly',
+        'Cardiff',
+        'Carmarthenshire',
+        'Ceredigion',
+        'Merthyr Tydfil',
+        'Monmouthshire',
+        'Neath Port Talbot',
+        'Newport',
+        'Pembrokeshire',
+        'Powys',
+        'Rhondda Cynon Taf',
+        'Swansea',
+        'Torfaen',
+        'Vale of Glamorgan',
+        
+        // Northern Ireland (geographically south of Scotland)
+        'Antrim and Newtownabbey',
+        'Ards and North Down',
+        'Armagh City, Banbridge and Craigavon',
+        'Belfast',
+        'Causeway Coast and Glens',
+        'Derry City and Strabane',
+        'Fermanagh and Omagh',
+        'Lisburn and Castlereagh',
+        'Mid and East Antrim',
+        'Mid Ulster',
+        'Newry, Mourne and Down'
+      ];
+      
+      const northCount = optedIn.filter(u => northRegions.includes(u.fields['Region'])).length;
+      const southCount = optedIn.filter(u => southRegions.includes(u.fields['Region'])).length;
 
       document.getElementById('totalOptedIn').textContent = optedIn.length;
-      document.getElementById('northOptedIn').textContent = `${serviceCount} (Service)`;
-      document.getElementById('southOptedIn').textContent = `${yorkshireCount} (Yorkshire)`;
+      document.getElementById('northOptedIn').textContent = northCount;
+      document.getElementById('southOptedIn').textContent = southCount;
     }
 
     document.getElementById('lastSentDate').textContent = 'Never';
