@@ -7828,19 +7828,16 @@ function loadBroadcastTemplate(templateId) {
    case 'availability':
   subject = 'Available Shoot Dates - Book Your Slot';
   
-  // Show loading state
   composer.style.display = 'block';
   contentInput.value = 'Loading availability data...';
   
-  // Fetch availability for first selected recipient
   if (selectedRecipients.length > 0) {
     const firstRecipient = allBroadcastUsers.find(u => u.fields['Email'] === selectedRecipients[0]);
     
     if (firstRecipient) {
-      const userUKRegion = firstRecipient.fields['Region'];  // ✅ NEW - Get UK region
-      const userRegion = mapRegionToBookingRegion(userUKRegion);  // ✅ NEW - Map to North/South
+      const userUKRegion = firstRecipient.fields['Region'];
+      const userRegion = mapRegionToBookingRegion(userUKRegion);
       
-      // If no region or can't map, show error
       if (!userRegion) {
         content = `Hi [Name],
 
@@ -7860,30 +7857,42 @@ Markeb Media Team`;
       
       const userPostcode = firstRecipient.fields['Postcode'] || 'M1 1AA';
       
-      // Generate next 7 days
+      // ✅ FIXED: Generate next 7 WEEKDAYS (skip weekends)
       const availabilityPromises = [];
-      for (let i = 1; i <= 7; i++) {
+      let daysChecked = 0;
+      let dayOffset = 1;
+      
+      while (daysChecked < 7 && dayOffset <= 14) {  // Check up to 14 days to find 7 weekdays
         const checkDate = new Date();
-        checkDate.setDate(checkDate.getDate() + i);
-        const dateStr = checkDate.toISOString().split('T')[0];
+        checkDate.setDate(checkDate.getDate() + dayOffset);
         
-        availabilityPromises.push(
-          fetch('/.netlify/functions/check-availability', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              postcode: userPostcode,
-              region: userRegion,
-              selectedDate: dateStr,
-              duration: 90
+        // ✅ Skip weekends (Sunday=0, Saturday=6)
+        const dayOfWeek = checkDate.getDay();
+        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+          const dateStr = checkDate.toISOString().split('T')[0];
+          
+          availabilityPromises.push(
+            fetch('/.netlify/functions/check-availability', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                postcode: userPostcode,
+                region: userRegion,
+                selectedDate: dateStr,
+                duration: 90
+              })
             })
-          })
-          .then(res => res.json())
-          .then(data => ({
-            date: dateStr,
-            slots: data.availableSlots.filter(s => s.available)
-          }))
-        );
+            .then(res => res.json())
+            .then(data => ({
+              date: dateStr,
+              slots: data.availableSlots ? data.availableSlots.filter(s => s.available) : []
+            }))
+          );
+          
+          daysChecked++;
+        }
+        
+        dayOffset++;
       }
       
       Promise.all(availabilityPromises).then(results => {
@@ -7934,62 +7943,11 @@ Markeb Media Team`;
         updateBroadcastPreview();
       }).catch(error => {
         console.error('Error fetching availability:', error);
-        content = `Hi [Name],
-
-We wanted to let you know about upcoming availability in your region.
-
-<strong>Why book now?</strong>
-- Peak season approaching - slots filling fast
-- Professional content = faster sales
-- Premium presentation = premium prices
-
-Ready to showcase your next property?
-
-<strong><a href="https://markebmedia.com/website/dashboard.html">Book Your Shoot Now</a></strong>
-
-Best regards,
-Markeb Media Team`;
-        
+        content = fallbackAvailabilityContent;
         contentInput.value = content;
         updateBroadcastPreview();
       });
-    } else {
-      content = `Hi [Name],
-
-We wanted to let you know about upcoming availability in your region.
-
-<strong>Why book now?</strong>
-- Peak season approaching - slots filling fast
-- Professional content = faster sales
-- Premium presentation = premium prices
-
-Ready to showcase your next property?
-
-<strong><a href="https://markebmedia.com/website/dashboard.html">Book Your Shoot Now</a></strong>
-
-Best regards,
-Markeb Media Team`;
-      
-      contentInput.value = content;
     }
-  } else {
-    content = `Hi [Name],
-
-We wanted to let you know about upcoming availability in your region.
-
-<strong>Why book now?</strong>
-- Peak season approaching - slots filling fast
-- Professional content = faster sales
-- Premium presentation = premium prices
-
-Ready to showcase your next property?
-
-<strong><a href="https://markebmedia.com/website/dashboard.html">Book Your Shoot Now</a></strong>
-
-Best regards,
-Markeb Media Team`;
-    
-    contentInput.value = content;
   }
   break;
   }
