@@ -240,7 +240,6 @@ async function sendBookingConfirmation(booking) {
     <h3>What to Expect</h3>
     <ul>
       <li><strong>${booking.mediaSpecialist}</strong> will arrive at your property at ${booking.time}</li>
-      <li>The shoot will take approximately ${Math.floor(booking.duration / 60)} hour${booking.duration >= 120 ? 's' : ''}</li>
       <li>You'll receive your edited content within 48 hours</li>
       ${!isPaid ? '<li>Payment will be collected automatically after your shoot</li>' : ''}
     </ul>
