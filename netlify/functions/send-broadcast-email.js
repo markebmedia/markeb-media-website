@@ -57,6 +57,7 @@ function getEmailLayout(content) {
       color: #1e293b;
       font-size: 24px;
       margin-top: 0;
+      margin-bottom: 16px;
     }
     .content p {
       margin: 16px 0;
@@ -170,47 +171,125 @@ function replaceMergeTags(content, user) {
     .replace(/\[Email\]/g, user.email || '');
 }
 
-// Get available dates for next 30 days
-async function getAvailableDates(region, mediaSpecialist) {
-  try {
-    const today = new Date();
-    const thirtyDaysOut = new Date();
-    thirtyDaysOut.setDate(today.getDate() + 30);
+// Helper: Convert time string (HH:MM) to minutes since midnight
+function timeToMinutes(timeString) {
+  if (!timeString) return 0;
+  const [hours, minutes] = timeString.split(':').map(Number);
+  return hours * 60 + minutes;
+}
 
-    // Fetch all bookings in the next 30 days
+// Helper: Check if a specific date has ANY available time slots
+async function checkDateAvailability(region, dateString) {
+  try {
+    // Capitalize region for Airtable lookup
+    const capitalizedRegion = region.charAt(0).toUpperCase() + region.slice(1).toLowerCase();
+    
+    // Fetch bookings for this date
     const bookings = await base('Bookings')
       .select({
         filterByFormula: `AND(
-          {Media Specialist} = '${mediaSpecialist}',
-          IS_AFTER({Date}, '${today.toISOString().split('T')[0]}'),
-          IS_BEFORE({Date}, '${thirtyDaysOut.toISOString().split('T')[0]}'),
-          {Booking Status} != 'Cancelled'
+          {Region} = '${capitalizedRegion}',
+          IS_SAME({Date}, '${dateString}', 'day'),
+          OR(
+            {Booking Status} = 'Booked',
+            {Booking Status} = 'Reserved',
+            {Booking Status} = 'Confirmed'
+          )
         )`,
-        fields: ['Date', 'Time', 'Duration (mins)']
+        fields: ['Time', 'Duration (mins)']
       })
       .all();
 
-    // Get booked dates
-    const bookedDates = new Set();
-    bookings.forEach(record => {
-      bookedDates.add(record.fields.Date);
+    // Fetch blocked times for this date
+    const blockedTimes = await base('Blocked Times')
+      .select({
+        filterByFormula: `AND(
+          {Region} = '${capitalizedRegion}',
+          IS_SAME({Date}, '${dateString}', 'day')
+        )`,
+        fields: ['Start Time', 'End Time']
+      })
+      .all();
+
+    // Generate all possible time slots (9:00 - 15:00, 30-min intervals)
+    const allSlots = [];
+    for (let hour = 9; hour <= 15; hour++) {
+      for (let minute of [0, 30]) {
+        if (hour === 15 && minute === 30) break; // Stop at 15:00
+        allSlots.push(`${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`);
+      }
+    }
+
+    // Check each slot for conflicts
+    const availableSlots = allSlots.filter(slotTime => {
+      const slotMinutes = timeToMinutes(slotTime);
+      const fixedBufferMinutes = 45;
+
+      // Check against existing bookings (with 45-min buffer before and after)
+      for (const booking of bookings) {
+        const bookingStartMinutes = timeToMinutes(booking.fields.Time);
+        const bookingDuration = booking.fields['Duration (mins)'] || 90;
+        const bookingEndMinutes = bookingStartMinutes + bookingDuration;
+        
+        const bufferStartMinutes = bookingStartMinutes - fixedBufferMinutes;
+        const bufferEndMinutes = bookingEndMinutes + fixedBufferMinutes;
+        
+        // Slot is blocked if it falls within the buffer window
+        if (slotMinutes >= bufferStartMinutes && slotMinutes < bufferEndMinutes) {
+          return false;
+        }
+      }
+
+      // Check against admin-blocked times
+      for (const blocked of blockedTimes) {
+        const blockStartMinutes = timeToMinutes(blocked.fields['Start Time']);
+        const blockEndMinutes = timeToMinutes(blocked.fields['End Time']);
+        
+        if (slotMinutes >= blockStartMinutes && slotMinutes < blockEndMinutes) {
+          return false;
+        }
+      }
+
+      return true;
     });
 
-    // Generate available dates
-    const availableDates = [];
-    const currentDate = new Date(today);
+    return availableSlots.length > 0;
+  } catch (error) {
+    console.error('Error checking date availability:', error);
+    return false;
+  }
+}
+
+// Get available dates for next 30 days
+async function getAvailableDates(region, mediaSpecialist) {
+  try {
+    const now = new Date();
     
-    while (currentDate <= thirtyDaysOut) {
+    // Start checking from tomorrow (24-hour advance booking requirement)
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() + 1);
+    startDate.setHours(0, 0, 0, 0);
+
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 30);
+
+    const availableDates = [];
+    const currentDate = new Date(startDate);
+    
+    while (currentDate <= endDate && availableDates.length < 10) {
       const dateString = currentDate.toISOString().split('T')[0];
       
-      // Skip weekends (optional - remove if you work weekends)
+      // Skip weekends (Sunday=0, Saturday=6)
       const dayOfWeek = currentDate.getDay();
       if (dayOfWeek === 0 || dayOfWeek === 6) {
         currentDate.setDate(currentDate.getDate() + 1);
         continue;
       }
       
-      if (!bookedDates.has(dateString)) {
+      // Check if this date has ANY available slots
+      const hasAvailability = await checkDateAvailability(region, dateString);
+      
+      if (hasAvailability) {
         availableDates.push({
           date: dateString,
           formatted: currentDate.toLocaleDateString('en-GB', { 
@@ -225,7 +304,7 @@ async function getAvailableDates(region, mediaSpecialist) {
       currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    return availableDates.slice(0, 10); // Return first 10 available dates
+    return availableDates;
   } catch (error) {
     console.error('Error getting available dates:', error);
     return [];
@@ -262,7 +341,9 @@ async function generateAvailabilityContent(user) {
   
   return `
     <h2>📸 Available Shoot Dates</h2>
+    
     <p>Hi ${user.name},</p>
+    
     <p>We wanted to let you know about upcoming availability with <strong>${mediaSpecialist}</strong> in your region (${region}).</p>
     
     <p>Here are our next available dates:</p>
@@ -281,6 +362,7 @@ async function generateAvailabilityContent(user) {
     </div>
     
     <p>Questions? Just reply to this email or call us directly.</p>
+    
     <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
   `;
 }
