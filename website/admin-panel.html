@@ -7476,6 +7476,575 @@ Best regards,
 Markeb Media Team`;
 }
 
+// ===== EMAIL BROADCAST FUNCTIONS =====
+
+let allBroadcastUsers = [];
+let selectedRecipients = [];
+let broadcastHistory = [];
+
+// Load broadcast data on section show
+async function loadBroadcastData() {
+  try {
+    const response = await fetch('/.netlify/functions/admin-users');
+    const data = await response.json();
+    
+    if (data.success) {
+      allBroadcastUsers = data.users;
+      
+      // Update stats
+      document.getElementById('broadcastTotalUsers').textContent = data.total;
+      
+      // Load history from localStorage
+      broadcastHistory = JSON.parse(localStorage.getItem('broadcastHistory') || '[]');
+      const totalSent = broadcastHistory.reduce((sum, h) => sum + h.recipientCount, 0);
+      document.getElementById('broadcastTotalSent').textContent = totalSent;
+      
+      const lastSent = broadcastHistory.length > 0 
+        ? new Date(broadcastHistory[0].timestamp).toLocaleDateString('en-GB')
+        : 'Never';
+      document.getElementById('broadcastLastSent').textContent = lastSent;
+      
+      // Render recipient list
+      renderBroadcastRecipients();
+      renderBroadcastHistory();
+    }
+  } catch (error) {
+    console.error('Error loading broadcast data:', error);
+  }
+}
+
+// Render recipient checkboxes
+function renderBroadcastRecipients(filtered = null) {
+  const container = document.getElementById('broadcastRecipientList');
+  const users = filtered || allBroadcastUsers;
+  
+  if (users.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 40px; color: #94a3b8;">
+        <p>No users found</p>
+      </div>
+    `;
+    return;
+  }
+  
+  let html = '';
+  
+  users.forEach(user => {
+    const fields = user.fields;
+    const isActive = fields['Account Status'] === 'Active';
+    const hasEmail = fields['Email Notifications Enabled'] === true;
+    const isSelected = selectedRecipients.includes(fields['Email']);
+    
+    html += `
+      <div class="recipient-checkbox-item">
+        <input 
+          type="checkbox" 
+          value="${fields['Email']}"
+          ${isSelected ? 'checked' : ''}
+          onchange="toggleRecipient('${fields['Email']}')"
+          id="recipient-${user.id}"
+        >
+        <label for="recipient-${user.id}" class="recipient-info">
+          <div class="recipient-name">${fields['Name']}</div>
+          <div class="recipient-details">
+            ${fields['Company'] || 'No company'} • ${fields['Email']}
+          </div>
+        </label>
+        <div>
+          <span class="recipient-badge ${isActive ? 'badge-active' : 'badge-inactive'}">
+            ${isActive ? 'Active' : 'Inactive'}
+          </span>
+        </div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+  updateSelectedCount();
+  
+  // Re-initialize Lucide icons
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+}
+
+// Toggle recipient selection
+function toggleRecipient(email) {
+  const index = selectedRecipients.indexOf(email);
+  if (index > -1) {
+    selectedRecipients.splice(index, 1);
+  } else {
+    selectedRecipients.push(email);
+  }
+  updateSelectedCount();
+}
+
+// Select all recipients
+function selectAllBroadcastRecipients() {
+  selectedRecipients = allBroadcastUsers.map(u => u.fields['Email']);
+  renderBroadcastRecipients();
+}
+
+// Deselect all recipients
+function deselectAllBroadcastRecipients() {
+  selectedRecipients = [];
+  renderBroadcastRecipients();
+}
+
+// Filter recipients
+function filterBroadcastRecipients() {
+  const search = document.getElementById('broadcastRecipientSearch').value.toLowerCase();
+  const filter = document.getElementById('broadcastRecipientFilter').value;
+  
+  let filtered = allBroadcastUsers;
+  
+  // Apply status filter
+  if (filter === 'active') {
+    filtered = filtered.filter(u => u.fields['Account Status'] === 'Active');
+  } else if (filter === 'email-enabled') {
+    filtered = filtered.filter(u => u.fields['Email Notifications Enabled'] === true);
+  }
+  
+  // Apply search filter
+  if (search) {
+    filtered = filtered.filter(u => {
+      const name = (u.fields['Name'] || '').toLowerCase();
+      const email = (u.fields['Email'] || '').toLowerCase();
+      const company = (u.fields['Company'] || '').toLowerCase();
+      return name.includes(search) || email.includes(search) || company.includes(search);
+    });
+  }
+  
+  renderBroadcastRecipients(filtered);
+}
+
+// Update selected count
+function updateSelectedCount() {
+  const count = selectedRecipients.length;
+  document.getElementById('broadcastSelected').textContent = count;
+  document.getElementById('sendBroadcastCount').textContent = count;
+  
+  // Enable/disable send button
+  const sendBtn = document.getElementById('sendBroadcastBtn');
+  if (sendBtn) {
+    sendBtn.disabled = count === 0;
+  }
+}
+
+// Load broadcast template
+function loadBroadcastTemplate(templateId) {
+  const subjectInput = document.getElementById('broadcastSubject');
+  const contentInput = document.getElementById('broadcastContent');
+  const composer = document.getElementById('broadcastComposer');
+  
+  let subject = '';
+  let content = '';
+  
+  switch(templateId) {
+    case 'availability':
+      subject = '📸 Available Shoot Dates - Book Your Slot';
+      content = `Hi [Name],
+
+We wanted to let you know about upcoming availability in your region.
+
+<strong>Why book now?</strong>
+- Peak season approaching - slots filling fast
+- Professional content = faster sales
+- Premium presentation = premium prices
+
+Ready to showcase your next property?
+
+<strong><a href="https://markebmedia.com/website/dashboard.html">Book Your Shoot Now</a></strong>
+
+Best regards,
+Markeb Media Team`;
+      break;
+      
+    case 'feature-announcement':
+      subject = '🎉 New Feature: [Feature Name]';
+      content = `Hi [Name],
+
+We're excited to announce a new feature in your Markeb Media dashboard!
+
+<strong>What's New:</strong>
+[Describe the new feature and its benefits]
+
+<strong>How to Use It:</strong>
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
+
+<strong><a href="https://markebmedia.com/website/dashboard.html">Try It Now</a></strong>
+
+Best regards,
+Markeb Media Team`;
+      break;
+      
+    case 'seasonal-offer':
+      subject = '🎁 [Season] Special Offer - Limited Time';
+      content = `Hi [Name],
+
+This [season], we're offering something special for our valued clients.
+
+<strong>Special Offer:</strong>
+[Describe the offer - discount, package deal, etc.]
+
+<strong>Valid Until:</strong> [Date]
+
+<strong>Why Act Now:</strong>
+- Limited availability
+- [Benefit 1]
+- [Benefit 2]
+
+<strong><a href="https://markebmedia.com/website/dashboard.html">Claim Your Offer</a></strong>
+
+Best regards,
+Markeb Media Team`;
+      break;
+      
+    case 'tips-advice':
+      subject = '💡 Property Marketing Tips from Markeb Media';
+      content = `Hi [Name],
+
+Here are some quick tips to maximize your property marketing:
+
+<strong>Photography Tips:</strong>
+- Shoot during golden hour (early morning/late afternoon)
+- Declutter and stage before the shoot
+- Turn on all lights for a warm, inviting feel
+
+<strong>Videography Tips:</strong>
+- Highlight unique features and selling points
+- Keep videos concise (60-90 seconds ideal)
+- Include neighbourhood context
+
+<strong>Social Media:</strong>
+- Post consistently across platforms
+- Use high-quality images in every post
+- Engage with comments and enquiries quickly
+
+Need professional content? <strong><a href="https://markebmedia.com/website/dashboard.html">Book a shoot</a></strong>
+
+Best regards,
+Markeb Media Team`;
+      break;
+      
+    case 'company-news':
+      subject = '📰 Markeb Media Update';
+      content = `Hi [Name],
+
+We wanted to share some exciting news from Markeb Media!
+
+<strong>Latest Updates:</strong>
+- [Update 1]
+- [Update 2]
+- [Update 3]
+
+<strong>What This Means For You:</strong>
+[Explain how these updates benefit your clients]
+
+Thank you for being part of the Markeb Media family!
+
+Best regards,
+Markeb Media Team`;
+      break;
+      
+    case 'custom':
+      subject = '';
+      content = `Hi [Name],
+
+[Your message here]
+
+Best regards,
+Markeb Media Team`;
+      break;
+  }
+  
+  subjectInput.value = subject;
+  contentInput.value = content;
+  composer.style.display = 'block';
+  
+  updateBroadcastPreview();
+  
+  // Re-initialize Lucide icons
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+}
+
+// Update preview with merge tags replaced
+function updateBroadcastPreview() {
+  const subject = document.getElementById('broadcastSubject').value;
+  const content = document.getElementById('broadcastContent').value;
+  const preview = document.getElementById('broadcastPreview');
+  
+  if (!subject && !content) {
+    preview.innerHTML = '<div style="text-align: center; color: #94a3b8;">Select a template or enter content to preview</div>';
+    return;
+  }
+  
+  // Get first selected recipient for preview
+  let previewData = {
+    name: 'John Smith',
+    company: 'Example Estate Agents',
+    email: 'john@example.com'
+  };
+  
+  if (selectedRecipients.length > 0) {
+    const firstRecipient = allBroadcastUsers.find(u => u.fields['Email'] === selectedRecipients[0]);
+    if (firstRecipient) {
+      previewData = {
+        name: firstRecipient.fields['Name'],
+        company: firstRecipient.fields['Company'] || 'No company',
+        email: firstRecipient.fields['Email']
+      };
+    }
+  }
+  
+  // Replace merge tags
+  let previewSubject = subject
+    .replace(/\[Name\]/g, previewData.name)
+    .replace(/\[Company\]/g, previewData.company)
+    .replace(/\[Email\]/g, previewData.email);
+    
+  let previewContent = content
+    .replace(/\[Name\]/g, previewData.name)
+    .replace(/\[Company\]/g, previewData.company)
+    .replace(/\[Email\]/g, previewData.email);
+  
+  preview.innerHTML = `
+    <div style="border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 16px;">
+      <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">SUBJECT:</div>
+      <div style="font-weight: 700; font-size: 16px;">${previewSubject}</div>
+    </div>
+    <div style="font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${previewContent}</div>
+    <div style="margin-top: 16px; padding-top: 16px; border-top: 2px solid #e2e8f0; font-size: 12px; color: #64748b;">
+      Preview using: ${previewData.name} (${previewData.email})
+    </div>
+  `;
+}
+
+// Send test broadcast
+async function sendTestBroadcast() {
+  const subject = document.getElementById('broadcastSubject').value;
+  const content = document.getElementById('broadcastContent').value;
+  
+  if (!subject || !content) {
+    alert('⚠️ Please enter subject and content first');
+    return;
+  }
+  
+  if (!confirm('Send test email to commercial@markebmedia.com?')) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/.netlify/functions/send-broadcast-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        recipients: [{
+          email: 'commercial@markebmedia.com',
+          name: 'Test User',
+          company: 'Test Company'
+        }],
+        subject: '[TEST] ' + subject,
+        content: content,
+        templateType: 'custom',
+        testMode: true
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      alert('✅ Test email sent to commercial@markebmedia.com!');
+    } else {
+      alert('❌ Failed to send test: ' + (data.error || 'Unknown error'));
+    }
+  } catch (error) {
+    console.error('Error sending test:', error);
+    alert('❌ Error sending test email');
+  }
+}
+
+// Send broadcast email
+async function sendBroadcastEmail() {
+  const subject = document.getElementById('broadcastSubject').value;
+  const content = document.getElementById('broadcastContent').value;
+  
+  if (!subject || !content) {
+    alert('⚠️ Please enter subject and content');
+    return;
+  }
+  
+  if (selectedRecipients.length === 0) {
+    alert('⚠️ Please select at least one recipient');
+    return;
+  }
+  
+  if (!confirm(`Send email to ${selectedRecipients.length} recipient${selectedRecipients.length !== 1 ? 's' : ''}?\n\nThis cannot be undone.`)) {
+    return;
+  }
+  
+  const btn = document.getElementById('sendBroadcastBtn');
+  const originalHTML = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Sending...';
+  
+  try {
+    // Build recipients array with full data
+    const recipients = selectedRecipients.map(email => {
+      const user = allBroadcastUsers.find(u => u.fields['Email'] === email);
+      return {
+        email: email,
+        name: user?.fields['Name'] || 'Client',
+        company: user?.fields['Company'] || ''
+      };
+    });
+    
+    const response = await fetch('/.netlify/functions/send-broadcast-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        recipients: recipients,
+        subject: subject,
+        content: content,
+        templateType: 'custom',
+        testMode: false
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      alert(`✅ Broadcast sent successfully!\n\nSent: ${data.successCount}\nFailed: ${data.failureCount}`);
+      
+      // Save to history
+      saveBroadcastHistory(subject, selectedRecipients.length);
+      
+      // Clear form
+      clearBroadcastForm();
+      loadBroadcastData();
+    } else {
+      alert('❌ Failed to send broadcast: ' + (data.error || 'Unknown error'));
+    }
+  } catch (error) {
+    console.error('Error sending broadcast:', error);
+    alert('❌ Error sending broadcast');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+  }
+}
+
+// Save broadcast to history
+function saveBroadcastHistory(subject, recipientCount) {
+  const history = JSON.parse(localStorage.getItem('broadcastHistory') || '[]');
+  
+  history.unshift({
+    subject: subject,
+    recipientCount: recipientCount,
+    timestamp: new Date().toISOString()
+  });
+  
+  // Keep only last 20
+  if (history.length > 20) {
+    history.pop();
+  }
+  
+  localStorage.setItem('broadcastHistory', JSON.stringify(history));
+  broadcastHistory = history;
+  
+  renderBroadcastHistory();
+}
+
+// Render broadcast history
+function renderBroadcastHistory() {
+  const container = document.getElementById('broadcastHistoryContainer');
+  const history = JSON.parse(localStorage.getItem('broadcastHistory') || '[]');
+  
+  if (history.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 40px; color: #94a3b8;">
+        <i data-lucide="clock" style="width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+        <p>No broadcasts sent yet</p>
+      </div>
+    `;
+    
+    // Re-initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+    return;
+  }
+  
+  let html = '<div style="display: flex; flex-direction: column; gap: 12px;">';
+  
+  history.forEach((item, index) => {
+    const date = new Date(item.timestamp);
+    const formattedDate = date.toLocaleDateString('en-GB', { 
+      day: 'numeric', 
+      month: 'short', 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    html += `
+      <div style="padding: 16px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+          <div style="font-weight: 600; color: #1e293b; flex: 1;">${item.subject}</div>
+          <div style="font-size: 12px; color: #64748b; white-space: nowrap; margin-left: 12px;">${formattedDate}</div>
+        </div>
+        <div style="font-size: 13px; color: #64748b;">
+          Sent to ${item.recipientCount} recipient${item.recipientCount !== 1 ? 's' : ''}
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// Clear broadcast history
+function clearBroadcastHistory() {
+  if (!confirm('Clear all broadcast history?\n\nThis cannot be undone.')) {
+    return;
+  }
+  
+  localStorage.removeItem('broadcastHistory');
+  broadcastHistory = [];
+  document.getElementById('broadcastTotalSent').textContent = '0';
+  document.getElementById('broadcastLastSent').textContent = 'Never';
+  renderBroadcastHistory();
+}
+
+// Clear broadcast form
+function clearBroadcastForm() {
+  document.getElementById('broadcastSubject').value = '';
+  document.getElementById('broadcastContent').value = '';
+  document.getElementById('broadcastComposer').style.display = 'none';
+  document.getElementById('broadcastPreview').innerHTML = '<div style="text-align: center; color: #94a3b8;">Select a template or enter content to preview</div>';
+  selectedRecipients = [];
+  renderBroadcastRecipients();
+}
+
+// Update showSection to load broadcast data
+const originalShowSectionBroadcast = showSection;
+showSection = function(sectionId) {
+  originalShowSectionBroadcast(sectionId);
+  
+  if (sectionId === 'email-broadcast') {
+    loadBroadcastData();
+  }
+  
+  if (sectionId === 'market-updates') {
+    loadMarketUpdateStats();
+  }
+};
+
   </script>
 </body>
 </html>
