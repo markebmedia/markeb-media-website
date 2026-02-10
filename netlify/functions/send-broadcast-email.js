@@ -353,7 +353,7 @@ async function generateAvailabilityContent(user) {
     ${datesHTML}
     
     <center>
-      <a href="https://markebmedia.com/book" class="button">Book Your Shoot Now</a>
+      <a href="https://markebmedia.com/login" class="button">Book Your Shoot Now</a>
     </center>
     
     <div class="alert alert-info">
