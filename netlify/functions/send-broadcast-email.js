@@ -154,7 +154,7 @@ function getEmailLayout(content) {
       </p>
       <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">
         You received this email because you're a valued Markeb Media client.<br>
-        <a href="https://markebmedia.com/website/dashboard">Manage your preferences</a>
+        <a href="https://markebmedia.com/login">Manage your preferences</a>
       </p>
     </div>
   </div>
