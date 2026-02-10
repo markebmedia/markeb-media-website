@@ -7914,7 +7914,7 @@ Markeb Media Team`;
           daysWithAvailability.slice(0, 5).forEach(day => {
             const date = new Date(day.date);
             const dayName = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
-            const times = day.slots.slice(0, 5).map(s => s.time).join(', ');
+            const times = day.slots.map(s => s.time).join(', ');
             
             availabilityHTML += `<strong>${dayName}:</strong> ${times}<br>\n`;
           });
