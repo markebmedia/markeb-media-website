@@ -154,7 +154,7 @@ function getEmailLayout(content) {
       </p>
       <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">
         You received this email because you're a valued Markeb Media client.<br>
-        <a href="https://markebmedia.com/dashboard">Manage your preferences</a>
+        <a href="https://markebmedia.com/website/dashboard">Manage your preferences</a>
       </p>
     </div>
   </div>
@@ -163,12 +163,15 @@ function getEmailLayout(content) {
   `;
 }
 
-// Replace merge tags
+// Replace merge tags AND convert line breaks to <br>
 function replaceMergeTags(content, user) {
+  const firstName = (user.name || 'there').split(' ')[0];  // ✅ Extract first name only
+  
   return content
-    .replace(/\[Name\]/g, user.name || 'there')
+    .replace(/\[Name\]/g, firstName)
     .replace(/\[Company\]/g, user.company || 'your company')
-    .replace(/\[Email\]/g, user.email || '');
+    .replace(/\[Email\]/g, user.email || '')
+    .replace(/\n/g, '<br>');
 }
 
 // Helper: Convert time string (HH:MM) to minutes since midnight
