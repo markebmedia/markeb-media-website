@@ -2983,6 +2983,23 @@ function updatePriceWithDiscount() {
   document.getElementById('totalPrice').textContent = `£${appliedDiscount.finalPrice.toFixed(2)}`;
   document.getElementById('summaryTotal').textContent = `£${appliedDiscount.finalPrice.toFixed(2)}`;
 }
-  </script>
+</script>
+
+<script>
+  // Force video to play on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const video = document.querySelector('.video-background video');
+    if (video) {
+      video.muted = true;
+      video.play().catch(err => {
+        console.log('Video autoplay failed:', err);
+        document.body.addEventListener('click', function() {
+          video.play();
+        }, { once: true });
+      });
+    }
+  });
+</script>
+
 </body>
 </html>
