@@ -12,17 +12,53 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     body { 
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      min-height: 100vh;
-      padding: 40px 20px;
-      color: #1e293b;
-    }
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  padding: 40px 20px;
+  color: #1e293b;
+  position: relative;
+  overflow-x: hidden;
+}
 
-    .booking-container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
+/* Video Background */
+.video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.video-background video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+}
+
+/* Dark overlay for readability */
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.85) 0%, rgba(37, 99, 235, 0.85) 100%);
+}
+
+.booking-container {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
 
     .booking-header {
       text-align: center;
@@ -557,6 +593,14 @@
   </style>
 </head>
 <body>
+
+  <!-- Add this right after <body> tag -->
+<div class="video-background">
+  <video autoplay muted loop playsinline>
+    <source src="/public/videos/property-showcase.mp4" type="video/mp4">
+  </video>
+  <div class="video-overlay"></div>
+</div>
 
   <!-- ✅ ADD BACK BUTTON HERE -->
   <button onclick="window.location.href='./dashboard.html'" 
