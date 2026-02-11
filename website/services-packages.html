@@ -76,6 +76,46 @@
       transform: translateX(-2px);
     }
 
+    /* Floating Book Now Button */
+    .floating-book-btn {
+      position: fixed;
+      right: 30px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 9998;
+      padding: 18px 32px;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .floating-book-btn:hover {
+      transform: translateY(-50%) scale(1.05);
+      box-shadow: 0 12px 32px rgba(59, 130, 246, 0.5);
+    }
+
+    .floating-book-btn i {
+      display: flex;
+      color: white;
+    }
+
+    .floating-book-btn svg {
+      stroke: white;
+      fill: none;
+    }
+
     /* Section Headers */
     .section-header {
       text-align: center;
@@ -359,12 +399,26 @@
       font-size: 48px;
       font-weight: 700;
       color: #3b82f6;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
     }
 
     .subscription-period {
       font-size: 14px;
       color: #94a3b8;
+      margin-bottom: 12px;
+    }
+
+    /* Savings Badge - NEW */
+    .savings-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 8px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     }
 
     .subscription-features {
@@ -435,93 +489,6 @@
       box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
     }
 
-    /* Savings Comparison */
-    .comparison-section {
-      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-      border: 3px solid #10b981;
-      border-radius: 24px;
-      padding: 60px 40px;
-      margin: 80px 0 60px;
-      text-align: center;
-    }
-
-    .comparison-header {
-      margin-bottom: 48px;
-    }
-
-    .comparison-header h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(28px, 4vw, 40px);
-      font-weight: 700;
-      color: #065f46;
-      margin-bottom: 16px;
-    }
-
-    .comparison-header p {
-      font-size: 18px;
-      color: #047857;
-    }
-
-    .comparison-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 32px;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .comparison-card {
-      background: white;
-      border-radius: 16px;
-      padding: 32px;
-      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.1);
-    }
-
-    .comparison-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 24px;
-    }
-
-    .price-breakdown {
-      margin-bottom: 24px;
-    }
-
-    .price-line {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      font-size: 14px;
-      color: #64748b;
-    }
-
-    .price-line.total {
-      padding-top: 16px;
-      margin-top: 16px;
-      border-top: 2px solid #f1f5f9;
-      font-size: 18px;
-      font-weight: 700;
-      color: #1e293b;
-    }
-
-    .savings-badge {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: white;
-      padding: 16px 24px;
-      border-radius: 12px;
-      font-size: 24px;
-      font-weight: 700;
-      margin-top: 24px;
-    }
-
-    .savings-subtext {
-      font-size: 14px;
-      color: #047857;
-      margin-top: 8px;
-    }
-
     /* Final CTA Section */
     .final-cta {
       background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);
@@ -588,6 +555,16 @@
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
     }
 
+    @media (max-width: 1024px) {
+      .floating-book-btn {
+        display: none;
+      }
+
+      .back-btn {
+        display: none;
+      }
+    }
+
     @media (max-width: 768px) {
       body {
         padding: 20px 12px;
@@ -614,10 +591,6 @@
         transform: translateY(-8px) scale(1);
       }
 
-      .comparison-section {
-        padding: 40px 24px;
-      }
-
       .final-cta {
         padding: 60px 24px;
       }
@@ -628,6 +601,12 @@
   <a href="./dashboard.html" class="back-btn">
     <span style="font-size: 18px;">←</span>
     <span>Back to Dashboard</span>
+  </a>
+
+  <!-- Floating Book Now Button -->
+  <a href="./booking.html?source=services" class="floating-book-btn" id="floatingBookBtn">
+    <span>Book Now</span>
+    <i data-lucide="calendar" style="width: 20px; height: 20px;"></i>
   </a>
 
   <div class="container">
@@ -695,6 +674,7 @@
           <h3 class="subscription-name">Kick Start Package</h3>
           <div class="subscription-price">£540</div>
           <div class="subscription-period">per month inc. VAT</div>
+          <div class="savings-badge">Save 32% vs individual services</div>
         </div>
         <ul class="subscription-features">
           <li>
@@ -748,6 +728,7 @@
           <h3 class="subscription-name">Growth Package</h3>
           <div class="subscription-price">£1,800</div>
           <div class="subscription-period">per month inc. VAT</div>
+          <div class="savings-badge">Save 36% vs individual services</div>
         </div>
         <ul class="subscription-features">
           <li>
@@ -800,6 +781,7 @@
           <h3 class="subscription-name">Elite Package</h3>
           <div class="subscription-price">£2,500</div>
           <div class="subscription-period">per month inc. VAT</div>
+          <div class="savings-badge">Save 47% vs individual services</div>
         </div>
         <ul class="subscription-features">
           <li>
@@ -850,77 +832,6 @@
         <a href="mailto:commercial@markebmedia.com?subject=Premium%20Package%20Enquiry" class="cta-btn">Get Started</a>
       </div>
     </div>
-
-    <!-- Savings Comparison -->
-    <div class="comparison-section">
-      <div class="comparison-header">
-        <h2>See How Much You Save</h2>
-        <p>Our subscription packages offer incredible value compared to booking individual services</p>
-      </div>
-
-    <div class="comparison-grid">
-  <!-- Growth Package Comparison -->
-  <div class="comparison-card">
-    <div class="comparison-title">Growth Package Value</div>
-    <div class="price-breakdown">
-      <div class="price-line">
-        <span>4 Bronze Shoots (£202.80 each)</span>
-        <strong>£811.20</strong>
-      </div>
-      <div class="price-line">
-        <span>12 Custom Social Posts</span>
-        <strong>£1,500</strong>
-      </div>
-      <div class="price-line">
-        <span>Monthly Content Calendar</span>
-        <strong>£250</strong>
-      </div>
-      <div class="price-line">
-        <span>Performance Analytics & Reporting</span>
-        <strong>£250</strong>
-      </div>
-      <div class="price-line total">
-        <span>Individual Service Total</span>
-        <strong>£2,811.20</strong>
-      </div>
-    </div>
-    <div class="savings-badge">Save £1,011.20/month</div>
-    <div class="savings-subtext">That's 36% savings!</div>
-  </div>
-
-  <!-- Elite Package Comparison -->
-  <div class="comparison-card">
-    <div class="comparison-title">Elite Package Value</div>
-    <div class="price-breakdown">
-      <div class="price-line">
-        <span>4 Silver Shoots (£262.80 each)</span>
-        <strong>£1,051.20</strong>
-      </div>
-      <div class="price-line">
-        <span>20 Custom Social Posts</span>
-        <strong>£2,500</strong>
-      </div>
-      <div class="price-line">
-        <span>2 Short-Form Videos</span>
-        <strong>£300</strong>
-      </div>
-      <div class="price-line">
-        <span>Monthly Strategy Call</span>
-        <strong>£500</strong>
-      </div>
-      <div class="price-line">
-        <span>Premium Analytics & Reporting</span>
-        <strong>£350</strong>
-      </div>
-      <div class="price-line total">
-        <span>Individual Service Total</span>
-        <strong>£4,701.20</strong>
-      </div>
-    </div>
-    <div class="savings-badge">Save £2,201.20/month</div>
-    <div class="savings-subtext">That's 47% savings!</div>
-  </div>
-  </div>
 
     <!-- Final CTA -->
     <div class="final-cta">
@@ -1092,19 +1003,12 @@
 
     // Initialize page
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('DOM loaded');
-      console.log('Lucide available?', typeof lucide !== 'undefined');
-      
       populateServices();
       
-      // Double-check icon initialization after a moment
+      // Initialize Lucide icons
       setTimeout(function() {
         if (typeof lucide !== 'undefined') {
-          console.log('Initializing Lucide icons...');
           lucide.createIcons();
-          console.log('Icons initialized');
-        } else {
-          console.error('Lucide library not found!');
         }
       }, 200);
     });
