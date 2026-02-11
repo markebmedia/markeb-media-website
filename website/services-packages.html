@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@0.263.1/dist/umd/lucide.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -138,37 +138,6 @@
 
     .service-card:hover::before {
       transform: scaleX(1);
-    }
-
-    .service-icon {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      flex-shrink: 0;
-      color: #3b82f6;
-      position: relative;
-      z-index: 1;
-    }
-
-    .service-icon svg {
-      width: 28px;
-      height: 28px;
-      stroke-width: 2;
-      color: #3b82f6;
-      stroke: #3b82f6;
-      fill: none;
-    }
-
-    .service-icon i {
-      color: #3b82f6;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .service-card h3 {
@@ -1076,9 +1045,6 @@
       const brandingHTML = brandingServices.map(service => `
         <div class="service-card">
           ${service.popular ? '<div class="popular-badge">Popular</div>' : ''}
-          <div class="service-icon">
-            <i data-lucide="${service.icon}"></i>
-          </div>
           <h3>${service.name}</h3>
           <p class="description">${service.description}</p>
           <div class="service-meta">
@@ -1094,9 +1060,6 @@
       const propertyHTML = propertyServices.map(service => `
         <div class="service-card">
           ${service.popular ? '<div class="popular-badge">Popular</div>' : ''}
-          <div class="service-icon">
-            <i data-lucide="${service.icon}"></i>
-          </div>
           <h3>${service.name}</h3>
           <p class="description">${service.description}</p>
           <div class="service-meta">
