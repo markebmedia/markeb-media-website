@@ -200,27 +200,40 @@ function processData() {
   console.log('🔄 Processing data...');
   
   const csvText = fs.readFileSync('ppd-data.csv', 'utf-8');
+  
+  // PPD CSV has NO headers - define column names manually
   const records = parse(csvText, {
-    columns: true,
+    columns: [
+      'transaction_id',
+      'price',
+      'date',
+      'postcode',
+      'property_type',
+      'new_build',
+      'tenure',
+      'paon',
+      'saon',
+      'street',
+      'locality',
+      'town_city',
+      'district',
+      'county',
+      'ppd_category',
+      'record_status'
+    ],
     skip_empty_lines: true,
-    trim: true
+    trim: true,
+    from_line: 1
   });
   
   console.log(`📊 Total transactions: ${records.length}`);
   
-  // DEBUG: Log CSV structure
-  console.log('🔍 Sample CSV record:', JSON.stringify(records[0], null, 2));
-  console.log('📋 CSV columns:', Object.keys(records[0]));
+  // DEBUG: Log sample to verify structure
+  console.log('🔍 Sample record:', JSON.stringify(records[0], null, 2));
   
-  // DEBUG: Log sample county values
-  const counties = records.slice(0, 100).map(r => r.County).filter(Boolean);
+  const counties = records.slice(0, 100).map(r => r.county).filter(Boolean);
   const uniqueCounties = [...new Set(counties)];
-  console.log('🏴 Sample counties found:', uniqueCounties.slice(0, 20));
-  
-  // DEBUG: Log sample districts
-  const districts = records.slice(0, 100).map(r => r.District).filter(Boolean);
-  const uniqueDistricts = [...new Set(districts)];
-  console.log('🏙️  Sample districts found:', uniqueDistricts.slice(0, 20));
+  console.log('🏴 Sample counties:', uniqueCounties.slice(0, 10));
   
   const typeMapping = {
     'D': 'Detached',
@@ -236,9 +249,9 @@ function processData() {
     const searchTerm = REGION_MAPPING[region];
     
     const regionTransactions = records.filter(record => {
-      const county = (record.County || '').toUpperCase();
-      const district = (record.District || '').toUpperCase();
-      const city = (record['Town/City'] || '').toUpperCase();
+      const county = (record.county || '').toUpperCase();
+      const district = (record.district || '').toUpperCase();
+      const city = (record.town_city || '').toUpperCase();
       
       return county.includes(searchTerm) || 
              district.includes(searchTerm) || 
@@ -260,8 +273,8 @@ function processData() {
     let totalCount = 0;
     
     regionTransactions.forEach(tx => {
-      const price = parseFloat(tx.Price);
-      const type = typeMapping[tx['Property Type']];
+      const price = parseFloat(tx.price);
+      const type = typeMapping[tx.property_type];
       
       if (!price || price <= 0 || !type) return;
       
@@ -283,7 +296,7 @@ function processData() {
       propertyTypes[type] = {
         averagePrice: Math.round(average),
         transactions: byType[type].count,
-        yoyChange: 4.2 // Will calculate from historical data later
+        yoyChange: 4.2
       };
     });
     
@@ -324,6 +337,6 @@ function processData() {
   try {
     fs.unlinkSync('ppd-data.csv');
   } catch (e) {
-    // Ignore if file doesn't exist
+    // Ignore
   }
 }
