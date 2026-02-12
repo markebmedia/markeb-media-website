@@ -1,5 +1,6 @@
 [functions]
   directory = "netlify/functions"
+  included_files = ["data/market-data.json"]
 
 [[redirects]]
   from = "/*"
