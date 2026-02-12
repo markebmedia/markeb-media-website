@@ -7351,11 +7351,11 @@ async function autoFetchMarketData() {
   const preview = document.getElementById('dataPreview');
   
   btn.disabled = true;
-  btn.innerHTML = '⏳ Fetching market data...';
-  preview.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="spinner" style="width: 40px; height: 40px;"></div></div>';
+  btn.innerHTML = '⏳ Fetching PPD market data...';
+  preview.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="spinner" style="width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top-color: #3b82f6; border-radius: 50%; animation: spin 1s linear infinite;"></div></div>';
   
   try {
-    const response = await fetch('/.netlify/functions/fetch-ppd-data', {
+    const response = await fetch('/.netlify/functions/fetch-market-data', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ region: primaryRegion })
@@ -7365,7 +7365,7 @@ async function autoFetchMarketData() {
     
     if (result.success) {
       const data = result.data;
-      currentMarketData = data.metrics;
+      currentMarketData = data;
       
       // Auto-fill subject
       const regionText = selectedRegions.length === 1 
@@ -7376,18 +7376,18 @@ async function autoFetchMarketData() {
       // Generate content
       const content = `Hey [Name],
 
-Here's your ${data.targetRegion} property market update based on official HM Land Registry sold price data.
+Here's your ${data.region} property market update based on official HM Land Registry sold price data.
 
 **LAST 3 MONTHS AT A GLANCE:**
-- Average sold price: £${data.metrics.snapshot.averagePrice.toLocaleString()}
-- Change vs previous 3 months: ${data.metrics.snapshot.momChange >= 0 ? '+' : ''}${data.metrics.snapshot.momChange}%
-- Change vs last year: ${data.metrics.snapshot.yoyChange >= 0 ? '+' : ''}${data.metrics.snapshot.yoyChange}%
-- Total sales completed: ${data.metrics.snapshot.totalTransactions}
+- Average sold price: £${data.snapshot.averagePrice.toLocaleString()}
+- Change vs previous 3 months: ${data.snapshot.momChange >= 0 ? '+' : ''}${data.snapshot.momChange}%
+- Change vs last year: ${data.snapshot.yoyChange >= 0 ? '+' : ''}${data.snapshot.yoyChange}%
+- Total sales completed: ${data.snapshot.totalTransactions}
 
 **PROPERTY TYPE BREAKDOWN:**
 Average sold prices:
-${Object.keys(data.metrics.propertyTypes).map(type => {
-  const d = data.metrics.propertyTypes[type];
+${Object.keys(data.propertyTypes).map(type => {
+  const d = data.propertyTypes[type];
   const emoji = {'Detached': '🏠', 'Semi-detached': '🏡', 'Terraced': '🏘', 'Flats': '🏢'}[type];
   return `• ${emoji} ${type}: £${d.averagePrice.toLocaleString()} (${d.yoyChange >= 0 ? '+' : ''}${d.yoyChange.toFixed(1)}% YoY)`;
 }).join('\n')}
@@ -7405,39 +7405,50 @@ Markeb Media Team`;
       
       document.getElementById('marketUpdateContent').value = content;
       
+      // Determine data source badge
+      const sourceBadge = result.source === 'ppd-live' 
+        ? `<span style="background: #10b981; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">✓ REAL PPD DATA</span>`
+        : `<span style="background: #f59e0b; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">ESTIMATED DATA</span>`;
+      
       // Show preview
       preview.innerHTML = `
         <div class="success-box">
-          <strong>✅ Market data fetched for ${data.targetRegion}!</strong>
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+            <strong>✅ Market data fetched for ${data.region}!</strong>
+            ${sourceBadge}
+          </div>
+          ${result.transactionCount ? `<div style="font-size: 12px; color: #64748b; margin-bottom: 16px;">Based on ${result.transactionCount} recent transactions</div>` : ''}
           ${selectedRegions.length > 1 ? `<div style="font-size: 12px; margin-top: 4px;">Will send to ${selectedRegions.length} regions</div>` : ''}
           
           <div style="margin-top: 16px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
             <div style="text-align: center;">
-              <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">£${data.metrics.snapshot.averagePrice.toLocaleString()}</div>
+              <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">£${data.snapshot.averagePrice.toLocaleString()}</div>
               <div style="font-size: 12px; color: #64748b;">Average Price</div>
             </div>
             <div style="text-align: center;">
-              <div style="font-size: 24px; font-weight: 700; color: ${data.metrics.snapshot.yoyChange >= 0 ? '#10b981' : '#ef4444'};">
-                ${data.metrics.snapshot.yoyChange >= 0 ? '+' : ''}${data.metrics.snapshot.yoyChange}%
+              <div style="font-size: 24px; font-weight: 700; color: ${data.snapshot.yoyChange >= 0 ? '#10b981' : '#ef4444'};">
+                ${data.snapshot.yoyChange >= 0 ? '+' : ''}${data.snapshot.yoyChange}%
               </div>
               <div style="font-size: 12px; color: #64748b;">YoY Change</div>
             </div>
             <div style="text-align: center;">
-              <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">${data.metrics.snapshot.totalTransactions}</div>
+              <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">${data.snapshot.totalTransactions}</div>
               <div style="font-size: 12px; color: #64748b;">Sales Volume</div>
             </div>
             <div style="text-align: center;">
-              <div style="font-size: 24px; font-weight: 700; color: ${data.metrics.snapshot.transactionChange >= 0 ? '#10b981' : '#ef4444'};">
-                ${data.metrics.snapshot.transactionChange >= 0 ? '+' : ''}${data.metrics.snapshot.transactionChange}%
+              <div style="font-size: 24px; font-weight: 700; color: ${data.snapshot.transactionChange >= 0 ? '#10b981' : '#ef4444'};">
+                ${data.snapshot.transactionChange >= 0 ? '+' : ''}${data.snapshot.transactionChange}%
               </div>
               <div style="font-size: 12px; color: #64748b;">Volume Change</div>
             </div>
           </div>
           
           <div style="margin-top: 16px; padding: 12px; background: #eff6ff; border-radius: 8px; font-size: 13px;">
-            <strong>Data Source:</strong> ${data.dataSource}<br>
-            <strong>Period:</strong> ${data.period.current}
+            <strong>Data Source:</strong> ${data.dataSource || 'HM Land Registry'}<br>
+            ${data.currentMonth ? `<strong>Period:</strong> Latest available data` : ''}
           </div>
+          
+          ${result.message ? `<div style="margin-top: 12px; font-size: 12px; color: #64748b;">${result.message}</div>` : ''}
         </div>
       `;
       
