@@ -2,8 +2,12 @@ const http = require('http');
 const fs = require('fs');
 const { parse } = require('csv-parse/sync');
 
-// Working AWS S3 URL for PPD monthly updates
-const PPD_URL = 'http://prod1.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-monthly-update-new-version.csv';
+// URLs for current month and previous year
+const MONTHLY_UPDATE_URL = 'http://prod1.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-monthly-update-new-version.csv';
+
+const currentYear = new Date().getFullYear();
+const previousYear = currentYear - 1;
+const PREVIOUS_YEAR_URL = `http://prod1.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-${previousYear}.csv`;
 
 // Region mapping (exact match to your dropdown)
 const REGION_MAPPING = {
@@ -167,73 +171,81 @@ const REGION_MAPPING = {
   'Newry, Mourne and Down': 'NEWRY'
 };
 
-console.log('📥 Downloading PPD data from AWS S3...');
+console.log(`📥 Downloading monthly update and ${previousYear} data...`);
 
-// Download CSV
-const file = fs.createWriteStream('ppd-data.csv');
-http.get(PPD_URL, (response) => {
-  console.log(`Response status: ${response.statusCode}`);
-  
-  if (response.statusCode !== 200) {
-    console.error(`❌ Failed with status ${response.statusCode}`);
+let monthlyData = '';
+let previousYearData = '';
+
+function downloadFile(url) {
+  return new Promise((resolve, reject) => {
+    http.get(url, (response) => {
+      console.log(`Response from ${url.split('/').pop()}: ${response.statusCode}`);
+      
+      if (response.statusCode !== 200) {
+        reject(new Error(`HTTP ${response.statusCode}`));
+        return;
+      }
+      
+      let data = '';
+      response.on('data', chunk => data += chunk);
+      response.on('end', () => resolve(data));
+    }).on('error', reject);
+  });
+}
+
+async function downloadBothFiles() {
+  try {
+    console.log('Downloading monthly update...');
+    monthlyData = await downloadFile(MONTHLY_UPDATE_URL);
+    console.log(`✅ Monthly update downloaded (${(monthlyData.length / 1024 / 1024).toFixed(2)} MB)`);
+    
+    console.log(`Downloading ${previousYear} data...`);
+    previousYearData = await downloadFile(PREVIOUS_YEAR_URL);
+    console.log(`✅ ${previousYear} data downloaded (${(previousYearData.length / 1024 / 1024).toFixed(2)} MB)`);
+    
+    processData();
+  } catch (error) {
+    console.error('❌ Download failed:', error.message);
     process.exit(1);
   }
-  
-  response.pipe(file);
-  
-  file.on('finish', () => {
-    file.close();
-    console.log('✅ Download complete');
-    processData();
-  });
-}).on('error', (err) => {
-  try {
-    fs.unlinkSync('ppd-data.csv');
-  } catch (e) {
-    // Ignore if file doesn't exist
-  }
-  console.error('❌ Download failed:', err.message);
-  process.exit(1);
-});
+}
+
+downloadBothFiles();
 
 function processData() {
   console.log('🔄 Processing data...');
   
-  const csvText = fs.readFileSync('ppd-data.csv', 'utf-8');
+  // Parse both CSV files
+  const columnNames = [
+    'transaction_id', 'price', 'date', 'postcode', 'property_type',
+    'new_build', 'tenure', 'paon', 'saon', 'street', 'locality',
+    'town_city', 'district', 'county', 'ppd_category', 'record_status'
+  ];
   
-  // PPD CSV has NO headers - define column names manually
-  const records = parse(csvText, {
-    columns: [
-      'transaction_id',
-      'price',
-      'date',
-      'postcode',
-      'property_type',
-      'new_build',
-      'tenure',
-      'paon',
-      'saon',
-      'street',
-      'locality',
-      'town_city',
-      'district',
-      'county',
-      'ppd_category',
-      'record_status'
-    ],
+  const monthlyRecords = parse(monthlyData, {
+    columns: columnNames,
     skip_empty_lines: true,
     trim: true,
     from_line: 1
   });
   
-  console.log(`📊 Total transactions: ${records.length}`);
+  const previousRecords = parse(previousYearData, {
+    columns: columnNames,
+    skip_empty_lines: true,
+    trim: true,
+    from_line: 1
+  });
   
-  // DEBUG: Log sample to verify structure
-  console.log('🔍 Sample record:', JSON.stringify(records[0], null, 2));
+  console.log(`📊 Monthly update transactions: ${monthlyRecords.length}`);
+  console.log(`📊 ${previousYear} transactions: ${previousRecords.length}`);
   
-  const counties = records.slice(0, 100).map(r => r.county).filter(Boolean);
-  const uniqueCounties = [...new Set(counties)];
-  console.log('🏴 Sample counties:', uniqueCounties.slice(0, 10));
+  // Determine the month/year from monthly update data
+  const currentPeriod = getCurrentPeriod(monthlyRecords);
+  const comparisonMonth = currentPeriod.month;
+  const comparisonYear = previousYear;
+  
+  console.log(`📅 Current period: ${currentPeriod.month}/${currentPeriod.year}`);
+  console.log(`📅 Comparing to: ${comparisonMonth}/${comparisonYear}`);
   
   const typeMapping = {
     'D': 'Detached',
@@ -244,75 +256,75 @@ function processData() {
   
   const regionalData = {};
   
-  // Group by region
+  // Process each region
   Object.keys(REGION_MAPPING).forEach(region => {
     const searchTerm = REGION_MAPPING[region];
     
-    const regionTransactions = records.filter(record => {
-      const county = (record.county || '').toUpperCase();
-      const district = (record.district || '').toUpperCase();
-      const city = (record.town_city || '').toUpperCase();
-      
-      return county.includes(searchTerm) || 
-             district.includes(searchTerm) || 
-             city.includes(searchTerm) ||
-             searchTerm.includes(county) ||
-             searchTerm.includes(district);
+    // Current month data (from monthly update)
+    const currentTransactions = monthlyRecords.filter(record => 
+      matchesLocation(record, searchTerm)
+    );
+    
+    // Same month last year (from previous year file)
+    const previousTransactions = previousRecords.filter(record => {
+      const matchesRegion = matchesLocation(record, searchTerm);
+      const matchesMonth = isInMonth(record.date, comparisonMonth, comparisonYear);
+      return matchesRegion && matchesMonth;
     });
     
-    if (regionTransactions.length === 0) {
-      console.log(`⚠️  No data for ${region}`);
+    if (currentTransactions.length === 0) {
+      console.log(`⚠️  No current data for ${region}`);
       return;
     }
     
-    console.log(`✓ ${region}: ${regionTransactions.length} transactions`);
+    console.log(`✓ ${region}: ${currentTransactions.length} current, ${previousTransactions.length} previous year`);
     
-    // Process by property type
-    const byType = {};
-    let totalPrice = 0;
-    let totalCount = 0;
+    // Calculate statistics
+    const currentStats = calculateStats(currentTransactions, typeMapping);
+    const previousStats = calculateStats(previousTransactions, typeMapping);
     
-    regionTransactions.forEach(tx => {
-      const price = parseFloat(tx.price);
-      const type = typeMapping[tx.property_type];
-      
-      if (!price || price <= 0 || !type) return;
-      
-      if (!byType[type]) {
-        byType[type] = { prices: [], count: 0 };
-      }
-      
-      byType[type].prices.push(price);
-      byType[type].count++;
-      totalPrice += price;
-      totalCount++;
-    });
+    // Calculate real YoY changes
+    const yoyChange = previousStats.averagePrice > 0 
+      ? ((currentStats.averagePrice - previousStats.averagePrice) / previousStats.averagePrice * 100)
+      : 0;
     
+    const transactionChange = previousStats.totalTransactions > 0
+      ? ((currentStats.totalTransactions - previousStats.totalTransactions) / previousStats.totalTransactions * 100)
+      : 0;
+    
+    // Calculate property type YoY changes
     const propertyTypes = {};
-    Object.keys(byType).forEach(type => {
-      const prices = byType[type].prices;
-      const average = prices.reduce((a, b) => a + b, 0) / prices.length;
+    Object.keys(currentStats.byType).forEach(type => {
+      const currentPrice = currentStats.byType[type].average;
+      const previousPrice = previousStats.byType[type]?.average || 0;
+      const typeYoY = previousPrice > 0 
+        ? ((currentPrice - previousPrice) / previousPrice * 100)
+        : 0;
       
       propertyTypes[type] = {
-        averagePrice: Math.round(average),
-        transactions: byType[type].count,
-        yoyChange: 4.2
+        averagePrice: Math.round(currentPrice),
+        transactions: currentStats.byType[type].count,
+        yoyChange: parseFloat(typeYoY.toFixed(1)),
+        previousYearPrice: Math.round(previousPrice)
       };
     });
     
     regionalData[region] = {
       region: region,
       lastUpdated: new Date().toISOString(),
+      dataPeriod: `${currentPeriod.month}/${currentPeriod.year}`,
       snapshot: {
-        averagePrice: Math.round(totalPrice / totalCount),
-        momChange: 2.1,
-        yoyChange: 4.6,
-        totalTransactions: totalCount,
-        transactionChange: 5.3
+        averagePrice: Math.round(currentStats.averagePrice),
+        momChange: 0, // Not calculated
+        yoyChange: parseFloat(yoyChange.toFixed(1)),
+        totalTransactions: currentStats.totalTransactions,
+        transactionChange: parseFloat(transactionChange.toFixed(1)),
+        previousYearPrice: Math.round(previousStats.averagePrice),
+        previousYearTransactions: previousStats.totalTransactions
       },
       propertyTypes: propertyTypes,
-      dataSource: 'HM Land Registry Price Paid Data (monthly update)',
-      compliance: 'Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales from the most recent monthly update.'
+      dataSource: `HM Land Registry Price Paid Data (${currentPeriod.month}/${currentPeriod.year} vs ${comparisonMonth}/${comparisonYear})`,
+      compliance: 'Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.'
     };
   });
   
@@ -326,17 +338,109 @@ function processData() {
     `${outputDir}/market-data.json`,
     JSON.stringify({
       generatedAt: new Date().toISOString(),
+      dataPeriod: `${currentPeriod.month}/${currentPeriod.year}`,
+      comparisonPeriod: `${comparisonMonth}/${comparisonYear}`,
       regions: regionalData
     }, null, 2)
   );
   
   console.log('✅ Data processed and saved to data/market-data.json');
   console.log(`📈 Regions with data: ${Object.keys(regionalData).length}`);
+}
+
+function matchesLocation(record, searchTerm) {
+  const county = (record.county || '').toUpperCase();
+  const district = (record.district || '').toUpperCase();
+  const city = (record.town_city || '').toUpperCase();
   
-  // Cleanup
-  try {
-    fs.unlinkSync('ppd-data.csv');
-  } catch (e) {
-    // Ignore
+  return county.includes(searchTerm) || 
+         district.includes(searchTerm) || 
+         city.includes(searchTerm) ||
+         searchTerm.includes(county) ||
+         searchTerm.includes(district);
+}
+
+function isInMonth(dateStr, month, year) {
+  if (!dateStr) return false;
+  const date = new Date(dateStr);
+  return date.getMonth() + 1 === month && date.getFullYear() === year;
+}
+
+function getCurrentPeriod(records) {
+  // Find the most common month in the monthly update data
+  const months = {};
+  
+  records.slice(0, 1000).forEach(record => {
+    if (!record.date) return;
+    const date = new Date(record.date);
+    const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
+    months[monthYear] = (months[monthYear] || 0) + 1;
+  });
+  
+  // Get the most common month
+  let maxCount = 0;
+  let mostCommonPeriod = null;
+  
+  Object.keys(months).forEach(period => {
+    if (months[period] > maxCount) {
+      maxCount = months[period];
+      mostCommonPeriod = period;
+    }
+  });
+  
+  if (mostCommonPeriod) {
+    const [month, year] = mostCommonPeriod.split('/').map(Number);
+    return { month, year };
   }
+  
+  // Fallback to previous month
+  const now = new Date();
+  let month = now.getMonth(); // 0-11
+  let year = now.getFullYear();
+  
+  if (month === 0) {
+    month = 12;
+    year--;
+  }
+  
+  return { month, year };
+}
+
+function calculateStats(transactions, typeMapping) {
+  const byType = {};
+  let totalPrice = 0;
+  let totalCount = 0;
+  
+  transactions.forEach(tx => {
+    const price = parseFloat(tx.price);
+    const type = typeMapping[tx.property_type];
+    
+    if (!price || price <= 0 || !type) return;
+    
+    if (!byType[type]) {
+      byType[type] = { prices: [], count: 0 };
+    }
+    
+    byType[type].prices.push(price);
+    byType[type].count++;
+    totalPrice += price;
+    totalCount++;
+  });
+  
+  // Calculate averages per type
+  const typeStats = {};
+  Object.keys(byType).forEach(type => {
+    const prices = byType[type].prices;
+    const average = prices.reduce((a, b) => a + b, 0) / prices.length;
+    typeStats[type] = {
+      average: average,
+      count: byType[type].count
+    };
+  });
+  
+  return {
+    averagePrice: totalCount > 0 ? totalPrice / totalCount : 0,
+    totalTransactions: totalCount,
+    byType: typeStats
+  };
 }
