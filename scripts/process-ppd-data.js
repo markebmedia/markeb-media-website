@@ -305,3 +305,9 @@ function processData() {
     // Ignore if file doesn't exist
   }
 }
+
+// At the very end, add:
+process.on('unhandledRejection', (error) => {
+  console.error('❌ Unhandled error:', error.message);
+  process.exit(1);
+});

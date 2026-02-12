@@ -20,15 +20,31 @@ jobs:
           node-version: '18'
           
       - name: Install dependencies
-        run: npm install csv-parse
+        run: npm install csv-parse node-fetch@2
         
       - name: Download and process PPD data
+        env:
+          LAND_REGISTRY_API_KEY: ${{ secrets.LAND_REGISTRY_API_KEY }}
         run: node scripts/process-ppd-data.js
+        continue-on-error: true
+        
+      - name: Check if data was generated
+        id: check_data
+        run: |
+          if [ -f data/market-data.json ]; then
+            echo "data_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "data_exists=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Generate fallback data if download failed
+        if: steps.check_data.outputs.data_exists == 'false'
+        run: node scripts/generate-fallback-data.js
         
       - name: Commit updated data
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/market-data.json
-          git diff --staged --quiet || git commit -m "chore: update PPD market data for $(date +'%B %Y')"
+          git diff --staged --quiet || git commit -m "chore: update market data for $(date +'%B %Y')"
           git push
