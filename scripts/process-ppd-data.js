@@ -2,7 +2,8 @@ const http = require('http');
 const fs = require('fs');
 const { parse } = require('csv-parse/sync');
 
-const PPD_URL = 'http://prod.publicdata.landregistry.gov.uk/pp-monthly-update-new-version.csv';
+// Working AWS S3 URL for PPD monthly updates
+const PPD_URL = 'http://prod1.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-monthly-update-new-version.csv';
 
 // Region mapping (exact match to your dropdown)
 const REGION_MAPPING = {
@@ -166,11 +167,18 @@ const REGION_MAPPING = {
   'Newry, Mourne and Down': 'NEWRY'
 };
 
-console.log('📥 Downloading PPD data...');
+console.log('📥 Downloading PPD data from AWS S3...');
 
 // Download CSV
 const file = fs.createWriteStream('ppd-data.csv');
 http.get(PPD_URL, (response) => {
+  console.log(`Response status: ${response.statusCode}`);
+  
+  if (response.statusCode !== 200) {
+    console.error(`❌ Failed with status ${response.statusCode}`);
+    process.exit(1);
+  }
+  
   response.pipe(file);
   
   file.on('finish', () => {
@@ -305,9 +313,3 @@ function processData() {
     // Ignore if file doesn't exist
   }
 }
-
-// At the very end, add:
-process.on('unhandledRejection', (error) => {
-  console.error('❌ Unhandled error:', error.message);
-  process.exit(1);
-});
