@@ -9,135 +9,7 @@ const BCC_EMAIL = 'commercial@markebmedia.com';
 const SITE_URL = 'https://markebmedia.com';
 const LOGO_URL = 'https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png';
 
-// QuickChart.io - Free chart image generation service
-const QUICKCHART_URL = 'https://quickchart.io/chart';
-
-// Generate chart URL for price trends
-function generatePriceChartUrl(historicalPrices, region) {
-  const labels = historicalPrices.slice(-6).map(d => {
-    const date = new Date(d.month);
-    return date.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
-  });
-  
-  const prices = historicalPrices.slice(-6).map(d => d.price);
-  
-  const chartConfig = {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Average Price (£)',
-        data: prices,
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        borderWidth: 3,
-        fill: true,
-        tension: 0.4
-      }]
-    },
-    options: {
-      title: {
-        display: true,
-        text: `${region} - 6 Month Price Trend`,
-        fontSize: 16,
-        fontColor: '#1e293b'
-      },
-      scales: {
-        yAxes: [{
-          ticks: {
-            callback: function(value) {
-              return '£' + value.toLocaleString();
-            }
-          }
-        }]
-      },
-      legend: {
-        display: false
-      }
-    }
-  };
-  
-  return `${QUICKCHART_URL}?width=600&height=300&c=${encodeURIComponent(JSON.stringify(chartConfig))}`;
-}
-
-// Generate chart URL for sales volume
-function generateVolumeChartUrl(historicalVolumes, region) {
-  const labels = historicalVolumes.slice(-6).map(d => {
-    const date = new Date(d.month);
-    return date.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
-  });
-  
-  const volumes = historicalVolumes.slice(-6).map(d => d.volume);
-  
-  const chartConfig = {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: 'Sales Volume',
-        data: volumes,
-        backgroundColor: '#10b981',
-        borderColor: '#059669',
-        borderWidth: 2
-      }]
-    },
-    options: {
-      title: {
-        display: true,
-        text: `${region} - 6 Month Sales Volume`,
-        fontSize: 16,
-        fontColor: '#1e293b'
-      },
-      scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: true
-          }
-        }]
-      },
-      legend: {
-        display: false
-      }
-    }
-  };
-  
-  return `${QUICKCHART_URL}?width=600&height=300&c=${encodeURIComponent(JSON.stringify(chartConfig))}`;
-}
-
-// Generate market health gauge chart
-function generateHealthGaugeUrl(healthScore, status) {
-  const chartConfig = {
-    type: 'radialGauge',
-    data: {
-      datasets: [{
-        data: [healthScore],
-        backgroundColor: getHealthColor(healthScore)
-      }]
-    },
-    options: {
-      domain: [0, 100],
-      trackColor: '#e2e8f0',
-      centerPercentage: 80,
-      centerArea: {
-        text: status,
-        fontSize: 24
-      },
-      roundedCorners: true
-    }
-  };
-  
-  return `${QUICKCHART_URL}?width=400&height=300&c=${encodeURIComponent(JSON.stringify(chartConfig))}`;
-}
-
-function getHealthColor(score) {
-  if (score >= 80) return '#10b981'; // Green
-  if (score >= 65) return '#3b82f6'; // Blue
-  if (score >= 50) return '#f59e0b'; // Orange
-  if (score >= 35) return '#ef4444'; // Red
-  return '#991b1b'; // Dark red
-}
-
-// Email Layout Wrapper with Charts
+// Email Layout Wrapper
 function getEmailLayout(content) {
   return `
 <!DOCTYPE html>
@@ -181,48 +53,6 @@ function getEmailLayout(content) {
     .content {
       padding: 40px 30px;
     }
-    .market-content {
-      background-color: #f8fafc;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 24px;
-      margin: 24px 0;
-      line-height: 1.8;
-    }
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      margin: 24px 0;
-    }
-    .stat-card {
-      background: #f8fafc;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-    }
-    .stat-value {
-      font-size: 28px;
-      font-weight: 700;
-      color: #3b82f6;
-      margin-bottom: 8px;
-    }
-    .stat-label {
-      font-size: 13px;
-      color: #64748b;
-      font-weight: 600;
-    }
-    .chart-container {
-      margin: 24px 0;
-      text-align: center;
-    }
-    .chart-container img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 12px;
-      border: 2px solid #e2e8f0;
-    }
     .alert {
       padding: 16px;
       border-radius: 8px;
@@ -232,16 +62,6 @@ function getEmailLayout(content) {
       background-color: #eff6ff;
       border: 2px solid #3b82f6;
       color: #1e40af;
-    }
-    .alert-success {
-      background-color: #f0fdf4;
-      border: 2px solid #10b981;
-      color: #065f46;
-    }
-    .alert-warning {
-      background-color: #fef3c7;
-      border: 2px solid #f59e0b;
-      color: #92400e;
     }
     .footer {
       background-color: #f8fafc;
@@ -297,56 +117,60 @@ function getEmailLayout(content) {
 }
 
 exports.handler = async (event) => {
+  console.log('=== Market Updates Function Called ===');
+  
+  const headers = {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return { 
+      statusCode: 405, 
+      headers,
+      body: JSON.stringify({ success: false, error: 'Method Not Allowed' })
+    };
   }
 
   try {
     const { region, subject, content, sendPreview, recipients, marketData } = JSON.parse(event.body);
 
+    console.log('Request data:', { region, subject, sendPreview, recipientsCount: recipients?.length });
+
     if (!region || !subject || !content) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ success: false, error: 'Missing required fields' })
+        headers,
+        body: JSON.stringify({ success: false, error: 'Missing required fields: region, subject, or content' })
       };
     }
 
-    // Generate chart URLs if market data is provided
-    let priceChartUrl = '';
-    let volumeChartUrl = '';
-    let healthGaugeUrl = '';
-    let statsHtml = '';
+    if (!recipients || recipients.length === 0) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ success: false, error: 'No recipients provided' })
+      };
+    }
 
-    if (marketData) {
-      priceChartUrl = generatePriceChartUrl(marketData.historicalPrices, region);
-      volumeChartUrl = generateVolumeChartUrl(marketData.historicalVolumes, region);
-      healthGaugeUrl = generateHealthGaugeUrl(marketData.marketHealth.score, marketData.marketHealth.status);
-      
-      // Build stats cards
-      statsHtml = `
-        <div class="stat-grid">
-          <div class="stat-card">
-            <div class="stat-value">£${marketData.averagePrice.toLocaleString()}</div>
-            <div class="stat-label">Average Price</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">${marketData.annualChange > 0 ? '+' : ''}${marketData.annualChange.toFixed(1)}%</div>
-            <div class="stat-label">Annual Change</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">${marketData.salesVolume.toLocaleString()}</div>
-            <div class="stat-label">Sales Volume</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">${marketData.marketHealth.emoji} ${marketData.marketHealth.score}/100</div>
-            <div class="stat-label">Market Health</div>
-          </div>
-        </div>
-      `;
+    if (!marketData || !marketData.snapshot || !marketData.propertyTypes) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ success: false, error: 'Market data is required. Please fetch market data first.' })
+      };
     }
 
     // TEST MODE - Send to admin only
     if (sendPreview) {
+      console.log('Sending test email to admin...');
+      
       const testContent = content.replace(/\[Name\]/g, 'Admin');
       
       const previewHtml = `
@@ -357,22 +181,46 @@ exports.handler = async (event) => {
           <strong>Recipients:</strong> ${recipients.length} customer${recipients.length !== 1 ? 's' : ''}
         </div>
 
-        ${statsHtml}
-
-        ${priceChartUrl ? `
-          <div class="chart-container">
-            <img src="${priceChartUrl}" alt="Price Trend Chart">
+        <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 24px; margin: 24px 0;">
+          <h3 style="margin-top: 0; color: #1e40af;">📍 Last 3 Months at a Glance</h3>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px;">
+            <div>
+              <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Average Sold Price</div>
+              <div style="font-size: 28px; font-weight: 700; color: #1e40af;">£${marketData.snapshot.averagePrice.toLocaleString()}</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Change vs Previous 3 Months</div>
+              <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.momChange >= 0 ? '#10b981' : '#ef4444'};">
+                ${marketData.snapshot.momChange >= 0 ? '+' : ''}${marketData.snapshot.momChange}%
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Change vs Last Year</div>
+              <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.yoyChange >= 0 ? '#10b981' : '#ef4444'};">
+                ${marketData.snapshot.yoyChange >= 0 ? '+' : ''}${marketData.snapshot.yoyChange}%
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Total Sales Completed</div>
+              <div style="font-size: 28px; font-weight: 700; color: #1e40af;">${marketData.snapshot.totalTransactions}</div>
+            </div>
           </div>
-        ` : ''}
+        </div>
 
-        ${volumeChartUrl ? `
-          <div class="chart-container">
-            <img src="${volumeChartUrl}" alt="Sales Volume Chart">
-          </div>
-        ` : ''}
+        <h3 style="color: #1e293b; margin-top: 32px;">🏘 Property Type Breakdown</h3>
+        ${Object.keys(marketData.propertyTypes).map(type => {
+          const data = marketData.propertyTypes[type];
+          const emoji = {'Detached': '🏠', 'Semi-detached': '🏡', 'Terraced': '🏘', 'Flats': '🏢'}[type];
+          return `
+            <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+              ${emoji} ${type}: £${data.averagePrice.toLocaleString()} (${data.yoyChange >= 0 ? '+' : ''}${data.yoyChange.toFixed(1)}% YoY)
+            </div>
+          `;
+        }).join('')}
 
-        <div class="market-content">
-          ${testContent.replace(/\n/g, '<br>')}
+        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin: 24px 0;">
+          <h3 style="margin-top: 0; color: #92400e;">💡 What This Means for Valuations</h3>
+          <p style="color: #78350f; margin: 0;">${marketData.insight}</p>
         </div>
 
         <div class="alert alert-info">
@@ -390,8 +238,11 @@ exports.handler = async (event) => {
         html: emailHtml
       });
 
+      console.log('✓ Test email sent');
+
       return {
         statusCode: 200,
+        headers,
         body: JSON.stringify({
           success: true,
           sentCount: 1,
@@ -401,41 +252,95 @@ exports.handler = async (event) => {
     }
 
     // LIVE MODE - Send to all recipients
+    console.log(`Sending to ${recipients.length} recipients...`);
     let sentCount = 0;
     const errors = [];
 
     for (const recipient of recipients) {
       try {
         // Personalize content with customer name
-        const personalizedContent = content.replace(/\[Name\]/g, recipient.name);
+        const firstName = (recipient.name || 'there').split(' ')[0];
+        const personalizedContent = content.replace(/\[Name\]/g, firstName);
 
         const emailContent = `
-          <p>Hi ${recipient.name},</p>
+          <p>Hi ${firstName},</p>
           
-          ${statsHtml}
-
-          ${priceChartUrl ? `
-            <div class="chart-container">
-              <img src="${priceChartUrl}" alt="${region} Price Trend">
+          <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 24px; margin: 24px 0;">
+            <h3 style="margin-top: 0; color: #1e40af;">📍 Last 3 Months at a Glance</h3>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px;">
+              <div>
+                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Average Sold Price</div>
+                <div style="font-size: 28px; font-weight: 700; color: #1e40af;">£${marketData.snapshot.averagePrice.toLocaleString()}</div>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Change vs Previous 3 Months</div>
+                <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.momChange >= 0 ? '#10b981' : '#ef4444'};">
+                  ${marketData.snapshot.momChange >= 0 ? '+' : ''}${marketData.snapshot.momChange}%
+                </div>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Change vs Last Year</div>
+                <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.yoyChange >= 0 ? '#10b981' : '#ef4444'};">
+                  ${marketData.snapshot.yoyChange >= 0 ? '+' : ''}${marketData.snapshot.yoyChange}%
+                </div>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Total Sales Completed</div>
+                <div style="font-size: 28px; font-weight: 700; color: #1e40af;">${marketData.snapshot.totalTransactions}</div>
+              </div>
             </div>
-          ` : ''}
-
-          ${volumeChartUrl ? `
-            <div class="chart-container">
-              <img src="${volumeChartUrl}" alt="${region} Sales Volume">
-            </div>
-          ` : ''}
-
-          <div class="market-content">
-            ${personalizedContent.replace(/\n/g, '<br>')}
           </div>
 
-          <div class="alert alert-info">
-            <strong>📊 Data Source</strong><br>
-            UK House Price Index (HM Land Registry)
+          <h3 style="color: #1e293b; margin-top: 32px;">🏘 Property Type Breakdown</h3>
+          <p style="color: #64748b; margin-bottom: 16px;">Average sold prices by property type:</p>
+
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            ${Object.keys(marketData.propertyTypes).map(type => {
+              const data = marketData.propertyTypes[type];
+              const emoji = {
+                'Detached': '🏠',
+                'Semi-detached': '🏡',
+                'Terraced': '🏘',
+                'Flats': '🏢'
+              }[type];
+              
+              return `
+                <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <div style="font-size: 16px; font-weight: 600; color: #1e293b;">${emoji} ${type}</div>
+                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">${data.transactions} sales</div>
+                  </div>
+                  <div style="text-align: right;">
+                    <div style="font-size: 20px; font-weight: 700; color: #3b82f6;">£${data.averagePrice.toLocaleString()}</div>
+                    <div style="font-size: 13px; font-weight: 600; color: ${data.yoyChange >= 0 ? '#10b981' : '#ef4444'};">
+                      ${data.yoyChange >= 0 ? '+' : ''}${data.yoyChange.toFixed(1)}% YoY
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
           </div>
 
-          <p>Stay ahead of the market with Markeb Media's professional property content services.</p>
+          <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin: 32px 0;">
+            <h3 style="margin-top: 0; color: #92400e;">💡 What This Means for Valuations</h3>
+            <p style="color: #78350f; margin: 0; line-height: 1.7;">
+              ${marketData.insight}
+            </p>
+          </div>
+
+          <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 24px 0;">
+            <h3 style="margin-top: 0; color: #1e293b;">📊 How to Use This Data</h3>
+            <ul style="color: #475569; margin: 0; padding-left: 20px;">
+              <li style="margin-bottom: 8px;">Support realistic pricing during valuations</li>
+              <li style="margin-bottom: 8px;">Reassure vendors using <strong>sold</strong>, not asking, prices</li>
+              <li style="margin-bottom: 8px;">Handle objections around "the market slowing"</li>
+            </ul>
+          </div>
+
+          <p style="color: #64748b; font-size: 13px; font-style: italic; margin-top: 32px;">
+            ${marketData.compliance}
+          </p>
+
           <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
         `;
 
@@ -450,37 +355,22 @@ exports.handler = async (event) => {
         });
 
         sentCount++;
+        console.log(`✓ Sent to ${recipient.email}`);
         
         // Rate limiting: 100ms delay between sends
         await new Promise(resolve => setTimeout(resolve, 100));
 
       } catch (error) {
-        console.error(`Failed to send to ${recipient.email}:`, error);
+        console.error(`✗ Failed to send to ${recipient.email}:`, error);
         errors.push({ email: recipient.email, error: error.message });
       }
     }
 
-    // Log to Airtable (optional - create "Market Update History" table if you want tracking)
-    try {
-      await base('Market Update History').create({
-        'Region': region,
-        'Subject': subject,
-        'Recipients Count': sentCount,
-        'Sent Date': new Date().toISOString(),
-        'Sent By': 'Admin',
-        'Market Data': marketData ? JSON.stringify({
-          averagePrice: marketData.averagePrice,
-          annualChange: marketData.annualChange,
-          marketHealth: marketData.marketHealth.status
-        }) : null
-      });
-    } catch (error) {
-      console.log('Could not log to history (table may not exist):', error.message);
-      // Non-critical, continue
-    }
+    console.log(`=== Completed: ${sentCount} sent, ${errors.length} failed ===`);
 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({
         success: true,
         sentCount,
@@ -493,6 +383,7 @@ exports.handler = async (event) => {
     console.error('Error sending market updates:', error);
     return {
       statusCode: 500,
+      headers,
       body: JSON.stringify({
         success: false,
         error: error.message

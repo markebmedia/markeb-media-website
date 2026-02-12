@@ -7345,7 +7345,6 @@ async function autoFetchMarketData() {
     return;
   }
   
-  // Use first selected region for data fetching
   const primaryRegion = selectedRegions[0];
   
   const btn = document.getElementById('fetchDataBtn');
@@ -7356,8 +7355,7 @@ async function autoFetchMarketData() {
   preview.innerHTML = '<div style="text-align: center; padding: 20px;"><div class="spinner" style="width: 40px; height: 40px;"></div></div>';
   
   try {
-    // Fetch market data from API using primary region
-    const response = await fetch('/.netlify/functions/fetch-market-data', {
+    const response = await fetch('/.netlify/functions/fetch-ppd-data', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ region: primaryRegion })
@@ -7367,52 +7365,78 @@ async function autoFetchMarketData() {
     
     if (result.success) {
       const data = result.data;
-      currentMarketData = data;
+      currentMarketData = data.metrics;
       
-      // Auto-fill subject - show all selected regions
-      const month = new Date(data.currentMonth).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+      // Auto-fill subject
       const regionText = selectedRegions.length === 1 
         ? selectedRegions[0] 
         : `${selectedRegions.length} Regions`;
-      document.getElementById('marketUpdateSubject').value = `${regionText} Property Market Update - ${month}`;
+      document.getElementById('marketUpdateSubject').value = `📊 ${regionText} Property Market Update – Latest Sold Prices`;
       
-      // Generate content with data
-      const content = generateMarketUpdateContent(data, selectedRegions);
+      // Generate content
+      const content = `Hey [Name],
+
+Here's your ${data.targetRegion} property market update based on official HM Land Registry sold price data.
+
+**LAST 3 MONTHS AT A GLANCE:**
+- Average sold price: £${data.metrics.snapshot.averagePrice.toLocaleString()}
+- Change vs previous 3 months: ${data.metrics.snapshot.momChange >= 0 ? '+' : ''}${data.metrics.snapshot.momChange}%
+- Change vs last year: ${data.metrics.snapshot.yoyChange >= 0 ? '+' : ''}${data.metrics.snapshot.yoyChange}%
+- Total sales completed: ${data.metrics.snapshot.totalTransactions}
+
+**PROPERTY TYPE BREAKDOWN:**
+Average sold prices:
+${Object.keys(data.metrics.propertyTypes).map(type => {
+  const d = data.metrics.propertyTypes[type];
+  const emoji = {'Detached': '🏠', 'Semi-detached': '🏡', 'Terraced': '🏘', 'Flats': '🏢'}[type];
+  return `• ${emoji} ${type}: £${d.averagePrice.toLocaleString()} (${d.yoyChange >= 0 ? '+' : ''}${d.yoyChange.toFixed(1)}% YoY)`;
+}).join('\n')}
+
+**WHAT THIS MEANS FOR VALUATIONS:**
+${data.insight}
+
+**HOW TO USE THIS DATA:**
+- Support realistic pricing during valuations
+- Reassure vendors using sold, not asking, prices
+- Handle objections around "the market slowing"
+
+Best regards,
+Markeb Media Team`;
+      
       document.getElementById('marketUpdateContent').value = content;
       
-      // Show preview with charts
+      // Show preview
       preview.innerHTML = `
         <div class="success-box">
-          <strong>✅ Market data fetched for ${primaryRegion}!</strong>
-          ${selectedRegions.length > 1 ? `<div style="font-size: 12px; margin-top: 4px;">Data will be sent to ${selectedRegions.length} regions: ${selectedRegions.join(', ')}</div>` : ''}
+          <strong>✅ Market data fetched for ${data.targetRegion}!</strong>
+          ${selectedRegions.length > 1 ? `<div style="font-size: 12px; margin-top: 4px;">Will send to ${selectedRegions.length} regions</div>` : ''}
           
           <div style="margin-top: 16px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
             <div style="text-align: center;">
-              <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">£${data.averagePrice.toLocaleString()}</div>
+              <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">£${data.metrics.snapshot.averagePrice.toLocaleString()}</div>
               <div style="font-size: 12px; color: #64748b;">Average Price</div>
             </div>
             <div style="text-align: center;">
-              <div style="font-size: 24px; font-weight: 700; color: ${data.annualChange > 0 ? '#10b981' : '#ef4444'};">
-                ${data.annualChange > 0 ? '+' : ''}${data.annualChange.toFixed(1)}%
+              <div style="font-size: 24px; font-weight: 700; color: ${data.metrics.snapshot.yoyChange >= 0 ? '#10b981' : '#ef4444'};">
+                ${data.metrics.snapshot.yoyChange >= 0 ? '+' : ''}${data.metrics.snapshot.yoyChange}%
               </div>
-              <div style="font-size: 12px; color: #64748b;">Annual Change</div>
+              <div style="font-size: 12px; color: #64748b;">YoY Change</div>
             </div>
             <div style="text-align: center;">
-              <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">${data.salesVolume.toLocaleString()}</div>
+              <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">${data.metrics.snapshot.totalTransactions}</div>
               <div style="font-size: 12px; color: #64748b;">Sales Volume</div>
             </div>
             <div style="text-align: center;">
-              <div style="font-size: 24px; font-weight: 700; color: #f59e0b;">
-                ${data.marketHealth.emoji} ${data.marketHealth.score}/100
+              <div style="font-size: 24px; font-weight: 700; color: ${data.metrics.snapshot.transactionChange >= 0 ? '#10b981' : '#ef4444'};">
+                ${data.metrics.snapshot.transactionChange >= 0 ? '+' : ''}${data.metrics.snapshot.transactionChange}%
               </div>
-              <div style="font-size: 12px; color: #64748b;">Market Health</div>
+              <div style="font-size: 12px; color: #64748b;">Volume Change</div>
             </div>
           </div>
           
           <div style="margin-top: 16px; padding: 12px; background: #eff6ff; border-radius: 8px; font-size: 13px;">
-            <strong>Market Status:</strong> ${data.marketHealth.status}<br>
-            <strong>Data Source:</strong> UK House Price Index (HM Land Registry)<br>
-            <strong>Period:</strong> Last 12 months
+            <strong>Data Source:</strong> ${data.dataSource}<br>
+            <strong>Period:</strong> ${data.period.current}
           </div>
         </div>
       `;
