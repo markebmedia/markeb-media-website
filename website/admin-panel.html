@@ -7805,8 +7805,16 @@ function filterBroadcastRecipients() {
 // Update selected count
 function updateSelectedCount() {
   const count = selectedRecipients.length;
-  document.getElementById('broadcastSelected').textContent = count;
-  document.getElementById('sendBroadcastCount').textContent = count;
+  
+  const selectedElement = document.getElementById('broadcastSelected');
+  if (selectedElement) {
+    selectedElement.textContent = count;
+  }
+  
+  const countElement = document.getElementById('sendBroadcastCount');
+  if (countElement) {
+    countElement.textContent = count;
+  }
   
   // Enable/disable send button
   const sendBtn = document.getElementById('sendBroadcastBtn');
