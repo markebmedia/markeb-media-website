@@ -208,6 +208,20 @@ function processData() {
   
   console.log(`📊 Total transactions: ${records.length}`);
   
+  // DEBUG: Log CSV structure
+  console.log('🔍 Sample CSV record:', JSON.stringify(records[0], null, 2));
+  console.log('📋 CSV columns:', Object.keys(records[0]));
+  
+  // DEBUG: Log sample county values
+  const counties = records.slice(0, 100).map(r => r.County).filter(Boolean);
+  const uniqueCounties = [...new Set(counties)];
+  console.log('🏴 Sample counties found:', uniqueCounties.slice(0, 20));
+  
+  // DEBUG: Log sample districts
+  const districts = records.slice(0, 100).map(r => r.District).filter(Boolean);
+  const uniqueDistricts = [...new Set(districts)];
+  console.log('🏙️  Sample districts found:', uniqueDistricts.slice(0, 20));
+  
   const typeMapping = {
     'D': 'Detached',
     'S': 'Semi-detached',
