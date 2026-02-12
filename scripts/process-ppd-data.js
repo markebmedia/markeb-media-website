@@ -1,10 +1,10 @@
-const https = require('https');
+const http = require('http');
 const fs = require('fs');
 const { parse } = require('csv-parse/sync');
 
 const PPD_URL = 'http://prod.publicdata.landregistry.gov.uk/pp-monthly-update-new-version.csv';
 
-// Region mapping (same as your function)
+// Region mapping (exact match to your dropdown)
 const REGION_MAPPING = {
   // ===== ENGLAND - NORTH WEST =====
   'Cheshire East': 'CHESHIRE EAST',
@@ -170,7 +170,7 @@ console.log('📥 Downloading PPD data...');
 
 // Download CSV
 const file = fs.createWriteStream('ppd-data.csv');
-https.get(PPD_URL, (response) => {
+http.get(PPD_URL, (response) => {
   response.pipe(file);
   
   file.on('finish', () => {
@@ -179,7 +179,11 @@ https.get(PPD_URL, (response) => {
     processData();
   });
 }).on('error', (err) => {
-  fs.unlink('ppd-data.csv', () => {});
+  try {
+    fs.unlinkSync('ppd-data.csv');
+  } catch (e) {
+    // Ignore if file doesn't exist
+  }
   console.error('❌ Download failed:', err.message);
   process.exit(1);
 });
@@ -216,7 +220,9 @@ function processData() {
       
       return county.includes(searchTerm) || 
              district.includes(searchTerm) || 
-             city.includes(searchTerm);
+             city.includes(searchTerm) ||
+             searchTerm.includes(county) ||
+             searchTerm.includes(district);
     });
     
     if (regionTransactions.length === 0) {
@@ -293,5 +299,9 @@ function processData() {
   console.log(`📈 Regions with data: ${Object.keys(regionalData).length}`);
   
   // Cleanup
-  fs.unlinkSync('ppd-data.csv');
+  try {
+    fs.unlinkSync('ppd-data.csv');
+  } catch (e) {
+    // Ignore if file doesn't exist
+  }
 }
