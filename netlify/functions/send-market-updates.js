@@ -136,6 +136,29 @@ function getEmailLayout(content) {
 async function generateMarketInsight(region, marketData) {
   console.log('🧠 Generating AI market insight with Claude...');
 
+  // Randomize the briefing style for variety
+  const styles = [
+    {
+      name: 'market_conditions',
+      instruction: 'Lead with overall market direction and transaction volumes, then highlight property type performance'
+    },
+    {
+      name: 'price_performance',
+      instruction: 'Lead with average sold price and YoY change, then explain which property types are driving/dragging the market'
+    },
+    {
+      name: 'comparative',
+      instruction: 'Compare performance across property types, highlighting the spread between strongest and weakest performers'
+    },
+    {
+      name: 'volume_and_value',
+      instruction: 'Balance both transaction volumes and price movements, connecting buyer activity to pricing trends'
+    }
+  ];
+
+  const selectedStyle = styles[Math.floor(Math.random() * styles.length)];
+  console.log(`📝 Using briefing style: ${selectedStyle.name}`);
+
   const prompt = `
 You are the UK's leading property market analyst providing clear, actionable intelligence to estate agents.
 
@@ -153,7 +176,10 @@ ${Object.entries(marketData.propertyTypes).map(([type, data]) =>
 ).join('\n')}
 
 **Your Task:**
-Write 2-3 clear sentences summarising what this data means for estate agents doing valuations. Be factual and specific.
+Write 2-3 clear sentences summarising what this data means for estate agents doing valuations.
+
+**Briefing Style:**
+${selectedStyle.instruction}
 
 **CRITICAL REQUIREMENTS:**
 1. UK English spelling only
@@ -161,6 +187,7 @@ Write 2-3 clear sentences summarising what this data means for estate agents doi
 3. Reference the actual numbers provided
 4. State facts clearly - no fluff or sales language
 5. Focus on market conditions and property type performance
+6. Vary your sentence structure and opening - don't always start the same way
 
 **What to cover:**
 - Brief summary of market direction (growing/stable/cooling)
@@ -176,6 +203,7 @@ Senior analyst giving a factual briefing. Clear, concise, data-driven.
 - Give generic advice
 - Mention Markeb Media
 - Use exclamation marks
+- Start every sentence with the region name
 
 Generate the insight now:
 `;
