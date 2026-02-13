@@ -3,8 +3,8 @@ const fs = require('fs');
 const { parse } = require('csv-parse/sync');
 
 // URLs for current and previous year
-const currentYear = new Date().getFullYear();
-const previousYear = currentYear - 1;
+const currentYear = 2025;
+const previousYear = 2024;
 
 const CURRENT_YEAR_URL = `http://prod1.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-${currentYear}.csv`;
 const PREVIOUS_YEAR_URL = `http://prod1.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-${previousYear}.csv`;
