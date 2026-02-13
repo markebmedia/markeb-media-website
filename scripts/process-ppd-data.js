@@ -2,12 +2,53 @@ const http = require('http');
 const fs = require('fs');
 const { parse } = require('csv-parse/sync');
 
-// URLs for current month and previous year
-const MONTHLY_UPDATE_URL = 'http://prod1.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-monthly-update-new-version.csv';
-
+// URLs for current and previous year
 const currentYear = new Date().getFullYear();
 const previousYear = currentYear - 1;
+
+const CURRENT_YEAR_URL = `http://prod1.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-${currentYear}.csv`;
 const PREVIOUS_YEAR_URL = `http://prod1.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-${previousYear}.csv`;
+
+console.log(`📥 Downloading ${currentYear} and ${previousYear} data...`);
+
+let currentYearData = '';
+let previousYearData = '';
+
+function downloadFile(url) {
+  return new Promise((resolve, reject) => {
+    http.get(url, (response) => {
+      console.log(`Response from ${url.split('/').pop()}: ${response.statusCode}`);
+      
+      if (response.statusCode !== 200) {
+        reject(new Error(`HTTP ${response.statusCode}`));
+        return;
+      }
+      
+      let data = '';
+      response.on('data', chunk => data += chunk);
+      response.on('end', () => resolve(data));
+    }).on('error', reject);
+  });
+}
+
+async function downloadBothFiles() {
+  try {
+    console.log(`Downloading ${currentYear} data...`);
+    currentYearData = await downloadFile(CURRENT_YEAR_URL);
+    console.log(`✅ ${currentYear} data downloaded (${(currentYearData.length / 1024 / 1024).toFixed(2)} MB)`);
+    
+    console.log(`Downloading ${previousYear} data...`);
+    previousYearData = await downloadFile(PREVIOUS_YEAR_URL);
+    console.log(`✅ ${previousYear} data downloaded (${(previousYearData.length / 1024 / 1024).toFixed(2)} MB)`);
+    
+    processData();
+  } catch (error) {
+    console.error('❌ Download failed:', error.message);
+    process.exit(1);
+  }
+}
+
+downloadBothFiles();
 
 // Region mapping (exact match to your dropdown)
 const REGION_MAPPING = {
@@ -171,47 +212,6 @@ const REGION_MAPPING = {
   'Newry, Mourne and Down': 'NEWRY'
 };
 
-console.log(`📥 Downloading monthly update and ${previousYear} data...`);
-
-let monthlyData = '';
-let previousYearData = '';
-
-function downloadFile(url) {
-  return new Promise((resolve, reject) => {
-    http.get(url, (response) => {
-      console.log(`Response from ${url.split('/').pop()}: ${response.statusCode}`);
-      
-      if (response.statusCode !== 200) {
-        reject(new Error(`HTTP ${response.statusCode}`));
-        return;
-      }
-      
-      let data = '';
-      response.on('data', chunk => data += chunk);
-      response.on('end', () => resolve(data));
-    }).on('error', reject);
-  });
-}
-
-async function downloadBothFiles() {
-  try {
-    console.log('Downloading monthly update...');
-    monthlyData = await downloadFile(MONTHLY_UPDATE_URL);
-    console.log(`✅ Monthly update downloaded (${(monthlyData.length / 1024 / 1024).toFixed(2)} MB)`);
-    
-    console.log(`Downloading ${previousYear} data...`);
-    previousYearData = await downloadFile(PREVIOUS_YEAR_URL);
-    console.log(`✅ ${previousYear} data downloaded (${(previousYearData.length / 1024 / 1024).toFixed(2)} MB)`);
-    
-    processData();
-  } catch (error) {
-    console.error('❌ Download failed:', error.message);
-    process.exit(1);
-  }
-}
-
-downloadBothFiles();
-
 function processData() {
   console.log('🔄 Processing data...');
   
@@ -222,7 +222,7 @@ function processData() {
     'town_city', 'district', 'county', 'ppd_category', 'record_status'
   ];
   
-  const monthlyRecords = parse(monthlyData, {
+  const currentRecords = parse(currentYearData, {
     columns: columnNames,
     skip_empty_lines: true,
     trim: true,
@@ -236,16 +236,14 @@ function processData() {
     from_line: 1
   });
   
-  console.log(`📊 Monthly update transactions: ${monthlyRecords.length}`);
+  console.log(`📊 ${currentYear} transactions: ${currentRecords.length}`);
   console.log(`📊 ${previousYear} transactions: ${previousRecords.length}`);
   
-  // Determine the month/year from monthly update data
-  const currentPeriod = getCurrentPeriod(monthlyRecords);
-  const comparisonMonth = currentPeriod.month;
-  const comparisonYear = previousYear;
+  // Get the most recent 3 complete months from current year
+  const currentPeriod = getMostRecentCompleteMonths(currentRecords, 3);
   
-  console.log(`📅 Current period: ${currentPeriod.month}/${currentPeriod.year}`);
-  console.log(`📅 Comparing to: ${comparisonMonth}/${comparisonYear}`);
+  console.log(`📅 Current period: ${currentPeriod.startMonth}/${currentYear} - ${currentPeriod.endMonth}/${currentYear}`);
+  console.log(`📅 Comparing to: ${currentPeriod.startMonth}/${previousYear} - ${currentPeriod.endMonth}/${previousYear}`);
   
   const typeMapping = {
     'D': 'Detached',
@@ -260,16 +258,18 @@ function processData() {
   Object.keys(REGION_MAPPING).forEach(region => {
     const searchTerm = REGION_MAPPING[region];
     
-    // Current month data (from monthly update)
-    const currentTransactions = monthlyRecords.filter(record => 
-      matchesLocation(record, searchTerm)
-    );
+    // Current period data
+    const currentTransactions = currentRecords.filter(record => {
+      const matchesRegion = matchesLocation(record, searchTerm);
+      const matchesPeriod = isInDateRange(record.date, currentPeriod.startMonth, currentPeriod.endMonth, currentYear);
+      return matchesRegion && matchesPeriod;
+    });
     
-    // Same month last year (from previous year file)
+    // Same period last year
     const previousTransactions = previousRecords.filter(record => {
       const matchesRegion = matchesLocation(record, searchTerm);
-      const matchesMonth = isInMonth(record.date, comparisonMonth, comparisonYear);
-      return matchesRegion && matchesMonth;
+      const matchesPeriod = isInDateRange(record.date, currentPeriod.startMonth, currentPeriod.endMonth, previousYear);
+      return matchesRegion && matchesPeriod;
     });
     
     if (currentTransactions.length === 0) {
@@ -312,7 +312,7 @@ function processData() {
     regionalData[region] = {
       region: region,
       lastUpdated: new Date().toISOString(),
-      dataPeriod: `${currentPeriod.month}/${currentPeriod.year}`,
+      dataPeriod: `${currentPeriod.startMonth}-${currentPeriod.endMonth}/${currentYear}`,
       snapshot: {
         averagePrice: Math.round(currentStats.averagePrice),
         momChange: 0, // Not calculated
@@ -323,7 +323,7 @@ function processData() {
         previousYearTransactions: previousStats.totalTransactions
       },
       propertyTypes: propertyTypes,
-      dataSource: `HM Land Registry Price Paid Data (${currentPeriod.month}/${currentPeriod.year} vs ${comparisonMonth}/${comparisonYear})`,
+      dataSource: `HM Land Registry Price Paid Data (${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} ${currentYear} vs ${previousYear})`,
       compliance: 'Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.'
     };
   });
@@ -338,8 +338,8 @@ function processData() {
     `${outputDir}/market-data.json`,
     JSON.stringify({
       generatedAt: new Date().toISOString(),
-      dataPeriod: `${currentPeriod.month}/${currentPeriod.year}`,
-      comparisonPeriod: `${comparisonMonth}/${comparisonYear}`,
+      dataPeriod: `${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} ${currentYear}`,
+      comparisonPeriod: `${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} ${previousYear}`,
       regions: regionalData
     }, null, 2)
   );
@@ -360,50 +360,59 @@ function matchesLocation(record, searchTerm) {
          searchTerm.includes(district);
 }
 
-function isInMonth(dateStr, month, year) {
+function isInDateRange(dateStr, startMonth, endMonth, year) {
   if (!dateStr) return false;
   const date = new Date(dateStr);
-  return date.getMonth() + 1 === month && date.getFullYear() === year;
+  const month = date.getMonth() + 1;
+  const dateYear = date.getFullYear();
+  
+  return dateYear === year && month >= startMonth && month <= endMonth;
 }
 
-function getCurrentPeriod(records) {
-  // Find the most common month in the monthly update data
-  const months = {};
+function getMostRecentCompleteMonths(records, monthCount) {
+  // Find the most recent month with significant data
+  const monthCounts = {};
   
-  records.slice(0, 1000).forEach(record => {
+  records.forEach(record => {
     if (!record.date) return;
     const date = new Date(record.date);
-    const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
-    months[monthYear] = (months[monthYear] || 0) + 1;
-  });
-  
-  // Get the most common month
-  let maxCount = 0;
-  let mostCommonPeriod = null;
-  
-  Object.keys(months).forEach(period => {
-    if (months[period] > maxCount) {
-      maxCount = months[period];
-      mostCommonPeriod = period;
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    
+    // Only count current year data
+    if (year === new Date().getFullYear()) {
+      const key = `${year}-${month}`;
+      monthCounts[key] = (monthCounts[key] || 0) + 1;
     }
   });
   
-  if (mostCommonPeriod) {
-    const [month, year] = mostCommonPeriod.split('/').map(Number);
-    return { month, year };
+  // Find the most recent month with at least 1000 transactions
+  const sortedMonths = Object.keys(monthCounts)
+    .filter(key => monthCounts[key] >= 1000)
+    .sort()
+    .reverse();
+  
+  if (sortedMonths.length === 0) {
+    // Fallback to 3 months ago
+    const now = new Date();
+    const endMonth = now.getMonth() - 2; // 2 months ago to ensure complete data
+    return {
+      startMonth: endMonth - 2,
+      endMonth: endMonth
+    };
   }
   
-  // Fallback to previous month
-  const now = new Date();
-  let month = now.getMonth(); // 0-11
-  let year = now.getFullYear();
+  const mostRecentMonth = parseInt(sortedMonths[0].split('-')[1]);
   
-  if (month === 0) {
-    month = 12;
-    year--;
-  }
-  
-  return { month, year };
+  return {
+    endMonth: mostRecentMonth,
+    startMonth: mostRecentMonth - monthCount + 1
+  };
+}
+
+function getMonthName(monthNum) {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return months[monthNum - 1];
 }
 
 function calculateStats(transactions, typeMapping) {
