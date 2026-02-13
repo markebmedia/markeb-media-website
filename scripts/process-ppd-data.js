@@ -4,9 +4,9 @@ const { parse } = require('csv-parse/sync');
 
 // URLs - use monthly update for current + previous full year for comparison
 const MONTHLY_UPDATE_URL = 'http://prod1.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-monthly-update-new-version.csv';
-const PREVIOUS_YEAR_URL = 'http://prod1.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-2024.csv';
+const PREVIOUS_YEAR_URL = 'http://prod1.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-2025.csv';
 
-console.log(`📥 Downloading monthly update and 2024 data...`);
+console.log(`📥 Downloading monthly update and 2025 data...`);
 
 let monthlyData = '';
 let previousYearData = '';
@@ -34,9 +34,9 @@ async function downloadBothFiles() {
     monthlyData = await downloadFile(MONTHLY_UPDATE_URL);
     console.log(`✅ Monthly update downloaded (${(monthlyData.length / 1024 / 1024).toFixed(2)} MB)`);
     
-    console.log('Downloading 2024 data...');
+    console.log('Downloading 2025 data...');
     previousYearData = await downloadFile(PREVIOUS_YEAR_URL);
-    console.log(`✅ 2024 data downloaded (${(previousYearData.length / 1024 / 1024).toFixed(2)} MB)`);
+    console.log(`✅ 2025 data downloaded (${(previousYearData.length / 1024 / 1024).toFixed(2)} MB)`);
     
     processData();
   } catch (error) {
@@ -234,13 +234,13 @@ function processData() {
   });
   
   console.log(`📊 Monthly update records: ${monthlyRecords.length}`);
-  console.log(`📊 2024 transactions: ${previousRecords.length}`);
+  console.log(`📊 2025 transactions: ${previousRecords.length}`);
   
-  // Get the most recent 3-month period from monthly data
-  const currentPeriod = getMostRecentPeriod(monthlyRecords);
+  // Get the most recent complete quarter from monthly data
+  const currentPeriod = getMostRecentQuarter(monthlyRecords);
   
-  console.log(`📅 Current period: ${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} ${currentPeriod.year}`);
-  console.log(`📅 Comparing to: ${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} 2024`);
+  console.log(`📅 Most recent quarter: ${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} ${currentPeriod.year}`);
+  console.log(`📅 Comparing to: ${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} 2025`);
   
   const typeMapping = {
     'D': 'Detached',
@@ -262,10 +262,10 @@ function processData() {
       return matchesRegion && matchesPeriod;
     });
     
-    // Filter 2024 data for same period
+    // Filter 2025 data for same period
     const previousTransactions = previousRecords.filter(record => {
       const matchesRegion = matchesLocation(record, searchTerm);
-      const matchesPeriod = isInDateRange(record.date, currentPeriod.startMonth, currentPeriod.endMonth, 2024);
+      const matchesPeriod = isInDateRange(record.date, currentPeriod.startMonth, currentPeriod.endMonth, 2025);
       return matchesRegion && matchesPeriod;
     });
     
@@ -309,7 +309,7 @@ function processData() {
     regionalData[region] = {
       region: region,
       lastUpdated: new Date().toISOString(),
-      dataPeriod: `${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} ${currentPeriod.year}`,
+      dataPeriod: `Most Recent Quarter (${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} ${currentPeriod.year})`,
       snapshot: {
         averagePrice: Math.round(currentStats.averagePrice),
         momChange: 0,
@@ -320,7 +320,7 @@ function processData() {
         previousYearTransactions: previousStats.totalTransactions
       },
       propertyTypes: propertyTypes,
-      dataSource: `HM Land Registry Price Paid Data (${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} ${currentPeriod.year} vs 2024)`,
+      dataSource: `HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)`,
       compliance: 'Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.'
     };
   });
@@ -335,8 +335,8 @@ function processData() {
     `${outputDir}/market-data.json`,
     JSON.stringify({
       generatedAt: new Date().toISOString(),
-      dataPeriod: `${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} ${currentPeriod.year}`,
-      comparisonPeriod: `${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} 2024`,
+      dataPeriod: `Most Recent Quarter (${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} ${currentPeriod.year})`,
+      comparisonPeriod: `Year Ago (${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} 2025)`,
       regions: regionalData
     }, null, 2)
   );
@@ -345,52 +345,53 @@ function processData() {
   console.log(`📈 Regions with data: ${Object.keys(regionalData).length}`);
 }
 
-function getMostRecentPeriod(records) {
-  // Count transactions by month for recent months only
+function getMostRecentQuarter(records) {
+  // Count transactions by month for recent quarters
   const monthCounts = {};
   const now = new Date();
-  const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, 1);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 12, 1);
   
   records.forEach(record => {
     if (!record.date) return;
     const date = new Date(record.date);
     
-    // Only look at transactions from last 6 months
-    if (date >= sixMonthsAgo) {
+    // Look at transactions from last 12 months AND not in the future
+    if (date >= twelveMonthsAgo && date <= today) {
       const key = `${date.getFullYear()}-${date.getMonth() + 1}`;
       monthCounts[key] = (monthCounts[key] || 0) + 1;
     }
   });
   
-  // Find months with significant data (>500 transactions)
+  // Find months with data (lowered threshold to catch more recent quarters)
   const validMonths = Object.keys(monthCounts)
-    .filter(key => monthCounts[key] >= 500)
+    .filter(key => monthCounts[key] >= 100)
     .sort()
     .reverse();
   
-  console.log('📊 Recent months with data:', validMonths.slice(0, 5).map(m => `${m} (${monthCounts[m]} txns)`));
+  console.log('📊 Recent months with data:', validMonths.slice(0, 8).map(m => `${m} (${monthCounts[m]} txns)`));
   
   if (validMonths.length === 0) {
-    // Fallback: use Nov-Jan
+    // Fallback: use Q4 of previous year
     return {
-      startMonth: 11,
-      endMonth: 1,
-      year: now.getFullYear()
+      startMonth: 10,
+      endMonth: 12,
+      year: now.getFullYear() - 1
     };
   }
   
   // Get the most recent month with data
   const [year, month] = validMonths[0].split('-').map(Number);
   
-  // Use 3-month period ending with this month
+  // Use quarterly period (3 months) ending with this month
   let endMonth = month;
   let startMonth = month - 2;
   let periodYear = year;
   
-  // Handle year wrap (e.g., Nov-Jan)
+  // Handle year wrap (e.g., Q4 Oct-Dec → Q1 Jan-Mar crosses year)
   if (startMonth < 1) {
     startMonth += 12;
-    // Year stays the same since we want Jan of current year
+    // Year stays the same since we want current year data
   }
   
   return {
