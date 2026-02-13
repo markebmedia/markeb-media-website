@@ -1,5 +1,11 @@
+const Anthropic = require('@anthropic-ai/sdk');
 const Airtable = require('airtable');
 const { Resend } = require('resend');
+
+// Initialize services
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_PAT }).base(process.env.AIRTABLE_BASE_ID);
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -8,6 +14,13 @@ const FROM_EMAIL = 'Markeb Media <commercial@markebmedia.com>';
 const BCC_EMAIL = 'commercial@markebmedia.com';
 const SITE_URL = 'https://markebmedia.com';
 const LOGO_URL = 'https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png';
+
+const headers = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type'
+};
 
 // Email Layout Wrapper
 function getEmailLayout(content) {
@@ -96,7 +109,7 @@ function getEmailLayout(content) {
     <div class="footer">
       <p>
         <strong>Markeb Media</strong><br>
-        Professional Property Media, Marketing & Technology Solution<br>
+        Professional Property Media, Marketing & Technology Solutions<br>
         <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
       </p>
       <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">
@@ -116,15 +129,77 @@ function getEmailLayout(content) {
   `;
 }
 
+/**
+ * Generate AI-powered market insight using Claude
+ * This positions the data as a valuation-winning tool
+ */
+async function generateMarketInsight(region, marketData) {
+  console.log('🧠 Generating AI market insight with Claude...');
+
+  const prompt = `
+You are the UK's leading property market analyst providing clear, actionable intelligence to estate agents.
+
+**Market Data for ${region}:**
+
+**Overall Market (Last 3 Months):**
+- Average Sold Price: £${marketData.snapshot.averagePrice.toLocaleString()}
+- Year-on-Year Change: ${marketData.snapshot.yoyChange >= 0 ? '+' : ''}${marketData.snapshot.yoyChange}%
+- Total Completed Sales: ${marketData.snapshot.totalTransactions}
+- vs Last Year Sales: ${marketData.snapshot.previousYearTransactions} (${marketData.snapshot.transactionChange >= 0 ? '+' : ''}${marketData.snapshot.transactionChange}% change)
+
+**Property Type Performance:**
+${Object.entries(marketData.propertyTypes).map(([type, data]) => 
+  `- ${type}: £${data.averagePrice.toLocaleString()} (${data.yoyChange >= 0 ? '+' : ''}${data.yoyChange}% YoY, ${data.transactions} sales)`
+).join('\n')}
+
+**Your Task:**
+Write 2-3 clear sentences summarising what this data means for estate agents doing valuations. Be factual and specific.
+
+**CRITICAL REQUIREMENTS:**
+1. UK English spelling only
+2. 2-3 sentences maximum
+3. Reference the actual numbers provided
+4. State facts clearly - no fluff or sales language
+5. Focus on market conditions and property type performance
+
+**What to cover:**
+- Brief summary of market direction (growing/stable/cooling)
+- Which property types are strongest/weakest
+- One clear takeaway for pricing strategy
+
+**Tone:** 
+Senior analyst giving a factual briefing. Clear, concise, data-driven.
+
+**DO NOT:**
+- Use bullet points
+- Write sales copy or pitches
+- Give generic advice
+- Mention Markeb Media
+- Use exclamation marks
+
+Generate the insight now:
+`;
+
+  try {
+    const message = await anthropic.messages.create({
+      model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514',
+      max_tokens: 400,
+      temperature: 0.7,
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    const insight = message.content[0].text.trim();
+    console.log('✅ AI market insight generated successfully');
+    return insight;
+  } catch (error) {
+    console.error('❌ Error generating AI insight:', error);
+    // Fallback to a generic insight if AI fails
+    return `The ${region} market has shown ${marketData.snapshot.yoyChange >= 0 ? 'growth' : 'adjustment'} with average prices at £${marketData.snapshot.averagePrice.toLocaleString()}, ${Math.abs(marketData.snapshot.yoyChange)}% ${marketData.snapshot.yoyChange >= 0 ? 'up' : 'down'} year-on-year. With ${marketData.snapshot.totalTransactions} completed sales, vendors need data-driven pricing strategies and professional presentation to achieve the best possible outcome in current conditions.`;
+  }
+}
+
 exports.handler = async (event) => {
   console.log('=== Market Updates Function Called ===');
-  
-  const headers = {
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type'
-  };
 
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
@@ -139,15 +214,15 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { region, subject, content, sendPreview, recipients, marketData } = JSON.parse(event.body);
+    const { region, subject, sendPreview, recipients, marketData, generateInsight } = JSON.parse(event.body);
 
-    console.log('Request data:', { region, subject, sendPreview, recipientsCount: recipients?.length });
+    console.log('Request data:', { region, subject, sendPreview, recipientsCount: recipients?.length, generateInsight });
 
-    if (!region || !subject || !content) {
+    if (!region || !subject) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ success: false, error: 'Missing required fields: region, subject, or content' })
+        body: JSON.stringify({ success: false, error: 'Missing required fields: region or subject' })
       };
     }
 
@@ -167,11 +242,17 @@ exports.handler = async (event) => {
       };
     }
 
+    // ⭐ GENERATE AI INSIGHT if requested
+    let insight = marketData.insight; // Use existing insight by default
+    
+    if (generateInsight) {
+      console.log('🤖 AI insight generation requested...');
+      insight = await generateMarketInsight(region, marketData);
+    }
+
     // TEST MODE - Send to admin only
     if (sendPreview) {
       console.log('Sending test email to admin...');
-      
-      const testContent = content.replace(/\[Name\]/g, 'Admin');
       
       const previewHtml = `
         <div class="alert alert-info">
@@ -181,18 +262,18 @@ exports.handler = async (event) => {
           <strong>Recipients:</strong> ${recipients.length} customer${recipients.length !== 1 ? 's' : ''}
         </div>
 
+        <p>Hi there,</p>
+
+        <p style="font-size: 16px; line-height: 1.7; color: #475569;">
+          Here's your latest market intelligence for ${region} to help you win more valuations.
+        </p>
+
         <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 24px; margin: 24px 0;">
-          <h3 style="margin-top: 0; color: #1e40af;">📍 Last 3 Months at a Glance</h3>
+          <h3 style="margin-top: 0; color: #1e40af;">📍 ${region} Market Snapshot (Last 3 Months)</h3>
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px;">
             <div>
               <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Average Sold Price</div>
               <div style="font-size: 28px; font-weight: 700; color: #1e40af;">£${marketData.snapshot.averagePrice.toLocaleString()}</div>
-            </div>
-            <div>
-              <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Change vs Previous 3 Months</div>
-              <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.momChange >= 0 ? '#10b981' : '#ef4444'};">
-                ${marketData.snapshot.momChange >= 0 ? '+' : ''}${marketData.snapshot.momChange}%
-              </div>
             </div>
             <div>
               <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Change vs Last Year</div>
@@ -204,23 +285,67 @@ exports.handler = async (event) => {
               <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Total Sales Completed</div>
               <div style="font-size: 28px; font-weight: 700; color: #1e40af;">${marketData.snapshot.totalTransactions}</div>
             </div>
+            <div>
+              <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Sales Volume Change</div>
+              <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.transactionChange >= 0 ? '#10b981' : '#ef4444'};">
+                ${marketData.snapshot.transactionChange >= 0 ? '+' : ''}${marketData.snapshot.transactionChange}%
+              </div>
+            </div>
           </div>
         </div>
 
-        <h3 style="color: #1e293b; margin-top: 32px;">🏘 Property Type Breakdown</h3>
-        ${Object.keys(marketData.propertyTypes).map(type => {
-          const data = marketData.propertyTypes[type];
-          const emoji = {'Detached': '🏠', 'Semi-detached': '🏡', 'Terraced': '🏘', 'Flats': '🏢'}[type];
-          return `
-            <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
-              ${emoji} ${type}: £${data.averagePrice.toLocaleString()} (${data.yoyChange >= 0 ? '+' : ''}${data.yoyChange.toFixed(1)}% YoY)
-            </div>
-          `;
-        }).join('')}
+        <h3 style="color: #1e293b; margin-top: 32px;">🏘 Property Type Performance</h3>
+        <p style="color: #64748b; margin-bottom: 16px;">Average sold prices by property type:</p>
 
-        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin: 24px 0;">
-          <h3 style="margin-top: 0; color: #92400e;">💡 What This Means for Valuations</h3>
-          <p style="color: #78350f; margin: 0;">${marketData.insight}</p>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          ${Object.keys(marketData.propertyTypes).map(type => {
+            const data = marketData.propertyTypes[type];
+            const emoji = {'Detached': '🏠', 'Semi-detached': '🏡', 'Terraced': '🏘', 'Flats': '🏢'}[type];
+            return `
+              <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-size: 16px; font-weight: 600; color: #1e293b;">${emoji} ${type}</div>
+                  <div style="font-size: 12px; color: #64748b; margin-top: 4px;">${data.transactions} sales</div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-size: 20px; font-weight: 700; color: #3b82f6;">£${data.averagePrice.toLocaleString()}</div>
+                  <div style="font-size: 13px; font-weight: 600; color: ${data.yoyChange >= 0 ? '#10b981' : '#ef4444'};">
+                    ${data.yoyChange >= 0 ? '+' : ''}${data.yoyChange.toFixed(1)}% YoY
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin: 32px 0;">
+          <h3 style="margin-top: 0; color: #92400e;">💡 What This Means for Winning Valuations</h3>
+          <p style="color: #78350f; margin: 0; line-height: 1.7; font-size: 15px;">
+            ${insight}
+          </p>
+        </div>
+
+        <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 24px 0;">
+          <h3 style="margin-top: 0; color: #1e293b;">📊 How to Use This Intelligence</h3>
+          <ul style="color: #475569; margin: 0; padding-left: 20px; line-height: 1.8;">
+            <li style="margin-bottom: 8px;">Reference these <strong>actual sold prices</strong> (not asking prices) during valuations</li>
+            <li style="margin-bottom: 8px;">Show vendors you understand current market conditions with real data</li>
+            <li style="margin-bottom: 8px;">Demonstrate which property types are performing strongest in ${region}</li>
+            <li style="margin-bottom: 8px;">Position yourself as the data-driven expert vendors trust</li>
+          </ul>
+        </div>
+
+        <p style="color: #64748b; font-size: 13px; font-style: italic; margin-top: 32px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+          ${marketData.compliance}
+        </p>
+
+        <p style="margin-top: 32px;">Best regards,<br><strong>The Markeb Media Team</strong></p>
+
+        <div style="background: #f8fafc; border: 2px dashed #e2e8f0; border-radius: 8px; padding: 16px; margin-top: 32px; text-align: center;">
+          <p style="margin: 0; color: #64748b; font-size: 14px;">
+            <strong>Need professional property media that wins valuations?</strong><br>
+            Markeb Media provides photography, videography, and social media content that positions you as the premium choice.
+          </p>
         </div>
 
         <div class="alert alert-info">
@@ -246,6 +371,7 @@ exports.handler = async (event) => {
         body: JSON.stringify({
           success: true,
           sentCount: 1,
+          insight: insight,
           message: 'Test email sent to commercial@markebmedia.com'
         })
       };
@@ -258,25 +384,21 @@ exports.handler = async (event) => {
 
     for (const recipient of recipients) {
       try {
-        // Personalize content with customer name
         const firstName = (recipient.name || 'there').split(' ')[0];
-        const personalizedContent = content.replace(/\[Name\]/g, firstName);
 
         const emailContent = `
           <p>Hi ${firstName},</p>
+
+          <p style="font-size: 16px; line-height: 1.7; color: #475569;">
+            Here's your latest market intelligence for ${region} to help you win more valuations.
+          </p>
           
           <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 24px; margin: 24px 0;">
-            <h3 style="margin-top: 0; color: #1e40af;">📍 Last 3 Months at a Glance</h3>
+            <h3 style="margin-top: 0; color: #1e40af;">📍 ${region} Market Snapshot (Last 3 Months)</h3>
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px;">
               <div>
                 <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Average Sold Price</div>
                 <div style="font-size: 28px; font-weight: 700; color: #1e40af;">£${marketData.snapshot.averagePrice.toLocaleString()}</div>
-              </div>
-              <div>
-                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Change vs Previous 3 Months</div>
-                <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.momChange >= 0 ? '#10b981' : '#ef4444'};">
-                  ${marketData.snapshot.momChange >= 0 ? '+' : ''}${marketData.snapshot.momChange}%
-                </div>
               </div>
               <div>
                 <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Change vs Last Year</div>
@@ -288,10 +410,16 @@ exports.handler = async (event) => {
                 <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Total Sales Completed</div>
                 <div style="font-size: 28px; font-weight: 700; color: #1e40af;">${marketData.snapshot.totalTransactions}</div>
               </div>
+              <div>
+                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Sales Volume Change</div>
+                <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.transactionChange >= 0 ? '#10b981' : '#ef4444'};">
+                  ${marketData.snapshot.transactionChange >= 0 ? '+' : ''}${marketData.snapshot.transactionChange}%
+                </div>
+              </div>
             </div>
           </div>
 
-          <h3 style="color: #1e293b; margin-top: 32px;">🏘 Property Type Breakdown</h3>
+          <h3 style="color: #1e293b; margin-top: 32px;">🏘 Property Type Performance</h3>
           <p style="color: #64748b; margin-bottom: 16px;">Average sold prices by property type:</p>
 
           <div style="display: flex; flex-direction: column; gap: 12px;">
@@ -322,26 +450,34 @@ exports.handler = async (event) => {
           </div>
 
           <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin: 32px 0;">
-            <h3 style="margin-top: 0; color: #92400e;">💡 What This Means for Valuations</h3>
-            <p style="color: #78350f; margin: 0; line-height: 1.7;">
-              ${marketData.insight}
+            <h3 style="margin-top: 0; color: #92400e;">💡 What This Means for Winning Valuations</h3>
+            <p style="color: #78350f; margin: 0; line-height: 1.7; font-size: 15px;">
+              ${insight}
             </p>
           </div>
 
           <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 24px 0;">
-            <h3 style="margin-top: 0; color: #1e293b;">📊 How to Use This Data</h3>
-            <ul style="color: #475569; margin: 0; padding-left: 20px;">
-              <li style="margin-bottom: 8px;">Support realistic pricing during valuations</li>
-              <li style="margin-bottom: 8px;">Reassure vendors using <strong>sold</strong>, not asking, prices</li>
-              <li style="margin-bottom: 8px;">Handle objections around "the market slowing"</li>
+            <h3 style="margin-top: 0; color: #1e293b;">📊 How to Use This Intelligence</h3>
+            <ul style="color: #475569; margin: 0; padding-left: 20px; line-height: 1.8;">
+              <li style="margin-bottom: 8px;">Reference these <strong>actual sold prices</strong> (not asking prices) during valuations</li>
+              <li style="margin-bottom: 8px;">Show vendors you understand current market conditions with real data</li>
+              <li style="margin-bottom: 8px;">Demonstrate which property types are performing strongest in ${region}</li>
+              <li style="margin-bottom: 8px;">Position yourself as the data-driven expert vendors trust</li>
             </ul>
           </div>
 
-          <p style="color: #64748b; font-size: 13px; font-style: italic; margin-top: 32px;">
+          <p style="color: #64748b; font-size: 13px; font-style: italic; margin-top: 32px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
             ${marketData.compliance}
           </p>
 
-          <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+          <p style="margin-top: 32px;">Best regards,<br><strong>The Markeb Media Team</strong></p>
+
+          <div style="background: #f8fafc; border: 2px dashed #e2e8f0; border-radius: 8px; padding: 16px; margin-top: 32px; text-align: center;">
+            <p style="margin: 0; color: #64748b; font-size: 14px;">
+              <strong>Need professional property media that wins valuations?</strong><br>
+              Markeb Media provides photography, videography, and social media content that positions you as the premium choice.
+            </p>
+          </div>
         `;
 
         const emailHtml = getEmailLayout(emailContent);
@@ -374,6 +510,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         success: true,
         sentCount,
+        insight: insight,
         errors: errors.length > 0 ? errors : undefined,
         message: `Sent to ${sentCount} recipient${sentCount !== 1 ? 's' : ''}`
       })

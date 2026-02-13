@@ -7292,16 +7292,17 @@ document.getElementById('marketUpdateForm')?.addEventListener('submit', async (e
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        region: regionsList,
-        subject,
-        content,
-        sendPreview,
-        recipients: recipients.map(r => ({
-          email: r.fields['Email'],
-          name: r.fields['Name']
-        })),
-        marketData: currentMarketData
-      })
+  region: regionsList,
+  subject,
+  content,
+  sendPreview,
+  recipients: recipients.map(r => ({
+    email: r.fields['Email'],
+    name: r.fields['Name']
+  })),
+  marketData: currentMarketData,
+  generateInsight: true  // ⭐ ADD THIS LINE
+})
     });
 
     const data = await response.json();
