@@ -2418,26 +2418,20 @@ body {
 
 <!-- Market Updates Section -->
 <div class="admin-section" id="market-updates">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-    <div>
-      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Market Updates</h2>
-      <p style="color: #64748b; font-size: 14px;">Send property market insights to opted-in estate agents by region</p>
-    </div>
-  </div>
-
+  
   <!-- Stats Cards -->
-  <div class="stats-grid" style="margin-bottom: 24px;">
+  <div class="stats-grid" style="margin-bottom: 32px;">
     <div class="stat-card">
       <div class="stat-value" id="totalOptedIn">-</div>
       <div class="stat-label">Total Opted In</div>
     </div>
     <div class="stat-card">
       <div class="stat-value" id="northOptedIn">-</div>
-      <div class="stat-label">North Region</div>
+      <div class="stat-label">North Regions</div>
     </div>
     <div class="stat-card">
       <div class="stat-value" id="southOptedIn">-</div>
-      <div class="stat-label">South Region</div>
+      <div class="stat-label">South Regions</div>
     </div>
     <div class="stat-card">
       <div class="stat-value" id="lastSentDate">-</div>
@@ -2445,209 +2439,220 @@ body {
     </div>
   </div>
 
-  <!-- Send Controls -->
-  <div class="calendar-container">
-    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">📧 Send Market Update</h3>
+  <!-- Compose Market Update -->
+  <div class="calendar-container" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="font-size: 18px; font-weight: 700;">
+        <i data-lucide="trending-up" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle;"></i>
+        Send Market Update
+      </h3>
+    </div>
     
     <div class="info-box" style="margin-bottom: 24px;">
-      💡 <strong>How it works:</strong> Select a region and compose your market update. Only customers who have opted in for market updates in that region will receive the email.
+      <strong>How it works:</strong> Select region(s), fetch real market data, then send to opted-in estate agents.<br>
+      Data is pulled from HM Land Registry and analyzed by AI.
     </div>
 
-    <div class="form-group">
-  <label class="form-label" for="marketUpdateRegion">Select Region(s) *</label>
-  <select 
-    id="marketUpdateRegion" 
-    class="form-input" 
-    required 
-    multiple 
-    size="8" 
-    onchange="updateMarketRecipientCount()" 
-    style="height: auto; min-height: 200px;"
-  >
-    <optgroup label="🎯 Your Service Regions">
-      <option value="Cheshire East">Cheshire East</option>
-      <option value="Cheshire West and Chester">Cheshire West and Chester</option>
-      <option value="Greater London">Greater London</option>
-      <option value="Greater Manchester">Greater Manchester</option>
-      <option value="Essex">Essex</option>
-      <option value="West Midlands">West Midlands</option>
-      <option value="Leicestershire">Leicestershire</option>
-    </optgroup>
-    
-    <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - Yorkshire & Humber">
-      <option value="South Yorkshire">South Yorkshire</option>
-      <option value="West Yorkshire">West Yorkshire</option>
-      <option value="North Yorkshire">North Yorkshire</option>
-      <option value="East Riding of Yorkshire">East Riding of Yorkshire</option>
-      <option value="York">York</option>
-    </optgroup>
-    
-    <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - North West">
-      <option value="Cumbria">Cumbria</option>
-      <option value="Lancashire">Lancashire</option>
-      <option value="Merseyside">Merseyside</option>
-      <option value="Blackburn with Darwen">Blackburn with Darwen</option>
-      <option value="Blackpool">Blackpool</option>
-      <option value="Halton">Halton</option>
-      <option value="Warrington">Warrington</option>
-    </optgroup>
-    
-    <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - North East">
-      <option value="County Durham">County Durham</option>
-      <option value="Northumberland">Northumberland</option>
-      <option value="Tyne and Wear">Tyne and Wear</option>
-    </optgroup>
-    
-    <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - Midlands">
-      <option value="Derbyshire">Derbyshire</option>
-      <option value="Derby">Derby</option>
-      <option value="Herefordshire">Herefordshire</option>
-      <option value="Lincolnshire">Lincolnshire</option>
-      <option value="Northamptonshire">Northamptonshire</option>
-      <option value="Nottinghamshire">Nottinghamshire</option>
-      <option value="Nottingham">Nottingham</option>
-      <option value="Rutland">Rutland</option>
-      <option value="Shropshire">Shropshire</option>
-      <option value="Telford and Wrekin">Telford and Wrekin</option>
-      <option value="Staffordshire">Staffordshire</option>
-      <option value="Stoke-on-Trent">Stoke-on-Trent</option>
-      <option value="Warwickshire">Warwickshire</option>
-      <option value="Worcestershire">Worcestershire</option>
-    </optgroup>
-    
-    <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - East">
-      <option value="Bedford">Bedford</option>
-      <option value="Central Bedfordshire">Central Bedfordshire</option>
-      <option value="Cambridgeshire">Cambridgeshire</option>
-      <option value="Peterborough">Peterborough</option>
-      <option value="Hertfordshire">Hertfordshire</option>
-      <option value="Norfolk">Norfolk</option>
-      <option value="Suffolk">Suffolk</option>
-    </optgroup>
-    
-    <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - South East">
-      <option value="Berkshire">Berkshire</option>
-      <option value="Buckinghamshire">Buckinghamshire</option>
-      <option value="East Sussex">East Sussex</option>
-      <option value="Brighton and Hove">Brighton and Hove</option>
-      <option value="Hampshire">Hampshire</option>
-      <option value="Portsmouth">Portsmouth</option>
-      <option value="Southampton">Southampton</option>
-      <option value="Isle of Wight">Isle of Wight</option>
-      <option value="Kent">Kent</option>
-      <option value="Medway">Medway</option>
-      <option value="Oxfordshire">Oxfordshire</option>
-      <option value="Surrey">Surrey</option>
-      <option value="West Sussex">West Sussex</option>
-    </optgroup>
-    
-    <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - South West">
-      <option value="Bristol">Bristol</option>
-      <option value="Cornwall">Cornwall</option>
-      <option value="Devon">Devon</option>
-      <option value="Plymouth">Plymouth</option>
-      <option value="Torbay">Torbay</option>
-      <option value="Dorset">Dorset</option>
-      <option value="Bournemouth, Christchurch and Poole">Bournemouth, Christchurch and Poole</option>
-      <option value="Gloucestershire">Gloucestershire</option>
-      <option value="Somerset">Somerset</option>
-      <option value="Bath and North East Somerset">Bath and North East Somerset</option>
-      <option value="North Somerset">North Somerset</option>
-      <option value="South Gloucestershire">South Gloucestershire</option>
-      <option value="Wiltshire">Wiltshire</option>
-      <option value="Swindon">Swindon</option>
-    </optgroup>
-    
-    <optgroup label="🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland">
-      <option value="Aberdeen City">Aberdeen City</option>
-      <option value="Aberdeenshire">Aberdeenshire</option>
-      <option value="Angus">Angus</option>
-      <option value="Argyll and Bute">Argyll and Bute</option>
-      <option value="City of Edinburgh">City of Edinburgh</option>
-      <option value="Clackmannanshire">Clackmannanshire</option>
-      <option value="Dumfries and Galloway">Dumfries and Galloway</option>
-      <option value="Dundee City">Dundee City</option>
-      <option value="East Ayrshire">East Ayrshire</option>
-      <option value="East Dunbartonshire">East Dunbartonshire</option>
-      <option value="East Lothian">East Lothian</option>
-      <option value="East Renfrewshire">East Renfrewshire</option>
-      <option value="Falkirk">Falkirk</option>
-      <option value="Fife">Fife</option>
-      <option value="Glasgow City">Glasgow City</option>
-      <option value="Highland">Highland</option>
-      <option value="Inverclyde">Inverclyde</option>
-      <option value="Midlothian">Midlothian</option>
-      <option value="Moray">Moray</option>
-      <option value="North Ayrshire">North Ayrshire</option>
-      <option value="North Lanarkshire">North Lanarkshire</option>
-      <option value="Orkney Islands">Orkney Islands</option>
-      <option value="Perth and Kinross">Perth and Kinross</option>
-      <option value="Renfrewshire">Renfrewshire</option>
-      <option value="Scottish Borders">Scottish Borders</option>
-      <option value="Shetland Islands">Shetland Islands</option>
-      <option value="South Ayrshire">South Ayrshire</option>
-      <option value="South Lanarkshire">South Lanarkshire</option>
-      <option value="Stirling">Stirling</option>
-      <option value="West Dunbartonshire">West Dunbartonshire</option>
-      <option value="West Lothian">West Lothian</option>
-      <option value="Na h-Eileanan Siar">Na h-Eileanan Siar</option>
-    </optgroup>
-    
-    <optgroup label="🏴󠁧󠁢󠁷󠁬󠁳󠁿 Wales">
-      <option value="Isle of Anglesey">Isle of Anglesey</option>
-      <option value="Blaenau Gwent">Blaenau Gwent</option>
-      <option value="Bridgend">Bridgend</option>
-      <option value="Caerphilly">Caerphilly</option>
-      <option value="Cardiff">Cardiff</option>
-      <option value="Carmarthenshire">Carmarthenshire</option>
-      <option value="Ceredigion">Ceredigion</option>
-      <option value="Conwy">Conwy</option>
-      <option value="Denbighshire">Denbighshire</option>
-      <option value="Flintshire">Flintshire</option>
-      <option value="Gwynedd">Gwynedd</option>
-      <option value="Merthyr Tydfil">Merthyr Tydfil</option>
-      <option value="Monmouthshire">Monmouthshire</option>
-      <option value="Neath Port Talbot">Neath Port Talbot</option>
-      <option value="Newport">Newport</option>
-      <option value="Pembrokeshire">Pembrokeshire</option>
-      <option value="Powys">Powys</option>
-      <option value="Rhondda Cynon Taf">Rhondda Cynon Taf</option>
-      <option value="Swansea">Swansea</option>
-      <option value="Torfaen">Torfaen</option>
-      <option value="Vale of Glamorgan">Vale of Glamorgan</option>
-      <option value="Wrexham">Wrexham</option>
-    </optgroup>
-    
-    <optgroup label="Northern Ireland">
-      <option value="Antrim and Newtownabbey">Antrim and Newtownabbey</option>
-      <option value="Ards and North Down">Ards and North Down</option>
-      <option value="Armagh City, Banbridge and Craigavon">Armagh City, Banbridge and Craigavon</option>
-      <option value="Belfast">Belfast</option>
-      <option value="Causeway Coast and Glens">Causeway Coast and Glens</option>
-      <option value="Derry City and Strabane">Derry City and Strabane</option>
-      <option value="Fermanagh and Omagh">Fermanagh and Omagh</option>
-      <option value="Lisburn and Castlereagh">Lisburn and Castlereagh</option>
-      <option value="Mid and East Antrim">Mid and East Antrim</option>
-      <option value="Mid Ulster">Mid Ulster</option>
-      <option value="Newry, Mourne and Down">Newry, Mourne and Down</option>
-    </optgroup>
-  </select>
-  <div style="font-size: 12px; color: #64748b; margin-top: 8px;">
-    💡 Hold Ctrl (Windows) or Cmd (Mac) to select multiple regions
-  </div>
-  <div id="recipientCount" style="font-size: 13px; margin-top: 8px;">
-    Select region(s) to see recipient count
-  </div>
-</div>
+    <form id="marketUpdateForm">
+      
+      <!-- Region Selection -->
+      <div class="form-group">
+        <label class="form-label" for="marketUpdateRegion">Select Region(s) *</label>
+        <select 
+          id="marketUpdateRegion" 
+          class="form-input" 
+          required 
+          multiple 
+          size="8" 
+          onchange="updateMarketRecipientCount()" 
+          style="height: auto; min-height: 200px;"
+        >
+          <optgroup label="🎯 Your Service Regions">
+            <option value="Cheshire East">Cheshire East</option>
+            <option value="Cheshire West and Chester">Cheshire West and Chester</option>
+            <option value="Greater London">Greater London</option>
+            <option value="Greater Manchester">Greater Manchester</option>
+            <option value="Essex">Essex</option>
+            <option value="West Midlands">West Midlands</option>
+            <option value="Leicestershire">Leicestershire</option>
+          </optgroup>
+          
+          <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - Yorkshire & Humber">
+            <option value="South Yorkshire">South Yorkshire</option>
+            <option value="West Yorkshire">West Yorkshire</option>
+            <option value="North Yorkshire">North Yorkshire</option>
+            <option value="East Riding of Yorkshire">East Riding of Yorkshire</option>
+            <option value="York">York</option>
+          </optgroup>
+          
+          <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - North West">
+            <option value="Cumbria">Cumbria</option>
+            <option value="Lancashire">Lancashire</option>
+            <option value="Merseyside">Merseyside</option>
+            <option value="Blackburn with Darwen">Blackburn with Darwen</option>
+            <option value="Blackpool">Blackpool</option>
+            <option value="Halton">Halton</option>
+            <option value="Warrington">Warrington</option>
+          </optgroup>
+          
+          <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - North East">
+            <option value="County Durham">County Durham</option>
+            <option value="Northumberland">Northumberland</option>
+            <option value="Tyne and Wear">Tyne and Wear</option>
+          </optgroup>
+          
+          <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - Midlands">
+            <option value="Derbyshire">Derbyshire</option>
+            <option value="Derby">Derby</option>
+            <option value="Herefordshire">Herefordshire</option>
+            <option value="Lincolnshire">Lincolnshire</option>
+            <option value="Northamptonshire">Northamptonshire</option>
+            <option value="Nottinghamshire">Nottinghamshire</option>
+            <option value="Nottingham">Nottingham</option>
+            <option value="Rutland">Rutland</option>
+            <option value="Shropshire">Shropshire</option>
+            <option value="Telford and Wrekin">Telford and Wrekin</option>
+            <option value="Staffordshire">Staffordshire</option>
+            <option value="Stoke-on-Trent">Stoke-on-Trent</option>
+            <option value="Warwickshire">Warwickshire</option>
+            <option value="Worcestershire">Worcestershire</option>
+          </optgroup>
+          
+          <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - East">
+            <option value="Bedford">Bedford</option>
+            <option value="Central Bedfordshire">Central Bedfordshire</option>
+            <option value="Cambridgeshire">Cambridgeshire</option>
+            <option value="Peterborough">Peterborough</option>
+            <option value="Hertfordshire">Hertfordshire</option>
+            <option value="Norfolk">Norfolk</option>
+            <option value="Suffolk">Suffolk</option>
+          </optgroup>
+          
+          <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - South East">
+            <option value="Berkshire">Berkshire</option>
+            <option value="Buckinghamshire">Buckinghamshire</option>
+            <option value="East Sussex">East Sussex</option>
+            <option value="Brighton and Hove">Brighton and Hove</option>
+            <option value="Hampshire">Hampshire</option>
+            <option value="Portsmouth">Portsmouth</option>
+            <option value="Southampton">Southampton</option>
+            <option value="Isle of Wight">Isle of Wight</option>
+            <option value="Kent">Kent</option>
+            <option value="Medway">Medway</option>
+            <option value="Oxfordshire">Oxfordshire</option>
+            <option value="Surrey">Surrey</option>
+            <option value="West Sussex">West Sussex</option>
+          </optgroup>
+          
+          <optgroup label="🏴󠁧󠁢󠁥󠁮󠁧󠁿 England - South West">
+            <option value="Bristol">Bristol</option>
+            <option value="Cornwall">Cornwall</option>
+            <option value="Devon">Devon</option>
+            <option value="Plymouth">Plymouth</option>
+            <option value="Torbay">Torbay</option>
+            <option value="Dorset">Dorset</option>
+            <option value="Bournemouth, Christchurch and Poole">Bournemouth, Christchurch and Poole</option>
+            <option value="Gloucestershire">Gloucestershire</option>
+            <option value="Somerset">Somerset</option>
+            <option value="Bath and North East Somerset">Bath and North East Somerset</option>
+            <option value="North Somerset">North Somerset</option>
+            <option value="South Gloucestershire">South Gloucestershire</option>
+            <option value="Wiltshire">Wiltshire</option>
+            <option value="Swindon">Swindon</option>
+          </optgroup>
+          
+          <optgroup label="🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland">
+            <option value="Aberdeen City">Aberdeen City</option>
+            <option value="Aberdeenshire">Aberdeenshire</option>
+            <option value="Angus">Angus</option>
+            <option value="Argyll and Bute">Argyll and Bute</option>
+            <option value="City of Edinburgh">City of Edinburgh</option>
+            <option value="Clackmannanshire">Clackmannanshire</option>
+            <option value="Dumfries and Galloway">Dumfries and Galloway</option>
+            <option value="Dundee City">Dundee City</option>
+            <option value="East Ayrshire">East Ayrshire</option>
+            <option value="East Dunbartonshire">East Dunbartonshire</option>
+            <option value="East Lothian">East Lothian</option>
+            <option value="East Renfrewshire">East Renfrewshire</option>
+            <option value="Falkirk">Falkirk</option>
+            <option value="Fife">Fife</option>
+            <option value="Glasgow City">Glasgow City</option>
+            <option value="Highland">Highland</option>
+            <option value="Inverclyde">Inverclyde</option>
+            <option value="Midlothian">Midlothian</option>
+            <option value="Moray">Moray</option>
+            <option value="North Ayrshire">North Ayrshire</option>
+            <option value="North Lanarkshire">North Lanarkshire</option>
+            <option value="Orkney Islands">Orkney Islands</option>
+            <option value="Perth and Kinross">Perth and Kinross</option>
+            <option value="Renfrewshire">Renfrewshire</option>
+            <option value="Scottish Borders">Scottish Borders</option>
+            <option value="Shetland Islands">Shetland Islands</option>
+            <option value="South Ayrshire">South Ayrshire</option>
+            <option value="South Lanarkshire">South Lanarkshire</option>
+            <option value="Stirling">Stirling</option>
+            <option value="West Dunbartonshire">West Dunbartonshire</option>
+            <option value="West Lothian">West Lothian</option>
+            <option value="Na h-Eileanan Siar">Na h-Eileanan Siar</option>
+          </optgroup>
+          
+          <optgroup label="🏴󠁧󠁢󠁷󠁬󠁳󠁿 Wales">
+            <option value="Isle of Anglesey">Isle of Anglesey</option>
+            <option value="Blaenau Gwent">Blaenau Gwent</option>
+            <option value="Bridgend">Bridgend</option>
+            <option value="Caerphilly">Caerphilly</option>
+            <option value="Cardiff">Cardiff</option>
+            <option value="Carmarthenshire">Carmarthenshire</option>
+            <option value="Ceredigion">Ceredigion</option>
+            <option value="Conwy">Conwy</option>
+            <option value="Denbighshire">Denbighshire</option>
+            <option value="Flintshire">Flintshire</option>
+            <option value="Gwynedd">Gwynedd</option>
+            <option value="Merthyr Tydfil">Merthyr Tydfil</option>
+            <option value="Monmouthshire">Monmouthshire</option>
+            <option value="Neath Port Talbot">Neath Port Talbot</option>
+            <option value="Newport">Newport</option>
+            <option value="Pembrokeshire">Pembrokeshire</option>
+            <option value="Powys">Powys</option>
+            <option value="Rhondda Cynon Taf">Rhondda Cynon Taf</option>
+            <option value="Swansea">Swansea</option>
+            <option value="Torfaen">Torfaen</option>
+            <option value="Vale of Glamorgan">Vale of Glamorgan</option>
+            <option value="Wrexham">Wrexham</option>
+          </optgroup>
+          
+          <optgroup label="Northern Ireland">
+            <option value="Antrim and Newtownabbey">Antrim and Newtownabbey</option>
+            <option value="Ards and North Down">Ards and North Down</option>
+            <option value="Armagh City, Banbridge and Craigavon">Armagh City, Banbridge and Craigavon</option>
+            <option value="Belfast">Belfast</option>
+            <option value="Causeway Coast and Glens">Causeway Coast and Glens</option>
+            <option value="Derry City and Strabane">Derry City and Strabane</option>
+            <option value="Fermanagh and Omagh">Fermanagh and Omagh</option>
+            <option value="Lisburn and Castlereagh">Lisburn and Castlereagh</option>
+            <option value="Mid and East Antrim">Mid and East Antrim</option>
+            <option value="Mid Ulster">Mid Ulster</option>
+            <option value="Newry, Mourne and Down">Newry, Mourne and Down</option>
+          </optgroup>
+        </select>
+        <div style="font-size: 12px; color: #64748b; margin-top: 8px;">
+          💡 Hold Ctrl (Windows) or Cmd (Mac) to select multiple regions
+        </div>
+        <div id="recipientCount" style="font-size: 13px; margin-top: 8px; font-weight: 600;">
+          Select region(s) to see recipient count
+        </div>
+      </div>
 
-<!-- Add this ABOVE the subject field -->
-<div style="margin-bottom: 24px;">
-  <button type="button" class="btn btn-primary" onclick="autoFetchMarketData()" id="fetchDataBtn">
-    📊 Auto-Fetch Market Data & Generate Content
-  </button>
-  <div id="dataPreview" style="margin-top: 16px;"></div>
-</div>
+      <!-- Auto-Fetch Button -->
+      <div style="margin-bottom: 24px;">
+        <button type="button" class="btn btn-primary" onclick="autoFetchMarketData()" id="fetchDataBtn">
+          <i data-lucide="database" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i>
+          Auto-Fetch Market Data & Generate Content
+        </button>
+        <div id="dataPreview" style="margin-top: 16px;"></div>
+      </div>
 
+      <!-- Subject -->
       <div class="form-group">
         <label class="form-label" for="marketUpdateSubject">Email Subject *</label>
         <input 
@@ -2659,32 +2664,14 @@ body {
         />
       </div>
 
-      <div class="form-group">
+      <!-- Content (hidden initially, shown after fetch) -->
+      <div class="form-group" id="contentGroup" style="display: none;">
         <label class="form-label" for="marketUpdateContent">Email Content *</label>
         <textarea 
           id="marketUpdateContent" 
           class="form-input" 
           rows="12"
-          placeholder="Compose your market update here...
-
-Example:
-Hey [Name],
-
-Here's what's happening in the [Region] property market:
-
-📊 KEY STATS
-- Average sale price: £XXX,XXX (↑X% vs last month)
-- Median time to sell: XX days
-- Transaction volume: XXX properties
-
-🎯 WHAT THIS MEANS FOR YOU
-[Your insights and interpretation]
-
-💡 VALUATION INSIGHT
-[Specific actionable advice for estate agents]
-
-Best regards,
-Markeb Media Team"
+          placeholder="Content will be auto-generated..."
           required
         ></textarea>
         <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
@@ -2692,6 +2679,7 @@ Markeb Media Team"
         </div>
       </div>
 
+      <!-- Test Mode Checkbox -->
       <div class="form-group">
         <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
           <input type="checkbox" id="marketUpdatePreview" style="width: 20px; height: 20px;">
@@ -2699,26 +2687,38 @@ Markeb Media Team"
         </label>
       </div>
 
-      <div class="button-group" style="margin-top: 24px;">
-        <button type="button" class="btn btn-secondary" onclick="resetMarketUpdateForm()" style="flex: 1;">
-          Reset
+      <!-- Action Buttons -->
+      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+        <button type="submit" class="btn btn-primary" id="sendMarketUpdateBtn">
+          <i data-lucide="send" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i>
+          Send to <span id="sendMarketUpdateCount">0</span> Recipients
         </button>
-        <button type="submit" class="btn btn-primary" style="flex: 2;">
-          📧 Send Market Update
+        
+        <button type="button" class="btn btn-secondary" onclick="resetMarketUpdateForm()">
+          <i data-lucide="x" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i>
+          Clear
         </button>
       </div>
+
     </form>
   </div>
 
   <!-- Send History -->
-  <div class="calendar-container" style="margin-top: 24px;">
-    <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">📜 Send History</h3>
+  <div class="calendar-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h3 style="font-size: 18px; font-weight: 700;">
+        <i data-lucide="history" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle;"></i>
+        Send History
+      </h3>
+    </div>
     <div id="marketUpdateHistory">
-      <div style="text-align: center; padding: 40px;">
-        <div class="spinner"></div>
+      <div style="text-align: center; padding: 40px; color: #94a3b8;">
+        <i data-lucide="clock" style="width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+        <p>No market updates sent yet</p>
       </div>
     </div>
   </div>
+
 </div>
 
 <!-- EMAIL BROADCAST SECTION -->
@@ -7220,9 +7220,13 @@ function updateMarketRecipientCount() {
   const regionSelect = document.getElementById('marketUpdateRegion');
   const selectedRegions = Array.from(regionSelect.selectedOptions).map(opt => opt.value);
   const recipientDiv = document.getElementById('recipientCount');
+  const sendBtn = document.getElementById('sendMarketUpdateBtn');
+  const countSpan = document.getElementById('sendMarketUpdateCount');
   
   if (selectedRegions.length === 0) {
     recipientDiv.innerHTML = 'Select region(s) to see recipient count';
+    if (sendBtn) sendBtn.disabled = true;
+    if (countSpan) countSpan.textContent = '0';
     return;
   }
 
@@ -7235,10 +7239,10 @@ function updateMarketRecipientCount() {
     <span style="color: #10b981; font-weight: 600;">
       ✅ Will send to ${optedIn.length} customer${optedIn.length !== 1 ? 's' : ''} across ${selectedRegions.length} region${selectedRegions.length !== 1 ? 's' : ''}
     </span>
-    <div style="font-size: 11px; color: #64748b; margin-top: 4px;">
-      Selected: ${selectedRegions.join(', ')}
-    </div>
   `;
+  
+  if (sendBtn) sendBtn.disabled = optedIn.length === 0;
+  if (countSpan) countSpan.textContent = optedIn.length;
 }
 
 function resetMarketUpdateForm() {
@@ -7410,7 +7414,9 @@ All data from HM Land Registry Price Paid Data.
 Best regards,
 Markeb Media Team`;
       
-      document.getElementById('marketUpdateContent').value = content;
+      // Add this inside your autoFetchMarketData function, right after setting the content:
+document.getElementById('marketUpdateContent').value = content;
+document.getElementById('contentGroup').style.display = 'block'; // ✅ ADD THIS LINE
       
       // Determine data source badge
       const sourceBadge = result.source === 'ppd-processed' 
