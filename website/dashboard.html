@@ -1457,6 +1457,293 @@
   box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
 }
 
+/* ===== MARKET DATA LOOKUP BAR ===== */
+.market-lookup-bar {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  padding: 24px 32px;
+  margin: 0;
+  border-bottom: 2px solid #1e40af;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.market-lookup-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.market-lookup-header {
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.market-lookup-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.market-lookup-header p {
+  font-size: 14px;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.market-lookup-search {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.postcode-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 14px 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.95);
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.postcode-input:focus {
+  outline: none;
+  border-color: #fff;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+.postcode-input::placeholder {
+  text-transform: none;
+}
+
+.btn-market-search {
+  padding: 14px 28px;
+  background: #fff;
+  color: #3b82f6;
+  border: 2px solid #fff;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-market-search:hover {
+  background: #f0f9ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-market-search:active {
+  transform: translateY(0);
+}
+
+.market-data-result {
+  margin-top: 20px;
+  display: none;
+}
+
+.market-data-result.active {
+  display: block;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.market-result-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.market-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.market-result-location {
+  flex: 1;
+}
+
+.market-result-location h4 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+
+.market-result-location p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.market-result-badge {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 2px solid #3b82f6;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e40af;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.market-property-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.market-property-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.2s ease;
+}
+
+.market-property-card:hover {
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.market-property-type {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 12px;
+}
+
+.market-property-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #3b82f6;
+  margin-bottom: 8px;
+}
+
+.market-property-change {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.market-property-change.positive {
+  color: #10b981;
+}
+
+.market-property-change.negative {
+  color: #ef4444;
+}
+
+.market-property-sales {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 8px;
+}
+
+.market-error {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border: 2px solid #ef4444;
+  border-radius: 12px;
+  padding: 20px;
+  color: #991b1b;
+  text-align: center;
+  font-weight: 600;
+}
+
+.market-loading {
+  background: #fff;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .market-lookup-bar {
+    padding: 16px 20px;
+  }
+
+  .market-lookup-header h3 {
+    font-size: 18px;
+  }
+
+  .market-lookup-header p {
+    font-size: 13px;
+  }
+
+  .market-lookup-search {
+    flex-direction: column;
+  }
+
+  .postcode-input,
+  .btn-market-search {
+    width: 100%;
+  }
+
+  .market-result-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .market-property-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .market-property-price {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .market-lookup-bar {
+    padding: 12px 16px;
+  }
+
+  .market-lookup-header h3 {
+    font-size: 16px;
+  }
+
+  .market-result-card {
+    padding: 16px;
+  }
+
+  .market-result-header h4 {
+    font-size: 18px;
+  }
+}
+
   /* ===== CALENDAR RESPONSIVE STYLES ===== */
 @media (max-width: 480px) {
   .calendar-container {
@@ -1774,6 +2061,42 @@
       </div>
     </div>
   </div>
+
+  <!-- ===== ADD THIS MARKET DATA LOOKUP BAR HERE ===== -->
+  <!-- Market Data Lookup Bar -->
+  <div class="market-lookup-bar">
+    <div class="market-lookup-container">
+      <div class="market-lookup-header">
+        <h3>
+          <i data-lucide="bar-chart-3" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
+          Local Market Intelligence
+        </h3>
+        <p>Enter any UK postcode to see average property prices in that area</p>
+      </div>
+      <div class="market-lookup-search">
+        <div style="position: relative; flex: 1;">
+          <i data-lucide="map-pin" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: #64748b;"></i>
+          <input 
+            type="text" 
+            id="postcodeInput" 
+            placeholder="Enter postcode (e.g., M1 4AE, SW1A 1AA)" 
+            class="postcode-input"
+            style="padding-left: 44px;"
+            onkeypress="if(event.key==='Enter') lookupMarketData()"
+          />
+        </div>
+        <button 
+          class="btn-market-search" 
+          onclick="lookupMarketData()"
+        >
+          <i data-lucide="search" style="width: 18px; height: 18px;"></i>
+          Get Market Data
+        </button>
+      </div>
+      <div id="marketDataResult" class="market-data-result"></div>
+    </div>
+  </div>
+  <!-- ===== END OF MARKET DATA LOOKUP BAR ===== -->
 
   <div class="content-area">
 
@@ -2307,6 +2630,303 @@ Any media produced remains the property of Markeb Media until full payment has b
 
    function contactSocialMedia(){
   window.location.href = "mailto:commercial@markebmedia.com?subject=Social%20Media%20Management%20Inquiry&body=Hi%20Markeb%20Media%20Team,%0D%0A%0D%0AI'm%20interested%20in%20learning%20more%20about%20your%20social%20media%20management%20services.%0D%0A%0D%0APlease%20send%20me%20more%20information.";
+}
+
+/* ===== MARKET DATA LOOKUP ===== */
+async function lookupMarketData() {
+  const input = document.getElementById('postcodeInput');
+  const resultDiv = document.getElementById('marketDataResult');
+  const postcode = input.value.trim().replace(/\s+/g, '').toUpperCase();
+
+  if (!postcode) {
+    showMarketError('Please enter a postcode');
+    return;
+  }
+
+  // Basic UK postcode validation
+  const postcodeRegex = /^[A-Z]{1,2}\d{1,2}[A-Z]?\d[A-Z]{2}$/;
+  if (!postcodeRegex.test(postcode)) {
+    showMarketError('Please enter a valid UK postcode (e.g., M1 4AE)');
+    return;
+  }
+
+  // Show loading state
+  resultDiv.classList.add('active');
+  resultDiv.innerHTML = `
+    <div class="market-loading">
+      <div class="spinner"></div>
+      <p style="margin-top: 16px; color: #64748b;">
+        <i data-lucide="loader" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px; animation: spin 1s linear infinite;"></i>
+        Looking up market data for ${formatPostcode(postcode)}...
+      </p>
+    </div>
+  `;
+  
+  // Initialize Lucide icons
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+
+  try {
+    // Step 1: Get location data from postcode
+    const postcodeResponse = await fetch(`https://api.postcodes.io/postcodes/${postcode}`);
+    
+    if (!postcodeResponse.ok) {
+      showMarketError('Postcode not found. Please check and try again.');
+      return;
+    }
+
+    const postcodeData = await postcodeResponse.json();
+    const location = postcodeData.result;
+    
+    // Step 2: Determine which region to use
+    const region = determineRegion(location);
+    
+    if (!region) {
+      showMarketError(`We don't have market data for ${location.admin_district || 'this area'} yet. We cover major UK regions - try a postcode in Yorkshire, Manchester, London, Essex, Leicester, West Midlands, or Cheshire.`);
+      return;
+    }
+
+    // Step 3: Fetch market data
+    const marketResponse = await fetch('/data/market-data.json');
+    const marketData = await marketResponse.json();
+    
+    const regionData = marketData.regions[region];
+    
+    if (!regionData) {
+      showMarketError(`No market data available for ${region} at this time.`);
+      return;
+    }
+
+    // Step 4: Display results
+    displayMarketData(regionData, location, formatPostcode(postcode));
+
+  } catch (error) {
+    console.error('Market lookup error:', error);
+    showMarketError('Unable to retrieve market data. Please try again later.');
+  }
+}
+
+function determineRegion(location) {
+  // Map postcodes.io location data to your regional data
+  const district = location.admin_district || '';
+  const county = location.admin_county || '';
+  const region = location.region || '';
+  
+  // Try to match to your REGION_MAPPING
+  // Check district first, then county, then region
+  const searchTerms = [district, county, region].filter(Boolean);
+  
+  // Your region mapping (from your market data script)
+  const regionMap = {
+    // Yorkshire
+    'Leeds': 'West Yorkshire',
+    'Sheffield': 'South Yorkshire',
+    'Bradford': 'West Yorkshire',
+    'York': 'York',
+    'Hull': 'East Riding of Yorkshire',
+    'Doncaster': 'South Yorkshire',
+    'Rotherham': 'South Yorkshire',
+    'Barnsley': 'South Yorkshire',
+    'Wakefield': 'West Yorkshire',
+    'Kirklees': 'West Yorkshire',
+    'Calderdale': 'West Yorkshire',
+    
+    // Manchester
+    'Manchester': 'Greater Manchester',
+    'Salford': 'Greater Manchester',
+    'Bolton': 'Greater Manchester',
+    'Bury': 'Greater Manchester',
+    'Oldham': 'Greater Manchester',
+    'Rochdale': 'Greater Manchester',
+    'Stockport': 'Greater Manchester',
+    'Tameside': 'Greater Manchester',
+    'Trafford': 'Greater Manchester',
+    'Wigan': 'Greater Manchester',
+    
+    // Cheshire
+    'Cheshire East': 'Cheshire East',
+    'Cheshire West and Chester': 'Cheshire West and Chester',
+    
+    // London
+    'City of London': 'Greater London',
+    'Barking and Dagenham': 'Greater London',
+    'Barnet': 'Greater London',
+    'Bexley': 'Greater London',
+    'Brent': 'Greater London',
+    'Bromley': 'Greater London',
+    'Camden': 'Greater London',
+    'Croydon': 'Greater London',
+    'Ealing': 'Greater London',
+    'Enfield': 'Greater London',
+    'Greenwich': 'Greater London',
+    'Hackney': 'Greater London',
+    'Hammersmith and Fulham': 'Greater London',
+    'Haringey': 'Greater London',
+    'Harrow': 'Greater London',
+    'Havering': 'Greater London',
+    'Hillingdon': 'Greater London',
+    'Hounslow': 'Greater London',
+    'Islington': 'Greater London',
+    'Kensington and Chelsea': 'Greater London',
+    'Kingston upon Thames': 'Greater London',
+    'Lambeth': 'Greater London',
+    'Lewisham': 'Greater London',
+    'Merton': 'Greater London',
+    'Newham': 'Greater London',
+    'Redbridge': 'Greater London',
+    'Richmond upon Thames': 'Greater London',
+    'Southwark': 'Greater London',
+    'Sutton': 'Greater London',
+    'Tower Hamlets': 'Greater London',
+    'Waltham Forest': 'Greater London',
+    'Wandsworth': 'Greater London',
+    'Westminster': 'Greater London',
+    
+    // Essex
+    'Essex': 'Essex',
+    'Basildon': 'Essex',
+    'Braintree': 'Essex',
+    'Brentwood': 'Essex',
+    'Castle Point': 'Essex',
+    'Chelmsford': 'Essex',
+    'Colchester': 'Essex',
+    'Epping Forest': 'Essex',
+    'Harlow': 'Essex',
+    'Maldon': 'Essex',
+    'Rochford': 'Essex',
+    'Tendring': 'Essex',
+    'Uttlesford': 'Essex',
+    
+    // Leicester
+    'Leicester': 'Leicestershire',
+    'Leicestershire': 'Leicestershire',
+    
+    // West Midlands
+    'Birmingham': 'West Midlands',
+    'Coventry': 'West Midlands',
+    'Dudley': 'West Midlands',
+    'Sandwell': 'West Midlands',
+    'Solihull': 'West Midlands',
+    'Walsall': 'West Midlands',
+    'Wolverhampton': 'West Midlands',
+  };
+  
+  // Try to find a match
+  for (const term of searchTerms) {
+    if (regionMap[term]) {
+      return regionMap[term];
+    }
+    // Try partial match
+    for (const [key, value] of Object.entries(regionMap)) {
+      if (term.includes(key) || key.includes(term)) {
+        return value;
+      }
+    }
+  }
+  
+  return null;
+}
+
+function displayMarketData(data, location, postcode) {
+  const resultDiv = document.getElementById('marketDataResult');
+  
+  const propertyTypes = {
+    'Detached': 'home',
+    'Semi-detached': 'house',
+    'Terraced': 'building',
+    'Flats': 'building-2'
+  };
+  
+  const propertyCardsHTML = Object.entries(data.propertyTypes)
+    .map(([type, typeData]) => {
+      const change = typeData.yoyChange;
+      const isPositive = change >= 0;
+      const changeClass = isPositive ? 'positive' : 'negative';
+      const arrowIcon = isPositive ? 'trending-up' : 'trending-down';
+      
+      return `
+        <div class="market-property-card">
+          <div class="market-property-type">
+            <i data-lucide="${propertyTypes[type] || 'home'}" style="width: 18px; height: 18px;"></i>
+            ${type}
+          </div>
+          <div class="market-property-price">
+            £${typeData.averagePrice.toLocaleString('en-GB')}
+          </div>
+          <div class="market-property-change ${changeClass}">
+            <i data-lucide="${arrowIcon}" style="width: 16px; height: 16px;"></i>
+            ${isPositive ? '+' : ''}${change}% YoY
+          </div>
+          <div class="market-property-sales">
+            <i data-lucide="shopping-cart" style="width: 12px; height: 12px; display: inline-block; vertical-align: middle; margin-right: 4px;"></i>
+            ${typeData.transactions.toLocaleString('en-GB')} sales
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+  
+  resultDiv.innerHTML = `
+    <div class="market-result-card">
+      <div class="market-result-header">
+        <div class="market-result-location">
+          <h4>
+            <i data-lucide="map-pin" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px; color: #3b82f6;"></i>
+            ${location.admin_district || location.region}
+          </h4>
+          <p>${postcode} • ${location.admin_county || location.region}</p>
+        </div>
+        <div class="market-result-badge">
+          <i data-lucide="calendar" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
+          ${data.dataPeriod}
+        </div>
+      </div>
+      
+      <div class="market-property-grid">
+        ${propertyCardsHTML}
+      </div>
+      
+      <div style="margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #3b82f6;">
+        <p style="font-size: 12px; color: #64748b; margin: 0; line-height: 1.6;">
+          <i data-lucide="info" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
+          <strong style="color: #475569;">Data Source:</strong> ${data.compliance}
+        </p>
+      </div>
+    </div>
+  `;
+  
+  // Re-initialize Lucide icons for the newly added content
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+}
+
+function showMarketError(message) {
+  const resultDiv = document.getElementById('marketDataResult');
+  resultDiv.classList.add('active');
+  resultDiv.innerHTML = `
+    <div class="market-error">
+      <i data-lucide="alert-circle" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
+      ${message}
+    </div>
+  `;
+  
+  // Re-initialize Lucide icons
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+}
+
+function formatPostcode(postcode) {
+  // Format postcode with space (e.g., M14AE → M1 4AE)
+  if (postcode.length <= 5) {
+    return postcode.slice(0, -3) + ' ' + postcode.slice(-3);
+  } else if (postcode.length === 6) {
+    return postcode.slice(0, -3) + ' ' + postcode.slice(-3);
+  } else {
+    return postcode.slice(0, -3) + ' ' + postcode.slice(-3);
+  }
 }
 
 /* ===== USER DROPDOWN MENU TOGGLE ===== */
