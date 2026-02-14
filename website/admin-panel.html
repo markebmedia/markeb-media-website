@@ -7244,11 +7244,11 @@ function updateMarketRecipientCount() {
 function resetMarketUpdateForm() {
   document.getElementById('marketUpdateForm').reset();
   document.getElementById('recipientCount').innerHTML = 'Select a region to see recipient count';
-  document.getElementById('dataPreview').innerHTML = '';  // ✅ ADD THIS LINE
-  currentMarketData = null;  // ✅ ADD THIS LINE
+  document.getElementById('dataPreview').innerHTML = '';
+  currentMarketData = null;
 }
 
-// Find this section and UPDATE it:
+// Market Update Form Submit Handler
 document.getElementById('marketUpdateForm')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   
@@ -7257,83 +7257,81 @@ document.getElementById('marketUpdateForm')?.addEventListener('submit', async (e
   const subject = document.getElementById('marketUpdateSubject').value;
   const content = document.getElementById('marketUpdateContent').value;
   const sendPreview = document.getElementById('marketUpdatePreview').checked;
-
+  
   if (selectedRegions.length === 0) {
     alert('❌ Please select at least one region');
     return;
   }
-
+  
   const recipients = allCustomers.filter(u => 
     u.fields['Market Updates Opt In'] === true && 
     selectedRegions.includes(u.fields['Region'])
   );
-
+  
   if (recipients.length === 0) {
     alert('❌ No opted-in customers found in selected region(s)');
     return;
   }
-
+  
   const regionsList = selectedRegions.join(', ');
   const confirmMsg = sendPreview 
     ? `Send test email to yourself first?` 
     : `Send market update to ${recipients.length} customer${recipients.length !== 1 ? 's' : ''} across:\n${regionsList}?\n\nThis cannot be undone.`;
-
+  
   if (!confirm(confirmMsg)) {
     return;
   }
-
+  
   const btn = e.target.querySelector('button[type="submit"]');
   const originalText = btn.innerHTML;
   btn.innerHTML = '⏳ Sending...';
   btn.disabled = true;
-
+  
   try {
     const response = await fetch('/.netlify/functions/send-market-updates', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-  region: regionsList,
-  subject,
-  content,
-  sendPreview,
-  recipients: recipients.map(r => ({
-    email: r.fields['Email'],
-    name: r.fields['Name']
-  })),
-  marketData: currentMarketData,
-  generateInsight: true  // ⭐ ADD THIS LINE
-})
+        region: regionsList,
+        subject,
+        content,
+        sendPreview,
+        recipients: recipients.map(r => ({
+          email: r.fields['Email'],
+          name: r.fields['Name']
+        })),
+        marketData: currentMarketData,
+        generateInsight: true
+      })
     });
-
+    
     const data = await response.json();
-
+    
     if (data.success) {
-      alert(`✅ Market update sent!\n\nSent to: ${data.sentCount} recipient${data.sentCount !== 1 ? 's' : ''}\nRegions: ${regionsList}`);
-      resetMarketUpdateForm();
-      loadMarketUpdateStats();
-      currentMarketData = null;
-    } else {
-      alert(`❌ Error: ${data.error}`);
-    }
-  } catch (error) {
-    console.error('Error sending market update:', error);
-    alert('❌ Failed to send market update: ' + error.message);
-  } finally {
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-  }
+  alert(`✅ Market update sent!\n\nSent to: ${data.sentCount} recipient${data.sentCount !== 1 ? 's' : ''}\nRegions: ${regionsList}`);
+  resetMarketUpdateForm();
+  loadMarketUpdateStats();
+  currentMarketData = null;
+} else {
+  alert(`❌ Error: ${data.error}`);
+}
+} catch (error) {
+  console.error('Error sending market update:', error);
+  alert('❌ Failed to send market update: ' + error.message);
+} finally {
+  btn.innerHTML = originalText;
+  btn.disabled = false;
+}
 });
 
 // Load stats when section is shown
 const originalShowSection = showSection;
 showSection = function(sectionId) {
   originalShowSection(sectionId);
-  
   if (sectionId === 'market-updates') {
     loadMarketUpdateStats();
   }
 };
-
 // ===== AUTO-FETCH MARKET DATA =====
 
 async function autoFetchMarketData() {
