@@ -7209,6 +7209,9 @@ async function loadMarketUpdateStats() {
       document.getElementById('southOptedIn').textContent = southCount;
     }
 
+    // ✅ ADD THIS LINE:
+    renderMarketUpdateHistory();
+
     document.getElementById('lastSentDate').textContent = 'Never';
 
   } catch (error) {
@@ -7243,6 +7246,74 @@ function updateMarketRecipientCount() {
   
   if (sendBtn) sendBtn.disabled = optedIn.length === 0;
   if (countSpan) countSpan.textContent = optedIn.length;
+}
+
+// Save market update to history
+function saveMarketUpdateHistory(subject, regionsList, recipientCount) {
+  const history = JSON.parse(localStorage.getItem('marketUpdateHistory') || '[]');
+  
+  history.unshift({
+    subject: subject,
+    regions: regionsList,
+    recipientCount: recipientCount,
+    timestamp: new Date().toISOString()
+  });
+  
+  // Keep only last 20
+  if (history.length > 20) {
+    history.pop();
+  }
+  
+  localStorage.setItem('marketUpdateHistory', JSON.stringify(history));
+  renderMarketUpdateHistory();
+}
+
+// Render market update history
+function renderMarketUpdateHistory() {
+  const container = document.getElementById('marketUpdateHistory');
+  const history = JSON.parse(localStorage.getItem('marketUpdateHistory') || '[]');
+  
+  if (history.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 40px; color: #94a3b8;">
+        <i data-lucide="clock" style="width: 48px; height: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+        <p>No market updates sent yet</p>
+      </div>
+    `;
+    
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+    return;
+  }
+  
+  let html = '<div style="display: flex; flex-direction: column; gap: 12px;">';
+  
+  history.forEach((item) => {
+    const date = new Date(item.timestamp);
+    const formattedDate = date.toLocaleDateString('en-GB', { 
+      day: 'numeric', 
+      month: 'short', 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    html += `
+      <div style="padding: 16px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+          <div style="font-weight: 600; color: #1e293b; flex: 1;">${item.subject}</div>
+          <div style="font-size: 12px; color: #64748b; white-space: nowrap; margin-left: 12px;">${formattedDate}</div>
+        </div>
+        <div style="font-size: 13px; color: #64748b;">
+          ${item.regions} • ${item.recipientCount} recipient${item.recipientCount !== 1 ? 's' : ''}
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  container.innerHTML = html;
 }
 
 function resetMarketUpdateForm() {
@@ -7313,6 +7384,10 @@ document.getElementById('marketUpdateForm')?.addEventListener('submit', async (e
     
     if (data.success) {
   alert(`✅ Market update sent!\n\nSent to: ${data.sentCount} recipient${data.sentCount !== 1 ? 's' : ''}\nRegions: ${regionsList}`);
+  
+  // ✅ ADD THIS LINE:
+  saveMarketUpdateHistory(subject, regionsList, data.sentCount);
+  
   resetMarketUpdateForm();
   loadMarketUpdateStats();
   currentMarketData = null;
