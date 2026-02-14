@@ -47,16 +47,28 @@ async function downloadBothFiles() {
 
 downloadBothFiles();
 
-// Region mapping (exact match to your dropdown)
+// Region mapping - DISTRICT LEVEL for better localization
 const REGION_MAPPING = {
   // ===== ENGLAND - NORTH WEST =====
   'Cheshire East': 'CHESHIRE EAST',
-  'Cheshire West and Chester': 'CHESHIRE WEST',
+  'Cheshire West and Chester': 'CHESHIRE WEST AND CHESTER',
   'Cumbria': 'CUMBRIA',
-  'Greater Manchester': 'GREATER MANCHESTER',
+  
+  // Greater Manchester - broken down by district
+  'Manchester': 'MANCHESTER',
+  'Salford': 'SALFORD',
+  'Bolton': 'BOLTON',
+  'Bury': 'BURY',
+  'Oldham': 'OLDHAM',
+  'Rochdale': 'ROCHDALE',
+  'Stockport': 'STOCKPORT',
+  'Tameside': 'TAMESIDE',
+  'Trafford': 'TRAFFORD',
+  'Wigan': 'WIGAN',
+  
   'Lancashire': 'LANCASHIRE',
   'Merseyside': 'MERSEYSIDE',
-  'Blackburn with Darwen': 'BLACKBURN',
+  'Blackburn with Darwen': 'BLACKBURN WITH DARWEN',
   'Blackpool': 'BLACKPOOL',
   'Halton': 'HALTON',
   'Warrington': 'WARRINGTON',
@@ -67,15 +79,28 @@ const REGION_MAPPING = {
   'Tyne and Wear': 'TYNE AND WEAR',
   
   // ===== ENGLAND - YORKSHIRE & HUMBER =====
-  'East Riding of Yorkshire': 'EAST RIDING',
+  'East Riding of Yorkshire': 'EAST RIDING OF YORKSHIRE',
   'North Yorkshire': 'NORTH YORKSHIRE',
-  'South Yorkshire': 'SOUTH YORKSHIRE',
-  'West Yorkshire': 'WEST YORKSHIRE',
+  
+  // South Yorkshire - broken down by district
+  'Sheffield': 'SHEFFIELD',
+  'Doncaster': 'DONCASTER',
+  'Rotherham': 'ROTHERHAM',
+  'Barnsley': 'BARNSLEY',
+  
+  // West Yorkshire - broken down by district
+  'Leeds': 'LEEDS',
+  'Bradford': 'BRADFORD',
+  'Wakefield': 'WAKEFIELD',
+  'Kirklees': 'KIRKLEES',
+  'Calderdale': 'CALDERDALE',
+  
   'York': 'YORK',
   
   // ===== ENGLAND - EAST MIDLANDS =====
   'Derby': 'DERBY',
   'Derbyshire': 'DERBYSHIRE',
+  'Leicester': 'LEICESTER',
   'Leicestershire': 'LEICESTERSHIRE',
   'Lincolnshire': 'LINCOLNSHIRE',
   'Northamptonshire': 'NORTHAMPTONSHIRE',
@@ -87,17 +112,42 @@ const REGION_MAPPING = {
   'Herefordshire': 'HEREFORDSHIRE',
   'Shropshire': 'SHROPSHIRE',
   'Staffordshire': 'STAFFORDSHIRE',
-  'Stoke-on-Trent': 'STOKE',
-  'Telford and Wrekin': 'TELFORD',
+  'Stoke-on-Trent': 'STOKE-ON-TRENT',
+  'Telford and Wrekin': 'TELFORD AND WREKIN',
   'Warwickshire': 'WARWICKSHIRE',
-  'West Midlands': 'WEST MIDLANDS',
+  
+  // West Midlands - broken down by district
+  'Birmingham': 'BIRMINGHAM',
+  'Coventry': 'COVENTRY',
+  'Dudley': 'DUDLEY',
+  'Sandwell': 'SANDWELL',
+  'Solihull': 'SOLIHULL',
+  'Walsall': 'WALSALL',
+  'Wolverhampton': 'WOLVERHAMPTON',
+  
   'Worcestershire': 'WORCESTERSHIRE',
   
   // ===== ENGLAND - EAST OF ENGLAND =====
   'Bedford': 'BEDFORD',
   'Cambridgeshire': 'CAMBRIDGESHIRE',
   'Central Bedfordshire': 'CENTRAL BEDFORDSHIRE',
-  'Essex': 'ESSEX',
+  
+  // Essex - broken down by district
+  'Basildon': 'BASILDON',
+  'Braintree': 'BRAINTREE',
+  'Brentwood': 'BRENTWOOD',
+  'Castle Point': 'CASTLE POINT',
+  'Chelmsford': 'CHELMSFORD',
+  'Colchester': 'COLCHESTER',
+  'Epping Forest': 'EPPING FOREST',
+  'Harlow': 'HARLOW',
+  'Maldon': 'MALDON',
+  'Rochford': 'ROCHFORD',
+  'Tendring': 'TENDRING',
+  'Uttlesford': 'UTTLESFORD',
+  'Southend-on-Sea': 'SOUTHEND-ON-SEA',
+  'Thurrock': 'THURROCK',
+  
   'Hertfordshire': 'HERTFORDSHIRE',
   'Norfolk': 'NORFOLK',
   'Peterborough': 'PETERBOROUGH',
@@ -105,7 +155,7 @@ const REGION_MAPPING = {
   
   // ===== ENGLAND - SOUTH EAST =====
   'Berkshire': 'BERKSHIRE',
-  'Brighton and Hove': 'BRIGHTON',
+  'Brighton and Hove': 'BRIGHTON AND HOVE',
   'Buckinghamshire': 'BUCKINGHAMSHIRE',
   'East Sussex': 'EAST SUSSEX',
   'Hampshire': 'HAMPSHIRE',
@@ -119,8 +169,8 @@ const REGION_MAPPING = {
   'West Sussex': 'WEST SUSSEX',
   
   // ===== ENGLAND - SOUTH WEST =====
-  'Bath and North East Somerset': 'BATH',
-  'Bournemouth, Christchurch and Poole': 'BOURNEMOUTH',
+  'Bath and North East Somerset': 'BATH AND NORTH EAST SOMERSET',
+  'Bournemouth, Christchurch and Poole': 'BOURNEMOUTH CHRISTCHURCH AND POOLE',
   'Bristol': 'BRISTOL',
   'Cornwall': 'CORNWALL',
   'Devon': 'DEVON',
@@ -134,25 +184,57 @@ const REGION_MAPPING = {
   'Torbay': 'TORBAY',
   'Wiltshire': 'WILTSHIRE',
   
-  // ===== ENGLAND - LONDON =====
-  'Greater London': 'GREATER LONDON',
+  // ===== ENGLAND - LONDON (32 boroughs) =====
+  'City of London': 'CITY OF LONDON',
+  'Barking and Dagenham': 'BARKING AND DAGENHAM',
+  'Barnet': 'BARNET',
+  'Bexley': 'BEXLEY',
+  'Brent': 'BRENT',
+  'Bromley': 'BROMLEY',
+  'Camden': 'CAMDEN',
+  'Croydon': 'CROYDON',
+  'Ealing': 'EALING',
+  'Enfield': 'ENFIELD',
+  'Greenwich': 'GREENWICH',
+  'Hackney': 'HACKNEY',
+  'Hammersmith and Fulham': 'HAMMERSMITH AND FULHAM',
+  'Haringey': 'HARINGEY',
+  'Harrow': 'HARROW',
+  'Havering': 'HAVERING',
+  'Hillingdon': 'HILLINGDON',
+  'Hounslow': 'HOUNSLOW',
+  'Islington': 'ISLINGTON',
+  'Kensington and Chelsea': 'KENSINGTON AND CHELSEA',
+  'Kingston upon Thames': 'KINGSTON UPON THAMES',
+  'Lambeth': 'LAMBETH',
+  'Lewisham': 'LEWISHAM',
+  'Merton': 'MERTON',
+  'Newham': 'NEWHAM',
+  'Redbridge': 'REDBRIDGE',
+  'Richmond upon Thames': 'RICHMOND UPON THAMES',
+  'Southwark': 'SOUTHWARK',
+  'Sutton': 'SUTTON',
+  'Tower Hamlets': 'TOWER HAMLETS',
+  'Waltham Forest': 'WALTHAM FOREST',
+  'Wandsworth': 'WANDSWORTH',
+  'Westminster': 'WESTMINSTER',
   
   // ===== SCOTLAND =====
-  'Aberdeen City': 'ABERDEEN',
+  'Aberdeen City': 'ABERDEEN CITY',
   'Aberdeenshire': 'ABERDEENSHIRE',
   'Angus': 'ANGUS',
-  'Argyll and Bute': 'ARGYLL',
-  'City of Edinburgh': 'EDINBURGH',
+  'Argyll and Bute': 'ARGYLL AND BUTE',
+  'City of Edinburgh': 'CITY OF EDINBURGH',
   'Clackmannanshire': 'CLACKMANNANSHIRE',
-  'Dumfries and Galloway': 'DUMFRIES',
-  'Dundee City': 'DUNDEE',
+  'Dumfries and Galloway': 'DUMFRIES AND GALLOWAY',
+  'Dundee City': 'DUNDEE CITY',
   'East Ayrshire': 'EAST AYRSHIRE',
   'East Dunbartonshire': 'EAST DUNBARTONSHIRE',
   'East Lothian': 'EAST LOTHIAN',
   'East Renfrewshire': 'EAST RENFREWSHIRE',
   'Falkirk': 'FALKIRK',
   'Fife': 'FIFE',
-  'Glasgow City': 'GLASGOW',
+  'Glasgow City': 'GLASGOW CITY',
   'Highland': 'HIGHLAND',
   'Inverclyde': 'INVERCLYDE',
   'Midlothian': 'MIDLOTHIAN',
@@ -160,11 +242,11 @@ const REGION_MAPPING = {
   'Na h-Eileanan Siar': 'NA H-EILEANAN SIAR',
   'North Ayrshire': 'NORTH AYRSHIRE',
   'North Lanarkshire': 'NORTH LANARKSHIRE',
-  'Orkney Islands': 'ORKNEY',
-  'Perth and Kinross': 'PERTH',
+  'Orkney Islands': 'ORKNEY ISLANDS',
+  'Perth and Kinross': 'PERTH AND KINROSS',
   'Renfrewshire': 'RENFREWSHIRE',
   'Scottish Borders': 'SCOTTISH BORDERS',
-  'Shetland Islands': 'SHETLAND',
+  'Shetland Islands': 'SHETLAND ISLANDS',
   'South Ayrshire': 'SOUTH AYRSHIRE',
   'South Lanarkshire': 'SOUTH LANARKSHIRE',
   'Stirling': 'STIRLING',
@@ -182,31 +264,31 @@ const REGION_MAPPING = {
   'Denbighshire': 'DENBIGHSHIRE',
   'Flintshire': 'FLINTSHIRE',
   'Gwynedd': 'GWYNEDD',
-  'Isle of Anglesey': 'ANGLESEY',
-  'Merthyr Tydfil': 'MERTHYR',
+  'Isle of Anglesey': 'ISLE OF ANGLESEY',
+  'Merthyr Tydfil': 'MERTHYR TYDFIL',
   'Monmouthshire': 'MONMOUTHSHIRE',
-  'Neath Port Talbot': 'NEATH',
+  'Neath Port Talbot': 'NEATH PORT TALBOT',
   'Newport': 'NEWPORT',
   'Pembrokeshire': 'PEMBROKESHIRE',
   'Powys': 'POWYS',
-  'Rhondda Cynon Taf': 'RHONDDA',
+  'Rhondda Cynon Taf': 'RHONDDA CYNON TAF',
   'Swansea': 'SWANSEA',
   'Torfaen': 'TORFAEN',
   'Vale of Glamorgan': 'VALE OF GLAMORGAN',
   'Wrexham': 'WREXHAM',
   
   // ===== NORTHERN IRELAND =====
-  'Antrim and Newtownabbey': 'ANTRIM',
-  'Ards and North Down': 'ARDS',
-  'Armagh City, Banbridge and Craigavon': 'ARMAGH',
+  'Antrim and Newtownabbey': 'ANTRIM AND NEWTOWNABBEY',
+  'Ards and North Down': 'ARDS AND NORTH DOWN',
+  'Armagh City, Banbridge and Craigavon': 'ARMAGH CITY BANBRIDGE AND CRAIGAVON',
   'Belfast': 'BELFAST',
-  'Causeway Coast and Glens': 'CAUSEWAY',
-  'Derry City and Strabane': 'DERRY',
-  'Fermanagh and Omagh': 'FERMANAGH',
-  'Lisburn and Castlereagh': 'LISBURN',
-  'Mid and East Antrim': 'MID ANTRIM',
+  'Causeway Coast and Glens': 'CAUSEWAY COAST AND GLENS',
+  'Derry City and Strabane': 'DERRY CITY AND STRABANE',
+  'Fermanagh and Omagh': 'FERMANAGH AND OMAGH',
+  'Lisburn and Castlereagh': 'LISBURN AND CASTLEREAGH',
+  'Mid and East Antrim': 'MID AND EAST ANTRIM',
   'Mid Ulster': 'MID ULSTER',
-  'Newry, Mourne and Down': 'NEWRY'
+  'Newry, Mourne and Down': 'NEWRY MOURNE AND DOWN'
 };
 
 function processData() {
@@ -309,7 +391,7 @@ function processData() {
     regionalData[region] = {
       region: region,
       lastUpdated: new Date().toISOString(),
-      dataPeriod: `Most Recent Quarter (${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} ${currentPeriod.year})`,
+      dataPeriod: `Most Recent Quarter`,
       snapshot: {
         averagePrice: Math.round(currentStats.averagePrice),
         momChange: 0,
@@ -335,8 +417,8 @@ function processData() {
     `${outputDir}/market-data.json`,
     JSON.stringify({
       generatedAt: new Date().toISOString(),
-      dataPeriod: `Most Recent Quarter (${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} ${currentPeriod.year})`,
-      comparisonPeriod: `Year Ago (${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} 2025)`,
+      dataPeriod: `Most Recent Quarter`,
+      comparisonPeriod: `Year Ago Quarter`,
       regions: regionalData
     }, null, 2)
   );
