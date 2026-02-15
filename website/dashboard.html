@@ -2741,6 +2741,32 @@ async function lookupMarketData() {
         }
       }
     }
+
+    // TIER 4: Try using the county name as fallback
+if (!data && location.admin_county) {
+  const county = location.admin_county;
+  
+  // Try districts
+  if (marketData.districts && marketData.districts[county]) {
+    data = marketData.districts[county];
+    tier = 'DISTRICT';
+    console.log(`✓ Found county data for ${county}`);
+  }
+  
+  // Try sub-regions
+  if (!data && marketData.subRegions && marketData.subRegions[county.toUpperCase()]) {
+    data = marketData.subRegions[county.toUpperCase()];
+    tier = 'SUB_REGION';
+    console.log(`✓ Found sub-region data for ${county}`);
+  }
+  
+  // Try regions
+  if (!data && marketData.regions && marketData.regions[county.toUpperCase()]) {
+    data = marketData.regions[county.toUpperCase()];
+    tier = 'REGION';
+    console.log(`✓ Found region data for ${county}`);
+  }
+}
     
     if (!data) {
       showMarketError(`No market data available for ${region} at this time.`);
