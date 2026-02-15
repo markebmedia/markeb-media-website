@@ -2636,7 +2636,7 @@ Any media produced remains the property of Markeb Media until full payment has b
 async function lookupMarketData() {
   const input = document.getElementById('postcodeInput');
   const resultDiv = document.getElementById('marketDataResult');
-  const postcode = input.value.trim().replace(/\s+/g, '').toUpperCase();
+  const postcode = input.value.trim().toUpperCase();
 
   if (!postcode) {
     showMarketError('Please enter a postcode');
