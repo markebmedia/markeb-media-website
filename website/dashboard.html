@@ -4060,16 +4060,20 @@ async function loadRecentBookings() {
   </script>
 
   <script>
-  document.addEventListener("DOMContentLoaded", () => {
+  // Play video on ANY user interaction
+  const playVideo = () => {
     const v = document.querySelector(".market-lookup-video");
-    if (v) {
+    if (v && v.paused) {
       v.play().then(() => {
-        v.classList.add('playing'); // Show video when it starts
-      }).catch(() => {
-        // If autoplay fails, just show the gradient background
-      });
+        v.classList.add('playing');
+      }).catch(() => {});
     }
-  });
+  };
+  
+  // Trigger on scroll, click, or mouse move
+  document.addEventListener('scroll', playVideo, { once: true });
+  document.addEventListener('click', playVideo, { once: true });
+  document.addEventListener('mousemove', playVideo, { once: true });
 </script>
   
 </body>
