@@ -1491,30 +1491,6 @@
   height: 100%;
   object-fit: cover;
   z-index: 0;
-  pointer-events: none;
-}
-
-/* Aggressively hide ALL video controls */
-.market-lookup-video::-webkit-media-controls {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-}
-
-.market-lookup-video::-webkit-media-controls-enclosure {
-  display: none !important;
-}
-
-.market-lookup-video::-webkit-media-controls-panel {
-  display: none !important;
-}
-
-.market-lookup-video::-webkit-media-controls-play-button {
-  display: none !important;
-}
-
-.market-lookup-video::-webkit-media-controls-start-playback-button {
-  display: none !important;
 }
 
 .market-lookup-container {
@@ -2116,9 +2092,9 @@
   <!-- ===== ADD THIS MARKET DATA LOOKUP BAR HERE ===== -->
  <!-- Market Data Lookup Bar -->
 <div class="market-lookup-bar">
- <video class="market-lookup-video" autoplay muted loop playsinline webkit-playsinline preload="auto">
-  <source src="/public/videos/property-showcase.mp4" type="video/mp4">
-</video>
+  <video class="market-lookup-video" autoplay muted loop playsinline>
+    <source src="/public/videos/property-showcase.mp4" type="video/mp4">
+  </video>
   <div class="market-lookup-container">
     <div class="market-lookup-header">
       <h3>
