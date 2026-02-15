@@ -2691,15 +2691,64 @@ async function lookupMarketData() {
     const marketResponse = await fetch('/data/market-data.json');
     const marketData = await marketResponse.json();
     
-    const regionData = marketData.regions[region];
+    // THREE-TIER FALLBACK: Try districts → sub-regions → regions
+    let data = null;
+    let tier = null;
     
-    if (!regionData) {
+    // TIER 1: Try district first
+    if (marketData.districts && marketData.districts[region]) {
+      data = marketData.districts[region];
+      tier = 'DISTRICT';
+      console.log(`✓ Found district data for ${region}`);
+    }
+    
+    // TIER 2: Fallback to sub-region
+    if (!data && marketData.subRegions) {
+      // Try exact match
+      if (marketData.subRegions[region]) {
+        data = marketData.subRegions[region];
+        tier = 'SUB_REGION';
+        console.log(`✓ Found sub-region data for ${region}`);
+      } else {
+        // Try to find which sub-region contains this district
+        for (const [subRegionName, subRegionData] of Object.entries(marketData.subRegions)) {
+          if (subRegionData.districts && subRegionData.districts.includes(region)) {
+            data = subRegionData;
+            tier = 'SUB_REGION';
+            console.log(`✓ Found parent sub-region ${subRegionName} for ${region}`);
+            break;
+          }
+        }
+      }
+    }
+    
+    // TIER 3: Fallback to broad region
+    if (!data && marketData.regions) {
+      // Try exact match
+      if (marketData.regions[region]) {
+        data = marketData.regions[region];
+        tier = 'REGION';
+        console.log(`✓ Found region data for ${region}`);
+      } else {
+        // Try to find which region contains this district
+        for (const [regionName, regionData] of Object.entries(marketData.regions)) {
+          if (regionData.districts && regionData.districts.includes(region)) {
+            data = regionData;
+            tier = 'REGION';
+            console.log(`✓ Found parent region ${regionName} for ${region}`);
+            break;
+          }
+        }
+      }
+    }
+    
+    if (!data) {
       showMarketError(`No market data available for ${region} at this time.`);
       return;
     }
 
     // Step 4: Display results
-    displayMarketData(regionData, location, formatPostcode(postcode));
+    displayMarketData(data, location, formatPostcode(postcode));
 
   } catch (error) {
     console.error('Market lookup error:', error);
