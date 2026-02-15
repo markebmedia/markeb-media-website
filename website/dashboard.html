@@ -2063,39 +2063,39 @@
   </div>
 
   <!-- ===== ADD THIS MARKET DATA LOOKUP BAR HERE ===== -->
-  <!-- Market Data Lookup Bar -->
-  <div class="market-lookup-bar">
-    <div class="market-lookup-container">
-      <div class="market-lookup-header">
-        <h3>
-          <i data-lucide="bar-chart-3" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
-          Local Market Intelligence
-        </h3>
-        <p>Enter any UK postcode to see average property prices in that area</p>
-      </div>
-      <div class="market-lookup-search">
-        <div style="position: relative; flex: 1;">
-          <i data-lucide="map-pin" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: #64748b;"></i>
-          <input 
-            type="text" 
-            id="postcodeInput" 
-            placeholder="Enter postcode (e.g., M1 4AE, SW1A 1AA)" 
-            class="postcode-input"
-            style="padding-left: 44px;"
-            onkeypress="if(event.key==='Enter') lookupMarketData()"
-          />
-        </div>
-        <button 
-          class="btn-market-search" 
-          onclick="lookupMarketData()"
-        >
-          <i data-lucide="search" style="width: 18px; height: 18px;"></i>
-          Get Market Data
-        </button>
-      </div>
-      <div id="marketDataResult" class="market-data-result"></div>
+ <!-- Market Data Lookup Bar -->
+<div class="market-lookup-bar">
+  <div class="market-lookup-container">
+    <div class="market-lookup-header">
+      <h3>
+        <i data-lucide="trending-up" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
+        Instant Valuation Support
+      </h3>
+      <p>Get live sold price data to support your property appraisals and win more instructions</p>
     </div>
+    <div class="market-lookup-search">
+      <div style="position: relative; flex: 1;">
+        <i data-lucide="map-pin" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: #64748b;"></i>
+        <input 
+          type="text" 
+          id="postcodeInput" 
+          placeholder="Enter postcode or property address (e.g., S5 6FS, M1 4AE)" 
+          class="postcode-input"
+          style="padding-left: 44px;"
+          onkeypress="if(event.key==='Enter') lookupMarketData()"
+        />
+      </div>
+      <button 
+        class="btn-market-search" 
+        onclick="lookupMarketData()"
+      >
+        <i data-lucide="search" style="width: 18px; height: 18px;"></i>
+        Get Market Data
+      </button>
+    </div>
+    <div id="marketDataResult" class="market-data-result"></div>
   </div>
+</div>
   <!-- ===== END OF MARKET DATA LOOKUP BAR ===== -->
 
   <div class="content-area">
