@@ -47,8 +47,93 @@ async function downloadBothFiles() {
 
 downloadBothFiles();
 
-// Region mapping - DISTRICT LEVEL for better localization
-const REGION_MAPPING = {
+// SUB-REGIONAL GROUPINGS (Middle tier - e.g., South Yorkshire, Greater Manchester)
+const SUB_REGIONAL_GROUPINGS = {
+  // Yorkshire sub-regions
+  'SOUTH YORKSHIRE': ['Sheffield', 'Doncaster', 'Rotherham', 'Barnsley'],
+  'WEST YORKSHIRE': ['Leeds', 'Bradford', 'Wakefield', 'Kirklees', 'Calderdale'],
+  'NORTH YORKSHIRE': ['North Yorkshire', 'York'],
+  'EAST YORKSHIRE': ['East Riding of Yorkshire'],
+  
+  // North West sub-regions
+  'GREATER MANCHESTER': ['Manchester', 'Salford', 'Bolton', 'Bury', 'Oldham', 'Rochdale', 'Stockport', 'Tameside', 'Trafford', 'Wigan'],
+  'MERSEYSIDE': ['Merseyside'],
+  'LANCASHIRE': ['Lancashire', 'Blackburn with Darwen', 'Blackpool'],
+  'CHESHIRE': ['Cheshire East', 'Cheshire West and Chester', 'Halton', 'Warrington'],
+  'CUMBRIA': ['Cumbria'],
+  
+  // East of England sub-regions
+  'ESSEX': ['Basildon', 'Braintree', 'Brentwood', 'Castle Point', 'Chelmsford', 'Colchester', 'Epping Forest', 'Harlow', 'Maldon', 'Rochford', 'Tendring', 'Uttlesford', 'Southend-on-Sea', 'Thurrock'],
+  'HERTFORDSHIRE': ['Hertfordshire'],
+  'BEDFORDSHIRE': ['Bedford', 'Central Bedfordshire'],
+  'CAMBRIDGESHIRE': ['Cambridgeshire', 'Peterborough'],
+  'NORFOLK': ['Norfolk'],
+  'SUFFOLK': ['Suffolk'],
+  
+  // West Midlands sub-regions
+  'WEST MIDLANDS CONURBATION': ['Birmingham', 'Coventry', 'Dudley', 'Sandwell', 'Solihull', 'Walsall', 'Wolverhampton'],
+  'STAFFORDSHIRE': ['Staffordshire', 'Stoke-on-Trent'],
+  'WARWICKSHIRE': ['Warwickshire'],
+  'WORCESTERSHIRE': ['Worcestershire'],
+  'SHROPSHIRE': ['Shropshire', 'Telford and Wrekin'],
+  'HEREFORDSHIRE': ['Herefordshire'],
+  
+  // East Midlands sub-regions
+  'NOTTINGHAMSHIRE': ['Nottingham', 'Nottinghamshire'],
+  'DERBYSHIRE': ['Derby', 'Derbyshire'],
+  'LEICESTERSHIRE': ['Leicester', 'Leicestershire'],
+  'LINCOLNSHIRE': ['Lincolnshire'],
+  'NORTHAMPTONSHIRE': ['Northamptonshire'],
+  'RUTLAND': ['Rutland'],
+  
+  // South East sub-regions
+  'KENT': ['Kent', 'Medway'],
+  'SURREY': ['Surrey'],
+  'SUSSEX': ['East Sussex', 'West Sussex', 'Brighton and Hove'],
+  'HAMPSHIRE': ['Hampshire', 'Portsmouth', 'Southampton', 'Isle of Wight'],
+  'BERKSHIRE': ['Berkshire'],
+  'BUCKINGHAMSHIRE': ['Buckinghamshire'],
+  'OXFORDSHIRE': ['Oxfordshire'],
+  
+  // South West sub-regions
+  'BRISTOL AND BATH': ['Bristol', 'Bath and North East Somerset', 'North Somerset', 'South Gloucestershire'],
+  'DEVON': ['Devon', 'Plymouth', 'Torbay'],
+  'CORNWALL': ['Cornwall'],
+  'DORSET': ['Dorset', 'Bournemouth, Christchurch and Poole'],
+  'GLOUCESTERSHIRE': ['Gloucestershire'],
+  'SOMERSET': ['Somerset'],
+  'WILTSHIRE': ['Wiltshire', 'Swindon'],
+};
+
+// BROAD REGIONAL GROUPINGS (Top tier - e.g., Yorkshire, North West)
+const REGIONAL_GROUPINGS = {
+  'NORTH WEST': ['Cheshire East', 'Cheshire West and Chester', 'Cumbria', 'Manchester', 'Salford', 'Bolton', 'Bury', 'Oldham', 'Rochdale', 'Stockport', 'Tameside', 'Trafford', 'Wigan', 'Lancashire', 'Merseyside', 'Blackburn with Darwen', 'Blackpool', 'Halton', 'Warrington'],
+  
+  'NORTH EAST': ['County Durham', 'Northumberland', 'Tyne and Wear'],
+  
+  'YORKSHIRE': ['East Riding of Yorkshire', 'North Yorkshire', 'Sheffield', 'Doncaster', 'Rotherham', 'Barnsley', 'Leeds', 'Bradford', 'Wakefield', 'Kirklees', 'Calderdale', 'York'],
+  
+  'EAST MIDLANDS': ['Derby', 'Derbyshire', 'Leicester', 'Leicestershire', 'Lincolnshire', 'Northamptonshire', 'Nottingham', 'Nottinghamshire', 'Rutland'],
+  
+  'WEST MIDLANDS': ['Herefordshire', 'Shropshire', 'Staffordshire', 'Stoke-on-Trent', 'Telford and Wrekin', 'Warwickshire', 'Birmingham', 'Coventry', 'Dudley', 'Sandwell', 'Solihull', 'Walsall', 'Wolverhampton', 'Worcestershire'],
+  
+  'EAST OF ENGLAND': ['Bedford', 'Cambridgeshire', 'Central Bedfordshire', 'Basildon', 'Braintree', 'Brentwood', 'Castle Point', 'Chelmsford', 'Colchester', 'Epping Forest', 'Harlow', 'Maldon', 'Rochford', 'Tendring', 'Uttlesford', 'Southend-on-Sea', 'Thurrock', 'Hertfordshire', 'Norfolk', 'Peterborough', 'Suffolk'],
+  
+  'SOUTH EAST': ['Berkshire', 'Brighton and Hove', 'Buckinghamshire', 'East Sussex', 'Hampshire', 'Isle of Wight', 'Kent', 'Medway', 'Oxfordshire', 'Portsmouth', 'Southampton', 'Surrey', 'West Sussex'],
+  
+  'SOUTH WEST': ['Bath and North East Somerset', 'Bournemouth, Christchurch and Poole', 'Bristol', 'Cornwall', 'Devon', 'Dorset', 'Gloucestershire', 'North Somerset', 'Plymouth', 'Somerset', 'South Gloucestershire', 'Swindon', 'Torbay', 'Wiltshire'],
+  
+  'LONDON': ['City of London', 'Barking and Dagenham', 'Barnet', 'Bexley', 'Brent', 'Bromley', 'Camden', 'Croydon', 'Ealing', 'Enfield', 'Greenwich', 'Hackney', 'Hammersmith and Fulham', 'Haringey', 'Harrow', 'Havering', 'Hillingdon', 'Hounslow', 'Islington', 'Kensington and Chelsea', 'Kingston upon Thames', 'Lambeth', 'Lewisham', 'Merton', 'Newham', 'Redbridge', 'Richmond upon Thames', 'Southwark', 'Sutton', 'Tower Hamlets', 'Waltham Forest', 'Wandsworth', 'Westminster'],
+  
+  'SCOTLAND': ['Aberdeen City', 'Aberdeenshire', 'Angus', 'Argyll and Bute', 'City of Edinburgh', 'Clackmannanshire', 'Dumfries and Galloway', 'Dundee City', 'East Ayrshire', 'East Dunbartonshire', 'East Lothian', 'East Renfrewshire', 'Falkirk', 'Fife', 'Glasgow City', 'Highland', 'Inverclyde', 'Midlothian', 'Moray', 'Na h-Eileanan Siar', 'North Ayrshire', 'North Lanarkshire', 'Orkney Islands', 'Perth and Kinross', 'Renfrewshire', 'Scottish Borders', 'Shetland Islands', 'South Ayrshire', 'South Lanarkshire', 'Stirling', 'West Dunbartonshire', 'West Lothian'],
+  
+  'WALES': ['Blaenau Gwent', 'Bridgend', 'Caerphilly', 'Cardiff', 'Carmarthenshire', 'Ceredigion', 'Conwy', 'Denbighshire', 'Flintshire', 'Gwynedd', 'Isle of Anglesey', 'Merthyr Tydfil', 'Monmouthshire', 'Neath Port Talbot', 'Newport', 'Pembrokeshire', 'Powys', 'Rhondda Cynon Taf', 'Swansea', 'Torfaen', 'Vale of Glamorgan', 'Wrexham'],
+  
+  'NORTHERN IRELAND': ['Antrim and Newtownabbey', 'Ards and North Down', 'Armagh City, Banbridge and Craigavon', 'Belfast', 'Causeway Coast and Glens', 'Derry City and Strabane', 'Fermanagh and Omagh', 'Lisburn and Castlereagh', 'Mid and East Antrim', 'Mid Ulster', 'Newry, Mourne and Down']
+};
+
+// DISTRICT MAPPING (Most granular tier)
+const DISTRICT_MAPPING = {
   // ===== ENGLAND - NORTH WEST =====
   'Cheshire East': 'CHESHIRE EAST',
   'Cheshire West and Chester': 'CHESHIRE WEST AND CHESTER',
@@ -331,83 +416,125 @@ function processData() {
     'F': 'Flats'
   };
   
+  const districtData = {};
+  const subRegionalData = {};
   const regionalData = {};
   
-  // Process each region
-  Object.keys(REGION_MAPPING).forEach(region => {
-    const searchTerm = REGION_MAPPING[region];
+  // ===== TIER 1: PROCESS DISTRICTS (Most granular) =====
+  console.log('\n📍 Processing District-level data...');
+  Object.keys(DISTRICT_MAPPING).forEach(district => {
+    const searchTerm = DISTRICT_MAPPING[district];
     
     // Filter monthly update for current period
     const currentTransactions = monthlyRecords.filter(record => {
-      const matchesRegion = matchesLocation(record, searchTerm);
+      const matchesLocation = matchesLocationSearch(record, searchTerm);
       const matchesPeriod = isInPeriod(record.date, currentPeriod);
-      return matchesRegion && matchesPeriod;
+      return matchesLocation && matchesPeriod;
     });
     
     // Filter 2025 data for same period
     const previousTransactions = previousRecords.filter(record => {
-      const matchesRegion = matchesLocation(record, searchTerm);
+      const matchesLocation = matchesLocationSearch(record, searchTerm);
       const matchesPeriod = isInDateRange(record.date, currentPeriod.startMonth, currentPeriod.endMonth, 2025);
-      return matchesRegion && matchesPeriod;
+      return matchesLocation && matchesPeriod;
     });
     
     if (currentTransactions.length === 0) {
-      console.log(`⚠️  No current data for ${region}`);
+      console.log(`⚠️  No current data for ${district}`);
       return;
     }
     
-    console.log(`✓ ${region}: ${currentTransactions.length} current, ${previousTransactions.length} previous year`);
+    console.log(`✓ ${district}: ${currentTransactions.length} current, ${previousTransactions.length} previous year`);
     
-    // Calculate statistics
-    const currentStats = calculateStats(currentTransactions, typeMapping);
-    const previousStats = calculateStats(previousTransactions, typeMapping);
-    
-    // Calculate real YoY changes
-    const yoyChange = previousStats.averagePrice > 0 
-      ? ((currentStats.averagePrice - previousStats.averagePrice) / previousStats.averagePrice * 100)
-      : 0;
-    
-    const transactionChange = previousStats.totalTransactions > 0
-      ? ((currentStats.totalTransactions - previousStats.totalTransactions) / previousStats.totalTransactions * 100)
-      : 0;
-    
-    // Calculate property type YoY changes
-    const propertyTypes = {};
-    Object.keys(currentStats.byType).forEach(type => {
-      const currentPrice = currentStats.byType[type].average;
-      const previousPrice = previousStats.byType[type]?.average || 0;
-      const typeYoY = previousPrice > 0 
-        ? ((currentPrice - previousPrice) / previousPrice * 100)
-        : 0;
-      
-      propertyTypes[type] = {
-        averagePrice: Math.round(currentPrice),
-        transactions: currentStats.byType[type].count,
-        yoyChange: parseFloat(typeYoY.toFixed(1)),
-        previousYearPrice: Math.round(previousPrice)
-      };
-    });
-    
-    regionalData[region] = {
-      region: region,
-      lastUpdated: new Date().toISOString(),
-      dataPeriod: `Most Recent Quarter`,
-      snapshot: {
-        averagePrice: Math.round(currentStats.averagePrice),
-        momChange: 0,
-        yoyChange: parseFloat(yoyChange.toFixed(1)),
-        totalTransactions: currentStats.totalTransactions,
-        transactionChange: parseFloat(transactionChange.toFixed(1)),
-        previousYearPrice: Math.round(previousStats.averagePrice),
-        previousYearTransactions: previousStats.totalTransactions
-      },
-      propertyTypes: propertyTypes,
-      dataSource: `HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)`,
-      compliance: 'Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.'
-    };
+    districtData[district] = createDataObject(
+      district,
+      currentTransactions,
+      previousTransactions,
+      typeMapping,
+      'DISTRICT',
+      null
+    );
   });
   
-  // Save to JSON
+  // ===== TIER 2: PROCESS SUB-REGIONS (Middle tier - e.g., South Yorkshire) =====
+  console.log('\n🗺️  Processing Sub-Regional data...');
+  Object.keys(SUB_REGIONAL_GROUPINGS).forEach(subRegionName => {
+    const districts = SUB_REGIONAL_GROUPINGS[subRegionName];
+    
+    // Aggregate all transactions from districts in this sub-region
+    const currentTransactions = monthlyRecords.filter(record => {
+      const matchesPeriod = isInPeriod(record.date, currentPeriod);
+      const matchesDistrict = districts.some(district => 
+        matchesLocationSearch(record, DISTRICT_MAPPING[district])
+      );
+      return matchesPeriod && matchesDistrict;
+    });
+    
+    const previousTransactions = previousRecords.filter(record => {
+      const matchesPeriod = isInDateRange(record.date, currentPeriod.startMonth, currentPeriod.endMonth, 2025);
+      const matchesDistrict = districts.some(district => 
+        matchesLocationSearch(record, DISTRICT_MAPPING[district])
+      );
+      return matchesPeriod && matchesDistrict;
+    });
+    
+    if (currentTransactions.length === 0) {
+      console.log(`⚠️  No sub-regional data for ${subRegionName}`);
+      return;
+    }
+    
+    console.log(`✓ ${subRegionName}: ${currentTransactions.length} current, ${previousTransactions.length} previous year`);
+    
+    subRegionalData[subRegionName] = createDataObject(
+      subRegionName,
+      currentTransactions,
+      previousTransactions,
+      typeMapping,
+      'SUB_REGION',
+      districts
+    );
+  });
+  
+  // ===== TIER 3: PROCESS BROAD REGIONS (Top tier - e.g., Yorkshire) =====
+  console.log('\n🌍 Processing Regional data...');
+  Object.keys(REGIONAL_GROUPINGS).forEach(regionName => {
+    const districts = REGIONAL_GROUPINGS[regionName];
+    
+    // Aggregate all transactions from districts in this region
+    const currentTransactions = monthlyRecords.filter(record => {
+      const matchesPeriod = isInPeriod(record.date, currentPeriod);
+      const matchesDistrict = districts.some(district => 
+        matchesLocationSearch(record, DISTRICT_MAPPING[district])
+      );
+      return matchesPeriod && matchesDistrict;
+    });
+    
+    const previousTransactions = previousRecords.filter(record => {
+      const matchesPeriod = isInDateRange(record.date, currentPeriod.startMonth, currentPeriod.endMonth, 2025);
+      const matchesDistrict = districts.some(district => 
+        matchesLocationSearch(record, DISTRICT_MAPPING[district])
+      );
+      return matchesPeriod && matchesDistrict;
+    });
+    
+    if (currentTransactions.length === 0) {
+      console.log(`⚠️  No regional data for ${regionName}`);
+      return;
+    }
+    
+    console.log(`✓ ${regionName}: ${currentTransactions.length} current, ${previousTransactions.length} previous year`);
+    
+    regionalData[regionName] = createDataObject(
+      regionName,
+      currentTransactions,
+      previousTransactions,
+      typeMapping,
+      'REGION',
+      districts
+    );
+  });
+  
+  // Save to JSON with all three tiers
   const outputDir = 'data';
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
@@ -419,12 +546,87 @@ function processData() {
       generatedAt: new Date().toISOString(),
       dataPeriod: `Most Recent Quarter`,
       comparisonPeriod: `Year Ago Quarter`,
+      period: {
+        current: {
+          startMonth: currentPeriod.startMonth,
+          endMonth: currentPeriod.endMonth,
+          year: currentPeriod.year,
+          label: `${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} ${currentPeriod.year}`
+        },
+        previous: {
+          startMonth: currentPeriod.startMonth,
+          endMonth: currentPeriod.endMonth,
+          year: 2025,
+          label: `${getMonthName(currentPeriod.startMonth)}-${getMonthName(currentPeriod.endMonth)} 2025`
+        }
+      },
+      districts: districtData,
+      subRegions: subRegionalData,
       regions: regionalData
     }, null, 2)
   );
   
-  console.log('✅ Data processed and saved to data/market-data.json');
-  console.log(`📈 Regions with data: ${Object.keys(regionalData).length}`);
+  console.log('\n✅ Data processed and saved to data/market-data.json');
+  console.log(`📈 Districts with data: ${Object.keys(districtData).length}`);
+  console.log(`🗺️  Sub-regions with data: ${Object.keys(subRegionalData).length}`);
+  console.log(`🌍 Regions with data: ${Object.keys(regionalData).length}`);
+}
+
+// Helper function to create standardized data object
+function createDataObject(name, currentTx, previousTx, typeMapping, tier, districts = null) {
+  const currentStats = calculateStats(currentTx, typeMapping);
+  const previousStats = calculateStats(previousTx, typeMapping);
+  
+  const yoyChange = previousStats.averagePrice > 0 
+    ? ((currentStats.averagePrice - previousStats.averagePrice) / previousStats.averagePrice * 100)
+    : 0;
+  
+  const transactionChange = previousStats.totalTransactions > 0
+    ? ((currentStats.totalTransactions - previousStats.totalTransactions) / previousStats.totalTransactions * 100)
+    : 0;
+  
+  // Calculate property type YoY changes
+  const propertyTypes = {};
+  Object.keys(currentStats.byType).forEach(type => {
+    const currentPrice = currentStats.byType[type].average;
+    const previousPrice = previousStats.byType[type]?.average || 0;
+    const typeYoY = previousPrice > 0 
+      ? ((currentPrice - previousPrice) / previousPrice * 100)
+      : 0;
+    
+    propertyTypes[type] = {
+      averagePrice: Math.round(currentPrice),
+      transactions: currentStats.byType[type].count,
+      yoyChange: parseFloat(typeYoY.toFixed(1)),
+      previousYearPrice: Math.round(previousPrice)
+    };
+  });
+  
+  const dataObject = {
+    name: name,
+    tier: tier,
+    lastUpdated: new Date().toISOString(),
+    dataPeriod: `Most Recent Quarter`,
+    snapshot: {
+      averagePrice: Math.round(currentStats.averagePrice),
+      momChange: 0,
+      yoyChange: parseFloat(yoyChange.toFixed(1)),
+      totalTransactions: currentStats.totalTransactions,
+      transactionChange: parseFloat(transactionChange.toFixed(1)),
+      previousYearPrice: Math.round(previousStats.averagePrice),
+      previousYearTransactions: previousStats.totalTransactions
+    },
+    propertyTypes: propertyTypes,
+    dataSource: `HM Land Registry Price Paid Data (${tier} - Most Recent Quarter vs Year Ago)`,
+    compliance: 'Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.'
+  };
+  
+  // Add districts list for aggregated tiers
+  if (districts && tier !== 'DISTRICT') {
+    dataObject.districts = districts;
+  }
+  
+  return dataObject;
 }
 
 function getMostRecentQuarter(records) {
@@ -513,7 +715,7 @@ function isInDateRange(dateStr, startMonth, endMonth, year) {
   }
 }
 
-function matchesLocation(record, searchTerm) {
+function matchesLocationSearch(record, searchTerm) {
   const county = (record.county || '').toUpperCase();
   const district = (record.district || '').toUpperCase();
   const city = (record.town_city || '').toUpperCase();
