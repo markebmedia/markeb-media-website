@@ -34,7 +34,7 @@ function loadMarketData() {
 }
 
 exports.handler = async (event, context) => {
-  console.log('=== Fetch Market Data (Pre-processed) ===');
+  console.log('=== Fetch Market Data (Three-Tier System) ===');
   
   const headers = {
     'Content-Type': 'application/json',
@@ -71,8 +71,8 @@ exports.handler = async (event, context) => {
     // Load pre-processed data
     const marketData = loadMarketData();
     
-    if (!marketData || !marketData.regions || !marketData.regions[region]) {
-      console.log(`No data for ${region}, using fallback`);
+    if (!marketData) {
+      console.log(`Failed to load market data, using fallback for ${region}`);
       const fallbackData = generateFallbackData(region);
       
       return {
@@ -82,14 +82,153 @@ exports.handler = async (event, context) => {
           success: true,
           data: fallbackData,
           source: 'fallback',
+          tier: 'FALLBACK',
           message: `Using industry-standard estimates for ${region}`
         })
       };
     }
 
+    // THREE-TIER FALLBACK LOGIC
+    let data = null;
+    let usedTier = null;
+    let fallbackReason = null;
+
+    // TIER 1: Try district first (minimum 1 transaction)
+    if (marketData.districts && marketData.districts[region]) {
+      const districtData = marketData.districts[region];
+      if (districtData.snapshot.totalTransactions >= 1) {
+        data = districtData;
+        usedTier = 'DISTRICT';
+        console.log(`✓ Using DISTRICT data for ${region} (${districtData.snapshot.totalTransactions} transactions)`);
+      } else {
+        fallbackReason = `District found but only ${districtData.snapshot.totalTransactions} transactions`;
+        console.log(`⚠️ ${fallbackReason}`);
+      }
+    }
+
+    // TIER 2: Fallback to sub-region if district insufficient
+    if (!data && marketData.subRegions) {
+      const subRegionData = marketData.subRegions[region];
+      if (subRegionData && subRegionData.snapshot.totalTransactions >= 1) {
+        data = subRegionData;
+        usedTier = 'SUB_REGION';
+        fallbackReason = fallbackReason || 'District not found, using sub-region';
+        console.log(`✓ Using SUB-REGION data for ${region} (${subRegionData.snapshot.totalTransactions} transactions)`);
+      }
+    }
+
+    // TIER 3: Fallback to broad region if sub-region insufficient
+    if (!data && marketData.regions) {
+      const regionData = marketData.regions[region];
+      if (regionData && regionData.snapshot.totalTransactions >= 1) {
+        data = regionData;
+        usedTier = 'REGION';
+        fallbackReason = fallbackReason || 'District and sub-region not found, using broad region';
+        console.log(`✓ Using REGION data for ${region} (${regionData.snapshot.totalTransactions} transactions)`);
+      }
+    }
+
+    // TIER 4: Try case-insensitive matching if exact match fails
+    if (!data) {
+      const regionUpper = region.toUpperCase();
+      
+      // Try districts
+      if (marketData.districts) {
+        const districtMatch = Object.keys(marketData.districts).find(
+          key => key.toUpperCase() === regionUpper
+        );
+        if (districtMatch) {
+          const districtData = marketData.districts[districtMatch];
+          if (districtData.snapshot.totalTransactions >= 1) {
+            data = districtData;
+            usedTier = 'DISTRICT';
+            fallbackReason = 'Case-insensitive district match';
+            console.log(`✓ Using DISTRICT data (case-insensitive) for ${districtMatch}`);
+          }
+        }
+      }
+
+      // Try sub-regions
+      if (!data && marketData.subRegions) {
+        const subRegionMatch = Object.keys(marketData.subRegions).find(
+          key => key.toUpperCase() === regionUpper
+        );
+        if (subRegionMatch) {
+          const subRegionData = marketData.subRegions[subRegionMatch];
+          if (subRegionData.snapshot.totalTransactions >= 1) {
+            data = subRegionData;
+            usedTier = 'SUB_REGION';
+            fallbackReason = 'Case-insensitive sub-region match';
+            console.log(`✓ Using SUB-REGION data (case-insensitive) for ${subRegionMatch}`);
+          }
+        }
+      }
+
+      // Try regions
+      if (!data && marketData.regions) {
+        const regionMatch = Object.keys(marketData.regions).find(
+          key => key.toUpperCase() === regionUpper
+        );
+        if (regionMatch) {
+          data = marketData.regions[regionMatch];
+          usedTier = 'REGION';
+          fallbackReason = 'Case-insensitive region match';
+          console.log(`✓ Using REGION data (case-insensitive) for ${regionMatch}`);
+        }
+      }
+    }
+
+    // TIER 5: Try finding parent sub-region for district with insufficient data
+    if (!data && marketData.districts && marketData.districts[region]) {
+      for (const [subRegionName, subRegionData] of Object.entries(marketData.subRegions || {})) {
+        if (subRegionData.districts && subRegionData.districts.includes(region)) {
+          if (subRegionData.snapshot.totalTransactions >= 1) {
+            data = subRegionData;
+            usedTier = 'SUB_REGION';
+            fallbackReason = `District has insufficient data, using parent sub-region ${subRegionName}`;
+            console.log(`✓ ${fallbackReason}`);
+            break;
+          }
+        }
+      }
+    }
+
+    // TIER 6: Try finding parent region for sub-region with insufficient data
+    if (!data && marketData.subRegions && marketData.subRegions[region]) {
+      for (const [regionName, regionData] of Object.entries(marketData.regions || {})) {
+        if (regionData.districts && regionData.districts.some(d => 
+          marketData.subRegions[region].districts.includes(d)
+        )) {
+          data = regionData;
+          usedTier = 'REGION';
+          fallbackReason = `Sub-region has insufficient data, using parent region ${regionName}`;
+          console.log(`✓ ${fallbackReason}`);
+          break;
+        }
+      }
+    }
+
+    // FINAL FALLBACK: Use generated fallback data
+    if (!data) {
+      console.log(`No PPD data for ${region}, using fallback estimates`);
+      const fallbackData = generateFallbackData(region);
+      
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          success: true,
+          data: fallbackData,
+          source: 'fallback',
+          tier: 'FALLBACK',
+          message: `Using industry-standard estimates for ${region}`,
+          fallbackReason: fallbackReason || 'No matching location found in PPD data'
+        })
+      };
+    }
+
     // Add insight generation
-    const data = marketData.regions[region];
-    data.insight = generateMarketInsight(data, region);
+    data.insight = generateMarketInsight(data, data.name || region);
 
     return {
       statusCode: 200,
@@ -98,9 +237,13 @@ exports.handler = async (event, context) => {
         success: true,
         data: data,
         source: 'ppd-processed',
+        tier: usedTier,
         transactionCount: data.snapshot.totalTransactions,
+        dataQuality: getDataQualityRating(data.snapshot.totalTransactions),
         message: `Real PPD data from ${new Date(marketData.generatedAt).toLocaleDateString()}`,
-        lastUpdated: marketData.generatedAt
+        lastUpdated: marketData.generatedAt,
+        fallbackApplied: fallbackReason ? true : false,
+        fallbackReason: fallbackReason
       })
     };
 
@@ -116,6 +259,16 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+// Helper function to rate data quality based on transaction count
+function getDataQualityRating(transactions) {
+  if (transactions >= 500) return 'EXCELLENT';
+  if (transactions >= 200) return 'GOOD';
+  if (transactions >= 100) return 'FAIR';
+  if (transactions >= 50) return 'LIMITED';
+  if (transactions >= 10) return 'VERY_LIMITED';
+  return 'MINIMAL';
+}
 
 // Fallback data generator
 function generateFallbackData(region) {
@@ -136,10 +289,15 @@ function generateFallbackData(region) {
 
   // Determine base price from region
   let basePrice = 250000;
-  if (region.includes('London')) basePrice = basePrices['London'];
+  if (region.includes('London') || region.toUpperCase().includes('LONDON')) basePrice = basePrices['London'];
   else if (region.includes('Manchester') || region.includes('Lancashire') || region.includes('Cheshire')) basePrice = basePrices['North West'];
-  else if (region.includes('Yorkshire') || region.includes('York')) basePrice = basePrices['Yorkshire and The Humber'];
-  // Add more region matching as needed...
+  else if (region.includes('Yorkshire') || region.includes('York') || region.toUpperCase().includes('YORKSHIRE')) basePrice = basePrices['Yorkshire and The Humber'];
+  else if (region.includes('Birmingham') || region.includes('Midlands')) basePrice = basePrices['West Midlands'];
+  else if (region.includes('Essex') || region.includes('Cambridge') || region.includes('Norfolk')) basePrice = basePrices['East of England'];
+  else if (region.includes('Bristol') || region.includes('Cornwall') || region.includes('Devon')) basePrice = basePrices['South West'];
+  else if (region.includes('Kent') || region.includes('Surrey') || region.includes('Sussex')) basePrice = basePrices['South East'];
+  else if (region.includes('Scotland') || region.includes('Edinburgh') || region.includes('Glasgow')) basePrice = basePrices['Scotland'];
+  else if (region.includes('Wales') || region.includes('Cardiff')) basePrice = basePrices['Wales'];
 
   const typeMultipliers = {
     'Detached': 1.65,
@@ -170,6 +328,8 @@ function generateFallbackData(region) {
 
   return {
     region: region,
+    name: region,
+    tier: 'FALLBACK',
     lastUpdated: new Date().toISOString(),
     snapshot: {
       averagePrice: Math.round(weightedTotal / transactionTotal),
@@ -205,8 +365,10 @@ function generateMarketInsight(data, region) {
   
   if (strongest.change > 4) {
     insight = `${strongest.type} homes are driving growth in ${region}, with ${strongest.change.toFixed(1)}% annual growth. `;
-  } else {
+  } else if (strongest.change > 0) {
     insight = `The ${region} market is showing steady performance across property types. `;
+  } else {
+    insight = `The ${region} market is experiencing price adjustments. `;
   }
 
   if (weakest.change < 0) {
@@ -215,7 +377,7 @@ function generateMarketInsight(data, region) {
 
   if (snapshot.transactionChange > 0) {
     insight += `Transaction volumes are up ${snapshot.transactionChange.toFixed(1)}% compared to last year, indicating healthy buyer activity. `;
-  } else {
+  } else if (snapshot.transactionChange < 0) {
     insight += `Transaction volumes are down ${Math.abs(snapshot.transactionChange).toFixed(1)}% year-on-year, typical of seasonal patterns. `;
   }
 
