@@ -1478,6 +1478,17 @@
   z-index: 1;
 }
 
+.market-lookup-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
 .market-lookup-bar > * {
   position: relative;
   z-index: 2;
@@ -1491,6 +1502,28 @@
   height: 100%;
   object-fit: cover;
   z-index: 0;
+  pointer-events: none;
+}
+
+/* Hide all video controls */
+.market-lookup-video::-webkit-media-controls {
+  display: none !important;
+}
+
+.market-lookup-video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+
+.market-lookup-video::-webkit-media-controls-panel {
+  display: none !important;
+}
+
+.market-lookup-video::-webkit-media-controls-play-button {
+  display: none !important;
+}
+
+.market-lookup-video::-webkit-media-controls-start-playback-button {
+  display: none !important;
 }
 
 .market-lookup-container {
