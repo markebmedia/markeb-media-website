@@ -1491,6 +1491,16 @@
   height: 100%;
   object-fit: cover;
   z-index: 0;
+  pointer-events: none; /* Prevents clicking on video */
+}
+
+/* Hide any browser video controls */
+.market-lookup-video::-webkit-media-controls {
+  display: none !important;
+}
+
+.market-lookup-video::-webkit-media-controls-enclosure {
+  display: none !important;
 }
 
 .market-lookup-container {
