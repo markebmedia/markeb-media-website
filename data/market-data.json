@@ -1,11 +1,26 @@
 {
-  "generatedAt": "2026-02-14T17:04:07.226Z",
+  "generatedAt": "2026-02-15T14:50:03.211Z",
   "dataPeriod": "Most Recent Quarter",
   "comparisonPeriod": "Year Ago Quarter",
-  "regions": {
+  "period": {
+    "current": {
+      "startMonth": 7,
+      "endMonth": 9,
+      "year": 2025,
+      "label": "Jul-Sep 2025"
+    },
+    "previous": {
+      "startMonth": 7,
+      "endMonth": 9,
+      "year": 2025,
+      "label": "Jul-Sep 2025"
+    }
+  },
+  "districts": {
     "Cheshire East": {
-      "region": "Cheshire East",
-      "lastUpdated": "2026-02-14T17:02:49.992Z",
+      "name": "Cheshire East",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:46.358Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 557665,
@@ -42,12 +57,13 @@
           "previousYearPrice": 564872
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Cheshire West and Chester": {
-      "region": "Cheshire West and Chester",
-      "lastUpdated": "2026-02-14T17:02:50.381Z",
+      "name": "Cheshire West and Chester",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:46.750Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 353763,
@@ -84,12 +100,13 @@
           "previousYearPrice": 159020
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Manchester": {
-      "region": "Manchester",
-      "lastUpdated": "2026-02-14T17:02:51.148Z",
+      "name": "Manchester",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:47.529Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 303114,
@@ -126,12 +143,13 @@
           "previousYearPrice": 203172
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Salford": {
-      "region": "Salford",
-      "lastUpdated": "2026-02-14T17:02:51.534Z",
+      "name": "Salford",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:47.919Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 264666,
@@ -168,12 +186,13 @@
           "previousYearPrice": 415692
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Bolton": {
-      "region": "Bolton",
-      "lastUpdated": "2026-02-14T17:02:51.912Z",
+      "name": "Bolton",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:48.300Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 234019,
@@ -210,12 +229,13 @@
           "previousYearPrice": 409443
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Bury": {
-      "region": "Bury",
-      "lastUpdated": "2026-02-14T17:02:52.292Z",
+      "name": "Bury",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:48.679Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 364489,
@@ -252,12 +272,13 @@
           "previousYearPrice": 528553
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Oldham": {
-      "region": "Oldham",
-      "lastUpdated": "2026-02-14T17:02:52.675Z",
+      "name": "Oldham",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:49.058Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 256751,
@@ -288,12 +309,13 @@
           "previousYearPrice": 240708
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Rochdale": {
-      "region": "Rochdale",
-      "lastUpdated": "2026-02-14T17:02:53.060Z",
+      "name": "Rochdale",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:49.439Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 230922,
@@ -330,12 +352,13 @@
           "previousYearPrice": 346307
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Stockport": {
-      "region": "Stockport",
-      "lastUpdated": "2026-02-14T17:02:53.446Z",
+      "name": "Stockport",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:49.819Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 439089,
@@ -372,12 +395,13 @@
           "previousYearPrice": 557937
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Tameside": {
-      "region": "Tameside",
-      "lastUpdated": "2026-02-14T17:02:53.832Z",
+      "name": "Tameside",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:50.201Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 237370,
@@ -414,12 +438,13 @@
           "previousYearPrice": 123242
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Trafford": {
-      "region": "Trafford",
-      "lastUpdated": "2026-02-14T17:02:54.219Z",
+      "name": "Trafford",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:50.582Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 491250,
@@ -456,12 +481,13 @@
           "previousYearPrice": 343951
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Wigan": {
-      "region": "Wigan",
-      "lastUpdated": "2026-02-14T17:02:54.594Z",
+      "name": "Wigan",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:50.955Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 224846,
@@ -498,12 +524,13 @@
           "previousYearPrice": 111858
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Lancashire": {
-      "region": "Lancashire",
-      "lastUpdated": "2026-02-14T17:02:54.974Z",
+      "name": "Lancashire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:51.331Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 235906,
@@ -540,12 +567,13 @@
           "previousYearPrice": 121455
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Merseyside": {
-      "region": "Merseyside",
-      "lastUpdated": "2026-02-14T17:02:55.355Z",
+      "name": "Merseyside",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:51.708Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 243481,
@@ -582,12 +610,13 @@
           "previousYearPrice": 401897
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Blackburn with Darwen": {
-      "region": "Blackburn with Darwen",
-      "lastUpdated": "2026-02-14T17:02:55.737Z",
+      "name": "Blackburn with Darwen",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:52.085Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 214407,
@@ -624,12 +653,13 @@
           "previousYearPrice": 93074
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Blackpool": {
-      "region": "Blackpool",
-      "lastUpdated": "2026-02-14T17:02:56.121Z",
+      "name": "Blackpool",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:52.462Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 154748,
@@ -666,12 +696,13 @@
           "previousYearPrice": 88924
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Halton": {
-      "region": "Halton",
-      "lastUpdated": "2026-02-14T17:02:56.500Z",
+      "name": "Halton",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:52.837Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 275638,
@@ -708,12 +739,13 @@
           "previousYearPrice": 273667
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Warrington": {
-      "region": "Warrington",
-      "lastUpdated": "2026-02-14T17:02:56.879Z",
+      "name": "Warrington",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:53.213Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 312838,
@@ -750,12 +782,13 @@
           "previousYearPrice": 450687
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "County Durham": {
-      "region": "County Durham",
-      "lastUpdated": "2026-02-14T17:02:57.258Z",
+      "name": "County Durham",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:53.589Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 155861,
@@ -792,12 +825,13 @@
           "previousYearPrice": 100277
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Northumberland": {
-      "region": "Northumberland",
-      "lastUpdated": "2026-02-14T17:02:57.640Z",
+      "name": "Northumberland",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:53.967Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 256003,
@@ -834,12 +868,13 @@
           "previousYearPrice": 222825
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Tyne and Wear": {
-      "region": "Tyne and Wear",
-      "lastUpdated": "2026-02-14T17:02:58.019Z",
+      "name": "Tyne and Wear",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:54.341Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 217506,
@@ -876,12 +911,13 @@
           "previousYearPrice": 343148
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "East Riding of Yorkshire": {
-      "region": "East Riding of Yorkshire",
-      "lastUpdated": "2026-02-14T17:02:58.399Z",
+      "name": "East Riding of Yorkshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:54.719Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 289487,
@@ -918,12 +954,13 @@
           "previousYearPrice": 163195
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "North Yorkshire": {
-      "region": "North Yorkshire",
-      "lastUpdated": "2026-02-14T17:02:58.776Z",
+      "name": "North Yorkshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:55.095Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 376581,
@@ -960,12 +997,13 @@
           "previousYearPrice": 288421
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Sheffield": {
-      "region": "Sheffield",
-      "lastUpdated": "2026-02-14T17:02:59.160Z",
+      "name": "Sheffield",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:55.481Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 268383,
@@ -1002,12 +1040,13 @@
           "previousYearPrice": 413549
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Doncaster": {
-      "region": "Doncaster",
-      "lastUpdated": "2026-02-14T17:02:59.544Z",
+      "name": "Doncaster",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:55.860Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 244201,
@@ -1038,12 +1077,13 @@
           "previousYearPrice": 168722
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Rotherham": {
-      "region": "Rotherham",
-      "lastUpdated": "2026-02-14T17:02:59.927Z",
+      "name": "Rotherham",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:56.240Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 304557,
@@ -1080,12 +1120,13 @@
           "previousYearPrice": 166669
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Barnsley": {
-      "region": "Barnsley",
-      "lastUpdated": "2026-02-14T17:03:00.312Z",
+      "name": "Barnsley",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:56.618Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 211750,
@@ -1122,12 +1163,13 @@
           "previousYearPrice": 319509
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Leeds": {
-      "region": "Leeds",
-      "lastUpdated": "2026-02-14T17:03:00.691Z",
+      "name": "Leeds",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:56.994Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 297859,
@@ -1164,12 +1206,13 @@
           "previousYearPrice": 168553
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Bradford": {
-      "region": "Bradford",
-      "lastUpdated": "2026-02-14T17:03:01.076Z",
+      "name": "Bradford",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:57.372Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 242011,
@@ -1206,12 +1249,13 @@
           "previousYearPrice": 387237
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Wakefield": {
-      "region": "Wakefield",
-      "lastUpdated": "2026-02-14T17:03:01.498Z",
+      "name": "Wakefield",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:57.757Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 225788,
@@ -1248,12 +1292,13 @@
           "previousYearPrice": 115536
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Kirklees": {
-      "region": "Kirklees",
-      "lastUpdated": "2026-02-14T17:03:01.878Z",
+      "name": "Kirklees",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:58.142Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 248339,
@@ -1290,12 +1335,13 @@
           "previousYearPrice": 113700
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Calderdale": {
-      "region": "Calderdale",
-      "lastUpdated": "2026-02-14T17:03:02.261Z",
+      "name": "Calderdale",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:58.529Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 290559,
@@ -1326,12 +1372,13 @@
           "previousYearPrice": 438414
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "York": {
-      "region": "York",
-      "lastUpdated": "2026-02-14T17:03:02.634Z",
+      "name": "York",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:58.909Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 274273,
@@ -1368,12 +1415,13 @@
           "previousYearPrice": 159377
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Derby": {
-      "region": "Derby",
-      "lastUpdated": "2026-02-14T17:03:03.009Z",
+      "name": "Derby",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:59.290Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 266305,
@@ -1410,12 +1458,13 @@
           "previousYearPrice": 375819
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Derbyshire": {
-      "region": "Derbyshire",
-      "lastUpdated": "2026-02-14T17:03:03.388Z",
+      "name": "Derbyshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:47:59.674Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 272003,
@@ -1452,12 +1501,13 @@
           "previousYearPrice": 162705
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Leicester": {
-      "region": "Leicester",
-      "lastUpdated": "2026-02-14T17:03:03.767Z",
+      "name": "Leicester",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:00.057Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 319086,
@@ -1494,12 +1544,13 @@
           "previousYearPrice": 133426
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Leicestershire": {
-      "region": "Leicestershire",
-      "lastUpdated": "2026-02-14T17:03:04.147Z",
+      "name": "Leicestershire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:00.439Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 319086,
@@ -1536,12 +1587,13 @@
           "previousYearPrice": 133426
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Lincolnshire": {
-      "region": "Lincolnshire",
-      "lastUpdated": "2026-02-14T17:03:04.525Z",
+      "name": "Lincolnshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:00.813Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 236080,
@@ -1578,12 +1630,13 @@
           "previousYearPrice": 142684
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Northamptonshire": {
-      "region": "Northamptonshire",
-      "lastUpdated": "2026-02-14T17:03:04.906Z",
+      "name": "Northamptonshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:01.189Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 341064,
@@ -1620,12 +1673,13 @@
           "previousYearPrice": 443971
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Nottingham": {
-      "region": "Nottingham",
-      "lastUpdated": "2026-02-14T17:03:05.288Z",
+      "name": "Nottingham",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:01.565Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 285312,
@@ -1662,12 +1716,13 @@
           "previousYearPrice": 370604
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Nottinghamshire": {
-      "region": "Nottinghamshire",
-      "lastUpdated": "2026-02-14T17:03:05.669Z",
+      "name": "Nottinghamshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:01.942Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 305940,
@@ -1704,12 +1759,13 @@
           "previousYearPrice": 130351
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Rutland": {
-      "region": "Rutland",
-      "lastUpdated": "2026-02-14T17:03:06.056Z",
+      "name": "Rutland",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:02.325Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 472500,
@@ -1746,12 +1802,13 @@
           "previousYearPrice": 142000
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Herefordshire": {
-      "region": "Herefordshire",
-      "lastUpdated": "2026-02-14T17:03:06.437Z",
+      "name": "Herefordshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:02.700Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 336404,
@@ -1788,12 +1845,13 @@
           "previousYearPrice": 141749
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Shropshire": {
-      "region": "Shropshire",
-      "lastUpdated": "2026-02-14T17:03:06.833Z",
+      "name": "Shropshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:03.078Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 350577,
@@ -1830,12 +1888,13 @@
           "previousYearPrice": 436344
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Staffordshire": {
-      "region": "Staffordshire",
-      "lastUpdated": "2026-02-14T17:03:07.215Z",
+      "name": "Staffordshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:03.457Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 303264,
@@ -1872,12 +1931,13 @@
           "previousYearPrice": 410661
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Stoke-on-Trent": {
-      "region": "Stoke-on-Trent",
-      "lastUpdated": "2026-02-14T17:03:07.597Z",
+      "name": "Stoke-on-Trent",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:03.835Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 206427,
@@ -1914,12 +1974,13 @@
           "previousYearPrice": 91535
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Telford and Wrekin": {
-      "region": "Telford and Wrekin",
-      "lastUpdated": "2026-02-14T17:03:07.979Z",
+      "name": "Telford and Wrekin",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:04.210Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 269453,
@@ -1956,12 +2017,13 @@
           "previousYearPrice": 96598
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Warwickshire": {
-      "region": "Warwickshire",
-      "lastUpdated": "2026-02-14T17:03:08.361Z",
+      "name": "Warwickshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:04.584Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 418520,
@@ -1998,12 +2060,13 @@
           "previousYearPrice": 514331
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Birmingham": {
-      "region": "Birmingham",
-      "lastUpdated": "2026-02-14T17:03:08.742Z",
+      "name": "Birmingham",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:04.961Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 307721,
@@ -2040,12 +2103,13 @@
           "previousYearPrice": 152399
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Coventry": {
-      "region": "Coventry",
-      "lastUpdated": "2026-02-14T17:03:09.127Z",
+      "name": "Coventry",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:05.344Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 250611,
@@ -2082,12 +2146,13 @@
           "previousYearPrice": 128815
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Dudley": {
-      "region": "Dudley",
-      "lastUpdated": "2026-02-14T17:03:09.506Z",
+      "name": "Dudley",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:05.722Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 287396,
@@ -2124,12 +2189,13 @@
           "previousYearPrice": 125170
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Sandwell": {
-      "region": "Sandwell",
-      "lastUpdated": "2026-02-14T17:03:09.891Z",
+      "name": "Sandwell",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:06.109Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 232630,
@@ -2166,12 +2232,13 @@
           "previousYearPrice": 311045
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Solihull": {
-      "region": "Solihull",
-      "lastUpdated": "2026-02-14T17:03:10.278Z",
+      "name": "Solihull",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:06.492Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 461069,
@@ -2208,12 +2275,13 @@
           "previousYearPrice": 180925
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Walsall": {
-      "region": "Walsall",
-      "lastUpdated": "2026-02-14T17:03:10.662Z",
+      "name": "Walsall",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:06.873Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 232984,
@@ -2250,12 +2318,13 @@
           "previousYearPrice": 389225
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Wolverhampton": {
-      "region": "Wolverhampton",
-      "lastUpdated": "2026-02-14T17:03:11.043Z",
+      "name": "Wolverhampton",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:07.249Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 294264,
@@ -2292,12 +2361,13 @@
           "previousYearPrice": 393208
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Worcestershire": {
-      "region": "Worcestershire",
-      "lastUpdated": "2026-02-14T17:03:11.426Z",
+      "name": "Worcestershire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:07.629Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 355553,
@@ -2334,12 +2404,13 @@
           "previousYearPrice": 161337
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Bedford": {
-      "region": "Bedford",
-      "lastUpdated": "2026-02-14T17:03:11.812Z",
+      "name": "Bedford",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:08.011Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 445539,
@@ -2376,12 +2447,13 @@
           "previousYearPrice": 374505
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Cambridgeshire": {
-      "region": "Cambridgeshire",
-      "lastUpdated": "2026-02-14T17:03:12.194Z",
+      "name": "Cambridgeshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:08.391Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 501301,
@@ -2418,12 +2490,13 @@
           "previousYearPrice": 341974
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Central Bedfordshire": {
-      "region": "Central Bedfordshire",
-      "lastUpdated": "2026-02-14T17:03:12.575Z",
+      "name": "Central Bedfordshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:08.771Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 445539,
@@ -2460,12 +2533,13 @@
           "previousYearPrice": 374505
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Basildon": {
-      "region": "Basildon",
-      "lastUpdated": "2026-02-14T17:03:12.957Z",
+      "name": "Basildon",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:09.150Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 405435,
@@ -2502,12 +2576,13 @@
           "previousYearPrice": 423957
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Braintree": {
-      "region": "Braintree",
-      "lastUpdated": "2026-02-14T17:03:13.339Z",
+      "name": "Braintree",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:09.528Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 423223,
@@ -2544,12 +2619,13 @@
           "previousYearPrice": 157028
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Brentwood": {
-      "region": "Brentwood",
-      "lastUpdated": "2026-02-14T17:03:13.722Z",
+      "name": "Brentwood",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:09.906Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 964728,
@@ -2586,12 +2662,13 @@
           "previousYearPrice": 699546
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Castle Point": {
-      "region": "Castle Point",
-      "lastUpdated": "2026-02-14T17:03:14.101Z",
+      "name": "Castle Point",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:10.283Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 544208,
@@ -2628,12 +2705,13 @@
           "previousYearPrice": 213339
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Chelmsford": {
-      "region": "Chelmsford",
-      "lastUpdated": "2026-02-14T17:03:14.484Z",
+      "name": "Chelmsford",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:10.662Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 456538,
@@ -2670,12 +2748,13 @@
           "previousYearPrice": 678664
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Colchester": {
-      "region": "Colchester",
-      "lastUpdated": "2026-02-14T17:03:14.866Z",
+      "name": "Colchester",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:11.040Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 336842,
@@ -2712,12 +2791,13 @@
           "previousYearPrice": 173547
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Epping Forest": {
-      "region": "Epping Forest",
-      "lastUpdated": "2026-02-14T17:03:15.247Z",
+      "name": "Epping Forest",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:11.416Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 737955,
@@ -2754,12 +2834,13 @@
           "previousYearPrice": 990219
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Harlow": {
-      "region": "Harlow",
-      "lastUpdated": "2026-02-14T17:03:15.625Z",
+      "name": "Harlow",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:11.790Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 347817,
@@ -2790,12 +2871,13 @@
           "previousYearPrice": 206766
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Maldon": {
-      "region": "Maldon",
-      "lastUpdated": "2026-02-14T17:03:15.999Z",
+      "name": "Maldon",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:12.162Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 486659,
@@ -2832,12 +2914,13 @@
           "previousYearPrice": 307044
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Rochford": {
-      "region": "Rochford",
-      "lastUpdated": "2026-02-14T17:03:16.383Z",
+      "name": "Rochford",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:12.543Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 503529,
@@ -2874,12 +2957,13 @@
           "previousYearPrice": 214615
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Tendring": {
-      "region": "Tendring",
-      "lastUpdated": "2026-02-14T17:03:16.769Z",
+      "name": "Tendring",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:12.925Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 318480,
@@ -2916,12 +3000,13 @@
           "previousYearPrice": 171981
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Uttlesford": {
-      "region": "Uttlesford",
-      "lastUpdated": "2026-02-14T17:03:17.149Z",
+      "name": "Uttlesford",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:13.301Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 656643,
@@ -2958,12 +3043,13 @@
           "previousYearPrice": 461210
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Southend-on-Sea": {
-      "region": "Southend-on-Sea",
-      "lastUpdated": "2026-02-14T17:03:17.533Z",
+      "name": "Southend-on-Sea",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:13.678Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 461793,
@@ -3000,12 +3086,13 @@
           "previousYearPrice": 612055
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Thurrock": {
-      "region": "Thurrock",
-      "lastUpdated": "2026-02-14T17:03:17.921Z",
+      "name": "Thurrock",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:14.060Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 362109,
@@ -3042,12 +3129,13 @@
           "previousYearPrice": 196595
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Hertfordshire": {
-      "region": "Hertfordshire",
-      "lastUpdated": "2026-02-14T17:03:18.304Z",
+      "name": "Hertfordshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:14.438Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 668297,
@@ -3084,12 +3172,13 @@
           "previousYearPrice": 898132
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Norfolk": {
-      "region": "Norfolk",
-      "lastUpdated": "2026-02-14T17:03:18.689Z",
+      "name": "Norfolk",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:14.821Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 343406,
@@ -3126,12 +3215,13 @@
           "previousYearPrice": 264630
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Peterborough": {
-      "region": "Peterborough",
-      "lastUpdated": "2026-02-14T17:03:19.065Z",
+      "name": "Peterborough",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:15.195Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 393364,
@@ -3168,12 +3258,13 @@
           "previousYearPrice": 128087
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Suffolk": {
-      "region": "Suffolk",
-      "lastUpdated": "2026-02-14T17:03:19.450Z",
+      "name": "Suffolk",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:15.577Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 359894,
@@ -3210,12 +3301,13 @@
           "previousYearPrice": 452544
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Berkshire": {
-      "region": "Berkshire",
-      "lastUpdated": "2026-02-14T17:03:19.832Z",
+      "name": "Berkshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:15.954Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 522651,
@@ -3252,12 +3344,13 @@
           "previousYearPrice": 224791
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Brighton and Hove": {
-      "region": "Brighton and Hove",
-      "lastUpdated": "2026-02-14T17:03:20.212Z",
+      "name": "Brighton and Hove",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:16.329Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 547728,
@@ -3294,12 +3387,13 @@
           "previousYearPrice": 559172
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Buckinghamshire": {
-      "region": "Buckinghamshire",
-      "lastUpdated": "2026-02-14T17:03:20.594Z",
+      "name": "Buckinghamshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:16.704Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 732675,
@@ -3336,12 +3430,13 @@
           "previousYearPrice": 494275
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "East Sussex": {
-      "region": "East Sussex",
-      "lastUpdated": "2026-02-14T17:03:20.975Z",
+      "name": "East Sussex",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:17.081Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 439939,
@@ -3378,12 +3473,13 @@
           "previousYearPrice": 553434
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Hampshire": {
-      "region": "Hampshire",
-      "lastUpdated": "2026-02-14T17:03:21.358Z",
+      "name": "Hampshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:17.459Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 485213,
@@ -3420,12 +3516,13 @@
           "previousYearPrice": 392325
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Isle of Wight": {
-      "region": "Isle of Wight",
-      "lastUpdated": "2026-02-14T17:03:21.737Z",
+      "name": "Isle of Wight",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:17.835Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 287021,
@@ -3462,12 +3559,13 @@
           "previousYearPrice": 226518
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Kent": {
-      "region": "Kent",
-      "lastUpdated": "2026-02-14T17:03:22.109Z",
+      "name": "Kent",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:18.204Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 515885,
@@ -3504,12 +3602,13 @@
           "previousYearPrice": 622428
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Medway": {
-      "region": "Medway",
-      "lastUpdated": "2026-02-14T17:03:22.485Z",
+      "name": "Medway",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:18.576Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 334200,
@@ -3546,12 +3645,13 @@
           "previousYearPrice": 499751
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Oxfordshire": {
-      "region": "Oxfordshire",
-      "lastUpdated": "2026-02-14T17:03:22.865Z",
+      "name": "Oxfordshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:18.951Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 578478,
@@ -3588,12 +3688,13 @@
           "previousYearPrice": 267915
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Portsmouth": {
-      "region": "Portsmouth",
-      "lastUpdated": "2026-02-14T17:03:23.247Z",
+      "name": "Portsmouth",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:19.327Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 273750,
@@ -3624,12 +3725,13 @@
           "previousYearPrice": 363023
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Southampton": {
-      "region": "Southampton",
-      "lastUpdated": "2026-02-14T17:03:23.628Z",
+      "name": "Southampton",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:19.713Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 396599,
@@ -3666,12 +3768,13 @@
           "previousYearPrice": 287763
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Surrey": {
-      "region": "Surrey",
-      "lastUpdated": "2026-02-14T17:03:24.009Z",
+      "name": "Surrey",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:20.096Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 815493,
@@ -3708,12 +3811,13 @@
           "previousYearPrice": 304632
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "West Sussex": {
-      "region": "West Sussex",
-      "lastUpdated": "2026-02-14T17:03:24.390Z",
+      "name": "West Sussex",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:20.482Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 505194,
@@ -3750,12 +3854,13 @@
           "previousYearPrice": 676663
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Bath and North East Somerset": {
-      "region": "Bath and North East Somerset",
-      "lastUpdated": "2026-02-14T17:03:24.777Z",
+      "name": "Bath and North East Somerset",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:20.871Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 353574,
@@ -3792,12 +3897,13 @@
           "previousYearPrice": 333411
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Bristol": {
-      "region": "Bristol",
-      "lastUpdated": "2026-02-14T17:03:25.550Z",
+      "name": "Bristol",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:21.641Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 416661,
@@ -3834,12 +3940,13 @@
           "previousYearPrice": 575730
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Cornwall": {
-      "region": "Cornwall",
-      "lastUpdated": "2026-02-14T17:03:25.932Z",
+      "name": "Cornwall",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:22.026Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 411671,
@@ -3876,12 +3983,13 @@
           "previousYearPrice": 257702
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Devon": {
-      "region": "Devon",
-      "lastUpdated": "2026-02-14T17:03:26.310Z",
+      "name": "Devon",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:22.399Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 397977,
@@ -3918,12 +4026,13 @@
           "previousYearPrice": 200940
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Dorset": {
-      "region": "Dorset",
-      "lastUpdated": "2026-02-14T17:03:26.687Z",
+      "name": "Dorset",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:22.770Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 428471,
@@ -3960,12 +4069,13 @@
           "previousYearPrice": 537236
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Gloucestershire": {
-      "region": "Gloucestershire",
-      "lastUpdated": "2026-02-14T17:03:27.072Z",
+      "name": "Gloucestershire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:23.148Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 427556,
@@ -4002,12 +4112,13 @@
           "previousYearPrice": 579848
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "North Somerset": {
-      "region": "North Somerset",
-      "lastUpdated": "2026-02-14T17:03:27.454Z",
+      "name": "North Somerset",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:23.527Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 330559,
@@ -4044,12 +4155,13 @@
           "previousYearPrice": 306332
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Plymouth": {
-      "region": "Plymouth",
-      "lastUpdated": "2026-02-14T17:03:27.836Z",
+      "name": "Plymouth",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:23.904Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 312070,
@@ -4086,12 +4198,13 @@
           "previousYearPrice": 269899
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Somerset": {
-      "region": "Somerset",
-      "lastUpdated": "2026-02-14T17:03:28.223Z",
+      "name": "Somerset",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:24.285Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 350148,
@@ -4128,12 +4241,13 @@
           "previousYearPrice": 336077
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "South Gloucestershire": {
-      "region": "South Gloucestershire",
-      "lastUpdated": "2026-02-14T17:03:28.609Z",
+      "name": "South Gloucestershire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:24.667Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 427556,
@@ -4170,12 +4284,13 @@
           "previousYearPrice": 579848
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Swindon": {
-      "region": "Swindon",
-      "lastUpdated": "2026-02-14T17:03:28.994Z",
+      "name": "Swindon",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:25.049Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 326164,
@@ -4212,12 +4327,13 @@
           "previousYearPrice": 478910
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Torbay": {
-      "region": "Torbay",
-      "lastUpdated": "2026-02-14T17:03:29.375Z",
+      "name": "Torbay",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:25.426Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 306572,
@@ -4254,12 +4370,13 @@
           "previousYearPrice": 231824
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Wiltshire": {
-      "region": "Wiltshire",
-      "lastUpdated": "2026-02-14T17:03:29.757Z",
+      "name": "Wiltshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:25.809Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 423761,
@@ -4296,12 +4413,13 @@
           "previousYearPrice": 531192
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "City of London": {
-      "region": "City of London",
-      "lastUpdated": "2026-02-14T17:03:30.156Z",
+      "name": "City of London",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:26.185Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 933333,
@@ -4320,12 +4438,13 @@
           "previousYearPrice": 807250
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Barking and Dagenham": {
-      "region": "Barking and Dagenham",
-      "lastUpdated": "2026-02-14T17:03:30.536Z",
+      "name": "Barking and Dagenham",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:26.563Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 358000,
@@ -4356,12 +4475,13 @@
           "previousYearPrice": 436303
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Barnet": {
-      "region": "Barnet",
-      "lastUpdated": "2026-02-14T17:03:30.913Z",
+      "name": "Barnet",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:26.936Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 953453,
@@ -4398,12 +4518,13 @@
           "previousYearPrice": 713203
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Bexley": {
-      "region": "Bexley",
-      "lastUpdated": "2026-02-14T17:03:31.288Z",
+      "name": "Bexley",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:27.309Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 488491,
@@ -4440,12 +4561,13 @@
           "previousYearPrice": 674982
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Brent": {
-      "region": "Brent",
-      "lastUpdated": "2026-02-14T17:03:31.664Z",
+      "name": "Brent",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:27.682Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 954924,
@@ -4482,12 +4604,13 @@
           "previousYearPrice": 697774
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Bromley": {
-      "region": "Bromley",
-      "lastUpdated": "2026-02-14T17:03:32.049Z",
+      "name": "Bromley",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:28.064Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 629540,
@@ -4524,12 +4647,13 @@
           "previousYearPrice": 930673
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Camden": {
-      "region": "Camden",
-      "lastUpdated": "2026-02-14T17:03:32.428Z",
+      "name": "Camden",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:28.438Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 1304269,
@@ -4566,12 +4690,13 @@
           "previousYearPrice": 2686042
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Croydon": {
-      "region": "Croydon",
-      "lastUpdated": "2026-02-14T17:03:32.815Z",
+      "name": "Croydon",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:28.819Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 490261,
@@ -4608,12 +4733,13 @@
           "previousYearPrice": 740747
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Ealing": {
-      "region": "Ealing",
-      "lastUpdated": "2026-02-14T17:03:33.200Z",
+      "name": "Ealing",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:29.198Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 813474,
@@ -4650,12 +4776,13 @@
           "previousYearPrice": 1697507
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Enfield": {
-      "region": "Enfield",
-      "lastUpdated": "2026-02-14T17:03:33.589Z",
+      "name": "Enfield",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:29.582Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 651419,
@@ -4692,12 +4819,13 @@
           "previousYearPrice": 713729
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Greenwich": {
-      "region": "Greenwich",
-      "lastUpdated": "2026-02-14T17:03:33.968Z",
+      "name": "Greenwich",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:29.960Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 541190,
@@ -4734,12 +4862,13 @@
           "previousYearPrice": 702286
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Hackney": {
-      "region": "Hackney",
-      "lastUpdated": "2026-02-14T17:03:34.357Z",
+      "name": "Hackney",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:30.341Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 886637,
@@ -4770,12 +4899,13 @@
           "previousYearPrice": 1853750
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Hammersmith and Fulham": {
-      "region": "Hammersmith and Fulham",
-      "lastUpdated": "2026-02-14T17:03:34.739Z",
+      "name": "Hammersmith and Fulham",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:30.719Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 1307989,
@@ -4812,12 +4942,13 @@
           "previousYearPrice": 1960000
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Haringey": {
-      "region": "Haringey",
-      "lastUpdated": "2026-02-14T17:03:35.123Z",
+      "name": "Haringey",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:31.099Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 1081620,
@@ -4854,12 +4985,13 @@
           "previousYearPrice": 485542
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Harrow": {
-      "region": "Harrow",
-      "lastUpdated": "2026-02-14T17:03:35.503Z",
+      "name": "Harrow",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:31.474Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 742479,
@@ -4896,12 +5028,13 @@
           "previousYearPrice": 331495
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Havering": {
-      "region": "Havering",
-      "lastUpdated": "2026-02-14T17:03:35.886Z",
+      "name": "Havering",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:31.854Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 509048,
@@ -4938,12 +5071,13 @@
           "previousYearPrice": 751269
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Hillingdon": {
-      "region": "Hillingdon",
-      "lastUpdated": "2026-02-14T17:03:36.268Z",
+      "name": "Hillingdon",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:32.232Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 558931,
@@ -4980,12 +5114,13 @@
           "previousYearPrice": 574795
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Hounslow": {
-      "region": "Hounslow",
-      "lastUpdated": "2026-02-14T17:03:36.653Z",
+      "name": "Hounslow",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:32.612Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 953906,
@@ -5022,12 +5157,13 @@
           "previousYearPrice": 1283750
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Islington": {
-      "region": "Islington",
-      "lastUpdated": "2026-02-14T17:03:37.036Z",
+      "name": "Islington",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:32.991Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 1248936,
@@ -5058,12 +5194,13 @@
           "previousYearPrice": 633580
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Kensington and Chelsea": {
-      "region": "Kensington and Chelsea",
-      "lastUpdated": "2026-02-14T17:03:37.420Z",
+      "name": "Kensington and Chelsea",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:33.370Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 1732066,
@@ -5088,12 +5225,13 @@
           "previousYearPrice": 4208576
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Kingston upon Thames": {
-      "region": "Kingston upon Thames",
-      "lastUpdated": "2026-02-14T17:03:37.804Z",
+      "name": "Kingston upon Thames",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:33.746Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 926593,
@@ -5130,12 +5268,13 @@
           "previousYearPrice": 1320229
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Lambeth": {
-      "region": "Lambeth",
-      "lastUpdated": "2026-02-14T17:03:38.191Z",
+      "name": "Lambeth",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:34.128Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 914944,
@@ -5172,12 +5311,13 @@
           "previousYearPrice": 1574667
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Lewisham": {
-      "region": "Lewisham",
-      "lastUpdated": "2026-02-14T17:03:38.576Z",
+      "name": "Lewisham",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:34.507Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 703456,
@@ -5214,12 +5354,13 @@
           "previousYearPrice": 896647
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Merton": {
-      "region": "Merton",
-      "lastUpdated": "2026-02-14T17:03:38.955Z",
+      "name": "Merton",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:34.879Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 1257678,
@@ -5256,12 +5397,13 @@
           "previousYearPrice": 838935
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Newham": {
-      "region": "Newham",
-      "lastUpdated": "2026-02-14T17:03:39.337Z",
+      "name": "Newham",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:35.253Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 482536,
@@ -5292,12 +5434,13 @@
           "previousYearPrice": 579556
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Redbridge": {
-      "region": "Redbridge",
-      "lastUpdated": "2026-02-14T17:03:39.722Z",
+      "name": "Redbridge",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:35.633Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 634537,
@@ -5334,12 +5477,13 @@
           "previousYearPrice": 1208490
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Richmond upon Thames": {
-      "region": "Richmond upon Thames",
-      "lastUpdated": "2026-02-14T17:03:40.103Z",
+      "name": "Richmond upon Thames",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:36.011Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 1175525,
@@ -5376,12 +5520,13 @@
           "previousYearPrice": 2500019
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Southwark": {
-      "region": "Southwark",
-      "lastUpdated": "2026-02-14T17:03:40.487Z",
+      "name": "Southwark",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:36.391Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 868381,
@@ -5418,12 +5563,13 @@
           "previousYearPrice": 1867083
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Sutton": {
-      "region": "Sutton",
-      "lastUpdated": "2026-02-14T17:03:40.868Z",
+      "name": "Sutton",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:36.768Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 558233,
@@ -5460,12 +5606,13 @@
           "previousYearPrice": 459129
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Tower Hamlets": {
-      "region": "Tower Hamlets",
-      "lastUpdated": "2026-02-14T17:03:41.275Z",
+      "name": "Tower Hamlets",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:37.144Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 715049,
@@ -5490,12 +5637,13 @@
           "previousYearPrice": 833497
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Waltham Forest": {
-      "region": "Waltham Forest",
-      "lastUpdated": "2026-02-14T17:03:41.657Z",
+      "name": "Waltham Forest",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:37.525Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 584601,
@@ -5532,12 +5680,13 @@
           "previousYearPrice": 740395
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Wandsworth": {
-      "region": "Wandsworth",
-      "lastUpdated": "2026-02-14T17:03:42.036Z",
+      "name": "Wandsworth",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:37.903Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 1303782,
@@ -5574,12 +5723,13 @@
           "previousYearPrice": 1622981
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Westminster": {
-      "region": "Westminster",
-      "lastUpdated": "2026-02-14T17:03:42.416Z",
+      "name": "Westminster",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:38.280Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 1881296,
@@ -5610,12 +5760,13 @@
           "previousYearPrice": 6750000
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Blaenau Gwent": {
-      "region": "Blaenau Gwent",
-      "lastUpdated": "2026-02-14T17:03:55.000Z",
+      "name": "Blaenau Gwent",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:50.812Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 117078,
@@ -5640,12 +5791,13 @@
           "previousYearPrice": 120276
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Bridgend": {
-      "region": "Bridgend",
-      "lastUpdated": "2026-02-14T17:03:55.385Z",
+      "name": "Bridgend",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:51.194Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 280115,
@@ -5682,12 +5834,13 @@
           "previousYearPrice": 191667
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Caerphilly": {
-      "region": "Caerphilly",
-      "lastUpdated": "2026-02-14T17:03:55.766Z",
+      "name": "Caerphilly",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:51.576Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 210838,
@@ -5724,12 +5877,13 @@
           "previousYearPrice": 127350
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Cardiff": {
-      "region": "Cardiff",
-      "lastUpdated": "2026-02-14T17:03:56.154Z",
+      "name": "Cardiff",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:51.964Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 416664,
@@ -5766,12 +5920,13 @@
           "previousYearPrice": 544486
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Carmarthenshire": {
-      "region": "Carmarthenshire",
-      "lastUpdated": "2026-02-14T17:03:56.536Z",
+      "name": "Carmarthenshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:52.346Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 210409,
@@ -5808,12 +5963,13 @@
           "previousYearPrice": 145111
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Ceredigion": {
-      "region": "Ceredigion",
-      "lastUpdated": "2026-02-14T17:03:56.917Z",
+      "name": "Ceredigion",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:52.729Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 273906,
@@ -5844,12 +6000,13 @@
           "previousYearPrice": 183220
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Conwy": {
-      "region": "Conwy",
-      "lastUpdated": "2026-02-14T17:03:57.297Z",
+      "name": "Conwy",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:53.108Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 270234,
@@ -5886,12 +6043,13 @@
           "previousYearPrice": 163047
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Denbighshire": {
-      "region": "Denbighshire",
-      "lastUpdated": "2026-02-14T17:03:57.674Z",
+      "name": "Denbighshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:53.485Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 202375,
@@ -5928,12 +6086,13 @@
           "previousYearPrice": 103519
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Flintshire": {
-      "region": "Flintshire",
-      "lastUpdated": "2026-02-14T17:03:58.051Z",
+      "name": "Flintshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:53.862Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 259240,
@@ -5970,12 +6129,13 @@
           "previousYearPrice": 161966
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Gwynedd": {
-      "region": "Gwynedd",
-      "lastUpdated": "2026-02-14T17:03:58.434Z",
+      "name": "Gwynedd",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:54.241Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 292320,
@@ -6012,12 +6172,13 @@
           "previousYearPrice": 120813
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Isle of Anglesey": {
-      "region": "Isle of Anglesey",
-      "lastUpdated": "2026-02-14T17:03:58.813Z",
+      "name": "Isle of Anglesey",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:54.616Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 230286,
@@ -6048,12 +6209,13 @@
           "previousYearPrice": 354178
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Merthyr Tydfil": {
-      "region": "Merthyr Tydfil",
-      "lastUpdated": "2026-02-14T17:03:59.194Z",
+      "name": "Merthyr Tydfil",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:54.992Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 188738,
@@ -6084,12 +6246,13 @@
           "previousYearPrice": 284115
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Monmouthshire": {
-      "region": "Monmouthshire",
-      "lastUpdated": "2026-02-14T17:03:59.573Z",
+      "name": "Monmouthshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:55.368Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 438801,
@@ -6126,12 +6289,13 @@
           "previousYearPrice": 254902
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Neath Port Talbot": {
-      "region": "Neath Port Talbot",
-      "lastUpdated": "2026-02-14T17:03:59.952Z",
+      "name": "Neath Port Talbot",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:55.746Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 169833,
@@ -6162,12 +6326,13 @@
           "previousYearPrice": 270551
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Newport": {
-      "region": "Newport",
-      "lastUpdated": "2026-02-14T17:04:00.343Z",
+      "name": "Newport",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:56.132Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 288241,
@@ -6204,12 +6369,13 @@
           "previousYearPrice": 408921
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Pembrokeshire": {
-      "region": "Pembrokeshire",
-      "lastUpdated": "2026-02-14T17:04:00.724Z",
+      "name": "Pembrokeshire",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:56.508Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 340217,
@@ -6246,12 +6412,13 @@
           "previousYearPrice": 174250
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Powys": {
-      "region": "Powys",
-      "lastUpdated": "2026-02-14T17:04:01.100Z",
+      "name": "Powys",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:56.877Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 375259,
@@ -6288,12 +6455,13 @@
           "previousYearPrice": 158383
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Rhondda Cynon Taf": {
-      "region": "Rhondda Cynon Taf",
-      "lastUpdated": "2026-02-14T17:04:01.483Z",
+      "name": "Rhondda Cynon Taf",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:57.253Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 166618,
@@ -6330,12 +6498,13 @@
           "previousYearPrice": 330966
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Swansea": {
-      "region": "Swansea",
-      "lastUpdated": "2026-02-14T17:04:01.870Z",
+      "name": "Swansea",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:57.636Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 223486,
@@ -6372,12 +6541,13 @@
           "previousYearPrice": 145969
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Torfaen": {
-      "region": "Torfaen",
-      "lastUpdated": "2026-02-14T17:04:02.259Z",
+      "name": "Torfaen",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:58.020Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 224191,
@@ -6408,12 +6578,13 @@
           "previousYearPrice": 340000
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Vale of Glamorgan": {
-      "region": "Vale of Glamorgan",
-      "lastUpdated": "2026-02-14T17:04:02.637Z",
+      "name": "Vale of Glamorgan",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:58.393Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 448948,
@@ -6450,12 +6621,13 @@
           "previousYearPrice": 184964
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
     },
     "Wrexham": {
-      "region": "Wrexham",
-      "lastUpdated": "2026-02-14T17:04:03.018Z",
+      "name": "Wrexham",
+      "tier": "DISTRICT",
+      "lastUpdated": "2026-02-15T14:48:58.774Z",
       "dataPeriod": "Most Recent Quarter",
       "snapshot": {
         "averagePrice": 336682,
@@ -6492,8 +6664,2523 @@
           "previousYearPrice": 108605
         }
       },
-      "dataSource": "HM Land Registry Price Paid Data (Most Recent Quarter vs Year Ago)",
+      "dataSource": "HM Land Registry Price Paid Data (DISTRICT - Most Recent Quarter vs Year Ago)",
       "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales."
+    }
+  },
+  "subRegions": {
+    "SOUTH YORKSHIRE": {
+      "name": "SOUTH YORKSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:03.844Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 267631,
+        "momChange": 0,
+        "yoyChange": 19.1,
+        "totalTransactions": 292,
+        "transactionChange": -92.6,
+        "previousYearPrice": 224658,
+        "previousYearTransactions": 3936
+      },
+      "propertyTypes": {
+        "Detached": {
+          "averagePrice": 452244,
+          "transactions": 79,
+          "yoyChange": 19.9,
+          "previousYearPrice": 377114
+        },
+        "Terraced": {
+          "averagePrice": 172453,
+          "transactions": 79,
+          "yoyChange": 8.3,
+          "previousYearPrice": 159306
+        },
+        "Semi-detached": {
+          "averagePrice": 223016,
+          "transactions": 116,
+          "yoyChange": 10.7,
+          "previousYearPrice": 201420
+        },
+        "Flats": {
+          "averagePrice": 162634,
+          "transactions": 18,
+          "yoyChange": 8.8,
+          "previousYearPrice": 149458
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Sheffield",
+        "Doncaster",
+        "Rotherham",
+        "Barnsley"
+      ]
+    },
+    "WEST YORKSHIRE": {
+      "name": "WEST YORKSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:04.861Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 263363,
+        "momChange": 0,
+        "yoyChange": 10.1,
+        "totalTransactions": 442,
+        "transactionChange": -93.6,
+        "previousYearPrice": 239154,
+        "previousYearTransactions": 6883
+      },
+      "propertyTypes": {
+        "Semi-detached": {
+          "averagePrice": 252068,
+          "transactions": 162,
+          "yoyChange": 4.3,
+          "previousYearPrice": 241634
+        },
+        "Detached": {
+          "averagePrice": 452222,
+          "transactions": 91,
+          "yoyChange": 9,
+          "previousYearPrice": 414939
+        },
+        "Terraced": {
+          "averagePrice": 181868,
+          "transactions": 145,
+          "yoyChange": 3.5,
+          "previousYearPrice": 175786
+        },
+        "Flats": {
+          "averagePrice": 182913,
+          "transactions": 44,
+          "yoyChange": 20,
+          "previousYearPrice": 152415
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Leeds",
+        "Bradford",
+        "Wakefield",
+        "Kirklees",
+        "Calderdale"
+      ]
+    },
+    "NORTH YORKSHIRE": {
+      "name": "NORTH YORKSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:05.414Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 274273,
+        "momChange": 0,
+        "yoyChange": 11.2,
+        "totalTransactions": 927,
+        "transactionChange": -93.5,
+        "previousYearPrice": 246674,
+        "previousYearTransactions": 14328
+      },
+      "propertyTypes": {
+        "Semi-detached": {
+          "averagePrice": 245923,
+          "transactions": 348,
+          "yoyChange": 5.7,
+          "previousYearPrice": 232680
+        },
+        "Detached": {
+          "averagePrice": 449576,
+          "transactions": 223,
+          "yoyChange": 11.7,
+          "previousYearPrice": 402633
+        },
+        "Terraced": {
+          "averagePrice": 190148,
+          "transactions": 274,
+          "yoyChange": 3.7,
+          "previousYearPrice": 183291
+        },
+        "Flats": {
+          "averagePrice": 198947,
+          "transactions": 82,
+          "yoyChange": 24.8,
+          "previousYearPrice": 159377
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "North Yorkshire",
+        "York"
+      ]
+    },
+    "EAST YORKSHIRE": {
+      "name": "EAST YORKSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:05.836Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 289487,
+        "momChange": 0,
+        "yoyChange": 6.5,
+        "totalTransactions": 116,
+        "transactionChange": -94,
+        "previousYearPrice": 271746,
+        "previousYearTransactions": 1924
+      },
+      "propertyTypes": {
+        "Detached": {
+          "averagePrice": 347657,
+          "transactions": 34,
+          "yoyChange": -7,
+          "previousYearPrice": 373775
+        },
+        "Semi-detached": {
+          "averagePrice": 276979,
+          "transactions": 50,
+          "yoyChange": 15.2,
+          "previousYearPrice": 240355
+        },
+        "Terraced": {
+          "averagePrice": 265927,
+          "transactions": 27,
+          "yoyChange": 15,
+          "previousYearPrice": 231181
+        },
+        "Flats": {
+          "averagePrice": 146240,
+          "transactions": 5,
+          "yoyChange": -10.4,
+          "previousYearPrice": 163195
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "East Riding of Yorkshire"
+      ]
+    },
+    "GREATER MANCHESTER": {
+      "name": "GREATER MANCHESTER",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:07.594Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 327143,
+        "momChange": 0,
+        "yoyChange": 10.4,
+        "totalTransactions": 770,
+        "transactionChange": -93.2,
+        "previousYearPrice": 296282,
+        "previousYearTransactions": 11335
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 225626,
+          "transactions": 256,
+          "yoyChange": 0.8,
+          "previousYearPrice": 223895
+        },
+        "Flats": {
+          "averagePrice": 236588,
+          "transactions": 94,
+          "yoyChange": 29.9,
+          "previousYearPrice": 182135
+        },
+        "Detached": {
+          "averagePrice": 551385,
+          "transactions": 150,
+          "yoyChange": 11.4,
+          "previousYearPrice": 495124
+        },
+        "Semi-detached": {
+          "averagePrice": 330345,
+          "transactions": 270,
+          "yoyChange": 8.7,
+          "previousYearPrice": 303906
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Manchester",
+        "Salford",
+        "Bolton",
+        "Bury",
+        "Oldham",
+        "Rochdale",
+        "Stockport",
+        "Tameside",
+        "Trafford",
+        "Wigan"
+      ]
+    },
+    "MERSEYSIDE": {
+      "name": "MERSEYSIDE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:08.014Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 243481,
+        "momChange": 0,
+        "yoyChange": 10.3,
+        "totalTransactions": 243,
+        "transactionChange": -93.4,
+        "previousYearPrice": 220656,
+        "previousYearTransactions": 3697
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 174872,
+          "transactions": 74,
+          "yoyChange": 9.8,
+          "previousYearPrice": 159233
+        },
+        "Semi-detached": {
+          "averagePrice": 263281,
+          "transactions": 109,
+          "yoyChange": 9,
+          "previousYearPrice": 241443
+        },
+        "Flats": {
+          "averagePrice": 137190,
+          "transactions": 21,
+          "yoyChange": -4.7,
+          "previousYearPrice": 143920
+        },
+        "Detached": {
+          "averagePrice": 375558,
+          "transactions": 39,
+          "yoyChange": -6.6,
+          "previousYearPrice": 401897
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Merseyside"
+      ]
+    },
+    "LANCASHIRE": {
+      "name": "LANCASHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:08.719Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 227046,
+        "momChange": 0,
+        "yoyChange": 11.5,
+        "totalTransactions": 320,
+        "transactionChange": -93.5,
+        "previousYearPrice": 203573,
+        "previousYearTransactions": 4953
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 147427,
+          "transactions": 125,
+          "yoyChange": 8.3,
+          "previousYearPrice": 136140
+        },
+        "Semi-detached": {
+          "averagePrice": 222404,
+          "transactions": 112,
+          "yoyChange": 6.8,
+          "previousYearPrice": 208290
+        },
+        "Detached": {
+          "averagePrice": 397018,
+          "transactions": 68,
+          "yoyChange": 10.4,
+          "previousYearPrice": 359711
+        },
+        "Flats": {
+          "averagePrice": 154667,
+          "transactions": 15,
+          "yoyChange": 35.1,
+          "previousYearPrice": 114460
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Lancashire",
+        "Blackburn with Darwen",
+        "Blackpool"
+      ]
+    },
+    "CHESHIRE": {
+      "name": "CHESHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:09.580Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 405110,
+        "momChange": 0,
+        "yoyChange": 27.9,
+        "totalTransactions": 267,
+        "transactionChange": -92.9,
+        "previousYearPrice": 316706,
+        "previousYearTransactions": 3736
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 232861,
+          "transactions": 70,
+          "yoyChange": 7.9,
+          "previousYearPrice": 215745
+        },
+        "Semi-detached": {
+          "averagePrice": 301896,
+          "transactions": 83,
+          "yoyChange": 8.5,
+          "previousYearPrice": 278287
+        },
+        "Detached": {
+          "averagePrice": 746492,
+          "transactions": 82,
+          "yoyChange": 49.3,
+          "previousYearPrice": 500074
+        },
+        "Flats": {
+          "averagePrice": 174825,
+          "transactions": 32,
+          "yoyChange": 1,
+          "previousYearPrice": 173014
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Cheshire East",
+        "Cheshire West and Chester",
+        "Halton",
+        "Warrington"
+      ]
+    },
+    "ESSEX": {
+      "name": "ESSEX",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:12.408Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 545201,
+        "momChange": 0,
+        "yoyChange": 30,
+        "totalTransactions": 425,
+        "transactionChange": -92.8,
+        "previousYearPrice": 419231,
+        "previousYearTransactions": 5922
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 513903,
+          "transactions": 110,
+          "yoyChange": 38.2,
+          "previousYearPrice": 371746
+        },
+        "Semi-detached": {
+          "averagePrice": 568904,
+          "transactions": 117,
+          "yoyChange": 34,
+          "previousYearPrice": 424439
+        },
+        "Flats": {
+          "averagePrice": 279412,
+          "transactions": 88,
+          "yoyChange": 12.3,
+          "previousYearPrice": 248815
+        },
+        "Detached": {
+          "averagePrice": 763920,
+          "transactions": 110,
+          "yoyChange": 30.6,
+          "previousYearPrice": 585081
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Basildon",
+        "Braintree",
+        "Brentwood",
+        "Castle Point",
+        "Chelmsford",
+        "Colchester",
+        "Epping Forest",
+        "Harlow",
+        "Maldon",
+        "Rochford",
+        "Tendring",
+        "Uttlesford",
+        "Southend-on-Sea",
+        "Thurrock"
+      ]
+    },
+    "HERTFORDSHIRE": {
+      "name": "HERTFORDSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:12.830Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 668297,
+        "momChange": 0,
+        "yoyChange": 27,
+        "totalTransactions": 249,
+        "transactionChange": -92.2,
+        "previousYearPrice": 526195,
+        "previousYearTransactions": 3181
+      },
+      "propertyTypes": {
+        "Semi-detached": {
+          "averagePrice": 716367,
+          "transactions": 60,
+          "yoyChange": 20.7,
+          "previousYearPrice": 593487
+        },
+        "Flats": {
+          "averagePrice": 258185,
+          "transactions": 49,
+          "yoyChange": -5.6,
+          "previousYearPrice": 273395
+        },
+        "Terraced": {
+          "averagePrice": 435903,
+          "transactions": 66,
+          "yoyChange": -1.2,
+          "previousYearPrice": 441161
+        },
+        "Detached": {
+          "averagePrice": 1108153,
+          "transactions": 74,
+          "yoyChange": 23.4,
+          "previousYearPrice": 898132
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Hertfordshire"
+      ]
+    },
+    "BEDFORDSHIRE": {
+      "name": "BEDFORDSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:13.395Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 445539,
+        "momChange": 0,
+        "yoyChange": 20,
+        "totalTransactions": 103,
+        "transactionChange": -93.2,
+        "previousYearPrice": 371311,
+        "previousYearTransactions": 1515
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 299399,
+          "transactions": 25,
+          "yoyChange": -1.7,
+          "previousYearPrice": 304601
+        },
+        "Detached": {
+          "averagePrice": 774617,
+          "transactions": 30,
+          "yoyChange": 42.4,
+          "previousYearPrice": 543930
+        },
+        "Flats": {
+          "averagePrice": 190133,
+          "transactions": 15,
+          "yoyChange": 4.4,
+          "previousYearPrice": 182092
+        },
+        "Semi-detached": {
+          "averagePrice": 373182,
+          "transactions": 33,
+          "yoyChange": -0.4,
+          "previousYearPrice": 374505
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Bedford",
+        "Central Bedfordshire"
+      ]
+    },
+    "CAMBRIDGESHIRE": {
+      "name": "CAMBRIDGESHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:13.954Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 486848,
+        "momChange": 0,
+        "yoyChange": 32.7,
+        "totalTransactions": 153,
+        "transactionChange": -93.7,
+        "previousYearPrice": 366904,
+        "previousYearTransactions": 2425
+      },
+      "propertyTypes": {
+        "Detached": {
+          "averagePrice": 671679,
+          "transactions": 61,
+          "yoyChange": 38,
+          "previousYearPrice": 486619
+        },
+        "Terraced": {
+          "averagePrice": 361489,
+          "transactions": 44,
+          "yoyChange": 15.9,
+          "previousYearPrice": 312027
+        },
+        "Flats": {
+          "averagePrice": 236389,
+          "transactions": 9,
+          "yoyChange": 11.6,
+          "previousYearPrice": 211733
+        },
+        "Semi-detached": {
+          "averagePrice": 396984,
+          "transactions": 39,
+          "yoyChange": 24.8,
+          "previousYearPrice": 318198
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Cambridgeshire",
+        "Peterborough"
+      ]
+    },
+    "NORFOLK": {
+      "name": "NORFOLK",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:14.382Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 343406,
+        "momChange": 0,
+        "yoyChange": 15.2,
+        "totalTransactions": 184,
+        "transactionChange": -93.6,
+        "previousYearPrice": 297989,
+        "previousYearTransactions": 2882
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 243868,
+          "transactions": 52,
+          "yoyChange": 5.7,
+          "previousYearPrice": 230783
+        },
+        "Detached": {
+          "averagePrice": 501671,
+          "transactions": 66,
+          "yoyChange": 25.8,
+          "previousYearPrice": 398812
+        },
+        "Flats": {
+          "averagePrice": 188778,
+          "transactions": 18,
+          "yoyChange": 22.4,
+          "previousYearPrice": 154269
+        },
+        "Semi-detached": {
+          "averagePrice": 291611,
+          "transactions": 48,
+          "yoyChange": 10.2,
+          "previousYearPrice": 264630
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Norfolk"
+      ]
+    },
+    "SUFFOLK": {
+      "name": "SUFFOLK",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:14.807Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 359894,
+        "momChange": 0,
+        "yoyChange": 11.2,
+        "totalTransactions": 125,
+        "transactionChange": -94.7,
+        "previousYearPrice": 323647,
+        "previousYearTransactions": 2372
+      },
+      "propertyTypes": {
+        "Flats": {
+          "averagePrice": 177153,
+          "transactions": 13,
+          "yoyChange": 14.1,
+          "previousYearPrice": 155228
+        },
+        "Semi-detached": {
+          "averagePrice": 358156,
+          "transactions": 32,
+          "yoyChange": 23.8,
+          "previousYearPrice": 289370
+        },
+        "Terraced": {
+          "averagePrice": 219520,
+          "transactions": 32,
+          "yoyChange": -7.3,
+          "previousYearPrice": 236721
+        },
+        "Detached": {
+          "averagePrice": 504127,
+          "transactions": 48,
+          "yoyChange": 11.4,
+          "previousYearPrice": 452544
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Suffolk"
+      ]
+    },
+    "WEST MIDLANDS CONURBATION": {
+      "name": "WEST MIDLANDS CONURBATION",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:16.128Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 296956,
+        "momChange": 0,
+        "yoyChange": 11.8,
+        "totalTransactions": 572,
+        "transactionChange": -90.8,
+        "previousYearPrice": 265527,
+        "previousYearTransactions": 6213
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 217856,
+          "transactions": 181,
+          "yoyChange": 0.5,
+          "previousYearPrice": 216732
+        },
+        "Semi-detached": {
+          "averagePrice": 280259,
+          "transactions": 236,
+          "yoyChange": 4.5,
+          "previousYearPrice": 268300
+        },
+        "Detached": {
+          "averagePrice": 550151,
+          "transactions": 104,
+          "yoyChange": 18.6,
+          "previousYearPrice": 464004
+        },
+        "Flats": {
+          "averagePrice": 138621,
+          "transactions": 51,
+          "yoyChange": -2.8,
+          "previousYearPrice": 142680
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Birmingham",
+        "Coventry",
+        "Dudley",
+        "Sandwell",
+        "Solihull",
+        "Walsall",
+        "Wolverhampton"
+      ]
+    },
+    "STAFFORDSHIRE": {
+      "name": "STAFFORDSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:16.687Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 273598,
+        "momChange": 0,
+        "yoyChange": 9.1,
+        "totalTransactions": 258,
+        "transactionChange": -92.3,
+        "previousYearPrice": 250663,
+        "previousYearTransactions": 3358
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 191205,
+          "transactions": 60,
+          "yoyChange": 18,
+          "previousYearPrice": 162051
+        },
+        "Flats": {
+          "averagePrice": 103778,
+          "transactions": 13,
+          "yoyChange": -16.6,
+          "previousYearPrice": 124452
+        },
+        "Semi-detached": {
+          "averagePrice": 230153,
+          "transactions": 110,
+          "yoyChange": 5.6,
+          "previousYearPrice": 217869
+        },
+        "Detached": {
+          "averagePrice": 432667,
+          "transactions": 75,
+          "yoyChange": 8.6,
+          "previousYearPrice": 398501
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Staffordshire",
+        "Stoke-on-Trent"
+      ]
+    },
+    "WARWICKSHIRE": {
+      "name": "WARWICKSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:17.105Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 418520,
+        "momChange": 0,
+        "yoyChange": 20.7,
+        "totalTransactions": 131,
+        "transactionChange": -92.8,
+        "previousYearPrice": 346819,
+        "previousYearTransactions": 1832
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 284133,
+          "transactions": 27,
+          "yoyChange": 7.3,
+          "previousYearPrice": 264704
+        },
+        "Flats": {
+          "averagePrice": 228545,
+          "transactions": 16,
+          "yoyChange": 16.5,
+          "previousYearPrice": 196220
+        },
+        "Semi-detached": {
+          "averagePrice": 398540,
+          "transactions": 39,
+          "yoyChange": 27.2,
+          "previousYearPrice": 313222
+        },
+        "Detached": {
+          "averagePrice": 570505,
+          "transactions": 49,
+          "yoyChange": 10.9,
+          "previousYearPrice": 514331
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Warwickshire"
+      ]
+    },
+    "WORCESTERSHIRE": {
+      "name": "WORCESTERSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:17.525Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 355553,
+        "momChange": 0,
+        "yoyChange": 8.7,
+        "totalTransactions": 148,
+        "transactionChange": -91.4,
+        "previousYearPrice": 327180,
+        "previousYearTransactions": 1712
+      },
+      "propertyTypes": {
+        "Detached": {
+          "averagePrice": 531190,
+          "transactions": 38,
+          "yoyChange": 9.4,
+          "previousYearPrice": 485363
+        },
+        "Semi-detached": {
+          "averagePrice": 335950,
+          "transactions": 55,
+          "yoyChange": 15.9,
+          "previousYearPrice": 289848
+        },
+        "Terraced": {
+          "averagePrice": 278383,
+          "transactions": 42,
+          "yoyChange": 16.9,
+          "previousYearPrice": 238239
+        },
+        "Flats": {
+          "averagePrice": 174404,
+          "transactions": 13,
+          "yoyChange": 8.1,
+          "previousYearPrice": 161337
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Worcestershire"
+      ]
+    },
+    "SHROPSHIRE": {
+      "name": "SHROPSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:18.090Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 315342,
+        "momChange": 0,
+        "yoyChange": 10.1,
+        "totalTransactions": 99,
+        "transactionChange": -92.5,
+        "previousYearPrice": 286387,
+        "previousYearTransactions": 1318
+      },
+      "propertyTypes": {
+        "Flats": {
+          "averagePrice": 119500,
+          "transactions": 6,
+          "yoyChange": -16.3,
+          "previousYearPrice": 142846
+        },
+        "Semi-detached": {
+          "averagePrice": 264500,
+          "transactions": 38,
+          "yoyChange": 8.2,
+          "previousYearPrice": 244460
+        },
+        "Terraced": {
+          "averagePrice": 193806,
+          "transactions": 18,
+          "yoyChange": -5.4,
+          "previousYearPrice": 204936
+        },
+        "Detached": {
+          "averagePrice": 458442,
+          "transactions": 37,
+          "yoyChange": 13.3,
+          "previousYearPrice": 404722
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Shropshire",
+        "Telford and Wrekin"
+      ]
+    },
+    "HEREFORDSHIRE": {
+      "name": "HEREFORDSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:18.509Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 336404,
+        "momChange": 0,
+        "yoyChange": 6.4,
+        "totalTransactions": 47,
+        "transactionChange": -91.7,
+        "previousYearPrice": 316279,
+        "previousYearTransactions": 567
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 235131,
+          "transactions": 8,
+          "yoyChange": 1.2,
+          "previousYearPrice": 232245
+        },
+        "Semi-detached": {
+          "averagePrice": 326813,
+          "transactions": 15,
+          "yoyChange": 21,
+          "previousYearPrice": 270144
+        },
+        "Detached": {
+          "averagePrice": 430612,
+          "transactions": 20,
+          "yoyChange": -0.5,
+          "previousYearPrice": 432863
+        },
+        "Flats": {
+          "averagePrice": 103875,
+          "transactions": 4,
+          "yoyChange": -26.7,
+          "previousYearPrice": 141749
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Herefordshire"
+      ]
+    },
+    "NOTTINGHAMSHIRE": {
+      "name": "NOTTINGHAMSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:19.063Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 285312,
+        "momChange": 0,
+        "yoyChange": 14.4,
+        "totalTransactions": 250,
+        "transactionChange": -92.7,
+        "previousYearPrice": 249476,
+        "previousYearTransactions": 3447
+      },
+      "propertyTypes": {
+        "Semi-detached": {
+          "averagePrice": 266009,
+          "transactions": 98,
+          "yoyChange": 20.6,
+          "previousYearPrice": 220631
+        },
+        "Terraced": {
+          "averagePrice": 176008,
+          "transactions": 54,
+          "yoyChange": 2.9,
+          "previousYearPrice": 170982
+        },
+        "Flats": {
+          "averagePrice": 132634,
+          "transactions": 17,
+          "yoyChange": -2.4,
+          "previousYearPrice": 135879
+        },
+        "Detached": {
+          "averagePrice": 413579,
+          "transactions": 81,
+          "yoyChange": 11.6,
+          "previousYearPrice": 370604
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Nottingham",
+        "Nottinghamshire"
+      ]
+    },
+    "DERBYSHIRE": {
+      "name": "DERBYSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:19.623Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 266305,
+        "momChange": 0,
+        "yoyChange": 6.3,
+        "totalTransactions": 210,
+        "transactionChange": -93.4,
+        "previousYearPrice": 250441,
+        "previousYearTransactions": 3158
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 175277,
+          "transactions": 60,
+          "yoyChange": 2.9,
+          "previousYearPrice": 170305
+        },
+        "Semi-detached": {
+          "averagePrice": 247916,
+          "transactions": 83,
+          "yoyChange": 11.8,
+          "previousYearPrice": 221716
+        },
+        "Flats": {
+          "averagePrice": 171455,
+          "transactions": 11,
+          "yoyChange": 21.3,
+          "previousYearPrice": 141388
+        },
+        "Detached": {
+          "averagePrice": 409722,
+          "transactions": 56,
+          "yoyChange": 9,
+          "previousYearPrice": 375819
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Derby",
+        "Derbyshire"
+      ]
+    },
+    "LEICESTERSHIRE": {
+      "name": "LEICESTERSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:20.185Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 319086,
+        "momChange": 0,
+        "yoyChange": 8.1,
+        "totalTransactions": 193,
+        "transactionChange": -93,
+        "previousYearPrice": 295232,
+        "previousYearTransactions": 2748
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 225201,
+          "transactions": 55,
+          "yoyChange": 2.7,
+          "previousYearPrice": 219347
+        },
+        "Semi-detached": {
+          "averagePrice": 281699,
+          "transactions": 73,
+          "yoyChange": 6.6,
+          "previousYearPrice": 264212
+        },
+        "Detached": {
+          "averagePrice": 508875,
+          "transactions": 52,
+          "yoyChange": 21.4,
+          "previousYearPrice": 419306
+        },
+        "Flats": {
+          "averagePrice": 167077,
+          "transactions": 13,
+          "yoyChange": 25.2,
+          "previousYearPrice": 133426
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Leicester",
+        "Leicestershire"
+      ]
+    },
+    "LINCOLNSHIRE": {
+      "name": "LINCOLNSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:20.603Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 236080,
+        "momChange": 0,
+        "yoyChange": 7.2,
+        "totalTransactions": 228,
+        "transactionChange": -93.7,
+        "previousYearPrice": 220249,
+        "previousYearTransactions": 3647
+      },
+      "propertyTypes": {
+        "Semi-detached": {
+          "averagePrice": 224975,
+          "transactions": 70,
+          "yoyChange": 18.1,
+          "previousYearPrice": 190529
+        },
+        "Detached": {
+          "averagePrice": 331678,
+          "transactions": 77,
+          "yoyChange": 8.9,
+          "previousYearPrice": 304578
+        },
+        "Flats": {
+          "averagePrice": 153781,
+          "transactions": 16,
+          "yoyChange": 35.2,
+          "previousYearPrice": 113777
+        },
+        "Terraced": {
+          "averagePrice": 155050,
+          "transactions": 65,
+          "yoyChange": 8.7,
+          "previousYearPrice": 142684
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Lincolnshire"
+      ]
+    },
+    "NORTHAMPTONSHIRE": {
+      "name": "NORTHAMPTONSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:21.022Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 341064,
+        "momChange": 0,
+        "yoyChange": 11.7,
+        "totalTransactions": 143,
+        "transactionChange": -94.2,
+        "previousYearPrice": 305416,
+        "previousYearTransactions": 2480
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 227443,
+          "transactions": 45,
+          "yoyChange": 0.7,
+          "previousYearPrice": 225753
+        },
+        "Semi-detached": {
+          "averagePrice": 273551,
+          "transactions": 52,
+          "yoyChange": -1.9,
+          "previousYearPrice": 278833
+        },
+        "Flats": {
+          "averagePrice": 154722,
+          "transactions": 9,
+          "yoyChange": 7.1,
+          "previousYearPrice": 144517
+        },
+        "Detached": {
+          "averagePrice": 619459,
+          "transactions": 37,
+          "yoyChange": 39.5,
+          "previousYearPrice": 443971
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Northamptonshire"
+      ]
+    },
+    "RUTLAND": {
+      "name": "RUTLAND",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:21.446Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 472500,
+        "momChange": 0,
+        "yoyChange": 26.2,
+        "totalTransactions": 10,
+        "transactionChange": -93,
+        "previousYearPrice": 374388,
+        "previousYearTransactions": 142
+      },
+      "propertyTypes": {
+        "Detached": {
+          "averagePrice": 654583,
+          "transactions": 6,
+          "yoyChange": 30.4,
+          "previousYearPrice": 502085
+        },
+        "Terraced": {
+          "averagePrice": 207500,
+          "transactions": 2,
+          "yoyChange": -20.3,
+          "previousYearPrice": 260350
+        },
+        "Semi-detached": {
+          "averagePrice": 260000,
+          "transactions": 1,
+          "yoyChange": -9.1,
+          "previousYearPrice": 285881
+        },
+        "Flats": {
+          "averagePrice": 122500,
+          "transactions": 1,
+          "yoyChange": -13.7,
+          "previousYearPrice": 142000
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Rutland"
+      ]
+    },
+    "KENT": {
+      "name": "KENT",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:22.001Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 490559,
+        "momChange": 0,
+        "yoyChange": 27.9,
+        "totalTransactions": 330,
+        "transactionChange": -93.8,
+        "previousYearPrice": 383521,
+        "previousYearTransactions": 5325
+      },
+      "propertyTypes": {
+        "Flats": {
+          "averagePrice": 221359,
+          "transactions": 48,
+          "yoyChange": 5.3,
+          "previousYearPrice": 210303
+        },
+        "Terraced": {
+          "averagePrice": 334183,
+          "transactions": 90,
+          "yoyChange": 10.2,
+          "previousYearPrice": 303352
+        },
+        "Semi-detached": {
+          "averagePrice": 426878,
+          "transactions": 100,
+          "yoyChange": 9.1,
+          "previousYearPrice": 391196
+        },
+        "Detached": {
+          "averagePrice": 853206,
+          "transactions": 92,
+          "yoyChange": 39.6,
+          "previousYearPrice": 611055
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Kent",
+        "Medway"
+      ]
+    },
+    "SURREY": {
+      "name": "SURREY",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:22.419Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 815493,
+        "momChange": 0,
+        "yoyChange": 32.8,
+        "totalTransactions": 274,
+        "transactionChange": -92.2,
+        "previousYearPrice": 613871,
+        "previousYearTransactions": 3528
+      },
+      "propertyTypes": {
+        "Detached": {
+          "averagePrice": 1271866,
+          "transactions": 114,
+          "yoyChange": 28.3,
+          "previousYearPrice": 991469
+        },
+        "Semi-detached": {
+          "averagePrice": 639654,
+          "transactions": 69,
+          "yoyChange": 11,
+          "previousYearPrice": 576180
+        },
+        "Terraced": {
+          "averagePrice": 488201,
+          "transactions": 37,
+          "yoyChange": 4.5,
+          "previousYearPrice": 467083
+        },
+        "Flats": {
+          "averagePrice": 300979,
+          "transactions": 54,
+          "yoyChange": -1.2,
+          "previousYearPrice": 304632
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Surrey"
+      ]
+    },
+    "SUSSEX": {
+      "name": "SUSSEX",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:23.127Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 490098,
+        "momChange": 0,
+        "yoyChange": 15.8,
+        "totalTransactions": 338,
+        "transactionChange": -93.3,
+        "previousYearPrice": 423136,
+        "previousYearTransactions": 5066
+      },
+      "propertyTypes": {
+        "Semi-detached": {
+          "averagePrice": 457283,
+          "transactions": 76,
+          "yoyChange": 7.9,
+          "previousYearPrice": 423663
+        },
+        "Terraced": {
+          "averagePrice": 423553,
+          "transactions": 83,
+          "yoyChange": 11.1,
+          "previousYearPrice": 381309
+        },
+        "Flats": {
+          "averagePrice": 282813,
+          "transactions": 83,
+          "yoyChange": 17.8,
+          "previousYearPrice": 240046
+        },
+        "Detached": {
+          "averagePrice": 752824,
+          "transactions": 96,
+          "yoyChange": 18.6,
+          "previousYearPrice": 634837
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "East Sussex",
+        "West Sussex",
+        "Brighton and Hove"
+      ]
+    },
+    "HAMPSHIRE": {
+      "name": "HAMPSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:23.994Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 442776,
+        "momChange": 0,
+        "yoyChange": 22.3,
+        "totalTransactions": 364,
+        "transactionChange": -94.1,
+        "previousYearPrice": 361906,
+        "previousYearTransactions": 6156
+      },
+      "propertyTypes": {
+        "Detached": {
+          "averagePrice": 686090,
+          "transactions": 115,
+          "yoyChange": 17.8,
+          "previousYearPrice": 582183
+        },
+        "Flats": {
+          "averagePrice": 171965,
+          "transactions": 58,
+          "yoyChange": -5.9,
+          "previousYearPrice": 182711
+        },
+        "Terraced": {
+          "averagePrice": 341461,
+          "transactions": 97,
+          "yoyChange": 12.5,
+          "previousYearPrice": 303590
+        },
+        "Semi-detached": {
+          "averagePrice": 416748,
+          "transactions": 94,
+          "yoyChange": 11.7,
+          "previousYearPrice": 373087
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Hampshire",
+        "Portsmouth",
+        "Southampton",
+        "Isle of Wight"
+      ]
+    },
+    "BERKSHIRE": {
+      "name": "BERKSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:24.430Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 522651,
+        "momChange": 0,
+        "yoyChange": 14.9,
+        "totalTransactions": 32,
+        "transactionChange": -93.1,
+        "previousYearPrice": 454803,
+        "previousYearTransactions": 465
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 389200,
+          "transactions": 5,
+          "yoyChange": 12.8,
+          "previousYearPrice": 344884
+        },
+        "Semi-detached": {
+          "averagePrice": 441500,
+          "transactions": 8,
+          "yoyChange": 0.1,
+          "previousYearPrice": 440847
+        },
+        "Detached": {
+          "averagePrice": 743774,
+          "transactions": 14,
+          "yoyChange": 9.2,
+          "previousYearPrice": 680924
+        },
+        "Flats": {
+          "averagePrice": 166800,
+          "transactions": 5,
+          "yoyChange": -25.8,
+          "previousYearPrice": 224791
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Berkshire"
+      ]
+    },
+    "BUCKINGHAMSHIRE": {
+      "name": "BUCKINGHAMSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:24.863Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 732675,
+        "momChange": 0,
+        "yoyChange": 35.2,
+        "totalTransactions": 91,
+        "transactionChange": -94.1,
+        "previousYearPrice": 542104,
+        "previousYearTransactions": 1542
+      },
+      "propertyTypes": {
+        "Detached": {
+          "averagePrice": 1094791,
+          "transactions": 43,
+          "yoyChange": 30.2,
+          "previousYearPrice": 840627
+        },
+        "Terraced": {
+          "averagePrice": 394627,
+          "transactions": 19,
+          "yoyChange": 0.1,
+          "previousYearPrice": 394090
+        },
+        "Flats": {
+          "averagePrice": 244733,
+          "transactions": 15,
+          "yoyChange": -8.1,
+          "previousYearPrice": 266443
+        },
+        "Semi-detached": {
+          "averagePrice": 602036,
+          "transactions": 14,
+          "yoyChange": 21.8,
+          "previousYearPrice": 494275
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Buckinghamshire"
+      ]
+    },
+    "OXFORDSHIRE": {
+      "name": "OXFORDSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:25.296Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 578478,
+        "momChange": 0,
+        "yoyChange": 21.3,
+        "totalTransactions": 113,
+        "transactionChange": -94.3,
+        "previousYearPrice": 476810,
+        "previousYearTransactions": 1998
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 461891,
+          "transactions": 21,
+          "yoyChange": 18.2,
+          "previousYearPrice": 390779
+        },
+        "Semi-detached": {
+          "averagePrice": 474343,
+          "transactions": 35,
+          "yoyChange": 3.8,
+          "previousYearPrice": 457122
+        },
+        "Detached": {
+          "averagePrice": 915027,
+          "transactions": 37,
+          "yoyChange": 32.9,
+          "previousYearPrice": 688423
+        },
+        "Flats": {
+          "averagePrice": 260517,
+          "transactions": 20,
+          "yoyChange": -2.8,
+          "previousYearPrice": 267915
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Oxfordshire"
+      ]
+    },
+    "BRISTOL AND BATH": {
+      "name": "BRISTOL AND BATH",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:26.172Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 403951,
+        "momChange": 0,
+        "yoyChange": 8.2,
+        "totalTransactions": 444,
+        "transactionChange": -94,
+        "previousYearPrice": 373205,
+        "previousYearTransactions": 7388
+      },
+      "propertyTypes": {
+        "Detached": {
+          "averagePrice": 639106,
+          "transactions": 107,
+          "yoyChange": 16.9,
+          "previousYearPrice": 546925
+        },
+        "Semi-detached": {
+          "averagePrice": 381200,
+          "transactions": 136,
+          "yoyChange": 4.9,
+          "previousYearPrice": 363305
+        },
+        "Flats": {
+          "averagePrice": 244787,
+          "transactions": 75,
+          "yoyChange": 4.7,
+          "previousYearPrice": 233873
+        },
+        "Terraced": {
+          "averagePrice": 323552,
+          "transactions": 126,
+          "yoyChange": -0.5,
+          "previousYearPrice": 325255
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Bristol",
+        "Bath and North East Somerset",
+        "North Somerset",
+        "South Gloucestershire"
+      ]
+    },
+    "DEVON": {
+      "name": "DEVON",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:26.897Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 361219,
+        "momChange": 0,
+        "yoyChange": 13.8,
+        "totalTransactions": 244,
+        "transactionChange": -93.8,
+        "previousYearPrice": 317427,
+        "previousYearTransactions": 3946
+      },
+      "propertyTypes": {
+        "Semi-detached": {
+          "averagePrice": 314762,
+          "transactions": 59,
+          "yoyChange": 5,
+          "previousYearPrice": 299896
+        },
+        "Terraced": {
+          "averagePrice": 261388,
+          "transactions": 82,
+          "yoyChange": 4.3,
+          "previousYearPrice": 250516
+        },
+        "Detached": {
+          "averagePrice": 621315,
+          "transactions": 65,
+          "yoyChange": 28.5,
+          "previousYearPrice": 483555
+        },
+        "Flats": {
+          "averagePrice": 203873,
+          "transactions": 38,
+          "yoyChange": 16,
+          "previousYearPrice": 175782
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Devon",
+        "Plymouth",
+        "Torbay"
+      ]
+    },
+    "CORNWALL": {
+      "name": "CORNWALL",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:27.324Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 411671,
+        "momChange": 0,
+        "yoyChange": 22.8,
+        "totalTransactions": 123,
+        "transactionChange": -92.8,
+        "previousYearPrice": 335194,
+        "previousYearTransactions": 1717
+      },
+      "propertyTypes": {
+        "Semi-detached": {
+          "averagePrice": 243250,
+          "transactions": 23,
+          "yoyChange": -13.7,
+          "previousYearPrice": 281910
+        },
+        "Detached": {
+          "averagePrice": 655232,
+          "transactions": 51,
+          "yoyChange": 37.5,
+          "previousYearPrice": 476408
+        },
+        "Flats": {
+          "averagePrice": 203300,
+          "transactions": 15,
+          "yoyChange": -3,
+          "previousYearPrice": 209642
+        },
+        "Terraced": {
+          "averagePrice": 252189,
+          "transactions": 34,
+          "yoyChange": -2.1,
+          "previousYearPrice": 257702
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Cornwall"
+      ]
+    },
+    "DORSET": {
+      "name": "DORSET",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:27.890Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 428471,
+        "momChange": 0,
+        "yoyChange": 11.5,
+        "totalTransactions": 79,
+        "transactionChange": -94,
+        "previousYearPrice": 384139,
+        "previousYearTransactions": 1319
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 280761,
+          "transactions": 23,
+          "yoyChange": -4.7,
+          "previousYearPrice": 294641
+        },
+        "Flats": {
+          "averagePrice": 191958,
+          "transactions": 12,
+          "yoyChange": 2.8,
+          "previousYearPrice": 186769
+        },
+        "Semi-detached": {
+          "averagePrice": 355600,
+          "transactions": 16,
+          "yoyChange": 1.6,
+          "previousYearPrice": 349912
+        },
+        "Detached": {
+          "averagePrice": 692806,
+          "transactions": 28,
+          "yoyChange": 29,
+          "previousYearPrice": 537236
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Dorset",
+        "Bournemouth, Christchurch and Poole"
+      ]
+    },
+    "GLOUCESTERSHIRE": {
+      "name": "GLOUCESTERSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:28.310Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 427556,
+        "momChange": 0,
+        "yoyChange": 13.8,
+        "totalTransactions": 207,
+        "transactionChange": -92.9,
+        "previousYearPrice": 375721,
+        "previousYearTransactions": 2908
+      },
+      "propertyTypes": {
+        "Semi-detached": {
+          "averagePrice": 365404,
+          "transactions": 68,
+          "yoyChange": 3.1,
+          "previousYearPrice": 354509
+        },
+        "Flats": {
+          "averagePrice": 171083,
+          "transactions": 24,
+          "yoyChange": -8.2,
+          "previousYearPrice": 186416
+        },
+        "Terraced": {
+          "averagePrice": 337053,
+          "transactions": 54,
+          "yoyChange": 11.5,
+          "previousYearPrice": 302362
+        },
+        "Detached": {
+          "averagePrice": 677865,
+          "transactions": 61,
+          "yoyChange": 16.9,
+          "previousYearPrice": 579848
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Gloucestershire"
+      ]
+    },
+    "SOMERSET": {
+      "name": "SOMERSET",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:28.733Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 350148,
+        "momChange": 0,
+        "yoyChange": -2.3,
+        "totalTransactions": 170,
+        "transactionChange": -94.7,
+        "previousYearPrice": 358477,
+        "previousYearTransactions": 3190
+      },
+      "propertyTypes": {
+        "Detached": {
+          "averagePrice": 550942,
+          "transactions": 42,
+          "yoyChange": 7,
+          "previousYearPrice": 515072
+        },
+        "Terraced": {
+          "averagePrice": 288630,
+          "transactions": 56,
+          "yoyChange": 0.3,
+          "previousYearPrice": 287865
+        },
+        "Flats": {
+          "averagePrice": 208577,
+          "transactions": 26,
+          "yoyChange": -5.8,
+          "previousYearPrice": 221361
+        },
+        "Semi-detached": {
+          "averagePrice": 321723,
+          "transactions": 46,
+          "yoyChange": -4.3,
+          "previousYearPrice": 336077
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Somerset"
+      ]
+    },
+    "WILTSHIRE": {
+      "name": "WILTSHIRE",
+      "tier": "SUB_REGION",
+      "lastUpdated": "2026-02-15T14:49:29.301Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 379461,
+        "momChange": 0,
+        "yoyChange": 9.1,
+        "totalTransactions": 120,
+        "transactionChange": -94.8,
+        "previousYearPrice": 347717,
+        "previousYearTransactions": 2315
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 243435,
+          "transactions": 41,
+          "yoyChange": -11,
+          "previousYearPrice": 273629
+        },
+        "Semi-detached": {
+          "averagePrice": 310088,
+          "transactions": 34,
+          "yoyChange": -3.8,
+          "previousYearPrice": 322243
+        },
+        "Flats": {
+          "averagePrice": 149249,
+          "transactions": 8,
+          "yoyChange": -8.5,
+          "previousYearPrice": 163173
+        },
+        "Detached": {
+          "averagePrice": 643716,
+          "transactions": 37,
+          "yoyChange": 25.3,
+          "previousYearPrice": 513583
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (SUB_REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Wiltshire",
+        "Swindon"
+      ]
+    }
+  },
+  "regions": {
+    "NORTH WEST": {
+      "name": "NORTH WEST",
+      "tier": "REGION",
+      "lastUpdated": "2026-02-15T14:49:32.300Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 307158,
+        "momChange": 0,
+        "yoyChange": 14.6,
+        "totalTransactions": 1580,
+        "transactionChange": -93.3,
+        "previousYearPrice": 268076,
+        "previousYearTransactions": 23482
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 200964,
+          "transactions": 520,
+          "yoyChange": 5.3,
+          "previousYearPrice": 190780
+        },
+        "Flats": {
+          "averagePrice": 203918,
+          "transactions": 162,
+          "yoyChange": 22.8,
+          "previousYearPrice": 166101
+        },
+        "Detached": {
+          "averagePrice": 545877,
+          "transactions": 334,
+          "yoyChange": 19.2,
+          "previousYearPrice": 457875
+        },
+        "Semi-detached": {
+          "averagePrice": 293351,
+          "transactions": 564,
+          "yoyChange": 8.7,
+          "previousYearPrice": 269890
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Cheshire East",
+        "Cheshire West and Chester",
+        "Cumbria",
+        "Manchester",
+        "Salford",
+        "Bolton",
+        "Bury",
+        "Oldham",
+        "Rochdale",
+        "Stockport",
+        "Tameside",
+        "Trafford",
+        "Wigan",
+        "Lancashire",
+        "Merseyside",
+        "Blackburn with Darwen",
+        "Blackpool",
+        "Halton",
+        "Warrington"
+      ]
+    },
+    "NORTH EAST": {
+      "name": "NORTH EAST",
+      "tier": "REGION",
+      "lastUpdated": "2026-02-15T14:49:33.008Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 206834,
+        "momChange": 0,
+        "yoyChange": 8.6,
+        "totalTransactions": 458,
+        "transactionChange": -92,
+        "previousYearPrice": 190437,
+        "previousYearTransactions": 5728
+      },
+      "propertyTypes": {
+        "Flats": {
+          "averagePrice": 144911,
+          "transactions": 66,
+          "yoyChange": 24.8,
+          "previousYearPrice": 116081
+        },
+        "Semi-detached": {
+          "averagePrice": 191661,
+          "transactions": 169,
+          "yoyChange": -0.4,
+          "previousYearPrice": 192462
+        },
+        "Terraced": {
+          "averagePrice": 151058,
+          "transactions": 144,
+          "yoyChange": 3.8,
+          "previousYearPrice": 145571
+        },
+        "Detached": {
+          "averagePrice": 392692,
+          "transactions": 79,
+          "yoyChange": 15.4,
+          "previousYearPrice": 340407
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "County Durham",
+        "Northumberland",
+        "Tyne and Wear"
+      ]
+    },
+    "YORKSHIRE": {
+      "name": "YORKSHIRE",
+      "tier": "REGION",
+      "lastUpdated": "2026-02-15T14:49:35.049Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 280943,
+        "momChange": 0,
+        "yoyChange": 12.2,
+        "totalTransactions": 967,
+        "transactionChange": -93.5,
+        "previousYearPrice": 250341,
+        "previousYearTransactions": 14785
+      },
+      "propertyTypes": {
+        "Semi-detached": {
+          "averagePrice": 247560,
+          "transactions": 356,
+          "yoyChange": 5.7,
+          "previousYearPrice": 234188
+        },
+        "Detached": {
+          "averagePrice": 457494,
+          "transactions": 245,
+          "yoyChange": 12,
+          "previousYearPrice": 408494
+        },
+        "Terraced": {
+          "averagePrice": 193868,
+          "transactions": 280,
+          "yoyChange": 5,
+          "previousYearPrice": 184605
+        },
+        "Flats": {
+          "averagePrice": 199671,
+          "transactions": 86,
+          "yoyChange": 23.9,
+          "previousYearPrice": 161107
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "East Riding of Yorkshire",
+        "North Yorkshire",
+        "Sheffield",
+        "Doncaster",
+        "Rotherham",
+        "Barnsley",
+        "Leeds",
+        "Bradford",
+        "Wakefield",
+        "Kirklees",
+        "Calderdale",
+        "York"
+      ]
+    },
+    "EAST MIDLANDS": {
+      "name": "EAST MIDLANDS",
+      "tier": "REGION",
+      "lastUpdated": "2026-02-15T14:49:36.612Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 286762,
+        "momChange": 0,
+        "yoyChange": 9.8,
+        "totalTransactions": 1014,
+        "transactionChange": -93.4,
+        "previousYearPrice": 261214,
+        "previousYearTransactions": 15365
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 188964,
+          "transactions": 274,
+          "yoyChange": 3.3,
+          "previousYearPrice": 182912
+        },
+        "Semi-detached": {
+          "averagePrice": 258855,
+          "transactions": 369,
+          "yoyChange": 11.4,
+          "previousYearPrice": 232300
+        },
+        "Detached": {
+          "averagePrice": 437221,
+          "transactions": 305,
+          "yoyChange": 16.8,
+          "previousYearPrice": 374462
+        },
+        "Flats": {
+          "averagePrice": 153489,
+          "transactions": 66,
+          "yoyChange": 14.2,
+          "previousYearPrice": 134354
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Derby",
+        "Derbyshire",
+        "Leicester",
+        "Leicestershire",
+        "Lincolnshire",
+        "Northamptonshire",
+        "Nottingham",
+        "Nottinghamshire",
+        "Rutland"
+      ]
+    },
+    "WEST MIDLANDS": {
+      "name": "WEST MIDLANDS",
+      "tier": "REGION",
+      "lastUpdated": "2026-02-15T14:49:38.958Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 311927,
+        "momChange": 0,
+        "yoyChange": 11,
+        "totalTransactions": 1217,
+        "transactionChange": -91.6,
+        "previousYearPrice": 281061,
+        "previousYearTransactions": 14565
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 223716,
+          "transactions": 329,
+          "yoyChange": 5.6,
+          "previousYearPrice": 211851
+        },
+        "Semi-detached": {
+          "averagePrice": 285380,
+          "transactions": 481,
+          "yoyChange": 9.2,
+          "previousYearPrice": 261451
+        },
+        "Detached": {
+          "averagePrice": 502681,
+          "transactions": 305,
+          "yoyChange": 12.8,
+          "previousYearPrice": 445828
+        },
+        "Flats": {
+          "averagePrice": 151248,
+          "transactions": 102,
+          "yoyChange": 1.3,
+          "previousYearPrice": 149372
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Herefordshire",
+        "Shropshire",
+        "Staffordshire",
+        "Stoke-on-Trent",
+        "Telford and Wrekin",
+        "Warwickshire",
+        "Birmingham",
+        "Coventry",
+        "Dudley",
+        "Sandwell",
+        "Solihull",
+        "Walsall",
+        "Wolverhampton",
+        "Worcestershire"
+      ]
+    },
+    "EAST OF ENGLAND": {
+      "name": "EAST OF ENGLAND",
+      "tier": "REGION",
+      "lastUpdated": "2026-02-15T14:49:42.439Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 505786,
+        "momChange": 0,
+        "yoyChange": 27.9,
+        "totalTransactions": 1239,
+        "transactionChange": -93.2,
+        "previousYearPrice": 395336,
+        "previousYearTransactions": 18281
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 390259,
+          "transactions": 329,
+          "yoyChange": 16.8,
+          "previousYearPrice": 334139
+        },
+        "Semi-detached": {
+          "averagePrice": 494831,
+          "transactions": 329,
+          "yoyChange": 27.2,
+          "previousYearPrice": 389122
+        },
+        "Flats": {
+          "averagePrice": 249583,
+          "transactions": 192,
+          "yoyChange": 7.2,
+          "previousYearPrice": 232837
+        },
+        "Detached": {
+          "averagePrice": 739213,
+          "transactions": 389,
+          "yoyChange": 36.4,
+          "previousYearPrice": 541990
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Bedford",
+        "Cambridgeshire",
+        "Central Bedfordshire",
+        "Basildon",
+        "Braintree",
+        "Brentwood",
+        "Castle Point",
+        "Chelmsford",
+        "Colchester",
+        "Epping Forest",
+        "Harlow",
+        "Maldon",
+        "Rochford",
+        "Tendring",
+        "Uttlesford",
+        "Southend-on-Sea",
+        "Thurrock",
+        "Hertfordshire",
+        "Norfolk",
+        "Peterborough",
+        "Suffolk"
+      ]
+    },
+    "SOUTH EAST": {
+      "name": "SOUTH EAST",
+      "tier": "REGION",
+      "lastUpdated": "2026-02-15T14:49:44.609Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 558313,
+        "momChange": 0,
+        "yoyChange": 27.1,
+        "totalTransactions": 1542,
+        "transactionChange": -93.6,
+        "previousYearPrice": 439351,
+        "previousYearTransactions": 24080
+      },
+      "propertyTypes": {
+        "Semi-detached": {
+          "averagePrice": 478066,
+          "transactions": 396,
+          "yoyChange": 9.2,
+          "previousYearPrice": 437744
+        },
+        "Terraced": {
+          "averagePrice": 385114,
+          "transactions": 352,
+          "yoyChange": 10.6,
+          "previousYearPrice": 348324
+        },
+        "Flats": {
+          "averagePrice": 247494,
+          "transactions": 283,
+          "yoyChange": 6.7,
+          "previousYearPrice": 232018
+        },
+        "Detached": {
+          "averagePrice": 911945,
+          "transactions": 511,
+          "yoyChange": 30.8,
+          "previousYearPrice": 697156
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Berkshire",
+        "Brighton and Hove",
+        "Buckinghamshire",
+        "East Sussex",
+        "Hampshire",
+        "Isle of Wight",
+        "Kent",
+        "Medway",
+        "Oxfordshire",
+        "Portsmouth",
+        "Southampton",
+        "Surrey",
+        "West Sussex"
+      ]
+    },
+    "SOUTH WEST": {
+      "name": "SOUTH WEST",
+      "tier": "REGION",
+      "lastUpdated": "2026-02-15T14:49:47.000Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 393576,
+        "momChange": 0,
+        "yoyChange": 11.4,
+        "totalTransactions": 1010,
+        "transactionChange": -93.9,
+        "previousYearPrice": 353430,
+        "previousYearTransactions": 16685
+      },
+      "propertyTypes": {
+        "Terraced": {
+          "averagePrice": 285014,
+          "transactions": 306,
+          "yoyChange": -2,
+          "previousYearPrice": 290688
+        },
+        "Semi-detached": {
+          "averagePrice": 344185,
+          "transactions": 268,
+          "yoyChange": 2.5,
+          "previousYearPrice": 335835
+        },
+        "Flats": {
+          "averagePrice": 220630,
+          "transactions": 148,
+          "yoyChange": 6.8,
+          "previousYearPrice": 206542
+        },
+        "Detached": {
+          "averagePrice": 643759,
+          "transactions": 288,
+          "yoyChange": 24.6,
+          "previousYearPrice": 516476
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Bath and North East Somerset",
+        "Bournemouth, Christchurch and Poole",
+        "Bristol",
+        "Cornwall",
+        "Devon",
+        "Dorset",
+        "Gloucestershire",
+        "North Somerset",
+        "Plymouth",
+        "Somerset",
+        "South Gloucestershire",
+        "Swindon",
+        "Torbay",
+        "Wiltshire"
+      ]
+    },
+    "LONDON": {
+      "name": "LONDON",
+      "tier": "REGION",
+      "lastUpdated": "2026-02-15T14:49:52.276Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 911207,
+        "momChange": 0,
+        "yoyChange": 40,
+        "totalTransactions": 1832,
+        "transactionChange": -89.6,
+        "previousYearPrice": 650750,
+        "previousYearTransactions": 17668
+      },
+      "propertyTypes": {
+        "Detached": {
+          "averagePrice": 1482926,
+          "transactions": 170,
+          "yoyChange": 35.4,
+          "previousYearPrice": 1095390
+        },
+        "Flats": {
+          "averagePrice": 660469,
+          "transactions": 756,
+          "yoyChange": 33.2,
+          "previousYearPrice": 495866
+        },
+        "Terraced": {
+          "averagePrice": 1024326,
+          "transactions": 572,
+          "yoyChange": 36.3,
+          "previousYearPrice": 751776
+        },
+        "Semi-detached": {
+          "averagePrice": 994030,
+          "transactions": 334,
+          "yoyChange": 32,
+          "previousYearPrice": 753066
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "City of London",
+        "Barking and Dagenham",
+        "Barnet",
+        "Bexley",
+        "Brent",
+        "Bromley",
+        "Camden",
+        "Croydon",
+        "Ealing",
+        "Enfield",
+        "Greenwich",
+        "Hackney",
+        "Hammersmith and Fulham",
+        "Haringey",
+        "Harrow",
+        "Havering",
+        "Hillingdon",
+        "Hounslow",
+        "Islington",
+        "Kensington and Chelsea",
+        "Kingston upon Thames",
+        "Lambeth",
+        "Lewisham",
+        "Merton",
+        "Newham",
+        "Redbridge",
+        "Richmond upon Thames",
+        "Southwark",
+        "Sutton",
+        "Tower Hamlets",
+        "Waltham Forest",
+        "Wandsworth",
+        "Westminster"
+      ]
+    },
+    "WALES": {
+      "name": "WALES",
+      "tier": "REGION",
+      "lastUpdated": "2026-02-15T14:50:01.247Z",
+      "dataPeriod": "Most Recent Quarter",
+      "snapshot": {
+        "averagePrice": 270871,
+        "momChange": 0,
+        "yoyChange": 13.2,
+        "totalTransactions": 635,
+        "transactionChange": -92.6,
+        "previousYearPrice": 239236,
+        "previousYearTransactions": 8574
+      },
+      "propertyTypes": {
+        "Semi-detached": {
+          "averagePrice": 245824,
+          "transactions": 191,
+          "yoyChange": 10.1,
+          "previousYearPrice": 223273
+        },
+        "Terraced": {
+          "averagePrice": 183297,
+          "transactions": 218,
+          "yoyChange": 3.6,
+          "previousYearPrice": 176858
+        },
+        "Flats": {
+          "averagePrice": 189074,
+          "transactions": 37,
+          "yoyChange": 21.8,
+          "previousYearPrice": 155225
+        },
+        "Detached": {
+          "averagePrice": 413209,
+          "transactions": 189,
+          "yoyChange": 14.9,
+          "previousYearPrice": 359497
+        }
+      },
+      "dataSource": "HM Land Registry Price Paid Data (REGION - Most Recent Quarter vs Year Ago)",
+      "compliance": "Insights derived from HM Land Registry Price Paid Data (Open Government Licence). Data reflects completed and registered sales.",
+      "districts": [
+        "Blaenau Gwent",
+        "Bridgend",
+        "Caerphilly",
+        "Cardiff",
+        "Carmarthenshire",
+        "Ceredigion",
+        "Conwy",
+        "Denbighshire",
+        "Flintshire",
+        "Gwynedd",
+        "Isle of Anglesey",
+        "Merthyr Tydfil",
+        "Monmouthshire",
+        "Neath Port Talbot",
+        "Newport",
+        "Pembrokeshire",
+        "Powys",
+        "Rhondda Cynon Taf",
+        "Swansea",
+        "Torfaen",
+        "Vale of Glamorgan",
+        "Wrexham"
+      ]
     }
   }
 }
