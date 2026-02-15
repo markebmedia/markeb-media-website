@@ -1503,27 +1503,12 @@
   object-fit: cover;
   z-index: 0;
   pointer-events: none;
+  opacity: 0; /* Hide initially */
+  transition: opacity 0.3s ease;
 }
 
-/* Hide all video controls */
-.market-lookup-video::-webkit-media-controls {
-  display: none !important;
-}
-
-.market-lookup-video::-webkit-media-controls-enclosure {
-  display: none !important;
-}
-
-.market-lookup-video::-webkit-media-controls-panel {
-  display: none !important;
-}
-
-.market-lookup-video::-webkit-media-controls-play-button {
-  display: none !important;
-}
-
-.market-lookup-video::-webkit-media-controls-start-playback-button {
-  display: none !important;
+.market-lookup-video.playing {
+  opacity: 1; /* Show when playing */
 }
 
 .market-lookup-container {
@@ -4073,6 +4058,19 @@ async function loadRecentBookings() {
     // Initialize all Lucide icons
     lucide.createIcons();
   </script>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const v = document.querySelector(".market-lookup-video");
+    if (v) {
+      v.play().then(() => {
+        v.classList.add('playing'); // Show video when it starts
+      }).catch(() => {
+        // If autoplay fails, just show the gradient background
+      });
+    }
+  });
+</script>
   
 </body>
 </html>
