@@ -2644,7 +2644,7 @@ async function lookupMarketData() {
   }
 
   // Basic UK postcode validation
-  const postcodeRegex = /^[A-Z]{1,2}\d{1,2}[A-Z]?\d[A-Z]{2}$/;
+  const postcodeRegex = /^[A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2}$/;
   if (!postcodeRegex.test(postcode)) {
     showMarketError('Please enter a valid UK postcode (e.g., M1 4AE)');
     return;
@@ -2669,7 +2669,7 @@ async function lookupMarketData() {
 
   try {
     // Step 1: Get location data from postcode
-    const postcodeResponse = await fetch(`https://api.postcodes.io/postcodes/${postcode}`);
+    const postcodeResponse = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`);
     
     if (!postcodeResponse.ok) {
       showMarketError('Postcode not found. Please check and try again.');
