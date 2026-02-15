@@ -1459,11 +1459,16 @@
 
 /* ===== MARKET DATA LOOKUP BAR ===== */
 .market-lookup-bar {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: 
+    linear-gradient(135deg, rgba(59, 130, 246, 0.75) 0%, rgba(37, 99, 235, 0.75) 100%),
+    url('../public/images/property-background.jpg') center/cover;
   padding: 24px 32px;
   margin: 0;
   border-bottom: 2px solid #1e40af;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
 }
 
 .market-lookup-container {
@@ -1728,17 +1733,8 @@
 
 @media (max-width: 480px) {
   .market-lookup-bar {
-  background: 
-    linear-gradient(135deg, rgba(59, 130, 246, 0.75) 0%, rgba(37, 99, 235, 0.75) 100%),
-    url('../public/images/property-background.jpg') center/cover;
-  padding: 24px 32px;
-  margin: 0;
-  border-bottom: 2px solid #1e40af;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  background-attachment: fixed;
-  background-position: center;
-  background-size: cover;
-}
+    padding: 12px 16px;
+  }
 
   .market-lookup-header h3 {
     font-size: 16px;
