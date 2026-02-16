@@ -1,8 +1,12 @@
 // netlify/functions/dropbox-helper.js
 // Dropbox API helper - handles token refresh and folder operations
+// UPDATED: Now supports Dropbox Business Team folders with namespace header
 
 let cachedAccessToken = null;
 let tokenExpiryTime = null;
+
+// ✅ Your team namespace ID (from account info)
+const TEAM_NAMESPACE_ID = '13641191203';
 
 /**
  * Refreshes the Dropbox access token using the refresh token
@@ -60,8 +64,8 @@ async function getAccessToken() {
 }
 
 /**
- * Creates a folder in Dropbox
- * @param {string} path - Full path including folder name (e.g., "/Markeb Media Team folder/Markeb Media - QC Delivery Link/123 Main St")
+ * Creates a folder in Dropbox (with team namespace support)
+ * @param {string} path - Full path including folder name
  */
 async function createFolder(path) {
   const accessToken = await getAccessToken();
@@ -70,7 +74,11 @@ async function createFolder(path) {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Dropbox-API-Path-Root': JSON.stringify({
+        '.tag': 'root',
+        'root': TEAM_NAMESPACE_ID
+      })
     },
     body: JSON.stringify({
       path: path,
@@ -96,7 +104,7 @@ async function createFolder(path) {
 }
 
 /**
- * Creates a shared link for a folder
+ * Creates a shared link for a folder (with team namespace support)
  * @param {string} path - Full path to the folder
  */
 async function createSharedLink(path) {
@@ -107,7 +115,11 @@ async function createSharedLink(path) {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Dropbox-API-Path-Root': JSON.stringify({
+        '.tag': 'root',
+        'root': TEAM_NAMESPACE_ID
+      })
     },
     body: JSON.stringify({
       path: path,
@@ -129,7 +141,11 @@ async function createSharedLink(path) {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Dropbox-API-Path-Root': JSON.stringify({
+        '.tag': 'root',
+        'root': TEAM_NAMESPACE_ID
+      })
     },
     body: JSON.stringify({
       path: path,
@@ -164,7 +180,7 @@ async function createBookingFolders(propertyAddress, companyName, postcode = '')
     // ✅ Create full address with postcode
     const fullAddress = postcode ? `${propertyAddress}, ${postcode}` : propertyAddress;
     
-    // ✅ FIXED: Match exact capitalization in Dropbox (lowercase 'folder')
+    // ✅ Team folder path (lowercase 'folder' - confirmed correct)
     const teamFolder = '/Markeb Media Team folder';
     
     // ===== QC DELIVERY FOLDER (for client downloads) =====
