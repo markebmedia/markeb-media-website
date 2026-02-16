@@ -1,8 +1,8 @@
 // netlify/functions/create-booking.js
-// UPDATED: Now links bookings to authenticated users + sets paymentStatus correctly + handles free bookings + creates Active Bookings with Dropbox folders + SUPPORTS GUEST BOOKINGS
+// UPDATED: Now links bookings to authenticated users + sets paymentStatus correctly + handles free bookings + creates Active Bookings with Dropbox folders + SUPPORTS GUEST BOOKINGS + ACCESS TYPE
 
 exports.handler = async (event, context) => {
-  console.log('=== Create Booking Function (Updated with Auth + Active Bookings + Guest Support) ===');
+  console.log('=== Create Booking Function (Updated with Auth + Active Bookings + Guest Support + Access Type) ===');
   console.log('Method:', event.httpMethod);
   
   const headers = {
@@ -92,6 +92,7 @@ exports.handler = async (event, context) => {
       service: bookingData.service,
       paymentOption: bookingData.paymentOption,
       totalPrice: bookingData.totalPrice,
+      accessType: bookingData.accessType,
       userType: userId ? 'Registered' : 'Guest'
     });
 
@@ -255,7 +256,10 @@ exports.handler = async (event, context) => {
         'Client Email': bookingData.clientEmail,
         'Client Phone': bookingData.clientPhone || '',
         'Client Notes': bookingData.clientNotes || '',
-        'Access Instructions': bookingData.accessInstructions || '',
+        
+        // ✅ NEW: Access Type fields
+        'Access Type': bookingData.accessType || '',
+        'Key Pickup Location': bookingData.keyPickupLocation || '',
         
         'Booking Status': bookingStatus,
         'Payment Status': paymentStatus,
@@ -273,6 +277,7 @@ exports.handler = async (event, context) => {
 
     console.log('Creating Airtable record with payment status:', paymentStatus);
     console.log('Airtable record Region field:', airtableRecord.fields.Region);
+    console.log('Airtable record Access Type:', airtableRecord.fields['Access Type']);
     console.log('User linked:', userId ? 'Yes' : 'No (Guest)');
 
     // Create booking in Airtable
@@ -360,7 +365,10 @@ exports.handler = async (event, context) => {
           discountCode: bookingData.discountCode || '',
           discountAmount: discountAmount,
           trackingCode: trackingCode,
-          region: bookingData.region
+          region: bookingData.region,
+          // ✅ NEW: Access Type fields
+          accessType: bookingData.accessType || '',
+          keyPickupLocation: bookingData.keyPickupLocation || ''
         };
         
         await sendBookingConfirmation(emailData);

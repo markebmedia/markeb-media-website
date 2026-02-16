@@ -61,7 +61,7 @@ async function getAccessToken() {
 
 /**
  * Creates a folder in Dropbox
- * @param {string} path - Full path including folder name (e.g., "/Markeb Media - QC Delivery Link/123 Main St")
+ * @param {string} path - Full path including folder name (e.g., "/Markeb Media Team Folder/Markeb Media - QC Delivery Link/123 Main St")
  */
 async function createFolder(path) {
   const accessToken = await getAccessToken();
@@ -164,9 +164,12 @@ async function createBookingFolders(propertyAddress, companyName, postcode = '')
     // ✅ Create full address with postcode
     const fullAddress = postcode ? `${propertyAddress}, ${postcode}` : propertyAddress;
     
+    // ✅ NEW: Base path for all folders inside Team Folder
+    const teamFolder = '/Markeb Media Team Folder';
+    
     // ===== QC DELIVERY FOLDER (for client downloads) =====
-    const qcBasePath = '/Markeb Media - QC Delivery Link';
-    const qcMainFolder = `${qcBasePath}/${fullAddress}`; // ✅ Use full address
+    const qcBasePath = `${teamFolder}/Markeb Media - QC Delivery Link`;
+    const qcMainFolder = `${qcBasePath}/${fullAddress}`;
     const qcPhotoFolder = `${qcMainFolder}/Photo`;
     const qcVideoFolder = `${qcMainFolder}/Video`;
 
@@ -180,12 +183,12 @@ async function createBookingFolders(propertyAddress, companyName, postcode = '')
     console.log(`✓ QC Delivery folder created with shared link`);
 
     // ===== RAW CLIENT FOLDER (for internal team) =====
-    const rawBasePath = '/Markeb Media Client Folder';
+    const rawBasePath = `${teamFolder}/Markeb Media Client Folder`;
     const rawCompanyFolder = `${rawBasePath}/${companyName}`;
-    const rawPropertyFolder = `${rawCompanyFolder}/${fullAddress}`; // ✅ Use full address
+    const rawPropertyFolder = `${rawCompanyFolder}/${fullAddress}`;
     const rawDroneFolder = `${rawPropertyFolder}/Drone`;
-    const rawOutsourcePhotoFolder = `${rawPropertyFolder}/Outsource Photo - ${fullAddress}`; // ✅ Use full address
-    const rawOutsourceVideoFolder = `${rawPropertyFolder}/Outsource Video - ${fullAddress}`; // ✅ Use full address
+    const rawOutsourcePhotoFolder = `${rawPropertyFolder}/Outsource Photo - ${fullAddress}`;
+    const rawOutsourceVideoFolder = `${rawPropertyFolder}/Outsource Video - ${fullAddress}`;
     const rawClipsFolder = `${rawPropertyFolder}/Raw Clips`;
 
     console.log('Creating Raw Client folders...');

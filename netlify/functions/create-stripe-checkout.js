@@ -168,6 +168,10 @@ exports.handler = async (event, context) => {
         clientPhone: bookingData.clientPhone,
         clientNotes: bookingData.clientNotes || '',
         
+// ✅ ADD THESE TWO LINES HERE:
+  accessType: bookingData.accessType || '',
+  keyPickupLocation: bookingData.keyPickupLocation || '',
+
         // Add-ons
         addons: JSON.stringify(bookingData.addons || []),
         

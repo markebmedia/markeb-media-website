@@ -82,53 +82,57 @@ exports.handler = async (event, context) => {
       addonsArray = [];
     }
 
-   // Return booking data aligned with create-booking.js
-return {
-  statusCode: 200,
-  headers,
-  body: JSON.stringify({
-    id: booking.id,
-    bookingRef: fields['Booking Reference'],
-    postcode: fields['Postcode'],
-    propertyAddress: fields['Property Address'],
-    region: fields['Region'],
-    mediaSpecialist: fields['Media Specialist'],
-    date: fields['Date'],
-    time: fields['Time'],
-    service: fields['Service'],
-    serviceId: fields['Service ID'],
-    duration: fields['Duration (mins)'],
-    bedrooms: fields['Bedrooms'] || 0,
-    basePrice: fields['Base Price'],
-    extraBedroomFee: fields['Extra Bedroom Fee'] || 0,
-    addons: addonsArray,
-    addonsPrice: fields['Add-ons Price'] || 0,
-    totalPrice: fields['Total Price'],
-    finalPrice: fields['Final Price'] || fields['Total Price'] || 0, // ✅ ADD THIS
-    discountCode: fields['Discount Code'] || null,                    // ✅ ADD THIS
-    discountAmount: fields['Discount Amount'] || 0,                   // ✅ ADD THIS
-    priceBeforeDiscount: fields['Price Before Discount'] || 0,        // ✅ ADD THIS
-    bookingStatus: bookingStatus,
-    paymentStatus: fields['Payment Status'] || 'Pending',
-    clientName: fields['Client Name'],
-    clientEmail: fields['Client Email'],
-    clientPhone: fields['Client Phone'],
-    clientNotes: fields['Client Notes'] || '',
-    
-    // Payment method details (for reserved bookings)
-    stripePaymentMethodId: fields['Stripe Payment Method ID'] || '',
-    cardholderName: fields['Cardholder Name'] || '',
-    cardLast4: fields['Card Last 4'] || '',
-    cardBrand: fields['Card Brand'] || '',
-    cardExpiry: fields['Card Expiry'] || '',
-    
-    // Management flags
-    canCancel: canCancel,
-    canReschedule: canReschedule,
-    hoursUntilBooking: Math.round(hoursUntilBooking),
-    isCancelled: isCancelled
-  })
-};
+    // Return booking data aligned with create-booking.js
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({
+        id: booking.id,
+        bookingRef: fields['Booking Reference'],
+        postcode: fields['Postcode'],
+        propertyAddress: fields['Property Address'],
+        region: fields['Region'],
+        mediaSpecialist: fields['Media Specialist'],
+        date: fields['Date'],
+        time: fields['Time'],
+        service: fields['Service'],
+        serviceId: fields['Service ID'],
+        duration: fields['Duration (mins)'],
+        bedrooms: fields['Bedrooms'] || 0,
+        basePrice: fields['Base Price'],
+        extraBedroomFee: fields['Extra Bedroom Fee'] || 0,
+        addons: addonsArray,
+        addonsPrice: fields['Add-ons Price'] || 0,
+        totalPrice: fields['Total Price'],
+        finalPrice: fields['Final Price'] || fields['Total Price'] || 0,
+        discountCode: fields['Discount Code'] || null,
+        discountAmount: fields['Discount Amount'] || 0,
+        priceBeforeDiscount: fields['Price Before Discount'] || 0,
+        bookingStatus: bookingStatus,
+        paymentStatus: fields['Payment Status'] || 'Pending',
+        clientName: fields['Client Name'],
+        clientEmail: fields['Client Email'],
+        clientPhone: fields['Client Phone'],
+        clientNotes: fields['Client Notes'] || '',
+        
+        // ✅ NEW: Access Type fields
+        accessType: fields['Access Type'] || '',
+        keyPickupLocation: fields['Key Pickup Location'] || '',
+        
+        // Payment method details (for reserved bookings)
+        stripePaymentMethodId: fields['Stripe Payment Method ID'] || '',
+        cardholderName: fields['Cardholder Name'] || '',
+        cardLast4: fields['Card Last 4'] || '',
+        cardBrand: fields['Card Brand'] || '',
+        cardExpiry: fields['Card Expiry'] || '',
+        
+        // Management flags
+        canCancel: canCancel,
+        canReschedule: canReschedule,
+        hoursUntilBooking: Math.round(hoursUntilBooking),
+        isCancelled: isCancelled
+      })
+    };
 
   } catch (error) {
     console.error('Error fetching booking:', error);

@@ -976,6 +976,41 @@
           ></textarea>
         </div>
 
+        <!-- Property Access Section - ADD THIS AFTER clientNotes -->
+<div class="form-group">
+  <label class="form-label" for="accessType">Property Access Arrangement *</label>
+  <select 
+    id="accessType" 
+    class="form-input" 
+    style="cursor: pointer;"
+    onchange="handleAccessTypeChange()"
+    required
+  >
+    <option value="">-- Select access type --</option>
+    <option value="Meeting Agent">Meeting Agent at Property</option>
+    <option value="Meeting Vendor">Meeting Vendor at Property</option>
+    <option value="Pick Up Keys">Pick Up Keys from Office</option>
+  </select>
+  <div class="error-message" id="accessTypeError">Please select how access will be arranged</div>
+</div>
+
+<!-- Key Pickup Location (shown only when "Pick Up Keys" selected) -->
+<div id="keyPickupSection" style="display: none;">
+  <div class="form-group">
+    <label class="form-label" for="keyPickupLocation">Key Pickup Location *</label>
+    <input 
+      type="text" 
+      id="keyPickupLocation" 
+      class="form-input" 
+      placeholder="e.g. Main office reception, 123 High Street"
+    />
+    <div style="font-size: 12px; color: #64748b; margin-top: 6px;">
+      Please provide the full address where keys can be collected
+    </div>
+    <div class="error-message" id="keyPickupError">Please enter the key pickup location</div>
+  </div>
+</div>
+
         <!-- Terms & Conditions -->
         <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 28px;">
           <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 16px;">
@@ -1990,7 +2025,20 @@ function handleAddressSelection() {
       const name = document.getElementById('clientName').value.trim();
       const email = document.getElementById('clientEmail').value.trim();
       const phone = document.getElementById('clientPhone').value.trim();
+      const accessType = document.getElementById('accessType').value;
       const paymentOption = bookingData.paymentOption;
+      
+      // Access type conditional validation
+      let accessValid = true;
+      
+      if (accessType === 'Pick Up Keys') {
+        const keyLocation = document.getElementById('keyPickupLocation').value.trim();
+        accessValid = keyLocation.length > 5;
+      } else if (accessType === 'Meeting Agent' || accessType === 'Meeting Vendor') {
+        accessValid = true; // No extra info needed
+      } else {
+        accessValid = false; // Access type not selected
+      }
       
       const termsRevisions = document.getElementById('termsRevisions').checked;
       const termsAgree = document.getElementById('termsAgree').checked;
@@ -2005,7 +2053,7 @@ function handleAddressSelection() {
       
       const submitBtn = document.getElementById('completeBookingBtn');
       
-      if (name && email && phone && paymentOption && termsRevisions && termsAgree && itemRemovalChecked && accessChecked && hygieneChecked) {
+      if (name && email && phone && accessType && accessValid && paymentOption && termsRevisions && termsAgree && itemRemovalChecked && accessChecked && hygieneChecked) {
         submitBtn.disabled = false;
       } else {
         submitBtn.disabled = true;
@@ -2399,9 +2447,17 @@ document.addEventListener('DOMContentLoaded', function() {
   const emailField = document.getElementById('clientEmail');
   const phoneField = document.getElementById('clientPhone');
   
+  // ✅ ADD THESE TWO LINES HERE:
+  const accessTypeField = document.getElementById('accessType');
+  const keyPickupField = document.getElementById('keyPickupLocation');
+  
   if (nameField) nameField.addEventListener('input', validateStep4Form);
   if (emailField) emailField.addEventListener('input', validateStep4Form);
   if (phoneField) phoneField.addEventListener('input', validateStep4Form);
+  
+  // ✅ ADD THESE TWO LINES HERE:
+  if (accessTypeField) accessTypeField.addEventListener('change', validateStep4Form);
+  if (keyPickupField) keyPickupField.addEventListener('input', validateStep4Form);
 
   const checkboxes = ['termsRevisions', 'termsItemRemovalConfirm', 'termsAccess', 'termsHygieneConfirm', 'termsAgree'];
   checkboxes.forEach(id => {
@@ -2506,6 +2562,41 @@ async function completeBooking() {
     document.getElementById('clientPhone').classList.add('error');
     document.getElementById('phoneError').classList.add('show');
     hasError = true;
+  }
+
+  // ✅ ADD THIS ENTIRE ACCESS TYPE VALIDATION SECTION RIGHT HERE (AFTER PHONE VALIDATION):
+  
+  // Validate Access Type
+  const accessType = document.getElementById('accessType').value;
+  
+  if (!accessType) {
+    document.getElementById('accessType').classList.add('error');
+    document.getElementById('accessTypeError').classList.add('show');
+    hasError = true;
+  }
+  
+  // Store access type
+  bookingData.accessType = accessType;
+  
+  // Only validate key pickup location if "Pick Up Keys" selected
+  if (accessType === 'Pick Up Keys') {
+    const keyLocation = document.getElementById('keyPickupLocation').value.trim();
+    if (!keyLocation || keyLocation.length < 5) {
+      document.getElementById('keyPickupLocation').classList.add('error');
+      document.getElementById('keyPickupError').classList.add('show');
+      hasError = true;
+    }
+    bookingData.keyPickupLocation = keyLocation;
+  }
+  
+  // ✅ END OF ACCESS TYPE VALIDATION
+
+  if (hasError) {
+    const firstError = document.querySelector('.form-input.error');
+    if (firstError) {
+      firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
   }
 
   if (hasError) {
@@ -2677,16 +2768,20 @@ async function createBooking() {
     })),
     addonsPrice: bookingData.addonsPrice || 0,
     
-    // ✅ ADD THESE DISCOUNT FIELDS
     discountCode: bookingData.discountCode || '',
     discountAmount: bookingData.discountAmount || 0,
     priceBeforeDiscount: bookingData.priceBeforeDiscount || 0,
-    totalPrice: bookingData.totalPrice, // This should be the discounted price
+    totalPrice: bookingData.totalPrice,
     
     clientName: bookingData.clientName,
     clientEmail: bookingData.clientEmail,
     clientPhone: bookingData.clientPhone,
     clientNotes: bookingData.clientNotes,
+    
+    // ✅ ADD THESE TWO LINES RIGHT HERE (AFTER clientNotes):
+    accessType: bookingData.accessType || '',
+    keyPickupLocation: bookingData.keyPickupLocation || '',
+    
     paymentOption: bookingData.paymentOption,
     
     // Stripe Payment Method (card on file)

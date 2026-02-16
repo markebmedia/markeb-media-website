@@ -4,10 +4,10 @@ const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL = 'Markeb Media <commercial@markebmedia.com>';
-const BCC_EMAIL = 'commercial@markebmedia.com'; // ✅ BCC all client emails
+const BCC_EMAIL = 'commercial@markebmedia.com';
 const SITE_URL = 'https://markebmedia.com';
 const LOGO_URL = 'https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png';
-const MANAGE_BOOKING_PATH = '/manage-booking'; // ✅ Uses redirect to /website/manage-booking.html
+const MANAGE_BOOKING_PATH = '/manage-booking';
 
 // Format date nicely
 function formatDate(dateString) {
@@ -18,6 +18,44 @@ function formatDate(dateString) {
     month: 'long', 
     year: 'numeric' 
   });
+}
+
+// ✅ NEW: Format Access Type Information (simplified - only Pick Up Keys has extra info)
+function getAccessTypeSection(booking) {
+  if (!booking.accessType) return '';
+  
+  let accessDetails = '';
+  
+  if (booking.accessType === 'Meeting Agent') {
+    accessDetails = `
+      <div class="detail-row">
+        <span class="detail-label">Access Arrangement</span>
+        <span class="detail-value">Meeting Agent at Property</span>
+      </div>
+    `;
+  } else if (booking.accessType === 'Meeting Vendor') {
+    accessDetails = `
+      <div class="detail-row">
+        <span class="detail-label">Access Arrangement</span>
+        <span class="detail-value">Meeting Vendor at Property</span>
+      </div>
+    `;
+  } else if (booking.accessType === 'Pick Up Keys') {
+    accessDetails = `
+      <div class="detail-row">
+        <span class="detail-label">Access Arrangement</span>
+        <span class="detail-value">Pick Up Keys from Office</span>
+      </div>
+      ${booking.keyPickupLocation ? `
+      <div class="detail-row">
+        <span class="detail-label">Key Pickup Location</span>
+        <span class="detail-value">${booking.keyPickupLocation}</span>
+      </div>
+      ` : ''}
+    `;
+  }
+  
+  return accessDetails;
 }
 
 // Email Layout Wrapper
@@ -44,11 +82,11 @@ function getEmailLayout(content) {
       background-color: #ffffff;
     }
     .header {
-  background-color: #3b82f6;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  padding: 40px 20px;
-  text-align: center;
-}
+      background-color: #3b82f6;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      padding: 40px 20px;
+      text-align: center;
+    }
     .header img {
       max-width: 200px;
       width: 100%;
@@ -91,16 +129,16 @@ function getEmailLayout(content) {
       max-width: 60%;
     }
     .button {
-  display: inline-block;
-  background-color: #3b82f6;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: #ffffff !important;
-  padding: 14px 32px;
-  border-radius: 10px;
-  text-decoration: none;
-  font-weight: 600;
-  margin: 20px 0;
-}
+      display: inline-block;
+      background-color: #3b82f6;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: #ffffff !important;
+      padding: 14px 32px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 20px 0;
+    }
     .alert {
       padding: 16px;
       border-radius: 8px;
@@ -163,7 +201,6 @@ function getEmailLayout(content) {
 async function sendBookingConfirmation(booking) {
   const manageUrl = `${SITE_URL}${MANAGE_BOOKING_PATH}?ref=${booking.bookingRef}&email=${encodeURIComponent(booking.clientEmail)}`;
   
-  // Determine if payment is already completed or pending
   const isPaid = booking.paymentStatus === 'Paid';
   const isAdminBooking = booking.createdBy === 'Admin';
   
@@ -199,6 +236,7 @@ async function sendBookingConfirmation(booking) {
         <span class="detail-label">Your Media Specialist</span>
         <span class="detail-value">${booking.mediaSpecialist}</span>
       </div>
+      ${getAccessTypeSection(booking)}
       <div class="detail-row">
         <span class="detail-label">Total Amount</span>
         <span class="detail-value">£${booking.totalPrice.toFixed(2)}</span>
@@ -220,6 +258,22 @@ async function sendBookingConfirmation(booking) {
             : 'We\'ll charge your card automatically once your content enters the editing stage.'}
       </div>
     `}
+
+    ${booking.accessType ? `
+    <div class="alert alert-info">
+      <strong>🔑 Property Access Details</strong><br>
+      ${booking.accessType === 'Meeting Agent' ? `
+        <strong>Meeting Agent at Property</strong><br>
+        Your Media Specialist will meet the agent on-site at ${booking.time}.
+      ` : booking.accessType === 'Meeting Vendor' ? `
+        <strong>Meeting Vendor at Property</strong><br>
+        Your Media Specialist will meet the vendor on-site at ${booking.time}.
+      ` : booking.accessType === 'Pick Up Keys' ? `
+        <strong>Keys to be collected from:</strong><br>
+        ${booking.keyPickupLocation || 'Location TBC'}
+      ` : ''}
+    </div>
+    ` : ''}
 
     <center>
       <a href="${manageUrl}" class="button">Manage Your Booking</a>
@@ -249,7 +303,9 @@ async function sendBookingConfirmation(booking) {
       <li>Ensure the property is tidy and well-lit</li>
       <li>Remove personal items, toiletries, and clutter</li>
       <li>Turn on all lights for the best results</li>
-      <li>Have access arranged for the Media Specialist</li>
+      ${booking.accessType === 'Pick Up Keys' ? '<li>Confirm key pickup location and time with the office</li>' : ''}
+      ${booking.accessType === 'Meeting Agent' ? '<li>Ensure the agent will be available at the property at the scheduled time</li>' : ''}
+      ${booking.accessType === 'Meeting Vendor' ? '<li>Ensure the vendor will be available at the property at the scheduled time</li>' : ''}
     </ul>
 
     <p>If you have any questions, feel free to reach out!</p>
@@ -258,67 +314,61 @@ async function sendBookingConfirmation(booking) {
 
   const emailHtml = getEmailLayout(content);
 
-  // ✅ Determine BCC recipients based on region
-  const bccRecipients = [BCC_EMAIL]; // Always include office email
+  const bccRecipients = [BCC_EMAIL];
   
   if (booking.region) {
     if (booking.region.toLowerCase() === 'north') {
       bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
-      console.log('✓ BCC: Adding Jodie (North region)');
     } else if (booking.region.toLowerCase() === 'south') {
       bccRecipients.push('Maeve.Darley@markebmedia.com');
-      console.log('✓ BCC: Adding Maeve (South region)');
     }
   }
 
-  // Send to customer with BCC to office and regional media specialist
   await resend.emails.send({
     from: FROM_EMAIL,
     to: booking.clientEmail,
-    bcc: bccRecipients, // ✅ Array of BCC recipients
+    bcc: bccRecipients,
     subject: `Booking ${isPaid ? 'Confirmed' : 'Reserved'} - ${booking.bookingRef}`,
     html: emailHtml
   });
 
-  // ✅ ADDITIONAL: Send internal notification to office for admin bookings
   if (isAdminBooking) {
     const internalContent = `
       <h2>🔔 New Admin Booking Created</h2>
       <p><strong>Admin created a new booking:</strong></p>
 
       <div class="booking-details">
-        <div class="booking-details">
-      <div class="detail-row">
-        <span class="detail-label">Booking Reference</span>
-        <span class="detail-value">${booking.bookingRef}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Service</span>
-        <span class="detail-value">${booking.service}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Date & Time</span>
-        <span class="detail-value">${formatDate(booking.date)} at ${booking.time}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Property Address</span>
-        <span class="detail-value">${booking.propertyAddress}${booking.postcode ? `, ${booking.postcode}` : ''}</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-label">Your Media Specialist</span>
-        <span class="detail-value">${booking.mediaSpecialist}</span>
-      </div>
-      ${booking.discountCode && booking.discountAmount > 0 ? `
-      <div class="detail-row">
-        <span class="detail-label">Discount (${booking.discountCode})</span>
-        <span class="detail-value" style="color: #10b981;">-£${booking.discountAmount.toFixed(2)}</span>
-      </div>
-      ` : ''}
-      <div class="detail-row">
-        <span class="detail-label">Total Amount</span>
-        <span class="detail-value">£${booking.totalPrice.toFixed(2)}</span>
-      </div>
-    </div>
+        <div class="detail-row">
+          <span class="detail-label">Booking Reference</span>
+          <span class="detail-value">${booking.bookingRef}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Service</span>
+          <span class="detail-value">${booking.service}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Date & Time</span>
+          <span class="detail-value">${formatDate(booking.date)} at ${booking.time}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Property Address</span>
+          <span class="detail-value">${booking.propertyAddress}${booking.postcode ? `, ${booking.postcode}` : ''}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Media Specialist</span>
+          <span class="detail-value">${booking.mediaSpecialist}</span>
+        </div>
+        ${getAccessTypeSection(booking)}
+        ${booking.discountCode && booking.discountAmount > 0 ? `
+        <div class="detail-row">
+          <span class="detail-label">Discount (${booking.discountCode})</span>
+          <span class="detail-value" style="color: #10b981;">-£${booking.discountAmount.toFixed(2)}</span>
+        </div>
+        ` : ''}
+        <div class="detail-row">
+          <span class="detail-label">Total Amount</span>
+          <span class="detail-value">£${booking.totalPrice.toFixed(2)}</span>
+        </div>
         <div class="detail-row">
           <span class="detail-label">Payment Status</span>
           <span class="detail-value">${booking.paymentStatus}</span>
@@ -335,7 +385,7 @@ async function sendBookingConfirmation(booking) {
 
     await resend.emails.send({
       from: FROM_EMAIL,
-      to: BCC_EMAIL, // Send directly to office
+      to: BCC_EMAIL,
       subject: `[ADMIN BOOKING] ${booking.bookingRef} - ${booking.clientName}`,
       html: internalEmailHtml
     });
@@ -372,6 +422,7 @@ async function sendPaymentConfirmation(booking) {
         <span class="detail-label">Your Media Specialist</span>
         <span class="detail-value">${booking.mediaSpecialist}</span>
       </div>
+      ${getAccessTypeSection(booking)}
       <div class="detail-row">
         <span class="detail-label">Amount Paid</span>
         <span class="detail-value">£${booking.amountPaid.toFixed(2)}</span>
@@ -404,7 +455,9 @@ async function sendPaymentConfirmation(booking) {
       <li>Ensure the property is tidy and well-lit</li>
       <li>Remove personal items, toiletries, and clutter</li>
       <li>Turn on all lights for the best results</li>
-      <li>Have access arranged for the Media Specialist</li>
+      ${booking.accessType === 'Pick Up Keys' ? '<li>Confirm key pickup location and time with the office</li>' : ''}
+      ${booking.accessType === 'Meeting Agent' ? '<li>Ensure the agent will be available at the property at the scheduled time</li>' : ''}
+      ${booking.accessType === 'Meeting Vendor' ? '<li>Ensure the vendor will be available at the property at the scheduled time</li>' : ''}
     </ul>
 
     <p>If you have any questions, feel free to reach out!</p>
@@ -457,6 +510,7 @@ async function sendRescheduleConfirmation(booking, oldDate, oldTime) {
         <span class="detail-label">Your Media Specialist</span>
         <span class="detail-value">${booking.mediaSpecialist}</span>
       </div>
+      ${getAccessTypeSection(booking)}
     </div>
 
     <center>
@@ -565,7 +619,22 @@ async function sendReminderEmail(booking) {
         <span class="detail-label">Service</span>
         <span class="detail-value">${booking.service}</span>
       </div>
+      ${getAccessTypeSection(booking)}
     </div>
+
+    ${booking.accessType ? `
+    <div class="alert alert-warning">
+      <strong>🔑 Property Access Reminder</strong><br>
+      ${booking.accessType === 'Meeting Agent' ? `
+        Please ensure the agent will be at the property at ${booking.time} to provide access.
+      ` : booking.accessType === 'Meeting Vendor' ? `
+        Please ensure the vendor will be at the property at ${booking.time} to provide access.
+      ` : booking.accessType === 'Pick Up Keys' ? `
+        Please confirm keys are available for collection at:<br>
+        <strong>${booking.keyPickupLocation}</strong>
+      ` : ''}
+    </div>
+    ` : ''}
 
     <div class="alert alert-info">
       <strong>📸 Final Preparations</strong><br>
@@ -577,7 +646,9 @@ async function sendReminderEmail(booking) {
       <li>✅ Property is clean and tidy</li>
       <li>✅ Personal items and clutter removed</li>
       <li>✅ All lights turned on</li>
-      <li>✅ Access arranged for Media Specialist</li>
+      ${booking.accessType === 'Pick Up Keys' ? '<li>✅ Keys confirmed at pickup location</li>' : ''}
+      ${booking.accessType === 'Meeting Agent' ? '<li>✅ Agent confirmed for property access</li>' : ''}
+      ${booking.accessType === 'Meeting Vendor' ? '<li>✅ Vendor confirmed for property access</li>' : ''}
       <li>✅ Pets secured (if applicable)</li>
     </ul>
 
@@ -652,6 +723,7 @@ async function sendServiceModificationConfirmation(booking, oldService, oldPrice
         <span class="detail-label">Your Media Specialist</span>
         <span class="detail-value">${booking.mediaSpecialist}</span>
       </div>
+      ${getAccessTypeSection(booking)}
       <div class="detail-row">
         <span class="detail-label">New Total Amount</span>
         <span class="detail-value">£${newPrice.toFixed(2)}</span>

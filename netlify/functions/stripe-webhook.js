@@ -286,10 +286,13 @@ exports.handler = async (event, context) => {
         'Final Price': totalPrice,
         
         'Client Name': metadata.clientName,
-        'Client Email': metadata.clientEmail,
-        'Client Phone': metadata.clientPhone || '',
-        'Client Notes': metadata.clientNotes || '',
-        'Access Instructions': metadata.accessInstructions || '',
+'Client Email': metadata.clientEmail,
+'Client Phone': metadata.clientPhone || '',
+'Client Notes': metadata.clientNotes || '',
+
+// ✅ ADD THESE TWO LINES:
+'Access Type': metadata.accessType || '',
+'Key Pickup Location': metadata.keyPickupLocation || '',
         
         'Booking Status': 'Confirmed',
         'Payment Status': 'Paid',
@@ -354,26 +357,29 @@ exports.handler = async (event, context) => {
           const { sendBookingConfirmation } = require('./email-service');
           
           const emailData = {
-            bookingRef: bookingRef,
-            clientName: metadata.clientName,
-            clientEmail: metadata.clientEmail,
-            service: metadata.service,
-            date: metadata.date,
-            time: metadata.time,
-            propertyAddress: metadata.propertyAddress,
-            postcode: metadata.postcode,
-            mediaSpecialist: metadata.mediaSpecialist,
-            totalPrice: totalPrice,
-            duration: parseInt(metadata.duration) || 90,
-            paymentStatus: 'Paid',
-            bookingStatus: 'Confirmed',
-            createdBy: 'Customer',
-            cardLast4: '',
-            discountCode: discountCode,
-            discountAmount: discountAmount,
-            trackingCode: trackingCode,
-            region: capitalizedRegion
-          };
+  bookingRef: bookingRef,
+  clientName: metadata.clientName,
+  clientEmail: metadata.clientEmail,
+  service: metadata.service,
+  date: metadata.date,
+  time: metadata.time,
+  propertyAddress: metadata.propertyAddress,
+  postcode: metadata.postcode,
+  mediaSpecialist: metadata.mediaSpecialist,
+  totalPrice: totalPrice,
+  duration: parseInt(metadata.duration) || 90,
+  paymentStatus: 'Paid',
+  bookingStatus: 'Confirmed',
+  createdBy: 'Customer',
+  cardLast4: '',
+  discountCode: discountCode,
+  discountAmount: discountAmount,
+  trackingCode: trackingCode,
+  region: capitalizedRegion,
+  // ✅ ADD THESE TWO LINES:
+  accessType: metadata.accessType || '',
+  keyPickupLocation: metadata.keyPickupLocation || ''
+};
           
           await sendBookingConfirmation(emailData);
           console.log(`✓ Confirmation email sent to ${metadata.clientEmail}`);
