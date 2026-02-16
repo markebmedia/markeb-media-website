@@ -308,20 +308,21 @@ exports.handler = async (event, context) => {
       const { createActiveBooking } = require('./create-active-booking');
       
       const activeBookingData = {
-        bookingRef: bookingRef,
-        propertyAddress: bookingData.propertyAddress,
-        postcode: bookingData.postcode,
-        clientName: bookingData.clientName,
-        clientEmail: bookingData.clientEmail,
-        clientPhone: bookingData.clientPhone,
-        service: bookingData.service,
-        date: bookingData.date,
-        time: bookingData.time,
-        region: bookingData.region,
-        mediaSpecialist: bookingData.mediaSpecialist,
-        bookingStatus: bookingStatus,
-        paymentStatus: paymentStatus
-      };
+  bookingRef: bookingRef,
+  propertyAddress: bookingData.propertyAddress,
+  postcode: bookingData.postcode,
+  clientName: bookingData.clientName,
+  clientEmail: bookingData.clientEmail,
+  clientPhone: bookingData.clientPhone,
+  service: bookingData.service,
+  date: bookingData.date,
+  time: bookingData.time,
+  region: bookingData.region,
+  mediaSpecialist: bookingData.mediaSpecialist,
+  bookingStatus: bookingStatus,
+  paymentStatus: paymentStatus,
+  addons: bookingData.addons || []  // ✅ ADD THIS LINE
+};
 
       const activeBookingResult = await createActiveBooking(activeBookingData);
       
@@ -347,30 +348,30 @@ exports.handler = async (event, context) => {
         const { sendBookingConfirmation } = require('./email-service');
         
         const emailData = {
-          bookingRef: bookingRef,
-          clientName: bookingData.clientName,
-          clientEmail: bookingData.clientEmail,
-          service: bookingData.service,
-          date: bookingData.date,
-          time: bookingData.time,
-          propertyAddress: bookingData.propertyAddress,
-          postcode: bookingData.postcode,
-          mediaSpecialist: bookingData.mediaSpecialist,
-          totalPrice: finalPrice,
-          duration: bookingData.duration,
-          paymentStatus: paymentStatus,
-          bookingStatus: bookingStatus,
-          createdBy: bookingData.createdBy || 'Customer',
-          cardLast4: bookingData.cardLast4 || '',
-          discountCode: bookingData.discountCode || '',
-          discountAmount: discountAmount,
-          trackingCode: trackingCode,
-          region: bookingData.region,
-          // ✅ NEW: Access Type fields
-          accessType: bookingData.accessType || '',
-          keyPickupLocation: bookingData.keyPickupLocation || ''
-        };
-        
+  bookingRef: bookingRef,
+  clientName: bookingData.clientName,
+  clientEmail: bookingData.clientEmail,
+  service: bookingData.service,
+  date: bookingData.date,
+  time: bookingData.time,
+  propertyAddress: bookingData.propertyAddress,
+  postcode: bookingData.postcode,
+  mediaSpecialist: bookingData.mediaSpecialist,
+  totalPrice: finalPrice,
+  duration: bookingData.duration,
+  paymentStatus: paymentStatus,
+  bookingStatus: bookingStatus,
+  createdBy: bookingData.createdBy || 'Customer',
+  cardLast4: bookingData.cardLast4 || '',
+  discountCode: bookingData.discountCode || '',
+  discountAmount: discountAmount,
+  trackingCode: trackingCode,
+  region: bookingData.region,
+  accessType: bookingData.accessType || '',
+  keyPickupLocation: bookingData.keyPickupLocation || '',
+  addons: bookingData.addons || []  // ✅ ADD THIS LINE
+};
+
         await sendBookingConfirmation(emailData);
         console.log(`✓ Confirmation email sent to ${bookingData.clientEmail}`);
         

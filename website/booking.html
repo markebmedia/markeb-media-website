@@ -2060,6 +2060,38 @@ function handleAddressSelection() {
       }
     }
 
+    // Handle Access Type Change
+function handleAccessTypeChange() {
+  const accessType = document.getElementById('accessType').value;
+  const keyPickupSection = document.getElementById('keyPickupSection');
+  const keyPickupInput = document.getElementById('keyPickupLocation');
+  
+  // Clear previous errors
+  document.getElementById('accessTypeError').classList.remove('show');
+  document.getElementById('accessType').classList.remove('error');
+  
+  // Reset key pickup requirement
+  keyPickupInput.required = false;
+  
+  if (accessType === 'Pick Up Keys') {
+    // Show key pickup section
+    keyPickupSection.style.display = 'block';
+    keyPickupInput.required = true;
+    
+    // Focus on the input after a short delay
+    setTimeout(() => {
+      keyPickupInput.focus();
+    }, 100);
+  } else {
+    // Hide key pickup section
+    keyPickupSection.style.display = 'none';
+    keyPickupInput.value = '';
+  }
+  
+  // Revalidate form
+  validateStep4Form();
+}
+
     // Render Services
     function renderServices() {
       const region = bookingData.region; // ✅ FIXED: lowercase

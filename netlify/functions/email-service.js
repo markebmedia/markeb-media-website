@@ -20,7 +20,17 @@ function formatDate(dateString) {
   });
 }
 
-// ✅ NEW: Format Access Type Information (simplified - only Pick Up Keys has extra info)
+// ✅ Format Service with Add-ons
+function formatServiceWithAddons(service, addons) {
+  if (!addons || addons.length === 0) {
+    return service;
+  }
+  
+  const addonNames = addons.map(a => a.name).join(', ');
+  return `${service}<br><span style="font-size: 13px; color: #64748b;">Add-ons: ${addonNames}</span>`;
+}
+
+// ✅ Format Access Type Information
 function getAccessTypeSection(booking) {
   if (!booking.accessType) return '';
   
@@ -197,7 +207,7 @@ function getEmailLayout(content) {
   `;
 }
 
-// 1. Booking Confirmation (Works for both Customer & Admin bookings)
+// 1. Booking Confirmation
 async function sendBookingConfirmation(booking) {
   const manageUrl = `${SITE_URL}${MANAGE_BOOKING_PATH}?ref=${booking.bookingRef}&email=${encodeURIComponent(booking.clientEmail)}`;
   
@@ -222,7 +232,7 @@ async function sendBookingConfirmation(booking) {
       ` : ''}
       <div class="detail-row">
         <span class="detail-label">Service</span>
-        <span class="detail-value">${booking.service}</span>
+        <span class="detail-value">${formatServiceWithAddons(booking.service, booking.addons)}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Date & Time</span>
@@ -344,7 +354,7 @@ async function sendBookingConfirmation(booking) {
         </div>
         <div class="detail-row">
           <span class="detail-label">Service</span>
-          <span class="detail-value">${booking.service}</span>
+          <span class="detail-value">${formatServiceWithAddons(booking.service, booking.addons)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Date & Time</span>
@@ -392,7 +402,7 @@ async function sendBookingConfirmation(booking) {
   }
 }
 
-// 2. Payment Confirmation (Stripe)
+// 2. Payment Confirmation
 async function sendPaymentConfirmation(booking) {
   const manageUrl = `${SITE_URL}${MANAGE_BOOKING_PATH}?ref=${booking.bookingRef}&email=${encodeURIComponent(booking.clientEmail)}`;
   
@@ -408,7 +418,7 @@ async function sendPaymentConfirmation(booking) {
       </div>
       <div class="detail-row">
         <span class="detail-label">Service</span>
-        <span class="detail-value">${booking.service}</span>
+        <span class="detail-value">${formatServiceWithAddons(booking.service, booking.addons)}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Date & Time</span>
@@ -496,7 +506,7 @@ async function sendRescheduleConfirmation(booking, oldDate, oldTime) {
       </div>
       <div class="detail-row">
         <span class="detail-label">Service</span>
-        <span class="detail-value">${booking.service}</span>
+        <span class="detail-value">${formatServiceWithAddons(booking.service, booking.addons)}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">New Date & Time</span>
@@ -550,7 +560,7 @@ async function sendCancellationConfirmation(booking, cancellationCharge, refundA
       </div>
       <div class="detail-row">
         <span class="detail-label">Service</span>
-        <span class="detail-value">${booking.service}</span>
+        <span class="detail-value">${formatServiceWithAddons(booking.service, booking.addons)}</span>
       </div>
       <div class="detail-row">
         <span class="detail-label">Total Amount</span>
@@ -617,7 +627,7 @@ async function sendReminderEmail(booking) {
       </div>
       <div class="detail-row">
         <span class="detail-label">Service</span>
-        <span class="detail-value">${booking.service}</span>
+        <span class="detail-value">${formatServiceWithAddons(booking.service, booking.addons)}</span>
       </div>
       ${getAccessTypeSection(booking)}
     </div>
@@ -701,7 +711,7 @@ async function sendServiceModificationConfirmation(booking, oldService, oldPrice
 
     <div class="alert alert-success">
       <strong>New Service:</strong><br>
-      ${booking.service} - £${newPrice.toFixed(2)}
+      ${formatServiceWithAddons(booking.service, booking.addons)} - £${newPrice.toFixed(2)}
     </div>
 
     ${paymentSection}

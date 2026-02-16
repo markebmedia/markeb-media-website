@@ -61,7 +61,7 @@ async function getAccessToken() {
 
 /**
  * Creates a folder in Dropbox
- * @param {string} path - Full path including folder name (e.g., "/Markeb Media Team Folder/Markeb Media - QC Delivery Link/123 Main St")
+ * @param {string} path - Full path including folder name (e.g., "/Markeb Media Team folder/Markeb Media - QC Delivery Link/123 Main St")
  */
 async function createFolder(path) {
   const accessToken = await getAccessToken();
@@ -164,8 +164,8 @@ async function createBookingFolders(propertyAddress, companyName, postcode = '')
     // ✅ Create full address with postcode
     const fullAddress = postcode ? `${propertyAddress}, ${postcode}` : propertyAddress;
     
-    // ✅ NEW: Base path for all folders inside Team Folder
-    const teamFolder = '/Markeb Media Team Folder';
+    // ✅ FIXED: Match exact capitalization in Dropbox (lowercase 'folder')
+    const teamFolder = '/Markeb Media Team folder';
     
     // ===== QC DELIVERY FOLDER (for client downloads) =====
     const qcBasePath = `${teamFolder}/Markeb Media - QC Delivery Link`;

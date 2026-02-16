@@ -321,20 +321,21 @@ exports.handler = async (event, context) => {
         const { createActiveBooking } = require('./create-active-booking');
         
         const activeBookingData = {
-          bookingRef: bookingRef,
-          propertyAddress: metadata.propertyAddress,
-          postcode: metadata.postcode,
-          clientName: metadata.clientName,
-          clientEmail: metadata.clientEmail,
-          clientPhone: metadata.clientPhone,
-          service: metadata.service,
-          date: metadata.date,
-          time: metadata.time,
-          region: capitalizedRegion,
-          mediaSpecialist: metadata.mediaSpecialist,
-          bookingStatus: 'Confirmed',
-          paymentStatus: 'Paid'
-        };
+  bookingRef: bookingRef,
+  propertyAddress: metadata.propertyAddress,
+  postcode: metadata.postcode,
+  clientName: metadata.clientName,
+  clientEmail: metadata.clientEmail,
+  clientPhone: metadata.clientPhone,
+  service: metadata.service,
+  date: metadata.date,
+  time: metadata.time,
+  region: capitalizedRegion,
+  mediaSpecialist: metadata.mediaSpecialist,
+  bookingStatus: 'Confirmed',
+  paymentStatus: 'Paid',
+  addons: addons  // ✅ ADD THIS LINE (addons is already parsed on line 236)
+};
 
         const activeBookingResult = await createActiveBooking(activeBookingData);
         
@@ -376,9 +377,9 @@ exports.handler = async (event, context) => {
   discountAmount: discountAmount,
   trackingCode: trackingCode,
   region: capitalizedRegion,
-  // ✅ ADD THESE TWO LINES:
   accessType: metadata.accessType || '',
-  keyPickupLocation: metadata.keyPickupLocation || ''
+  keyPickupLocation: metadata.keyPickupLocation || '',
+  addons: addons  // ✅ ADD THIS LINE
 };
           
           await sendBookingConfirmation(emailData);

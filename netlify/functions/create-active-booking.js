@@ -78,9 +78,9 @@ async function createActiveBooking(bookingData) {
       fields: {
         'Project Address': `${sanitizedAddress}, ${bookingData.postcode}`,
         'Customer Name': bookingData.clientName,
-        'Service Type': bookingData['Add-Ons']
-  ? `${bookingData.service}, ${bookingData['Add-Ons']}` 
-  : bookingData.service,
+        'Service Type': bookingData.addons && bookingData.addons.length > 0
+          ? `${bookingData.service} + ${bookingData.addons.map(a => a.name).join(', ')}`
+          : bookingData.service,
         'Shoot Date': bookingData.date,
         'Status': 'Booked',
         'Delivery Link': dropboxResult.sharedLink, // This gets the QC Ready folder link
