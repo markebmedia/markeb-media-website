@@ -128,11 +128,15 @@ async function createSharedLink(path) {
   });
 
   if (listResponse.ok) {
-    const listData = await listResponse.json();
-    if (listData.links && listData.links.length > 0) {
-      console.log(`✓ Using existing shared link for: ${path}`);
-      // Convert preview link to download link
-      return listData.links[0].url.replace('dl=0', 'dl=1');
+    try {
+      const listData = await listResponse.json();
+      if (listData.links && listData.links.length > 0) {
+        console.log(`✓ Using existing shared link for: ${path}`);
+        // Convert preview link to download link
+        return listData.links[0].url.replace('dl=0', 'dl=1');
+      }
+    } catch (parseError) {
+      console.log('Could not parse existing links response, will create new link');
     }
   }
 
@@ -158,8 +162,16 @@ async function createSharedLink(path) {
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`Failed to create shared link for ${path}: ${JSON.stringify(error)}`);
+    const errorText = await response.text();
+    console.error('Dropbox shared link error response:', errorText);
+    
+    // Try to parse as JSON, but handle if it's not
+    try {
+      const error = JSON.parse(errorText);
+      throw new Error(`Failed to create shared link for ${path}: ${JSON.stringify(error)}`);
+    } catch (e) {
+      throw new Error(`Failed to create shared link for ${path}: ${errorText}`);
+    }
   }
 
   const data = await response.json();
