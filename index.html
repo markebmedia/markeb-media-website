@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premium Property Media & Marketing | Markeb Media</title>
     <meta name="description" content="Professional real estate photography, videography & drone services in the UK. Premium marketing and media delivered within 48 hours. Book your property shoot today.">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="../public/images/Markeb Media Logo (2).PNG">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * {
             margin: 0;
@@ -36,15 +36,15 @@
 
         /* Hero Landing Section */
         .hero-landing {
-    background: #FFFFFF;
-    color: #1F2E3C;
-    padding: 40px 20px 80px; /* Changed from 80px 20px */
-    text-align: center;
-    min-height: calc(100vh - 90px); /* Account for header height */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+            background: #FFFFFF;
+            color: #1F2E3C;
+            padding: 40px 20px 80px;
+            text-align: center;
+            min-height: calc(100vh - 90px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         .hero-content {
             max-width: 900px;
@@ -193,6 +193,10 @@
             font-weight: 700;
             margin-bottom: 15px;
             color: #1F2E3C;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .step-card p {
@@ -213,6 +217,9 @@
             position: relative;
             animation: pulse 2s infinite;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         @keyframes pulse {
@@ -233,6 +240,9 @@
             z-index: 3;
             animation: celebrate 3s ease-in-out infinite;
             border: 4px solid #FFFFFF;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         @keyframes celebrate {
@@ -262,8 +272,11 @@
         }
 
         .benefit-item .icon {
-            font-size: 1.8em;
             margin-bottom: 10px;
+            color: #FF6B00;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .benefit-item h4 {
@@ -393,21 +406,12 @@
         }
 
         .service-icon {
-            font-size: 2.8em;
             margin-bottom: 20px;
-            background: linear-gradient(135deg, #FF6B00, #FF8A33);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            filter: drop-shadow(0 2px 4px rgba(255, 107, 0, 0.2));
-            line-height: 1;
-            height: 1.2em;
+            color: #FF6B00;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-left: auto;
-            margin-right: auto;
-            width: 1.2em;
+            filter: drop-shadow(0 2px 4px rgba(255, 107, 0, 0.2));
         }
 
         .service-card h3 {
@@ -429,12 +433,10 @@
             position: absolute;
             top: 25px;
             right: 25px;
-            font-size: 1.8em;
             color: #22C55E;
             opacity: 0;
             transform: scale(.5) rotate(-180deg);
             animation: tickPop .8s ease forwards;
-            text-shadow: 0 2px 4px rgba(34, 197, 94, 0.3);
         }
 
         .service-card:nth-child(1) .tick { animation-delay: .2s; }
@@ -617,6 +619,9 @@
             margin-bottom: 18px;
             position: relative;
             z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .danger-card h2 {
@@ -679,7 +684,6 @@
         }
 
         .stake-icon {
-            font-size: 1.2em;
             margin-top: 2px;
             flex-shrink: 0;
         }
@@ -716,7 +720,9 @@
         }
 
         .header-badge {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             background: linear-gradient(135deg, #FF6B00, #FF8A33);
             color: white;
             padding: 8px 20px;
@@ -753,9 +759,10 @@
         }
 
         .scenario-icon {
-            font-size: 2.5em;
             margin-bottom: 20px;
-            display: block;
+            display: flex;
+            align-items: center;
+            color: #FF6B00;
         }
 
         .scenario-card h3 {
@@ -979,7 +986,6 @@
         }
 
         .faq-icon {
-            font-size: 1.5em;
             color: #FF6B00;
             transition: transform 0.3s ease;
             flex-shrink: 0;
@@ -1005,48 +1011,41 @@
             margin-top: 15px;
         }
 
-  /* Responsive Design */
-@media (max-width: 768px) {
-    .hero-landing h1 {
-        font-size: 2.2em;
-        margin-bottom: 25px;
-    }
-    
-    .hero-landing p {
-        font-size: 1.15em;
-        margin-bottom: 35px;
-    }
-    
-    .cta-primary, .cta-secondary {
-        display: block;
-        width: 100%;
-        max-width: 300px;
-        margin: 10px auto;
-        text-align: center;
-    }
-    
-    /* Header responsive styles */
-    header img {
-        height: 80px !important;
-    }
-    
-    header .cta-primary {
-        padding: 10px 20px !important;
-        font-size: 0.85em !important;
-        width: auto !important;
-        max-width: none !important;
-        display: inline-block !important;
-    }
-    
-    header > div {
-        gap: 10px;
-    }
-
-    /* Rest of existing mobile styles continue below... */
-    .testimonials-container {
-        grid-template-columns: 1fr;
-        gap: 25px;
-    }
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-landing h1 {
+                font-size: 2.2em;
+                margin-bottom: 25px;
+            }
+            
+            .hero-landing p {
+                font-size: 1.15em;
+                margin-bottom: 35px;
+            }
+            
+            .cta-primary, .cta-secondary {
+                display: block;
+                width: 100%;
+                max-width: 300px;
+                margin: 10px auto;
+                text-align: center;
+            }
+            
+            header img {
+                height: 80px !important;
+            }
+            
+            header .cta-primary {
+                padding: 10px 20px !important;
+                font-size: 0.85em !important;
+                width: auto !important;
+                max-width: none !important;
+                display: inline-block !important;
+            }
+            
+            header > div {
+                gap: 10px;
+            }
 
             .testimonials-container {
                 grid-template-columns: 1fr;
@@ -1156,407 +1155,412 @@
                 max-width: 300px;
             }
         }
+
         /* Audit Section Styles */
-.audit-section {
-    background: #FFFFFF;
-    padding: 80px 20px;
-    position: relative;
-    overflow: hidden;
-}
+        .audit-section {
+            background: #FFFFFF;
+            padding: 80px 20px;
+            position: relative;
+            overflow: hidden;
+        }
 
-.audit-container {
-    max-width: 800px;
-    margin: 0 auto;
-    background: #FFFFFF;
-    border-radius: 24px;
-    padding: 50px 40px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-    border: 2px solid #F1F5F9;
-}
+        .audit-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 50px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            border: 2px solid #F1F5F9;
+        }
 
-.audit-header {
-    text-align: center;
-    margin-bottom: 40px;
-}
+        .audit-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
 
-.audit-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #FF6B00, #FF8A33);
-    color: white;
-    padding: 8px 20px;
-    border-radius: 25px;
-    font-size: 0.9em;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 20px;
-}
+        .audit-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #FF6B00, #FF8A33);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
 
-.audit-header h2 {
-    font-size: 2.4em;
-    font-weight: 800;
-    color: #1F2E3C;
-    margin-bottom: 15px;
-    line-height: 1.2;
-}
+        .audit-header h2 {
+            font-size: 2.4em;
+            font-weight: 800;
+            color: #1F2E3C;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
 
-.audit-header p {
-    font-size: 1.2em;
-    color: #6B7280;
-    margin-bottom: 10px;
-}
+        .audit-header p {
+            font-size: 1.2em;
+            color: #6B7280;
+            margin-bottom: 10px;
+        }
 
-.progress-bar-container {
-    width: 100%;
-    height: 8px;
-    background: #E5E7EB;
-    border-radius: 10px;
-    overflow: hidden;
-    margin: 30px 0;
-}
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: #E5E7EB;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 30px 0;
+        }
 
-.progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, #FF6B00, #FF8A33);
-    width: 0%;
-    transition: width 0.3s ease;
-    border-radius: 10px;
-}
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #FF6B00, #FF8A33);
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
 
-.progress-text {
-    text-align: center;
-    color: #6B7280;
-    font-size: 0.9em;
-    margin-top: 10px;
-}
+        .progress-text {
+            text-align: center;
+            color: #6B7280;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
 
-.form-step {
-    display: none;
-}
+        .form-step {
+            display: none;
+        }
 
-.form-step.active {
-    display: block;
-    animation: fadeIn 0.3s ease;
-}
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-.question-card {
-    background: #F9FAFB;
-    border-radius: 16px;
-    padding: 30px;
-    margin-bottom: 30px;
-    border: 2px solid #E5E7EB;
-}
+        .question-card {
+            background: #F9FAFB;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #E5E7EB;
+        }
 
-.question-number {
-    display: inline-block;
-    background: linear-gradient(135deg, #FF6B00, #FF8A33);
-    color: white;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    text-align: center;
-    line-height: 35px;
-    font-weight: 700;
-    margin-bottom: 15px;
-}
+        .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF6B00, #FF8A33);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
 
-.question-text {
-    font-size: 1.3em;
-    font-weight: 700;
-    color: #1F2E3C;
-    margin-bottom: 25px;
-    line-height: 1.4;
-}
+        .question-text {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #1F2E3C;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
 
-.option-group {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+        .option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
-.option-label {
-    display: flex;
-    align-items: center;
-    padding: 18px 20px;
-    background: white;
-    border: 2px solid #E5E7EB;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-}
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            background: white;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
 
-.option-label:hover {
-    border-color: #FF6B00;
-    background: #FFF5F0;
-    transform: translateX(5px);
-}
+        .option-label:hover {
+            border-color: #FF6B00;
+            background: #FFF5F0;
+            transform: translateX(5px);
+        }
 
-.option-label input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-}
+        .option-label input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
 
-.option-label input[type="radio"]:checked + .checkmark {
-    background: #FF6B00;
-    border-color: #FF6B00;
-}
+        .option-label input[type="radio"]:checked + .checkmark {
+            background: #FF6B00;
+            border-color: #FF6B00;
+        }
 
-.option-label input[type="radio"]:checked + .checkmark::after {
-    display: block;
-}
+        .option-label input[type="radio"]:checked + .checkmark::after {
+            display: block;
+        }
 
-.option-label input[type="radio"]:checked ~ .option-text {
-    font-weight: 600;
-}
+        .option-label input[type="radio"]:checked ~ .option-text {
+            font-weight: 600;
+        }
 
-.option-label.selected {
-    border-color: #FF6B00;
-    background: linear-gradient(135deg, #FFF5F0 0%, #FFEDE0 100%);
-    box-shadow: 0 4px 15px rgba(255, 107, 0, 0.15);
-}
+        .option-label.selected {
+            border-color: #FF6B00;
+            background: linear-gradient(135deg, #FFF5F0 0%, #FFEDE0 100%);
+            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.15);
+        }
 
-.checkmark {
-    width: 24px;
-    height: 24px;
-    border: 2px solid #D1D5DB;
-    border-radius: 50%;
-    margin-right: 15px;
-    position: relative;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
-}
+        .checkmark {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #D1D5DB;
+            border-radius: 50%;
+            margin-right: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
 
-.checkmark::after {
-    content: '✓';
-    position: absolute;
-    display: none;
-    color: white;
-    font-size: 14px;
-    font-weight: bold;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
+        .checkmark::after {
+            content: '✓';
+            position: absolute;
+            display: none;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
 
-.option-text {
-    flex: 1;
-    font-size: 1.05em;
-    color: #374151;
-    line-height: 1.5;
-}
+        .option-text {
+            flex: 1;
+            font-size: 1.05em;
+            color: #374151;
+            line-height: 1.5;
+        }
 
-.form-input {
-    width: 100%;
-    padding: 15px 20px;
-    font-size: 1.05em;
-    border: 2px solid #E5E7EB;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    font-family: 'Poppins', sans-serif;
-    transition: all 0.3s ease;
-}
+        .form-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.05em;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
 
-.form-input:focus {
-    outline: none;
-    border-color: #FF6B00;
-    box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
-}
+        .form-input:focus {
+            outline: none;
+            border-color: #FF6B00;
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+        }
 
-.form-input::placeholder {
-    color: #9CA3AF;
-}
+        .form-input::placeholder {
+            color: #9CA3AF;
+        }
 
-.button-group {
-    display: flex;
-    gap: 15px;
-    margin-top: 30px;
-}
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
 
-.btn {
-    flex: 1;
-    padding: 15px 30px;
-    font-size: 1.1em;
-    font-weight: 700;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: 'Poppins', sans-serif;
-}
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
 
-.btn-primary {
-    background: linear-gradient(135deg, #FF6B00, #FF8A33);
-    color: white;
-    box-shadow: 0 6px 20px rgba(255, 107, 0, 0.3);
-}
+        .btn-primary {
+            background: linear-gradient(135deg, #FF6B00, #FF8A33);
+            color: white;
+            box-shadow: 0 6px 20px rgba(255, 107, 0, 0.3);
+        }
 
-.btn-primary:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(255, 107, 0, 0.4);
-}
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 0, 0.4);
+        }
 
-.btn-primary:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
-.btn-secondary {
-    background: white;
-    color: #6B7280;
-    border: 2px solid #E5E7EB;
-}
+        .btn-secondary {
+            background: white;
+            color: #6B7280;
+            border: 2px solid #E5E7EB;
+        }
 
-.btn-secondary:hover {
-    background: #F9FAFB;
-    border-color: #D1D5DB;
-}
+        .btn-secondary:hover {
+            background: #F9FAFB;
+            border-color: #D1D5DB;
+        }
 
-.results-container {
-    display: none;
-}
+        .results-container {
+            display: none;
+        }
 
-.results-container.active {
-    display: block;
-    animation: fadeIn 0.5s ease;
-}
+        .results-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
 
-.score-display {
-    background: linear-gradient(135deg, #FF6B00, #FF8A33);
-    color: white;
-    padding: 40px;
-    border-radius: 20px;
-    margin: 30px 0;
-    box-shadow: 0 10px 30px rgba(255, 107, 0, 0.3);
-}
+        .score-display {
+            background: linear-gradient(135deg, #FF6B00, #FF8A33);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.3);
+        }
 
-.score-number {
-    font-size: 4em;
-    font-weight: 900;
-    margin-bottom: 10px;
-}
+        .score-number {
+            font-size: 4em;
+            font-weight: 900;
+            margin-bottom: 10px;
+        }
 
-.score-verdict {
-    font-size: 1.5em;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
+        .score-verdict {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
 
-.score-description {
-    font-size: 1.1em;
-    opacity: 0.9;
-}
+        .score-description {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
 
-.analysis-content {
-    background: #F9FAFB;
-    border-radius: 16px;
-    padding: 30px;
-    margin: 30px 0;
-    text-align: left;
-    border: 2px solid #E5E7EB;
-}
+        .analysis-content {
+            background: #F9FAFB;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: left;
+            border: 2px solid #E5E7EB;
+        }
 
-.analysis-content h3 {
-    color: #1F2E3C;
-    margin-top: 25px;
-    margin-bottom: 15px;
-    font-size: 1.4em;
-}
+        .analysis-content h3 {
+            color: #1F2E3C;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-.analysis-content h3:first-child {
-    margin-top: 0;
-}
+        .analysis-content h3:first-child {
+            margin-top: 0;
+        }
 
-.analysis-content p, .analysis-content ul {
-    color: #4A6378;
-    font-size: 1.05em;
-    line-height: 1.7;
-    margin-bottom: 15px;
-}
+        .analysis-content p, .analysis-content ul {
+            color: #4A6378;
+            font-size: 1.05em;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
 
-.analysis-content ul {
-    padding-left: 20px;
-}
+        .analysis-content ul {
+            padding-left: 20px;
+        }
 
-.analysis-content li {
-    margin-bottom: 10px;
-}
+        .analysis-content li {
+            margin-bottom: 10px;
+        }
 
-.loading-spinner {
-    display: none;
-    text-align: center;
-    padding: 40px;
-}
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
 
-.loading-spinner.active {
-    display: block;
-}
+        .loading-spinner.active {
+            display: block;
+        }
 
-.spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid #E5E7EB;
-    border-top: 4px solid #FF6B00;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 20px;
-}
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #E5E7EB;
+            border-top: 4px solid #FF6B00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-.error-message {
-    display: none;
-    background: #FEE2E2;
-    border: 2px solid #FCA5A5;
-    color: #991B1B;
-    padding: 15px 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-}
+        .error-message {
+            display: none;
+            background: #FEE2E2;
+            border: 2px solid #FCA5A5;
+            color: #991B1B;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
 
-.error-message.active {
-    display: block;
-}
+        .error-message.active {
+            display: block;
+        }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .audit-container {
-        padding: 30px 20px;
-    }
-    
-    .audit-header h2 {
-        font-size: 1.8em;
-    }
-    
-    .question-text {
-        font-size: 1.15em;
-    }
-    
-    .option-label {
-        padding: 15px;
-    }
-    
-    .button-group {
-        flex-direction: column;
-    }
-    
-    .btn {
-        width: 100%;
-    }
-}
+        @media (max-width: 768px) {
+            .audit-container {
+                padding: 30px 20px;
+            }
+            
+            .audit-header h2 {
+                font-size: 1.8em;
+            }
+            
+            .question-text {
+                font-size: 1.15em;
+            }
+            
+            .option-label {
+                padding: 15px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
 
-     <!-- Logo Header -->
+<!-- Logo Header -->
 <header style="position: fixed; top: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); z-index: 1000; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
     <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
         <img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" style="height: 80px; width: auto;">
@@ -1564,29 +1568,27 @@
     </div>
 </header>
 
-<!-- Add padding to hero so it doesn't hide behind fixed header -->
 <div style="height: 130px;"></div>
 
 <!-- 1. Hero Landing Section -->
 <section class="hero-landing" id="hero">
     <div class="hero-content">
         <h1>"I need my listings to stand out and sell faster, but I'm stretched thin as it is."</h1>
-        
         <p>You're juggling viewings, valuations, and completions, whilst vendors expect premium marketing that matches their investment - and your competitors are winning instructions with better presentation.</p>
-        
         <div style="margin-bottom: 40px;">
-            <a href="#audit" class="cta-secondary">
-                Get Your Free 2-Minute Marketing Audit
-            </a>
+            <a href="#audit" class="cta-secondary">Get Your Free 2-Minute Marketing Audit</a>
         </div>
     </div>
 </section>
 
-    <!-- Marketing Audit Section -->
+<!-- Marketing Audit Section -->
 <section class="audit-section" id="audit">
     <div class="audit-container">
         <div class="audit-header">
-            <div class="audit-badge">🎯 Free Marketing Audit</div>
+            <div class="audit-badge">
+                <i data-lucide="target" style="width:16px;height:16px;"></i>
+                Free Marketing Audit
+            </div>
             <h2>How Effective Is Your Property Marketing?</h2>
             <p>Answer 8 quick questions to discover where you're losing listings and revenue.</p>
         </div>
@@ -1599,33 +1601,33 @@
         <div class="error-message" id="errorMessage"></div>
 
         <form id="auditForm">
-           <!-- Question 1 -->
-<div class="form-step active" data-step="1">
-    <div class="question-card">
-        <div class="question-number">1</div>
-        <div class="question-text">What type of photography do you currently use for property listings?</div>
-        <div class="option-group">
-            <label class="option-label">
-                <input type="radio" name="q1" value="1" required>
-                <div class="checkmark"></div>
-                <span class="option-text">iPhone or basic camera photos</span>
-            </label>
-            <label class="option-label">
-                <input type="radio" name="q1" value="2">
-                <div class="checkmark"></div>
-                <span class="option-text">General Media Specialist (does properties occasionally)</span>
-            </label>
-            <label class="option-label">
-                <input type="radio" name="q1" value="3">
-                <div class="checkmark"></div>
-                <span class="option-text">Specialist property Media Specialist with HDR/editing</span>
-            </label>
-        </div>
-    </div>
-    <div class="button-group">
-        <button type="button" class="btn btn-primary" onclick="nextStep()" style="width: 100%;">Next →</button>
-    </div>
-</div>
+            <!-- Question 1 -->
+            <div class="form-step active" data-step="1">
+                <div class="question-card">
+                    <div class="question-number">1</div>
+                    <div class="question-text">What type of photography do you currently use for property listings?</div>
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="radio" name="q1" value="1" required>
+                            <div class="checkmark"></div>
+                            <span class="option-text">iPhone or basic camera photos</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q1" value="2">
+                            <div class="checkmark"></div>
+                            <span class="option-text">General Media Specialist (does properties occasionally)</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q1" value="3">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Specialist property Media Specialist with HDR/editing</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-primary" onclick="nextStep()" style="width: 100%;">Next →</button>
+                </div>
+            </div>
 
             <!-- Question 2 -->
             <div class="form-step" data-step="2">
@@ -1743,34 +1745,34 @@
                 </div>
             </div>
 
-       <!-- Question 6 -->
-<div class="form-step" data-step="6">
-    <div class="question-card">
-        <div class="question-number">6</div>
-        <div class="question-text">Do you provide clients with regular marketing performance reports?</div>
-        <div class="option-group">
-            <label class="option-label">
-                <input type="radio" name="q6" value="0" required>
-                <div class="checkmark"></div>
-                <span class="option-text">No - clients rarely receive performance updates</span>
-            </label>
-            <label class="option-label">
-                <input type="radio" name="q6" value="1">
-                <div class="checkmark"></div>
-                <span class="option-text">Occasional updates when clients ask</span>
-            </label>
-            <label class="option-label">
-                <input type="radio" name="q6" value="3">
-                <div class="checkmark"></div>
-                <span class="option-text">Weekly performance reports with views, engagement & enquiries</span>
-            </label>
-        </div>
-    </div>
-    <div class="button-group">
-        <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
-        <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
-    </div>
-</div>
+            <!-- Question 6 -->
+            <div class="form-step" data-step="6">
+                <div class="question-card">
+                    <div class="question-number">6</div>
+                    <div class="question-text">Do you provide clients with regular marketing performance reports?</div>
+                    <div class="option-group">
+                        <label class="option-label">
+                            <input type="radio" name="q6" value="0" required>
+                            <div class="checkmark"></div>
+                            <span class="option-text">No - clients rarely receive performance updates</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q6" value="1">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Occasional updates when clients ask</span>
+                        </label>
+                        <label class="option-label">
+                            <input type="radio" name="q6" value="3">
+                            <div class="checkmark"></div>
+                            <span class="option-text">Weekly performance reports with views, engagement & enquiries</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
+                </div>
+            </div>
 
             <!-- Question 7 -->
             <div class="form-step" data-step="7">
@@ -1830,10 +1832,13 @@
                 </div>
             </div>
 
-            <!-- Step 9: Contact Info (Now at the end) -->
+            <!-- Step 9: Contact Info -->
             <div class="form-step" data-step="9">
                 <div class="question-card">
-                    <div class="question-text" style="font-size: 1.5em; margin-bottom: 15px;">📊 Your Score is Ready!</div>
+                    <div class="question-text" style="font-size: 1.5em; margin-bottom: 15px; display:flex; align-items:center; gap:10px;">
+                        <i data-lucide="bar-chart-2" style="width:28px;height:28px;color:#FF6B00;"></i>
+                        Your Score is Ready!
+                    </div>
                     <p style="color: #6B7280; font-size: 1.1em; margin-bottom: 25px;">Enter your details below to receive your personalised marketing analysis and actionable recommendations.</p>
                     <input type="text" class="form-input" id="name" placeholder="Your Full Name *" required>
                     <input type="text" class="form-input" id="agency" placeholder="Agency Name *" required>
@@ -1860,531 +1865,493 @@
                 <div class="score-verdict" id="scoreVerdict"></div>
                 <div class="score-description" id="scoreDescription"></div>
             </div>
-
             <div class="analysis-content" id="analysisContent"></div>
-
             <div style="text-align: center; margin-top: 40px;">
-                <a href="login.html" class="cta-primary" style="display: inline-block;">
-                    Book Your Premium Shoot Now
-                </a>
+                <a href="login.html" class="cta-primary" style="display: inline-block;">Book Your Premium Shoot Now</a>
             </div>
         </div>
     </div>
 </section>
 
-    <!-- 2. Process Section -->
-    <section class="process-section" id="process">
-        <h2 style="font-size: 2.8em; font-weight: 800; margin-bottom: 15px; color: #1F2E3C; line-height: 1.2;">
-            From Brief to Brilliant in 3 Steps
-        </h2>
-        <p style="font-size: 1.3em; color: #6B7280; margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">
-            Our proven process transforms your property into premium marketing content that sells.
-        </p>
+<!-- 2. Process Section -->
+<section class="process-section" id="process">
+    <h2 style="font-size: 2.8em; font-weight: 800; margin-bottom: 15px; color: #1F2E3C; line-height: 1.2;">
+        From Brief to Brilliant in 3 Steps
+    </h2>
+    <p style="font-size: 1.3em; color: #6B7280; margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">
+        Our proven process transforms your property into premium marketing content that sells.
+    </p>
+    
+    <div class="roadmap-container" style="margin-top: 60px;">
+        <div class="road-line"></div>
         
-        <div class="roadmap-container" style="margin-top: 60px;">
-            <div class="road-line"></div>
-            
-            <div class="marker-start">🚀 START HERE</div>
-            
-            <div class="step-card">
-                <div>
-                    <div class="step-number">1</div>
-                    <h3>📅 Book Your Shoot</h3>
-                    <p>Choose your date and we'll handle everything from planning to equipment. No stress, just results.</p>
-                </div>
-            </div>
-            
-            <div class="step-card">
-                <div>
-                    <div class="step-number">2</div>
-                    <h3>📸 We Create Magic</h3>
-                    <p>Professional photography and filming that captures every detail and showcases what makes your property irresistible.</p>
-                </div>
-            </div>
-            
-            <div class="step-card">
-                <div>
-                    <div class="step-number">3</div>
-                    <h3>📱 Receive & Go Live</h3>
-                    <p>Get your platform-ready photos and videos delivered, then watch your listing go live with premium content.</p>
-                </div>
-            </div>
-            
-            <div class="marker-sold">💰 SOLD</div>
+        <div class="marker-start">
+            <i data-lucide="rocket" style="width:18px;height:18px;"></i>
+            START HERE
         </div>
         
-        <div class="benefits">
-            <div class="benefit-item">
-                <div class="icon">⚡</div>
-                <h4>48-Hour Delivery</h4>
-                <p>From shoot to your inbox in just 2 working days</p>
-            </div>
-            <div class="benefit-item">
-                <div class="icon">📊</div>
-                <h4>Live Progress Tracking</h4>
-                <p>See exactly where your content is in our process</p>
-            </div>
-            <div class="benefit-item">
-                <div class="icon">🎯</div>
-                <h4>Platform Optimised</h4>
-                <p>Ready for Rightmove, Zoopla, and social media</p>
-            </div>
-            <div class="benefit-item">
-                <div class="icon">🏆</div>
-                <h4>Premium Quality</h4>
-                <p>Cinematic content that positions you as the expert</p>
-            </div>
-        </div>
-        
-        <div style="background:linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);border-radius:20px;padding:35px;margin-top:40px;border-left:6px solid #22C55E;">
-            <p style="font-size:1.3em;font-weight:600;color:#15803D;margin:0;">
-                ✅ Your property marketing transformed in under 48 hours
-            </p>
-        </div>
-    </section>
-
-    <!-- 3. Services Section -->
-    <section class="services-section" id="services">
-        <div class="container">
-            <div class="line-band" id="mm-line-band">
-                <h2 class="line-header" id="mm-line-header">Consistent, Reliable, High Quality</h2>
-            </div>
-
-            <div class="cards">
-                <div class="service-card">
-                    <span class="tick">✅</span>
-                    <div class="service-icon">📷</div>
-                    <h3>Photography</h3>
-                    <p>Crisp interior & exterior shots designed to sell homes and capture every premium detail.</p>
-                </div>
-
-                <div class="service-card">
-                    <span class="tick">✅</span>
-                    <div class="service-icon">🎥</div>
-                    <h3>Videography</h3>
-                    <p>Walkthrough videos that let buyers feel the space and imagine their future home.</p>
-                </div>
-
-                <div class="service-card">
-                    <span class="tick">✅</span>
-                    <div class="service-icon">🚁</div>
-                    <h3>Drone</h3>
-                    <p>Aerial media that gives your listings a luxury edge and showcases the full property.</p>
-                </div>
-
-                <div class="service-card">
-                    <span class="tick">✅</span>
-                    <div class="service-icon">📱</div>
-                    <h3>Content Tracking</h3>
-                    <p>Track your content's progress live — complete clarity, no stress, total control.</p>
-                </div>
-
-                <div class="service-card">
-                    <span class="tick">✅</span>
-                    <div class="service-icon">⚡</div>
-                    <h3>48hr Turnaround</h3>
-                    <p>All visuals delivered within two working days, ready for immediate listing.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 4. Testimonials Section -->
-    <section class="testimonials-section" id="testimonials">
-        <div class="container">
-            <h2 style="font-size: 2.6em; font-weight: 800; margin-bottom: 20px; color: #1F2E3C; line-height: 1.2;">
-                Why Estate Agents Choose Markeb Media
-            </h2>
-            <p style="font-size: 1.3em; color: #6B7280; margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto;">
-                Real results from real agents who've transformed their property marketing
-            </p>
-            
-            <div class="testimonials-container">
-                <div class="testimonial-card">
-                    <div class="quote-mark">❝</div>
-                    <div class="testimonial-text">
-                        "I've had the pleasure of working with Mark and Kebin for some time now, and their level of service has been exceptional. They're always accommodating with appointments, and the quality of work they deliver is consistently fantastic. The turnaround is impressively quick — even faster than most. I highly recommend them!"
-                    </div>
-                    <div class="client-info">
-                        <div class="client-avatar">JG</div>
-                        <div class="client-details">
-                            <h4>Jessica Grimes</h4>
-                            <p>Director</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="testimonial-card">
-                    <div class="quote-mark">❝</div>
-                    <div class="testimonial-text">
-                        "I've worked with Markeb Media for just over a year now, and they've always been top notch. Easy to work with, excellent communication, and the photography and media are outstanding. I look forward to many more years of working with this brilliant team."
-                    </div>
-                    <div class="client-info">
-                        <div class="client-avatar">LH</div>
-                        <div class="client-details">
-                            <h4>L. Hughes</h4>
-                            <p>Director, Hughes Estate Agents</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 5. What's at Stake Section -->
-    <section class="section" style="background:#FFFFFF;">
-        <div class="container" style="max-width:1200px;">
-            <div style="text-align:center;margin-bottom:40px;">
-                <div class="header-badge">⚖️ What's Really at Stake</div>
-                <h2 style="font-size:2.6em;font-weight:800;color:#1F2E3C;margin-bottom:15px;line-height:1.2;">
-                    The Choice That Defines Your Success
-                </h2>
-                <p style="font-size:1.3em;color:#6B7280;max-width:700px;margin:0 auto;">
-                    Every day you wait is a day your competitors get ahead. Here's what hangs in the balance.
-                </p>
-            </div>
-
-            <div class="stake-grid">
-                <div class="stake-card danger-card">
-                    <h2>❌ Without Professional Marketing</h2>
-                    <p>
-                        Sticking with amateur photos and basic marketing isn't just limiting your growth—it's actively damaging your reputation and revenue.
-                    </p>
-                    <ul class="stake-list danger-list">
-                        <li>
-                            <span class="stake-icon danger-icon">⚠️</span>
-                            <span>Listings sit on the market for months</span>
-                        </li>
-                        <li>
-                            <span class="stake-icon danger-icon">⚠️</span>
-                            <span>Vendors question your marketing investment</span>
-                        </li>
-                        <li>
-                            <span class="stake-icon danger-icon">⚠️</span>
-                            <span>Competitors win premium instructions</span>
-                        </li>
-                        <li>
-                            <span class="stake-icon danger-icon">⚠️</span>
-                            <span>Reduced commission opportunities</span>
-                        </li>
-                        <li>
-                            <span class="stake-icon danger-icon">⚠️</span>
-                            <span>Your reputation suffers in the market</span>
-                        </li>
-                        <li>
-                            <span class="stake-icon danger-icon">⚠️</span>
-                            <span>Business growth stagnates</span>
-                        </li>
-                    </ul>
-                    <div class="bottom-cta danger-cta">
-                        "Why did I wait so long? I could have been earning more this whole time."
-                    </div>
-                </div>
-
-                <div class="stake-card success-card">
-                    <h2>✅ With Markeb Media</h2>
-                    <p>
-                        Professional video marketing doesn't just improve your listings—it transforms your entire business and positions you as the premium choice.
-                    </p>
-                    <ul class="stake-list success-list">
-                        <li>
-                            <span class="stake-icon success-icon">🚀</span>
-                            <span>Properties generate immediate interest</span>
-                        </li>
-                        <li>
-                            <span class="stake-icon success-icon">💎</span>
-                            <span>Vendors choose you for premium properties</span>
-                        </li>
-                        <li>
-                            <span class="stake-icon success-icon">🏆</span>
-                            <span>You become the go-to agent in your area</span>
-                        </li>
-                        <li>
-                            <span class="stake-icon success-icon">💰</span>
-                            <span>Higher-value instructions increase revenue</span>
-                        </li>
-                        <li>
-                            <span class="stake-icon success-icon">⭐</span>
-                            <span>Professional reputation attracts referrals</span>
-                        </li>
-                        <li>
-                            <span class="stake-icon success-icon">📈</span>
-                            <span>Sustainable business growth and success</span>
-                        </li>
-                    </ul>
-                    <div class="bottom-cta success-cta">
-                        "This is exactly the competitive edge I needed to dominate my market."
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 6. Success Vision Section -->
-    <section class="section" style="background:#F9FAFB;">
-        <div class="container" style="max-width:1000px;text-align:center;">
-            <h2 style="font-size:2.8em;font-weight:800;color:#1F2E3C;margin-bottom:20px;line-height:1.2;">
-                Picture This: Your Success Story
-            </h2>
-            <p style="font-size:1.4em;color:#6B7280;margin-bottom:30px;max-width:700px;margin-left:auto;margin-right:auto;">
-                Imagine the confidence, the reputation, and the results you'll have just weeks from now...
-            </p>
-
-            <div style="background:linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);border-radius:24px;padding:50px 40px;margin:40px 0;border:3px solid #BBF7D0;box-shadow:0 15px 40px rgba(5, 150, 105, 0.1);position:relative;overflow:hidden;">
-                <div style="position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg, #059669, #10B981, #059669);background-size:200% 100%;animation:shimmer 3s ease-in-out infinite;"></div>
-                <h3 style="font-size:2.2em;font-weight:700;color:#065F46;margin-bottom:25px;">
-                    ✨ Your Transformation Awaits
+        <div class="step-card">
+            <div>
+                <div class="step-number">1</div>
+                <h3>
+                    <i data-lucide="calendar" style="width:22px;height:22px;color:#FF6B00;"></i>
+                    Book Your Shoot
                 </h3>
-                <div style="background:rgba(255, 255, 255, 0.9);border-radius:16px;padding:30px;margin:30px 0;border-left:6px solid #10B981;font-style:italic;font-size:1.2em;color:#065F46;text-align:center;box-shadow:0 8px 25px rgba(16, 185, 129, 0.1);">
-                    "Within 30 days of working with Markeb Media, I became the agent everyone wants to list with. My phone doesn't stop ringing with enquiries from vendors who've seen my video content online."
-                </div>
-            </div>
-
-            <div class="success-scenarios">
-                <div class="scenario-card">
-                    <span class="scenario-icon">📱</span>
-                    <h3>The Social Media Buzz</h3>
-                    <p>Your video tours go viral on social media. Potential buyers are sharing your content, and other agents are asking "Who created that amazing property video?"</p>
-                </div>
-                
-                <div class="scenario-card">
-                    <span class="scenario-icon">🤝</span>
-                    <h3>The Vendor Meeting</h3>
-                    <p>You walk into a valuation with confidence, knowing your portfolio of stunning video content sets you apart. Vendors choose you before you even quote your commission.</p>
-                </div>
-                
-                <div class="scenario-card">
-                    <span class="scenario-icon">🏡</span>
-                    <h3>The Quick Sale</h3>
-                    <p>Properties that used to sit on the market for months are now generating multiple offers within days. Your reputation for results spreads throughout the community.</p>
-                </div>
+                <p>Choose your date and we'll handle everything from planning to equipment. No stress, just results.</p>
             </div>
         </div>
-    </section>
-
-    <!-- 7. Photo Showcase Section -->
-    <section class="showcase-section" id="showcase">
-        <div class="showcase-container">
-            <div style="text-align: center; margin-bottom: 60px;">
-                <div class="header-badge">📸 See the Difference</div>
-                <h2 style="font-size: 2.4em; font-weight: 800; color: #1F2E3C; margin-bottom: 15px; line-height: 1.2;">
-                    This Is What Premium Looks Like
-                </h2>
-                <p style="font-size: 1.3em; color: #4A6378; max-width: 600px; margin: 0 auto;">
-                    Our drone photography transforms ordinary properties into extraordinary marketing assets that stop scrollers in their tracks.
-                </p>
-            </div>
-            
-            <div class="photo-gallery">
-                <div class="photo-card">
-                    <img 
-                        src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/61b92060-d48f-4db8-b8cf-1657ec9a697c/DJI_0165_Removed+cars.jpg?format=500w" 
-                        alt="Drone view of UK period mansion"
-                    />
-                    <div class="photo-overlay">
-                        <div class="photo-title">Period Mansion Showcase</div>
-                        <div class="photo-description">Cinematic aerial perspective that reveals the full grandeur and setting of this premium property.</div>
-                    </div>
-                </div>
-                
-                <div class="photo-card">
-                    <img 
-                        src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/71cd6387-8d6d-44e1-ac4b-4e40cb183b90/DJI_0169_Removed+cars-2.jpg?format=500w" 
-                        alt="Drone view of estate near lake"
-                    />
-                    <div class="photo-overlay">
-                        <div class="photo-title">Lakeside Estate</div>
-                        <div class="photo-description">Luxury aerial shot capturing the property's enviable position and stunning natural surroundings.</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 50px; padding: 35px; background: linear-gradient(135deg, #F8F9FA 0%, #E5E7EB 100%); border-radius: 20px; border: 2px solid #E5E7EB;">
-                <h3 style="font-size: 1.6em; font-weight: 700; color: #1F2E3C; margin-bottom: 15px;">Ready for Photography Like This?</h3>
-                <p style="color: #4A6378; font-size: 1.1em; margin-bottom: 25px;">Let us create stunning visuals that make your properties impossible to ignore.</p>
-                <a href="login.html" style="display: inline-block; background: linear-gradient(135deg, #FF6B00, #FF8A33); color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: 700; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(255, 107, 0, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(255, 107, 0, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(255, 107, 0, 0.3)'">
-                    Sign Up
-                </a>
+        
+        <div class="step-card">
+            <div>
+                <div class="step-number">2</div>
+                <h3>
+                    <i data-lucide="camera" style="width:22px;height:22px;color:#FF6B00;"></i>
+                    We Create Magic
+                </h3>
+                <p>Professional photography and filming that captures every detail and showcases what makes your property irresistible.</p>
             </div>
         </div>
-    </section>
+        
+        <div class="step-card">
+            <div>
+                <div class="step-number">3</div>
+                <h3>
+                    <i data-lucide="smartphone" style="width:22px;height:22px;color:#FF6B00;"></i>
+                    Receive &amp; Go Live
+                </h3>
+                <p>Get your platform-ready photos and videos delivered, then watch your listing go live with premium content.</p>
+            </div>
+        </div>
+        
+        <div class="marker-sold">
+            <i data-lucide="banknote" style="width:20px;height:20px;"></i>
+            SOLD
+        </div>
+    </div>
+    
+    <div class="benefits">
+        <div class="benefit-item">
+            <div class="icon"><i data-lucide="zap" style="width:28px;height:28px;"></i></div>
+            <h4>48-Hour Delivery</h4>
+            <p>From shoot to your inbox in just 2 working days</p>
+        </div>
+        <div class="benefit-item">
+            <div class="icon"><i data-lucide="bar-chart-2" style="width:28px;height:28px;"></i></div>
+            <h4>Live Progress Tracking</h4>
+            <p>See exactly where your content is in our process</p>
+        </div>
+        <div class="benefit-item">
+            <div class="icon"><i data-lucide="target" style="width:28px;height:28px;"></i></div>
+            <h4>Platform Optimised</h4>
+            <p>Ready for Rightmove, Zoopla, and social media</p>
+        </div>
+        <div class="benefit-item">
+            <div class="icon"><i data-lucide="trophy" style="width:28px;height:28px;"></i></div>
+            <h4>Premium Quality</h4>
+            <p>Cinematic content that positions you as the expert</p>
+        </div>
+    </div>
+    
+    <div style="background:linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);border-radius:20px;padding:35px;margin-top:40px;border-left:6px solid #22C55E;">
+        <p style="font-size:1.3em;font-weight:600;color:#15803D;margin:0;display:flex;align-items:center;gap:10px;">
+            <i data-lucide="check-circle" style="width:24px;height:24px;color:#22C55E;flex-shrink:0;"></i>
+            Your property marketing transformed in under 48 hours
+        </p>
+    </div>
+</section>
 
-    <!-- 8. Final CTA Section -->
-    <section class="final-cta-section" id="final-cta">
-        <div style="max-width: 900px; margin: 0 auto;">
-            
-            <h2 style="font-size: 2.4em; font-weight: 800; margin-bottom: 20px; color: #1F2E3C; line-height: 1.3;">
-                Be the Agent Everyone Talks About
+<!-- 3. Services Section -->
+<section class="services-section" id="services">
+    <div class="container">
+        <div class="line-band" id="mm-line-band">
+            <h2 class="line-header" id="mm-line-header">Consistent, Reliable, High Quality</h2>
+        </div>
+
+        <div class="cards">
+            <div class="service-card">
+                <span class="tick"><i data-lucide="check-circle" style="width:22px;height:22px;"></i></span>
+                <div class="service-icon"><i data-lucide="camera" style="width:44px;height:44px;"></i></div>
+                <h3>Photography</h3>
+                <p>Crisp interior & exterior shots designed to sell homes and capture every premium detail.</p>
+            </div>
+
+            <div class="service-card">
+                <span class="tick"><i data-lucide="check-circle" style="width:22px;height:22px;"></i></span>
+                <div class="service-icon"><i data-lucide="video" style="width:44px;height:44px;"></i></div>
+                <h3>Videography</h3>
+                <p>Walkthrough videos that let buyers feel the space and imagine their future home.</p>
+            </div>
+
+            <div class="service-card">
+                <span class="tick"><i data-lucide="check-circle" style="width:22px;height:22px;"></i></span>
+                <div class="service-icon"><i data-lucide="navigation" style="width:44px;height:44px;"></i></div>
+                <h3>Drone</h3>
+                <p>Aerial media that gives your listings a luxury edge and showcases the full property.</p>
+            </div>
+
+            <div class="service-card">
+                <span class="tick"><i data-lucide="check-circle" style="width:22px;height:22px;"></i></span>
+                <div class="service-icon"><i data-lucide="smartphone" style="width:44px;height:44px;"></i></div>
+                <h3>Content Tracking</h3>
+                <p>Track your content's progress live — complete clarity, no stress, total control.</p>
+            </div>
+
+            <div class="service-card">
+                <span class="tick"><i data-lucide="check-circle" style="width:22px;height:22px;"></i></span>
+                <div class="service-icon"><i data-lucide="zap" style="width:44px;height:44px;"></i></div>
+                <h3>48hr Turnaround</h3>
+                <p>All visuals delivered within two working days, ready for immediate listing.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. What's at Stake Section -->
+<section class="section" style="background:#FFFFFF;">
+    <div class="container" style="max-width:1200px;">
+        <div style="text-align:center;margin-bottom:40px;">
+            <div class="header-badge">
+                <i data-lucide="scale" style="width:16px;height:16px;"></i>
+                What's Really at Stake
+            </div>
+            <h2 style="font-size:2.6em;font-weight:800;color:#1F2E3C;margin-bottom:15px;line-height:1.2;">
+                The Choice That Defines Your Success
             </h2>
-            
-            <p style="font-size: 1.3em; margin-bottom: 40px; color: #4A6378; max-width: 700px; margin-left: auto; margin-right: auto; margin-bottom: 40px; line-height: 1.6;">
-                Win more instructions, wow your clients, and keep buyers hooked — with high-impact marketing and live content tracking that puts you ahead of the competition.
+            <p style="font-size:1.3em;color:#6B7280;max-width:700px;margin:0 auto;">
+                Every day you wait is a day your competitors get ahead. Here's what hangs in the balance.
             </p>
-            
-            <div class="final-cta-buttons">
-                <a href="login.html" class="final-cta-button primary-final-cta">
-                    Sign Up
-                </a>
-                <a href="https://www.instagram.com/markeb_mediauk/" target="_blank" class="final-cta-button secondary-final-cta">
-                    View Our Portfolio
-                </a>
-            </div>
-            
-            <div style="margin-top: 50px; padding: 25px; background: #F8F9FA; border-radius: 16px; border: 2px solid #E5E7EB;">
-                <p style="font-size: 1em; color: #6B7280; margin: 0;">
-                    No contracts • 48-hour delivery • 100% satisfaction guarantee • Live progress tracking
-                </p>
-            </div>
-            
         </div>
-    </section>
 
-    <!-- 9. FAQ Section -->
-    <section class="faq-section">
-        <div class="faq-container">
-            <div style="text-align:center;margin-bottom:60px;">
-                <h2 style="font-size: 2.4em; font-weight: 800; color: #1F2E3C; margin-bottom: 15px; line-height: 1.2;">
-                    Questions? We've Got Answers
+        <div class="stake-grid">
+            <div class="stake-card danger-card">
+                <h2>
+                    <i data-lucide="x-circle" style="width:28px;height:28px;color:#DC2626;flex-shrink:0;"></i>
+                    Without Professional Marketing
                 </h2>
-                <p style="font-size: 1.3em; color: #4A6378; max-width: 600px; margin: 0 auto;">
-                    Everything you need to know about working with Markeb Media
-                </p>
-            </div>
-            
-            <div class="faq-grid">
-                <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question">
-                        <h3>How quickly can you schedule a shoot?</h3>
-                        <span class="faq-icon">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        We typically have availability within 2-3 days. For urgent requirements, we can often accommodate same-day or next-day bookings depending on location and weather conditions.
-                    </div>
-                </div>
-
-                <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question">
-                        <h3>What's included in the 48-hour delivery?</h3>
-                        <span class="faq-icon">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        You'll receive professionally edited photos, walkthrough videos, drone footage (if applicable), and all content optimised for Rightmove, Zoopla, and social media platforms. Everything is delivered via our secure client portal.
-                    </div>
-                </div>
-
-                <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question">
-                        <h3>Do you cover my area?</h3>
-                        <span class="faq-icon">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        We serve estate agents throughout the UK. Travel costs are included in our standard pricing for most locations. Contact us to confirm coverage for your specific area.
-                    </div>
-                </div>
-
-                <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question">
-                        <h3>What if the weather is bad on shoot day?</h3>
-                        <span class="faq-icon">+</span>
-                        </div>
-                    <div class="faq-answer">
-                        We monitor weather conditions closely and will reschedule drone work if necessary. Interior photography and videography can proceed regardless of weather, ensuring minimal delays to your marketing timeline.
-                    </div>
-                </div>
-
-                <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question">
-                        <h3>How does the content tracking work?</h3>
-                        <span class="faq-icon">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        Our client portal provides real-time updates on your project status - from shoot completion to editing stages and final delivery. You'll always know exactly where your content stands.
-                    </div>
-                </div>
-
-                <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question">
-                        <h3>Can I get the raw, unedited files?</h3>
-                        <span class="faq-icon">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        We provide professionally edited content optimised for marketing use. Raw files can be provided upon request for an additional fee, though our edited versions are specifically designed for maximum marketing impact.
-                    </div>
-                </div>
-
-                <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question">
-                        <h3>Do you offer payment plans?</h3>
-                        <span class="faq-icon">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        Yes, we understand cash flow is important for estate agents. We offer flexible payment terms for regular clients and can discuss payment plans for larger projects or ongoing partnerships.
-                    </div>
-                </div>
-
-                <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question">
-                        <h3>What equipment do you use?</h3>
-                        <span class="faq-icon">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        We use professional-grade cameras, stabilised gimbals, and CAA-approved drones. All equipment is regularly maintained and updated to ensure consistently high-quality results for every shoot.
-                    </div>
+                <p>Sticking with amateur photos and basic marketing isn't just limiting your growth—it's actively damaging your reputation and revenue.</p>
+                <ul class="stake-list danger-list">
+                    <li>
+                        <span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:18px;height:18px;"></i></span>
+                        <span>Listings sit on the market for months</span>
+                    </li>
+                    <li>
+                        <span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:18px;height:18px;"></i></span>
+                        <span>Vendors question your marketing investment</span>
+                    </li>
+                    <li>
+                        <span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:18px;height:18px;"></i></span>
+                        <span>Competitors win premium instructions</span>
+                    </li>
+                    <li>
+                        <span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:18px;height:18px;"></i></span>
+                        <span>Reduced commission opportunities</span>
+                    </li>
+                    <li>
+                        <span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:18px;height:18px;"></i></span>
+                        <span>Your reputation suffers in the market</span>
+                    </li>
+                    <li>
+                        <span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:18px;height:18px;"></i></span>
+                        <span>Business growth stagnates</span>
+                    </li>
+                </ul>
+                <div class="bottom-cta danger-cta">
+                    "Why did I wait so long? I could have been earning more this whole time."
                 </div>
             </div>
-            
-            <div style="background:linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);border-radius:20px;padding:35px;margin-top:40px;text-align:center;border:2px solid #BBF7D0;">
-                <h3 style="color:#065F46;font-weight:700;margin-bottom:10px;">Still have questions?</h3>
-                <p style="color:#064E3B;margin-bottom:15px;">Get in touch and we'll provide personalised answers for your specific requirements.</p>
-                <a href="https://markebmediabookings.as.me/intro" target="_blank" 
-                   style="display: inline-block; padding: 12px 25px; background: #FF6B00; color: white; text-decoration: none; border-radius: 25px; font-weight: 700; transition: all 0.3s ease;"
-                   onmouseover="this.style.transform='translateY(-2px)'" 
-                   onmouseout="this.style.transform='translateY(0)'">
-                    Let's Chat
-                </a>
+
+            <div class="stake-card success-card">
+                <h2>
+                    <i data-lucide="check-circle" style="width:28px;height:28px;color:#059669;flex-shrink:0;"></i>
+                    With Markeb Media
+                </h2>
+                <p>Professional video marketing doesn't just improve your listings—it transforms your entire business and positions you as the premium choice.</p>
+                <ul class="stake-list success-list">
+                    <li>
+                        <span class="stake-icon success-icon"><i data-lucide="rocket" style="width:18px;height:18px;"></i></span>
+                        <span>Properties generate immediate interest</span>
+                    </li>
+                    <li>
+                        <span class="stake-icon success-icon"><i data-lucide="gem" style="width:18px;height:18px;"></i></span>
+                        <span>Vendors choose you for premium properties</span>
+                    </li>
+                    <li>
+                        <span class="stake-icon success-icon"><i data-lucide="trophy" style="width:18px;height:18px;"></i></span>
+                        <span>You become the go-to agent in your area</span>
+                    </li>
+                    <li>
+                        <span class="stake-icon success-icon"><i data-lucide="banknote" style="width:18px;height:18px;"></i></span>
+                        <span>Higher-value instructions increase revenue</span>
+                    </li>
+                    <li>
+                        <span class="stake-icon success-icon"><i data-lucide="star" style="width:18px;height:18px;"></i></span>
+                        <span>Professional reputation attracts referrals</span>
+                    </li>
+                    <li>
+                        <span class="stake-icon success-icon"><i data-lucide="trending-up" style="width:18px;height:18px;"></i></span>
+                        <span>Sustainable business growth and success</span>
+                    </li>
+                </ul>
+                <div class="bottom-cta success-cta">
+                    "This is exactly the competitive edge I needed to dominate my market."
+                </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-  <script>
+<!-- 5. Success Vision Section -->
+<section class="section" style="background:#F9FAFB;">
+    <div class="container" style="max-width:1000px;text-align:center;">
+        <h2 style="font-size:2.8em;font-weight:800;color:#1F2E3C;margin-bottom:20px;line-height:1.2;">
+            Picture This: Your Success Story
+        </h2>
+        <p style="font-size:1.4em;color:#6B7280;margin-bottom:30px;max-width:700px;margin-left:auto;margin-right:auto;">
+            Imagine the confidence, the reputation, and the results you'll have just weeks from now...
+        </p>
+
+        <div style="background:linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);border-radius:24px;padding:50px 40px;margin:40px 0;border:3px solid #BBF7D0;box-shadow:0 15px 40px rgba(5, 150, 105, 0.1);position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg, #059669, #10B981, #059669);background-size:200% 100%;animation:shimmer 3s ease-in-out infinite;"></div>
+            <h3 style="font-size:2.2em;font-weight:700;color:#065F46;margin-bottom:25px;display:flex;align-items:center;justify-content:center;gap:10px;">
+                <i data-lucide="sparkles" style="width:32px;height:32px;color:#059669;"></i>
+                Your Transformation Awaits
+            </h3>
+            <div style="background:rgba(255, 255, 255, 0.9);border-radius:16px;padding:30px;margin:30px 0;border-left:6px solid #10B981;font-style:italic;font-size:1.2em;color:#065F46;text-align:center;box-shadow:0 8px 25px rgba(16, 185, 129, 0.1);">
+                "Within 30 days of working with Markeb Media, I became the agent everyone wants to list with. My phone doesn't stop ringing with enquiries from vendors who've seen my video content online."
+            </div>
+        </div>
+
+        <div class="success-scenarios">
+            <div class="scenario-card">
+                <div class="scenario-icon"><i data-lucide="smartphone" style="width:36px;height:36px;"></i></div>
+                <h3>The Social Media Buzz</h3>
+                <p>Your video tours go viral on social media. Potential buyers are sharing your content, and other agents are asking "Who created that amazing property video?"</p>
+            </div>
+            
+            <div class="scenario-card">
+                <div class="scenario-icon"><i data-lucide="handshake" style="width:36px;height:36px;"></i></div>
+                <h3>The Vendor Meeting</h3>
+                <p>You walk into a valuation with confidence, knowing your portfolio of stunning video content sets you apart. Vendors choose you before you even quote your commission.</p>
+            </div>
+            
+            <div class="scenario-card">
+                <div class="scenario-icon"><i data-lucide="home" style="width:36px;height:36px;"></i></div>
+                <h3>The Quick Sale</h3>
+                <p>Properties that used to sit on the market for months are now generating multiple offers within days. Your reputation for results spreads throughout the community.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 6. Photo Showcase Section -->
+<section class="showcase-section" id="showcase">
+    <div class="showcase-container">
+        <div style="text-align: center; margin-bottom: 60px;">
+            <div class="header-badge">
+                <i data-lucide="camera" style="width:16px;height:16px;"></i>
+                See the Difference
+            </div>
+            <h2 style="font-size: 2.4em; font-weight: 800; color: #1F2E3C; margin-bottom: 15px; line-height: 1.2;">
+                This Is What Premium Looks Like
+            </h2>
+            <p style="font-size: 1.3em; color: #4A6378; max-width: 600px; margin: 0 auto;">
+                Our drone photography transforms ordinary properties into extraordinary marketing assets that stop scrollers in their tracks.
+            </p>
+        </div>
+        
+        <div class="photo-gallery">
+            <div class="photo-card">
+                <img src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/61b92060-d48f-4db8-b8cf-1657ec9a697c/DJI_0165_Removed+cars.jpg?format=500w" alt="Drone view of UK period mansion" />
+                <div class="photo-overlay">
+                    <div class="photo-title">Period Mansion Showcase</div>
+                    <div class="photo-description">Cinematic aerial perspective that reveals the full grandeur and setting of this premium property.</div>
+                </div>
+            </div>
+            
+            <div class="photo-card">
+                <img src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/71cd6387-8d6d-44e1-ac4b-4e40cb183b90/DJI_0169_Removed+cars-2.jpg?format=500w" alt="Drone view of estate near lake" />
+                <div class="photo-overlay">
+                    <div class="photo-title">Lakeside Estate</div>
+                    <div class="photo-description">Luxury aerial shot capturing the property's enviable position and stunning natural surroundings.</div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 50px; padding: 35px; background: linear-gradient(135deg, #F8F9FA 0%, #E5E7EB 100%); border-radius: 20px; border: 2px solid #E5E7EB;">
+            <h3 style="font-size: 1.6em; font-weight: 700; color: #1F2E3C; margin-bottom: 15px;">Ready for Photography Like This?</h3>
+            <p style="color: #4A6378; font-size: 1.1em; margin-bottom: 25px;">Let us create stunning visuals that make your properties impossible to ignore.</p>
+            <a href="login.html" style="display: inline-block; background: linear-gradient(135deg, #FF6B00, #FF8A33); color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: 700; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(255, 107, 0, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(255, 107, 0, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(255, 107, 0, 0.3)'">
+                Sign Up
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- 7. Final CTA Section -->
+<section class="final-cta-section" id="final-cta">
+    <div style="max-width: 900px; margin: 0 auto;">
+        <h2 style="font-size: 2.4em; font-weight: 800; margin-bottom: 20px; color: #1F2E3C; line-height: 1.3;">
+            Be the Agent Everyone Talks About
+        </h2>
+        <p style="font-size: 1.3em; margin-bottom: 40px; color: #4A6378; max-width: 700px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+            Win more instructions, wow your clients, and keep buyers hooked — with high-impact marketing and live content tracking that puts you ahead of the competition.
+        </p>
+        <div class="final-cta-buttons">
+            <a href="login.html" class="final-cta-button primary-final-cta">Sign Up</a>
+            <a href="https://www.instagram.com/markeb_mediauk/" target="_blank" class="final-cta-button secondary-final-cta">View Our Portfolio</a>
+        </div>
+        <div style="margin-top: 50px; padding: 25px; background: #F8F9FA; border-radius: 16px; border: 2px solid #E5E7EB;">
+            <p style="font-size: 1em; color: #6B7280; margin: 0;">
+                No contracts • 48-hour delivery • 100% satisfaction guarantee • Live progress tracking
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- 9. FAQ Section -->
+<section class="faq-section">
+    <div class="faq-container">
+        <div style="text-align:center;margin-bottom:60px;">
+            <h2 style="font-size: 2.4em; font-weight: 800; color: #1F2E3C; margin-bottom: 15px; line-height: 1.2;">
+                Questions? We've Got Answers
+            </h2>
+            <p style="font-size: 1.3em; color: #4A6378; max-width: 600px; margin: 0 auto;">
+                Everything you need to know about working with Markeb Media
+            </p>
+        </div>
+        
+        <div class="faq-grid">
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <h3>How quickly can you schedule a shoot?</h3>
+                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
+                </div>
+                <div class="faq-answer">
+                    We typically have availability within 2-3 days. For urgent requirements, we can often accommodate same-day or next-day bookings depending on location and weather conditions.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <h3>What's included in the 48-hour delivery?</h3>
+                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
+                </div>
+                <div class="faq-answer">
+                    You'll receive professionally edited photos, walkthrough videos, drone footage (if applicable), and all content optimised for Rightmove, Zoopla, and social media platforms. Everything is delivered via our secure client portal.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <h3>Do you cover my area?</h3>
+                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
+                </div>
+                <div class="faq-answer">
+                    We serve estate agents throughout the UK. Travel costs are included in our standard pricing for most locations. Contact us to confirm coverage for your specific area.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <h3>What if the weather is bad on shoot day?</h3>
+                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
+                </div>
+                <div class="faq-answer">
+                    We monitor weather conditions closely and will reschedule drone work if necessary. Interior photography and videography can proceed regardless of weather, ensuring minimal delays to your marketing timeline.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <h3>How does the content tracking work?</h3>
+                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
+                </div>
+                <div class="faq-answer">
+                    Our client portal provides real-time updates on your project status - from shoot completion to editing stages and final delivery. You'll always know exactly where your content stands.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <h3>Can I get the raw, unedited files?</h3>
+                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
+                </div>
+                <div class="faq-answer">
+                    We provide professionally edited content optimised for marketing use. Raw files can be provided upon request for an additional fee, though our edited versions are specifically designed for maximum marketing impact.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <h3>Do you offer payment plans?</h3>
+                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
+                </div>
+                <div class="faq-answer">
+                    Yes, we understand cash flow is important for estate agents. We offer flexible payment terms for regular clients and can discuss payment plans for larger projects or ongoing partnerships.
+                </div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">
+                    <h3>What equipment do you use?</h3>
+                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
+                </div>
+                <div class="faq-answer">
+                    We use professional-grade cameras, stabilised gimbals, and CAA-approved drones. All equipment is regularly maintained and updated to ensure consistently high-quality results for every shoot.
+                </div>
+            </div>
+        </div>
+        
+        <div style="background:linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);border-radius:20px;padding:35px;margin-top:40px;text-align:center;border:2px solid #BBF7D0;">
+            <h3 style="color:#065F46;font-weight:700;margin-bottom:10px;">Still have questions?</h3>
+            <p style="color:#064E3B;margin-bottom:15px;">Get in touch and we'll provide personalised answers for your specific requirements.</p>
+            <a href="https://markebmediabookings.as.me/intro" target="_blank" 
+               style="display: inline-block; padding: 12px 25px; background: #FF6B00; color: white; text-decoration: none; border-radius: 25px; font-weight: 700; transition: all 0.3s ease;"
+               onmouseover="this.style.transform='translateY(-2px)'" 
+               onmouseout="this.style.transform='translateY(0)'">
+                Let's Chat
+            </a>
+        </div>
+    </div>
+</section>
+
+<script>
     // FAQ Toggle
     function toggleFaq(element) {
         const allFaqs = document.querySelectorAll('.faq-item');
         allFaqs.forEach(faq => {
-            if (faq !== element) {
-                faq.classList.remove('active');
-            }
+            if (faq !== element) faq.classList.remove('active');
         });
         element.classList.toggle('active');
+        // Re-render icons after toggle (for the plus icon rotation)
+        lucide.createIcons();
     }
 
-    // Smooth scrolling for anchor links
+    // Smooth scrolling
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
             const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth'
-                });
-            }
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
         });
     });
 
-    // Measure header height after fonts/wrapping and lock the line to 50%
+    // Lock header line height
     (function(){
         function lockHeader(){
-            var header=document.getElementById('mm-line-header');
-            var band=document.getElementById('mm-line-band');
-            if(!header||!band) return;
-            var h = header.offsetHeight;
-            band.style.setProperty('--headerH', h+'px');
+            var header = document.getElementById('mm-line-header');
+            var band = document.getElementById('mm-line-band');
+            if (!header || !band) return;
+            band.style.setProperty('--headerH', header.offsetHeight + 'px');
         }
         lockHeader();
-        if(document.fonts && document.fonts.ready){ document.fonts.ready.then(lockHeader); }
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(lockHeader);
         window.addEventListener('load', lockHeader);
         window.addEventListener('resize', lockHeader);
     })();
+
+    // Init Lucide
+    document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
 </script>
 
 <script>
@@ -2415,12 +2382,10 @@ function nextStep() {
         const agency = document.getElementById('agency').value.trim();
         const email = document.getElementById('email').value.trim();
         const phone = document.getElementById('phone').value.trim();
-
         if (!name || !agency || !email || !phone) {
             showError('Please fill in all required fields');
             return;
         }
-
         formData.name = name;
         formData.agency = agency;
         formData.email = email;
@@ -2428,19 +2393,16 @@ function nextStep() {
     } else {
         const questionName = `q${currentStep}`;
         const selected = document.querySelector(`input[name="${questionName}"]:checked`);
-        
         if (!selected) {
             showError('Please select an answer to continue');
             return;
         }
-
         formData[questionName] = parseInt(selected.value);
     }
 
     hideError();
     currentStepElement.classList.remove('active');
     currentStep++;
-    
     if (currentStep <= 9) {
         steps[currentStep - 1].classList.add('active');
         updateProgress();
@@ -2467,15 +2429,9 @@ function hideError() {
     document.getElementById('errorMessage').classList.remove('active');
 }
 
-function showSuccess() {
-    const successEl = document.getElementById('successMessage');
-    successEl.classList.add('active');
-    setTimeout(() => successEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-}
-
 function calculateScore() {
-    return (formData.q1 || 0) + (formData.q2 || 0) + (formData.q3 || 0) + 
-           (formData.q4 || 0) + (formData.q5 || 0) + (formData.q6 || 0) + 
+    return (formData.q1 || 0) + (formData.q2 || 0) + (formData.q3 || 0) +
+           (formData.q4 || 0) + (formData.q5 || 0) + (formData.q6 || 0) +
            (formData.q7 || 0) + (formData.q8 || 0);
 }
 
@@ -2506,7 +2462,6 @@ function mapAnswersToKeys(formData) {
 
 async function submitAudit() {
     const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-
     const nameInput = document.getElementById('name');
     const agencyInput = document.getElementById('agency');
     const emailInput = document.getElementById('email');
@@ -2529,18 +2484,7 @@ async function submitAudit() {
 
     const score = calculateScore();
     const mappedAnswers = mapAnswersToKeys(formData);
-    
-    // Prepare raw answers for Airtable function
-    const rawAnswers = {
-        q1: formData.q1,
-        q2: formData.q2,
-        q3: formData.q3,
-        q4: formData.q4,
-        q5: formData.q5,
-        q6: formData.q6,
-        q7: formData.q7,
-        q8: formData.q8
-    };
+    const rawAnswers = { q1: formData.q1, q2: formData.q2, q3: formData.q3, q4: formData.q4, q5: formData.q5, q6: formData.q6, q7: formData.q7, q8: formData.q8 };
 
     document.getElementById('auditForm').style.display = 'none';
     document.getElementById('loadingSpinner').classList.add('active');
@@ -2548,94 +2492,44 @@ async function submitAudit() {
     window.scrollTo(0, scrollPosition);
 
     try {
-        console.log('🚀 Starting audit submission...');
-        
-        // Add timeout wrapper
-        const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Request timeout')), 25000) // 25 second timeout
-        );
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Request timeout')), 25000));
 
-        // Call BOTH functions with timeout protection
         const responsePromises = Promise.race([
             Promise.all([
-                // 1. Send customer email
                 fetch('/.netlify/functions/send-audit-results', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: name,
-                        email: email,
-                        company: agency,
-                        answers: mappedAnswers,
-                        score: score
-                    })
-                }).then(res => {
-                    console.log('✅ Email function responded:', res.status);
-                    return res;
+                    body: JSON.stringify({ name, email, company: agency, answers: mappedAnswers, score })
                 }),
-                // 2. Save to Airtable & send internal notification
                 fetch('/.netlify/functions/submit-audit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        name: name,
-                        agency: agency,
-                        email: email,
-                        phone: phone,
-                        score: score,
-                        answers: rawAnswers
-                    })
-                }).then(res => {
-                    console.log('✅ Airtable function responded:', res.status);
-                    return res;
+                    body: JSON.stringify({ name, agency, email, phone, score, answers: rawAnswers })
                 })
             ]),
             timeoutPromise
         ]);
 
         const [emailResponse, airtableResponse] = await responsePromises;
-        
         const emailData = await emailResponse.json();
-        
-        // Try to get Airtable data, but don't fail if it errors
+
         let airtableData;
-        try {
-            airtableData = await airtableResponse.json();
-        } catch (e) {
-            console.warn('Could not parse Airtable response:', e);
-        }
+        try { airtableData = await airtableResponse.json(); } catch (e) {}
 
-        if (!emailResponse.ok) {
-            console.error('❌ Email function failed:', emailData);
-            throw new Error(emailData.error || 'Failed to send email');
-        }
+        if (!emailResponse.ok) throw new Error(emailData.error || 'Failed to send email');
 
-        if (!airtableResponse.ok) {
-            console.warn('⚠️ Airtable submission failed:', airtableData?.error || 'Unknown error');
-            // Don't throw error - customer still gets their email
-        }
-
-        console.log('✅ Audit submitted successfully!');
-        
         document.getElementById('loadingSpinner').classList.remove('active');
         showResults(score, `Your detailed analysis has been sent to ${email}`);
-
         setTimeout(() => {
-            document.getElementById('resultsContainer').scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'start' 
-            });
+            document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
 
     } catch (error) {
-        console.error('❌ Error submitting audit:', error);
         document.getElementById('loadingSpinner').classList.remove('active');
         document.getElementById('auditForm').style.display = 'block';
         window.scrollTo(0, scrollPosition);
-        
-        // More specific error messages
         if (error.message === 'Request timeout') {
-            showError('The request is taking longer than expected. We\'ve received your submission and will email you shortly. If you don\'t receive an email within 5 minutes, please contact us at commercial@markebmedia.com');
+            showError("The request is taking longer than expected. We've received your submission and will email you shortly. If you don't receive an email within 5 minutes, please contact us at commercial@markebmedia.com");
         } else {
             showError('Sorry, there was an error. Please try again or contact us at commercial@markebmedia.com');
         }
@@ -2644,13 +2538,11 @@ async function submitAudit() {
 
 function showResults(score, message) {
     const verdict = getVerdict(score);
-    
     document.getElementById('scoreNumber').textContent = score + '/25';
     document.getElementById('scoreVerdict').textContent = verdict.text;
     document.getElementById('scoreDescription').textContent = verdict.desc;
-    
     document.getElementById('analysisContent').innerHTML = `
-        <h3>📧 Check Your Email</h3>
+        <h3><i data-lucide="mail" style="width:20px;height:20px;color:#FF6B00;"></i> Check Your Email</h3>
         <p>${message}</p>
         <p>We've sent you a comprehensive analysis including:</p>
         <ul>
@@ -2661,14 +2553,10 @@ function showResults(score, message) {
         </ul>
         <p><strong>Didn't receive the email?</strong> Check your spam folder or contact us at <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a></p>
     `;
-    
     document.getElementById('resultsContainer').classList.add('active');
-    
+    lucide.createIcons();
     setTimeout(() => {
-        document.getElementById('resultsContainer').scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start' 
-        });
+        document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
 }
 
@@ -2681,8 +2569,8 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('selected');
         });
     });
-    
     updateProgress();
+    lucide.createIcons();
 });
 </script>
 </body>
