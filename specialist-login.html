@@ -69,7 +69,7 @@
     .input-wrap {
       position: relative;
     }
-    .input-wrap i {
+    .input-wrap > i[data-lucide] {
       position: absolute;
       left: 12px;
       top: 50%;
@@ -91,6 +91,25 @@
       transition: border 0.15s;
     }
     input:focus { border-color: #3b82f6; }
+
+    /* Password toggle */
+    .password-input-wrapper input {
+      padding-right: 44px;
+    }
+    .password-toggle-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      padding: 0;
+    }
+    .password-toggle-btn:hover { color: #64748b; }
 
     .btn {
       width: 100%;
@@ -150,9 +169,12 @@
 
   <div class="field">
     <label for="passcode">Passcode</label>
-    <div class="input-wrap">
+    <div class="input-wrap password-input-wrapper">
       <i data-lucide="lock"></i>
       <input type="password" id="passcode" placeholder="Enter your passcode" />
+      <button type="button" class="password-toggle-btn" onclick="togglePasscode()" aria-label="Toggle passcode visibility">
+        <i data-lucide="eye" id="passcode-icon" style="width:18px;height:18px;"></i>
+      </button>
     </div>
   </div>
 
@@ -173,6 +195,19 @@
   document.addEventListener('keydown', e => {
     if (e.key === 'Enter') handleLogin();
   });
+
+  function togglePasscode() {
+    const input = document.getElementById('passcode');
+    const icon = document.getElementById('passcode-icon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.setAttribute('data-lucide', 'eye-off');
+    } else {
+      input.type = 'password';
+      icon.setAttribute('data-lucide', 'eye');
+    }
+    lucide.createIcons();
+  }
 
   async function handleLogin() {
     const name = document.getElementById('name').value.trim();
