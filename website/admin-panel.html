@@ -2065,7 +2065,7 @@ body {
         <div class="admin-title">Admin Panel</div>
         <div class="admin-subtitle">Manage bookings, customers, and payments</div>
       </div>
-      <div class="admin-badge">⚠️ ADMIN ACCESS</div>
+      <div class="admin-badge">ADMIN ACCESS</div>
     </div>
 
     <!-- Dashboard Section -->
@@ -3288,9 +3288,8 @@ const STRIPE_PUBLIC_KEY = 'pk_live_51QycLvQAVOs8qTDFVfXTNzuuhBnPjgZQSS3AH30NGMuS
 const stripe = Stripe(STRIPE_PUBLIC_KEY);
 
     // ===== PASSWORD PROTECTION =====
-    const ADMIN_CODE = 'MARKEB2546';
-    const SESSION_KEY = 'admin_authenticated';
-    const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
+const SESSION_KEY = 'admin_authenticated';
+const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
 
     // ===== GLOBAL VARIABLES ===== 
     let currentMarketData = null;  // ✅ ADD THIS LINE HERE
@@ -3317,41 +3316,36 @@ const stripe = Stripe(STRIPE_PUBLIC_KEY);
       }
     }
 
-    // Check password
-    function checkPassword(event) {
-      event.preventDefault();
-      
-      const input = document.getElementById('adminPassword');
-      const error = document.getElementById('passwordError');
-      const modal = document.getElementById('passwordModal');
-      
-      if (input.value === ADMIN_CODE) {
-        // Correct password
-        localStorage.setItem(SESSION_KEY, JSON.stringify({
-          timestamp: Date.now()
-        }));
-        
-        // Success animation
-        modal.style.opacity = '0';
-        modal.style.transform = 'scale(0.95)';
-        modal.style.transition = 'all 0.3s ease';
-        
-        setTimeout(() => {
-          modal.classList.add('unlocked');
-        }, 300);
-        
-      } else {
-        // Incorrect password
-        error.classList.add('show');
-        input.value = '';
-        input.classList.add('error');
-        
-        setTimeout(() => {
-          error.classList.remove('show');
-          input.classList.remove('error');
-        }, 3000);
-      }
-    }
+   async function checkPassword(event) {
+  event.preventDefault();
+  
+  const input = document.getElementById('adminPassword');
+  const error = document.getElementById('passwordError');
+  const modal = document.getElementById('passwordModal');
+  
+  const res = await fetch('/.netlify/functions/admin-auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: input.value })
+  });
+  const data = await res.json();
+  
+  if (data.success) {
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ timestamp: Date.now() }));
+    modal.style.opacity = '0';
+    modal.style.transform = 'scale(0.95)';
+    modal.style.transition = 'all 0.3s ease';
+    setTimeout(() => { modal.classList.add('unlocked'); }, 300);
+  } else {
+    error.classList.add('show');
+    input.value = '';
+    input.classList.add('error');
+    setTimeout(() => {
+      error.classList.remove('show');
+      input.classList.remove('error');
+    }, 3000);
+  }
+}
 
     // Logout function
     function adminLogout() {

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In – Markeb Media</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 32px;
+      justify-content: center;
+    }
+    .logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: #64748b;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .field { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+    .input-wrap i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
+    }
+    input {
+      width: 100%;
+      padding: 11px 14px 11px 38px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: #0f172a;
+      outline: none;
+      transition: border 0.15s;
+    }
+    input:focus { border-color: #3b82f6; }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .error {
+      background: #fef2f2;
+      border: 1px solid #ef4444;
+      color: #b91c1c;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-top: 12px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .error.visible { display: flex; }
+    .error i { flex-shrink: 0; width: 16px; height: 16px; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">
+    <i data-lucide="camera" style="width:24px;height:24px;color:#3b82f6;"></i>
+    <span class="logo-text">Markeb Media</span>
+  </div>
+
+  <h1>Welcome back</h1>
+  <p class="subtitle">Sign in to view your bookings</p>
+
+  <div class="field">
+    <label for="name">Your Name</label>
+    <div class="input-wrap">
+      <i data-lucide="user"></i>
+      <input type="text" id="name" placeholder="e.g. Jodie" autocomplete="off" />
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="passcode">Passcode</label>
+    <div class="input-wrap">
+      <i data-lucide="lock"></i>
+      <input type="password" id="passcode" placeholder="Enter your passcode" />
+    </div>
+  </div>
+
+  <button class="btn" id="loginBtn" onclick="handleLogin()">
+    <i data-lucide="log-in" style="width:16px;height:16px;"></i>
+    Sign In
+  </button>
+
+  <div class="error" id="errorMsg">
+    <i data-lucide="alert-circle"></i>
+    <span id="errorText">Incorrect name or passcode. Please try again.</span>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleLogin();
+  });
+
+  async function handleLogin() {
+    const name = document.getElementById('name').value.trim();
+    const passcode = document.getElementById('passcode').value.trim();
+    const btn = document.getElementById('loginBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    const errorText = document.getElementById('errorText');
+
+    if (!name || !passcode) {
+      errorText.textContent = 'Please enter your name and passcode.';
+      errorMsg.classList.add('visible');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i data-lucide="loader" style="width:16px;height:16px;"></i> Signing in…';
+    lucide.createIcons();
+    errorMsg.classList.remove('visible');
+
+    try {
+      const res = await fetch('/.netlify/functions/specialist-auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, passcode })
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        localStorage.setItem('user', JSON.stringify({ name: data.name }));
+        window.location.href = '/specialist-bookings';
+      } else {
+        errorText.textContent = 'Incorrect name or passcode. Please try again.';
+        errorMsg.classList.add('visible');
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="log-in" style="width:16px;height:16px;"></i> Sign In';
+        lucide.createIcons();
+      }
+    } catch (err) {
+      errorText.textContent = 'Something went wrong. Please try again.';
+      errorMsg.classList.add('visible');
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="log-in" style="width:16px;height:16px;"></i> Sign In';
+      lucide.createIcons();
+    }
+  }
+</script>
+
+</body>
+</html>

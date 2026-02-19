@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings – Markeb Media</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #3b82f6;
+      --blue-dark: #2563eb;
+      --blue-light: #eff6ff;
+      --blue-mid: #dbeafe;
+      --slate-900: #0f172a;
+      --slate-700: #334155;
+      --slate-500: #64748b;
+      --slate-300: #cbd5e1;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+      --white: #ffffff;
+      --green: #10b981;
+      --green-light: #f0fdf4;
+      --amber: #f59e0b;
+      --amber-light: #fef3c7;
+      --red: #ef4444;
+      --red-light: #fef2f2;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--slate-50);
+      color: var(--slate-900);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    .nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--slate-300);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--slate-900);
+      text-decoration: none;
+    }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--slate-700);
+    }
+    .nav-avatar {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .nav-logout {
+      font-size: 13px;
+      color: var(--slate-500);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-logout:hover { background: var(--slate-100); }
+
+    /* MAIN */
+    .main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    /* HEADER */
+    .page-header {
+      margin-bottom: 32px;
+    }
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--slate-900);
+      margin-bottom: 4px;
+    }
+    .page-header p {
+      font-size: 15px;
+      color: var(--slate-500);
+    }
+
+    /* STATS ROW */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--slate-300);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .stat-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: var(--slate-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .stat-icon i { width: 20px; height: 20px; color: var(--slate-500); }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--slate-500);
+      margin-bottom: 4px;
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--slate-900);
+      font-family: 'DM Mono', monospace;
+    }
+    .stat-card.highlight { border-color: var(--blue); background: var(--blue-light); }
+    .stat-card.highlight .stat-icon { background: var(--blue-mid); }
+    .stat-card.highlight .stat-icon i { color: var(--blue); }
+    .stat-card.highlight .stat-value { color: var(--blue-dark); }
+
+    /* FILTERS */
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 7px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--slate-300);
+      background: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--slate-700);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .filter-btn.active { background: var(--blue); border-color: var(--blue); color: var(--white); }
+
+    .search-wrap {
+      margin-left: auto;
+      position: relative;
+    }
+    .search-wrap i {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px; height: 15px;
+      color: var(--slate-500);
+      pointer-events: none;
+    }
+    .filter-search {
+      padding: 7px 14px 7px 32px;
+      border-radius: 8px;
+      border: 1px solid var(--slate-300);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: var(--slate-900);
+      outline: none;
+      width: 220px;
+      transition: border 0.15s;
+    }
+    .filter-search:focus { border-color: var(--blue); }
+
+    /* BOOKING CARDS */
+    .bookings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .booking-card {
+      background: var(--white);
+      border: 1px solid var(--slate-300);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: box-shadow 0.15s, border-color 0.15s;
+      cursor: pointer;
+    }
+    .booking-card:hover {
+      border-color: var(--blue);
+      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
+    }
+    .booking-card.expanded { border-color: var(--blue); }
+
+    .booking-card-header {
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .booking-status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .status-upcoming { background: var(--green); }
+    .status-today { background: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
+    .status-past { background: var(--slate-300); }
+    .status-cancelled { background: var(--red); }
+
+    .booking-main { flex: 1; min-width: 0; }
+    .booking-ref {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--slate-500);
+      margin-bottom: 2px;
+    }
+    .booking-address {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--slate-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .booking-service {
+      font-size: 13px;
+      color: var(--slate-500);
+      margin-top: 2px;
+    }
+
+    .booking-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .booking-date { font-size: 13px; font-weight: 600; color: var(--slate-700); }
+    .booking-time { font-size: 13px; color: var(--slate-500); }
+
+    .booking-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-today { background: var(--blue-mid); color: var(--blue-dark); }
+    .badge-upcoming { background: var(--green-light); color: var(--green); }
+    .badge-past { background: var(--slate-100); color: var(--slate-500); }
+    .badge-cancelled { background: var(--red-light); color: var(--red); }
+
+    .booking-chevron {
+      color: var(--slate-300);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .booking-chevron i { width: 18px; height: 18px; }
+    .booking-card.expanded .booking-chevron { transform: rotate(180deg); color: var(--blue); }
+
+    /* EXPANDED DETAILS */
+    .booking-details {
+      display: none;
+      border-top: 1px solid var(--slate-100);
+      padding: 20px;
+      background: var(--slate-50);
+    }
+    .booking-card.expanded .booking-details { display: block; }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .detail-item.full { grid-column: 1 / -1; }
+    .detail-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--slate-500);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .detail-label i { width: 12px; height: 12px; }
+    .detail-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--slate-900);
+    }
+
+    .access-alert {
+      background: var(--amber-light);
+      border: 1px solid var(--amber);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: #92400e;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .access-alert i { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+    .access-alert strong { display: block; margin-bottom: 2px; }
+
+    .addons-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .addon-tag {
+      background: var(--blue-light);
+      border: 1px solid var(--blue-mid);
+      color: var(--blue-dark);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .notes-box {
+      background: var(--white);
+      border: 1px solid var(--slate-300);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--slate-700);
+      line-height: 1.5;
+    }
+
+    /* EMPTY / LOADING */
+    .state-box {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--slate-500);
+    }
+    .state-box i { width: 40px; height: 40px; margin-bottom: 12px; color: var(--slate-300); }
+    .state-box h3 { font-size: 16px; font-weight: 600; color: var(--slate-700); margin-bottom: 6px; }
+    .state-box p { font-size: 14px; }
+
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--blue-mid);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .booking-card.today-card { border-color: var(--blue); background: var(--blue-light); }
+    .booking-card.today-card .booking-card-header { background: var(--blue-light); }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--slate-500);
+      margin: 24px 0 10px;
+      padding: 0 2px;
+    }
+    .section-label:first-child { margin-top: 0; }
+
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .stat-icon { display: none; }
+      .stat-value { font-size: 24px; }
+      .details-grid { grid-template-columns: 1fr; }
+      .filter-search { width: 100%; }
+      .search-wrap { margin-left: 0; width: 100%; }
+      .filter-search { width: 100%; }
+      .filters { flex-direction: column; align-items: stretch; }
+      .filter-btn { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <i data-lucide="camera" style="width:22px;height:22px;color:#3b82f6;"></i>
+    Markeb Media
+  </a>
+  <div class="nav-right">
+    <div class="nav-user">
+      <div class="nav-avatar" id="navAvatar">JH</div>
+      <span id="navName">Loading…</span>
+    </div>
+    <a href="#" class="nav-logout" onclick="handleLogout()">
+      <i data-lucide="log-out" style="width:14px;height:14px;"></i>
+      Sign out
+    </a>
+  </div>
+</nav>
+
+<main class="main">
+
+  <div class="page-header">
+    <h1>My Bookings</h1>
+    <p id="pageSubtitle">All shoots assigned to you</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card highlight">
+      <div class="stat-icon"><i data-lucide="sun"></i></div>
+      <div>
+        <div class="stat-label">Today</div>
+        <div class="stat-value" id="statToday">—</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i data-lucide="calendar"></i></div>
+      <div>
+        <div class="stat-label">Upcoming</div>
+        <div class="stat-value" id="statUpcoming">—</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><i data-lucide="check-circle"></i></div>
+      <div>
+        <div class="stat-label">Completed</div>
+        <div class="stat-value" id="statCompleted">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+    <button class="filter-btn" onclick="setFilter('today', this)">Today</button>
+    <button class="filter-btn" onclick="setFilter('upcoming', this)">Upcoming</button>
+    <button class="filter-btn" onclick="setFilter('past', this)">Past</button>
+    <button class="filter-btn" onclick="setFilter('cancelled', this)">Cancelled</button>
+    <div class="search-wrap">
+      <i data-lucide="search"></i>
+      <input class="filter-search" type="text" placeholder="Search address or reference…" id="searchInput" oninput="renderBookings()">
+    </div>
+  </div>
+
+  <div id="bookingsContainer">
+    <div class="state-box">
+      <div class="spinner"></div>
+      <p>Loading your bookings…</p>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  let allBookings = [];
+  let currentFilter = 'all';
+
+  function getBookingStatus(booking) {
+    if (booking.bookingStatus === 'Cancelled') return 'cancelled';
+    const today = new Date().toISOString().split('T')[0];
+    if (booking.date === today) return 'today';
+    if (booking.date > today) return 'upcoming';
+    return 'past';
+  }
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function formatDateShort(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function getInitials(name) {
+    return (name || '').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  }
+
+  function getAccessInfo(booking) {
+    if (!booking.accessType) return null;
+    if (booking.accessType === 'Meeting Agent') return { label: 'Meeting Agent at Property', detail: null, icon: 'users' };
+    if (booking.accessType === 'Meeting Vendor') return { label: 'Meeting Vendor at Property', detail: null, icon: 'users' };
+    if (booking.accessType === 'Pick Up Keys') return { label: 'Pick Up Keys', detail: booking.keyPickupLocation || 'Location TBC', icon: 'key' };
+    return null;
+  }
+
+  function getSpecialistName() {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (user.name) return user.name;
+    } catch(e) {}
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('specialist')) return params.get('specialist');
+    return null;
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('user');
+    window.location.href = '/specialist-login';
+  }
+
+  async function loadBookings() {
+    const specialistName = getSpecialistName();
+
+    if (!specialistName) {
+      window.location.href = '/specialist-login';
+      return;
+    }
+
+    document.getElementById('navName').textContent = specialistName;
+    document.getElementById('navAvatar').textContent = getInitials(specialistName);
+
+    try {
+      const res = await fetch(`/.netlify/functions/get-specialist-bookings?specialist=${encodeURIComponent(specialistName)}`);
+      if (!res.ok) throw new Error('Failed to load bookings');
+      const data = await res.json();
+      allBookings = data.bookings || [];
+      updateStats();
+      renderBookings();
+      lucide.createIcons();
+    } catch (err) {
+      document.getElementById('bookingsContainer').innerHTML = `
+        <div class="state-box">
+          <i data-lucide="alert-triangle"></i>
+          <h3>Couldn't load bookings</h3>
+          <p>${err.message}</p>
+        </div>`;
+      lucide.createIcons();
+    }
+  }
+
+  function updateStats() {
+    document.getElementById('statToday').textContent = allBookings.filter(b => getBookingStatus(b) === 'today').length;
+    document.getElementById('statUpcoming').textContent = allBookings.filter(b => getBookingStatus(b) === 'upcoming').length;
+    document.getElementById('statCompleted').textContent = allBookings.filter(b => getBookingStatus(b) === 'past').length;
+  }
+
+  function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderBookings();
+  }
+
+  function renderBookings() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+
+    let bookings = allBookings.filter(b => {
+      const status = getBookingStatus(b);
+      if (currentFilter !== 'all' && status !== currentFilter) return false;
+      if (search) {
+        const haystack = `${b.propertyAddress} ${b.postcode} ${b.bookingRef} ${b.clientName} ${b.service}`.toLowerCase();
+        if (!haystack.includes(search)) return false;
+      }
+      return true;
+    });
+
+    bookings.sort((a, b) => {
+      const sa = getBookingStatus(a), sb = getBookingStatus(b);
+      const order = { today: 0, upcoming: 1, past: 2, cancelled: 3 };
+      if (order[sa] !== order[sb]) return order[sa] - order[sb];
+      if (sa === 'past') return b.date.localeCompare(a.date);
+      return a.date.localeCompare(b.date);
+    });
+
+    if (bookings.length === 0) {
+      document.getElementById('bookingsContainer').innerHTML = `
+        <div class="state-box">
+          <i data-lucide="inbox"></i>
+          <h3>No bookings found</h3>
+          <p>Try a different filter or search term.</p>
+        </div>`;
+      lucide.createIcons();
+      return;
+    }
+
+    let html = '';
+    if (currentFilter === 'all' && !search) {
+      const groups = [
+        { key: 'today', label: "Today's Shoots" },
+        { key: 'upcoming', label: 'Upcoming' },
+        { key: 'past', label: 'Past' },
+        { key: 'cancelled', label: 'Cancelled' }
+      ];
+      groups.forEach(({ key, label }) => {
+        const group = bookings.filter(b => getBookingStatus(b) === key);
+        if (group.length === 0) return;
+        html += `<div class="section-label">${label}</div>`;
+        group.forEach(b => { html += buildCard(b); });
+      });
+    } else {
+      bookings.forEach(b => { html += buildCard(b); });
+    }
+
+    document.getElementById('bookingsContainer').innerHTML = `<div class="bookings-list">${html}</div>`;
+    lucide.createIcons();
+  }
+
+  function buildCard(booking) {
+    const status = getBookingStatus(booking);
+    const access = getAccessInfo(booking);
+
+    let addons = [];
+    try { addons = typeof booking.addons === 'string' ? JSON.parse(booking.addons) : (booking.addons || []); } catch(e) {}
+
+    const badgeMap = {
+      today: '<span class="booking-badge badge-today">Today</span>',
+      upcoming: '<span class="booking-badge badge-upcoming">Upcoming</span>',
+      past: '<span class="booking-badge badge-past">Completed</span>',
+      cancelled: '<span class="booking-badge badge-cancelled">Cancelled</span>'
+    };
+
+    const dotClass = { today: 'status-today', upcoming: 'status-upcoming', past: 'status-past', cancelled: 'status-cancelled' }[status];
+
+    const accessHtml = access ? `
+      <div class="access-alert">
+        <i data-lucide="${access.icon}"></i>
+        <div>
+          <strong>${access.label}</strong>
+          ${access.detail ? `<span>${access.detail}</span>` : ''}
+        </div>
+      </div>` : '';
+
+    const addonsHtml = addons.length > 0 ? `
+      <div class="detail-item full">
+        <div class="detail-label"><i data-lucide="plus-circle"></i> Add-ons</div>
+        <div class="addons-list">${addons.map(a => `<span class="addon-tag">${a.name || a}</span>`).join('')}</div>
+      </div>` : '';
+
+    const notesHtml = booking.clientNotes ? `
+      <div class="detail-item full">
+        <div class="detail-label"><i data-lucide="message-square"></i> Client Notes</div>
+        <div class="notes-box">${booking.clientNotes}</div>
+      </div>` : '';
+
+    const duration = booking.duration
+      ? Math.floor(booking.duration / 60) + 'h' + (booking.duration % 60 ? ' ' + (booking.duration % 60) + 'm' : '')
+      : '—';
+
+    return `
+      <div class="booking-card ${status === 'today' ? 'today-card' : ''}" onclick="toggleCard(this)">
+        <div class="booking-card-header">
+          <div class="booking-status-dot ${dotClass}"></div>
+          <div class="booking-main">
+            <div class="booking-ref">${booking.bookingRef}</div>
+            <div class="booking-address">${booking.propertyAddress}${booking.postcode ? ', ' + booking.postcode : ''}</div>
+            <div class="booking-service">${booking.service}${addons.length > 0 ? ` + ${addons.length} add-on${addons.length > 1 ? 's' : ''}` : ''}</div>
+          </div>
+          <div class="booking-meta">
+            ${badgeMap[status]}
+            <div class="booking-date">${formatDateShort(booking.date)}</div>
+            <div class="booking-time">${booking.time}</div>
+          </div>
+          <div class="booking-chevron"><i data-lucide="chevron-down"></i></div>
+        </div>
+        <div class="booking-details">
+          ${accessHtml}
+          <div class="details-grid">
+            <div class="detail-item">
+              <div class="detail-label"><i data-lucide="calendar"></i> Date & Time</div>
+              <div class="detail-value">${formatDate(booking.date)} at ${booking.time}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label"><i data-lucide="user"></i> Client Name</div>
+              <div class="detail-value">${booking.clientName}</div>
+            </div>
+            <div class="detail-item full">
+              <div class="detail-label"><i data-lucide="map-pin"></i> Property Address</div>
+              <div class="detail-value">${booking.propertyAddress}${booking.postcode ? ', ' + booking.postcode : ''}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label"><i data-lucide="camera"></i> Service</div>
+              <div class="detail-value">${booking.service}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label"><i data-lucide="home"></i> Bedrooms</div>
+              <div class="detail-value">${booking.bedrooms || '—'}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label"><i data-lucide="phone"></i> Client Phone</div>
+              <div class="detail-value">${booking.clientPhone ? `<a href="tel:${booking.clientPhone}" style="color:var(--blue);text-decoration:none">${booking.clientPhone}</a>` : '—'}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label"><i data-lucide="clock"></i> Duration</div>
+              <div class="detail-value">${duration}</div>
+            </div>
+            ${addonsHtml}
+            ${notesHtml}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function toggleCard(card) {
+    card.classList.toggle('expanded');
+    lucide.createIcons();
+  }
+
+  loadBookings();
+</script>
+</body>
+</html>

@@ -2,6 +2,9 @@
   directory = "netlify/functions"
   included_files = ["data/**"]
 
+[functions."send-reminders"]
+  schedule = "0 9 * * *"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
