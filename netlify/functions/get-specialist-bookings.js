@@ -30,7 +30,7 @@ exports.handler = async (event) => {
   try {
     const records = await base('Bookings')
       .select({
-        filterByFormula: `{Media Specialist} = '${specialist.replace(/'/g, "\\'")}'`,
+        filterByFormula: `FIND('${specialist.replace(/'/g, "\\'")}', {Media Specialist})`,
         sort: [{ field: 'Date', direction: 'desc' }]
       })
       .all();
