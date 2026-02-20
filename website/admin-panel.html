@@ -2201,11 +2201,30 @@ body {
   <label class="form-label">Postcode *</label>
   <input type="text" id="bookingPostcode" class="form-input" required placeholder="e.g. M1 1AA" onchange="checkAdminAvailability()">
 </div>
-        <div class="form-group">
-          <label class="form-label">Access Instructions</label>
-          <input type="text" id="bookingAccess" class="form-input" placeholder="Key location, gate code, etc.">
-        </div>
-      </div>
+
+        <div class="form-row">
+  <div class="form-group">
+    <label class="form-label">Access Type</label>
+    <select id="bookingAccessType" class="form-input" onchange="handleAdminAccessTypeChange()">
+      <option value="">-- Select access type --</option>
+      <option value="Meeting Agent">Meeting Agent at Property</option>
+      <option value="Meeting Vendor">Meeting Vendor at Property</option>
+      <option value="Pick Up Keys">Pick Up Keys from Office</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label class="form-label">Access Instructions</label>
+    <input type="text" id="bookingAccess" class="form-input" placeholder="Gate code, parking notes, etc.">
+  </div>
+</div>
+
+<div id="adminKeyPickupSection" style="display: none;">
+  <div class="form-group">
+    <label class="form-label">Key Pickup Location *</label>
+    <input type="text" id="adminKeyPickupLocation" class="form-input" placeholder="e.g. Main office reception, 123 High Street">
+    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Full address where keys can be collected</div>
+  </div>
+</div>
 
       <!-- Date & Time -->
       <div class="form-row">
@@ -3854,6 +3873,22 @@ function handleSpecialistChange() {
   customInput.style.display = select.value === 'other' ? 'block' : 'none';
 }
 
+function handleAdminAccessTypeChange() {
+  const accessType = document.getElementById('bookingAccessType').value;
+  const keyPickupSection = document.getElementById('adminKeyPickupSection');
+  const keyPickupInput = document.getElementById('adminKeyPickupLocation');
+  
+  if (accessType === 'Pick Up Keys') {
+    keyPickupSection.style.display = 'block';
+    keyPickupInput.required = true;
+    setTimeout(() => keyPickupInput.focus(), 100);
+  } else {
+    keyPickupSection.style.display = 'none';
+    keyPickupInput.value = '';
+    keyPickupInput.required = false;
+  }
+}
+
     // Load services based on region
     function loadServicesForRegion() {
   const region = document.getElementById('bookingRegion').value;
@@ -4283,7 +4318,9 @@ if (!mediaSpecialist) {
     
     propertyAddress: document.getElementById('bookingAddress').value,
     postcode: document.getElementById('bookingPostcode').value,
-    accessInstructions: document.getElementById('bookingAccess').value || '',
+    accessType: document.getElementById('bookingAccessType').value || undefined,
+keyPickupLocation: document.getElementById('adminKeyPickupLocation').value || undefined,
+accessInstructions: document.getElementById('bookingAccess').value || '',
     
     date: document.getElementById('bookingDate').value,
     time: document.getElementById('bookingTime').value,

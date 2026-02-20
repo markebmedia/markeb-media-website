@@ -258,8 +258,8 @@ exports.handler = async (event, context) => {
         'Client Notes': bookingData.clientNotes || '',
         
         // ✅ NEW: Access Type fields
-        'Access Type': bookingData.accessType || '',
-        'Key Pickup Location': bookingData.keyPickupLocation || '',
+        'Access Type': bookingData.accessType || undefined,
+'Key Pickup Location': bookingData.keyPickupLocation || undefined,
         
         'Booking Status': bookingStatus,
         'Payment Status': paymentStatus,
