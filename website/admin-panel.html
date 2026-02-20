@@ -1924,6 +1924,104 @@ body {
   color: #ef4444;
 }
 
+/* =====================================================
+   ADMIN PANEL — LAPTOP TABLE FIX
+   Paste this block inside your <style> tag, just before
+   the closing </style> tag.
+   ===================================================== */
+
+@media (min-width: 1025px) and (max-width: 1440px) {
+
+  /* Narrower sidebar = more room for tables */
+  .admin-sidebar {
+    width: 220px;
+    padding: 16px;
+  }
+
+  .admin-main {
+    margin-left: 220px;
+    padding: 16px;
+  }
+
+  .admin-logo img {
+    height: 60px;
+  }
+
+  .nav-section-title {
+    font-size: 10px;
+  }
+
+  .nav-item {
+    padding: 9px 10px;
+    font-size: 13px;
+    gap: 10px;
+  }
+
+  /* Tighter table cells */
+  .data-table th,
+  .data-table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .data-table th {
+    font-size: 11px;
+    letter-spacing: 0.3px;
+  }
+
+  /* Compact region dropdown */
+  .region-select {
+    min-width: 100px !important;
+    max-width: 130px !important;
+    font-size: 12px !important;
+    padding: 6px 8px !important;
+  }
+
+  /* Scale down toggle switches */
+  .toggle-switch {
+    width: 42px;
+    height: 22px;
+  }
+
+  .toggle-slider:before {
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+  }
+
+  .toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+  }
+
+  /* Tighter badges */
+  .status-badge {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+
+  .region-badge {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  /* Smaller action buttons inside tables */
+  .data-table .btn,
+  .data-table .btn-small {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  /* Smaller stat cards */
+  .stat-value {
+    font-size: 26px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -2142,6 +2240,25 @@ body {
           <option value="South">South</option>
         </select>
       </div>
+
+      <div class="form-group">
+  <label class="form-label">Media Specialist *</label>
+  <div style="display: flex; gap: 12px;">
+    <select id="bookingSpecialist" class="form-input" onchange="handleSpecialistChange()" style="flex: 1;">
+      <option value="">-- Select Specialist --</option>
+      <option value="Jodie">Jodie (North)</option>
+      <option value="Maeve">Maeve (South)</option>
+      <option value="other">Other / Enter manually...</option>
+    </select>
+    <input 
+      type="text" 
+      id="bookingSpecialistCustom" 
+      class="form-input" 
+      placeholder="Enter name..."
+      style="flex: 1; display: none;"
+    >
+  </div>
+</div>
 
       <!-- Service Selection -->
       <div class="form-group">
@@ -2675,7 +2792,7 @@ body {
           required
         ></textarea>
         <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
-          💡 Use [Name] to personalize with customer name
+          💡 Use [Name] to personalise with customer name
         </div>
       </div>
 
@@ -3829,35 +3946,49 @@ function populateCustomerDetails() {
   }
 }
 
+function handleSpecialistChange() {
+  const select = document.getElementById('bookingSpecialist');
+  const customInput = document.getElementById('bookingSpecialistCustom');
+  customInput.style.display = select.value === 'other' ? 'block' : 'none';
+}
+
     // Load services based on region
     function loadServicesForRegion() {
-      const region = document.getElementById('bookingRegion').value;
-      const serviceSelect = document.getElementById('bookingService');
-      
-      if (!region) {
-        serviceSelect.innerHTML = '<option value="">-- Select Service --</option>';
-        return;
-      }
-      
-      const regionKey = region.toLowerCase();
-      const services = SERVICES_CATALOG[regionKey] || [];
-      
-      serviceSelect.innerHTML = '<option value="">-- Select Service --</option>';
-      services.forEach(service => {
-        serviceSelect.innerHTML += `
-          <option 
-            value="${service.id}" 
-            data-price="${service.price}"
-            data-duration="${service.duration}"
-            data-name="${service.name}"
-            data-property="${service.isPropertyService}"
-            data-addons='${JSON.stringify(service.availableAddons)}'
-          >
-            ${service.name} - £${service.price.toFixed(2)}
-          </option>
-        `;
-      });
-    }
+  const region = document.getElementById('bookingRegion').value;
+  const serviceSelect = document.getElementById('bookingService');
+  const specialistSelect = document.getElementById('bookingSpecialist');
+  
+  if (region === 'North') {
+    specialistSelect.value = 'Jodie';
+  } else if (region === 'South') {
+    specialistSelect.value = 'Maeve';
+  }
+  handleSpecialistChange();
+
+  if (!region) {
+    serviceSelect.innerHTML = '<option value="">-- Select Service --</option>';
+    return;
+  }
+  
+  const regionKey = region.toLowerCase();
+  const services = SERVICES_CATALOG[regionKey] || [];
+  
+  serviceSelect.innerHTML = '<option value="">-- Select Service --</option>';
+  services.forEach(service => {
+    serviceSelect.innerHTML += `
+      <option 
+        value="${service.id}" 
+        data-price="${service.price}"
+        data-duration="${service.duration}"
+        data-name="${service.name}"
+        data-property="${service.isPropertyService}"
+        data-addons='${JSON.stringify(service.availableAddons)}'
+      >
+        ${service.name} - £${service.price.toFixed(2)}
+      </option>
+    `;
+  });
+}
 
     // Update price and show/hide sections
     function updateBookingPrice() {
@@ -4200,7 +4331,15 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
   }
 
   const region = document.getElementById('bookingRegion').value;
-  const mediaSpecialist = region === 'North' ? 'Jodie' : 'Maeve';
+  const specialistSelect = document.getElementById('bookingSpecialist');
+const mediaSpecialist = specialistSelect.value === 'other'
+  ? document.getElementById('bookingSpecialistCustom').value.trim()
+  : specialistSelect.value;
+
+if (!mediaSpecialist) {
+  alert('Please select or enter a media specialist');
+  return;
+}
   const paymentStatus = document.getElementById('bookingPaymentStatus').value;
 
   // Calculate pricing (use discounted total if discount applied)
