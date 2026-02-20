@@ -103,19 +103,14 @@
     }
 
     /* HEADER */
-    .page-header {
-      margin-bottom: 32px;
-    }
+    .page-header { margin-bottom: 32px; }
     .page-header h1 {
       font-size: 28px;
       font-weight: 700;
       color: var(--slate-900);
       margin-bottom: 4px;
     }
-    .page-header p {
-      font-size: 15px;
-      color: var(--slate-500);
-    }
+    .page-header p { font-size: 15px; color: var(--slate-500); }
 
     /* STATS ROW */
     .stats-row {
@@ -246,11 +241,7 @@
     .filter-search:focus { border-color: var(--blue); }
 
     /* BOOKING CARDS */
-    .bookings-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+    .bookings-list { display: flex; flex-direction: column; gap: 12px; }
 
     .booking-card {
       background: var(--white);
@@ -260,10 +251,7 @@
       transition: box-shadow 0.15s, border-color 0.15s;
       cursor: pointer;
     }
-    .booking-card:hover {
-      border-color: var(--blue);
-      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
-    }
+    .booking-card:hover { border-color: var(--blue); box-shadow: 0 4px 16px rgba(59,130,246,0.1); }
     .booking-card.expanded { border-color: var(--blue); }
 
     .booking-card-header {
@@ -273,11 +261,7 @@
       gap: 16px;
     }
 
-    .booking-status-dot {
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    .booking-status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
     .status-upcoming { background: var(--green); }
     .status-today { background: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
     .status-past { background: var(--slate-300); }
@@ -299,19 +283,9 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .booking-service {
-      font-size: 13px;
-      color: var(--slate-500);
-      margin-top: 2px;
-    }
+    .booking-service { font-size: 13px; color: var(--slate-500); margin-top: 2px; }
 
-    .booking-meta {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
-      flex-shrink: 0;
-    }
+    .booking-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
     .booking-date { font-size: 13px; font-weight: 600; color: var(--slate-700); }
     .booking-time { font-size: 13px; color: var(--slate-500); }
 
@@ -330,11 +304,7 @@
     .badge-past { background: var(--slate-100); color: var(--slate-500); }
     .badge-cancelled { background: var(--red-light); color: var(--red); }
 
-    .booking-chevron {
-      color: var(--slate-300);
-      transition: transform 0.2s;
-      flex-shrink: 0;
-    }
+    .booking-chevron { color: var(--slate-300); transition: transform 0.2s; flex-shrink: 0; }
     .booking-chevron i { width: 18px; height: 18px; }
     .booking-card.expanded .booking-chevron { transform: rotate(180deg); color: var(--blue); }
 
@@ -347,12 +317,7 @@
     }
     .booking-card.expanded .booking-details { display: block; }
 
-    .details-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 16px;
-    }
+    .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
     .detail-item.full { grid-column: 1 / -1; }
     .detail-label {
       font-size: 11px;
@@ -366,11 +331,7 @@
       gap: 5px;
     }
     .detail-label i { width: 12px; height: 12px; }
-    .detail-value {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--slate-900);
-    }
+    .detail-value { font-size: 14px; font-weight: 500; color: var(--slate-900); }
 
     .access-alert {
       background: var(--amber-light);
@@ -409,11 +370,7 @@
     }
 
     /* EMPTY / LOADING */
-    .state-box {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--slate-500);
-    }
+    .state-box { text-align: center; padding: 60px 20px; color: var(--slate-500); }
     .state-box i { width: 40px; height: 40px; margin-bottom: 12px; color: var(--slate-300); }
     .state-box h3 { font-size: 16px; font-weight: 600; color: var(--slate-700); margin-bottom: 6px; }
     .state-box p { font-size: 14px; }
@@ -452,11 +409,7 @@
       margin-bottom: 20px;
       gap: 12px;
     }
-    .cal-nav {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    .cal-nav { display: flex; align-items: center; gap: 12px; }
     .cal-nav-btn {
       width: 34px; height: 34px;
       border-radius: 8px;
@@ -513,10 +466,7 @@
       letter-spacing: 0.08em;
       color: var(--slate-500);
     }
-    .cal-body {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-    }
+    .cal-body { display: grid; grid-template-columns: repeat(7, 1fr); }
     .cal-cell {
       min-height: 100px;
       border-right: 1px solid var(--slate-100);
@@ -544,12 +494,15 @@
       height: 26px;
       border-radius: 50%;
     }
-    .cal-cell.is-today .cal-day-num {
-      background: var(--blue);
-      color: var(--white);
-    }
+    .cal-cell.is-today .cal-day-num { background: var(--blue); color: var(--white); }
 
+    /* cal-event is now a <button> for reliable click handling everywhere */
     .cal-event {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
       font-size: 11px;
       font-weight: 600;
       padding: 3px 6px;
@@ -576,12 +529,12 @@
     }
     .cal-more:hover { color: var(--blue); }
 
-    /* BOOKING DETAIL PANEL (shown on calendar event click) */
+    /* BOOKING DETAIL PANEL */
     .cal-detail-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.4);
+      background: rgba(15,23,42,0.4);
       z-index: 500;
       align-items: center;
       justify-content: center;
@@ -610,16 +563,8 @@
       justify-content: space-between;
       gap: 12px;
     }
-    .cal-detail-header h3 {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--slate-900);
-      margin-bottom: 2px;
-    }
-    .cal-detail-header p {
-      font-size: 13px;
-      color: var(--slate-500);
-    }
+    .cal-detail-header h3 { font-size: 16px; font-weight: 700; color: var(--slate-900); margin-bottom: 2px; }
+    .cal-detail-header p { font-size: 13px; color: var(--slate-500); }
     .cal-detail-close {
       width: 30px; height: 30px;
       border-radius: 6px;
@@ -636,11 +581,7 @@
     .cal-detail-close:hover { border-color: var(--red); color: var(--red); }
     .cal-detail-close i { width: 14px; height: 14px; }
     .cal-detail-body { padding: 20px; }
-    .cal-detail-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+    .cal-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .cal-detail-grid .detail-item.full { grid-column: 1 / -1; }
 
     /* ===== TABLET (≤768px) ===== */
@@ -716,7 +657,7 @@
       .cal-day-num { font-size: 11px; width: 20px; height: 20px; margin-bottom: 2px; }
       .cal-header-cell { font-size: 9px; padding: 6px 0; letter-spacing: 0; }
 
-      /* On phones: show coloured dot instead of text — but NOT for cancelled */
+      /* Phones: show coloured dot instead of text */
       .cal-event:not(.ev-cancelled) {
         height: 7px;
         padding: 0;
@@ -725,16 +666,13 @@
         margin-bottom: 2px;
         min-width: 100%;
       }
-
-      /* Cancelled always stays visible and tappable */
+      /* Cancelled stays visible and tappable */
       .cal-event.ev-cancelled {
         height: auto !important;
         padding: 3px 5px !important;
         font-size: 10px !important;
         min-height: 18px !important;
         text-decoration: line-through;
-        pointer-events: auto !important;
-        cursor: pointer !important;
       }
 
       .cal-more { font-size: 9px; }
@@ -758,28 +696,19 @@
       .cal-nav-btn { min-height: 44px; min-width: 44px; }
     }
 
-    /* Touch: ensure tap targets everywhere */
+    /* Touch: ensure tap targets */
     @media (pointer: coarse) {
       .cal-event { min-height: 22px; font-size: 10px; padding: 3px 5px; }
       .cal-cell { cursor: default; }
-
-      /* Cancelled must always be tappable on touch */
       .cal-event.ev-cancelled {
         min-height: 22px !important;
         font-size: 10px !important;
         padding: 3px 5px !important;
-        pointer-events: auto !important;
-        cursor: pointer !important;
       }
     }
 
-    /* ===== COLOUR LEGEND (mobile calendar) ===== */
-    .cal-legend {
-      display: none;
-      gap: 12px;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-    }
+    /* COLOUR LEGEND — mobile only */
+    .cal-legend { display: none; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
     .cal-legend-item {
       display: flex;
       align-items: center;
@@ -788,14 +717,8 @@
       font-weight: 600;
       color: var(--slate-500);
     }
-    .cal-legend-dot {
-      width: 10px; height: 10px;
-      border-radius: 2px;
-      flex-shrink: 0;
-    }
-    @media (max-width: 480px) {
-      .cal-legend { display: flex; }
-    }
+    .cal-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    @media (max-width: 480px) { .cal-legend { display: flex; } }
   </style>
 </head>
 <body>
@@ -884,7 +807,6 @@
   <!-- CALENDAR VIEW -->
   <div id="calendarView">
 
-    <!-- Colour legend — visible on mobile only -->
     <div class="cal-legend">
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#dbeafe;border:1px solid #93c5fd;"></div>Today</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#dcfce7;border:1px solid #86efac;"></div>Upcoming</div>
@@ -900,6 +822,7 @@
       </div>
       <button class="cal-today-btn" onclick="calGoToday()">Today</button>
     </div>
+
     <div class="cal-grid">
       <div class="cal-header-row">
         <div class="cal-header-cell">Mon</div>
@@ -916,7 +839,7 @@
 
 </main>
 
-<!-- BOOKING DETAIL OVERLAY (calendar) -->
+<!-- BOOKING DETAIL OVERLAY -->
 <div class="cal-detail-overlay" id="calDetailOverlay" onclick="closeCalDetail(event)">
   <div class="cal-detail-panel" id="calDetailPanel">
     <div class="cal-detail-header">
@@ -938,7 +861,16 @@
   let currentView = 'list';
   let calDate = new Date();
 
-  // ===== SHARED HELPERS =====
+  // ─── KEY FIX ───────────────────────────────────────────────────────────────
+  // Instead of serialising booking objects into onclick="" attributes (which
+  // breaks on special characters in addresses/names across ALL browsers),
+  // we store them in a plain JS array and reference by numeric index.
+  // The cal-event elements are rendered as <button> tags so they are
+  // natively focusable and clickable on every device without any hacks.
+  // ──────────────────────────────────────────────────────────────────────────
+  let calBookingIndex = [];
+
+  // ===== HELPERS =====
 
   function getBookingStatus(booking) {
     if (booking.bookingStatus === 'Cancelled') return 'cancelled';
@@ -1020,7 +952,7 @@
   // ===== STATS =====
 
   function updateStats() {
-    document.getElementById('statToday').textContent = allBookings.filter(b => getBookingStatus(b) === 'today').length;
+    document.getElementById('statToday').textContent    = allBookings.filter(b => getBookingStatus(b) === 'today').length;
     document.getElementById('statUpcoming').textContent = allBookings.filter(b => getBookingStatus(b) === 'upcoming').length;
     document.getElementById('statCompleted').textContent = allBookings.filter(b => getBookingStatus(b) === 'past').length;
   }
@@ -1029,13 +961,11 @@
 
   function switchView(view) {
     currentView = view;
-    document.getElementById('listView').style.display = view === 'list' ? 'block' : 'none';
+    document.getElementById('listView').style.display     = view === 'list'     ? 'block' : 'none';
     document.getElementById('calendarView').style.display = view === 'calendar' ? 'block' : 'none';
     document.getElementById('listViewBtn').classList.toggle('active', view === 'list');
     document.getElementById('calViewBtn').classList.toggle('active', view === 'calendar');
-    if (view === 'calendar') {
-      renderCalendar();
-    }
+    if (view === 'calendar') renderCalendar();
     lucide.createIcons();
   }
 
@@ -1083,9 +1013,9 @@
     let html = '';
     if (currentFilter === 'all' && !search) {
       const groups = [
-        { key: 'today', label: "Today's Shoots" },
-        { key: 'upcoming', label: 'Upcoming' },
-        { key: 'past', label: 'Past' },
+        { key: 'today',     label: "Today's Shoots" },
+        { key: 'upcoming',  label: 'Upcoming' },
+        { key: 'past',      label: 'Past' },
         { key: 'cancelled', label: 'Cancelled' }
       ];
       groups.forEach(({ key, label }) => {
@@ -1110,9 +1040,9 @@
     try { addons = typeof booking.addons === 'string' ? JSON.parse(booking.addons) : (booking.addons || []); } catch(e) {}
 
     const badgeMap = {
-      today: '<span class="booking-badge badge-today">Today</span>',
-      upcoming: '<span class="booking-badge badge-upcoming">Upcoming</span>',
-      past: '<span class="booking-badge badge-past">Completed</span>',
+      today:     '<span class="booking-badge badge-today">Today</span>',
+      upcoming:  '<span class="booking-badge badge-upcoming">Upcoming</span>',
+      past:      '<span class="booking-badge badge-past">Completed</span>',
       cancelled: '<span class="booking-badge badge-cancelled">Cancelled</span>'
     };
 
@@ -1163,7 +1093,7 @@
           ${accessHtml}
           <div class="details-grid">
             <div class="detail-item">
-              <div class="detail-label"><i data-lucide="calendar"></i> Date & Time</div>
+              <div class="detail-label"><i data-lucide="calendar"></i> Date &amp; Time</div>
               <div class="detail-value">${formatDate(booking.date)} at ${booking.time}</div>
             </div>
             <div class="detail-item">
@@ -1202,37 +1132,30 @@
     lucide.createIcons();
   }
 
-  // ===== CALENDAR VIEW =====
+  // ===== CALENDAR =====
 
-  function calPrev() {
-    calDate = new Date(calDate.getFullYear(), calDate.getMonth() - 1, 1);
-    renderCalendar();
-  }
-
-  function calNext() {
-    calDate = new Date(calDate.getFullYear(), calDate.getMonth() + 1, 1);
-    renderCalendar();
-  }
-
-  function calGoToday() {
-    calDate = new Date();
-    renderCalendar();
-  }
+  function calPrev()    { calDate = new Date(calDate.getFullYear(), calDate.getMonth() - 1, 1); renderCalendar(); }
+  function calNext()    { calDate = new Date(calDate.getFullYear(), calDate.getMonth() + 1, 1); renderCalendar(); }
+  function calGoToday() { calDate = new Date(); renderCalendar(); }
 
   function renderCalendar() {
-    const year = calDate.getFullYear();
+    // Reset the booking index every time we re-render
+    calBookingIndex = [];
+
+    const year  = calDate.getFullYear();
     const month = calDate.getMonth();
 
     document.getElementById('calMonthLabel').textContent =
       new Date(year, month, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    const todayStr = new Date().toISOString().split('T')[0];
+    const firstDay  = new Date(year, month, 1);
+    const lastDay   = new Date(year, month + 1, 0);
+    const todayStr  = new Date().toISOString().split('T')[0];
 
     let startDow = firstDay.getDay();
-    startDow = startDow === 0 ? 6 : startDow - 1;
+    startDow = startDow === 0 ? 6 : startDow - 1; // Mon-first grid
 
+    // Build a date→bookings map
     const bookingMap = {};
     allBookings.forEach(b => {
       if (!bookingMap[b.date]) bookingMap[b.date] = [];
@@ -1241,81 +1164,97 @@
 
     let cells = '';
 
+    // Leading days from previous month
     for (let i = 0; i < startDow; i++) {
-      const d = new Date(year, month, 1 - (startDow - i));
+      const d  = new Date(year, month, 1 - (startDow - i));
       const ds = d.toISOString().split('T')[0];
       cells += buildCalCell(ds, true, todayStr, bookingMap[ds] || []);
     }
 
+    // Current month
     for (let d = 1; d <= lastDay.getDate(); d++) {
       const ds = `${year}-${String(month + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       cells += buildCalCell(ds, false, todayStr, bookingMap[ds] || []);
     }
 
+    // Trailing days from next month
     const totalCells = startDow + lastDay.getDate();
-    const remainder = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+    const remainder  = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
     for (let i = 1; i <= remainder; i++) {
-      const d = new Date(year, month + 1, i);
+      const d  = new Date(year, month + 1, i);
       const ds = d.toISOString().split('T')[0];
       cells += buildCalCell(ds, true, todayStr, bookingMap[ds] || []);
     }
 
     document.getElementById('calBody').innerHTML = cells;
+
+    // ── Attach click listeners via JS (not inline onclick) ──────────────────
+    // This is the core fix: numeric data-idx attributes are always safe;
+    // no JSON/quote escaping needed, works on every browser and device.
+    document.querySelectorAll('#calBody .cal-event').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const idx = parseInt(this.dataset.idx, 10);
+        openCalDetail(idx);
+      });
+    });
+
     lucide.createIcons();
   }
 
   function buildCalCell(dateStr, otherMonth, todayStr, bookings) {
-    const dayNum = parseInt(dateStr.split('-')[2]);
-    const isToday = dateStr === todayStr;
+    const dayNum     = parseInt(dateStr.split('-')[2]);
+    const isToday    = dateStr === todayStr;
     const hasBookings = bookings.length > 0;
 
     let classes = 'cal-cell';
-    if (otherMonth) classes += ' other-month';
-    if (isToday) classes += ' is-today';
-    if (hasBookings) classes += ' has-bookings';
+    if (otherMonth)   classes += ' other-month';
+    if (isToday)      classes += ' is-today';
+    if (hasBookings)  classes += ' has-bookings';
 
     const MAX_SHOW = 3;
-    const visible = bookings.slice(0, MAX_SHOW);
-    const extra = bookings.length - MAX_SHOW;
+    const visible  = bookings.slice(0, MAX_SHOW);
+    const extra    = bookings.length - MAX_SHOW;
 
     const eventsHtml = visible.map(b => {
-      const status = getBookingStatus(b);
+      const status  = getBookingStatus(b);
       const evClass = { today: 'ev-today', upcoming: 'ev-upcoming', past: 'ev-past', cancelled: 'ev-cancelled' }[status];
-      const safeB = encodeBookingForAttr(b);
-      return `<div class="cal-event ${evClass}" onclick="event.stopPropagation(); openCalDetail(${safeB})">${b.time} ${b.clientName || b.propertyAddress}</div>`;
+
+      // Store booking by index — safe integer reference, no JSON in HTML
+      const idx = calBookingIndex.length;
+      calBookingIndex.push(b);
+
+      // Use <button> for native keyboard/touch/click support everywhere
+      return `<button class="cal-event ${evClass}" data-idx="${idx}" type="button">${b.time} ${b.clientName || b.propertyAddress}</button>`;
     }).join('');
 
-    const moreHtml = extra > 0
-      ? `<div class="cal-more">+${extra} more</div>`
-      : '';
+    const moreHtml = extra > 0 ? `<div class="cal-more">+${extra} more</div>` : '';
 
     return `<div class="${classes}"><div class="cal-day-num">${dayNum}</div>${eventsHtml}${moreHtml}</div>`;
   }
 
-  function encodeBookingForAttr(b) {
-    return "'" + JSON.stringify(b).replace(/'/g, '&#39;') + "'";
-  }
+  function openCalDetail(idx) {
+    const booking = calBookingIndex[idx];
+    if (!booking) return;
 
-  function openCalDetail(bookingOrStr) {
-    const booking = typeof bookingOrStr === 'string' ? JSON.parse(bookingOrStr) : bookingOrStr;
     const status = getBookingStatus(booking);
 
     let addons = [];
     try { addons = typeof booking.addons === 'string' ? JSON.parse(booking.addons) : (booking.addons || []); } catch(e) {}
 
-    const access = getAccessInfo(booking);
+    const access   = getAccessInfo(booking);
     const duration = booking.duration
       ? Math.floor(booking.duration / 60) + 'h' + (booking.duration % 60 ? ' ' + (booking.duration % 60) + 'm' : '')
       : '—';
 
     const badgeMap = {
-      today: '<span class="booking-badge badge-today">Today</span>',
-      upcoming: '<span class="booking-badge badge-upcoming">Upcoming</span>',
-      past: '<span class="booking-badge badge-past">Completed</span>',
+      today:     '<span class="booking-badge badge-today">Today</span>',
+      upcoming:  '<span class="booking-badge badge-upcoming">Upcoming</span>',
+      past:      '<span class="booking-badge badge-past">Completed</span>',
       cancelled: '<span class="booking-badge badge-cancelled">Cancelled</span>'
     };
 
-    document.getElementById('calDetailTitle').textContent = booking.propertyAddress + (booking.postcode ? ', ' + booking.postcode : '');
+    document.getElementById('calDetailTitle').textContent    = booking.propertyAddress + (booking.postcode ? ', ' + booking.postcode : '');
     document.getElementById('calDetailSubtitle').textContent = formatDate(booking.date) + ' · ' + booking.time;
 
     const accessHtml = access ? `
@@ -1381,9 +1320,7 @@
   }
 
   function closeCalDetail(e) {
-    if (e.target === document.getElementById('calDetailOverlay')) {
-      closeCalDetailDirect();
-    }
+    if (e.target === document.getElementById('calDetailOverlay')) closeCalDetailDirect();
   }
 
   function closeCalDetailDirect() {
