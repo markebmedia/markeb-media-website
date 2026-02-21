@@ -1039,7 +1039,7 @@
   function showAllBookings() {
     const geocoded = filteredBookingData.filter(b => b.lat).length;
     const total = filteredBookingData.length;
-    const totalRevenue = filteredBookingData.reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
+    const totalRevenue = filteredBookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
     document.getElementById('detailTitle').textContent = `Bookings (${total})`;
 
     const revenueHtml = totalRevenue > 0
@@ -1065,7 +1065,7 @@
 
   function showBookingsInArea(area) {
     const bookings = filteredBookingData.filter(b => b.postcode && b.postcode.toUpperCase().startsWith(area));
-    const totalRevenue = bookings.reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
+    const totalRevenue = bookings.filter(b => b.bookingStatus !== 'Cancelled').reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
     document.getElementById('detailTitle').textContent = `${area} — ${bookings.length} bookings`;
     const revenueHtml = totalRevenue > 0 ? `<div class="revenue-total">Revenue: £${totalRevenue.toFixed(2)}</div>` : '';
     document.getElementById('detailContent').innerHTML = revenueHtml

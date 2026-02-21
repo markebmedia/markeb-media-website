@@ -171,7 +171,9 @@ exports.handler = async (event, context) => {
     const reserved = allRecords.filter(b => b.bookingStatus === 'Reserved').length;
 
     const cancelled = allRecords.filter(b => b.bookingStatus === 'Cancelled').length;
-    const totalRevenue = allRecords.reduce((sum, b) => sum + (parseFloat(b.finalPrice) || 0), 0);
+    const totalRevenue = allRecords
+      .filter(b => b.bookingStatus !== 'Cancelled')
+      .reduce((sum, b) => sum + (parseFloat(b.finalPrice) || 0), 0);
 
     return {
       statusCode: 200,
