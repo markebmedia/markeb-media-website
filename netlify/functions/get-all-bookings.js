@@ -1,5 +1,7 @@
 // netlify/functions/get-all-bookings.js
 const Airtable = require('airtable');
+const fetch = require('node-fetch');
+
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
 exports.handler = async (event, context) => {
@@ -25,50 +27,29 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Optional query params for filtering
     const {
-      status,       // e.g. 'Booked', 'Completed', 'Cancelled'
-      region,       // e.g. 'West Yorkshire'
-      dateFrom,     // e.g. '2024-01-01'
-      dateTo,       // e.g. '2024-12-31'
-      limit         // max records to return (defaults to all)
+      status,
+      dateFrom,
+      dateTo,
+      limit
     } = event.queryStringParameters || {};
 
-    console.log('Filters:', { status, region, dateFrom, dateTo, limit });
+    console.log('Filters:', { status, dateFrom, dateTo, limit });
 
-    // Build filter formula
+    // Build Airtable filter formula
     const filters = [];
+    if (status) filters.push(`{Booking Status} = '${status}'`);
+    if (dateFrom) filters.push(`IS_AFTER({Date}, '${dateFrom}')`);
+    if (dateTo) filters.push(`IS_BEFORE({Date}, '${dateTo}')`);
 
-    if (status) {
-      filters.push(`{Booking Status} = '${status}'`);
-    }
+    const filterFormula = filters.length > 0 ? `AND(${filters.join(', ')})` : '';
 
-    if (region) {
-      filters.push(`{Region} = '${region}'`);
-    }
-
-    if (dateFrom) {
-      filters.push(`IS_AFTER({Date}, '${dateFrom}')`);
-    }
-
-    if (dateTo) {
-      filters.push(`IS_BEFORE({Date}, '${dateTo}')`);
-    }
-
-    const filterFormula = filters.length > 0
-      ? `AND(${filters.join(', ')})`
-      : '';
-
-    // Fields to retrieve - only what the map needs
-    // Note: 'Created Time' is a built-in Airtable field, fetched via record._rawJson.createdTime
     const selectOptions = {
       fields: [
         'Booking Reference',
-        'Region',
         'Postcode',
         'Property Address',
         'Service',
-        'Service ID',
         'Booking Status',
         'Payment Status',
         'Date',
@@ -79,21 +60,15 @@ exports.handler = async (event, context) => {
         'Client Email',
         'Media Specialist',
         'Bedrooms',
-        'Add-Ons',
-        'Created Date'
+        'Add-Ons'
       ],
       sort: [{ field: 'Date', direction: 'desc' }]
     };
 
-    if (filterFormula) {
-      selectOptions.filterByFormula = filterFormula;
-    }
+    if (filterFormula) selectOptions.filterByFormula = filterFormula;
+    if (limit) selectOptions.maxRecords = parseInt(limit);
 
-    if (limit) {
-      selectOptions.maxRecords = parseInt(limit);
-    }
-
-    // Fetch all records (handles pagination automatically)
+    // ── Fetch all bookings from Airtable ──
     const allRecords = [];
     await base('Bookings')
       .select(selectOptions)
@@ -101,12 +76,10 @@ exports.handler = async (event, context) => {
         records.forEach(record => {
           allRecords.push({
             id: record.id,
-            bookingRef: record.fields['Booking Reference'],
-            region: record.fields['Region'] || null,
+            bookingRef: record.fields['Booking Reference'] || null,
             postcode: record.fields['Postcode'] || null,
             propertyAddress: record.fields['Property Address'] || null,
             service: record.fields['Service'] || null,
-            serviceId: record.fields['Service ID'] || null,
             bookingStatus: record.fields['Booking Status'] || 'Booked',
             paymentStatus: record.fields['Payment Status'] || 'Pending',
             date: record.fields['Date'] || null,
@@ -118,13 +91,12 @@ exports.handler = async (event, context) => {
             mediaSpecialist: record.fields['Media Specialist'] || null,
             bedrooms: record.fields['Bedrooms'] || 0,
             addons: (() => {
-              try {
-                return JSON.parse(record.fields['Add-Ons'] || '[]');
-              } catch {
-                return [];
-              }
+              try { return JSON.parse(record.fields['Add-Ons'] || '[]'); }
+              catch { return []; }
             })(),
-            createdTime: record.fields['Created Date'] || record._rawJson.createdTime || null
+            createdTime: record._rawJson.createdTime || null,
+            lat: null,
+            lng: null
           });
         });
         fetchNextPage();
@@ -132,50 +104,88 @@ exports.handler = async (event, context) => {
 
     console.log(`Fetched ${allRecords.length} bookings`);
 
-    // Build region summary for map heatmap
-    const regionSummary = {};
-    allRecords.forEach(booking => {
-      if (!booking.region) return;
+    // ── Batch geocode postcodes via postcodes.io (free, no API key) ──
+    const withPostcode = allRecords.filter(b => b.postcode);
+    const postcodes = [...new Set(withPostcode.map(b => b.postcode))]; // dedupe
 
-      if (!regionSummary[booking.region]) {
-        regionSummary[booking.region] = {
-          region: booking.region,
-          total: 0,
-          booked: 0,
-          completed: 0,
-          cancelled: 0,
-          totalRevenue: 0
-        };
+    if (postcodes.length > 0) {
+      // Split into chunks of 100 (postcodes.io limit per request)
+      const chunks = [];
+      for (let i = 0; i < postcodes.length; i += 100) {
+        chunks.push(postcodes.slice(i, i + 100));
       }
 
-      const summary = regionSummary[booking.region];
-      summary.total++;
-      summary.totalRevenue += parseFloat(booking.finalPrice) || 0;
+      // coordMap: normalised postcode -> { lat, lng }
+      const coordMap = {};
 
-      const status = (booking.bookingStatus || '').toLowerCase();
-      if (status === 'booked') summary.booked++;
-      else if (status === 'completed') summary.completed++;
-      else if (status === 'cancelled') summary.cancelled++;
-    });
+      for (const chunk of chunks) {
+        try {
+          const geoRes = await fetch('https://api.postcodes.io/postcodes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ postcodes: chunk })
+          });
 
-    // 30-day growth count
+          const geoData = await geoRes.json();
+
+          if (geoData.result) {
+            geoData.result.forEach(item => {
+              if (item.result) {
+                const key = item.query.toUpperCase().replace(/\s+/g, '');
+                coordMap[key] = {
+                  lat: item.result.latitude,
+                  lng: item.result.longitude
+                };
+              }
+            });
+          }
+        } catch (geoErr) {
+          // Non-fatal — bookings without coords just won't show on map
+          console.error('Geocoding chunk failed:', geoErr.message);
+        }
+      }
+
+      // Assign lat/lng back to each booking
+      allRecords.forEach(booking => {
+        if (!booking.postcode) return;
+        const key = booking.postcode.toUpperCase().replace(/\s+/g, '');
+        if (coordMap[key]) {
+          booking.lat = coordMap[key].lat;
+          booking.lng = coordMap[key].lng;
+        }
+      });
+
+      console.log(`Geocoded ${Object.keys(coordMap).length} unique postcodes`);
+    }
+
+    // ── 30-day growth ──
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const recentBookings = allRecords.filter(b => {
-      const created = new Date(b.createdTime);
-      return created >= thirtyDaysAgo;
+      return b.createdTime && new Date(b.createdTime) >= thirtyDaysAgo;
     }).length;
+
+    // ── Summary stats ──
+    const total = allRecords.length;
+    const confirmed = allRecords.filter(b => b.bookingStatus === 'Booked').length;
+    const completed = allRecords.filter(b => b.bookingStatus === 'Completed').length;
+    const cancelled = allRecords.filter(b => b.bookingStatus === 'Cancelled').length;
+    const totalRevenue = allRecords.reduce((sum, b) => sum + (parseFloat(b.finalPrice) || 0), 0);
 
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         bookings: allRecords,
-        regionSummary: Object.values(regionSummary).sort((a, b) => b.total - a.total),
         meta: {
-          total: allRecords.length,
+          total,
+          confirmed,
+          completed,
+          cancelled,
+          totalRevenue: parseFloat(totalRevenue.toFixed(2)),
           recentBookings,
-          filters: { status, region, dateFrom, dateTo }
+          geocoded: allRecords.filter(b => b.lat).length,
+          filters: { status, dateFrom, dateTo }
         }
       })
     };

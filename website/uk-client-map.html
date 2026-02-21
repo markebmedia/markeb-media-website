@@ -5,62 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>UK Client Map - Markeb Media</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Leaflet Core -->
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
-  
-  <!-- Leaflet Marker Cluster -->
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-  
-  <!-- Leaflet Heat Map -->
   <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.min.js"></script>
-  
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  
+
   <style>
-    :root {
-      --bg-primary: #f8fafc;
-      --bg-secondary: #ffffff;
-      --bg-tertiary: #f8fafc;
-      --text-primary: #0f172a;
-      --text-secondary: #64748b;
-      --text-tertiary: #94a3b8;
-      --border-color: #e2e8f0;
-      --border-hover: #3b82f6;
-      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-      --shadow-lg: 0 8px 24px rgba(59, 130, 246, 0.15);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg-primary: #0f172a;
-        --bg-secondary: #1e293b;
-        --bg-tertiary: #0f172a;
-        --text-primary: #e2e8f0;
-        --text-secondary: #94a3b8;
-        --text-tertiary: #64748b;
-        --border-color: #334155;
-        --border-hover: #60a5fa;
-        --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.3);
-        --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.4);
-        --shadow-lg: 0 8px 24px rgba(59, 130, 246, 0.3);
-      }
-    }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body { 
+
+    body {
       font-family: 'Inter', sans-serif;
-      background: var(--bg-primary);
+      background: #f8fafc;
       min-height: 100vh;
       padding: 20px;
-      color: var(--text-primary);
-      transition: background-color 0.3s ease, color 0.3s ease;
+      color: #0f172a;
     }
 
     .map-container { max-width: 1900px; margin: 0 auto; }
@@ -90,7 +51,6 @@
     }
 
     .header-subtitle { color: #94a3b8; font-size: 14px; }
-
     .header-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
     .btn {
@@ -102,29 +62,18 @@
       transition: all .2s ease;
       font-size: 14px;
       font-family: 'Inter', sans-serif;
-      text-decoration: none;
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      text-decoration: none;
     }
 
-    .btn-primary {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #fff;
-      border: 1px solid #60a5fa;
-    }
-
+    .btn-primary { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border: 1px solid #60a5fa; }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59,130,246,0.5); }
-
-    .btn-secondary {
-      background: #1e293b;
-      color: #60a5fa;
-      border: 2px solid #334155;
-    }
-
+    .btn-secondary { background: #1e293b; color: #60a5fa; border: 2px solid #334155; }
     .btn-secondary:hover { border-color: #60a5fa; background: #334155; }
 
-    /* ── DATA SOURCE TOGGLE ── */
+    /* Data source toggle */
     .data-source-toggle {
       display: flex;
       gap: 0;
@@ -153,22 +102,10 @@
       font-family: 'Inter', sans-serif;
     }
 
-    .ds-btn.active {
-      background: #fff;
-      color: #0f172a;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
+    .ds-btn.active.clients { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; box-shadow: 0 2px 8px rgba(59,130,246,0.3); }
+    .ds-btn.active.bookings { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; box-shadow: 0 2px 8px rgba(139,92,246,0.3); }
 
-    .ds-btn.active.bookings {
-      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-      color: #fff;
-    }
-
-    .ds-btn.active.clients {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #fff;
-    }
-
+    /* Stats */
     .stats-overview {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -186,21 +123,17 @@
       transition: all .3s ease;
     }
 
-    .stat-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(59,130,246,0.15);
-      border-color: #3b82f6;
-    }
-
-    .stat-card.booking-stat:hover { border-color: #8b5cf6; box-shadow: 0 8px 24px rgba(139,92,246,0.15); }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(59,130,246,0.15); border-color: #3b82f6; }
+    .stat-card.booking-stat:hover { box-shadow: 0 8px 24px rgba(139,92,246,0.15); border-color: #8b5cf6; }
 
     .stat-value { font-size: 36px; font-weight: 700; color: #3b82f6; margin-bottom: 8px; }
     .stat-value.purple { color: #8b5cf6; }
     .stat-label { color: #94a3b8; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
 
+    /* Layout */
     .content-grid {
       display: grid;
-      grid-template-columns: 400px 1fr 350px;
+      grid-template-columns: 380px 1fr 340px;
       gap: 24px;
     }
 
@@ -213,7 +146,7 @@
     }
 
     #map {
-      height: 700px;
+      height: 720px;
       border-radius: 12px;
       border: 2px solid #334155;
       box-shadow: 0 4px 16px rgba(0,0,0,0.3);
@@ -229,34 +162,14 @@
       border: 1px solid #e2e8f0;
     }
 
-    .control-panel h3 {
-      font-size: 18px;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .control-panel h3 { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
 
     .control-section { margin-bottom: 24px; }
     .control-section:last-child { margin-bottom: 0; }
 
-    .control-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #94a3b8;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .control-label { font-size: 13px; font-weight: 600; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    .view-toggle {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
+    .view-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
     .view-btn {
       padding: 12px;
@@ -276,12 +189,7 @@
     }
 
     .view-btn:hover { border-color: #3b82f6; color: #3b82f6; }
-
-    .view-btn.active {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #fff;
-      border-color: #60a5fa;
-    }
+    .view-btn.active { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border-color: #60a5fa; }
 
     .filter-btn {
       width: 100%;
@@ -302,31 +210,13 @@
     }
 
     .filter-btn:hover { border-color: #3b82f6; color: #3b82f6; }
+    .filter-btn.active { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border-color: #60a5fa; }
+    #bookingFilters .filter-btn.active { background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-color: #a78bfa; }
 
-    .filter-btn.active {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #fff;
-      border-color: #60a5fa;
-    }
-
-    .filter-count {
-      background: #e2e8f0;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 700;
-      color: #64748b;
-    }
-
+    .filter-count { background: #e2e8f0; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; color: #64748b; }
     .filter-btn.active .filter-count { background: rgba(255,255,255,0.3); color: #fff; }
 
-    /* Booking-specific filter buttons */
-    #bookingFilters .filter-btn.active {
-      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-      border-color: #a78bfa;
-    }
-
-    .date-filter { display: flex; gap: 8px; margin-top: 12px; }
+    .date-filter { display: flex; gap: 8px; margin-top: 8px; }
 
     .date-input {
       flex: 1;
@@ -341,113 +231,78 @@
 
     .date-input:focus { outline: none; border-color: #3b82f6; }
 
+    /* Region list */
     .region-list {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      background: linear-gradient(135deg, #1e293b, #0f172a);
       border-radius: 16px;
       padding: 24px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.3);
       border: 1px solid #334155;
-      max-height: 600px;
+      max-height: 580px;
       overflow-y: auto;
     }
 
-    .region-list h3 {
-      font-size: 18px;
-      font-weight: 700;
-      color: #e2e8f0;
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .region-list h3 { font-size: 16px; font-weight: 700; color: #e2e8f0; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
 
     .region-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 12px;
-      border-bottom: 1px solid #334155;
+      padding: 10px 12px;
+      border-bottom: 1px solid #1e293b;
       cursor: pointer;
       transition: all .2s ease;
       border-radius: 8px;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .region-item:hover { background: #334155; }
-    .region-item:last-child { border-bottom: none; }
+    .region-name { font-weight: 600; color: #e2e8f0; font-size: 13px; }
+    .region-sub { font-size: 11px; color: #10b981; margin-top: 2px; }
 
-    .region-name { font-weight: 600; color: #e2e8f0; font-size: 14px; }
-
-    .region-count {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #fff;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .region-count.booking { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
-
-    .region-item.active {
-      background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
-      border-left: 4px solid #60a5fa;
-    }
-
-    .region-item.empty { opacity: 0.5; }
+    .region-count { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .region-count.booking { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+    .region-item.empty { opacity: 0.4; }
     .region-item.empty .region-count { background: #334155; color: #94a3b8; }
+    .region-item.active { background: #1e293b; border-left: 3px solid #60a5fa; }
 
-    .client-detail-panel {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    /* Detail panel */
+    .detail-panel {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
       border-radius: 16px;
       padding: 24px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.3);
       border: 1px solid #334155;
-      max-height: 700px;
+      max-height: 740px;
       overflow-y: auto;
     }
 
-    .client-detail-panel h3 {
-      font-size: 18px;
-      font-weight: 700;
-      color: #e2e8f0;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .detail-panel h3 { font-size: 16px; font-weight: 700; color: #e2e8f0; margin-bottom: 16px; }
 
-    .client-card {
+    .card {
       background: #0f172a;
       border: 1px solid #334155;
       border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
       transition: all .2s ease;
+      cursor: pointer;
     }
 
-    .client-card:hover { border-color: #60a5fa; transform: translateX(4px); }
-    .client-card.booking-card:hover { border-color: #a78bfa; }
+    .card:hover { border-color: #60a5fa; transform: translateX(3px); }
+    .card.booking:hover { border-color: #a78bfa; }
 
-    .client-name { font-weight: 700; color: #e2e8f0; font-size: 15px; margin-bottom: 8px; }
+    .card-title { font-weight: 700; color: #e2e8f0; font-size: 14px; margin-bottom: 6px; }
+    .card-info { font-size: 12px; color: #94a3b8; margin-bottom: 3px; display: flex; align-items: center; gap: 5px; }
 
-    .client-info {
-      font-size: 13px;
-      color: #94a3b8;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .client-badge {
+    .badge {
       display: inline-block;
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 700;
       text-transform: uppercase;
-      margin-top: 8px;
+      margin-top: 6px;
       margin-right: 4px;
     }
 
@@ -456,1084 +311,801 @@
     .badge-booked { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; }
     .badge-completed { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
     .badge-cancelled { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; }
-    .badge-pending { background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid #fb923c; }
 
-    .map-legend {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-      border: 1px solid #334155;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-      font-size: 13px;
-      color: #94a3b8;
-    }
-
-    .legend-color {
-      width: 20px;
-      height: 20px;
-      border-radius: 4px;
-      border: 2px solid #334155;
-      flex-shrink: 0;
-    }
-
-    .loading-message { text-align: center; padding: 60px 20px; color: #94a3b8; }
-
-    .spinner {
-      margin: 0 auto 20px;
-      width: 50px;
-      height: 50px;
-      border: 4px solid #334155;
-      border-top: 4px solid #60a5fa;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .leaflet-popup-content-wrapper {
-      background: #1e293b;
-      color: #e2e8f0;
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      border: 1px solid #334155;
-    }
-
-    .leaflet-popup-tip { background: #1e293b; }
-
-    .leaflet-popup-content {
-      margin: 16px;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .popup-title {
-      font-size: 16px;
+    .revenue-total {
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #10b981;
       font-weight: 700;
-      color: #e2e8f0;
+      font-size: 14px;
       margin-bottom: 12px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid #334155;
     }
 
-    .popup-info {
-      font-size: 13px;
-      color: #94a3b8;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .revenue-tag {
+      display: inline-block;
+      background: rgba(16,185,129,0.15);
+      color: #10b981;
+      border: 1px solid #10b981;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 4px;
     }
 
-    .popup-footer {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 2px solid #334155;
+    /* Legend */
+    .map-legend {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid #334155;
+      margin-top: 16px;
     }
 
-    .marker-cluster-small { background: linear-gradient(135deg, rgba(59,130,246,0.8) 0%, rgba(37,99,235,0.8) 100%); border: 3px solid #60a5fa; }
-    .marker-cluster-medium { background: linear-gradient(135deg, rgba(251,146,60,0.8) 0%, rgba(249,115,22,0.8) 100%); border: 3px solid #fb923c; }
-    .marker-cluster-large { background: linear-gradient(135deg, rgba(239,68,68,0.8) 0%, rgba(220,38,38,0.8) 100%); border: 3px solid #ef4444; }
-    .marker-cluster div { background: transparent; color: #fff; font-weight: 700; font-size: 14px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; color: #94a3b8; }
+    .legend-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.3); }
 
-    /* Booking marker clusters - purple */
-    .marker-cluster-small.booking { background: linear-gradient(135deg, rgba(139,92,246,0.8) 0%, rgba(124,58,237,0.8) 100%); border: 3px solid #a78bfa; }
-    .marker-cluster-medium.booking { background: linear-gradient(135deg, rgba(167,139,250,0.8) 0%, rgba(139,92,246,0.8) 100%); border: 3px solid #c4b5fd; }
-    .marker-cluster-large.booking { background: linear-gradient(135deg, rgba(196,181,253,0.8) 0%, rgba(167,139,250,0.8) 100%); border: 3px solid #ddd6fe; }
+    /* Cluster */
+    .marker-cluster-small { background: rgba(59,130,246,0.85); border: 3px solid #60a5fa; }
+    .marker-cluster-medium { background: rgba(251,146,60,0.85); border: 3px solid #fb923c; }
+    .marker-cluster-large { background: rgba(239,68,68,0.85); border: 3px solid #ef4444; }
+    .marker-cluster-small.bk { background: rgba(139,92,246,0.85); border: 3px solid #a78bfa; }
+    .marker-cluster-medium.bk { background: rgba(167,139,250,0.85); border: 3px solid #c4b5fd; }
+    .marker-cluster-large.bk { background: rgba(196,181,253,0.85); border: 3px solid #ddd6fe; }
+    .marker-cluster div { background: transparent; color: #fff; font-weight: 700; font-size: 13px; }
 
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    /* Popups */
+    .leaflet-popup-content-wrapper { background: #1e293b; color: #e2e8f0; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid #334155; }
+    .leaflet-popup-tip { background: #1e293b; }
+    .leaflet-popup-content { margin: 14px; font-family: 'Inter', sans-serif; min-width: 220px; }
+    .popup-title { font-size: 15px; font-weight: 700; color: #e2e8f0; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
+    .popup-row { font-size: 12px; color: #94a3b8; margin-bottom: 5px; }
+    .popup-footer { margin-top: 10px; padding-top: 10px; border-top: 1px solid #334155; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; border-radius: 4px; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #60a5fa; }
 
+    .spinner { margin: 40px auto 16px; width: 40px; height: 40px; border: 4px solid #334155; border-top-color: #60a5fa; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty-state { text-align: center; padding: 40px 20px; }
+    .empty-state-text { font-size: 13px; color: #64748b; }
+
     @media (max-width: 1400px) {
       .content-grid { grid-template-columns: 1fr; }
-      .sidebar { order: -1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+      .sidebar { display: grid; grid-template-columns: 1fr 1fr; }
       #map { height: 600px; }
     }
 
     @media (max-width: 768px) {
       body { padding: 12px; }
-      .header { padding: 20px; }
-      .header-content h1 { font-size: 24px; }
       .stats-overview { grid-template-columns: 1fr 1fr; }
       .content-grid { grid-template-columns: 1fr; }
       .sidebar { grid-template-columns: 1fr; }
-      .map-section { padding: 16px; }
       #map { height: 400px; }
-      .region-list { max-height: none; }
-    }
-
-    .empty-state { text-align: center; padding: 40px 20px; color: #64748b; }
-    .empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-    .empty-state-text { font-size: 14px; color: #94a3b8; }
-
-    .revenue-badge {
-      display: inline-block;
-      background: rgba(16,185,129,0.15);
-      color: #10b981;
-      border: 1px solid #10b981;
-      padding: 3px 8px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      margin-top: 6px;
     }
   </style>
 </head>
 <body>
-  <div class="map-container">
+<div class="map-container">
 
-    <!-- Header -->
-    <div class="header">
-      <div class="header-content">
-        <h1>
-          <i data-lucide="map" style="width: 32px; height: 32px;"></i>
-          UK Distribution Map
-        </h1>
-        <p class="header-subtitle">Clients &amp; bookings geographic visualization</p>
-      </div>
-      <div class="header-actions">
-        <button class="btn btn-secondary" onclick="window.location.href='admin-panel.html'">
-          <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
-          Back to Admin Panel
-        </button>
-        <button class="btn btn-primary" onclick="loadMapData()">
-          <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
-          Refresh Data
-        </button>
-      </div>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <h1><i data-lucide="map" style="width:32px;height:32px;"></i> UK Distribution Map</h1>
+      <p class="header-subtitle">Clients &amp; bookings geographic visualization</p>
     </div>
-
-    <!-- Data Source Toggle -->
-    <div class="data-source-toggle">
-      <button class="ds-btn active clients" id="dsClients" onclick="setDataSource('clients')">
-        <i data-lucide="users" style="width: 16px; height: 16px;"></i>
-        Clients
+    <div class="header-actions">
+      <button class="btn btn-secondary" onclick="window.location.href='admin-panel.html'">
+        <i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Back to Admin
       </button>
-      <button class="ds-btn bookings" id="dsBookings" onclick="setDataSource('bookings')">
-        <i data-lucide="calendar-check" style="width: 16px; height: 16px;"></i>
-        Bookings
+      <button class="btn btn-primary" onclick="loadMapData()">
+        <i data-lucide="refresh-cw" style="width:16px;height:16px;"></i> Refresh
       </button>
-    </div>
-
-    <!-- Stats Overview -->
-    <div class="stats-overview" id="clientStats">
-      <div class="stat-card">
-        <div class="stat-value" id="totalClients">-</div>
-        <div class="stat-label">Total Clients</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="regionsWithClients">-</div>
-        <div class="stat-label">Regions Covered</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="emptyRegions">-</div>
-        <div class="stat-label">Opportunity Regions</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="topRegion">-</div>
-        <div class="stat-label">Top Region</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="growthRate">-</div>
-        <div class="stat-label">30-Day Growth</div>
-      </div>
-    </div>
-
-    <div class="stats-overview" id="bookingStats" style="display:none;">
-      <div class="stat-card booking-stat">
-        <div class="stat-value purple" id="totalBookings">-</div>
-        <div class="stat-label">Total Bookings</div>
-      </div>
-      <div class="stat-card booking-stat">
-        <div class="stat-value purple" id="activeBookings">-</div>
-        <div class="stat-label">Confirmed Bookings</div>
-      </div>
-      <div class="stat-card booking-stat">
-        <div class="stat-value purple" id="completedBookings">-</div>
-        <div class="stat-label">Completed</div>
-      </div>
-      <div class="stat-card booking-stat">
-        <div class="stat-value purple" id="topBookingRegion">-</div>
-        <div class="stat-label">Top Booking Region</div>
-      </div>
-      <div class="stat-card booking-stat">
-        <div class="stat-value purple" id="bookingGrowth">-</div>
-        <div class="stat-label">30-Day Bookings</div>
-      </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="content-grid">
-
-      <!-- Control Panel (Left Sidebar) -->
-      <div class="sidebar">
-        <div class="control-panel">
-          <h3>
-            <i data-lucide="settings" style="width: 18px; height: 18px;"></i>
-            Map Controls
-          </h3>
-
-          <!-- View Mode -->
-          <div class="control-section">
-            <div class="control-label">View Mode</div>
-            <div class="view-toggle">
-              <button class="view-btn active" onclick="setViewMode('markers')" id="viewMarkers">
-                <i data-lucide="map-pin" style="width: 16px; height: 16px;"></i>
-                Markers
-              </button>
-              <button class="view-btn" onclick="setViewMode('heatmap')" id="viewHeatmap">
-                <i data-lucide="flame" style="width: 16px; height: 16px;"></i>
-                Heat Map
-              </button>
-            </div>
-          </div>
-
-          <!-- Client Filters -->
-          <div class="control-section" id="clientFilters">
-            <div class="control-label">Quick Filters</div>
-            <button class="filter-btn active" onclick="filterMap('all', event)">
-              <span>All Regions</span>
-              <span class="filter-count" id="countAll">-</span>
-            </button>
-            <button class="filter-btn" onclick="filterMap('with-clients', event)">
-              <span>With Clients</span>
-              <span class="filter-count" id="countWithClients">-</span>
-            </button>
-            <button class="filter-btn" onclick="filterMap('opportunities', event)">
-              <span>Opportunities</span>
-              <span class="filter-count" id="countOpportunities">-</span>
-            </button>
-            <button class="filter-btn" onclick="filterMap('active', event)">
-              <span>Active Clients</span>
-              <span class="filter-count" id="countActive">-</span>
-            </button>
-          </div>
-
-          <!-- Booking Filters -->
-          <div class="control-section" id="bookingFilters" style="display:none;">
-            <div class="control-label">Booking Status</div>
-            <button class="filter-btn active" onclick="filterBookings('all', event)">
-              <span>All Bookings</span>
-              <span class="filter-count" id="bCountAll">-</span>
-            </button>
-            <button class="filter-btn" onclick="filterBookings('Booked', event)">
-              <span>Confirmed</span>
-              <span class="filter-count" id="bCountBooked">-</span>
-            </button>
-            <button class="filter-btn" onclick="filterBookings('Completed', event)">
-              <span>Completed</span>
-              <span class="filter-count" id="bCountCompleted">-</span>
-            </button>
-            <button class="filter-btn" onclick="filterBookings('Cancelled', event)">
-              <span>Cancelled</span>
-              <span class="filter-count" id="bCountCancelled">-</span>
-            </button>
-          </div>
-
-          <!-- Date Filter -->
-          <div class="control-section">
-            <div class="control-label">Date Range</div>
-            <div class="date-filter">
-              <input type="date" class="date-input" id="dateFrom" onchange="applyDateFilter()">
-              <input type="date" class="date-input" id="dateTo" onchange="applyDateFilter()">
-            </div>
-          </div>
-
-          <!-- Legend -->
-          <div class="control-section">
-            <div class="control-label">Legend</div>
-            <div class="map-legend" id="clientLegend">
-              <div class="legend-item">
-                <div class="legend-color" style="background: #ef4444; border-radius: 50%;"></div>
-                <span>Client marker</span>
-              </div>
-              <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div>
-                <span>Small cluster (2–10)</span>
-              </div>
-              <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(135deg, #fb923c, #f97316);"></div>
-                <span>Medium cluster (10–20)</span>
-              </div>
-              <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(135deg, #ef4444, #dc2626);"></div>
-                <span>Large cluster (20+)</span>
-              </div>
-            </div>
-            <div class="map-legend" id="bookingLegend" style="display:none;">
-              <div class="legend-item">
-                <div class="legend-color" style="background: #8b5cf6; border-radius: 50%;"></div>
-                <span>Booking marker</span>
-              </div>
-              <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);"></div>
-                <span>Small cluster (2–10)</span>
-              </div>
-              <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(135deg, #a78bfa, #8b5cf6);"></div>
-                <span>Medium cluster (10–20)</span>
-              </div>
-              <div class="legend-item">
-                <div class="legend-color" style="background: linear-gradient(135deg, #c4b5fd, #a78bfa);"></div>
-                <span>Large cluster (20+)</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Region List -->
-        <div class="region-list">
-          <h3>
-            <span style="display: flex; align-items: center; gap: 8px;">
-              <i data-lucide="map-pin" style="width: 18px; height: 18px;"></i>
-              <span id="regionListTitle">Regions</span>
-            </span>
-            <span id="regionTotal" style="color: #94a3b8; font-size: 14px; font-weight: 500;">-</span>
-          </h3>
-          <div id="regionListContainer">
-            <div class="loading-message"><p>Loading regions...</p></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Map -->
-      <div class="map-section">
-        <div id="map">
-          <div class="loading-message">
-            <div class="spinner"></div>
-            <p>Loading interactive UK map...</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Detail Panel (Right Sidebar) -->
-      <div class="sidebar">
-        <div class="client-detail-panel" id="clientDetailPanel">
-          <h3>
-            <span id="detailPanelTitle" style="display: flex; align-items: center; gap: 8px;">
-              <i data-lucide="users" style="width: 18px; height: 18px;"></i>
-              All Clients
-            </span>
-          </h3>
-          <div id="clientDetailContent">
-            <div class="empty-state">
-              <div class="empty-state-icon">
-                <i data-lucide="map" style="width: 48px; height: 48px; color: #64748b; opacity: 0.5;"></i>
-              </div>
-              <div class="empty-state-text">Click a region or marker to view details</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 
-  <script>
-    const REGION_COORDS = {
-      'Cheshire East': [53.1603, -2.2119],
-      'Cheshire West and Chester': [53.1905, -2.8909],
-      'Greater London': [51.5074, -0.1278],
-      'Greater Manchester': [53.4808, -2.2426],
-      'Essex': [51.7341, 0.4700],
-      'West Midlands': [52.4862, -1.8904],
-      'Leicestershire': [52.6369, -1.1398],
-      'South Yorkshire': [53.5400, -1.3500],
-      'West Yorkshire': [53.7900, -1.7500],
-      'North Yorkshire': [54.2766, -1.4090],
-      'East Riding of Yorkshire': [53.8429, -0.4380],
-      'York': [53.9600, -1.0873],
-      'Cumbria': [54.5772, -2.7974],
-      'Lancashire': [53.7632, -2.7044],
-      'Merseyside': [53.4106, -2.9779],
-      'Blackburn with Darwen': [53.7480, -2.4820],
-      'Blackpool': [53.8175, -3.0357],
-      'Halton': [53.3340, -2.7350],
-      'Warrington': [53.3900, -2.5970],
-      'County Durham': [54.7753, -1.5849],
-      'Northumberland': [55.2083, -2.0784],
-      'Tyne and Wear': [54.9783, -1.6178],
-      'Derbyshire': [53.1235, -1.5650],
-      'Derby': [52.9219, -1.4746],
-      'Herefordshire': [52.0564, -2.7160],
-      'Lincolnshire': [53.2307, -0.5406],
-      'Northamptonshire': [52.2700, -0.8700],
-      'Nottinghamshire': [53.1000, -0.9900],
-      'Nottingham': [52.9548, -1.1581],
-      'Rutland': [52.6558, -0.6389],
-      'Shropshire': [52.7069, -2.7464],
-      'Telford and Wrekin': [52.6766, -2.4469],
-      'Staffordshire': [52.8700, -2.0800],
-      'Stoke-on-Trent': [53.0027, -2.1794],
-      'Warwickshire': [52.2819, -1.5849],
-      'Worcestershire': [52.2500, -2.2200],
-      'Bedford': [52.1363, -0.4667],
-      'Central Bedfordshire': [52.0029, -0.2982],
-      'Cambridgeshire': [52.2053, 0.1218],
-      'Peterborough': [52.5695, -0.2405],
-      'Hertfordshire': [51.8090, -0.2376],
-      'Norfolk': [52.6295, 0.7100],
-      'Suffolk': [52.1872, 0.9708],
-      'Berkshire': [51.4543, -1.0000],
-      'Brighton and Hove': [50.8225, -0.1372],
-      'Buckinghamshire': [51.8133, -0.8084],
-      'East Sussex': [50.9085, 0.2500],
-      'Hampshire': [51.0577, -1.3081],
-      'Portsmouth': [50.8198, -1.0880],
-      'Southampton': [50.9097, -1.4044],
-      'Isle of Wight': [50.6938, -1.3047],
-      'Kent': [51.2787, 0.5217],
-      'Medway': [51.4021, 0.5501],
-      'Oxfordshire': [51.7612, -1.2500],
-      'Surrey': [51.3148, -0.5600],
-      'West Sussex': [50.9200, -0.6000],
-      'Bath and North East Somerset': [51.3811, -2.3590],
-      'Bournemouth, Christchurch and Poole': [50.7192, -1.8808],
-      'Bristol': [51.4545, -2.5879],
-      'Cornwall': [50.2660, -5.0527],
-      'Devon': [50.7184, -3.5339],
-      'Plymouth': [50.3755, -4.1427],
-      'Torbay': [50.4619, -3.5253],
-      'Dorset': [50.7480, -2.3440],
-      'Gloucestershire': [51.8642, -2.2381],
-      'North Somerset': [51.3877, -2.7780],
-      'Somerset': [51.1054, -2.9260],
-      'South Gloucestershire': [51.5260, -2.4729],
-      'Swindon': [51.5558, -1.7797],
-      'Wiltshire': [51.3493, -1.9927],
-      'Aberdeen City': [57.1497, -2.0943],
-      'Aberdeenshire': [57.1497, -2.5943],
-      'Angus': [56.6500, -2.8667],
-      'Argyll and Bute': [56.4155, -5.4760],
-      'City of Edinburgh': [55.9533, -3.1883],
-      'Clackmannanshire': [56.1072, -3.7508],
-      'Dumfries and Galloway': [55.0700, -3.6053],
-      'Dundee City': [56.4620, -2.9707],
-      'East Ayrshire': [55.4530, -4.2680],
-      'East Dunbartonshire': [55.9747, -4.2010],
-      'East Lothian': [55.9380, -2.7710],
-      'East Renfrewshire': [55.7703, -4.3370],
-      'Falkirk': [56.0019, -3.7839],
-      'Fife': [56.2079, -3.1498],
-      'Glasgow City': [55.8642, -4.2518],
-      'Highland': [57.4778, -4.2247],
-      'Inverclyde': [55.9463, -4.6760],
-      'Midlothian': [55.8282, -3.1076],
-      'Moray': [57.6495, -3.3150],
-      'Na h-Eileanan Siar': [58.2000, -6.3800],
-      'North Ayrshire': [55.6430, -4.7590],
-      'North Lanarkshire': [55.8667, -3.9667],
-      'Orkney Islands': [59.0000, -3.0000],
-      'Perth and Kinross': [56.3950, -4.2373],
-      'Renfrewshire': [55.8456, -4.5331],
-      'Scottish Borders': [55.5446, -2.7820],
-      'Shetland Islands': [60.5000, -1.2500],
-      'South Ayrshire': [55.4583, -4.6290],
-      'South Lanarkshire': [55.6743, -3.7819],
-      'Stirling': [56.1165, -3.9369],
-      'West Dunbartonshire': [55.9446, -4.5660],
-      'West Lothian': [55.9027, -3.5478],
-      'Isle of Anglesey': [53.2860, -4.3655],
-      'Blaenau Gwent': [51.7878, -3.2041],
-      'Bridgend': [51.5042, -3.5769],
-      'Caerphilly': [51.5784, -3.2184],
-      'Cardiff': [51.4816, -3.1791],
-      'Carmarthenshire': [51.8567, -4.3123],
-      'Ceredigion': [52.4167, -3.9667],
-      'Conwy': [53.2810, -3.8290],
-      'Denbighshire': [53.1840, -3.4200],
-      'Flintshire': [53.2460, -3.1420],
-      'Gwynedd': [52.9167, -4.1333],
-      'Merthyr Tydfil': [51.7485, -3.3783],
-      'Monmouthshire': [51.8116, -2.7160],
-      'Neath Port Talbot': [51.6609, -3.7837],
-      'Newport': [51.5842, -2.9977],
-      'Pembrokeshire': [51.6730, -4.9094],
-      'Powys': [52.3333, -3.3333],
-      'Rhondda Cynon Taf': [51.6587, -3.4313],
-      'Swansea': [51.6214, -3.9436],
-      'Torfaen': [51.7006, -3.0344],
-      'Vale of Glamorgan': [51.4061, -3.4800],
-      'Wrexham': [53.0465, -2.9930],
-      'Antrim and Newtownabbey': [54.7167, -6.2167],
-      'Ards and North Down': [54.5950, -5.6940],
-      'Armagh City, Banbridge and Craigavon': [54.3500, -6.4000],
-      'Belfast': [54.5973, -5.9301],
-      'Causeway Coast and Glens': [55.1340, -6.6530],
-      'Derry City and Strabane': [54.9958, -7.3086],
-      'Fermanagh and Omagh': [54.4500, -7.6500],
-      'Lisburn and Castlereagh': [54.5162, -6.0581],
-      'Mid and East Antrim': [54.8640, -6.0290],
-      'Mid Ulster': [54.6000, -6.7500],
-      'Newry, Mourne and Down': [54.1750, -6.3390]
-    };
+  <!-- Data Source Toggle -->
+  <div class="data-source-toggle">
+    <button class="ds-btn active clients" id="dsClients" onclick="setDataSource('clients')">
+      <i data-lucide="users" style="width:16px;height:16px;"></i> Clients
+    </button>
+    <button class="ds-btn" id="dsBookings" onclick="setDataSource('bookings')">
+      <i data-lucide="calendar-check" style="width:16px;height:16px;"></i> Bookings
+    </button>
+  </div>
 
-    const UK_REGIONS = Object.keys(REGION_COORDS).sort();
+  <!-- Client Stats -->
+  <div class="stats-overview" id="clientStats">
+    <div class="stat-card">
+      <div class="stat-value" id="totalClients">-</div>
+      <div class="stat-label">Total Clients</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="regionsWithClients">-</div>
+      <div class="stat-label">Regions Covered</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="emptyRegions">-</div>
+      <div class="stat-label">Opportunities</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="topRegion">-</div>
+      <div class="stat-label">Top Region</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="clientGrowth">-</div>
+      <div class="stat-label">30-Day Growth</div>
+    </div>
+  </div>
 
-    // ── State ──
-    let clientData = [];
-    let filteredClientData = [];
-    let bookingData = [];
-    let filteredBookingData = [];
-    let bookingRegionSummary = {};
-    let regionCounts = {};
-    let bookingRegionCounts = {};
+  <!-- Booking Stats -->
+  <div class="stats-overview" id="bookingStats" style="display:none;">
+    <div class="stat-card booking-stat">
+      <div class="stat-value purple" id="totalBookings">-</div>
+      <div class="stat-label">Total Bookings</div>
+    </div>
+    <div class="stat-card booking-stat">
+      <div class="stat-value purple" id="confirmedBookings">-</div>
+      <div class="stat-label">Confirmed</div>
+    </div>
+    <div class="stat-card booking-stat">
+      <div class="stat-value purple" id="completedBookings">-</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card booking-stat">
+      <div class="stat-value purple" id="totalRevenue">-</div>
+      <div class="stat-label">Total Revenue</div>
+    </div>
+    <div class="stat-card booking-stat">
+      <div class="stat-value purple" id="bookingGrowth">-</div>
+      <div class="stat-label">30-Day Bookings</div>
+    </div>
+  </div>
 
-    let map;
-    let markerCluster;
-    let heatLayer;
+  <!-- Main Grid -->
+  <div class="content-grid">
 
-    let currentDataSource = 'clients'; // 'clients' | 'bookings'
-    let currentViewMode = 'markers';
-    let currentFilter = 'all';
-    let currentBookingFilter = 'all';
-    let dateFilterFrom = null;
-    let dateFilterTo = null;
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div class="control-panel">
+        <h3><i data-lucide="settings" style="width:18px;height:18px;"></i> Map Controls</h3>
 
-    // ── Init ──
-    document.addEventListener('DOMContentLoaded', () => {
-      initMap();
-      initDateFilters();
-      loadMapData();
-      lucide.createIcons();
+        <!-- View mode -->
+        <div class="control-section">
+          <div class="control-label">View Mode</div>
+          <div class="view-toggle">
+            <button class="view-btn active" id="viewMarkers" onclick="setViewMode('markers')">
+              <i data-lucide="map-pin" style="width:15px;height:15px;"></i> Markers
+            </button>
+            <button class="view-btn" id="viewHeatmap" onclick="setViewMode('heatmap')">
+              <i data-lucide="flame" style="width:15px;height:15px;"></i> Heat Map
+            </button>
+          </div>
+        </div>
+
+        <!-- Client filters -->
+        <div class="control-section" id="clientFilters">
+          <div class="control-label">Filter</div>
+          <button class="filter-btn active" onclick="filterClients('all', event)">
+            <span>All Clients</span><span class="filter-count" id="cAll">-</span>
+          </button>
+          <button class="filter-btn" onclick="filterClients('active', event)">
+            <span>Active Only</span><span class="filter-count" id="cActive">-</span>
+          </button>
+          <button class="filter-btn" onclick="filterClients('with-clients', event)">
+            <span>Regions With Clients</span><span class="filter-count" id="cWithClients">-</span>
+          </button>
+        </div>
+
+        <!-- Booking filters -->
+        <div class="control-section" id="bookingFilters" style="display:none;">
+          <div class="control-label">Booking Status</div>
+          <button class="filter-btn active" onclick="filterBookings('all', event)">
+            <span>All Bookings</span><span class="filter-count" id="bAll">-</span>
+          </button>
+          <button class="filter-btn" onclick="filterBookings('Booked', event)">
+            <span>Confirmed</span><span class="filter-count" id="bBooked">-</span>
+          </button>
+          <button class="filter-btn" onclick="filterBookings('Completed', event)">
+            <span>Completed</span><span class="filter-count" id="bCompleted">-</span>
+          </button>
+          <button class="filter-btn" onclick="filterBookings('Cancelled', event)">
+            <span>Cancelled</span><span class="filter-count" id="bCancelled">-</span>
+          </button>
+        </div>
+
+        <!-- Date range -->
+        <div class="control-section">
+          <div class="control-label">Date Range</div>
+          <div class="date-filter">
+            <input type="date" class="date-input" id="dateFrom" onchange="applyDateFilter()">
+            <input type="date" class="date-input" id="dateTo" onchange="applyDateFilter()">
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="control-section">
+          <div class="control-label">Legend</div>
+          <div class="map-legend" id="clientLegend">
+            <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div> Client marker</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;border-radius:4px;"></div> Small cluster (2–10)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#fb923c;border-radius:4px;"></div> Medium (10–20)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#ef4444;border-radius:4px;"></div> Large (20+)</div>
+          </div>
+          <div class="map-legend" id="bookingLegend" style="display:none;">
+            <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6;"></div> Booking (exact postcode)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div> Completed</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div> Cancelled</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6;border-radius:4px;"></div> Cluster</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Region list (clients mode) / Postcode summary (bookings mode) -->
+      <div class="region-list" id="regionListPanel">
+        <h3>
+          <span id="regionListTitle">Regions</span>
+          <span id="regionTotal" style="color:#94a3b8;font-size:13px;font-weight:500;">-</span>
+        </h3>
+        <div id="regionListContainer">
+          <div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map -->
+    <div class="map-section">
+      <div id="map"></div>
+    </div>
+
+    <!-- Detail Panel -->
+    <div class="sidebar">
+      <div class="detail-panel" id="detailPanel">
+        <h3 id="detailTitle">All Clients</h3>
+        <div id="detailContent">
+          <div class="empty-state">
+            <div class="spinner"></div>
+            <p class="empty-state-text">Loading data...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── Region coords (for client mode only) ──
+  const REGION_COORDS = {
+    'Cheshire East': [53.1603, -2.2119], 'Cheshire West and Chester': [53.1905, -2.8909],
+    'Greater London': [51.5074, -0.1278], 'Greater Manchester': [53.4808, -2.2426],
+    'Essex': [51.7341, 0.4700], 'West Midlands': [52.4862, -1.8904],
+    'Leicestershire': [52.6369, -1.1398], 'South Yorkshire': [53.5400, -1.3500],
+    'West Yorkshire': [53.7900, -1.7500], 'North Yorkshire': [54.2766, -1.4090],
+    'East Riding of Yorkshire': [53.8429, -0.4380], 'York': [53.9600, -1.0873],
+    'Cumbria': [54.5772, -2.7974], 'Lancashire': [53.7632, -2.7044],
+    'Merseyside': [53.4106, -2.9779], 'Blackburn with Darwen': [53.7480, -2.4820],
+    'Blackpool': [53.8175, -3.0357], 'Halton': [53.3340, -2.7350],
+    'Warrington': [53.3900, -2.5970], 'County Durham': [54.7753, -1.5849],
+    'Northumberland': [55.2083, -2.0784], 'Tyne and Wear': [54.9783, -1.6178],
+    'Derbyshire': [53.1235, -1.5650], 'Derby': [52.9219, -1.4746],
+    'Herefordshire': [52.0564, -2.7160], 'Lincolnshire': [53.2307, -0.5406],
+    'Northamptonshire': [52.2700, -0.8700], 'Nottinghamshire': [53.1000, -0.9900],
+    'Nottingham': [52.9548, -1.1581], 'Rutland': [52.6558, -0.6389],
+    'Shropshire': [52.7069, -2.7464], 'Telford and Wrekin': [52.6766, -2.4469],
+    'Staffordshire': [52.8700, -2.0800], 'Stoke-on-Trent': [53.0027, -2.1794],
+    'Warwickshire': [52.2819, -1.5849], 'Worcestershire': [52.2500, -2.2200],
+    'Bedford': [52.1363, -0.4667], 'Central Bedfordshire': [52.0029, -0.2982],
+    'Cambridgeshire': [52.2053, 0.1218], 'Peterborough': [52.5695, -0.2405],
+    'Hertfordshire': [51.8090, -0.2376], 'Norfolk': [52.6295, 0.7100],
+    'Suffolk': [52.1872, 0.9708], 'Berkshire': [51.4543, -1.0000],
+    'Brighton and Hove': [50.8225, -0.1372], 'Buckinghamshire': [51.8133, -0.8084],
+    'East Sussex': [50.9085, 0.2500], 'Hampshire': [51.0577, -1.3081],
+    'Portsmouth': [50.8198, -1.0880], 'Southampton': [50.9097, -1.4044],
+    'Isle of Wight': [50.6938, -1.3047], 'Kent': [51.2787, 0.5217],
+    'Medway': [51.4021, 0.5501], 'Oxfordshire': [51.7612, -1.2500],
+    'Surrey': [51.3148, -0.5600], 'West Sussex': [50.9200, -0.6000],
+    'Bath and North East Somerset': [51.3811, -2.3590], 'Bournemouth, Christchurch and Poole': [50.7192, -1.8808],
+    'Bristol': [51.4545, -2.5879], 'Cornwall': [50.2660, -5.0527],
+    'Devon': [50.7184, -3.5339], 'Plymouth': [50.3755, -4.1427],
+    'Torbay': [50.4619, -3.5253], 'Dorset': [50.7480, -2.3440],
+    'Gloucestershire': [51.8642, -2.2381], 'North Somerset': [51.3877, -2.7780],
+    'Somerset': [51.1054, -2.9260], 'South Gloucestershire': [51.5260, -2.4729],
+    'Swindon': [51.5558, -1.7797], 'Wiltshire': [51.3493, -1.9927],
+    'Aberdeen City': [57.1497, -2.0943], 'City of Edinburgh': [55.9533, -3.1883],
+    'Glasgow City': [55.8642, -4.2518], 'Highland': [57.4778, -4.2247],
+    'Cardiff': [51.4816, -3.1791], 'Swansea': [51.6214, -3.9436],
+    'Belfast': [54.5973, -5.9301]
+  };
+
+  const UK_REGIONS = Object.keys(REGION_COORDS).sort();
+
+  // ── State ──
+  let clientData = [];
+  let filteredClientData = [];
+  let bookingData = [];
+  let filteredBookingData = [];
+  let regionCounts = {};
+
+  let map, markerCluster, heatLayer;
+  let currentDataSource = 'clients';
+  let currentViewMode = 'markers';
+
+  // ── Init ──
+  document.addEventListener('DOMContentLoaded', () => {
+    initMap();
+    initDateFilters();
+    loadMapData();
+    lucide.createIcons();
+  });
+
+  function initMap() {
+    map = L.map('map').setView([54.0, -2.5], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors', maxZoom: 18, minZoom: 5
+    }).addTo(map);
+    resetCluster();
+  }
+
+  function resetCluster() {
+    if (markerCluster) map.removeLayer(markerCluster);
+    const isBookings = currentDataSource === 'bookings';
+    markerCluster = L.markerClusterGroup({
+      showCoverageOnHover: false,
+      zoomToBoundsOnClick: true,
+      spiderfyOnMaxZoom: true,
+      iconCreateFunction: function(cluster) {
+        const count = cluster.getChildCount();
+        const size = count >= 20 ? 'large' : count >= 10 ? 'medium' : 'small';
+        const extra = isBookings ? ' bk' : '';
+        return L.divIcon({
+          html: '<div><span>' + count + '</span></div>',
+          className: 'marker-cluster marker-cluster-' + size + extra,
+          iconSize: L.point(40, 40)
+        });
+      }
     });
+  }
 
-    function initMap() {
-      map = L.map('map').setView([54.5, -3], 6);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
-        maxZoom: 12, minZoom: 5
-      }).addTo(map);
+  function initDateFilters() {
+    const today = new Date();
+    const yearAgo = new Date();
+    yearAgo.setFullYear(today.getFullYear() - 1);
+    document.getElementById('dateTo').value = today.toISOString().split('T')[0];
+    document.getElementById('dateFrom').value = yearAgo.toISOString().split('T')[0];
+  }
 
-      markerCluster = L.markerClusterGroup({
-        showCoverageOnHover: false,
-        zoomToBoundsOnClick: true,
-        spiderfyOnMaxZoom: true,
-        removeOutsideVisibleBounds: true,
-        iconCreateFunction: function(cluster) {
-          const count = cluster.getChildCount();
-          const isBooking = currentDataSource === 'bookings';
-          let size = count >= 20 ? 'large' : count >= 10 ? 'medium' : 'small';
-          const extraClass = isBooking ? ' booking' : '';
-          return L.divIcon({
-            html: '<div><span>' + count + '</span></div>',
-            className: 'marker-cluster marker-cluster-' + size + extraClass,
-            iconSize: L.point(40, 40)
-          });
-        }
-      });
-    }
+  // ── Load Data ──
+  async function loadMapData() {
+    try {
+      const [usersRes, bookingsRes] = await Promise.all([
+        fetch('/.netlify/functions/admin-users'),
+        fetch('/.netlify/functions/get-all-bookings')
+      ]);
 
-    function initDateFilters() {
-      const today = new Date();
-      const oneYearAgo = new Date();
-      oneYearAgo.setFullYear(today.getFullYear() - 1);
-      document.getElementById('dateTo').value = today.toISOString().split('T')[0];
-      document.getElementById('dateFrom').value = oneYearAgo.toISOString().split('T')[0];
-    }
+      if (!usersRes.ok) throw new Error('Failed to load user data');
+      if (!bookingsRes.ok) throw new Error('Failed to load booking data');
 
-    // ── Load Data ──
-    async function loadMapData() {
-      try {
-        const [usersRes, bookingsRes] = await Promise.all([
-          fetch('/.netlify/functions/admin-users'),
-          fetch('/.netlify/functions/get-all-bookings')
-        ]);
+      const userData = await usersRes.json();
+      const bData = await bookingsRes.json();
 
-        if (!usersRes.ok) throw new Error('Failed to load user data');
-        if (!bookingsRes.ok) throw new Error('Failed to load booking data');
-
-        const userData = await usersRes.json();
-        const bData = await bookingsRes.json();
-
-        clientData = userData.users || [];
-        filteredClientData = [...clientData];
-
-        bookingData = bData.bookings || [];
-        filteredBookingData = [...bookingData];
-        bookingRegionSummary = {};
-        (bData.regionSummary || []).forEach(r => { bookingRegionSummary[r.region] = r; });
-
-        buildRegionCounts();
-        buildBookingRegionCounts();
-        updateClientStats();
-        updateBookingStats();
-        updateClientFilterCounts();
-        updateBookingFilterCounts();
-        addMarkersToMap();
-        renderRegionList();
-        showAllDetails();
-
-      } catch (error) {
-        console.error('Error loading map data:', error);
-        alert('Failed to load map data: ' + error.message);
-      }
-    }
-
-    function buildRegionCounts() {
-      regionCounts = {};
-      UK_REGIONS.forEach(r => regionCounts[r] = 0);
-      clientData.forEach(u => {
-        const r = u.fields['Region'];
-        if (r && regionCounts.hasOwnProperty(r)) regionCounts[r]++;
-      });
-    }
-
-    function buildBookingRegionCounts() {
-      bookingRegionCounts = {};
-      UK_REGIONS.forEach(r => bookingRegionCounts[r] = 0);
-      filteredBookingData.forEach(b => {
-        if (b.region && bookingRegionCounts.hasOwnProperty(b.region)) bookingRegionCounts[b.region]++;
-      });
-    }
-
-    // ── Stats ──
-    function updateClientStats() {
-      const total = clientData.filter(u => u.fields['Region']).length;
-      const covered = Object.values(regionCounts).filter(c => c > 0).length;
-      const empty = UK_REGIONS.length - covered;
-      let topRegion = '-', maxCount = 0;
-      for (const [r, c] of Object.entries(regionCounts)) { if (c > maxCount) { maxCount = c; topRegion = r; } }
-      const ago30 = new Date(); ago30.setDate(ago30.getDate() - 30);
-      const recent = clientData.filter(u => new Date(u.fields['Created Date']) >= ago30).length;
-
-      document.getElementById('totalClients').textContent = total;
-      document.getElementById('regionsWithClients').textContent = covered;
-      document.getElementById('emptyRegions').textContent = empty;
-      document.getElementById('topRegion').textContent = maxCount > 0 ? topRegion : '-';
-      document.getElementById('growthRate').textContent = total > 0 ? `+${recent}` : '-';
-    }
-
-    function updateBookingStats() {
-      const total = bookingData.length;
-      const confirmed = bookingData.filter(b => b.bookingStatus === 'Booked').length;
-      const completed = bookingData.filter(b => b.bookingStatus === 'Completed').length;
-
-      let topRegion = '-', maxCount = 0;
-      for (const [r, c] of Object.entries(bookingRegionCounts)) { if (c > maxCount) { maxCount = c; topRegion = r; } }
-
-      const ago30 = new Date(); ago30.setDate(ago30.getDate() - 30);
-      const recent = bookingData.filter(b => new Date(b.createdTime) >= ago30).length;
-
-      document.getElementById('totalBookings').textContent = total;
-      document.getElementById('activeBookings').textContent = confirmed;
-      document.getElementById('completedBookings').textContent = completed;
-      document.getElementById('topBookingRegion').textContent = maxCount > 0 ? topRegion : '-';
-      document.getElementById('bookingGrowth').textContent = `+${recent}`;
-    }
-
-    function updateClientFilterCounts() {
-      document.getElementById('countAll').textContent = UK_REGIONS.length;
-      document.getElementById('countWithClients').textContent = Object.values(regionCounts).filter(c => c > 0).length;
-      document.getElementById('countOpportunities').textContent = UK_REGIONS.length - Object.values(regionCounts).filter(c => c > 0).length;
-      document.getElementById('countActive').textContent = clientData.filter(u => u.fields['Account Status'] === 'Active').length;
-    }
-
-    function updateBookingFilterCounts() {
-      document.getElementById('bCountAll').textContent = bookingData.length;
-      document.getElementById('bCountBooked').textContent = bookingData.filter(b => b.bookingStatus === 'Booked').length;
-      document.getElementById('bCountCompleted').textContent = bookingData.filter(b => b.bookingStatus === 'Completed').length;
-      document.getElementById('bCountCancelled').textContent = bookingData.filter(b => b.bookingStatus === 'Cancelled').length;
-    }
-
-    // ── Data Source Toggle ──
-    function setDataSource(source) {
-      currentDataSource = source;
-      currentFilter = 'all';
-      currentBookingFilter = 'all';
-
-      const isBookings = source === 'bookings';
-
-      document.getElementById('dsClients').classList.toggle('active', !isBookings);
-      document.getElementById('dsClients').classList.toggle('clients', !isBookings);
-      document.getElementById('dsBookings').classList.toggle('active', isBookings);
-      document.getElementById('dsBookings').classList.toggle('bookings', true);
-
-      document.getElementById('clientStats').style.display = isBookings ? 'none' : 'grid';
-      document.getElementById('bookingStats').style.display = isBookings ? 'grid' : 'none';
-      document.getElementById('clientFilters').style.display = isBookings ? 'none' : 'block';
-      document.getElementById('bookingFilters').style.display = isBookings ? 'block' : 'none';
-      document.getElementById('clientLegend').style.display = isBookings ? 'none' : 'block';
-      document.getElementById('bookingLegend').style.display = isBookings ? 'block' : 'none';
-      document.getElementById('regionListTitle').textContent = isBookings ? 'Bookings by Region' : 'Regions';
-
-      // Reset filter button states
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      const firstClientBtn = document.querySelector('#clientFilters .filter-btn');
-      const firstBookingBtn = document.querySelector('#bookingFilters .filter-btn');
-      if (!isBookings && firstClientBtn) firstClientBtn.classList.add('active');
-      if (isBookings && firstBookingBtn) firstBookingBtn.classList.add('active');
-
-      if (isBookings) {
-        filteredBookingData = [...bookingData];
-        buildBookingRegionCounts();
-      } else {
-        filteredClientData = [...clientData];
-        buildRegionCounts();
-      }
-
-      addMarkersToMap();
-      renderRegionList();
-      showAllDetails();
-      lucide.createIcons();
-    }
-
-    // ── Map Rendering ──
-    function addMarkersToMap() {
-      markerCluster.clearLayers();
-      if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
-
-      if (currentDataSource === 'clients') {
-        renderClientLayer();
-      } else {
-        renderBookingLayer();
-      }
-    }
-
-    function renderClientLayer() {
-      if (currentViewMode === 'markers') {
-        filteredClientData.forEach(user => {
-          const region = user.fields['Region'];
-          if (!region || !REGION_COORDS[region]) return;
-          const coords = REGION_COORDS[region];
-          const lat = coords[0] + (Math.random() - 0.5) * 0.05;
-          const lng = coords[1] + (Math.random() - 0.5) * 0.05;
-
-          const icon = L.divIcon({
-            className: 'custom-marker',
-            html: `<div style="background:linear-gradient(135deg,#ef4444,#dc2626);border:3px solid #fff;border-radius:50%;width:24px;height:24px;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>`,
-            iconSize: [24, 24]
-          });
-
-          const marker = L.marker([lat, lng], { icon });
-          marker.bindPopup(`
-            <div class="popup-title">${user.fields['Name']}</div>
-            <div class="popup-info">🏢 ${user.fields['Company'] || 'N/A'}</div>
-            <div class="popup-info">✉️ ${user.fields['Email']}</div>
-            <div class="popup-info">📍 ${region}</div>
-            <div class="popup-info">📅 Joined: ${formatDate(user.fields['Created Date'])}</div>
-            <div class="popup-footer">
-              <span class="client-badge ${user.fields['Account Status'] === 'Active' ? 'badge-active' : 'badge-inactive'}">
-                ${user.fields['Account Status'] || 'Unknown'}
-              </span>
-            </div>
-          `);
-          markerCluster.addLayer(marker);
-        });
-        map.addLayer(markerCluster);
-
-      } else {
-        const heatData = [];
-        Object.entries(regionCounts).forEach(([region, count]) => {
-          if (count > 0 && REGION_COORDS[region]) {
-            const c = REGION_COORDS[region];
-            heatData.push([c[0], c[1], count / 10]);
-          }
-        });
-        heatLayer = L.heatLayer(heatData, {
-          radius: 40, blur: 50, maxZoom: 10, max: 1.0,
-          gradient: { 0.0: '#3b82f6', 0.5: '#fb923c', 1.0: '#ef4444' }
-        }).addTo(map);
-      }
-    }
-
-    function renderBookingLayer() {
-      if (currentViewMode === 'markers') {
-        filteredBookingData.forEach(booking => {
-          if (!booking.region || !REGION_COORDS[booking.region]) return;
-          const coords = REGION_COORDS[booking.region];
-          const lat = coords[0] + (Math.random() - 0.5) * 0.06;
-          const lng = coords[1] + (Math.random() - 0.5) * 0.06;
-
-          const statusColor = {
-            'Booked': '#8b5cf6',
-            'Completed': '#10b981',
-            'Cancelled': '#ef4444'
-          }[booking.bookingStatus] || '#8b5cf6';
-
-          const icon = L.divIcon({
-            className: 'custom-marker',
-            html: `<div style="background:${statusColor};border:3px solid #fff;border-radius:50%;width:20px;height:20px;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>`,
-            iconSize: [20, 20]
-          });
-
-          const marker = L.marker([lat, lng], { icon });
-          marker.bindPopup(`
-            <div class="popup-title">${booking.bookingRef || 'Booking'}</div>
-            <div class="popup-info">👤 ${booking.clientName || 'N/A'}</div>
-            <div class="popup-info">🏠 ${booking.propertyAddress || booking.postcode || 'N/A'}</div>
-            <div class="popup-info">📍 ${booking.region}</div>
-            <div class="popup-info">🎬 ${booking.service || 'N/A'}</div>
-            <div class="popup-info">📅 ${formatDate(booking.date)}</div>
-            <div class="popup-footer">
-              <span class="client-badge badge-${(booking.bookingStatus || '').toLowerCase()}">${booking.bookingStatus || 'Unknown'}</span>
-              ${booking.finalPrice ? `<span class="revenue-badge">£${parseFloat(booking.finalPrice).toFixed(2)}</span>` : ''}
-            </div>
-          `);
-          markerCluster.addLayer(marker);
-        });
-        map.addLayer(markerCluster);
-
-      } else {
-        const heatData = [];
-        Object.entries(bookingRegionCounts).forEach(([region, count]) => {
-          if (count > 0 && REGION_COORDS[region]) {
-            const c = REGION_COORDS[region];
-            heatData.push([c[0], c[1], count / 10]);
-          }
-        });
-        heatLayer = L.heatLayer(heatData, {
-          radius: 45, blur: 55, maxZoom: 10, max: 1.0,
-          gradient: { 0.0: '#8b5cf6', 0.5: '#a78bfa', 1.0: '#c4b5fd' }
-        }).addTo(map);
-      }
-    }
-
-    // ── View Mode ──
-    function setViewMode(mode) {
-      currentViewMode = mode;
-      document.getElementById('viewMarkers').classList.toggle('active', mode === 'markers');
-      document.getElementById('viewHeatmap').classList.toggle('active', mode === 'heatmap');
-      addMarkersToMap();
-    }
-
-    // ── Filters ──
-    function filterMap(filterType, e) {
-      currentFilter = filterType;
-      document.querySelectorAll('#clientFilters .filter-btn').forEach(b => b.classList.remove('active'));
-      if (e && e.target) e.target.closest('.filter-btn').classList.add('active');
-
-      if (filterType === 'all') {
-        filteredClientData = [...clientData];
-      } else if (filterType === 'active') {
-        filteredClientData = clientData.filter(u => u.fields['Account Status'] === 'Active');
-      } else {
-        filteredClientData = [...clientData];
-      }
+      clientData = userData.users || [];
+      filteredClientData = [...clientData];
+      bookingData = bData.bookings || [];
+      filteredBookingData = [...bookingData];
 
       buildRegionCounts();
+      updateClientStats();
+      updateBookingStats(bData.meta || {});
+      updateClientFilterCounts();
+      updateBookingFilterCounts();
       addMarkersToMap();
       renderRegionList();
+      renderDetailPanel();
+
+    } catch (err) {
+      console.error('Error loading map data:', err);
+      alert('Failed to load map data: ' + err.message);
     }
+  }
 
-    function filterBookings(statusFilter, e) {
-      currentBookingFilter = statusFilter;
-      document.querySelectorAll('#bookingFilters .filter-btn').forEach(b => b.classList.remove('active'));
-      if (e && e.target) e.target.closest('.filter-btn').classList.add('active');
+  function buildRegionCounts() {
+    regionCounts = {};
+    UK_REGIONS.forEach(r => regionCounts[r] = 0);
+    clientData.forEach(u => {
+      const r = u.fields['Region'];
+      if (r && regionCounts.hasOwnProperty(r)) regionCounts[r]++;
+    });
+  }
 
-      if (statusFilter === 'all') {
-        filteredBookingData = [...bookingData];
-      } else {
-        filteredBookingData = bookingData.filter(b => b.bookingStatus === statusFilter);
-      }
+  // ── Stats ──
+  function updateClientStats() {
+    const total = clientData.filter(u => u.fields['Region']).length;
+    const covered = Object.values(regionCounts).filter(c => c > 0).length;
+    let top = '-', max = 0;
+    for (const [r, c] of Object.entries(regionCounts)) { if (c > max) { max = c; top = r; } }
+    const ago = new Date(); ago.setDate(ago.getDate() - 30);
+    const recent = clientData.filter(u => new Date(u.fields['Created Date']) >= ago).length;
 
-      buildBookingRegionCounts();
-      addMarkersToMap();
-      renderRegionList();
-    }
+    document.getElementById('totalClients').textContent = total;
+    document.getElementById('regionsWithClients').textContent = covered;
+    document.getElementById('emptyRegions').textContent = UK_REGIONS.length - covered;
+    document.getElementById('topRegion').textContent = max > 0 ? top : '-';
+    document.getElementById('clientGrowth').textContent = `+${recent}`;
+  }
 
-    function applyDateFilter() {
-      const from = document.getElementById('dateFrom').value;
-      const to = document.getElementById('dateTo').value;
-      if (!from || !to) return;
+  function updateBookingStats(meta) {
+    document.getElementById('totalBookings').textContent = meta.total || 0;
+    document.getElementById('confirmedBookings').textContent = meta.confirmed || 0;
+    document.getElementById('completedBookings').textContent = meta.completed || 0;
+    document.getElementById('totalRevenue').textContent = meta.totalRevenue ? `£${meta.totalRevenue.toLocaleString()}` : '£0';
+    document.getElementById('bookingGrowth').textContent = `+${meta.recentBookings || 0}`;
+  }
 
-      dateFilterFrom = new Date(from);
-      dateFilterTo = new Date(to);
-      dateFilterTo.setHours(23, 59, 59);
+  function updateClientFilterCounts() {
+    document.getElementById('cAll').textContent = clientData.length;
+    document.getElementById('cActive').textContent = clientData.filter(u => u.fields['Account Status'] === 'Active').length;
+    document.getElementById('cWithClients').textContent = Object.values(regionCounts).filter(c => c > 0).length;
+  }
 
-      if (currentDataSource === 'clients') {
-        filteredClientData = clientData.filter(u => {
-          const d = new Date(u.fields['Created Date']);
-          return d >= dateFilterFrom && d <= dateFilterTo;
+  function updateBookingFilterCounts() {
+    document.getElementById('bAll').textContent = bookingData.length;
+    document.getElementById('bBooked').textContent = bookingData.filter(b => b.bookingStatus === 'Booked').length;
+    document.getElementById('bCompleted').textContent = bookingData.filter(b => b.bookingStatus === 'Completed').length;
+    document.getElementById('bCancelled').textContent = bookingData.filter(b => b.bookingStatus === 'Cancelled').length;
+  }
+
+  // ── Data Source Toggle ──
+  function setDataSource(source) {
+    currentDataSource = source;
+    const isBookings = source === 'bookings';
+
+    document.getElementById('dsClients').className = `ds-btn${!isBookings ? ' active clients' : ''}`;
+    document.getElementById('dsBookings').className = `ds-btn${isBookings ? ' active bookings' : ''}`;
+
+    document.getElementById('clientStats').style.display = isBookings ? 'none' : 'grid';
+    document.getElementById('bookingStats').style.display = isBookings ? 'grid' : 'none';
+    document.getElementById('clientFilters').style.display = isBookings ? 'none' : 'block';
+    document.getElementById('bookingFilters').style.display = isBookings ? 'block' : 'none';
+    document.getElementById('clientLegend').style.display = isBookings ? 'none' : 'block';
+    document.getElementById('bookingLegend').style.display = isBookings ? 'block' : 'none';
+    document.getElementById('regionListTitle').textContent = isBookings ? 'Bookings by Area' : 'Regions';
+
+    // Reset filters
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    const firstBtn = document.querySelector(`#${isBookings ? 'booking' : 'client'}Filters .filter-btn`);
+    if (firstBtn) firstBtn.classList.add('active');
+
+    if (isBookings) filteredBookingData = [...bookingData];
+    else filteredClientData = [...clientData];
+
+    resetCluster();
+    addMarkersToMap();
+    renderRegionList();
+    renderDetailPanel();
+    lucide.createIcons();
+  }
+
+  // ── Map Rendering ──
+  function addMarkersToMap() {
+    if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+    markerCluster.clearLayers();
+
+    if (currentDataSource === 'clients') renderClientLayer();
+    else renderBookingLayer();
+  }
+
+  function renderClientLayer() {
+    if (currentViewMode === 'markers') {
+      filteredClientData.forEach(user => {
+        const region = user.fields['Region'];
+        if (!region || !REGION_COORDS[region]) return;
+        const [lat, lng] = REGION_COORDS[region];
+        const jLat = lat + (Math.random() - 0.5) * 0.06;
+        const jLng = lng + (Math.random() - 0.5) * 0.06;
+
+        const icon = L.divIcon({
+          className: '',
+          html: `<div style="background:linear-gradient(135deg,#ef4444,#dc2626);border:3px solid #fff;border-radius:50%;width:22px;height:22px;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>`,
+          iconSize: [22, 22], iconAnchor: [11, 11]
         });
-        buildRegionCounts();
-        updateClientFilterCounts();
-      } else {
-        filteredBookingData = bookingData.filter(b => {
-          const d = new Date(b.date || b.createdTime);
-          return d >= dateFilterFrom && d <= dateFilterTo;
-        });
-        buildBookingRegionCounts();
-        updateBookingFilterCounts();
-      }
 
-      addMarkersToMap();
-      renderRegionList();
+        const m = L.marker([jLat, jLng], { icon });
+        m.bindPopup(`
+          <div class="popup-title">${user.fields['Name'] || 'Client'}</div>
+          <div class="popup-row">🏢 ${user.fields['Company'] || 'N/A'}</div>
+          <div class="popup-row">✉️ ${user.fields['Email'] || 'N/A'}</div>
+          <div class="popup-row">📍 ${region}</div>
+          <div class="popup-footer">
+            <span class="badge badge-${(user.fields['Account Status'] || 'inactive').toLowerCase()}">${user.fields['Account Status'] || 'Unknown'}</span>
+          </div>
+        `);
+        markerCluster.addLayer(m);
+      });
+      map.addLayer(markerCluster);
+
+    } else {
+      // Heatmap
+      const heatData = UK_REGIONS
+        .filter(r => regionCounts[r] > 0 && REGION_COORDS[r])
+        .map(r => [...REGION_COORDS[r], regionCounts[r] / 10]);
+
+      heatLayer = L.heatLayer(heatData, {
+        radius: 40, blur: 50, maxZoom: 10,
+        gradient: { 0.0: '#3b82f6', 0.5: '#fb923c', 1.0: '#ef4444' }
+      }).addTo(map);
+    }
+  }
+
+  function renderBookingLayer() {
+    if (currentViewMode === 'markers') {
+      let plotted = 0;
+      filteredBookingData.forEach(booking => {
+        // Only plot if we have exact coords from postcode geocoding
+        if (!booking.lat || !booking.lng) return;
+        plotted++;
+
+        const statusColor = { 'Booked': '#8b5cf6', 'Completed': '#10b981', 'Cancelled': '#ef4444' }[booking.bookingStatus] || '#8b5cf6';
+
+        const icon = L.divIcon({
+          className: '',
+          html: `<div style="background:${statusColor};border:3px solid #fff;border-radius:50%;width:18px;height:18px;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>`,
+          iconSize: [18, 18], iconAnchor: [9, 9]
+        });
+
+        const isUpcoming = booking.date && new Date(booking.date) >= new Date();
+        const m = L.marker([booking.lat, booking.lng], { icon });
+        m.bindPopup(`
+          <div class="popup-title">${booking.bookingRef || 'Booking'}</div>
+          <div class="popup-row">👤 ${booking.clientName || 'N/A'}</div>
+          <div class="popup-row">🏠 ${booking.propertyAddress || booking.postcode || 'N/A'}</div>
+          <div class="popup-row">🎬 ${booking.service || 'N/A'}</div>
+          <div class="popup-row">📅 ${formatDate(booking.date)}${booking.time ? ' at ' + booking.time : ''}</div>
+          ${booking.mediaSpecialist ? `<div class="popup-row">📸 ${booking.mediaSpecialist}</div>` : ''}
+          <div class="popup-footer">
+            <span class="badge badge-${(booking.bookingStatus || '').toLowerCase()}">${booking.bookingStatus || 'Unknown'}</span>
+            ${isUpcoming ? '<span class="badge" style="background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid #3b82f6;">Upcoming</span>' : ''}
+            ${booking.finalPrice ? `<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid #10b981;">£${parseFloat(booking.finalPrice).toFixed(2)}</span>` : ''}
+          </div>
+        `);
+        markerCluster.addLayer(m);
+      });
+
+      console.log(`Plotted ${plotted} of ${filteredBookingData.length} bookings`);
+      map.addLayer(markerCluster);
+
+    } else {
+      // Heatmap using exact coords
+      const heatData = filteredBookingData
+        .filter(b => b.lat && b.lng)
+        .map(b => [b.lat, b.lng, 0.5]);
+
+      heatLayer = L.heatLayer(heatData, {
+        radius: 35, blur: 45, maxZoom: 12,
+        gradient: { 0.0: '#8b5cf6', 0.5: '#a78bfa', 1.0: '#c4b5fd' }
+      }).addTo(map);
+    }
+  }
+
+  // ── Controls ──
+  function setViewMode(mode) {
+    currentViewMode = mode;
+    document.getElementById('viewMarkers').classList.toggle('active', mode === 'markers');
+    document.getElementById('viewHeatmap').classList.toggle('active', mode === 'heatmap');
+    addMarkersToMap();
+  }
+
+  function filterClients(type, e) {
+    document.querySelectorAll('#clientFilters .filter-btn').forEach(b => b.classList.remove('active'));
+    if (e) e.target.closest('.filter-btn').classList.add('active');
+
+    if (type === 'active') filteredClientData = clientData.filter(u => u.fields['Account Status'] === 'Active');
+    else filteredClientData = [...clientData];
+
+    addMarkersToMap();
+    renderRegionList();
+    renderDetailPanel();
+  }
+
+  function filterBookings(status, e) {
+    document.querySelectorAll('#bookingFilters .filter-btn').forEach(b => b.classList.remove('active'));
+    if (e) e.target.closest('.filter-btn').classList.add('active');
+
+    filteredBookingData = status === 'all' ? [...bookingData] : bookingData.filter(b => b.bookingStatus === status);
+    addMarkersToMap();
+    renderRegionList();
+    renderDetailPanel();
+  }
+
+  function applyDateFilter() {
+    const from = document.getElementById('dateFrom').value;
+    const to = document.getElementById('dateTo').value;
+    if (!from || !to) return;
+
+    const dFrom = new Date(from);
+    const dTo = new Date(to); dTo.setHours(23, 59, 59);
+
+    if (currentDataSource === 'clients') {
+      filteredClientData = clientData.filter(u => {
+        const d = new Date(u.fields['Created Date']);
+        return d >= dFrom && d <= dTo;
+      });
+    } else {
+      filteredBookingData = bookingData.filter(b => {
+        const d = new Date(b.date || b.createdTime);
+        return d >= dFrom && d <= dTo;
+      });
     }
 
-    // ── Region List ──
-    function renderRegionList() {
-      const container = document.getElementById('regionListContainer');
-      const regionTotal = document.getElementById('regionTotal');
-      const isBookings = currentDataSource === 'bookings';
+    addMarkersToMap();
+    renderRegionList();
+    renderDetailPanel();
+  }
 
-      const counts = isBookings ? bookingRegionCounts : regionCounts;
+  // ── Region List ──
+  function renderRegionList() {
+    const container = document.getElementById('regionListContainer');
+    const regionTotal = document.getElementById('regionTotal');
 
-      let visibleRegions = UK_REGIONS;
-      if (!isBookings) {
-        if (currentFilter === 'with-clients') visibleRegions = UK_REGIONS.filter(r => counts[r] > 0);
-        else if (currentFilter === 'opportunities') visibleRegions = UK_REGIONS.filter(r => counts[r] === 0);
-      } else {
-        // For bookings, only show regions that have at least 1 booking (or all)
-        visibleRegions = UK_REGIONS; // show all, greyed out if empty
-      }
-
-      regionTotal.textContent = `${visibleRegions.filter(r => counts[r] > 0).length} active`;
-
-      const listHTML = visibleRegions.map(region => {
-        const count = counts[region] || 0;
-        const isEmpty = count === 0;
-        const revenue = isBookings && bookingRegionSummary[region]
-          ? `<span style="font-size:11px;color:#10b981;">£${Math.round(bookingRegionSummary[region].totalRevenue || 0).toLocaleString()}</span>`
-          : '';
-
+    if (currentDataSource === 'clients') {
+      const rows = UK_REGIONS.map(r => {
+        const count = regionCounts[r] || 0;
         return `
-          <div class="region-item ${isEmpty ? 'empty' : ''}" onclick="flyToRegion('${region}', event)">
-            <div>
-              <div class="region-name">${region}</div>
-              ${revenue}
-            </div>
-            <span class="region-count ${isBookings ? 'booking' : ''}">${count}</span>
-          </div>
-        `;
+          <div class="region-item ${count === 0 ? 'empty' : ''}" onclick="flyToRegion('${r}', event)">
+            <div class="region-name">${r}</div>
+            <span class="region-count">${count}</span>
+          </div>`;
       }).join('');
+      regionTotal.textContent = `${Object.values(regionCounts).filter(c => c > 0).length} active`;
+      container.innerHTML = rows;
 
-      container.innerHTML = listHTML || '<div class="empty-state"><div class="empty-state-text">No regions match this filter</div></div>';
-    }
+    } else {
+      // For bookings: group by postcode area (first half of postcode)
+      const areaCounts = {};
+      const areaRevenue = {};
+      filteredBookingData.forEach(b => {
+        if (!b.postcode) return;
+        const area = b.postcode.split(' ')[0].toUpperCase();
+        areaCounts[area] = (areaCounts[area] || 0) + 1;
+        areaRevenue[area] = (areaRevenue[area] || 0) + (parseFloat(b.finalPrice) || 0);
+      });
 
-    function flyToRegion(region, e) {
-      if (REGION_COORDS[region]) {
-        map.flyTo(REGION_COORDS[region], 9, { duration: 1.5 });
-        if (currentDataSource === 'clients') showClientsInRegion(region);
-        else showBookingsInRegion(region);
-      }
+      const sorted = Object.entries(areaCounts).sort((a, b) => b[1] - a[1]);
+      regionTotal.textContent = `${sorted.length} areas`;
 
-      document.querySelectorAll('.region-item').forEach(i => i.classList.remove('active'));
-      if (e && e.target) e.target.closest('.region-item').classList.add('active');
-    }
-
-    // ── Detail Panel ──
-    function showClientsInRegion(region) {
-      const clients = filteredClientData.filter(u => u.fields['Region'] === region);
-      const title = document.getElementById('detailPanelTitle');
-      const content = document.getElementById('clientDetailContent');
-
-      title.innerHTML = `📍 ${region} <span style="color:#94a3b8;font-size:14px;font-weight:500;">(${clients.length} clients)</span>`;
-
-      if (clients.length === 0) {
-        content.innerHTML = `<div class="empty-state"><div class="empty-state-text">No clients in ${region} yet</div></div>`;
+      if (sorted.length === 0) {
+        container.innerHTML = `<div class="empty-state"><div class="empty-state-text">No bookings to display</div></div>`;
         return;
       }
 
-      content.innerHTML = clients.map(client => `
-        <div class="client-card">
-          <div class="client-name">${client.fields['Name']}</div>
-          <div class="client-info">🏢 ${client.fields['Company'] || 'N/A'}</div>
-          <div class="client-info">✉️ ${client.fields['Email']}</div>
-          <div class="client-info">📅 Joined: ${formatDate(client.fields['Created Date'])}</div>
-          <span class="client-badge ${client.fields['Account Status'] === 'Active' ? 'badge-active' : 'badge-inactive'}">
-            ${client.fields['Account Status'] || 'Unknown'}
-          </span>
+      container.innerHTML = sorted.map(([area, count]) => `
+        <div class="region-item" onclick="flyToPostcodeArea('${area}', event)">
+          <div>
+            <div class="region-name">${area}</div>
+            ${areaRevenue[area] > 0 ? `<div class="region-sub">£${areaRevenue[area].toFixed(2)}</div>` : ''}
+          </div>
+          <span class="region-count booking">${count}</span>
         </div>
       `).join('');
     }
+  }
 
-    function showBookingsInRegion(region) {
-      const bookings = filteredBookingData.filter(b => b.region === region);
-      const title = document.getElementById('detailPanelTitle');
-      const content = document.getElementById('clientDetailContent');
-
-      const totalRevenue = bookings.reduce((sum, b) => sum + (parseFloat(b.finalPrice) || 0), 0);
-      title.innerHTML = `📍 ${region} <span style="color:#94a3b8;font-size:14px;font-weight:500;">(${bookings.length} bookings)</span>`;
-
-      if (bookings.length === 0) {
-        content.innerHTML = `<div class="empty-state"><div class="empty-state-text">No bookings in ${region} yet</div></div>`;
-        return;
-      }
-
-      const revenueHtml = totalRevenue > 0
-        ? `<div style="margin-bottom:12px;padding:12px;background:rgba(16,185,129,0.1);border-radius:8px;border:1px solid rgba(16,185,129,0.3);color:#10b981;font-weight:700;font-size:15px;">
-            Total Revenue: £${totalRevenue.toFixed(2)}
-           </div>`
-        : '';
-
-      content.innerHTML = revenueHtml + bookings.slice(0, 50).map(b => `
-        <div class="client-card booking-card">
-          <div class="client-name">${b.bookingRef || 'Booking'}</div>
-          <div class="client-info">👤 ${b.clientName || 'N/A'}</div>
-          <div class="client-info">🎬 ${b.service || 'N/A'}</div>
-          <div class="client-info">📅 ${formatDate(b.date)}</div>
-          ${b.mediaSpecialist ? `<div class="client-info">📸 ${b.mediaSpecialist}</div>` : ''}
-          <span class="client-badge badge-${(b.bookingStatus||'').toLowerCase()}">${b.bookingStatus || 'Unknown'}</span>
-          ${b.finalPrice ? `<span class="revenue-badge">£${parseFloat(b.finalPrice).toFixed(2)}</span>` : ''}
-        </div>
-      `).join('');
-
-      if (bookings.length > 50) {
-        content.innerHTML += `<div style="text-align:center;padding:20px;color:#94a3b8;font-size:13px;">Showing 50 of ${bookings.length} bookings</div>`;
-      }
+  function flyToRegion(region, e) {
+    if (REGION_COORDS[region]) {
+      map.flyTo(REGION_COORDS[region], 10, { duration: 1.5 });
+      showClientsInRegion(region);
     }
+    document.querySelectorAll('.region-item').forEach(i => i.classList.remove('active'));
+    if (e) e.target.closest('.region-item').classList.add('active');
+  }
 
-    function showAllDetails() {
-      const title = document.getElementById('detailPanelTitle');
-      const content = document.getElementById('clientDetailContent');
-
-      if (currentDataSource === 'clients') {
-        title.innerHTML = `👥 All Clients <span style="color:#94a3b8;font-size:14px;font-weight:500;">(${filteredClientData.length})</span>`;
-        if (filteredClientData.length === 0) {
-          content.innerHTML = `<div class="empty-state"><div class="empty-state-text">No clients found</div></div>`;
-          return;
-        }
-        content.innerHTML = filteredClientData.filter(u => u.fields['Region']).slice(0, 50).map(client => `
-          <div class="client-card" onclick="flyToRegion('${client.fields['Region']}', event)">
-            <div class="client-name">${client.fields['Name']}</div>
-            <div class="client-info">🏢 ${client.fields['Company'] || 'N/A'}</div>
-            <div class="client-info">📍 ${client.fields['Region']}</div>
-            <div class="client-info">📅 ${formatDate(client.fields['Created Date'])}</div>
-            <span class="client-badge ${client.fields['Account Status'] === 'Active' ? 'badge-active' : 'badge-inactive'}">
-              ${client.fields['Account Status'] || 'Unknown'}
-            </span>
-          </div>
-        `).join('');
-      } else {
-        const totalRevenue = filteredBookingData.reduce((sum, b) => sum + (parseFloat(b.finalPrice) || 0), 0);
-        title.innerHTML = `📅 All Bookings <span style="color:#94a3b8;font-size:14px;font-weight:500;">(${filteredBookingData.length})</span>`;
-
-        const revenueHtml = totalRevenue > 0
-          ? `<div style="margin-bottom:12px;padding:12px;background:rgba(16,185,129,0.1);border-radius:8px;border:1px solid rgba(16,185,129,0.3);color:#10b981;font-weight:700;font-size:15px;">
-              Total Revenue: £${totalRevenue.toFixed(2)}
-             </div>`
-          : '';
-
-        content.innerHTML = revenueHtml + filteredBookingData.slice(0, 50).map(b => `
-          <div class="client-card booking-card" onclick="flyToRegion('${b.region}', event)">
-            <div class="client-name">${b.bookingRef || 'Booking'}</div>
-            <div class="client-info">👤 ${b.clientName || 'N/A'}</div>
-            <div class="client-info">📍 ${b.region || 'N/A'}</div>
-            <div class="client-info">🎬 ${b.service || 'N/A'}</div>
-            <div class="client-info">📅 ${formatDate(b.date)}</div>
-            <span class="client-badge badge-${(b.bookingStatus||'').toLowerCase()}">${b.bookingStatus || 'Unknown'}</span>
-            ${b.finalPrice ? `<span class="revenue-badge">£${parseFloat(b.finalPrice).toFixed(2)}</span>` : ''}
-          </div>
-        `).join('');
-
-        if (filteredBookingData.length > 50) {
-          content.innerHTML += `<div style="text-align:center;padding:20px;color:#94a3b8;font-size:13px;">Showing 50 of ${filteredBookingData.length} bookings</div>`;
-        }
-      }
+  function flyToPostcodeArea(area, e) {
+    // Find first booking in this area with coords and fly there
+    const booking = filteredBookingData.find(b => b.postcode && b.postcode.toUpperCase().startsWith(area) && b.lat);
+    if (booking) {
+      map.flyTo([booking.lat, booking.lng], 12, { duration: 1.5 });
     }
+    showBookingsInArea(area);
+    document.querySelectorAll('.region-item').forEach(i => i.classList.remove('active'));
+    if (e) e.target.closest('.region-item').classList.add('active');
+  }
 
-    function formatDate(dateString) {
-      if (!dateString) return 'N/A';
-      return new Date(dateString).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-    }
-  </script>
+  // ── Detail Panel ──
+  function renderDetailPanel() {
+    if (currentDataSource === 'clients') showAllClients();
+    else showAllBookings();
+  }
+
+  function showAllClients() {
+    document.getElementById('detailTitle').textContent = `All Clients (${filteredClientData.length})`;
+    const items = filteredClientData.filter(u => u.fields['Region']).slice(0, 50);
+    document.getElementById('detailContent').innerHTML = items.length === 0
+      ? `<div class="empty-state"><div class="empty-state-text">No clients found</div></div>`
+      : items.map(c => clientCard(c)).join('') + (filteredClientData.length > 50 ? `<div style="text-align:center;padding:16px;color:#64748b;font-size:12px;">Showing 50 of ${filteredClientData.length}</div>` : '');
+  }
+
+  function showAllBookings() {
+    const geocoded = filteredBookingData.filter(b => b.lat).length;
+    const total = filteredBookingData.length;
+    const totalRevenue = filteredBookingData.reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
+    document.getElementById('detailTitle').textContent = `Bookings (${total})`;
+
+    const revenueHtml = totalRevenue > 0
+      ? `<div class="revenue-total">Total Revenue: £${totalRevenue.toFixed(2)}</div>`
+      : '';
+    const geocodeNote = `<div style="font-size:11px;color:#64748b;margin-bottom:12px;">📍 ${geocoded} of ${total} plotted on map</div>`;
+
+    const items = filteredBookingData.slice(0, 50);
+    document.getElementById('detailContent').innerHTML = revenueHtml + geocodeNote
+      + (items.length === 0
+        ? `<div class="empty-state"><div class="empty-state-text">No bookings found</div></div>`
+        : items.map(b => bookingCard(b)).join(''))
+      + (filteredBookingData.length > 50 ? `<div style="text-align:center;padding:16px;color:#64748b;font-size:12px;">Showing 50 of ${filteredBookingData.length}</div>` : '');
+  }
+
+  function showClientsInRegion(region) {
+    const clients = filteredClientData.filter(u => u.fields['Region'] === region);
+    document.getElementById('detailTitle').textContent = `${region} (${clients.length})`;
+    document.getElementById('detailContent').innerHTML = clients.length === 0
+      ? `<div class="empty-state"><div class="empty-state-text">No clients in ${region}</div></div>`
+      : clients.map(c => clientCard(c)).join('');
+  }
+
+  function showBookingsInArea(area) {
+    const bookings = filteredBookingData.filter(b => b.postcode && b.postcode.toUpperCase().startsWith(area));
+    const totalRevenue = bookings.reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
+    document.getElementById('detailTitle').textContent = `${area} — ${bookings.length} bookings`;
+    const revenueHtml = totalRevenue > 0 ? `<div class="revenue-total">Revenue: £${totalRevenue.toFixed(2)}</div>` : '';
+    document.getElementById('detailContent').innerHTML = revenueHtml
+      + (bookings.length === 0
+        ? `<div class="empty-state"><div class="empty-state-text">No bookings in ${area}</div></div>`
+        : bookings.map(b => bookingCard(b)).join(''));
+  }
+
+  // ── Card Templates ──
+  function clientCard(c) {
+    const status = c.fields['Account Status'] || 'Unknown';
+    return `
+      <div class="card" onclick="flyToRegion('${c.fields['Region']}', event)">
+        <div class="card-title">${c.fields['Name'] || 'Client'}</div>
+        <div class="card-info">🏢 ${c.fields['Company'] || 'N/A'}</div>
+        <div class="card-info">📍 ${c.fields['Region'] || 'N/A'}</div>
+        <div class="card-info">📅 ${formatDate(c.fields['Created Date'])}</div>
+        <span class="badge badge-${status.toLowerCase()}">${status}</span>
+      </div>`;
+  }
+
+  function bookingCard(b) {
+    const status = b.bookingStatus || 'Unknown';
+    const isUpcoming = b.date && new Date(b.date) >= new Date();
+    return `
+      <div class="card booking">
+        <div class="card-title">${b.bookingRef || 'Booking'}</div>
+        <div class="card-info">👤 ${b.clientName || 'N/A'}</div>
+        <div class="card-info">🏠 ${b.propertyAddress || b.postcode || 'N/A'}</div>
+        <div class="card-info">🎬 ${b.service || 'N/A'}</div>
+        <div class="card-info">📅 ${formatDate(b.date)}${b.time ? ' at ' + b.time : ''}</div>
+        ${b.mediaSpecialist ? `<div class="card-info">📸 ${b.mediaSpecialist}</div>` : ''}
+        <span class="badge badge-${status.toLowerCase()}">${status}</span>
+        ${isUpcoming ? '<span class="badge" style="background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid #3b82f6;">Upcoming</span>' : ''}
+        ${b.finalPrice ? `<span class="revenue-tag">£${parseFloat(b.finalPrice).toFixed(2)}</span>` : ''}
+        ${!b.lat ? '<div style="font-size:10px;color:#64748b;margin-top:4px;">⚠️ Postcode not geocoded</div>' : ''}
+      </div>`;
+  }
+
+  function formatDate(d) {
+    if (!d) return 'N/A';
+    return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+</script>
 </body>
 </html>
