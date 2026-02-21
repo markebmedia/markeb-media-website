@@ -60,6 +60,7 @@ exports.handler = async (event, context) => {
       : '';
 
     // Fields to retrieve - only what the map needs
+    // Note: 'Created Time' is a built-in Airtable field, fetched via record._rawJson.createdTime
     const selectOptions = {
       fields: [
         'Booking Reference',
@@ -79,7 +80,7 @@ exports.handler = async (event, context) => {
         'Media Specialist',
         'Bedrooms',
         'Add-Ons',
-        'Created Time'
+        'Created Date'
       ],
       sort: [{ field: 'Date', direction: 'desc' }]
     };
@@ -123,7 +124,7 @@ exports.handler = async (event, context) => {
                 return [];
               }
             })(),
-            createdTime: record.fields['Created Time'] || null
+            createdTime: record.fields['Created Date'] || record._rawJson.createdTime || null
           });
         });
         fetchNextPage();
