@@ -22,7 +22,6 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <style>
-    /* CSS Variables for Light/Dark Mode */
     :root {
       --bg-primary: #f8fafc;
       --bg-secondary: #ffffff;
@@ -37,7 +36,6 @@
       --shadow-lg: 0 8px 24px rgba(59, 130, 246, 0.15);
     }
 
-    /* Dark Mode */
     @media (prefers-color-scheme: dark) {
       :root {
         --bg-primary: #0f172a;
@@ -65,17 +63,14 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    .map-container {
-      max-width: 1900px;
-      margin: 0 auto;
-    }
+    .map-container { max-width: 1900px; margin: 0 auto; }
 
     .header {
       background: #fff;
       border-radius: 16px;
       padding: 32px;
       margin-bottom: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       border: 1px solid #e2e8f0;
       display: flex;
       justify-content: space-between;
@@ -94,16 +89,9 @@
       gap: 12px;
     }
 
-    .header-subtitle {
-      color: #94a3b8;
-      font-size: 14px;
-    }
+    .header-subtitle { color: #94a3b8; font-size: 14px; }
 
-    .header-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+    .header-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
     .btn {
       padding: 12px 24px;
@@ -126,10 +114,7 @@
       border: 1px solid #60a5fa;
     }
 
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.5);
-    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59,130,246,0.5); }
 
     .btn-secondary {
       background: #1e293b;
@@ -137,9 +122,51 @@
       border: 2px solid #334155;
     }
 
-    .btn-secondary:hover {
-      border-color: #60a5fa;
-      background: #334155;
+    .btn-secondary:hover { border-color: #60a5fa; background: #334155; }
+
+    /* ── DATA SOURCE TOGGLE ── */
+    .data-source-toggle {
+      display: flex;
+      gap: 0;
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 4px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 24px;
+    }
+
+    .ds-btn {
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all .2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .ds-btn.active {
+      background: #fff;
+      color: #0f172a;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .ds-btn.active.bookings {
+      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+      color: #fff;
+    }
+
+    .ds-btn.active.clients {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: #fff;
     }
 
     .stats-overview {
@@ -153,7 +180,7 @@
       background: #fff;
       border-radius: 12px;
       padding: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       border: 1px solid #e2e8f0;
       text-align: center;
       transition: all .3s ease;
@@ -161,24 +188,15 @@
 
     .stat-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
+      box-shadow: 0 8px 24px rgba(59,130,246,0.15);
       border-color: #3b82f6;
     }
 
-    .stat-value {
-      font-size: 36px;
-      font-weight: 700;
-      color: #3b82f6;
-      margin-bottom: 8px;
-    }
+    .stat-card.booking-stat:hover { border-color: #8b5cf6; box-shadow: 0 8px 24px rgba(139,92,246,0.15); }
 
-    .stat-label {
-      color: #94a3b8;
-      font-size: 13px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .stat-value { font-size: 36px; font-weight: 700; color: #3b82f6; margin-bottom: 8px; }
+    .stat-value.purple { color: #8b5cf6; }
+    .stat-label { color: #94a3b8; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
 
     .content-grid {
       display: grid;
@@ -190,7 +208,7 @@
       background: #fff;
       border-radius: 16px;
       padding: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       border: 1px solid #e2e8f0;
     }
 
@@ -198,20 +216,16 @@
       height: 700px;
       border-radius: 12px;
       border: 2px solid #334155;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
     }
 
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
+    .sidebar { display: flex; flex-direction: column; gap: 20px; }
 
     .control-panel {
       background: #fff;
       border-radius: 16px;
       padding: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       border: 1px solid #e2e8f0;
     }
 
@@ -225,13 +239,8 @@
       gap: 8px;
     }
 
-    .control-section {
-      margin-bottom: 24px;
-    }
-
-    .control-section:last-child {
-      margin-bottom: 0;
-    }
+    .control-section { margin-bottom: 24px; }
+    .control-section:last-child { margin-bottom: 0; }
 
     .control-label {
       font-size: 13px;
@@ -263,12 +272,10 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
+      font-family: 'Inter', sans-serif;
     }
 
-    .view-btn:hover {
-      border-color: #3b82f6;
-      color: #3b82f6;
-    }
+    .view-btn:hover { border-color: #3b82f6; color: #3b82f6; }
 
     .view-btn.active {
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
@@ -291,12 +298,10 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      font-family: 'Inter', sans-serif;
     }
 
-    .filter-btn:hover {
-      border-color: #3b82f6;
-      color: #3b82f6;
-    }
+    .filter-btn:hover { border-color: #3b82f6; color: #3b82f6; }
 
     .filter-btn.active {
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
@@ -313,16 +318,15 @@
       color: #64748b;
     }
 
-    .filter-btn.active .filter-count {
-      background: rgba(255, 255, 255, 0.3);
-      color: #fff;
+    .filter-btn.active .filter-count { background: rgba(255,255,255,0.3); color: #fff; }
+
+    /* Booking-specific filter buttons */
+    #bookingFilters .filter-btn.active {
+      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+      border-color: #a78bfa;
     }
 
-    .date-filter {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-    }
+    .date-filter { display: flex; gap: 8px; margin-top: 12px; }
 
     .date-input {
       flex: 1;
@@ -335,16 +339,13 @@
       font-family: 'Inter', sans-serif;
     }
 
-    .date-input:focus {
-      outline: none;
-      border-color: #3b82f6;
-    }
+    .date-input:focus { outline: none; border-color: #3b82f6; }
 
     .region-list {
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border-radius: 16px;
       padding: 24px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
       border: 1px solid #334155;
       max-height: 600px;
       overflow-y: auto;
@@ -372,19 +373,10 @@
       margin-bottom: 4px;
     }
 
-    .region-item:hover {
-      background: #334155;
-    }
+    .region-item:hover { background: #334155; }
+    .region-item:last-child { border-bottom: none; }
 
-    .region-item:last-child {
-      border-bottom: none;
-    }
-
-    .region-name {
-      font-weight: 600;
-      color: #e2e8f0;
-      font-size: 14px;
-    }
+    .region-name { font-weight: 600; color: #e2e8f0; font-size: 14px; }
 
     .region-count {
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
@@ -395,25 +387,21 @@
       font-weight: 700;
     }
 
+    .region-count.booking { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+
     .region-item.active {
       background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
       border-left: 4px solid #60a5fa;
     }
 
-    .region-item.empty {
-      opacity: 0.5;
-    }
-
-    .region-item.empty .region-count {
-      background: #334155;
-      color: #94a3b8;
-    }
+    .region-item.empty { opacity: 0.5; }
+    .region-item.empty .region-count { background: #334155; color: #94a3b8; }
 
     .client-detail-panel {
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border-radius: 16px;
       padding: 24px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
       border: 1px solid #334155;
       max-height: 700px;
       overflow-y: auto;
@@ -438,17 +426,10 @@
       transition: all .2s ease;
     }
 
-    .client-card:hover {
-      border-color: #60a5fa;
-      transform: translateX(4px);
-    }
+    .client-card:hover { border-color: #60a5fa; transform: translateX(4px); }
+    .client-card.booking-card:hover { border-color: #a78bfa; }
 
-    .client-name {
-      font-weight: 700;
-      color: #e2e8f0;
-      font-size: 15px;
-      margin-bottom: 8px;
-    }
+    .client-name { font-weight: 700; color: #e2e8f0; font-size: 15px; margin-bottom: 8px; }
 
     .client-info {
       font-size: 13px;
@@ -467,35 +448,22 @@
       font-weight: 600;
       text-transform: uppercase;
       margin-top: 8px;
+      margin-right: 4px;
     }
 
-    .badge-active {
-      background: rgba(16, 185, 129, 0.2);
-      color: #10b981;
-      border: 1px solid #10b981;
-    }
-
-    .badge-inactive {
-      background: rgba(239, 68, 68, 0.2);
-      color: #ef4444;
-      border: 1px solid #ef4444;
-    }
+    .badge-active { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
+    .badge-inactive { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; }
+    .badge-booked { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; }
+    .badge-completed { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
+    .badge-cancelled { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; }
+    .badge-pending { background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid #fb923c; }
 
     .map-legend {
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border-radius: 16px;
       padding: 20px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
       border: 1px solid #334155;
-    }
-
-    .map-legend h4 {
-      font-size: 14px;
-      font-weight: 700;
-      color: #e2e8f0;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     .legend-item {
@@ -512,13 +480,10 @@
       height: 20px;
       border-radius: 4px;
       border: 2px solid #334155;
+      flex-shrink: 0;
     }
 
-    .loading-message {
-      text-align: center;
-      padding: 60px 20px;
-      color: #94a3b8;
-    }
+    .loading-message { text-align: center; padding: 60px 20px; color: #94a3b8; }
 
     .spinner {
       margin: 0 auto 20px;
@@ -530,23 +495,17 @@
       animation: spin 1s linear infinite;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Custom Leaflet Styles */
     .leaflet-popup-content-wrapper {
       background: #1e293b;
       color: #e2e8f0;
       border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
       border: 1px solid #334155;
     }
 
-    .leaflet-popup-tip {
-      background: #1e293b;
-      border: 1px solid #334155;
-    }
+    .leaflet-popup-tip { background: #1e293b; }
 
     .leaflet-popup-content {
       margin: 16px;
@@ -571,158 +530,73 @@
       gap: 6px;
     }
 
-    .popup-clients {
-      font-size: 14px;
-      font-weight: 600;
-      color: #60a5fa;
+    .popup-footer {
       margin-top: 12px;
       padding-top: 12px;
       border-top: 2px solid #334155;
     }
 
-    .popup-client-list {
-      max-height: 150px;
-      overflow-y: auto;
-      margin-top: 8px;
-    }
+    .marker-cluster-small { background: linear-gradient(135deg, rgba(59,130,246,0.8) 0%, rgba(37,99,235,0.8) 100%); border: 3px solid #60a5fa; }
+    .marker-cluster-medium { background: linear-gradient(135deg, rgba(251,146,60,0.8) 0%, rgba(249,115,22,0.8) 100%); border: 3px solid #fb923c; }
+    .marker-cluster-large { background: linear-gradient(135deg, rgba(239,68,68,0.8) 0%, rgba(220,38,38,0.8) 100%); border: 3px solid #ef4444; }
+    .marker-cluster div { background: transparent; color: #fff; font-weight: 700; font-size: 14px; }
 
-    .popup-client-item {
-      padding: 6px 0;
-      color: #e2e8f0;
-      font-size: 13px;
-      border-bottom: 1px solid #334155;
-    }
+    /* Booking marker clusters - purple */
+    .marker-cluster-small.booking { background: linear-gradient(135deg, rgba(139,92,246,0.8) 0%, rgba(124,58,237,0.8) 100%); border: 3px solid #a78bfa; }
+    .marker-cluster-medium.booking { background: linear-gradient(135deg, rgba(167,139,250,0.8) 0%, rgba(139,92,246,0.8) 100%); border: 3px solid #c4b5fd; }
+    .marker-cluster-large.booking { background: linear-gradient(135deg, rgba(196,181,253,0.8) 0%, rgba(167,139,250,0.8) 100%); border: 3px solid #ddd6fe; }
 
-    .popup-client-item:last-child {
-      border-bottom: none;
-    }
-
-    /* Marker Cluster Styles */
-    .marker-cluster-small {
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(37, 99, 235, 0.8) 100%);
-      border: 3px solid #60a5fa;
-    }
-
-    .marker-cluster-medium {
-      background: linear-gradient(135deg, rgba(251, 146, 60, 0.8) 0%, rgba(249, 115, 22, 0.8) 100%);
-      border: 3px solid #fb923c;
-    }
-
-    .marker-cluster-large {
-      background: linear-gradient(135deg, rgba(239, 68, 68, 0.8) 0%, rgba(220, 38, 38, 0.8) 100%);
-      border: 3px solid #ef4444;
-    }
-
-    .marker-cluster div {
-      background: transparent;
-      color: #fff;
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    /* Scrollbar Styling */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #0f172a;
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #334155;
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: #60a5fa;
-    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0f172a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #60a5fa; }
 
     @media (max-width: 1400px) {
-      .content-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar {
-        order: -1;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-      }
-
-      #map {
-        height: 600px;
-      }
+      .content-grid { grid-template-columns: 1fr; }
+      .sidebar { order: -1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+      #map { height: 600px; }
     }
 
     @media (max-width: 768px) {
-      body {
-        padding: 12px;
-      }
-
-      .header {
-        padding: 20px;
-      }
-
-      .header-content h1 {
-        font-size: 24px;
-      }
-
-      .stats-overview {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .content-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar {
-        grid-template-columns: 1fr;
-      }
-
-      .map-section {
-        padding: 16px;
-      }
-
-      #map {
-        height: 400px;
-      }
-
-      .region-list {
-        max-height: none;
-      }
+      body { padding: 12px; }
+      .header { padding: 20px; }
+      .header-content h1 { font-size: 24px; }
+      .stats-overview { grid-template-columns: 1fr 1fr; }
+      .content-grid { grid-template-columns: 1fr; }
+      .sidebar { grid-template-columns: 1fr; }
+      .map-section { padding: 16px; }
+      #map { height: 400px; }
+      .region-list { max-height: none; }
     }
 
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: #64748b;
-    }
+    .empty-state { text-align: center; padding: 40px 20px; color: #64748b; }
+    .empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+    .empty-state-text { font-size: 14px; color: #94a3b8; }
 
-    .empty-state-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
-      opacity: 0.5;
-    }
-
-    .empty-state-text {
-      font-size: 14px;
-      color: #94a3b8;
+    .revenue-badge {
+      display: inline-block;
+      background: rgba(16,185,129,0.15);
+      color: #10b981;
+      border: 1px solid #10b981;
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 6px;
     }
   </style>
 </head>
 <body>
   <div class="map-container">
+
     <!-- Header -->
     <div class="header">
       <div class="header-content">
         <h1>
           <i data-lucide="map" style="width: 32px; height: 32px;"></i>
-          UK Client Distribution Map
+          UK Distribution Map
         </h1>
-        <p class="header-subtitle">Advanced analytics and geographic visualization</p>
+        <p class="header-subtitle">Clients &amp; bookings geographic visualization</p>
       </div>
       <div class="header-actions">
         <button class="btn btn-secondary" onclick="window.location.href='admin-panel.html'">
@@ -736,8 +610,20 @@
       </div>
     </div>
 
+    <!-- Data Source Toggle -->
+    <div class="data-source-toggle">
+      <button class="ds-btn active clients" id="dsClients" onclick="setDataSource('clients')">
+        <i data-lucide="users" style="width: 16px; height: 16px;"></i>
+        Clients
+      </button>
+      <button class="ds-btn bookings" id="dsBookings" onclick="setDataSource('bookings')">
+        <i data-lucide="calendar-check" style="width: 16px; height: 16px;"></i>
+        Bookings
+      </button>
+    </div>
+
     <!-- Stats Overview -->
-    <div class="stats-overview">
+    <div class="stats-overview" id="clientStats">
       <div class="stat-card">
         <div class="stat-value" id="totalClients">-</div>
         <div class="stat-label">Total Clients</div>
@@ -760,8 +646,32 @@
       </div>
     </div>
 
+    <div class="stats-overview" id="bookingStats" style="display:none;">
+      <div class="stat-card booking-stat">
+        <div class="stat-value purple" id="totalBookings">-</div>
+        <div class="stat-label">Total Bookings</div>
+      </div>
+      <div class="stat-card booking-stat">
+        <div class="stat-value purple" id="activeBookings">-</div>
+        <div class="stat-label">Confirmed Bookings</div>
+      </div>
+      <div class="stat-card booking-stat">
+        <div class="stat-value purple" id="completedBookings">-</div>
+        <div class="stat-label">Completed</div>
+      </div>
+      <div class="stat-card booking-stat">
+        <div class="stat-value purple" id="topBookingRegion">-</div>
+        <div class="stat-label">Top Booking Region</div>
+      </div>
+      <div class="stat-card booking-stat">
+        <div class="stat-value purple" id="bookingGrowth">-</div>
+        <div class="stat-label">30-Day Bookings</div>
+      </div>
+    </div>
+
     <!-- Main Content -->
     <div class="content-grid">
+
       <!-- Control Panel (Left Sidebar) -->
       <div class="sidebar">
         <div class="control-panel">
@@ -769,7 +679,7 @@
             <i data-lucide="settings" style="width: 18px; height: 18px;"></i>
             Map Controls
           </h3>
-          
+
           <!-- View Mode -->
           <div class="control-section">
             <div class="control-label">View Mode</div>
@@ -785,24 +695,45 @@
             </div>
           </div>
 
-          <!-- Filters -->
-          <div class="control-section">
+          <!-- Client Filters -->
+          <div class="control-section" id="clientFilters">
             <div class="control-label">Quick Filters</div>
-            <button class="filter-btn active" onclick="filterMap('all')">
+            <button class="filter-btn active" onclick="filterMap('all', event)">
               <span>All Regions</span>
               <span class="filter-count" id="countAll">-</span>
             </button>
-            <button class="filter-btn" onclick="filterMap('with-clients')">
+            <button class="filter-btn" onclick="filterMap('with-clients', event)">
               <span>With Clients</span>
               <span class="filter-count" id="countWithClients">-</span>
             </button>
-            <button class="filter-btn" onclick="filterMap('opportunities')">
+            <button class="filter-btn" onclick="filterMap('opportunities', event)">
               <span>Opportunities</span>
               <span class="filter-count" id="countOpportunities">-</span>
             </button>
-            <button class="filter-btn" onclick="filterMap('active')">
+            <button class="filter-btn" onclick="filterMap('active', event)">
               <span>Active Clients</span>
               <span class="filter-count" id="countActive">-</span>
+            </button>
+          </div>
+
+          <!-- Booking Filters -->
+          <div class="control-section" id="bookingFilters" style="display:none;">
+            <div class="control-label">Booking Status</div>
+            <button class="filter-btn active" onclick="filterBookings('all', event)">
+              <span>All Bookings</span>
+              <span class="filter-count" id="bCountAll">-</span>
+            </button>
+            <button class="filter-btn" onclick="filterBookings('Booked', event)">
+              <span>Confirmed</span>
+              <span class="filter-count" id="bCountBooked">-</span>
+            </button>
+            <button class="filter-btn" onclick="filterBookings('Completed', event)">
+              <span>Completed</span>
+              <span class="filter-count" id="bCountCompleted">-</span>
+            </button>
+            <button class="filter-btn" onclick="filterBookings('Cancelled', event)">
+              <span>Cancelled</span>
+              <span class="filter-count" id="bCountCancelled">-</span>
             </button>
           </div>
 
@@ -818,21 +749,39 @@
           <!-- Legend -->
           <div class="control-section">
             <div class="control-label">Legend</div>
-            <div class="map-legend">
+            <div class="map-legend" id="clientLegend">
               <div class="legend-item">
                 <div class="legend-color" style="background: #ef4444; border-radius: 50%;"></div>
                 <span>Client marker</span>
               </div>
               <div class="legend-item">
                 <div class="legend-color" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></div>
-                <span>Small cluster (2-10)</span>
+                <span>Small cluster (2–10)</span>
               </div>
               <div class="legend-item">
                 <div class="legend-color" style="background: linear-gradient(135deg, #fb923c, #f97316);"></div>
-                <span>Medium cluster (10-20)</span>
+                <span>Medium cluster (10–20)</span>
               </div>
               <div class="legend-item">
                 <div class="legend-color" style="background: linear-gradient(135deg, #ef4444, #dc2626);"></div>
+                <span>Large cluster (20+)</span>
+              </div>
+            </div>
+            <div class="map-legend" id="bookingLegend" style="display:none;">
+              <div class="legend-item">
+                <div class="legend-color" style="background: #8b5cf6; border-radius: 50%;"></div>
+                <span>Booking marker</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);"></div>
+                <span>Small cluster (2–10)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #a78bfa, #8b5cf6);"></div>
+                <span>Medium cluster (10–20)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #c4b5fd, #a78bfa);"></div>
                 <span>Large cluster (20+)</span>
               </div>
             </div>
@@ -844,19 +793,17 @@
           <h3>
             <span style="display: flex; align-items: center; gap: 8px;">
               <i data-lucide="map-pin" style="width: 18px; height: 18px;"></i>
-              Regions
+              <span id="regionListTitle">Regions</span>
             </span>
             <span id="regionTotal" style="color: #94a3b8; font-size: 14px; font-weight: 500;">-</span>
           </h3>
           <div id="regionListContainer">
-            <div class="loading-message">
-              <p>Loading regions...</p>
-            </div>
+            <div class="loading-message"><p>Loading regions...</p></div>
           </div>
         </div>
       </div>
 
-      <!-- Map Section (Center) -->
+      <!-- Map -->
       <div class="map-section">
         <div id="map">
           <div class="loading-message">
@@ -866,7 +813,7 @@
         </div>
       </div>
 
-      <!-- Client Detail Panel (Right Sidebar) -->
+      <!-- Detail Panel (Right Sidebar) -->
       <div class="sidebar">
         <div class="client-detail-panel" id="clientDetailPanel">
           <h3>
@@ -880,18 +827,17 @@
               <div class="empty-state-icon">
                 <i data-lucide="map" style="width: 48px; height: 48px; color: #64748b; opacity: 0.5;"></i>
               </div>
-              <div class="empty-state-text">Click a region or marker to view clients</div>
+              <div class="empty-state-text">Click a region or marker to view details</div>
             </div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
   <script>
-    // ✅ UPDATED: UK Region coordinates matching new HPI codes
     const REGION_COORDS = {
-      // Your Service Regions
       'Cheshire East': [53.1603, -2.2119],
       'Cheshire West and Chester': [53.1905, -2.8909],
       'Greater London': [51.5074, -0.1278],
@@ -899,15 +845,11 @@
       'Essex': [51.7341, 0.4700],
       'West Midlands': [52.4862, -1.8904],
       'Leicestershire': [52.6369, -1.1398],
-      
-      // Yorkshire & Humber
       'South Yorkshire': [53.5400, -1.3500],
       'West Yorkshire': [53.7900, -1.7500],
       'North Yorkshire': [54.2766, -1.4090],
       'East Riding of Yorkshire': [53.8429, -0.4380],
       'York': [53.9600, -1.0873],
-      
-      // North West England
       'Cumbria': [54.5772, -2.7974],
       'Lancashire': [53.7632, -2.7044],
       'Merseyside': [53.4106, -2.9779],
@@ -915,13 +857,9 @@
       'Blackpool': [53.8175, -3.0357],
       'Halton': [53.3340, -2.7350],
       'Warrington': [53.3900, -2.5970],
-      
-      // North East England
       'County Durham': [54.7753, -1.5849],
       'Northumberland': [55.2083, -2.0784],
       'Tyne and Wear': [54.9783, -1.6178],
-      
-      // Midlands
       'Derbyshire': [53.1235, -1.5650],
       'Derby': [52.9219, -1.4746],
       'Herefordshire': [52.0564, -2.7160],
@@ -936,8 +874,6 @@
       'Stoke-on-Trent': [53.0027, -2.1794],
       'Warwickshire': [52.2819, -1.5849],
       'Worcestershire': [52.2500, -2.2200],
-      
-      // East England
       'Bedford': [52.1363, -0.4667],
       'Central Bedfordshire': [52.0029, -0.2982],
       'Cambridgeshire': [52.2053, 0.1218],
@@ -945,8 +881,6 @@
       'Hertfordshire': [51.8090, -0.2376],
       'Norfolk': [52.6295, 0.7100],
       'Suffolk': [52.1872, 0.9708],
-      
-      // South East England
       'Berkshire': [51.4543, -1.0000],
       'Brighton and Hove': [50.8225, -0.1372],
       'Buckinghamshire': [51.8133, -0.8084],
@@ -960,8 +894,6 @@
       'Oxfordshire': [51.7612, -1.2500],
       'Surrey': [51.3148, -0.5600],
       'West Sussex': [50.9200, -0.6000],
-      
-      // South West England
       'Bath and North East Somerset': [51.3811, -2.3590],
       'Bournemouth, Christchurch and Poole': [50.7192, -1.8808],
       'Bristol': [51.4545, -2.5879],
@@ -976,8 +908,6 @@
       'South Gloucestershire': [51.5260, -2.4729],
       'Swindon': [51.5558, -1.7797],
       'Wiltshire': [51.3493, -1.9927],
-      
-      // Scotland
       'Aberdeen City': [57.1497, -2.0943],
       'Aberdeenshire': [57.1497, -2.5943],
       'Angus': [56.6500, -2.8667],
@@ -1010,8 +940,6 @@
       'Stirling': [56.1165, -3.9369],
       'West Dunbartonshire': [55.9446, -4.5660],
       'West Lothian': [55.9027, -3.5478],
-      
-      // Wales
       'Isle of Anglesey': [53.2860, -4.3655],
       'Blaenau Gwent': [51.7878, -3.2041],
       'Bridgend': [51.5042, -3.5769],
@@ -1034,8 +962,6 @@
       'Torfaen': [51.7006, -3.0344],
       'Vale of Glamorgan': [51.4061, -3.4800],
       'Wrexham': [53.0465, -2.9930],
-      
-      // Northern Ireland
       'Antrim and Newtownabbey': [54.7167, -6.2167],
       'Ards and North Down': [54.5950, -5.6940],
       'Armagh City, Banbridge and Craigavon': [54.3500, -6.4000],
@@ -1050,38 +976,42 @@
     };
 
     const UK_REGIONS = Object.keys(REGION_COORDS).sort();
-    
+
+    // ── State ──
     let clientData = [];
     let filteredClientData = [];
+    let bookingData = [];
+    let filteredBookingData = [];
+    let bookingRegionSummary = {};
     let regionCounts = {};
+    let bookingRegionCounts = {};
+
     let map;
     let markerCluster;
     let heatLayer;
+
+    let currentDataSource = 'clients'; // 'clients' | 'bookings'
     let currentViewMode = 'markers';
     let currentFilter = 'all';
+    let currentBookingFilter = 'all';
     let dateFilterFrom = null;
     let dateFilterTo = null;
 
-    // Initialize map
+    // ── Init ──
     document.addEventListener('DOMContentLoaded', () => {
       initMap();
-      loadMapData();
       initDateFilters();
-      lucide.createIcons(); // Initialize Lucide icons
+      loadMapData();
+      lucide.createIcons();
     });
 
     function initMap() {
-      // Create map centered on UK
       map = L.map('map').setView([54.5, -3], 6);
-
-      // Add light theme map tiles
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
-        maxZoom: 12,
-        minZoom: 5
+        maxZoom: 12, minZoom: 5
       }).addTo(map);
 
-      // Initialize marker cluster group
       markerCluster = L.markerClusterGroup({
         showCoverageOnHover: false,
         zoomToBoundsOnClick: true,
@@ -1089,13 +1019,12 @@
         removeOutsideVisibleBounds: true,
         iconCreateFunction: function(cluster) {
           const count = cluster.getChildCount();
-          let size = 'small';
-          if (count >= 20) size = 'large';
-          else if (count >= 10) size = 'medium';
-          
+          const isBooking = currentDataSource === 'bookings';
+          let size = count >= 20 ? 'large' : count >= 10 ? 'medium' : 'small';
+          const extraClass = isBooking ? ' booking' : '';
           return L.divIcon({
             html: '<div><span>' + count + '</span></div>',
-            className: 'marker-cluster marker-cluster-' + size,
+            className: 'marker-cluster marker-cluster-' + size + extraClass,
             iconSize: L.point(40, 40)
           });
         }
@@ -1103,57 +1032,44 @@
     }
 
     function initDateFilters() {
-      // Set default date range (last 12 months)
       const today = new Date();
       const oneYearAgo = new Date();
       oneYearAgo.setFullYear(today.getFullYear() - 1);
-      
       document.getElementById('dateTo').value = today.toISOString().split('T')[0];
       document.getElementById('dateFrom').value = oneYearAgo.toISOString().split('T')[0];
     }
 
+    // ── Load Data ──
     async function loadMapData() {
       try {
-        const response = await fetch('/.netlify/functions/admin-users', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        });
+        const [usersRes, bookingsRes] = await Promise.all([
+          fetch('/.netlify/functions/admin-users'),
+          fetch('/.netlify/functions/get-all-bookings')
+        ]);
 
-        if (!response.ok) {
-          throw new Error('Failed to load user data');
-        }
+        if (!usersRes.ok) throw new Error('Failed to load user data');
+        if (!bookingsRes.ok) throw new Error('Failed to load booking data');
 
-        const data = await response.json();
-        clientData = data.users || [];
+        const userData = await usersRes.json();
+        const bData = await bookingsRes.json();
+
+        clientData = userData.users || [];
         filteredClientData = [...clientData];
 
-        // Calculate region counts
-        regionCounts = {};
-        UK_REGIONS.forEach(region => {
-          regionCounts[region] = 0;
-        });
+        bookingData = bData.bookings || [];
+        filteredBookingData = [...bookingData];
+        bookingRegionSummary = {};
+        (bData.regionSummary || []).forEach(r => { bookingRegionSummary[r.region] = r; });
 
-        clientData.forEach(user => {
-          const region = user.fields['Region'];
-          if (region && regionCounts.hasOwnProperty(region)) {
-            regionCounts[region]++;
-          }
-        });
-
-        // Update stats
-        updateStats();
-
-        // Update filter counts
-        updateFilterCounts();
-
-        // Add markers to map
+        buildRegionCounts();
+        buildBookingRegionCounts();
+        updateClientStats();
+        updateBookingStats();
+        updateClientFilterCounts();
+        updateBookingFilterCounts();
         addMarkersToMap();
-
-        // Render region list
         renderRegionList();
-
-        // Show all clients initially
-        showAllClients();
+        showAllDetails();
 
       } catch (error) {
         console.error('Error loading map data:', error);
@@ -1161,218 +1077,330 @@
       }
     }
 
-    function updateStats() {
-      const totalClients = clientData.filter(u => u.fields['Region']).length;
-      const regionsWithClients = Object.values(regionCounts).filter(count => count > 0).length;
-      const emptyRegions = UK_REGIONS.length - regionsWithClients;
-      
-      let topRegion = '-';
-      let maxCount = 0;
-      for (const [region, count] of Object.entries(regionCounts)) {
-        if (count > maxCount) {
-          maxCount = count;
-          topRegion = region;
-        }
-      }
+    function buildRegionCounts() {
+      regionCounts = {};
+      UK_REGIONS.forEach(r => regionCounts[r] = 0);
+      clientData.forEach(u => {
+        const r = u.fields['Region'];
+        if (r && regionCounts.hasOwnProperty(r)) regionCounts[r]++;
+      });
+    }
 
-      // Calculate 30-day growth
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      const recentClients = clientData.filter(u => {
-        const created = new Date(u.fields['Created Date']);
-        return created >= thirtyDaysAgo;
-      }).length;
-      const growthRate = totalClients > 0 ? `+${recentClients}` : '-';
+    function buildBookingRegionCounts() {
+      bookingRegionCounts = {};
+      UK_REGIONS.forEach(r => bookingRegionCounts[r] = 0);
+      filteredBookingData.forEach(b => {
+        if (b.region && bookingRegionCounts.hasOwnProperty(b.region)) bookingRegionCounts[b.region]++;
+      });
+    }
 
-      document.getElementById('totalClients').textContent = totalClients;
-      document.getElementById('regionsWithClients').textContent = regionsWithClients;
-      document.getElementById('emptyRegions').textContent = emptyRegions;
+    // ── Stats ──
+    function updateClientStats() {
+      const total = clientData.filter(u => u.fields['Region']).length;
+      const covered = Object.values(regionCounts).filter(c => c > 0).length;
+      const empty = UK_REGIONS.length - covered;
+      let topRegion = '-', maxCount = 0;
+      for (const [r, c] of Object.entries(regionCounts)) { if (c > maxCount) { maxCount = c; topRegion = r; } }
+      const ago30 = new Date(); ago30.setDate(ago30.getDate() - 30);
+      const recent = clientData.filter(u => new Date(u.fields['Created Date']) >= ago30).length;
+
+      document.getElementById('totalClients').textContent = total;
+      document.getElementById('regionsWithClients').textContent = covered;
+      document.getElementById('emptyRegions').textContent = empty;
       document.getElementById('topRegion').textContent = maxCount > 0 ? topRegion : '-';
-      document.getElementById('growthRate').textContent = growthRate;
+      document.getElementById('growthRate').textContent = total > 0 ? `+${recent}` : '-';
     }
 
-    function updateFilterCounts() {
-      const all = UK_REGIONS.length;
-      const withClients = Object.values(regionCounts).filter(c => c > 0).length;
-      const opportunities = all - withClients;
-      const active = clientData.filter(u => u.fields['Account Status'] === 'Active').length;
+    function updateBookingStats() {
+      const total = bookingData.length;
+      const confirmed = bookingData.filter(b => b.bookingStatus === 'Booked').length;
+      const completed = bookingData.filter(b => b.bookingStatus === 'Completed').length;
 
-      document.getElementById('countAll').textContent = all;
-      document.getElementById('countWithClients').textContent = withClients;
-      document.getElementById('countOpportunities').textContent = opportunities;
-      document.getElementById('countActive').textContent = active;
+      let topRegion = '-', maxCount = 0;
+      for (const [r, c] of Object.entries(bookingRegionCounts)) { if (c > maxCount) { maxCount = c; topRegion = r; } }
+
+      const ago30 = new Date(); ago30.setDate(ago30.getDate() - 30);
+      const recent = bookingData.filter(b => new Date(b.createdTime) >= ago30).length;
+
+      document.getElementById('totalBookings').textContent = total;
+      document.getElementById('activeBookings').textContent = confirmed;
+      document.getElementById('completedBookings').textContent = completed;
+      document.getElementById('topBookingRegion').textContent = maxCount > 0 ? topRegion : '-';
+      document.getElementById('bookingGrowth').textContent = `+${recent}`;
     }
 
-    function addMarkersToMap() {
-      // Clear existing layers
-      markerCluster.clearLayers();
-      if (heatLayer) {
-        map.removeLayer(heatLayer);
+    function updateClientFilterCounts() {
+      document.getElementById('countAll').textContent = UK_REGIONS.length;
+      document.getElementById('countWithClients').textContent = Object.values(regionCounts).filter(c => c > 0).length;
+      document.getElementById('countOpportunities').textContent = UK_REGIONS.length - Object.values(regionCounts).filter(c => c > 0).length;
+      document.getElementById('countActive').textContent = clientData.filter(u => u.fields['Account Status'] === 'Active').length;
+    }
+
+    function updateBookingFilterCounts() {
+      document.getElementById('bCountAll').textContent = bookingData.length;
+      document.getElementById('bCountBooked').textContent = bookingData.filter(b => b.bookingStatus === 'Booked').length;
+      document.getElementById('bCountCompleted').textContent = bookingData.filter(b => b.bookingStatus === 'Completed').length;
+      document.getElementById('bCountCancelled').textContent = bookingData.filter(b => b.bookingStatus === 'Cancelled').length;
+    }
+
+    // ── Data Source Toggle ──
+    function setDataSource(source) {
+      currentDataSource = source;
+      currentFilter = 'all';
+      currentBookingFilter = 'all';
+
+      const isBookings = source === 'bookings';
+
+      document.getElementById('dsClients').classList.toggle('active', !isBookings);
+      document.getElementById('dsClients').classList.toggle('clients', !isBookings);
+      document.getElementById('dsBookings').classList.toggle('active', isBookings);
+      document.getElementById('dsBookings').classList.toggle('bookings', true);
+
+      document.getElementById('clientStats').style.display = isBookings ? 'none' : 'grid';
+      document.getElementById('bookingStats').style.display = isBookings ? 'grid' : 'none';
+      document.getElementById('clientFilters').style.display = isBookings ? 'none' : 'block';
+      document.getElementById('bookingFilters').style.display = isBookings ? 'block' : 'none';
+      document.getElementById('clientLegend').style.display = isBookings ? 'none' : 'block';
+      document.getElementById('bookingLegend').style.display = isBookings ? 'block' : 'none';
+      document.getElementById('regionListTitle').textContent = isBookings ? 'Bookings by Region' : 'Regions';
+
+      // Reset filter button states
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      const firstClientBtn = document.querySelector('#clientFilters .filter-btn');
+      const firstBookingBtn = document.querySelector('#bookingFilters .filter-btn');
+      if (!isBookings && firstClientBtn) firstClientBtn.classList.add('active');
+      if (isBookings && firstBookingBtn) firstBookingBtn.classList.add('active');
+
+      if (isBookings) {
+        filteredBookingData = [...bookingData];
+        buildBookingRegionCounts();
+      } else {
+        filteredClientData = [...clientData];
+        buildRegionCounts();
       }
 
+      addMarkersToMap();
+      renderRegionList();
+      showAllDetails();
+      lucide.createIcons();
+    }
+
+    // ── Map Rendering ──
+    function addMarkersToMap() {
+      markerCluster.clearLayers();
+      if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+
+      if (currentDataSource === 'clients') {
+        renderClientLayer();
+      } else {
+        renderBookingLayer();
+      }
+    }
+
+    function renderClientLayer() {
       if (currentViewMode === 'markers') {
-        // Add clustered markers
         filteredClientData.forEach(user => {
           const region = user.fields['Region'];
-          if (region && REGION_COORDS[region]) {
-            const coords = REGION_COORDS[region];
-            
-            // Add small random offset to prevent exact overlaps
-            const lat = coords[0] + (Math.random() - 0.5) * 0.05;
-            const lng = coords[1] + (Math.random() - 0.5) * 0.05;
+          if (!region || !REGION_COORDS[region]) return;
+          const coords = REGION_COORDS[region];
+          const lat = coords[0] + (Math.random() - 0.5) * 0.05;
+          const lng = coords[1] + (Math.random() - 0.5) * 0.05;
 
-            const icon = L.divIcon({
-              className: 'custom-marker',
-              html: `<div style="
-                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-                border: 3px solid #fff;
-                border-radius: 50%;
-                width: 24px;
-                height: 24px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-              "></div>`,
-              iconSize: [24, 24]
-            });
+          const icon = L.divIcon({
+            className: 'custom-marker',
+            html: `<div style="background:linear-gradient(135deg,#ef4444,#dc2626);border:3px solid #fff;border-radius:50%;width:24px;height:24px;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>`,
+            iconSize: [24, 24]
+          });
 
-            const marker = L.marker([lat, lng], { icon: icon });
-            
-            marker.bindPopup(`
-              <div class="popup-title">${user.fields['Name']}</div>
-              <div class="popup-info"><i data-lucide="building" style="width: 14px; height: 14px;"></i> ${user.fields['Company'] || 'N/A'}</div>
-              <div class="popup-info"><i data-lucide="mail" style="width: 14px; height: 14px;"></i> ${user.fields['Email']}</div>
-              <div class="popup-info"><i data-lucide="map-pin" style="width: 14px; height: 14px;"></i> ${region}</div>
-              <div class="popup-info"><i data-lucide="calendar" style="width: 14px; height: 14px;"></i> Joined: ${formatDate(user.fields['Created Date'])}</div>
-              <div class="popup-clients">
-                <span class="client-badge ${user.fields['Account Status'] === 'Active' ? 'badge-active' : 'badge-inactive'}">
-                  ${user.fields['Account Status'] || 'Unknown'}
-                </span>
-              </div>
-            `);
-
-            // Reinitialize icons in popup after it opens
-            marker.on('popupopen', () => {
-              lucide.createIcons();
-            });
-
-            markerCluster.addLayer(marker);
-          }
+          const marker = L.marker([lat, lng], { icon });
+          marker.bindPopup(`
+            <div class="popup-title">${user.fields['Name']}</div>
+            <div class="popup-info">🏢 ${user.fields['Company'] || 'N/A'}</div>
+            <div class="popup-info">✉️ ${user.fields['Email']}</div>
+            <div class="popup-info">📍 ${region}</div>
+            <div class="popup-info">📅 Joined: ${formatDate(user.fields['Created Date'])}</div>
+            <div class="popup-footer">
+              <span class="client-badge ${user.fields['Account Status'] === 'Active' ? 'badge-active' : 'badge-inactive'}">
+                ${user.fields['Account Status'] || 'Unknown'}
+              </span>
+            </div>
+          `);
+          markerCluster.addLayer(marker);
         });
-
         map.addLayer(markerCluster);
 
-      } else if (currentViewMode === 'heatmap') {
-        // Create heat map
+      } else {
         const heatData = [];
-        
         Object.entries(regionCounts).forEach(([region, count]) => {
           if (count > 0 && REGION_COORDS[region]) {
-            const coords = REGION_COORDS[region];
-            heatData.push([coords[0], coords[1], count / 10]); // Intensity based on count
+            const c = REGION_COORDS[region];
+            heatData.push([c[0], c[1], count / 10]);
           }
         });
-
         heatLayer = L.heatLayer(heatData, {
-          radius: 40,
-          blur: 50,
-          maxZoom: 10,
-          max: 1.0,
-          gradient: {
-            0.0: '#3b82f6',
-            0.5: '#fb923c',
-            1.0: '#ef4444'
-          }
+          radius: 40, blur: 50, maxZoom: 10, max: 1.0,
+          gradient: { 0.0: '#3b82f6', 0.5: '#fb923c', 1.0: '#ef4444' }
         }).addTo(map);
       }
     }
 
+    function renderBookingLayer() {
+      if (currentViewMode === 'markers') {
+        filteredBookingData.forEach(booking => {
+          if (!booking.region || !REGION_COORDS[booking.region]) return;
+          const coords = REGION_COORDS[booking.region];
+          const lat = coords[0] + (Math.random() - 0.5) * 0.06;
+          const lng = coords[1] + (Math.random() - 0.5) * 0.06;
+
+          const statusColor = {
+            'Booked': '#8b5cf6',
+            'Completed': '#10b981',
+            'Cancelled': '#ef4444'
+          }[booking.bookingStatus] || '#8b5cf6';
+
+          const icon = L.divIcon({
+            className: 'custom-marker',
+            html: `<div style="background:${statusColor};border:3px solid #fff;border-radius:50%;width:20px;height:20px;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>`,
+            iconSize: [20, 20]
+          });
+
+          const marker = L.marker([lat, lng], { icon });
+          marker.bindPopup(`
+            <div class="popup-title">${booking.bookingRef || 'Booking'}</div>
+            <div class="popup-info">👤 ${booking.clientName || 'N/A'}</div>
+            <div class="popup-info">🏠 ${booking.propertyAddress || booking.postcode || 'N/A'}</div>
+            <div class="popup-info">📍 ${booking.region}</div>
+            <div class="popup-info">🎬 ${booking.service || 'N/A'}</div>
+            <div class="popup-info">📅 ${formatDate(booking.date)}</div>
+            <div class="popup-footer">
+              <span class="client-badge badge-${(booking.bookingStatus || '').toLowerCase()}">${booking.bookingStatus || 'Unknown'}</span>
+              ${booking.finalPrice ? `<span class="revenue-badge">£${parseFloat(booking.finalPrice).toFixed(2)}</span>` : ''}
+            </div>
+          `);
+          markerCluster.addLayer(marker);
+        });
+        map.addLayer(markerCluster);
+
+      } else {
+        const heatData = [];
+        Object.entries(bookingRegionCounts).forEach(([region, count]) => {
+          if (count > 0 && REGION_COORDS[region]) {
+            const c = REGION_COORDS[region];
+            heatData.push([c[0], c[1], count / 10]);
+          }
+        });
+        heatLayer = L.heatLayer(heatData, {
+          radius: 45, blur: 55, maxZoom: 10, max: 1.0,
+          gradient: { 0.0: '#8b5cf6', 0.5: '#a78bfa', 1.0: '#c4b5fd' }
+        }).addTo(map);
+      }
+    }
+
+    // ── View Mode ──
     function setViewMode(mode) {
       currentViewMode = mode;
-      
-      // Update button states
       document.getElementById('viewMarkers').classList.toggle('active', mode === 'markers');
       document.getElementById('viewHeatmap').classList.toggle('active', mode === 'heatmap');
-      
-      // Re-render map
       addMarkersToMap();
     }
 
-    function filterMap(filterType) {
+    // ── Filters ──
+    function filterMap(filterType, e) {
       currentFilter = filterType;
-      
-      // Update button states
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      event.target.classList.add('active');
+      document.querySelectorAll('#clientFilters .filter-btn').forEach(b => b.classList.remove('active'));
+      if (e && e.target) e.target.closest('.filter-btn').classList.add('active');
 
-      // Apply filter to data
       if (filterType === 'all') {
         filteredClientData = [...clientData];
       } else if (filterType === 'active') {
         filteredClientData = clientData.filter(u => u.fields['Account Status'] === 'Active');
+      } else {
+        filteredClientData = [...clientData];
       }
 
-      // Re-render
+      buildRegionCounts();
+      addMarkersToMap();
+      renderRegionList();
+    }
+
+    function filterBookings(statusFilter, e) {
+      currentBookingFilter = statusFilter;
+      document.querySelectorAll('#bookingFilters .filter-btn').forEach(b => b.classList.remove('active'));
+      if (e && e.target) e.target.closest('.filter-btn').classList.add('active');
+
+      if (statusFilter === 'all') {
+        filteredBookingData = [...bookingData];
+      } else {
+        filteredBookingData = bookingData.filter(b => b.bookingStatus === statusFilter);
+      }
+
+      buildBookingRegionCounts();
       addMarkersToMap();
       renderRegionList();
     }
 
     function applyDateFilter() {
-      const fromDate = document.getElementById('dateFrom').value;
-      const toDate = document.getElementById('dateTo').value;
+      const from = document.getElementById('dateFrom').value;
+      const to = document.getElementById('dateTo').value;
+      if (!from || !to) return;
 
-      if (!fromDate || !toDate) return;
+      dateFilterFrom = new Date(from);
+      dateFilterTo = new Date(to);
+      dateFilterTo.setHours(23, 59, 59);
 
-      dateFilterFrom = new Date(fromDate);
-      dateFilterTo = new Date(toDate);
+      if (currentDataSource === 'clients') {
+        filteredClientData = clientData.filter(u => {
+          const d = new Date(u.fields['Created Date']);
+          return d >= dateFilterFrom && d <= dateFilterTo;
+        });
+        buildRegionCounts();
+        updateClientFilterCounts();
+      } else {
+        filteredBookingData = bookingData.filter(b => {
+          const d = new Date(b.date || b.createdTime);
+          return d >= dateFilterFrom && d <= dateFilterTo;
+        });
+        buildBookingRegionCounts();
+        updateBookingFilterCounts();
+      }
 
-      // Filter clients by date
-      filteredClientData = clientData.filter(user => {
-        const created = new Date(user.fields['Created Date']);
-        return created >= dateFilterFrom && created <= dateFilterTo;
-      });
-
-      // Recalculate region counts for filtered data
-      regionCounts = {};
-      UK_REGIONS.forEach(region => {
-        regionCounts[region] = 0;
-      });
-
-      filteredClientData.forEach(user => {
-        const region = user.fields['Region'];
-        if (region && regionCounts.hasOwnProperty(region)) {
-          regionCounts[region]++;
-        }
-      });
-
-      // Re-render
       addMarkersToMap();
       renderRegionList();
-      updateFilterCounts();
     }
 
+    // ── Region List ──
     function renderRegionList() {
       const container = document.getElementById('regionListContainer');
       const regionTotal = document.getElementById('regionTotal');
+      const isBookings = currentDataSource === 'bookings';
+
+      const counts = isBookings ? bookingRegionCounts : regionCounts;
 
       let visibleRegions = UK_REGIONS;
-      
-      if (currentFilter === 'with-clients') {
-        visibleRegions = UK_REGIONS.filter(region => regionCounts[region] > 0);
-      } else if (currentFilter === 'opportunities') {
-        visibleRegions = UK_REGIONS.filter(region => regionCounts[region] === 0);
+      if (!isBookings) {
+        if (currentFilter === 'with-clients') visibleRegions = UK_REGIONS.filter(r => counts[r] > 0);
+        else if (currentFilter === 'opportunities') visibleRegions = UK_REGIONS.filter(r => counts[r] === 0);
+      } else {
+        // For bookings, only show regions that have at least 1 booking (or all)
+        visibleRegions = UK_REGIONS; // show all, greyed out if empty
       }
 
-      regionTotal.textContent = `${visibleRegions.length} / ${UK_REGIONS.length}`;
+      regionTotal.textContent = `${visibleRegions.filter(r => counts[r] > 0).length} active`;
 
       const listHTML = visibleRegions.map(region => {
-        const count = regionCounts[region] || 0;
+        const count = counts[region] || 0;
         const isEmpty = count === 0;
-        
+        const revenue = isBookings && bookingRegionSummary[region]
+          ? `<span style="font-size:11px;color:#10b981;">£${Math.round(bookingRegionSummary[region].totalRevenue || 0).toLocaleString()}</span>`
+          : '';
+
         return `
-          <div class="region-item ${isEmpty ? 'empty' : ''}" onclick="flyToRegion('${region}')">
-            <span class="region-name">${region}</span>
-            <span class="region-count">${count}</span>
+          <div class="region-item ${isEmpty ? 'empty' : ''}" onclick="flyToRegion('${region}', event)">
+            <div>
+              <div class="region-name">${region}</div>
+              ${revenue}
+            </div>
+            <span class="region-count ${isBookings ? 'booking' : ''}">${count}</span>
           </div>
         `;
       }).join('');
@@ -1380,114 +1408,131 @@
       container.innerHTML = listHTML || '<div class="empty-state"><div class="empty-state-text">No regions match this filter</div></div>';
     }
 
-    function flyToRegion(region) {
+    function flyToRegion(region, e) {
       if (REGION_COORDS[region]) {
-        const coords = REGION_COORDS[region];
-        map.flyTo(coords, 9, {
-          duration: 1.5
-        });
-
-        // Show clients in this region
-        showClientsInRegion(region);
+        map.flyTo(REGION_COORDS[region], 9, { duration: 1.5 });
+        if (currentDataSource === 'clients') showClientsInRegion(region);
+        else showBookingsInRegion(region);
       }
 
-      // Highlight in sidebar
-      document.querySelectorAll('.region-item').forEach(item => {
-        item.classList.remove('active');
-      });
-      
-      event.target.closest('.region-item').classList.add('active');
+      document.querySelectorAll('.region-item').forEach(i => i.classList.remove('active'));
+      if (e && e.target) e.target.closest('.region-item').classList.add('active');
     }
 
+    // ── Detail Panel ──
     function showClientsInRegion(region) {
       const clients = filteredClientData.filter(u => u.fields['Region'] === region);
-      const panelTitle = document.getElementById('detailPanelTitle');
-      const panelContent = document.getElementById('clientDetailContent');
+      const title = document.getElementById('detailPanelTitle');
+      const content = document.getElementById('clientDetailContent');
 
-      panelTitle.innerHTML = `<i data-lucide="map-pin" style="width: 18px; height: 18px;"></i> ${region} <span style="color: #94a3b8; font-size: 14px; font-weight: 500;">(${clients.length})</span>`;
-      lucide.createIcons();
+      title.innerHTML = `📍 ${region} <span style="color:#94a3b8;font-size:14px;font-weight:500;">(${clients.length} clients)</span>`;
 
       if (clients.length === 0) {
-        panelContent.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">
-              <i data-lucide="inbox" style="width: 48px; height: 48px; color: #64748b; opacity: 0.5;"></i>
-            </div>
-            <div class="empty-state-text">No clients in ${region} yet</div>
-          </div>
-        `;
-        lucide.createIcons();
+        content.innerHTML = `<div class="empty-state"><div class="empty-state-text">No clients in ${region} yet</div></div>`;
         return;
       }
 
-      const clientCards = clients.map(client => `
+      content.innerHTML = clients.map(client => `
         <div class="client-card">
           <div class="client-name">${client.fields['Name']}</div>
-          <div class="client-info"><i data-lucide="building" style="width: 14px; height: 14px;"></i> ${client.fields['Company'] || 'N/A'}</div>
-          <div class="client-info"><i data-lucide="mail" style="width: 14px; height: 14px;"></i> ${client.fields['Email']}</div>
-          <div class="client-info"><i data-lucide="calendar" style="width: 14px; height: 14px;"></i> Joined: ${formatDate(client.fields['Created Date'])}</div>
+          <div class="client-info">🏢 ${client.fields['Company'] || 'N/A'}</div>
+          <div class="client-info">✉️ ${client.fields['Email']}</div>
+          <div class="client-info">📅 Joined: ${formatDate(client.fields['Created Date'])}</div>
           <span class="client-badge ${client.fields['Account Status'] === 'Active' ? 'badge-active' : 'badge-inactive'}">
             ${client.fields['Account Status'] || 'Unknown'}
           </span>
         </div>
       `).join('');
-
-      panelContent.innerHTML = clientCards;
-      lucide.createIcons();
     }
 
-    function showAllClients() {
-      const panelTitle = document.getElementById('detailPanelTitle');
-      const panelContent = document.getElementById('clientDetailContent');
+    function showBookingsInRegion(region) {
+      const bookings = filteredBookingData.filter(b => b.region === region);
+      const title = document.getElementById('detailPanelTitle');
+      const content = document.getElementById('clientDetailContent');
 
-      panelTitle.innerHTML = `<i data-lucide="users" style="width: 18px; height: 18px;"></i> All Clients <span style="color: #94a3b8; font-size: 14px; font-weight: 500;">(${filteredClientData.length})</span>`;
-      lucide.createIcons();
+      const totalRevenue = bookings.reduce((sum, b) => sum + (parseFloat(b.finalPrice) || 0), 0);
+      title.innerHTML = `📍 ${region} <span style="color:#94a3b8;font-size:14px;font-weight:500;">(${bookings.length} bookings)</span>`;
 
-      if (filteredClientData.length === 0) {
-        panelContent.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">
-              <i data-lucide="inbox" style="width: 48px; height: 48px; color: #64748b; opacity: 0.5;"></i>
-            </div>
-            <div class="empty-state-text">No clients found</div>
-          </div>
-        `;
-        lucide.createIcons();
+      if (bookings.length === 0) {
+        content.innerHTML = `<div class="empty-state"><div class="empty-state-text">No bookings in ${region} yet</div></div>`;
         return;
       }
 
-      const clientCards = filteredClientData
-        .filter(u => u.fields['Region'])
-        .slice(0, 50) // Show first 50
-        .map(client => `
-          <div class="client-card" onclick="flyToRegion('${client.fields['Region']}')">
+      const revenueHtml = totalRevenue > 0
+        ? `<div style="margin-bottom:12px;padding:12px;background:rgba(16,185,129,0.1);border-radius:8px;border:1px solid rgba(16,185,129,0.3);color:#10b981;font-weight:700;font-size:15px;">
+            Total Revenue: £${totalRevenue.toFixed(2)}
+           </div>`
+        : '';
+
+      content.innerHTML = revenueHtml + bookings.slice(0, 50).map(b => `
+        <div class="client-card booking-card">
+          <div class="client-name">${b.bookingRef || 'Booking'}</div>
+          <div class="client-info">👤 ${b.clientName || 'N/A'}</div>
+          <div class="client-info">🎬 ${b.service || 'N/A'}</div>
+          <div class="client-info">📅 ${formatDate(b.date)}</div>
+          ${b.mediaSpecialist ? `<div class="client-info">📸 ${b.mediaSpecialist}</div>` : ''}
+          <span class="client-badge badge-${(b.bookingStatus||'').toLowerCase()}">${b.bookingStatus || 'Unknown'}</span>
+          ${b.finalPrice ? `<span class="revenue-badge">£${parseFloat(b.finalPrice).toFixed(2)}</span>` : ''}
+        </div>
+      `).join('');
+
+      if (bookings.length > 50) {
+        content.innerHTML += `<div style="text-align:center;padding:20px;color:#94a3b8;font-size:13px;">Showing 50 of ${bookings.length} bookings</div>`;
+      }
+    }
+
+    function showAllDetails() {
+      const title = document.getElementById('detailPanelTitle');
+      const content = document.getElementById('clientDetailContent');
+
+      if (currentDataSource === 'clients') {
+        title.innerHTML = `👥 All Clients <span style="color:#94a3b8;font-size:14px;font-weight:500;">(${filteredClientData.length})</span>`;
+        if (filteredClientData.length === 0) {
+          content.innerHTML = `<div class="empty-state"><div class="empty-state-text">No clients found</div></div>`;
+          return;
+        }
+        content.innerHTML = filteredClientData.filter(u => u.fields['Region']).slice(0, 50).map(client => `
+          <div class="client-card" onclick="flyToRegion('${client.fields['Region']}', event)">
             <div class="client-name">${client.fields['Name']}</div>
-            <div class="client-info"><i data-lucide="building" style="width: 14px; height: 14px;"></i> ${client.fields['Company'] || 'N/A'}</div>
-            <div class="client-info"><i data-lucide="map-pin" style="width: 14px; height: 14px;"></i> ${client.fields['Region']}</div>
-            <div class="client-info"><i data-lucide="calendar" style="width: 14px; height: 14px;"></i> ${formatDate(client.fields['Created Date'])}</div>
+            <div class="client-info">🏢 ${client.fields['Company'] || 'N/A'}</div>
+            <div class="client-info">📍 ${client.fields['Region']}</div>
+            <div class="client-info">📅 ${formatDate(client.fields['Created Date'])}</div>
             <span class="client-badge ${client.fields['Account Status'] === 'Active' ? 'badge-active' : 'badge-inactive'}">
               ${client.fields['Account Status'] || 'Unknown'}
             </span>
           </div>
         `).join('');
+      } else {
+        const totalRevenue = filteredBookingData.reduce((sum, b) => sum + (parseFloat(b.finalPrice) || 0), 0);
+        title.innerHTML = `📅 All Bookings <span style="color:#94a3b8;font-size:14px;font-weight:500;">(${filteredBookingData.length})</span>`;
 
-      panelContent.innerHTML = clientCards;
-      
-      if (filteredClientData.length > 50) {
-        panelContent.innerHTML += `<div style="text-align: center; padding: 20px; color: #94a3b8; font-size: 13px;">Showing 50 of ${filteredClientData.length} clients</div>`;
+        const revenueHtml = totalRevenue > 0
+          ? `<div style="margin-bottom:12px;padding:12px;background:rgba(16,185,129,0.1);border-radius:8px;border:1px solid rgba(16,185,129,0.3);color:#10b981;font-weight:700;font-size:15px;">
+              Total Revenue: £${totalRevenue.toFixed(2)}
+             </div>`
+          : '';
+
+        content.innerHTML = revenueHtml + filteredBookingData.slice(0, 50).map(b => `
+          <div class="client-card booking-card" onclick="flyToRegion('${b.region}', event)">
+            <div class="client-name">${b.bookingRef || 'Booking'}</div>
+            <div class="client-info">👤 ${b.clientName || 'N/A'}</div>
+            <div class="client-info">📍 ${b.region || 'N/A'}</div>
+            <div class="client-info">🎬 ${b.service || 'N/A'}</div>
+            <div class="client-info">📅 ${formatDate(b.date)}</div>
+            <span class="client-badge badge-${(b.bookingStatus||'').toLowerCase()}">${b.bookingStatus || 'Unknown'}</span>
+            ${b.finalPrice ? `<span class="revenue-badge">£${parseFloat(b.finalPrice).toFixed(2)}</span>` : ''}
+          </div>
+        `).join('');
+
+        if (filteredBookingData.length > 50) {
+          content.innerHTML += `<div style="text-align:center;padding:20px;color:#94a3b8;font-size:13px;">Showing 50 of ${filteredBookingData.length} bookings</div>`;
+        }
       }
-      
-      lucide.createIcons();
     }
 
     function formatDate(dateString) {
       if (!dateString) return 'N/A';
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      });
+      return new Date(dateString).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
     }
   </script>
 </body>
