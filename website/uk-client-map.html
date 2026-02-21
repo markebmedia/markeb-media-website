@@ -308,6 +308,8 @@
 
     .badge-active { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
     .badge-inactive { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; }
+    .badge-confirmed { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
+    .badge-reserved { background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid #fb923c; }
     .badge-booked { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; }
     .badge-completed { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
     .badge-cancelled { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; }
@@ -455,8 +457,8 @@
       <div class="stat-label">Confirmed</div>
     </div>
     <div class="stat-card booking-stat">
-      <div class="stat-value purple" id="completedBookings">-</div>
-      <div class="stat-label">Completed</div>
+      <div class="stat-value purple" id="reservedBookings">-</div>
+      <div class="stat-label">Reserved</div>
     </div>
     <div class="stat-card booking-stat">
       <div class="stat-value purple" id="totalRevenue">-</div>
@@ -509,11 +511,11 @@
           <button class="filter-btn active" onclick="filterBookings('all', event)">
             <span>All Bookings</span><span class="filter-count" id="bAll">-</span>
           </button>
-          <button class="filter-btn" onclick="filterBookings('Booked', event)">
-            <span>Confirmed</span><span class="filter-count" id="bBooked">-</span>
+          <button class="filter-btn" onclick="filterBookings('Confirmed', event)">
+            <span>Confirmed</span><span class="filter-count" id="bConfirmed">-</span>
           </button>
-          <button class="filter-btn" onclick="filterBookings('Completed', event)">
-            <span>Completed</span><span class="filter-count" id="bCompleted">-</span>
+          <button class="filter-btn" onclick="filterBookings('Reserved', event)">
+            <span>Reserved</span><span class="filter-count" id="bReserved">-</span>
           </button>
           <button class="filter-btn" onclick="filterBookings('Cancelled', event)">
             <span>Cancelled</span><span class="filter-count" id="bCancelled">-</span>
@@ -540,7 +542,8 @@
           </div>
           <div class="map-legend" id="bookingLegend" style="display:none;">
             <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6;"></div> Booking (exact postcode)</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div> Completed</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div> Confirmed</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#fb923c;"></div> Reserved</div>
             <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div> Cancelled</div>
             <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6;border-radius:4px;"></div> Cluster</div>
           </div>
@@ -746,7 +749,7 @@
   function updateBookingStats(meta) {
     document.getElementById('totalBookings').textContent = meta.total || 0;
     document.getElementById('confirmedBookings').textContent = meta.confirmed || 0;
-    document.getElementById('completedBookings').textContent = meta.completed || 0;
+    document.getElementById('reservedBookings').textContent = meta.reserved || 0;
     document.getElementById('totalRevenue').textContent = meta.totalRevenue ? `£${meta.totalRevenue.toLocaleString()}` : '£0';
     document.getElementById('bookingGrowth').textContent = `+${meta.recentBookings || 0}`;
   }
@@ -759,8 +762,8 @@
 
   function updateBookingFilterCounts() {
     document.getElementById('bAll').textContent = bookingData.length;
-    document.getElementById('bBooked').textContent = bookingData.filter(b => b.bookingStatus === 'Booked').length;
-    document.getElementById('bCompleted').textContent = bookingData.filter(b => b.bookingStatus === 'Completed').length;
+    document.getElementById('bConfirmed').textContent = bookingData.filter(b => b.bookingStatus === 'Confirmed').length;
+    document.getElementById('bReserved').textContent = bookingData.filter(b => b.bookingStatus === 'Reserved').length;
     document.getElementById('bCancelled').textContent = bookingData.filter(b => b.bookingStatus === 'Cancelled').length;
   }
 
@@ -854,7 +857,7 @@
         if (!booking.lat || !booking.lng) return;
         plotted++;
 
-        const statusColor = { 'Booked': '#8b5cf6', 'Completed': '#10b981', 'Cancelled': '#ef4444' }[booking.bookingStatus] || '#8b5cf6';
+        const statusColor = { 'Confirmed': '#10b981', 'Reserved': '#fb923c', 'Cancelled': '#ef4444' }[booking.bookingStatus] || '#8b5cf6';
 
         const icon = L.divIcon({
           className: '',

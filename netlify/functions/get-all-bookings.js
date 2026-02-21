@@ -80,7 +80,7 @@ exports.handler = async (event, context) => {
             postcode: record.fields['Postcode'] || null,
             propertyAddress: record.fields['Property Address'] || null,
             service: record.fields['Service'] || null,
-            bookingStatus: record.fields['Booking Status'] || 'Booked',
+            bookingStatus: record.fields['Booking Status'] || 'Confirmed',
             paymentStatus: record.fields['Payment Status'] || 'Pending',
             date: record.fields['Date'] || null,
             time: record.fields['Time'] || null,
@@ -167,8 +167,9 @@ exports.handler = async (event, context) => {
 
     // ── Summary stats ──
     const total = allRecords.length;
-    const confirmed = allRecords.filter(b => b.bookingStatus === 'Booked').length;
-    const completed = allRecords.filter(b => b.bookingStatus === 'Completed').length;
+    const confirmed = allRecords.filter(b => b.bookingStatus === 'Confirmed').length;
+    const reserved = allRecords.filter(b => b.bookingStatus === 'Reserved').length;
+
     const cancelled = allRecords.filter(b => b.bookingStatus === 'Cancelled').length;
     const totalRevenue = allRecords.reduce((sum, b) => sum + (parseFloat(b.finalPrice) || 0), 0);
 
@@ -180,7 +181,8 @@ exports.handler = async (event, context) => {
         meta: {
           total,
           confirmed,
-          completed,
+          reserved,
+
           cancelled,
           totalRevenue: parseFloat(totalRevenue.toFixed(2)),
           recentBookings,
