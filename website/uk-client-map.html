@@ -337,6 +337,171 @@
       margin-top: 4px;
     }
 
+    /* Panel tabs */
+    .panel-tabs {
+      display: flex;
+      gap: 4px;
+      background: #0f172a;
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 16px;
+      border: 1px solid #334155;
+    }
+
+    .panel-tab {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all .2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .panel-tab.active {
+      background: #1e293b;
+      color: #e2e8f0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .panel-tab:hover:not(.active) { color: #94a3b8; }
+
+    /* Intelligence panel */
+    .intel-section { margin-bottom: 20px; }
+
+    .intel-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .intel-stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .intel-stat {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .intel-stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #3b82f6;
+      margin-bottom: 4px;
+    }
+
+    .intel-stat-value.gold { color: #f59e0b; }
+    .intel-stat-value.green { color: #10b981; }
+    .intel-stat-value.purple { color: #8b5cf6; }
+
+    .intel-stat-label { font-size: 10px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Booking rate bar */
+    .rate-bar-wrap {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .rate-bar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .rate-bar-pct {
+      font-size: 20px;
+      font-weight: 700;
+      color: #10b981;
+    }
+
+    .rate-bar-bg {
+      background: #1e293b;
+      border-radius: 6px;
+      height: 10px;
+      overflow: hidden;
+    }
+
+    .rate-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #10b981, #3b82f6);
+      transition: width 1s ease;
+    }
+
+    .rate-bar-sub {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 6px;
+    }
+
+    /* Top clients leaderboard */
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 8px;
+      transition: all .2s ease;
+    }
+
+    .leaderboard-item:hover { border-color: #60a5fa; transform: translateX(3px); }
+    .leaderboard-item.rank-1 { border-color: #f59e0b; }
+    .leaderboard-item.rank-2 { border-color: #94a3b8; }
+    .leaderboard-item.rank-3 { border-color: #cd7c2f; }
+
+    .rank-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .rank-1 .rank-badge { background: #f59e0b; color: #000; }
+    .rank-2 .rank-badge { background: #94a3b8; color: #000; }
+    .rank-3 .rank-badge { background: #cd7c2f; color: #fff; }
+    .rank-other .rank-badge { background: #1e293b; color: #64748b; border: 1px solid #334155; }
+
+    .leaderboard-info { flex: 1; min-width: 0; }
+    .leaderboard-name { font-weight: 700; color: #e2e8f0; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .leaderboard-email { font-size: 11px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .leaderboard-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+    .leaderboard-right { text-align: right; flex-shrink: 0; }
+    .ltv-value { font-size: 15px; font-weight: 700; color: #10b981; }
+    .ltv-label { font-size: 10px; color: #64748b; }
+    .booking-count { font-size: 11px; color: #60a5fa; font-weight: 600; margin-top: 2px; }
+
     /* Legend */
     .map-legend {
       background: linear-gradient(135deg, #1e293b, #0f172a);
@@ -400,7 +565,7 @@
   <div class="header">
     <div class="header-content">
       <h1><i data-lucide="map" style="width:32px;height:32px;"></i> UK Distribution Map</h1>
-      <p class="header-subtitle">Clients &amp; bookings geographic visualization</p>
+      <p class="header-subtitle">Clients &amp; bookings geographic visualisation</p>
     </div>
     <div class="header-actions">
       <button class="btn btn-secondary" onclick="window.location.href='admin-panel.html'">
@@ -467,6 +632,34 @@
     <div class="stat-card booking-stat">
       <div class="stat-value purple" id="bookingGrowth">-</div>
       <div class="stat-label">30-Day Bookings</div>
+    </div>
+  </div>
+
+  <!-- Intelligence Stats Row (always visible) -->
+  <div class="stats-overview" id="intelStats">
+    <div class="stat-card" style="border-color:#f59e0b20;">
+      <div class="stat-value gold" id="intelBookingRate" style="color:#f59e0b;">-</div>
+      <div class="stat-label">Booking Rate</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value green" id="intelAvgLTV" style="color:#10b981;">-</div>
+      <div class="stat-label">Avg Client LTV</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value purple" id="intelAvgBookings" style="color:#8b5cf6;">-</div>
+      <div class="stat-label">Avg Bookings / Client</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value gold" id="intelTotalLTV" style="color:#f59e0b;">-</div>
+      <div class="stat-label">Total Client LTV</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="intelNeverBooked">-</div>
+      <div class="stat-label">Never Booked</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="intelATV" style="color:#06b6d4;">-</div>
+      <div class="stat-label">Avg Transaction Value</div>
     </div>
   </div>
 
@@ -573,17 +766,74 @@
     <!-- Detail Panel -->
     <div class="sidebar">
       <div class="detail-panel" id="detailPanel">
-        <h3 id="detailTitle">All Clients</h3>
-        <div id="detailContent">
-          <div class="empty-state">
-            <div class="spinner"></div>
-            <p class="empty-state-text">Loading data...</p>
+        <div class="panel-tabs">
+          <button class="panel-tab active" id="tabData" onclick="switchTab('data')">&#128203; Data</button>
+          <button class="panel-tab" id="tabIntel" onclick="switchTab('intel')">&#127942; Intelligence</button>
+        </div>
+        <div id="tabDataContent">
+          <h3 id="detailTitle" style="margin-bottom:12px;">All Clients</h3>
+          <div id="detailContent">
+            <div class="empty-state">
+              <div class="spinner"></div>
+              <p class="empty-state-text">Loading data...</p>
+            </div>
+          </div>
+        </div>
+        <div id="tabIntelContent" style="display:none;">
+          <div id="intelContent">
+            <div class="empty-state"><div class="spinner"></div><p class="empty-state-text">Loading...</p></div>
           </div>
         </div>
       </div>
     </div>
 
   </div>
+
+  <!-- Intelligence Section (below map) -->
+  <div id="intelSection" style="margin-top:24px;">
+    <div style="background:linear-gradient(135deg,#1e293b,#0f172a);border-radius:16px;padding:28px;border:1px solid #334155;box-shadow:0 4px 16px rgba(0,0,0,0.3);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+        <h2 style="font-size:22px;font-weight:700;color:#e2e8f0;display:flex;align-items:center;gap:10px;">
+          🏆 Client Intelligence — Top Clients Leaderboard
+        </h2>
+        <div style="font-size:13px;color:#64748b;">Ranked by Lifetime Value (excl. cancelled bookings)</div>
+      </div>
+
+      <!-- Conversion rate bar -->
+      <div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:18px;margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-size:14px;font-weight:600;color:#94a3b8;">Client → Booking Conversion Rate</span>
+          <span style="font-size:28px;font-weight:700;color:#10b981;" id="bigBookingRate">-</span>
+        </div>
+        <div style="background:#1e293b;border-radius:8px;height:14px;overflow:hidden;">
+          <div id="bigRateBar" style="height:100%;border-radius:8px;background:linear-gradient(90deg,#10b981,#3b82f6);transition:width 1.2s ease;width:0%"></div>
+        </div>
+        <div style="font-size:12px;color:#64748b;margin-top:8px;" id="bigRateSub">Loading...</div>
+      </div>
+
+      <!-- ATV highlight -->
+      <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:140px;background:#0f172a;border:1px solid #334155;border-radius:12px;padding:16px;text-align:center;">
+          <div style="font-size:28px;font-weight:700;color:#06b6d4;" id="bigATV">-</div>
+          <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Avg Transaction Value</div>
+        </div>
+        <div style="flex:1;min-width:140px;background:#0f172a;border:1px solid #334155;border-radius:12px;padding:16px;text-align:center;">
+          <div style="font-size:28px;font-weight:700;color:#10b981;" id="bigAvgLTV">-</div>
+          <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Avg Client LTV</div>
+        </div>
+        <div style="flex:1;min-width:140px;background:#0f172a;border:1px solid #334155;border-radius:12px;padding:16px;text-align:center;">
+          <div style="font-size:28px;font-weight:700;color:#f59e0b;" id="bigTotalLTV">-</div>
+          <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Total LTV</div>
+        </div>
+      </div>
+
+      <!-- Full leaderboard grid -->
+      <div id="fullLeaderboard" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;">
+        <div style="text-align:center;padding:40px;color:#64748b;">Loading leaderboard...</div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>
@@ -714,6 +964,7 @@
       addMarkersToMap();
       renderRegionList();
       renderDetailPanel();
+      renderIntelligence();
 
     } catch (err) {
       console.error('Error loading map data:', err);
@@ -1108,6 +1359,219 @@
   function formatDate(d) {
     if (!d) return 'N/A';
     return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+
+  // ── Tab switching ──
+  function switchTab(tab) {
+    const isIntel = tab === 'intel';
+    document.getElementById('tabData').classList.toggle('active', !isIntel);
+    document.getElementById('tabIntel').classList.toggle('active', isIntel);
+    document.getElementById('tabDataContent').style.display = isIntel ? 'none' : 'block';
+    document.getElementById('tabIntelContent').style.display = isIntel ? 'block' : 'none';
+    if (isIntel) renderIntelligence();
+  }
+
+  // ── Client Intelligence ──
+  function renderIntelligence() {
+    const el = document.getElementById('intelContent');
+
+    // Match clients to bookings by email
+    const clientMap = {};
+    clientData.forEach(c => {
+      const email = (c.fields['Email'] || '').toLowerCase();
+      if (!email) return;
+      clientMap[email] = {
+        name: c.fields['Name'] || 'Unknown',
+        company: c.fields['Company'] || '',
+        email: email,
+        region: c.fields['Region'] || '',
+        status: c.fields['Account Status'] || '',
+        bookings: [],
+        ltv: 0,
+        bookingCount: 0,
+        avgSpend: 0,
+        lastBooking: null
+      };
+    });
+
+    // Assign bookings to clients (exclude cancelled from LTV)
+    bookingData.forEach(b => {
+      const email = (b.clientEmail || '').toLowerCase();
+      if (!email) return;
+      if (!clientMap[email]) {
+        // Guest booking - create entry
+        clientMap[email] = {
+          name: b.clientName || 'Guest',
+          company: '',
+          email: email,
+          region: '',
+          status: 'Guest',
+          bookings: [],
+          ltv: 0,
+          bookingCount: 0,
+          avgSpend: 0,
+          lastBooking: null
+        };
+      }
+      clientMap[email].bookings.push(b);
+      if (b.bookingStatus !== 'Cancelled') {
+        clientMap[email].ltv += parseFloat(b.finalPrice) || 0;
+      }
+    });
+
+    // Calculate stats per client
+    Object.values(clientMap).forEach(c => {
+      c.bookingCount = c.bookings.length;
+      c.avgSpend = c.bookingCount > 0 ? c.ltv / c.bookings.filter(b => b.bookingStatus !== 'Cancelled').length || 0 : 0;
+      const dates = c.bookings.map(b => b.date).filter(Boolean).sort();
+      c.lastBooking = dates[dates.length - 1] || null;
+    });
+
+    const allClients = Object.values(clientMap);
+    const totalClients = clientData.length;
+    const clientsWithBookings = allClients.filter(c => c.bookingCount > 0).length;
+    const bookingRate = totalClients > 0 ? ((clientsWithBookings / totalClients) * 100).toFixed(1) : 0;
+
+    const totalLTV = allClients.reduce((s, c) => s + c.ltv, 0);
+    const avgLTV = clientsWithBookings > 0 ? (totalLTV / clientsWithBookings).toFixed(2) : 0;
+    const avgBookingsPerClient = clientsWithBookings > 0
+      ? (allClients.reduce((s, c) => s + c.bookingCount, 0) / clientsWithBookings).toFixed(1)
+      : 0;
+
+    // ATV = total revenue / total non-cancelled bookings across all clients
+    const totalNonCancelledBookings = bookingData.filter(b => b.bookingStatus !== 'Cancelled').length;
+    const atv = totalNonCancelledBookings > 0 ? (totalLTV / totalNonCancelledBookings).toFixed(2) : 0;
+
+    // Top clients by LTV
+    const topClients = allClients
+      .filter(c => c.bookingCount > 0)
+      .sort((a, b) => b.ltv - a.ltv)
+      .slice(0, 10);
+
+    const rankEmoji = ['🥇', '🥈', '🥉'];
+    const rankClass = ['rank-1', 'rank-2', 'rank-3'];
+
+    // ── Update top stat cards row (always visible) ──
+    document.getElementById('intelBookingRate').textContent = bookingRate + '%';
+    document.getElementById('intelAvgLTV').textContent = '£' + parseFloat(avgLTV).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0});
+    document.getElementById('intelAvgBookings').textContent = avgBookingsPerClient;
+    document.getElementById('intelTotalLTV').textContent = '£' + parseFloat(totalLTV).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0});
+    document.getElementById('intelNeverBooked').textContent = totalClients - clientsWithBookings;
+    document.getElementById('intelATV').textContent = '£' + parseFloat(atv).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0});
+
+    // ── Update big leaderboard section below map ──
+    document.getElementById('bigBookingRate').textContent = bookingRate + '%';
+    document.getElementById('bigRateBar').style.width = Math.min(bookingRate, 100) + '%';
+    document.getElementById('bigRateSub').textContent = `${clientsWithBookings} of ${totalClients} clients have made at least 1 booking · ${totalClients - clientsWithBookings} yet to book`;
+    document.getElementById('bigATV').textContent = '£' + parseFloat(atv).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0});
+    document.getElementById('bigAvgLTV').textContent = '£' + parseFloat(avgLTV).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0});
+    document.getElementById('bigTotalLTV').textContent = '£' + parseFloat(totalLTV).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0});
+
+    const allTopClients = allClients.filter(c => c.bookingCount > 0).sort((a, b) => b.ltv - a.ltv);
+
+    document.getElementById('fullLeaderboard').innerHTML = allTopClients.length === 0
+      ? '<div style="text-align:center;padding:40px;color:#64748b;grid-column:1/-1;">No booking data available</div>'
+      : allTopClients.map((c, i) => {
+          const rank = i < 3 ? rankEmoji[i] : `#${i+1}`;
+          const cls = i < 3 ? rankClass[i] : 'rank-other';
+          const cancelledCount = c.bookings.filter(b => b.bookingStatus === 'Cancelled').length;
+          const confirmedCount = c.bookings.filter(b => b.bookingStatus === 'Confirmed').length;
+          const reservedCount = c.bookings.filter(b => b.bookingStatus === 'Reserved').length;
+          return `
+          <div class="leaderboard-item ${cls}" style="background:#1e293b;">
+            <div class="rank-badge">${rank}</div>
+            <div class="leaderboard-info">
+              <div class="leaderboard-name">${c.name}</div>
+              ${c.company ? `<div class="leaderboard-email">🏢 ${c.company}</div>` : ''}
+              <div class="leaderboard-sub" style="margin-top:4px;">
+                📅 Last: ${formatDate(c.lastBooking)}
+              </div>
+              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
+                ${confirmedCount > 0 ? `<span style="font-size:10px;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid #10b981;padding:1px 6px;border-radius:4px;">${confirmedCount} confirmed</span>` : ''}
+                ${reservedCount > 0 ? `<span style="font-size:10px;background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid #fb923c;padding:1px 6px;border-radius:4px;">${reservedCount} reserved</span>` : ''}
+                ${cancelledCount > 0 ? `<span style="font-size:10px;background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid #ef4444;padding:1px 6px;border-radius:4px;">${cancelledCount} cancelled</span>` : ''}
+              </div>
+            </div>
+            <div class="leaderboard-right" style="min-width:90px;">
+              <div class="ltv-value">£${c.ltv.toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0})}</div>
+              <div class="ltv-label">LTV</div>
+              <div class="booking-count">${c.bookingCount} booking${c.bookingCount !== 1 ? 's' : ''}</div>
+              <div style="font-size:10px;color:#64748b;margin-top:2px;">avg £${isNaN(c.avgSpend) ? 0 : c.avgSpend.toFixed(0)} / booking</div>
+            </div>
+          </div>`;
+        }).join('');
+
+    // ── Update the side panel intelligence tab ──
+    el.innerHTML = `
+      <!-- Booking Rate -->
+      <div class="intel-section">
+        <div class="intel-section-title">Booking Conversion</div>
+        <div class="rate-bar-wrap">
+          <div class="rate-bar-header">
+            <span>Clients who have booked</span>
+            <span class="rate-bar-pct">${bookingRate}%</span>
+          </div>
+          <div class="rate-bar-bg">
+            <div class="rate-bar-fill" style="width:${Math.min(bookingRate, 100)}%"></div>
+          </div>
+          <div class="rate-bar-sub">${clientsWithBookings} of ${totalClients} clients · ${totalClients - clientsWithBookings} yet to book</div>
+        </div>
+      </div>
+
+      <!-- Key metrics -->
+      <div class="intel-section">
+        <div class="intel-section-title">Client Metrics</div>
+        <div class="intel-stat-grid">
+          <div class="intel-stat">
+            <div class="intel-stat-value green">£${parseFloat(avgLTV).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0})}</div>
+            <div class="intel-stat-label">Avg LTV</div>
+          </div>
+          <div class="intel-stat">
+            <div class="intel-stat-value purple">${avgBookingsPerClient}</div>
+            <div class="intel-stat-label">Avg Bookings</div>
+          </div>
+          <div class="intel-stat">
+            <div class="intel-stat-value gold">£${parseFloat(totalLTV).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0})}</div>
+            <div class="intel-stat-label">Total LTV</div>
+          </div>
+          <div class="intel-stat">
+            <div class="intel-stat-value">${totalClients - clientsWithBookings}</div>
+            <div class="intel-stat-label">Never Booked</div>
+          </div>
+          <div class="intel-stat">
+            <div class="intel-stat-value" style="color:#06b6d4;font-size:18px;">£${parseFloat(atv).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0})}</div>
+            <div class="intel-stat-label">ATV</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top 10 in side panel -->
+      <div class="intel-section">
+        <div class="intel-section-title">Top 10 by LTV</div>
+        ${topClients.length === 0
+          ? '<div class="empty-state"><div class="empty-state-text">No booking data to rank clients</div></div>'
+          : topClients.map((c, i) => {
+              const rank = i < 3 ? rankEmoji[i] : '#' + (i+1);
+              const cls = i < 3 ? rankClass[i] : 'rank-other';
+              const cancelledCount = c.bookings.filter(b => b.bookingStatus === 'Cancelled').length;
+              return '<div class="leaderboard-item ' + cls + '">' +
+                '<div class="rank-badge">' + rank + '</div>' +
+                '<div class="leaderboard-info">' +
+                  '<div class="leaderboard-name">' + c.name + '</div>' +
+                  (c.company ? '<div class="leaderboard-email">🏢 ' + c.company + '</div>' : '') +
+                  '<div class="leaderboard-sub">📅 ' + formatDate(c.lastBooking) + (cancelledCount > 0 ? ' · ' + cancelledCount + ' cancelled' : '') + '</div>' +
+                '</div>' +
+                '<div class="leaderboard-right">' +
+                  '<div class="ltv-value">£' + c.ltv.toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0}) + '</div>' +
+                  '<div class="ltv-label">LTV</div>' +
+                  '<div class="booking-count">' + c.bookingCount + ' booking' + (c.bookingCount !== 1 ? 's' : '') + '</div>' +
+                  '<div style="font-size:10px;color:#64748b;">avg £' + (isNaN(c.avgSpend) ? 0 : c.avgSpend.toFixed(0)) + '</div>' +
+                '</div>' +
+              '</div>';
+            }).join('')
+        }
+      </div>
+    `;
   }
 </script>
 </body>
