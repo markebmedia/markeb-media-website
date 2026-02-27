@@ -2149,7 +2149,7 @@ body {
     <select id="bookingSpecialist" class="form-input" onchange="handleSpecialistChange()" style="flex: 1;">
       <option value="">-- Select Specialist --</option>
       <option value="Jodie">Jodie (North)</option>
-      <option value="Maeve">Maeve (South)</option>
+      <option value="Andrii">Andrii (South)</option>
       <option value="other">Other / Enter manually...</option>
     </select>
     <input 
@@ -3228,7 +3228,7 @@ We wanted to reach out..." required></textarea>
           <select id="blockRegion" class="form-input" required>
             <option value="">-- Select Region --</option>
             <option value="North">North (Jodie)</option>
-            <option value="South">South (Maeve)</option>
+            <option value="South">South (Andrii)</option>
           </select>
         </div>
 
@@ -3610,7 +3610,13 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
         name: 'Add Branded Outro To Video',
         price: 0.00,
         description: 'Add your branded outro to any video content'
-      }
+      },
+      'floor-plan-3d': {
+  id: 'floor-plan-3d',
+  name: '3D Floor Plan',
+  price: 100.00,
+  description: 'Immersive 3D floor plan giving buyers a realistic sense of space and layout — includes a Standard Floor Plan at no extra cost.'
+},
     };
 
     // Global state
@@ -3899,7 +3905,7 @@ function handleAdminAccessTypeChange() {
   if (region === 'North') {
     specialistSelect.value = 'Jodie';
   } else if (region === 'South') {
-    specialistSelect.value = 'Maeve';
+    specialistSelect.value = 'Andrii';
   }
   handleSpecialistChange();
 

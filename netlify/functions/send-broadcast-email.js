@@ -317,7 +317,7 @@ async function getAvailableDates(region, mediaSpecialist) {
 // Generate availability reminder content
 async function generateAvailabilityContent(user) {
   const region = user.region || 'North';
-  const mediaSpecialist = region === 'South' ? 'Maeve Darley' : 'Jodie Hamshaw';
+  const mediaSpecialist = region === 'South' ? 'Andrii' : 'Jodie Hamshaw';
   
   const availableDates = await getAvailableDates(region, mediaSpecialist);
   
