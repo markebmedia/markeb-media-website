@@ -350,30 +350,14 @@
         .marquee-item {
             display: flex;
             align-items: center;
-            padding: 0 56px;
+            padding: 0 48px;
             white-space: nowrap;
-            opacity: 0.55;
+            opacity: 0.5;
             transition: opacity 0.3s;
+            filter: grayscale(0.2);
         }
-        .marquee-item:hover { opacity: 1; }
-        .marquee-wordmark {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 18px;
-            color: var(--text);
-            letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .marquee-wordmark .wm-accent { color: var(--brand); }
-        .marquee-dot {
-            width: 5px; height: 5px;
-            border-radius: 50%;
-            background: var(--border-bright);
-            flex-shrink: 0;
-            margin-left: 56px;
-        }
+        .marquee-item:hover { opacity: 1; filter: none; }
+        .marquee-item svg { display: block; overflow: visible; }
 
         /* ── SECTION LABEL ── */
         .section-label {
@@ -1392,7 +1376,7 @@
     <div class="hero-content">
         <div class="hero-badge">
             <div class="hero-badge-dot"></div>
-            Premium Property Media · UK
+            Premium Property Media & Marketing · UK
         </div>
         <h1>
             Stand out.<br>
@@ -1592,19 +1576,161 @@
     <div class="brand-marquee-label">Trusted by leading agents across the UK</div>
     <div class="marquee-track" id="marqueeTrack">
         <!-- Set 1 -->
-        <div class="marquee-item"><span class="marquee-wordmark">e<span class="wm-accent">X</span>p Realty</span></div>
-        <div class="marquee-item"><span class="marquee-wordmark">Nested</span></div>
-        <div class="marquee-item"><span class="marquee-wordmark">Keller <span class="wm-accent">Williams</span></span></div>
-        <div class="marquee-item"><span class="marquee-wordmark">Signature <span class="wm-accent">Property</span> Partners</span></div>
-        <div class="marquee-item"><span class="marquee-wordmark">Banner <span class="wm-accent">&</span> Co</span></div>
-        <div class="marquee-item"><span class="marquee-wordmark">Homes of <span class="wm-accent">Distinction</span></span></div>
+
+        <!-- eXp Realty -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="24" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="26" fill="#19469D">e</text>
+                <text x="18" y="24" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="26" fill="#F6811F">X</text>
+                <text x="35" y="24" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="26" fill="#19469D">p</text>
+                <text x="54" y="22" font-family="Arial, sans-serif" font-weight="400" font-size="13" letter-spacing="1" fill="#19469D">REALTY</text>
+            </svg>
+        </div>
+
+        <!-- Keller Williams -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 160 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="25" font-family="Arial Black, sans-serif" font-weight="900" font-size="22" fill="#b40101">kw</text>
+                <line x1="45" y1="4" x2="45" y2="28" stroke="#cccccc" stroke-width="1"/>
+                <text x="52" y="16" font-family="Arial, sans-serif" font-weight="700" font-size="10" letter-spacing="0.5" fill="#444444">KELLER</text>
+                <text x="52" y="28" font-family="Arial, sans-serif" font-weight="300" font-size="10" letter-spacing="0.5" fill="#888888">WILLIAMS</text>
+            </svg>
+        </div>
+
+        <!-- Fine & Country -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 170 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="23" font-family="Georgia, serif" font-weight="400" font-size="16" letter-spacing="2.5" fill="#1a1a2e">FINE &amp; COUNTRY</text>
+                <line x1="0" y1="27" x2="160" y2="27" stroke="#1a1a2e" stroke-width="0.8"/>
+            </svg>
+        </div>
+
+        <!-- Nested -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 100 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="24" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#0f172a">nested</text>
+                <circle cx="91" cy="10" r="5" fill="#22c55e"/>
+            </svg>
+        </div>
+
+        <!-- eweMove -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 130 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="24" font-family="Arial Black, sans-serif" font-weight="900" font-size="20" fill="#6d28d9">ewe</text>
+                <text x="50" y="24" font-family="Arial Black, sans-serif" font-weight="900" font-size="20" fill="#1f2937">Move</text>
+            </svg>
+        </div>
+
+        <!-- Moveli -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 100 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="24" font-family="Arial, sans-serif" font-weight="300" font-size="22" letter-spacing="1" fill="#1f2937">Move</text>
+                <text x="63" y="24" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#e11d48">li</text>
+            </svg>
+        </div>
+
+        <!-- Signature Property Partners -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 210 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="22" font-family="Georgia, serif" font-style="italic" font-size="15" letter-spacing="1" fill="#1a1a2e">Signature</text>
+                <text x="88" y="22" font-family="Georgia, serif" font-size="15" letter-spacing="1" fill="#b45309">Property Partners</text>
+            </svg>
+        </div>
+
+        <!-- Banner & Co -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 130 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="23" font-family="Arial Black, sans-serif" font-weight="900" font-size="18" letter-spacing="0.5" fill="#1e3a5f">BANNER</text>
+                <text x="83" y="23" font-family="Georgia, serif" font-style="italic" font-size="18" fill="#b45309">&amp; Co</text>
+            </svg>
+        </div>
+
+        <!-- Homes of Distinction -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 185 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="21" font-family="Georgia, serif" font-size="14" letter-spacing="2" fill="#1a1a2e">HOMES OF</text>
+                <text x="0" y="32" font-family="Georgia, serif" font-style="italic" font-size="14" letter-spacing="2" fill="#b45309">DISTINCTION</text>
+            </svg>
+        </div>
+
         <!-- Set 2 — duplicate for seamless loop -->
-        <div class="marquee-item"><span class="marquee-wordmark">e<span class="wm-accent">X</span>p Realty</span></div>
-        <div class="marquee-item"><span class="marquee-wordmark">Nested</span></div>
-        <div class="marquee-item"><span class="marquee-wordmark">Keller <span class="wm-accent">Williams</span></span></div>
-        <div class="marquee-item"><span class="marquee-wordmark">Signature <span class="wm-accent">Property</span> Partners</span></div>
-        <div class="marquee-item"><span class="marquee-wordmark">Banner <span class="wm-accent">&</span> Co</span></div>
-        <div class="marquee-item"><span class="marquee-wordmark">Homes of <span class="wm-accent">Distinction</span></span></div>
+
+        <!-- eXp Realty -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="24" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="26" fill="#19469D">e</text>
+                <text x="18" y="24" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="26" fill="#F6811F">X</text>
+                <text x="35" y="24" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="26" fill="#19469D">p</text>
+                <text x="54" y="22" font-family="Arial, sans-serif" font-weight="400" font-size="13" letter-spacing="1" fill="#19469D">REALTY</text>
+            </svg>
+        </div>
+
+        <!-- Keller Williams -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 160 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="25" font-family="Arial Black, sans-serif" font-weight="900" font-size="22" fill="#b40101">kw</text>
+                <line x1="45" y1="4" x2="45" y2="28" stroke="#cccccc" stroke-width="1"/>
+                <text x="52" y="16" font-family="Arial, sans-serif" font-weight="700" font-size="10" letter-spacing="0.5" fill="#444444">KELLER</text>
+                <text x="52" y="28" font-family="Arial, sans-serif" font-weight="300" font-size="10" letter-spacing="0.5" fill="#888888">WILLIAMS</text>
+            </svg>
+        </div>
+
+        <!-- Fine & Country -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 170 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="23" font-family="Georgia, serif" font-weight="400" font-size="16" letter-spacing="2.5" fill="#1a1a2e">FINE &amp; COUNTRY</text>
+                <line x1="0" y1="27" x2="160" y2="27" stroke="#1a1a2e" stroke-width="0.8"/>
+            </svg>
+        </div>
+
+        <!-- Nested -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 100 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="24" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#0f172a">nested</text>
+                <circle cx="91" cy="10" r="5" fill="#22c55e"/>
+            </svg>
+        </div>
+
+        <!-- eweMove -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 130 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="24" font-family="Arial Black, sans-serif" font-weight="900" font-size="20" fill="#6d28d9">ewe</text>
+                <text x="50" y="24" font-family="Arial Black, sans-serif" font-weight="900" font-size="20" fill="#1f2937">Move</text>
+            </svg>
+        </div>
+
+        <!-- Moveli -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 100 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="24" font-family="Arial, sans-serif" font-weight="300" font-size="22" letter-spacing="1" fill="#1f2937">Move</text>
+                <text x="63" y="24" font-family="Arial, sans-serif" font-weight="700" font-size="22" fill="#e11d48">li</text>
+            </svg>
+        </div>
+
+        <!-- Signature Property Partners -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 210 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="22" font-family="Georgia, serif" font-style="italic" font-size="15" letter-spacing="1" fill="#1a1a2e">Signature</text>
+                <text x="88" y="22" font-family="Georgia, serif" font-size="15" letter-spacing="1" fill="#b45309">Property Partners</text>
+            </svg>
+        </div>
+
+        <!-- Banner & Co -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 130 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="23" font-family="Arial Black, sans-serif" font-weight="900" font-size="18" letter-spacing="0.5" fill="#1e3a5f">BANNER</text>
+                <text x="83" y="23" font-family="Georgia, serif" font-style="italic" font-size="18" fill="#b45309">&amp; Co</text>
+            </svg>
+        </div>
+
+        <!-- Homes of Distinction -->
+        <div class="marquee-item">
+            <svg height="32" viewBox="0 0 185 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="21" font-family="Georgia, serif" font-size="14" letter-spacing="2" fill="#1a1a2e">HOMES OF</text>
+                <text x="0" y="32" font-family="Georgia, serif" font-style="italic" font-size="14" letter-spacing="2" fill="#b45309">DISTINCTION</text>
+            </svg>
+        </div>
+
     </div>
 </div>
 
@@ -1889,12 +2015,12 @@
         <div class="faq-contact">
             <h3>Still have questions?</h3>
             <p>Get in touch and we'll provide personalised answers for your requirements.</p>
-            <a href="mailto:commercial@markebmedia.com" class="btn-primary" style="display:inline-block;font-size:15px;padding:12px 28px;">Let's Chat</a>
+            <a href="/cdn-cgi/l/email-protection#accfc3c1c1c9decfc5cdc0ecc1cddec7c9cec1c9c8c5cd82cfc3c1" class="btn-primary" style="display:inline-block;font-size:15px;padding:12px 28px;">Let's Chat</a>
         </div>
     </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // ── Init icons
     document.addEventListener('DOMContentLoaded', () => {
         lucide.createIcons();
@@ -2100,8 +2226,8 @@
         `;
         document.getElementById('resultsContainer').classList.add('active');
         lucide.createIcons();
-        setTimeout(() => document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-    }
+          }
+
 </script>
 </body>
 </html>
