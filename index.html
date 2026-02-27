@@ -5,1562 +5,1314 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premium Property Media & Marketing | Markeb Media</title>
     <meta name="description" content="Professional real estate photography, videography & drone services in the UK. Premium marketing and media delivered within 48 hours. Book your property shoot today.">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="../public/images/Markeb Media Logo (2).PNG">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* ── RESET & ROOT ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --brand: #FF6B00;
+            --brand-light: #FF8A33;
+            --brand-dim: rgba(255,107,0,0.08);
+            --brand-glow: rgba(255,107,0,0.25);
+            --bg: #ffffff;
+            --surface: #F9FAFB;
+            --surface2: #F1F5F9;
+            --border: rgba(0,0,0,0.08);
+            --border-bright: rgba(0,0,0,0.14);
+            --text: #1F2E3C;
+            --text-muted: #6B7280;
+            --text-dim: #9CA3AF;
+            --green: #059669;
+            --red: #ef4444;
+            --amber: #f59e0b;
         }
-        
+
+        html { scroll-behavior: smooth; }
+
         body {
-            font-family: 'Poppins', 'Segoe UI', 'Helvetica Neue', sans-serif;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
             line-height: 1.6;
-            color: #1F2E3C;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        html {
-            scroll-behavior: smooth;
+        /* Grain texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
         }
 
-        .container {
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* ── SCROLL REVEAL ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .reveal.visible { opacity: 1; transform: none; }
+
+        /* ── NAV ── */
+        .site-header {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 500;
+            padding: 8px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: transparent;
+            backdrop-filter: blur(0px);
+            border-bottom: 1px solid transparent;
+            box-shadow: none;
+            transition: background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+        .site-header.scrolled {
+            background: rgba(255,255,255,0.97);
+            backdrop-filter: blur(20px);
+            border-color: var(--border);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+        }
+        /* Logo: white on dark hero, normal on scrolled white header */
+        #headerLogo { filter: brightness(10); transition: filter 0.4s ease; }
+        .site-header.scrolled #headerLogo { filter: none; }
+        /* CTA: ghost on dark hero, solid orange on white header */
+        #headerCta {
+            background: rgba(255,255,255,0.15);
+            border: 2px solid rgba(255,255,255,0.7);
+            color: #fff !important;
+            backdrop-filter: blur(4px);
+            transition: background 0.4s, border-color 0.4s, box-shadow 0.4s, backdrop-filter 0.4s;
+        }
+        .site-header.scrolled #headerCta {
+            background: var(--brand);
+            border-color: transparent;
+            box-shadow: 0 0 20px var(--brand-glow);
+            backdrop-filter: none;
+        }
+        #headerCta:hover { transform: translateY(-1px); }
+        .nav-inner {
             max-width: 1200px;
+            width: 100%;
             margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-
-        .section {
-            padding: 80px 20px;
+        .nav-logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 20px;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.5px;
         }
+        .nav-logo span { color: var(--brand); }
+        .nav-cta {
+            display: inline-block;
+            background: var(--brand);
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.15s;
+            box-shadow: 0 0 20px var(--brand-glow);
+        }
+        .nav-cta:hover { background: var(--brand-light); transform: translateY(-1px); }
 
-        /* Hero Landing Section */
+        /* ── HERO ── */
         .hero-landing {
             position: relative;
-            color: #fff;
-            padding: 40px 20px 80px;
-            text-align: center;
-            min-height: 70vh;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            text-align: center;
+            padding: 120px 20px 140px;
             overflow: hidden;
+            /* Dark base — shows before video loads */
+            background: #0f172a;
         }
-
-        /* Video background */
+        /* Dark cinematic overlay always present */
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(10,15,30,0.88) 0%, rgba(20,40,80,0.78) 50%, rgba(10,15,30,0.85) 100%);
+            z-index: 1;
+            transition: background 1s ease;
+        }
+        .hero-landing.video-playing .hero-overlay {
+            background: linear-gradient(135deg, rgba(10,15,30,0.72) 0%, rgba(20,40,80,0.60) 50%, rgba(10,15,30,0.68) 100%);
+        }
         .hero-video {
             position: absolute;
-            top: 0; left: 0;
+            inset: 0;
             width: 100%; height: 100%;
             object-fit: cover;
             z-index: 0;
             opacity: 0;
-            transition: opacity 1.2s ease;
+            transition: opacity 1.4s ease;
         }
-
-        .hero-video.playing {
-            opacity: 1;
-        }
-
-        /* Gradient overlay — visible immediately, hides video until ready */
-        .hero-overlay {
+        .hero-video.playing { opacity: 1; }
+        /* Subtle grid over dark hero */
+        .hero-grid {
             position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: linear-gradient(135deg, rgba(15,23,42,0.92) 0%, rgba(30,58,138,0.85) 50%, rgba(15,23,42,0.90) 100%);
-            z-index: 1;
-            transition: background 1s ease;
+            inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 20%, transparent 100%);
+            pointer-events: none;
+            z-index: 2;
         }
-
-        /* Once video is playing, lighten overlay slightly */
-        .hero-landing.video-playing .hero-overlay {
-            background: linear-gradient(135deg, rgba(15,23,42,0.75) 0%, rgba(30,58,138,0.65) 50%, rgba(15,23,42,0.72) 100%);
+        /* Orange glow behind content */
+        .hero-glow {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(ellipse, rgba(255,107,0,0.18) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 2;
         }
-
-        /* Subtle bottom fade to blend into next section */
+        /* Fade hero into white page below */
         .hero-landing::after {
             content: '';
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            height: 120px;
+            height: 200px;
             background: linear-gradient(to bottom, transparent, #ffffff);
-            z-index: 3;
+            z-index: 4;
             pointer-events: none;
         }
-
         .hero-content {
-            max-width: 900px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-landing h1 {
-            font-size: 2.6em;
-            font-weight: 900;
-            line-height: 1.15;
-            margin-bottom: 30px;
-            color: #fff;
-            text-shadow: 0 2px 20px rgba(0,0,0,0.4);
-        }
-
-        .hero-landing p {
-            font-size: 1.3em;
-            opacity: .9;
-            margin-bottom: 40px;
-            font-weight: 500;
-            color: #e2e8f0;
-            text-shadow: 0 1px 8px rgba(0,0,0,0.3);
-        }
-
-        /* Header transparent over video, white on scroll */
-        .site-header {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            background: rgba(255,255,255,0);
-            backdrop-filter: blur(0px);
-            z-index: 1000;
-            padding: 15px 20px;
-            box-shadow: none;
-            transition: background 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease;
-        }
-
-        .site-header.scrolled {
-            background: rgba(255,255,255,0.98);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
-        }
-
-        .site-header.scrolled .cta-primary {
-            background-color: #FF6B00;
-        }
-
-        /* Hero CTA overrides — white outlined on dark bg */
-        .hero-cta-secondary {
-            display: inline-block;
-            padding: 16px 36px;
-            font-size: 1.2em;
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 14px;
-            font-weight: 700;
-            border: 2px solid rgba(255,255,255,0.7);
-            transition: all .2s ease;
-            margin: 10px;
-            backdrop-filter: blur(4px);
-        }
-
-        .hero-cta-secondary:hover {
-            background: rgba(255,255,255,0.2);
-            border-color: #fff;
-            transform: translateY(-2px);
-        }
-
-        .cta-primary {
-            display: inline-block;
-            padding: 16px 36px;
-            font-size: 1.2em;
-            background-color: #FF6B00;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 14px;
-            font-weight: 900;
-            box-shadow: 0 6px 16px rgba(255,107,0,0.25);
-            transition: transform .15s ease;
-            margin: 10px;
-        }
-
-        .cta-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255,107,0,0.35);
-        }
-
-        .cta-secondary {
-            display: inline-block;
-            padding: 16px 36px;
-            font-size: 1.2em;
-            background-color: transparent;
-            color: #1F2E3C;
-            text-decoration: none;
-            border-radius: 14px;
-            font-weight: 700;
-            border: 2px solid #1F2E3C;
-            transition: all .15s ease;
-            margin: 10px;
-        }
-
-        .cta-secondary:hover {
-            background-color: #1F2E3C;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        /* Process Section */
-        .process-section {
-            background-color: #FFFFFF;
-            color: #4A6378;
-            padding: 80px 20px;
-            text-align: center;
-            border-radius: 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .roadmap-container {
-            display: flex;
-            align-items: stretch;
-            justify-content: center;
-            gap: 0;
-            flex-wrap: nowrap;
-            position: relative;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .road-line {
-            position: absolute;
-            top: 50%;
-            left: 5%;
-            width: 90%;
-            height: 8px;
-            background: linear-gradient(90deg, #FF6B00 0%, #FFD700 25%, #FF6B00 50%, #FFD700 75%, #FF6B00 100%);
-            background-size: 200% 100%;
-            animation: roadFlow 3s linear infinite;
-            z-index: 0;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(255, 107, 0, 0.3);
-        }
-
-        @keyframes roadFlow {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
-        }
-
-        .step-card {
-            background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%);
-            color: #4A6378;
-            border-radius: 24px;
-            padding: 35px 25px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-            flex: 1;
-            text-align: center;
-            z-index: 2;
-            position: relative;
-            border: 3px solid #F1F5F9;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            min-height: 280px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .step-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 25px 60px rgba(255, 107, 0, 0.15);
-            border-color: #FF6B00;
-        }
-
-        .step-number {
-            font-size: 1.6em;
-            font-weight: 900;
-            background: linear-gradient(135deg, #FF6B00 0%, #FF8A33 100%);
-            color: #FFFFFF;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            margin: 0 auto 20px auto;
-            box-shadow: 0 8px 20px rgba(255, 107, 0, 0.3);
             position: relative;
             z-index: 3;
+            max-width: 860px;
+            margin: 0 auto;
         }
-
-        .step-card h3 {
-            font-size: 1.4em;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: #1F2E3C;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .step-card p {
-            font-size: 1.05em;
-            color: #6B7280;
-            line-height: 1.6;
-        }
-
-        .marker-start {
-            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-            color: #fff;
-            font-weight: 800;
-            font-size: 1.1em;
-            padding: 15px 25px;
-            border-radius: 50px;
-            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-            z-index: 3;
-            position: relative;
-            animation: pulse 2s infinite;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .marker-sold {
-            background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
-            color: #fff;
-            font-weight: 900;
-            font-size: 1.3em;
-            padding: 18px 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4);
-            transform: rotate(-3deg);
-            position: relative;
-            z-index: 3;
-            animation: celebrate 3s ease-in-out infinite;
-            border: 4px solid #FFFFFF;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        @keyframes celebrate {
-            0%, 100% { transform: rotate(-3deg) scale(1); }
-            50% { transform: rotate(3deg) scale(1.08); }
-        }
-
-        .benefits {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 40px;
-        }
-
-        .benefit-item {
-            background: rgba(255, 107, 0, 0.05);
-            padding: 20px;
-            border-radius: 16px;
-            border: 2px solid rgba(255, 107, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .benefit-item:hover {
-            background: rgba(255, 107, 0, 0.1);
-            border-color: rgba(255, 107, 0, 0.3);
-            transform: translateY(-3px);
-        }
-
-        .benefit-item .icon {
-            margin-bottom: 10px;
-            color: #FF6B00;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .benefit-item h4 {
-            font-size: 1.1em;
-            font-weight: 700;
-            color: #1F2E3C;
-            margin-bottom: 8px;
-        }
-
-        .benefit-item p {
-            font-size: 0.95em;
-            color: #6B7280;
-            margin: 0;
-        }
-
-        /* Services Section */
-        .services-section {
-            background-color: #F9FAFB;
-            color: #4A6378;
-            padding: 100px 20px 80px;
-            border-radius: 80px;
-            text-align: center;
-        }
-
-        .line-band {
-            position: relative;
-            margin-bottom: 28px;
-            --headerH: 52px;
-            --lineH: 4px;
-            --nudge: 0px;
-        }
-
-        .line-band::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: var(--lineH);
-            top: calc(50% + var(--nudge));
-            transform: translateY(-50%);
-            background: linear-gradient(90deg, #FF6B00, #FFD700, #FF6B00);
-            background-size: 300% 100%;
-            animation: borderFlow 4s linear infinite;
-            pointer-events: none;
-            border-radius: 999px;
-        }
-
-        @keyframes borderFlow {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 300% 50%; }
-        }
-
-        .line-header {
-            display: inline-block;
-            position: relative;
-            z-index: 1;
-            margin: 0;
-            background: #fff;
-            padding: 15px 30px;
-            border-radius: 20px;
-            border: 3px solid transparent;
-            font: 800 1.8em 'Poppins', 'Segoe UI', 'Helvetica Neue', sans-serif;
-            letter-spacing: .5px;
-            color: #1F2E3C;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, .08);
-            background-image: linear-gradient(#fff, #fff), linear-gradient(90deg, #FF6B00, #FFD700, #FF6B00);
-            background-origin: border-box;
-            background-clip: padding-box, border-box;
-            background-size: 300% 100%;
-            animation: borderFlow 4s linear infinite;
-            margin-top: calc(var(--headerH) / -2);
-        }
-
-        .cards {
-            margin-top: 18px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-        }
-
-        .service-card {
-            background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
-            border-radius: 24px;
-            padding: 35px 25px;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, .08);
-            text-align: center;
-            position: relative;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid #F1F5F9;
-            overflow: hidden;
-            flex: 1 1 280px;
-            max-width: 320px;
-            min-height: 240px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .service-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #FF6B00, #FFD700, #FF6B00);
-            background-size: 200% 100%;
-            animation: shimmer 3s ease-in-out infinite;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        @keyframes shimmer {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        .service-card:hover::before {
-            opacity: 1;
-        }
-
-        .service-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 0 20px 50px rgba(255, 107, 0, .15);
-            border-color: rgba(255, 107, 0, 0.3);
-        }
-
-        .service-icon {
-            margin-bottom: 20px;
-            color: #FF6B00;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            filter: drop-shadow(0 2px 4px rgba(255, 107, 0, 0.2));
-        }
-
-        .service-card h3 {
-            margin-top: 15px;
-            font-size: 1.4em;
-            font-weight: 700;
-            color: #1F2E3C;
-            margin-bottom: 15px;
-        }
-
-        .service-card p {
-            font-size: 1.05em;
-            color: #4A6378;
-            line-height: 1.6;
-            margin: 0;
-        }
-
-        .tick {
-            position: absolute;
-            top: 25px;
-            right: 25px;
-            color: #22C55E;
-            opacity: 0;
-            transform: scale(.5) rotate(-180deg);
-            animation: tickPop .8s ease forwards;
-        }
-
-        .service-card:nth-child(1) .tick { animation-delay: .2s; }
-        .service-card:nth-child(2) .tick { animation-delay: .4s; }
-        .service-card:nth-child(3) .tick { animation-delay: .6s; }
-        .service-card:nth-child(4) .tick { animation-delay: .8s; }
-        .service-card:nth-child(5) .tick { animation-delay: 1s; }
-
-        @keyframes tickPop {
-            0% { opacity: 0; transform: scale(.5) rotate(-180deg); }
-            70% { opacity: 1; transform: scale(1.2) rotate(10deg); }
-            100% { opacity: 1; transform: scale(1) rotate(0deg); }
-        }
-
-
-        /* What's at Stake Section */
-        .stake-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            margin-top: 50px;
-        }
-
-        .stake-card {
-            border-radius: 24px;
-            padding: 45px 35px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-            text-align: left;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stake-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            z-index: 1;
-        }
-
-        .danger-card {
-            background: linear-gradient(135deg, #FEF2F2 0%, #FECACA 100%);
-            border: 2px solid #FCA5A5;
-        }
-
-        .danger-card::before {
-            background: linear-gradient(90deg, #DC2626, #B91C1C);
-        }
-
-        .danger-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 25px 60px rgba(220, 38, 38, 0.2);
-            border-color: #DC2626;
-        }
-
-        .success-card {
-            background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
-            border: 2px solid #BBF7D0;
-        }
-
-        .success-card::before {
-            background: linear-gradient(90deg, #059669, #047857);
-        }
-
-        .success-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 25px 60px rgba(5, 150, 105, 0.2);
-            border-color: #059669;
-        }
-
-        .stake-card h2 {
-            font-size: 1.9em;
-            font-weight: 800;
-            margin-bottom: 18px;
-            position: relative;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .danger-card h2 {
-            color: #991B1B;
-        }
-
-        .success-card h2 {
-            color: #065F46;
-        }
-
-        .stake-card > p {
-            font-size: 1.15em;
-            margin-bottom: 30px;
-            position: relative;
-            z-index: 2;
-            line-height: 1.6;
-        }
-
-        .danger-card > p {
-            color: #7F1D1D;
-        }
-
-        .success-card > p {
-            color: #064E3B;
-        }
-
-        .stake-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            position: relative;
-            z-index: 2;
-        }
-
-        .stake-list li {
-            padding: 15px 0;
-            font-size: 1.1em;
-            font-weight: 500;
-            border-bottom: 1px solid rgba(0,0,0,0.08);
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .stake-list li:last-child {
-            border-bottom: none;
-        }
-
-        .stake-list li:hover {
-            padding-left: 10px;
-        }
-
-        .danger-list li {
-            color: #7F1D1D;
-        }
-
-        .success-list li {
-            color: #064E3B;
-        }
-
-        .stake-icon {
-            margin-top: 2px;
-            flex-shrink: 0;
-        }
-
-        .danger-icon {
-            color: #DC2626;
-        }
-
-        .success-icon {
-            color: #059669;
-        }
-
-        .bottom-cta {
-            margin-top: 35px;
-            padding: 25px;
-            border-radius: 16px;
-            text-align: center;
-            position: relative;
-            z-index: 2;
-            font-weight: 700;
-            font-size: 1.2em;
-        }
-
-        .danger-cta {
-            background: rgba(220, 38, 38, 0.1);
-            color: #991B1B;
-            border: 2px solid rgba(220, 38, 38, 0.2);
-        }
-
-        .success-cta {
-            background: rgba(5, 150, 105, 0.1);
-            color: #065F46;
-            border: 2px solid rgba(5, 150, 105, 0.2);
-        }
-
-        .header-badge {
+        .hero-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: linear-gradient(135deg, #FF6B00, #FF8A33);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-size: 0.9em;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 20px;
+            background: rgba(255,107,0,0.18);
+            border: 1px solid rgba(255,107,0,0.45);
+            color: #ffb380;
+            padding: 7px 18px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 32px;
+            font-family: 'DM Mono', monospace;
+            animation: fadeUp 0.6s ease both;
         }
-
-        /* Success Vision Section */
-        .success-scenarios {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin: 40px 0;
-        }
-
-        .scenario-card {
-            background: #FFFFFF;
-            border-radius: 20px;
-            padding: 35px 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            border: 2px solid #F1F5F9;
-            transition: all 0.3s ease;
-            text-align: left;
-        }
-
-        .scenario-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 50px rgba(255, 107, 0, 0.15);
-            border-color: #FF6B00;
-        }
-
-        .scenario-icon {
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            color: #FF6B00;
-        }
-
-        .scenario-card h3 {
-            font-size: 1.4em;
-            font-weight: 700;
-            color: #1F2937;
-            margin-bottom: 15px;
-        }
-
-        .scenario-card p {
-            font-size: 1.05em;
-            color: #6B7280;
-            line-height: 1.6;
-        }
-
-        /* Photo Showcase Section */
-        .showcase-section {
-            background-color: #FFFFFF;
-            color: #4A6378;
-            padding: 80px 20px;
-        }
-
-        .showcase-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .photo-gallery {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 40px;
-            margin: 50px 0;
-        }
-
-        .photo-card {
-            position: relative;
-            overflow: hidden;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #FFFFFF;
-            padding: 15px;
-        }
-
-        .photo-card:first-child {
-            transform: rotate(-2.5deg);
-            width: 45%;
-            min-width: 300px;
-        }
-
-        .photo-card:last-child {
-            transform: rotate(2.5deg);
-            width: 45%;
-            min-width: 300px;
-        }
-
-        .photo-card:hover {
-            transform: rotate(0deg) scale(1.03);
-            box-shadow: 0 25px 60px rgba(255, 107, 0, 0.2);
-        }
-
-        .photo-card img {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .photo-overlay {
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
-            right: 15px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9));
-            backdrop-filter: blur(10px);
-            border-radius: 8px;
-            padding: 15px;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .photo-card:hover .photo-overlay {
-            transform: translateY(0);
-        }
-
-        .photo-title {
-            font-weight: 700;
-            color: #1F2E3C;
-            font-size: 1.1em;
-            margin-bottom: 5px;
-        }
-
-        .photo-description {
-            color: #4A6378;
-            font-size: 0.9em;
-            line-height: 1.4;
-        }
-
-        /* Final CTA Section */
-        .final-cta-section {
-            background-color: #FFFFFF;
-            color: #4A6378;
-            padding: 80px 20px;
-            border-radius: 40px;
-            text-align: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .final-cta-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 40px;
-        }
-
-        .final-cta-button {
-            flex: 1 1 280px;
-            min-width: 250px;
-            max-width: 350px;
-            padding: 18px 30px;
-            text-decoration: none;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 1.1em;
-            text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 60px;
-        }
-
-        .primary-final-cta {
-            background: linear-gradient(135deg, #FF6B00 0%, #FF8A33 100%);
-            color: #ffffff;
-            box-shadow: 0 8px 25px rgba(255, 107, 0, 0.3);
-            border: none;
-        }
-
-        .primary-final-cta:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 12px 35px rgba(255, 107, 0, 0.4);
-        }
-
-        .secondary-final-cta {
-            background: #FFFFFF;
-            color: #4A6378;
-            border: 3px solid #4A6378;
-            box-shadow: 0 6px 20px rgba(74, 99, 120, 0.15);
-        }
-
-        .secondary-final-cta:hover {
-            background: #4A6378;
-            color: #FFFFFF;
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 12px 35px rgba(74, 99, 120, 0.3);
-        }
-
-        /* FAQ Section */
-        .faq-section {
-            background-color: #F9FAFB;
-            color: #4A6378;
-            padding: 80px 20px;
-        }
-
-        .faq-container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .faq-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
-        }
-
-        .faq-item {
-            background: #FFFFFF;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            border: 2px solid #F1F5F9;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .faq-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(255, 107, 0, 0.15);
-            border-color: rgba(255, 107, 0, 0.3);
-        }
-
-        .faq-item.active {
-            border-color: #FF6B00;
-            box-shadow: 0 15px 40px rgba(255, 107, 0, 0.2);
-        }
-
-        .faq-question {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .faq-question h3 {
-            font-size: 1.2em;
-            font-weight: 700;
-            color: #1F2E3C;
-            margin: 0;
-        }
-
-        .faq-icon {
-            color: #FF6B00;
-            transition: transform 0.3s ease;
+        .hero-badge-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--green);
+            animation: pulse 2s infinite;
             flex-shrink: 0;
         }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
 
-        .faq-item.active .faq-icon {
-            transform: rotate(45deg);
+        .hero-landing h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(36px, 6vw, 80px);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -2.5px;
+            margin-bottom: 24px;
+            color: #ffffff;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            animation: fadeUp 0.6s 0.1s ease both;
         }
-
-        .faq-answer {
-            color: #4A6378;
-            font-size: 1.05em;
-            line-height: 1.6;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease, opacity 0.3s ease;
-            opacity: 0;
+        .hero-h1-grad {
+            display: block;
+            background: linear-gradient(135deg, #FF6B00 0%, #FF8A33 50%, #ffd580 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-
-        .faq-item.active .faq-answer {
-            max-height: 200px;
-            opacity: 1;
-            margin-top: 15px;
+        .hero-landing p {
+            font-size: clamp(15px, 2.2vw, 20px);
+            color: rgba(255,255,255,0.78);
+            max-width: 600px;
+            margin: 0 auto 48px;
+            font-weight: 300;
+            line-height: 1.65;
+            text-shadow: 0 1px 8px rgba(0,0,0,0.2);
+            animation: fadeUp 0.6s 0.2s ease both;
         }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .hero-landing h1 {
-                font-size: 2.2em;
-                margin-bottom: 25px;
-            }
-            
-            .hero-landing p {
-                font-size: 1.15em;
-                margin-bottom: 35px;
-            }
-            
-            .cta-primary, .cta-secondary {
-                display: block;
-                width: 100%;
-                max-width: 300px;
-                margin: 10px auto;
-                text-align: center;
-            }
-            
-            header img {
-                height: 80px !important;
-            }
-            
-            header .cta-primary {
-                padding: 10px 20px !important;
-                font-size: 0.85em !important;
-                width: auto !important;
-                max-width: none !important;
-                display: inline-block !important;
-            }
-            
-            header > div {
-                gap: 10px;
-            }
-
-            .stake-grid {
-                grid-template-columns: 1fr;
-                gap: 30px;
-            }
-
-            .stake-card {
-                padding: 35px 25px;
-            }
-
-            .roadmap-container {
-                flex-direction: column;
-                align-items: center;
-                gap: 25px;
-                margin-top: 40px;
-            }
-
-            .road-line {
-                display: none;
-            }
-
-            .step-card {
-                max-width: 320px;
-                width: 90%;
-                padding: 25px 20px;
-            }
-
-            .marker-start, .marker-sold {
-                margin: 15px 0;
-                padding: 12px 20px;
-                font-size: 1em;
-            }
-
-            .benefits {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .cards {
-                gap: 20px;
-            }
-
-            .service-card {
-                flex: 1 1 100%;
-                max-width: 320px;
-            }
-
-            .photo-gallery {
-                flex-direction: column;
-                align-items: center;
-                gap: 25px;
-            }
-
-            .photo-card {
-                width: 95% !important;
-                max-width: 350px;
-                padding: 12px;
-            }
-
-            .photo-card:first-child,
-            .photo-card:last-child {
-                transform: rotate(0deg);
-            }
-
-            .photo-card img {
-                height: 200px;
-            }
-
-            .faq-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .faq-item {
-                padding: 25px 20px;
-            }
-
-            .final-cta-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .final-cta-button {
-                width: 100%;
-                max-width: 300px;
-            }
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            animation: fadeUp 0.6s 0.3s ease both;
         }
-
-        /* Audit Section Styles */
-        .audit-section {
-            background: #FFFFFF;
-            padding: 80px 20px;
+        .btn-primary {
+            display: inline-block;
+            background: var(--brand);
+            color: #fff;
+            padding: 16px 36px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            box-shadow: 0 0 40px var(--brand-glow);
             position: relative;
             overflow: hidden;
         }
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 60px var(--brand-glow); background: var(--brand-light); color: #fff; }
+        .btn-ghost {
+            display: inline-block;
+            color: rgba(255,255,255,0.85);
+            padding: 16px 28px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.45);
+            transition: all 0.2s;
+            backdrop-filter: blur(4px);
+            background: rgba(255,255,255,0.08);
+        }
+        .btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.18); }
 
-        .audit-container {
+        @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+
+        /* ── SECTION LABEL ── */
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            color: var(--brand-light);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+        }
+        .section-label::before {
+            content: '';
+            width: 20px;
+            height: 1px;
+            background: var(--brand-light);
+        }
+
+        /* ── SECTION WRAPPER ── */
+        .mm-section {
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .mm-section-full {
+            padding: 100px 20px;
+        }
+
+        .mm-h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(28px, 4.5vw, 54px);
+            font-weight: 800;
+            letter-spacing: -2px;
+            line-height: 1.05;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        .mm-sub {
+            font-size: 17px;
+            color: var(--text-muted);
+            max-width: 520px;
+            line-height: 1.6;
+            font-weight: 300;
+            margin-bottom: 56px;
+        }
+
+        /* ── PROOF BAR ── */
+        .proof-bar {
+            padding: 40px 20px;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: #F9FAFB;
+        }
+        .proof-bar-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 48px;
+            flex-wrap: wrap;
+        }
+        .proof-label {
+            width: 100%;
+            text-align: center;
+            font-size: 11px;
+            font-family: 'DM Mono', monospace;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 20px;
+        }
+        .proof-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .proof-item-icon { color: var(--brand); flex-shrink: 0; }
+        .proof-item-title { font-size: 14px; font-weight: 600; color: var(--text); }
+        .proof-item-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .proof-divider { width: 1px; height: 40px; background: var(--border); }
+
+        /* ── AUDIT SECTION ── */
+        .audit-wrap {
+            background: #F9FAFB;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 56px 48px;
             max-width: 800px;
             margin: 0 auto;
-            background: #FFFFFF;
+            position: relative;
+            overflow: hidden;
+        }
+        .audit-wrap::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
             border-radius: 24px;
-            padding: 50px 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-            border: 2px solid #F1F5F9;
+            background: linear-gradient(135deg, rgba(255,107,0,0.4), rgba(255,138,51,0.2), transparent 60%);
+            z-index: -1;
         }
-
-        .audit-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
         .audit-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: linear-gradient(135deg, #FF6B00, #FF8A33);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-size: 0.9em;
-            font-weight: 700;
+            background: var(--brand-dim);
+            border: 1px solid rgba(255,107,0,0.3);
+            color: var(--brand-light);
+            padding: 7px 18px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-family: 'DM Mono', monospace;
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.08em;
             margin-bottom: 20px;
         }
-
-        .audit-header h2 {
-            font-size: 2.4em;
+        .audit-wrap h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(26px, 4vw, 42px);
             font-weight: 800;
-            color: #1F2E3C;
-            margin-bottom: 15px;
-            line-height: 1.2;
+            letter-spacing: -1.5px;
+            color: var(--text);
+            margin-bottom: 12px;
+            line-height: 1.1;
         }
-
-        .audit-header p {
-            font-size: 1.2em;
-            color: #6B7280;
-            margin-bottom: 10px;
+        .audit-wrap > p {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 36px;
+            font-weight: 300;
         }
-
         .progress-bar-container {
             width: 100%;
-            height: 8px;
-            background: #E5E7EB;
-            border-radius: 10px;
+            height: 4px;
+            background: var(--surface2);
+            border-radius: 100px;
             overflow: hidden;
-            margin: 30px 0;
+            margin: 28px 0 12px;
         }
-
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #FF6B00, #FF8A33);
+            background: linear-gradient(90deg, var(--brand), var(--brand-light));
             width: 0%;
             transition: width 0.3s ease;
-            border-radius: 10px;
+            border-radius: 100px;
         }
-
         .progress-text {
-            text-align: center;
-            color: #6B7280;
-            font-size: 0.9em;
-            margin-top: 10px;
+            font-size: 12px;
+            font-family: 'DM Mono', monospace;
+            color: var(--text-dim);
+            margin-bottom: 28px;
         }
-
-        .form-step {
-            display: none;
-        }
-
-        .form-step.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .question-card {
-            background: #F9FAFB;
+            background: var(--surface2);
+            border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-            border: 2px solid #E5E7EB;
+            padding: 32px;
+            margin-bottom: 24px;
         }
-
         .question-number {
-            display: inline-block;
-            background: linear-gradient(135deg, #FF6B00, #FF8A33);
-            color: white;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 35px;
-            font-weight: 700;
-            margin-bottom: 15px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--brand-dim);
+            border: 1px solid rgba(255,107,0,0.3);
+            color: var(--brand-light);
+            border-radius: 8px;
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 16px;
         }
-
         .question-text {
-            font-size: 1.3em;
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
             font-weight: 700;
-            color: #1F2E3C;
-            margin-bottom: 25px;
+            color: var(--text);
+            margin-bottom: 24px;
             line-height: 1.4;
+            letter-spacing: -0.3px;
         }
-
-        .option-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
+        .option-group { display: flex; flex-direction: column; gap: 12px; }
         .option-label {
             display: flex;
             align-items: center;
-            padding: 18px 20px;
-            background: white;
-            border: 2px solid #E5E7EB;
+            padding: 16px 20px;
+            background: #F9FAFB;
+            border: 1px solid var(--border);
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
             position: relative;
         }
-
         .option-label:hover {
-            border-color: #FF6B00;
-            background: #FFF5F0;
-            transform: translateX(5px);
+            border-color: rgba(255,107,0,0.4);
+            background: var(--brand-dim);
+            transform: translateX(4px);
         }
-
-        .option-label input[type="radio"] {
-            position: absolute;
-            opacity: 0;
-        }
-
-        .option-label input[type="radio"]:checked + .checkmark {
-            background: #FF6B00;
-            border-color: #FF6B00;
-        }
-
-        .option-label input[type="radio"]:checked + .checkmark::after {
-            display: block;
-        }
-
-        .option-label input[type="radio"]:checked ~ .option-text {
-            font-weight: 600;
-        }
-
         .option-label.selected {
-            border-color: #FF6B00;
-            background: linear-gradient(135deg, #FFF5F0 0%, #FFEDE0 100%);
-            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.15);
+            border-color: var(--brand);
+            background: var(--brand-dim);
+            box-shadow: 0 0 20px rgba(255,107,0,0.1);
         }
-
+        .option-label input[type="radio"] { position: absolute; opacity: 0; }
+        .option-label input[type="radio"]:checked + .checkmark { background: var(--brand); border-color: var(--brand); }
+        .option-label input[type="radio"]:checked + .checkmark::after { display: block; }
         .checkmark {
-            width: 24px;
-            height: 24px;
-            border: 2px solid #D1D5DB;
+            width: 20px;
+            height: 20px;
+            border: 1px solid var(--border-bright);
             border-radius: 50%;
-            margin-right: 15px;
+            margin-right: 14px;
             position: relative;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
             flex-shrink: 0;
         }
-
         .checkmark::after {
             content: '✓';
             position: absolute;
             display: none;
             color: white;
-            font-size: 14px;
+            font-size: 11px;
             font-weight: bold;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
         }
-
-        .option-text {
-            flex: 1;
-            font-size: 1.05em;
-            color: #374151;
-            line-height: 1.5;
-        }
-
+        .option-text { flex: 1; font-size: 15px; color: var(--text-muted); line-height: 1.4; }
+        .option-label.selected .option-text { color: var(--text); }
         .form-input {
             width: 100%;
-            padding: 15px 20px;
-            font-size: 1.05em;
-            border: 2px solid #E5E7EB;
+            padding: 14px 18px;
+            font-size: 15px;
+            background: #F9FAFB;
+            border: 1px solid var(--border);
             border-radius: 12px;
-            margin-bottom: 15px;
-            font-family: 'Poppins', sans-serif;
-            transition: all 0.3s ease;
+            color: var(--text);
+            margin-bottom: 12px;
+            font-family: 'DM Sans', sans-serif;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #FF6B00;
-            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
-        }
-
-        .form-input::placeholder {
-            color: #9CA3AF;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
+        .form-input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(255,107,0,0.1); }
+        .form-input::placeholder { color: var(--text-dim); }
+        .button-group { display: flex; gap: 12px; margin-top: 24px; }
         .btn {
             flex: 1;
-            padding: 15px 30px;
-            font-size: 1.1em;
-            font-weight: 700;
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 600;
             border: none;
             border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
         }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #FF6B00, #FF8A33);
+        .btn-prim {
+            background: var(--brand);
             color: white;
-            box-shadow: 0 6px 20px rgba(255, 107, 0, 0.3);
+            box-shadow: 0 0 30px var(--brand-glow);
         }
-
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 107, 0, 0.4);
+        .btn-prim:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 40px var(--brand-glow); }
+        .btn-prim:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-sec {
+            background: var(--surface2);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
         }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #6B7280;
-            border: 2px solid #E5E7EB;
-        }
-
-        .btn-secondary:hover {
-            background: #F9FAFB;
-            border-color: #D1D5DB;
-        }
-
-        .results-container {
+        .btn-sec:hover { border-color: var(--border-bright); color: var(--text); }
+        .form-step { display: none; }
+        .form-step.active { display: block; animation: fadeUp 0.3s ease; }
+        .error-message {
             display: none;
+            background: rgba(239,68,68,0.07);
+            border: 1px solid rgba(239,68,68,0.25);
+            color: #b91c1c;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
         }
-
-        .results-container.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
+        .error-message.active { display: block; }
+        .loading-spinner { display: none; text-align: center; padding: 40px; }
+        .loading-spinner.active { display: block; }
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 3px solid var(--surface2);
+            border-top: 3px solid var(--brand);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px;
         }
-
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .results-container { display: none; }
+        .results-container.active { display: block; animation: fadeUp 0.5s ease; }
         .score-display {
-            background: linear-gradient(135deg, #FF6B00, #FF8A33);
+            background: linear-gradient(135deg, var(--brand), var(--brand-light));
             color: white;
             padding: 40px;
             border-radius: 20px;
-            margin: 30px 0;
-            box-shadow: 0 10px 30px rgba(255, 107, 0, 0.3);
+            margin: 28px 0;
+            text-align: center;
+            box-shadow: 0 0 60px var(--brand-glow);
         }
-
-        .score-number {
-            font-size: 4em;
-            font-weight: 900;
-            margin-bottom: 10px;
-        }
-
-        .score-verdict {
-            font-size: 1.5em;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .score-description {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
+        .score-number { font-family: 'Syne', sans-serif; font-size: 64px; font-weight: 800; letter-spacing: -3px; }
+        .score-verdict { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin: 8px 0; }
+        .score-description { font-size: 16px; opacity: 0.9; }
         .analysis-content {
-            background: #F9FAFB;
+            background: var(--surface2);
+            border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 30px;
-            margin: 30px 0;
+            padding: 32px;
+            margin: 28px 0;
             text-align: left;
-            border: 2px solid #E5E7EB;
         }
+        .analysis-content h3 { font-family: 'Syne', sans-serif; font-size: 18px; color: var(--text); margin: 24px 0 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        .analysis-content h3:first-child { margin-top: 0; }
+        .analysis-content p, .analysis-content ul { color: var(--text-muted); font-size: 15px; line-height: 1.7; margin-bottom: 14px; }
+        .analysis-content ul { padding-left: 20px; }
+        .analysis-content li { margin-bottom: 8px; }
+        .analysis-content a { color: var(--brand-light); }
 
-        .analysis-content h3 {
-            color: #1F2E3C;
-            margin-top: 25px;
-            margin-bottom: 15px;
-            font-size: 1.4em;
+        /* ── PROCESS SECTION ── */
+        .process-section {
+            background: #F9FAFB;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .roadmap-container {
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            flex-wrap: nowrap;
+            position: relative;
+            max-width: 1000px;
+            margin: 60px auto 0;
+            gap: 0;
+        }
+        .road-line {
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            width: 90%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--brand) 0%, var(--brand-light) 50%, var(--brand) 100%);
+            background-size: 200% 100%;
+            animation: roadFlow 3s linear infinite;
+            z-index: 0;
+            border-radius: 2px;
+            box-shadow: 0 0 12px var(--brand-glow);
+        }
+        @keyframes roadFlow { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+
+        .step-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px 24px;
+            flex: 1;
+            text-align: center;
+            z-index: 2;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 260px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .step-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--brand-dim), transparent);
+        }
+        .step-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255,107,0,0.4);
+            box-shadow: 0 20px 40px rgba(255,107,0,0.1);
+        }
+        .step-number {
+            width: 52px;
+            height: 52px;
+            background: var(--brand-dim);
+            border: 1px solid rgba(255,107,0,0.3);
+            color: var(--brand-light);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'DM Mono', monospace;
+            font-size: 18px;
+            font-weight: 500;
+            margin: 0 auto 20px;
+            position: relative;
+            z-index: 3;
+        }
+        .step-card h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: -0.3px;
+        }
+        .step-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; font-weight: 300; }
+
+        .marker-start {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: #fff;
+            font-weight: 700;
+            font-size: 13px;
+            font-family: 'DM Mono', monospace;
+            padding: 12px 20px;
+            border-radius: 100px;
+            z-index: 3;
+            position: relative;
+            animation: mPulse 2s infinite;
+            white-space: nowrap;
             display: flex;
             align-items: center;
             gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            box-shadow: 0 0 20px rgba(16,185,129,0.3);
         }
+        @keyframes mPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
 
-        .analysis-content h3:first-child {
-            margin-top: 0;
-        }
-
-        .analysis-content p, .analysis-content ul {
-            color: #4A6378;
-            font-size: 1.05em;
-            line-height: 1.7;
-            margin-bottom: 15px;
-        }
-
-        .analysis-content ul {
-            padding-left: 20px;
-        }
-
-        .analysis-content li {
-            margin-bottom: 10px;
-        }
-
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            padding: 40px;
-        }
-
-        .loading-spinner.active {
-            display: block;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #E5E7EB;
-            border-top: 4px solid #FF6B00;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error-message {
-            display: none;
-            background: #FEE2E2;
-            border: 2px solid #FCA5A5;
-            color: #991B1B;
-            padding: 15px 20px;
+        .marker-sold {
+            background: linear-gradient(135deg, #DC2626, #B91C1C);
+            color: #fff;
+            font-weight: 800;
+            font-size: 15px;
+            font-family: 'Syne', sans-serif;
+            padding: 16px 24px;
             border-radius: 12px;
+            z-index: 3;
+            position: relative;
+            animation: celebrate 3s ease-in-out infinite;
+            border: 2px solid rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 30px rgba(220,38,38,0.3);
+        }
+        @keyframes celebrate { 0%,100% { transform: rotate(-2deg) scale(1); } 50% { transform: rotate(2deg) scale(1.06); } }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 48px;
+        }
+        .benefit-cell {
+            background: var(--surface2);
+            padding: 28px 24px;
+            text-align: center;
+            transition: background 0.2s;
+            position: relative;
+        }
+        .benefit-cell:hover { background: var(--surface); }
+        .benefit-cell::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--brand-dim), transparent);
+        }
+        .benefit-icon { color: var(--brand); margin-bottom: 12px; display: flex; align-items: center; justify-content: center; }
+        .benefit-cell h4 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .benefit-cell p { font-size: 13px; color: var(--text-muted); line-height: 1.5; font-weight: 300; }
+
+        .process-banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #F0FDF4;
+            border: 1px solid #BBF7D0;
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-top: 40px;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            color: #15803D;
+        }
+
+        /* ── SERVICES ── */
+        .services-bg {
+            background: #F9FAFB;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 48px;
+        }
+        .service-card {
+            background: var(--surface2);
+            padding: 36px 28px;
+            text-align: center;
+            position: relative;
+            transition: background 0.2s;
+            overflow: hidden;
+        }
+        .service-card:hover { background: var(--surface); }
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--brand), var(--brand-light));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .service-card:hover::before { opacity: 1; }
+        .service-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--brand-dim), transparent);
+        }
+        .service-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            background: var(--brand-dim);
+            border: 1px solid rgba(255,107,0,0.2);
+            border-radius: 14px;
+            margin: 0 auto 20px;
+            color: var(--brand);
+        }
+        .tick {
+            position: absolute;
+            top: 20px; right: 20px;
+            color: #15803D;
+            opacity: 0;
+            transform: scale(0.5) rotate(-180deg);
+            animation: tickPop 0.8s ease forwards;
+        }
+        .service-card:nth-child(1) .tick { animation-delay: .2s; }
+        .service-card:nth-child(2) .tick { animation-delay: .4s; }
+        .service-card:nth-child(3) .tick { animation-delay: .6s; }
+        .service-card:nth-child(4) .tick { animation-delay: .8s; }
+        .service-card:nth-child(5) .tick { animation-delay: 1s; }
+        @keyframes tickPop { 0% { opacity:0; transform:scale(.5) rotate(-180deg); } 70% { opacity:1; transform:scale(1.15) rotate(8deg); } 100% { opacity:1; transform:scale(1) rotate(0deg); } }
+        .service-card h3 { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 10px; letter-spacing: -0.3px; }
+        .service-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; font-weight: 300; }
+
+        /* ── STAKE SECTION ── */
+        .stake-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 48px;
+        }
+        .stake-card {
+            border-radius: 20px;
+            padding: 40px 32px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .stake-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+        }
+        .stake-card:hover { transform: translateY(-6px); }
+        .danger-card {
+            background: #FEF2F2;
+            border-color: #FCA5A5;
+        }
+        .danger-card::before { background: linear-gradient(90deg, #DC2626, #B91C1C); }
+        .danger-card:hover { box-shadow: 0 20px 40px rgba(220,38,38,0.15); border-color: rgba(239,68,68,0.4); }
+        .success-card {
+            background: #F0FDF4;
+            border-color: #BBF7D0;
+        }
+        .success-card::before { background: linear-gradient(90deg, #059669, #10B981); }
+        .success-card:hover { box-shadow: 0 20px 40px rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.3); }
+        .stake-card h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.5px;
+        }
+        .danger-card h2 { color: #991B1B; }
+        .success-card h2 { color: #065F46; }
+        .stake-card > p { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; font-weight: 300; }
+        .stake-list { list-style: none; }
+        .stake-list li {
+            padding: 12px 0;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            transition: padding-left 0.2s;
+            color: var(--text-muted);
+        }
+        .stake-list li:last-child { border-bottom: none; }
+        .stake-list li:hover { padding-left: 8px; }
+        .stake-icon { flex-shrink: 0; margin-top: 2px; }
+        .danger-icon { color: #ef4444; }
+        .success-icon { color: var(--green); }
+        .bottom-cta {
+            margin-top: 28px;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 14px;
+            font-style: italic;
+        }
+        .danger-cta { background: rgba(220,38,38,0.08); color: #991B1B; border: 1px solid rgba(220,38,38,0.2); }
+        .success-cta { background: rgba(5,150,105,0.08); color: #065F46; border: 1px solid rgba(5,150,105,0.2); }
+
+        /* ── HEADER BADGE ── */
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--brand-dim);
+            border: 1px solid rgba(255,107,0,0.3);
+            color: var(--brand-light);
+            padding: 7px 18px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-family: 'DM Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
             margin-bottom: 20px;
         }
 
-        .error-message.active {
-            display: block;
+        /* ── SUCCESS VISION ── */
+        .vision-banner {
+            background: #F0FDF4;
+            border: 1px solid #BBF7D0;
+            border-radius: 20px;
+            padding: 48px 40px;
+            margin: 40px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .vision-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #059669, #10B981, #059669);
+            background-size: 200% 100%;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        @keyframes shimmer { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        .vision-quote {
+            background: rgba(255,255,255,0.85);
+            border: 1px solid rgba(5,150,105,0.2);
+            border-left: 3px solid var(--green);
+            border-radius: 12px;
+            padding: 28px;
+            margin: 24px 0;
+            font-style: italic;
+            font-size: 17px;
+            color: #065F46;
+            line-height: 1.7;
+        }
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 40px 0;
+        }
+        .scenario-card {
+            background: #F9FAFB;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px 28px;
+            text-align: left;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .scenario-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--brand-dim), transparent);
+        }
+        .scenario-card:hover {
+            border-color: rgba(255,107,0,0.3);
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(255,107,0,0.1);
+        }
+        .scenario-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            background: var(--brand-dim);
+            border: 1px solid rgba(255,107,0,0.2);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            color: var(--brand);
+        }
+        .scenario-card h3 { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 10px; letter-spacing: -0.3px; }
+        .scenario-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; font-weight: 300; }
+
+        /* ── SHOWCASE ── */
+        .showcase-bg { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .photo-gallery { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px; margin: 48px 0; }
+        .photo-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--surface2);
+            padding: 12px;
+        }
+        .photo-card:first-child { transform: rotate(-2deg); width: 45%; min-width: 280px; }
+        .photo-card:last-child { transform: rotate(2deg); width: 45%; min-width: 280px; }
+        .photo-card:hover { transform: rotate(0deg) scale(1.02); border-color: rgba(255,107,0,0.3); box-shadow: 0 20px 50px rgba(255,107,0,0.15); }
+        .photo-card img { width: 100%; height: 240px; object-fit: cover; border-radius: 12px; }
+        .photo-overlay {
+            position: absolute;
+            bottom: 12px; left: 12px; right: 12px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-bright);
+            border-radius: 10px;
+            padding: 14px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        .photo-card:hover .photo-overlay { transform: translateY(0); }
+        .photo-title { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--text); font-size: 15px; margin-bottom: 4px; }
+        .photo-description { color: var(--text-muted); font-size: 13px; line-height: 1.4; font-weight: 300; }
+        .showcase-footer {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            margin-top: 48px;
+        }
+        .showcase-footer h3 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 12px; letter-spacing: -0.5px; }
+        .showcase-footer p { color: var(--text-muted); font-size: 15px; margin-bottom: 24px; font-weight: 300; }
+
+        /* ── FINAL CTA ── */
+        .final-cta-wrap {
+            text-align: center;
+            padding: 100px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .final-cta-wrap::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 700px; height: 700px;
+            background: radial-gradient(ellipse, rgba(255,107,0,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .final-cta-wrap h2 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(30px, 5vw, 60px);
+            font-weight: 800;
+            letter-spacing: -2px;
+            color: var(--text);
+            margin-bottom: 20px;
+            line-height: 1.05;
+            position: relative;
+        }
+        .final-cta-grad {
+            background: linear-gradient(135deg, var(--brand), var(--brand-light), #ffd580);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .final-cta-sub { font-size: 18px; color: var(--text-muted); margin-bottom: 48px; font-weight: 300; max-width: 600px; margin-left: auto; margin-right: auto; position: relative; }
+        .cta-buttons { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; position: relative; }
+        .cta-btn-sec {
+            display: inline-block;
+            color: var(--text-muted);
+            padding: 16px 36px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid var(--border-bright);
+            transition: all 0.2s;
+        }
+        .cta-btn-sec:hover { color: var(--text); border-color: rgba(0,0,0,0.25); background: rgba(0,0,0,0.04); }
+        .trust-bar {
+            margin-top: 48px;
+            padding: 20px;
+            background: #F9FAFB;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            display: inline-block;
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            color: var(--text-dim);
+            letter-spacing: 0.05em;
+            position: relative;
         }
 
-        @media (max-width: 768px) {
-            .audit-container {
-                padding: 30px 20px;
-            }
-            
-            .audit-header h2 {
-                font-size: 1.8em;
-            }
-            
-            .question-text {
-                font-size: 1.15em;
-            }
-            
-            .option-label {
-                padding: 15px;
-            }
-            
-            .button-group {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
+        /* ── FAQ ── */
+        .faq-bg { background: var(--surface); border-top: 1px solid var(--border); }
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 48px;
+        }
+        .faq-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .faq-item::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--brand-dim), transparent);
+        }
+        .faq-item:hover { border-color: rgba(255,107,0,0.3); transform: translateY(-3px); }
+        .faq-item.active { border-color: var(--brand); box-shadow: 0 0 30px rgba(255,107,0,0.1); }
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+        .faq-question h3 { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+        .faq-icon { color: var(--brand); transition: transform 0.3s; flex-shrink: 0; }
+        .faq-item.active .faq-icon { transform: rotate(45deg); }
+        .faq-answer {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.65;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+            opacity: 0;
+            font-weight: 300;
+        }
+        .faq-item.active .faq-answer { max-height: 200px; opacity: 1; margin-top: 16px; }
+        .faq-contact {
+            background: #F0FDF4;
+            border: 1px solid #BBF7D0;
+            border-radius: 16px;
+            padding: 36px;
+            text-align: center;
+            margin-top: 32px;
+        }
+        .faq-contact h3 { font-family: 'Syne',sans-serif; font-size: 18px; font-weight: 700; color: #065F46; margin-bottom: 8px; }
+        .faq-contact p { font-size: 14px; color: #064E3B; margin-bottom: 20px; font-weight: 300; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .benefits-grid { grid-template-columns: 1fr 1fr; }
+            .services-grid { grid-template-columns: 1fr 1fr; }
+            .stake-grid { grid-template-columns: 1fr; }
+            .scenario-grid { grid-template-columns: 1fr; }
+            .faq-grid { grid-template-columns: 1fr; }
+            .proof-divider { display: none; }
+            .roadmap-container { flex-direction: column; align-items: center; gap: 20px; margin-top: 40px; }
+            .road-line { display: none; }
+            .step-card { max-width: 320px; width: 90%; min-height: auto; }
+        }
+        @media (max-width: 640px) {
+            .hero-landing h1 { letter-spacing: -1.5px; }
+            .hero-actions { flex-direction: column; width: 100%; }
+            .btn-primary, .btn-ghost { width: 100%; text-align: center; }
+            .benefits-grid { grid-template-columns: 1fr; }
+            .services-grid { grid-template-columns: 1fr; }
+            .photo-gallery { flex-direction: column; align-items: center; }
+            .photo-card { width: 95% !important; }
+            .photo-card:first-child, .photo-card:last-child { transform: none; }
+            .audit-wrap { padding: 32px 20px; }
+            .button-group { flex-direction: column; }
+            .cta-buttons { flex-direction: column; align-items: center; }
         }
     </style>
 </head>
 <body>
 
-<!-- Logo Header — transparent over hero, white on scroll -->
+<!-- ── HEADER ── -->
 <header class="site-header" id="siteHeader">
-    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
-        <img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" style="height: 80px; width: auto; filter: brightness(10); opacity: 0; transition: filter 0.4s ease, opacity 0.4s ease;" id="headerLogo">
-        <a href="login.html" class="cta-primary" style="padding: 12px 24px; font-size: 1em; margin: 0; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.7); color:#fff; backdrop-filter:blur(4px);" id="headerCta">Sign Up Free</a>
+    <div class="nav-inner">
+        <a href="#"><img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" id="headerLogo" style="height:70px;width:auto;transition:filter 0.4s ease;"></a>
+        <a href="login.html" class="nav-cta" id="headerCta">Sign Up Free</a>
     </div>
 </header>
 
-<!-- 1. Hero Landing Section -->
+<!-- ── HERO ── -->
 <section class="hero-landing" id="hero">
-    <!-- Video background -->
     <video class="hero-video" id="heroVideo" autoplay muted loop playsinline>
         <source src="/public/videos/property-showcase.mp4" type="video/mp4">
     </video>
-    <!-- Dark overlay -->
     <div class="hero-overlay"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
 
     <div class="hero-content">
-        <h1>"I need my listings to stand out and sell faster, but I'm stretched thin as it is."</h1>
-        <p>You're juggling viewings, valuations, and completions, whilst vendors expect premium marketing that matches their investment — and your competitors are winning instructions with better presentation.</p>
-        <div style="margin-bottom: 40px;">
-            <a href="#audit" class="hero-cta-secondary">Get Your Free 2-Minute Marketing Audit</a>
+        <div class="hero-badge">
+            <div class="hero-badge-dot"></div>
+            Premium Property Media · UK
+        </div>
+        <h1>
+            Stand out.<br>
+            <span class="hero-h1-grad">Sell faster.</span>
+        </h1>
+        <p>You're juggling viewings, valuations, and completions — whilst vendors expect premium marketing. Your competitors are winning instructions with better presentation. We fix that.</p>
+        <div class="hero-actions">
+            <a href="#audit" class="btn-primary">Get Your Free Marketing Audit →</a>
+            <a href="#services" class="btn-ghost">See what we do</a>
         </div>
     </div>
 </section>
 
-<!-- Marketing Audit Section -->
-<section class="audit-section" id="audit">
-    <div class="audit-container">
-        <div class="audit-header">
-            <div class="audit-badge">
-                <i data-lucide="target" style="width:16px;height:16px;"></i>
-                Free Marketing Audit
+<!-- ── PROOF BAR ── -->
+<div class="proof-bar">
+    <div class="proof-bar-inner">
+        <div class="proof-label">Why estate agents across the UK choose Markeb Media</div>
+        <div class="proof-item">
+            <div class="proof-item-icon"><i data-lucide="zap" style="width:20px;height:20px;"></i></div>
+            <div>
+                <div class="proof-item-title">48-Hour Delivery</div>
+                <div class="proof-item-sub">Shoot to inbox in 2 days</div>
             </div>
-            <h2>How Effective Is Your Property Marketing?</h2>
-            <p>Answer 8 quick questions to discover where you're losing listings and revenue.</p>
         </div>
+        <div class="proof-divider"></div>
+        <div class="proof-item">
+            <div class="proof-item-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px;"></i></div>
+            <div>
+                <div class="proof-item-title">Live Tracking</div>
+                <div class="proof-item-sub">See every stage in real time</div>
+            </div>
+        </div>
+        <div class="proof-divider"></div>
+        <div class="proof-item">
+            <div class="proof-item-icon"><i data-lucide="target" style="width:20px;height:20px;"></i></div>
+            <div>
+                <div class="proof-item-title">Platform Optimised</div>
+                <div class="proof-item-sub">Rightmove, Zoopla & social</div>
+            </div>
+        </div>
+        <div class="proof-divider"></div>
+        <div class="proof-item">
+            <div class="proof-item-icon"><i data-lucide="navigation" style="width:20px;height:20px;"></i></div>
+            <div>
+                <div class="proof-item-title">CAA-Approved Drones</div>
+                <div class="proof-item-sub">Cinematic aerial coverage</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── AUDIT SECTION ── -->
+<section style="padding: 100px 20px;" id="audit">
+    <div class="audit-wrap reveal">
+        <div class="audit-badge">
+            <i data-lucide="target" style="width:14px;height:14px;"></i>
+            Free Marketing Audit
+        </div>
+        <h2>How effective is your property marketing?</h2>
+        <p>Answer 8 quick questions to discover where you're losing listings and revenue.</p>
 
         <div class="progress-bar-container">
             <div class="progress-bar" id="progressBar"></div>
@@ -1570,264 +1322,125 @@
         <div class="error-message" id="errorMessage"></div>
 
         <form id="auditForm">
-            <!-- Question 1 -->
             <div class="form-step active" data-step="1">
                 <div class="question-card">
-                    <div class="question-number">1</div>
+                    <div class="question-number">01</div>
                     <div class="question-text">What type of photography do you currently use for property listings?</div>
                     <div class="option-group">
-                        <label class="option-label">
-                            <input type="radio" name="q1" value="1" required>
-                            <div class="checkmark"></div>
-                            <span class="option-text">iPhone or basic camera photos</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q1" value="2">
-                            <div class="checkmark"></div>
-                            <span class="option-text">General Media Specialist (does properties occasionally)</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q1" value="3">
-                            <div class="checkmark"></div>
-                            <span class="option-text">Specialist property Media Specialist with HDR/editing</span>
-                        </label>
+                        <label class="option-label"><input type="radio" name="q1" value="1" required><div class="checkmark"></div><span class="option-text">iPhone or basic camera photos</span></label>
+                        <label class="option-label"><input type="radio" name="q1" value="2"><div class="checkmark"></div><span class="option-text">General Media Specialist (does properties occasionally)</span></label>
+                        <label class="option-label"><input type="radio" name="q1" value="3"><div class="checkmark"></div><span class="option-text">Specialist property Media Specialist with HDR/editing</span></label>
                     </div>
                 </div>
-                <div class="button-group">
-                    <button type="button" class="btn btn-primary" onclick="nextStep()" style="width: 100%;">Next →</button>
-                </div>
+                <div class="button-group"><button type="button" class="btn btn-prim" onclick="nextStep()" style="width:100%;">Next →</button></div>
             </div>
-
-            <!-- Question 2 -->
             <div class="form-step" data-step="2">
                 <div class="question-card">
-                    <div class="question-number">2</div>
+                    <div class="question-number">02</div>
                     <div class="question-text">Do you currently use video content for your listings?</div>
                     <div class="option-group">
-                        <label class="option-label">
-                            <input type="radio" name="q2" value="0" required>
-                            <div class="checkmark"></div>
-                            <span class="option-text">No video content at all</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q2" value="2">
-                            <div class="checkmark"></div>
-                            <span class="option-text">Basic walkthrough videos occasionally</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q2" value="4">
-                            <div class="checkmark"></div>
-                            <span class="option-text">Professional video tours for most/all listings</span>
-                        </label>
+                        <label class="option-label"><input type="radio" name="q2" value="0" required><div class="checkmark"></div><span class="option-text">No video content at all</span></label>
+                        <label class="option-label"><input type="radio" name="q2" value="2"><div class="checkmark"></div><span class="option-text">Basic walkthrough videos occasionally</span></label>
+                        <label class="option-label"><input type="radio" name="q2" value="4"><div class="checkmark"></div><span class="option-text">Professional video tours for most/all listings</span></label>
                     </div>
                 </div>
-                <div class="button-group">
-                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
-                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
-                </div>
+                <div class="button-group"><button type="button" class="btn btn-sec" onclick="prevStep()">← Back</button><button type="button" class="btn btn-prim" onclick="nextStep()">Next →</button></div>
             </div>
-
-            <!-- Question 3 -->
             <div class="form-step" data-step="3">
                 <div class="question-card">
-                    <div class="question-number">3</div>
+                    <div class="question-number">03</div>
                     <div class="question-text">How often do you use drone/aerial footage?</div>
                     <div class="option-group">
-                        <label class="option-label">
-                            <input type="radio" name="q3" value="0" required>
-                            <div class="checkmark"></div>
-                            <span class="option-text">Never - don't use drone footage</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q3" value="2">
-                            <div class="checkmark"></div>
-                            <span class="option-text">Occasionally for premium properties</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q3" value="3">
-                            <div class="checkmark"></div>
-                            <span class="option-text">Regularly use aerial shots when appropriate</span>
-                        </label>
+                        <label class="option-label"><input type="radio" name="q3" value="0" required><div class="checkmark"></div><span class="option-text">Never — don't use drone footage</span></label>
+                        <label class="option-label"><input type="radio" name="q3" value="2"><div class="checkmark"></div><span class="option-text">Occasionally for premium properties</span></label>
+                        <label class="option-label"><input type="radio" name="q3" value="3"><div class="checkmark"></div><span class="option-text">Regularly use aerial shots when appropriate</span></label>
                     </div>
                 </div>
-                <div class="button-group">
-                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
-                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
-                </div>
+                <div class="button-group"><button type="button" class="btn btn-sec" onclick="prevStep()">← Back</button><button type="button" class="btn btn-prim" onclick="nextStep()">Next →</button></div>
             </div>
-
-            <!-- Question 4 -->
             <div class="form-step" data-step="4">
                 <div class="question-card">
-                    <div class="question-number">4</div>
+                    <div class="question-number">04</div>
                     <div class="question-text">What's your typical turnaround time from shoot to receiving media?</div>
                     <div class="option-group">
-                        <label class="option-label">
-                            <input type="radio" name="q4" value="1" required>
-                            <div class="checkmark"></div>
-                            <span class="option-text">1 week or more</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q4" value="2">
-                            <div class="checkmark"></div>
-                            <span class="option-text">3-5 business days</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q4" value="3">
-                            <div class="checkmark"></div>
-                            <span class="option-text">48 hours or less</span>
-                        </label>
+                        <label class="option-label"><input type="radio" name="q4" value="1" required><div class="checkmark"></div><span class="option-text">1 week or more</span></label>
+                        <label class="option-label"><input type="radio" name="q4" value="2"><div class="checkmark"></div><span class="option-text">3–5 business days</span></label>
+                        <label class="option-label"><input type="radio" name="q4" value="3"><div class="checkmark"></div><span class="option-text">48 hours or less</span></label>
                     </div>
                 </div>
-                <div class="button-group">
-                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
-                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
-                </div>
+                <div class="button-group"><button type="button" class="btn btn-sec" onclick="prevStep()">← Back</button><button type="button" class="btn btn-prim" onclick="nextStep()">Next →</button></div>
             </div>
-
-            <!-- Question 5 -->
             <div class="form-step" data-step="5">
                 <div class="question-card">
-                    <div class="question-number">5</div>
+                    <div class="question-number">05</div>
                     <div class="question-text">How active are you on social media with property content?</div>
                     <div class="option-group">
-                        <label class="option-label">
-                            <input type="radio" name="q5" value="1" required>
-                            <div class="checkmark"></div>
-                            <span class="option-text">Rarely or never post property content</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q5" value="2">
-                            <div class="checkmark"></div>
-                            <span class="option-text">Occasionally share new listings</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q5" value="3">
-                            <div class="checkmark"></div>
-                            <span class="option-text">Regular, engaging content strategy</span>
-                        </label>
+                        <label class="option-label"><input type="radio" name="q5" value="1" required><div class="checkmark"></div><span class="option-text">Rarely or never post property content</span></label>
+                        <label class="option-label"><input type="radio" name="q5" value="2"><div class="checkmark"></div><span class="option-text">Occasionally share new listings</span></label>
+                        <label class="option-label"><input type="radio" name="q5" value="3"><div class="checkmark"></div><span class="option-text">Regular, engaging content strategy</span></label>
                     </div>
                 </div>
-                <div class="button-group">
-                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
-                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
-                </div>
+                <div class="button-group"><button type="button" class="btn btn-sec" onclick="prevStep()">← Back</button><button type="button" class="btn btn-prim" onclick="nextStep()">Next →</button></div>
             </div>
-
-            <!-- Question 6 -->
             <div class="form-step" data-step="6">
                 <div class="question-card">
-                    <div class="question-number">6</div>
+                    <div class="question-number">06</div>
                     <div class="question-text">Do you provide clients with regular marketing performance reports?</div>
                     <div class="option-group">
-                        <label class="option-label">
-                            <input type="radio" name="q6" value="0" required>
-                            <div class="checkmark"></div>
-                            <span class="option-text">No - clients rarely receive performance updates</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q6" value="1">
-                            <div class="checkmark"></div>
-                            <span class="option-text">Occasional updates when clients ask</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q6" value="3">
-                            <div class="checkmark"></div>
-                            <span class="option-text">Weekly performance reports with views, engagement & enquiries</span>
-                        </label>
+                        <label class="option-label"><input type="radio" name="q6" value="0" required><div class="checkmark"></div><span class="option-text">No — clients rarely receive performance updates</span></label>
+                        <label class="option-label"><input type="radio" name="q6" value="1"><div class="checkmark"></div><span class="option-text">Occasional updates when clients ask</span></label>
+                        <label class="option-label"><input type="radio" name="q6" value="3"><div class="checkmark"></div><span class="option-text">Weekly performance reports with views, engagement & enquiries</span></label>
                     </div>
                 </div>
-                <div class="button-group">
-                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
-                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
-                </div>
+                <div class="button-group"><button type="button" class="btn btn-sec" onclick="prevStep()">← Back</button><button type="button" class="btn btn-prim" onclick="nextStep()">Next →</button></div>
             </div>
-
-            <!-- Question 7 -->
             <div class="form-step" data-step="7">
                 <div class="question-card">
-                    <div class="question-number">7</div>
+                    <div class="question-number">07</div>
                     <div class="question-text">How do vendors typically react to your property marketing materials?</div>
                     <div class="option-group">
-                        <label class="option-label">
-                            <input type="radio" name="q7" value="1" required>
-                            <div class="checkmark"></div>
-                            <span class="option-text">Often disappointed or request improvements</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q7" value="2">
-                            <div class="checkmark"></div>
-                            <span class="option-text">Generally satisfied, no major complaints</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q7" value="3">
-                            <div class="checkmark"></div>
-                            <span class="option-text">Consistently impressed and share with friends</span>
-                        </label>
+                        <label class="option-label"><input type="radio" name="q7" value="1" required><div class="checkmark"></div><span class="option-text">Often disappointed or request improvements</span></label>
+                        <label class="option-label"><input type="radio" name="q7" value="2"><div class="checkmark"></div><span class="option-text">Generally satisfied, no major complaints</span></label>
+                        <label class="option-label"><input type="radio" name="q7" value="3"><div class="checkmark"></div><span class="option-text">Consistently impressed and share with friends</span></label>
                     </div>
                 </div>
-                <div class="button-group">
-                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
-                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
-                </div>
+                <div class="button-group"><button type="button" class="btn btn-sec" onclick="prevStep()">← Back</button><button type="button" class="btn btn-prim" onclick="nextStep()">Next →</button></div>
             </div>
-
-            <!-- Question 8 -->
             <div class="form-step" data-step="8">
                 <div class="question-card">
-                    <div class="question-number">8</div>
+                    <div class="question-number">08</div>
                     <div class="question-text">How does your marketing compare to competitors in your area?</div>
                     <div class="option-group">
-                        <label class="option-label">
-                            <input type="radio" name="q8" value="1" required>
-                            <div class="checkmark"></div>
-                            <span class="option-text">We're behind - competitors have better visuals</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q8" value="2">
-                            <div class="checkmark"></div>
-                            <span class="option-text">About the same - similar quality</span>
-                        </label>
-                        <label class="option-label">
-                            <input type="radio" name="q8" value="3">
-                            <div class="checkmark"></div>
-                            <span class="option-text">We're the market leader in presentation</span>
-                        </label>
+                        <label class="option-label"><input type="radio" name="q8" value="1" required><div class="checkmark"></div><span class="option-text">We're behind — competitors have better visuals</span></label>
+                        <label class="option-label"><input type="radio" name="q8" value="2"><div class="checkmark"></div><span class="option-text">About the same — similar quality</span></label>
+                        <label class="option-label"><input type="radio" name="q8" value="3"><div class="checkmark"></div><span class="option-text">We're the market leader in presentation</span></label>
                     </div>
                 </div>
-                <div class="button-group">
-                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
-                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next →</button>
-                </div>
+                <div class="button-group"><button type="button" class="btn btn-sec" onclick="prevStep()">← Back</button><button type="button" class="btn btn-prim" onclick="nextStep()">Next →</button></div>
             </div>
-
-            <!-- Step 9: Contact Info -->
             <div class="form-step" data-step="9">
                 <div class="question-card">
-                    <div class="question-text" style="font-size: 1.5em; margin-bottom: 15px; display:flex; align-items:center; gap:10px;">
-                        <i data-lucide="bar-chart-2" style="width:28px;height:28px;color:#FF6B00;"></i>
-                        Your Score is Ready!
+                    <div class="question-text" style="font-size:1.3em;display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                        <i data-lucide="bar-chart-2" style="width:26px;height:26px;color:var(--brand);"></i>
+                        Your score is ready!
                     </div>
-                    <p style="color: #6B7280; font-size: 1.1em; margin-bottom: 25px;">Enter your details below to receive your personalised marketing analysis and actionable recommendations.</p>
+                    <p style="color:var(--text-muted);font-size:15px;margin-bottom:24px;font-weight:300;">Enter your details to receive your personalised marketing analysis.</p>
                     <input type="text" class="form-input" id="name" placeholder="Your Full Name *" required>
                     <input type="text" class="form-input" id="agency" placeholder="Agency Name *" required>
                     <input type="email" class="form-input" id="email" placeholder="Email Address *" required>
                     <input type="tel" class="form-input" id="phone" placeholder="Phone Number *" required>
                 </div>
                 <div class="button-group">
-                    <button type="button" class="btn btn-secondary" onclick="prevStep()">← Back</button>
-                    <button type="button" class="btn btn-primary" onclick="submitAudit()">Get My Full Analysis →</button>
+                    <button type="button" class="btn btn-sec" onclick="prevStep()">← Back</button>
+                    <button type="button" class="btn btn-prim" onclick="submitAudit()">Get My Full Analysis →</button>
                 </div>
             </div>
         </form>
 
-        <!-- Loading State -->
         <div class="loading-spinner" id="loadingSpinner">
             <div class="spinner"></div>
-            <p style="color: #6B7280; font-size: 1.1em;">Analysing your marketing strategy...</p>
+            <p style="color:var(--text-muted);font-size:15px;">Analysing your marketing strategy...</p>
         </div>
-
-        <!-- Results -->
         <div class="results-container" id="resultsContainer">
             <div class="score-display" id="scoreDisplay">
                 <div class="score-number" id="scoreNumber"></div>
@@ -1835,771 +1448,507 @@
                 <div class="score-description" id="scoreDescription"></div>
             </div>
             <div class="analysis-content" id="analysisContent"></div>
-            <div style="text-align: center; margin-top: 40px;">
-                <a href="login.html" class="cta-primary" style="display: inline-block;">Book Your Premium Shoot Now</a>
+            <div style="text-align:center;margin-top:32px;">
+                <a href="login.html" class="btn-primary" style="display:inline-block;">Book Your Premium Shoot Now</a>
             </div>
         </div>
     </div>
 </section>
 
-<!-- 2. Process Section -->
-<section class="process-section" id="process">
-    <h2 style="font-size: 2.8em; font-weight: 800; margin-bottom: 15px; color: #1F2E3C; line-height: 1.2;">
-        From Brief to Brilliant in 3 Steps
-    </h2>
-    <p style="font-size: 1.3em; color: #6B7280; margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">
-        Our proven process transforms your property into premium marketing content that sells.
-    </p>
-    
-    <div class="roadmap-container" style="margin-top: 60px;">
-        <div class="road-line"></div>
-        
-        <div class="marker-start">
-            <i data-lucide="rocket" style="width:18px;height:18px;"></i>
-            START HERE
-        </div>
-        
-        <div class="step-card">
-            <div>
-                <div class="step-number">1</div>
-                <h3>
-                    <i data-lucide="calendar" style="width:22px;height:22px;color:#FF6B00;"></i>
-                    Book Your Shoot
-                </h3>
-                <p>Choose your date and we'll handle everything from planning to equipment. No stress, just results.</p>
+<!-- ── PROCESS SECTION ── -->
+<div class="process-section">
+    <div class="mm-section reveal">
+        <div class="section-label">How it works</div>
+        <h2 class="mm-h2">From brief to brilliant<br>in 3 steps.</h2>
+        <p class="mm-sub">Our proven process transforms your property into premium marketing content that sells — all in under 48 hours.</p>
+
+        <div class="roadmap-container">
+            <div class="road-line"></div>
+            <div class="marker-start">
+                <i data-lucide="rocket" style="width:16px;height:16px;"></i>
+                Start here
             </div>
-        </div>
-        
-        <div class="step-card">
-            <div>
-                <div class="step-number">2</div>
-                <h3>
-                    <i data-lucide="camera" style="width:22px;height:22px;color:#FF6B00;"></i>
-                    We Create Magic
-                </h3>
+            <div class="step-card">
+                <div class="step-number">01</div>
+                <h3><i data-lucide="calendar" style="width:18px;height:18px;color:var(--brand);"></i>Book Your Shoot</h3>
+                <p>Choose your date and we handle everything from planning to equipment. No stress, just results.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">02</div>
+                <h3><i data-lucide="camera" style="width:18px;height:18px;color:var(--brand);"></i>We Create Magic</h3>
                 <p>Professional photography and filming that captures every detail and showcases what makes your property irresistible.</p>
             </div>
-        </div>
-        
-        <div class="step-card">
-            <div>
-                <div class="step-number">3</div>
-                <h3>
-                    <i data-lucide="smartphone" style="width:22px;height:22px;color:#FF6B00;"></i>
-                    Receive &amp; Go Live
-                </h3>
-                <p>Get your platform-ready photos and videos delivered, then watch your listing go live with premium content.</p>
+            <div class="step-card">
+                <div class="step-number">03</div>
+                <h3><i data-lucide="smartphone" style="width:18px;height:18px;color:var(--brand);"></i>Receive &amp; Go Live</h3>
+                <p>Platform-ready photos and videos delivered to your inbox, ready for immediate listing.</p>
+            </div>
+            <div class="marker-sold">
+                <i data-lucide="banknote" style="width:18px;height:18px;"></i>
+                SOLD
             </div>
         </div>
-        
-        <div class="marker-sold">
-            <i data-lucide="banknote" style="width:20px;height:20px;"></i>
-            SOLD
+
+        <div class="benefits-grid">
+            <div class="benefit-cell">
+                <div class="benefit-icon"><i data-lucide="zap" style="width:26px;height:26px;"></i></div>
+                <h4>48-Hour Delivery</h4>
+                <p>From shoot to your inbox in just 2 working days</p>
+            </div>
+            <div class="benefit-cell">
+                <div class="benefit-icon"><i data-lucide="bar-chart-2" style="width:26px;height:26px;"></i></div>
+                <h4>Live Progress Tracking</h4>
+                <p>See exactly where your content is in our process</p>
+            </div>
+            <div class="benefit-cell">
+                <div class="benefit-icon"><i data-lucide="target" style="width:26px;height:26px;"></i></div>
+                <h4>Platform Optimised</h4>
+                <p>Ready for Rightmove, Zoopla, and social media</p>
+            </div>
+            <div class="benefit-cell">
+                <div class="benefit-icon"><i data-lucide="trophy" style="width:26px;height:26px;"></i></div>
+                <h4>Premium Quality</h4>
+                <p>Cinematic content that positions you as the expert</p>
+            </div>
         </div>
-    </div>
-    
-    <div class="benefits">
-        <div class="benefit-item">
-            <div class="icon"><i data-lucide="zap" style="width:28px;height:28px;"></i></div>
-            <h4>48-Hour Delivery</h4>
-            <p>From shoot to your inbox in just 2 working days</p>
-        </div>
-        <div class="benefit-item">
-            <div class="icon"><i data-lucide="bar-chart-2" style="width:28px;height:28px;"></i></div>
-            <h4>Live Progress Tracking</h4>
-            <p>See exactly where your content is in our process</p>
-        </div>
-        <div class="benefit-item">
-            <div class="icon"><i data-lucide="target" style="width:28px;height:28px;"></i></div>
-            <h4>Platform Optimised</h4>
-            <p>Ready for Rightmove, Zoopla, and social media</p>
-        </div>
-        <div class="benefit-item">
-            <div class="icon"><i data-lucide="trophy" style="width:28px;height:28px;"></i></div>
-            <h4>Premium Quality</h4>
-            <p>Cinematic content that positions you as the expert</p>
-        </div>
-    </div>
-    
-    <div style="background:linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);border-radius:20px;padding:35px;margin-top:40px;border-left:6px solid #22C55E;">
-        <p style="font-size:1.3em;font-weight:600;color:#15803D;margin:0;display:flex;align-items:center;gap:10px;">
-            <i data-lucide="check-circle" style="width:24px;height:24px;color:#22C55E;flex-shrink:0;"></i>
+
+        <div class="process-banner">
+            <i data-lucide="check-circle" style="width:22px;height:22px;flex-shrink:0;"></i>
             Your property marketing transformed in under 48 hours
-        </p>
-    </div>
-</section>
-
-<!-- 3. Services Section -->
-<section class="services-section" id="services">
-    <div class="container">
-        <div class="line-band" id="mm-line-band">
-            <h2 class="line-header" id="mm-line-header">Consistent, Reliable, High Quality</h2>
         </div>
+    </div>
+</div>
 
-        <div class="cards">
+<!-- ── SERVICES SECTION ── -->
+<div class="services-bg" id="services">
+    <div class="mm-section reveal">
+        <div class="section-label">Services</div>
+        <h2 class="mm-h2">Consistent, reliable,<br>high quality.</h2>
+        <p class="mm-sub">Everything you need to present properties at their absolute best — delivered fast and ready to publish.</p>
+
+        <div class="services-grid">
             <div class="service-card">
-                <span class="tick"><i data-lucide="check-circle" style="width:22px;height:22px;"></i></span>
-                <div class="service-icon"><i data-lucide="camera" style="width:44px;height:44px;"></i></div>
+                <span class="tick"><i data-lucide="check-circle" style="width:20px;height:20px;"></i></span>
+                <div class="service-icon"><i data-lucide="camera" style="width:24px;height:24px;"></i></div>
                 <h3>Photography</h3>
                 <p>Crisp interior & exterior shots designed to sell homes and capture every premium detail.</p>
             </div>
-
             <div class="service-card">
-                <span class="tick"><i data-lucide="check-circle" style="width:22px;height:22px;"></i></span>
-                <div class="service-icon"><i data-lucide="video" style="width:44px;height:44px;"></i></div>
+                <span class="tick"><i data-lucide="check-circle" style="width:20px;height:20px;"></i></span>
+                <div class="service-icon"><i data-lucide="video" style="width:24px;height:24px;"></i></div>
                 <h3>Videography</h3>
                 <p>Walkthrough videos that let buyers feel the space and imagine their future home.</p>
             </div>
-
             <div class="service-card">
-                <span class="tick"><i data-lucide="check-circle" style="width:22px;height:22px;"></i></span>
-                <div class="service-icon"><i data-lucide="navigation" style="width:44px;height:44px;"></i></div>
+                <span class="tick"><i data-lucide="check-circle" style="width:20px;height:20px;"></i></span>
+                <div class="service-icon"><i data-lucide="navigation" style="width:24px;height:24px;"></i></div>
                 <h3>Drone</h3>
                 <p>Aerial media that gives your listings a luxury edge and showcases the full property.</p>
             </div>
-
             <div class="service-card">
-                <span class="tick"><i data-lucide="check-circle" style="width:22px;height:22px;"></i></span>
-                <div class="service-icon"><i data-lucide="smartphone" style="width:44px;height:44px;"></i></div>
+                <span class="tick"><i data-lucide="check-circle" style="width:20px;height:20px;"></i></span>
+                <div class="service-icon"><i data-lucide="smartphone" style="width:24px;height:24px;"></i></div>
                 <h3>Content Tracking</h3>
                 <p>Track your content's progress live — complete clarity, no stress, total control.</p>
             </div>
-
-            <div class="service-card">
-                <span class="tick"><i data-lucide="check-circle" style="width:22px;height:22px;"></i></span>
-                <div class="service-icon"><i data-lucide="zap" style="width:44px;height:44px;"></i></div>
+            <div class="service-card" style="grid-column: span 2;">
+                <span class="tick"><i data-lucide="check-circle" style="width:20px;height:20px;"></i></span>
+                <div class="service-icon"><i data-lucide="zap" style="width:24px;height:24px;"></i></div>
                 <h3>48hr Turnaround</h3>
                 <p>All visuals delivered within two working days, ready for immediate listing.</p>
             </div>
         </div>
     </div>
-</section>
+</div>
 
-
-<!-- 5. What's at Stake Section -->
-<section class="section" style="background:#FFFFFF;">
-    <div class="container" style="max-width:1200px;">
-        <div style="text-align:center;margin-bottom:40px;">
+<!-- ── WHAT'S AT STAKE ── -->
+<section style="padding: 100px 20px; background: var(--bg);">
+    <div class="container reveal">
+        <div style="text-align:center;margin-bottom:16px;">
             <div class="header-badge">
-                <i data-lucide="scale" style="width:16px;height:16px;"></i>
+                <i data-lucide="scale" style="width:14px;height:14px;"></i>
                 What's Really at Stake
             </div>
-            <h2 style="font-size:2.6em;font-weight:800;color:#1F2E3C;margin-bottom:15px;line-height:1.2;">
-                The Choice That Defines Your Success
-            </h2>
-            <p style="font-size:1.3em;color:#6B7280;max-width:700px;margin:0 auto;">
-                Every day you wait is a day your competitors get ahead. Here's what hangs in the balance.
-            </p>
         </div>
-
+        <div style="text-align:center;margin-bottom:48px;">
+            <h2 class="mm-h2" style="margin-bottom:12px;">The choice that defines<br>your success.</h2>
+            <p style="font-size:17px;color:var(--text-muted);max-width:600px;margin:0 auto;font-weight:300;line-height:1.6;">Every day you wait is a day your competitors get ahead.</p>
+        </div>
         <div class="stake-grid">
             <div class="stake-card danger-card">
-                <h2>
-                    <i data-lucide="x-circle" style="width:28px;height:28px;color:#DC2626;flex-shrink:0;"></i>
-                    Without Professional Marketing
-                </h2>
-                <p>Sticking with amateur photos and basic marketing isn't just limiting your growth—it's actively damaging your reputation and revenue.</p>
-                <ul class="stake-list danger-list">
-                    <li>
-                        <span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:18px;height:18px;"></i></span>
-                        <span>Listings sit on the market for months</span>
-                    </li>
-                    <li>
-                        <span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:18px;height:18px;"></i></span>
-                        <span>Vendors question your marketing investment</span>
-                    </li>
-                    <li>
-                        <span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:18px;height:18px;"></i></span>
-                        <span>Competitors win premium instructions</span>
-                    </li>
-                    <li>
-                        <span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:18px;height:18px;"></i></span>
-                        <span>Reduced commission opportunities</span>
-                    </li>
-                    <li>
-                        <span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:18px;height:18px;"></i></span>
-                        <span>Your reputation suffers in the market</span>
-                    </li>
-                    <li>
-                        <span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:18px;height:18px;"></i></span>
-                        <span>Business growth stagnates</span>
-                    </li>
+                <h2><i data-lucide="x-circle" style="width:24px;height:24px;color:#ef4444;flex-shrink:0;"></i>Without Professional Marketing</h2>
+                <p>Amateur photos aren't just limiting your growth — they're actively damaging your reputation and revenue.</p>
+                <ul class="stake-list">
+                    <li><span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:16px;height:16px;"></i></span><span>Listings sit on the market for months</span></li>
+                    <li><span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:16px;height:16px;"></i></span><span>Vendors question your marketing investment</span></li>
+                    <li><span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:16px;height:16px;"></i></span><span>Competitors win premium instructions</span></li>
+                    <li><span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:16px;height:16px;"></i></span><span>Reduced commission opportunities</span></li>
+                    <li><span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:16px;height:16px;"></i></span><span>Your reputation suffers in the market</span></li>
+                    <li><span class="stake-icon danger-icon"><i data-lucide="alert-triangle" style="width:16px;height:16px;"></i></span><span>Business growth stagnates</span></li>
                 </ul>
-                <div class="bottom-cta danger-cta">
-                    "Why did I wait so long? I could have been earning more this whole time."
-                </div>
+                <div class="bottom-cta danger-cta">"Why did I wait so long? I could have been earning more this whole time."</div>
             </div>
-
             <div class="stake-card success-card">
-                <h2>
-                    <i data-lucide="check-circle" style="width:28px;height:28px;color:#059669;flex-shrink:0;"></i>
-                    With Markeb Media
-                </h2>
-                <p>Professional video marketing doesn't just improve your listings—it transforms your entire business and positions you as the premium choice.</p>
-                <ul class="stake-list success-list">
-                    <li>
-                        <span class="stake-icon success-icon"><i data-lucide="rocket" style="width:18px;height:18px;"></i></span>
-                        <span>Properties generate immediate interest</span>
-                    </li>
-                    <li>
-                        <span class="stake-icon success-icon"><i data-lucide="gem" style="width:18px;height:18px;"></i></span>
-                        <span>Vendors choose you for premium properties</span>
-                    </li>
-                    <li>
-                        <span class="stake-icon success-icon"><i data-lucide="trophy" style="width:18px;height:18px;"></i></span>
-                        <span>You become the go-to agent in your area</span>
-                    </li>
-                    <li>
-                        <span class="stake-icon success-icon"><i data-lucide="banknote" style="width:18px;height:18px;"></i></span>
-                        <span>Higher-value instructions increase revenue</span>
-                    </li>
-                    <li>
-                        <span class="stake-icon success-icon"><i data-lucide="star" style="width:18px;height:18px;"></i></span>
-                        <span>Professional reputation attracts referrals</span>
-                    </li>
-                    <li>
-                        <span class="stake-icon success-icon"><i data-lucide="trending-up" style="width:18px;height:18px;"></i></span>
-                        <span>Sustainable business growth and success</span>
-                    </li>
+                <h2><i data-lucide="check-circle" style="width:24px;height:24px;color:var(--green);flex-shrink:0;"></i>With Markeb Media</h2>
+                <p>Professional video marketing transforms your entire business and positions you as the premium choice.</p>
+                <ul class="stake-list">
+                    <li><span class="stake-icon success-icon"><i data-lucide="rocket" style="width:16px;height:16px;"></i></span><span>Properties generate immediate interest</span></li>
+                    <li><span class="stake-icon success-icon"><i data-lucide="gem" style="width:16px;height:16px;"></i></span><span>Vendors choose you for premium properties</span></li>
+                    <li><span class="stake-icon success-icon"><i data-lucide="trophy" style="width:16px;height:16px;"></i></span><span>You become the go-to agent in your area</span></li>
+                    <li><span class="stake-icon success-icon"><i data-lucide="banknote" style="width:16px;height:16px;"></i></span><span>Higher-value instructions increase revenue</span></li>
+                    <li><span class="stake-icon success-icon"><i data-lucide="star" style="width:16px;height:16px;"></i></span><span>Professional reputation attracts referrals</span></li>
+                    <li><span class="stake-icon success-icon"><i data-lucide="trending-up" style="width:16px;height:16px;"></i></span><span>Sustainable business growth and success</span></li>
                 </ul>
-                <div class="bottom-cta success-cta">
-                    "This is exactly the competitive edge I needed to dominate my market."
-                </div>
+                <div class="bottom-cta success-cta">"This is exactly the competitive edge I needed to dominate my market."</div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- 6. Success Vision Section -->
-<section class="section" style="background:#F9FAFB;">
-    <div class="container" style="max-width:1000px;text-align:center;">
-        <h2 style="font-size:2.8em;font-weight:800;color:#1F2E3C;margin-bottom:20px;line-height:1.2;">
-            Picture This: Your Success Story
-        </h2>
-        <p style="font-size:1.4em;color:#6B7280;margin-bottom:30px;max-width:700px;margin-left:auto;margin-right:auto;">
-            Imagine the confidence, the reputation, and the results you'll have just weeks from now...
-        </p>
+<!-- ── SUCCESS VISION ── -->
+<section style="padding: 100px 20px; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div style="max-width:960px;margin:0 auto;text-align:center;" class="reveal">
+        <div class="section-label" style="justify-content:center;display:inline-flex;">Your transformation</div>
+        <h2 class="mm-h2" style="margin-bottom:16px;">Picture this:<br>your success story.</h2>
+        <p style="font-size:17px;color:var(--text-muted);max-width:560px;margin:0 auto 40px;font-weight:300;line-height:1.6;">Imagine the confidence, the reputation, and the results you'll have just weeks from now...</p>
 
-        <div style="background:linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);border-radius:24px;padding:50px 40px;margin:40px 0;border:3px solid #BBF7D0;box-shadow:0 15px 40px rgba(5, 150, 105, 0.1);position:relative;overflow:hidden;">
-            <div style="position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg, #059669, #10B981, #059669);background-size:200% 100%;animation:shimmer 3s ease-in-out infinite;"></div>
-            <h3 style="font-size:2.2em;font-weight:700;color:#065F46;margin-bottom:25px;display:flex;align-items:center;justify-content:center;gap:10px;">
-                <i data-lucide="sparkles" style="width:32px;height:32px;color:#059669;"></i>
+        <div class="vision-banner">
+            <h3 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#065F46;margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:10px;letter-spacing:-0.5px;">
+                <i data-lucide="sparkles" style="width:28px;height:28px;color:var(--green);"></i>
                 Your Transformation Awaits
             </h3>
-            <div style="background:rgba(255, 255, 255, 0.9);border-radius:16px;padding:30px;margin:30px 0;border-left:6px solid #10B981;font-style:italic;font-size:1.2em;color:#065F46;text-align:center;box-shadow:0 8px 25px rgba(16, 185, 129, 0.1);">
+            <div class="vision-quote">
                 "Within 30 days of working with Markeb Media, I became the agent everyone wants to list with. My phone doesn't stop ringing with enquiries from vendors who've seen my video content online."
             </div>
         </div>
 
-        <div class="success-scenarios">
+        <div class="scenario-grid" style="text-align:left;">
             <div class="scenario-card">
-                <div class="scenario-icon"><i data-lucide="smartphone" style="width:36px;height:36px;"></i></div>
+                <div class="scenario-icon"><i data-lucide="smartphone" style="width:22px;height:22px;"></i></div>
                 <h3>The Social Media Buzz</h3>
-                <p>Your video tours go viral on social media. Potential buyers are sharing your content, and other agents are asking "Who created that amazing property video?"</p>
+                <p>Your video tours go viral. Potential buyers are sharing your content, and other agents are asking "Who created that amazing property video?"</p>
             </div>
-            
             <div class="scenario-card">
-                <div class="scenario-icon"><i data-lucide="handshake" style="width:36px;height:36px;"></i></div>
+                <div class="scenario-icon"><i data-lucide="handshake" style="width:22px;height:22px;"></i></div>
                 <h3>The Vendor Meeting</h3>
-                <p>You walk into a valuation with confidence, knowing your portfolio of stunning video content sets you apart. Vendors choose you before you even quote your commission.</p>
+                <p>You walk into a valuation with confidence. Vendors choose you before you even quote your commission.</p>
             </div>
-            
             <div class="scenario-card">
-                <div class="scenario-icon"><i data-lucide="home" style="width:36px;height:36px;"></i></div>
+                <div class="scenario-icon"><i data-lucide="home" style="width:22px;height:22px;"></i></div>
                 <h3>The Quick Sale</h3>
-                <p>Properties that used to sit on the market for months are now generating multiple offers within days. Your reputation for results spreads throughout the community.</p>
+                <p>Properties that used to sit for months are now generating multiple offers within days. Your reputation spreads throughout the community.</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- 7. Photo Showcase Section -->
-<section class="showcase-section" id="showcase">
-    <div class="showcase-container">
-        <div style="text-align: center; margin-bottom: 60px;">
-            <div class="header-badge">
-                <i data-lucide="camera" style="width:16px;height:16px;"></i>
-                See the Difference
-            </div>
-            <h2 style="font-size: 2.4em; font-weight: 800; color: #1F2E3C; margin-bottom: 15px; line-height: 1.2;">
-                This Is What Premium Looks Like
-            </h2>
-            <p style="font-size: 1.3em; color: #4A6378; max-width: 600px; margin: 0 auto;">
-                Our drone photography transforms ordinary properties into extraordinary marketing assets that stop scrollers in their tracks.
-            </p>
+<!-- ── SHOWCASE ── -->
+<div class="showcase-bg" id="showcase">
+    <div class="mm-section reveal">
+        <div class="header-badge">
+            <i data-lucide="camera" style="width:14px;height:14px;"></i>
+            See the Difference
         </div>
-        
+        <h2 class="mm-h2">This is what<br>premium looks like.</h2>
+        <p class="mm-sub">Our drone photography transforms ordinary properties into extraordinary marketing assets that stop scrollers in their tracks.</p>
+
         <div class="photo-gallery">
             <div class="photo-card">
                 <img src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/61b92060-d48f-4db8-b8cf-1657ec9a697c/DJI_0165_Removed+cars.jpg?format=500w" alt="Drone view of UK period mansion" />
                 <div class="photo-overlay">
                     <div class="photo-title">Period Mansion Showcase</div>
-                    <div class="photo-description">Cinematic aerial perspective that reveals the full grandeur and setting of this premium property.</div>
+                    <div class="photo-description">Cinematic aerial perspective revealing the full grandeur of this premium property.</div>
                 </div>
             </div>
-            
             <div class="photo-card">
                 <img src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/71cd6387-8d6d-44e1-ac4b-4e40cb183b90/DJI_0169_Removed+cars-2.jpg?format=500w" alt="Drone view of estate near lake" />
                 <div class="photo-overlay">
                     <div class="photo-title">Lakeside Estate</div>
-                    <div class="photo-description">Luxury aerial shot capturing the property's enviable position and stunning natural surroundings.</div>
+                    <div class="photo-description">Luxury aerial shot capturing the property's enviable position and stunning surroundings.</div>
                 </div>
             </div>
         </div>
-        
-        <div style="text-align: center; margin-top: 50px; padding: 35px; background: linear-gradient(135deg, #F8F9FA 0%, #E5E7EB 100%); border-radius: 20px; border: 2px solid #E5E7EB;">
-            <h3 style="font-size: 1.6em; font-weight: 700; color: #1F2E3C; margin-bottom: 15px;">Ready for Photography Like This?</h3>
-            <p style="color: #4A6378; font-size: 1.1em; margin-bottom: 25px;">Let us create stunning visuals that make your properties impossible to ignore.</p>
-            <a href="login.html" style="display: inline-block; background: linear-gradient(135deg, #FF6B00, #FF8A33); color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: 700; transition: all 0.3s ease; box-shadow: 0 6px 20px rgba(255, 107, 0, 0.3);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(255, 107, 0, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(255, 107, 0, 0.3)'">
-                Sign Up
-            </a>
+
+        <div class="showcase-footer">
+            <h3>Ready for photography like this?</h3>
+            <p>Let us create stunning visuals that make your properties impossible to ignore.</p>
+            <a href="login.html" class="btn-primary" style="display:inline-block;">Sign Up</a>
         </div>
     </div>
-</section>
+</div>
 
-<!-- 8. Final CTA Section -->
-<section class="final-cta-section" id="final-cta">
-    <div style="max-width: 900px; margin: 0 auto;">
-        <h2 style="font-size: 2.4em; font-weight: 800; margin-bottom: 20px; color: #1F2E3C; line-height: 1.3;">
-            Be the Agent Everyone Talks About
-        </h2>
-        <p style="font-size: 1.3em; margin-bottom: 40px; color: #4A6378; max-width: 700px; margin-left: auto; margin-right: auto; line-height: 1.6;">
-            Win more instructions, wow your clients, and keep buyers hooked — with high-impact marketing and live content tracking that puts you ahead of the competition.
-        </p>
-        <div class="final-cta-buttons">
-            <a href="login.html" class="final-cta-button primary-final-cta">Sign Up</a>
-            <a href="https://www.instagram.com/markeb_mediauk/" target="_blank" class="final-cta-button secondary-final-cta">View Our Portfolio</a>
-        </div>
-        <div style="margin-top: 50px; padding: 25px; background: #F8F9FA; border-radius: 16px; border: 2px solid #E5E7EB;">
-            <p style="font-size: 1em; color: #6B7280; margin: 0;">
-                No contracts • 48-hour delivery • 100% satisfaction guarantee • Live progress tracking
-            </p>
-        </div>
+<!-- ── FINAL CTA ── -->
+<div class="final-cta-wrap reveal">
+    <div class="section-label" style="justify-content:center;display:inline-flex;margin-bottom:24px;">Ready to dominate your market?</div>
+    <h2>Be the agent<br><span class="final-cta-grad">everyone talks about.</span></h2>
+    <p class="final-cta-sub">Win more instructions, wow your clients, and keep buyers hooked — with high-impact marketing that puts you ahead of the competition.</p>
+    <div class="cta-buttons">
+        <a href="login.html" class="btn-primary" style="font-size:16px;padding:16px 36px;">Sign Up Free →</a>
+        <a href="https://www.instagram.com/markeb_mediauk/" target="_blank" class="cta-btn-sec">View Our Portfolio</a>
     </div>
-</section>
+    <div class="trust-bar">
+        No contracts &nbsp;·&nbsp; 48-hour delivery &nbsp;·&nbsp; 100% satisfaction guarantee &nbsp;·&nbsp; Live progress tracking
+    </div>
+</div>
 
-<!-- 9. FAQ Section -->
-<section class="faq-section">
-    <div class="faq-container">
-        <div style="text-align:center;margin-bottom:60px;">
-            <h2 style="font-size: 2.4em; font-weight: 800; color: #1F2E3C; margin-bottom: 15px; line-height: 1.2;">
-                Questions? We've Got Answers
-            </h2>
-            <p style="font-size: 1.3em; color: #4A6378; max-width: 600px; margin: 0 auto;">
-                Everything you need to know about working with Markeb Media
-            </p>
-        </div>
-        
+<!-- ── FAQ ── -->
+<div class="faq-bg">
+    <div class="mm-section reveal">
+        <div class="section-label">FAQ</div>
+        <h2 class="mm-h2">Questions?<br>We've got answers.</h2>
+        <p class="mm-sub">Everything you need to know about working with Markeb Media.</p>
+
         <div class="faq-grid">
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">
-                    <h3>How quickly can you schedule a shoot?</h3>
-                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
-                </div>
-                <div class="faq-answer">
-                    We typically have availability within 2-3 days. For urgent requirements, we can often accommodate same-day or next-day bookings depending on location and weather conditions.
-                </div>
+                <div class="faq-question"><h3>How quickly can you schedule a shoot?</h3><span class="faq-icon"><i data-lucide="plus" style="width:20px;height:20px;"></i></span></div>
+                <div class="faq-answer">We typically have availability within 2–3 days. For urgent requirements, we can often accommodate same-day or next-day bookings depending on location and weather conditions.</div>
             </div>
-
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">
-                    <h3>What's included in the 48-hour delivery?</h3>
-                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
-                </div>
-                <div class="faq-answer">
-                    You'll receive professionally edited photos, walkthrough videos, drone footage (if applicable), and all content optimised for Rightmove, Zoopla, and social media platforms. Everything is delivered via our secure client portal.
-                </div>
+                <div class="faq-question"><h3>What's included in the 48-hour delivery?</h3><span class="faq-icon"><i data-lucide="plus" style="width:20px;height:20px;"></i></span></div>
+                <div class="faq-answer">You'll receive professionally edited photos, walkthrough videos, drone footage (if applicable), and all content optimised for Rightmove, Zoopla, and social media platforms.</div>
             </div>
-
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">
-                    <h3>Do you cover my area?</h3>
-                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
-                </div>
-                <div class="faq-answer">
-                    We serve estate agents throughout the UK. Travel costs are included in our standard pricing for most locations. Contact us to confirm coverage for your specific area.
-                </div>
+                <div class="faq-question"><h3>Do you cover my area?</h3><span class="faq-icon"><i data-lucide="plus" style="width:20px;height:20px;"></i></span></div>
+                <div class="faq-answer">We serve estate agents throughout the UK. Travel costs are included in our standard pricing for most locations. Contact us to confirm coverage for your specific area.</div>
             </div>
-
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">
-                    <h3>What if the weather is bad on shoot day?</h3>
-                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
-                </div>
-                <div class="faq-answer">
-                    We monitor weather conditions closely and will reschedule drone work if necessary. Interior photography and videography can proceed regardless of weather, ensuring minimal delays to your marketing timeline.
-                </div>
+                <div class="faq-question"><h3>What if the weather is bad on shoot day?</h3><span class="faq-icon"><i data-lucide="plus" style="width:20px;height:20px;"></i></span></div>
+                <div class="faq-answer">We monitor weather conditions closely and will reschedule drone work if necessary. Interior photography and videography can proceed regardless of weather.</div>
             </div>
-
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">
-                    <h3>How does the content tracking work?</h3>
-                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
-                </div>
-                <div class="faq-answer">
-                    Our client portal provides real-time updates on your project status - from shoot completion to editing stages and final delivery. You'll always know exactly where your content stands.
-                </div>
+                <div class="faq-question"><h3>How does the content tracking work?</h3><span class="faq-icon"><i data-lucide="plus" style="width:20px;height:20px;"></i></span></div>
+                <div class="faq-answer">Our client portal provides real-time updates on your project status — from shoot completion to editing stages and final delivery. You'll always know exactly where your content stands.</div>
             </div>
-
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">
-                    <h3>Can I get the raw, unedited files?</h3>
-                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
-                </div>
-                <div class="faq-answer">
-                    We provide professionally edited content optimised for marketing use. Raw files can be provided upon request for an additional fee, though our edited versions are specifically designed for maximum marketing impact.
-                </div>
+                <div class="faq-question"><h3>Can I get the raw, unedited files?</h3><span class="faq-icon"><i data-lucide="plus" style="width:20px;height:20px;"></i></span></div>
+                <div class="faq-answer">Raw files can be provided upon request for an additional fee. Our edited versions are specifically designed for maximum marketing impact.</div>
             </div>
-
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">
-                    <h3>Do you offer payment plans?</h3>
-                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
-                </div>
-                <div class="faq-answer">
-                    Yes, we understand cash flow is important for estate agents. We offer flexible payment terms for regular clients and can discuss payment plans for larger projects or ongoing partnerships.
-                </div>
+                <div class="faq-question"><h3>Do you offer payment plans?</h3><span class="faq-icon"><i data-lucide="plus" style="width:20px;height:20px;"></i></span></div>
+                <div class="faq-answer">Yes, we offer flexible payment terms for regular clients and can discuss payment plans for larger projects or ongoing partnerships.</div>
             </div>
-
             <div class="faq-item" onclick="toggleFaq(this)">
-                <div class="faq-question">
-                    <h3>What equipment do you use?</h3>
-                    <span class="faq-icon"><i data-lucide="plus" style="width:22px;height:22px;"></i></span>
-                </div>
-                <div class="faq-answer">
-                    We use professional-grade cameras, stabilised gimbals, and CAA-approved drones. All equipment is regularly maintained and updated to ensure consistently high-quality results for every shoot.
-                </div>
+                <div class="faq-question"><h3>What equipment do you use?</h3><span class="faq-icon"><i data-lucide="plus" style="width:20px;height:20px;"></i></span></div>
+                <div class="faq-answer">We use professional-grade cameras, stabilised gimbals, and CAA-approved drones. All equipment is regularly maintained for consistently high-quality results.</div>
             </div>
         </div>
-        
-        <div style="background:linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);border-radius:20px;padding:35px;margin-top:40px;text-align:center;border:2px solid #BBF7D0;">
-            <h3 style="color:#065F46;font-weight:700;margin-bottom:10px;">Still have questions?</h3>
-            <p style="color:#064E3B;margin-bottom:15px;">Get in touch and we'll provide personalised answers for your specific requirements.</p>
-            <a href="https://markebmediabookings.as.me/intro" target="_blank" 
-               style="display: inline-block; padding: 12px 25px; background: #FF6B00; color: white; text-decoration: none; border-radius: 25px; font-weight: 700; transition: all 0.3s ease;"
-               onmouseover="this.style.transform='translateY(-2px)'" 
-               onmouseout="this.style.transform='translateY(0)'">
-                Let's Chat
-            </a>
+
+        <div class="faq-contact">
+            <h3>Still have questions?</h3>
+            <p>Get in touch and we'll provide personalised answers for your requirements.</p>
+            <a href="mailto:commercial@markebmedia.com" class="btn-primary" style="display:inline-block;font-size:15px;padding:12px 28px;">Let's Chat</a>
         </div>
     </div>
-</section>
+</div>
 
 <script>
-    // FAQ Toggle
-    function toggleFaq(element) {
-        const allFaqs = document.querySelectorAll('.faq-item');
-        allFaqs.forEach(faq => {
-            if (faq !== element) faq.classList.remove('active');
+    // ── Init icons
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Hero video
+        const heroVideo = document.getElementById('heroVideo');
+        const heroSection = document.getElementById('hero');
+        const tryPlay = () => {
+            if (heroVideo && heroVideo.paused) {
+                heroVideo.play().then(() => {
+                    heroVideo.classList.add('playing');
+                    heroSection.classList.add('video-playing');
+                }).catch(() => {});
+            }
+        };
+        if (heroVideo) {
+            heroVideo.play().then(() => {
+                heroVideo.classList.add('playing');
+                heroSection.classList.add('video-playing');
+            }).catch(() => {
+                ['scroll','click','mousemove','touchstart'].forEach(e => document.addEventListener(e, tryPlay, { once: true }));
+            });
+        }
+
+        // Header: transparent over hero, white once past it
+        const header = document.getElementById('siteHeader');
+        const onScroll = () => {
+            const heroH = document.getElementById('hero').offsetHeight;
+            header.classList.toggle('scrolled', window.scrollY > heroH * 0.6);
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+
+        // FAQ radio selection highlight
+        document.querySelectorAll('.option-label').forEach(label => {
+            label.addEventListener('click', function () {
+                this.closest('.option-group').querySelectorAll('.option-label').forEach(l => l.classList.remove('selected'));
+                this.classList.add('selected');
+            });
         });
-        element.classList.toggle('active');
-        // Re-render icons after toggle (for the plus icon rotation)
+
+        updateProgress();
+    });
+
+    // ── FAQ toggle
+    function toggleFaq(el) {
+        document.querySelectorAll('.faq-item').forEach(f => { if (f !== el) f.classList.remove('active'); });
+        el.classList.toggle('active');
         lucide.createIcons();
     }
 
-    // Smooth scrolling
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+    // ── Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) target.scrollIntoView({ behavior: 'smooth' });
+            const t = document.querySelector(a.getAttribute('href'));
+            if (t) t.scrollIntoView({ behavior: 'smooth' });
         });
     });
 
-    // Lock header line height
-    (function(){
-        function lockHeader(){
-            var header = document.getElementById('mm-line-header');
-            var band = document.getElementById('mm-line-band');
-            if (!header || !band) return;
-            band.style.setProperty('--headerH', header.offsetHeight + 'px');
+    // ── AUDIT FORM
+    let currentStep = 1;
+    const totalSteps = 8;
+    const formData = {};
+
+    function updateProgress() {
+        const bar = document.getElementById('progressBar');
+        const txt = document.getElementById('progressText');
+        const progress = Math.min((currentStep / totalSteps) * 100, 100);
+        bar.style.width = progress + '%';
+        if (currentStep <= totalSteps) {
+            txt.style.display = 'block';
+            txt.textContent = `Question ${currentStep} of ${totalSteps}`;
+        } else {
+            txt.style.display = 'none';
         }
-        lockHeader();
-        if (document.fonts && document.fonts.ready) document.fonts.ready.then(lockHeader);
-        window.addEventListener('load', lockHeader);
-        window.addEventListener('resize', lockHeader);
-    })();
-
-    // Init Lucide
-    document.addEventListener('DOMContentLoaded', () => lucide.createIcons());
-</script>
-
-<script>
-// ===== AUDIT FORM FUNCTIONALITY =====
-let currentStep = 1;
-const totalSteps = 8;
-const formData = {};
-
-function updateProgress() {
-    const progressBar = document.getElementById('progressBar');
-    const progressText = document.getElementById('progressText');
-    const progress = Math.min((currentStep / totalSteps) * 100, 100);
-    progressBar.style.width = progress + '%';
-    if (currentStep <= totalSteps) {
-        progressText.style.display = 'block';
-        progressText.textContent = `Question ${currentStep} of ${totalSteps}`;
-    } else {
-        progressText.style.display = 'none';
     }
-}
 
-function nextStep() {
-    const steps = document.querySelectorAll('.form-step');
-    const currentStepElement = steps[currentStep - 1];
+    function nextStep() {
+        const steps = document.querySelectorAll('.form-step');
+        if (currentStep === 9) { return; }
+        const qName = `q${currentStep}`;
+        const selected = document.querySelector(`input[name="${qName}"]:checked`);
+        if (!selected) { showError('Please select an answer to continue'); return; }
+        formData[qName] = parseInt(selected.value);
+        hideError();
+        steps[currentStep - 1].classList.remove('active');
+        currentStep++;
+        if (currentStep <= 9) { steps[currentStep - 1].classList.add('active'); updateProgress(); }
+    }
 
-    if (currentStep === 9) {
+    function prevStep() {
+        const steps = document.querySelectorAll('.form-step');
+        steps[currentStep - 1].classList.remove('active');
+        currentStep--;
+        steps[currentStep - 1].classList.add('active');
+        updateProgress();
+        hideError();
+    }
+
+    function showError(msg) {
+        const el = document.getElementById('errorMessage');
+        el.textContent = msg;
+        el.classList.add('active');
+    }
+    function hideError() { document.getElementById('errorMessage').classList.remove('active'); }
+
+    function calculateScore() {
+        return ['q1','q2','q3','q4','q5','q6','q7','q8'].reduce((sum, k) => sum + (formData[k] || 0), 0);
+    }
+
+    function getVerdict(score) {
+        if (score <= 10) return { text: 'Needs Improvement', desc: 'Your marketing needs urgent attention' };
+        if (score <= 16) return { text: 'Fair', desc: 'Room for significant improvement' };
+        if (score <= 21) return { text: 'Good', desc: 'Strong foundation with growth potential' };
+        return { text: 'Excellent', desc: 'Industry-leading marketing approach' };
+    }
+
+    function mapAnswersToKeys(fd) {
+        return {
+            professionalContent: fd.q1 >= 3 ? 'yes' : 'no',
+            videoContent: fd.q2 >= 2 ? 'yes' : 'no',
+            droneContent: fd.q3 >= 2 ? 'yes' : 'no',
+            quickTurnaround: fd.q4 >= 3 ? 'yes' : 'no',
+            socialMedia: fd.q5 >= 2 ? 'yes' : 'inconsistent',
+            trackResults: fd.q6 >= 1 ? 'yes' : 'no',
+            clientSatisfaction: fd.q7 >= 2 ? 'yes' : 'no',
+            competitivePosition: fd.q8 >= 2 ? 'yes' : 'no',
+            personalBranding: fd.q1 >= 3 && fd.q2 >= 2 ? 'yes' : 'no',
+            contentConsistency: fd.q5 >= 2 ? 'yes' : 'no',
+            timeForMarketing: fd.q4 >= 2 ? 'yes' : 'no',
+            contentManagement: fd.q6 >= 1 ? 'yes' : 'no',
+            outsourceMarketing: fd.q1 <= 2 || fd.q2 <= 2 ? 'no' : 'yes'
+        };
+    }
+
+    async function submitAudit() {
+        const scrollY = window.pageYOffset;
         const name = document.getElementById('name').value.trim();
         const agency = document.getElementById('agency').value.trim();
         const email = document.getElementById('email').value.trim();
         const phone = document.getElementById('phone').value.trim();
-        if (!name || !agency || !email || !phone) {
-            showError('Please fill in all required fields');
-            return;
-        }
-        formData.name = name;
-        formData.agency = agency;
-        formData.email = email;
-        formData.phone = phone;
-    } else {
-        const questionName = `q${currentStep}`;
-        const selected = document.querySelector(`input[name="${questionName}"]:checked`);
-        if (!selected) {
-            showError('Please select an answer to continue');
-            return;
-        }
-        formData[questionName] = parseInt(selected.value);
-    }
+        if (!name || !agency || !email || !phone) { showError('Please fill in all required fields.'); return; }
 
-    hideError();
-    currentStepElement.classList.remove('active');
-    currentStep++;
-    if (currentStep <= 9) {
-        steps[currentStep - 1].classList.add('active');
-        updateProgress();
-    }
-}
+        formData.name = name; formData.agency = agency; formData.email = email; formData.phone = phone;
 
-function prevStep() {
-    const steps = document.querySelectorAll('.form-step');
-    steps[currentStep - 1].classList.remove('active');
-    currentStep--;
-    steps[currentStep - 1].classList.add('active');
-    updateProgress();
-    hideError();
-}
+        const score = calculateScore();
+        const mappedAnswers = mapAnswersToKeys(formData);
+        const rawAnswers = { q1:formData.q1, q2:formData.q2, q3:formData.q3, q4:formData.q4, q5:formData.q5, q6:formData.q6, q7:formData.q7, q8:formData.q8 };
 
-function showError(message) {
-    const errorEl = document.getElementById('errorMessage');
-    errorEl.textContent = message;
-    errorEl.classList.add('active');
-    setTimeout(() => errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-}
+        document.getElementById('auditForm').style.display = 'none';
+        document.getElementById('loadingSpinner').classList.add('active');
+        hideError();
+        window.scrollTo(0, scrollY);
 
-function hideError() {
-    document.getElementById('errorMessage').classList.remove('active');
-}
-
-function calculateScore() {
-    return (formData.q1 || 0) + (formData.q2 || 0) + (formData.q3 || 0) +
-           (formData.q4 || 0) + (formData.q5 || 0) + (formData.q6 || 0) +
-           (formData.q7 || 0) + (formData.q8 || 0);
-}
-
-function getVerdict(score) {
-    if (score <= 10) return { text: 'Needs Improvement', colour: '#DC2626', desc: 'Your marketing needs urgent attention' };
-    if (score <= 16) return { text: 'Fair', colour: '#F59E0B', desc: 'Room for significant improvement' };
-    if (score <= 21) return { text: 'Good', colour: '#10B981', desc: 'Strong foundation with growth potential' };
-    return { text: 'Excellent', colour: '#059669', desc: 'Industry-leading marketing approach' };
-}
-
-function mapAnswersToKeys(formData) {
-    return {
-        professionalContent: formData.q1 >= 3 ? 'yes' : 'no',
-        videoContent: formData.q2 >= 2 ? 'yes' : 'no',
-        droneContent: formData.q3 >= 2 ? 'yes' : 'no',
-        quickTurnaround: formData.q4 >= 3 ? 'yes' : 'no',
-        socialMedia: formData.q5 >= 2 ? 'yes' : 'inconsistent',
-        trackResults: formData.q6 >= 1 ? 'yes' : 'no',
-        clientSatisfaction: formData.q7 >= 2 ? 'yes' : 'no',
-        competitivePosition: formData.q8 >= 2 ? 'yes' : 'no',
-        personalBranding: formData.q1 >= 3 && formData.q2 >= 2 ? 'yes' : 'no',
-        contentConsistency: formData.q5 >= 2 ? 'yes' : 'no',
-        timeForMarketing: formData.q4 >= 2 ? 'yes' : 'no',
-        contentManagement: formData.q6 >= 1 ? 'yes' : 'no',
-        outsourceMarketing: formData.q1 <= 2 || formData.q2 <= 2 ? 'no' : 'yes'
-    };
-}
-
-async function submitAudit() {
-    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-    const nameInput = document.getElementById('name');
-    const agencyInput = document.getElementById('agency');
-    const emailInput = document.getElementById('email');
-    const phoneInput = document.getElementById('phone');
-
-    if (!nameInput || !agencyInput || !emailInput || !phoneInput) {
-        showError('Something went wrong. Please refresh and try again.');
-        return;
-    }
-
-    const name = nameInput.value.trim();
-    const agency = agencyInput.value.trim();
-    const email = emailInput.value.trim();
-    const phone = phoneInput.value.trim();
-
-    if (!name || !agency || !email || !phone) {
-        showError('Please fill in all required contact details.');
-        return;
-    }
-
-    const score = calculateScore();
-    const mappedAnswers = mapAnswersToKeys(formData);
-    const rawAnswers = { q1: formData.q1, q2: formData.q2, q3: formData.q3, q4: formData.q4, q5: formData.q5, q6: formData.q6, q7: formData.q7, q8: formData.q8 };
-
-    document.getElementById('auditForm').style.display = 'none';
-    document.getElementById('loadingSpinner').classList.add('active');
-    hideError();
-    window.scrollTo(0, scrollPosition);
-
-    try {
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Request timeout')), 25000));
-
-        const responsePromises = Promise.race([
-            Promise.all([
-                fetch('/.netlify/functions/send-audit-results', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, company: agency, answers: mappedAnswers, score })
-                }),
-                fetch('/.netlify/functions/submit-audit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, agency, email, phone, score, answers: rawAnswers })
-                })
-            ]),
-            timeoutPromise
-        ]);
-
-        const [emailResponse, airtableResponse] = await responsePromises;
-        const emailData = await emailResponse.json();
-
-        let airtableData;
-        try { airtableData = await airtableResponse.json(); } catch (e) {}
-
-        if (!emailResponse.ok) throw new Error(emailData.error || 'Failed to send email');
-
-        document.getElementById('loadingSpinner').classList.remove('active');
-        showResults(score, `Your detailed analysis has been sent to ${email}`);
-        setTimeout(() => {
-            document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-
-    } catch (error) {
-        document.getElementById('loadingSpinner').classList.remove('active');
-        document.getElementById('auditForm').style.display = 'block';
-        window.scrollTo(0, scrollPosition);
-        if (error.message === 'Request timeout') {
-            showError("The request is taking longer than expected. We've received your submission and will email you shortly. If you don't receive an email within 5 minutes, please contact us at commercial@markebmedia.com");
-        } else {
-            showError('Sorry, there was an error. Please try again or contact us at commercial@markebmedia.com');
+        try {
+            const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('Request timeout')), 25000));
+            const [emailRes, airtableRes] = await Promise.race([
+                Promise.all([
+                    fetch('/.netlify/functions/send-audit-results', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, email, company: agency, answers: mappedAnswers, score }) }),
+                    fetch('/.netlify/functions/submit-audit', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, agency, email, phone, score, answers: rawAnswers }) })
+                ]),
+                timeout
+            ]);
+            const emailData = await emailRes.json();
+            if (!emailRes.ok) throw new Error(emailData.error || 'Failed to send email');
+            document.getElementById('loadingSpinner').classList.remove('active');
+            showResults(score, `Your detailed analysis has been sent to ${email}`);
+        } catch (err) {
+            document.getElementById('loadingSpinner').classList.remove('active');
+            document.getElementById('auditForm').style.display = 'block';
+            window.scrollTo(0, scrollY);
+            showError(err.message === 'Request timeout'
+                ? "Taking longer than expected — we've received your submission and will email you shortly."
+                : 'Sorry, there was an error. Please try again or contact commercial@markebmedia.com');
         }
     }
-}
 
-function showResults(score, message) {
-    const verdict = getVerdict(score);
-    document.getElementById('scoreNumber').textContent = score + '/25';
-    document.getElementById('scoreVerdict').textContent = verdict.text;
-    document.getElementById('scoreDescription').textContent = verdict.desc;
-    document.getElementById('analysisContent').innerHTML = `
-        <h3><i data-lucide="mail" style="width:20px;height:20px;color:#FF6B00;"></i> Check Your Email</h3>
-        <p>${message}</p>
-        <p>We've sent you a comprehensive analysis including:</p>
-        <ul>
-            <li>Detailed breakdown of your marketing strengths and weaknesses</li>
-            <li>Personalised recommendations for improvement</li>
-            <li>Priority action items to boost your property marketing</li>
-            <li>How Markeb Media can help you achieve better results</li>
-        </ul>
-        <p><strong>Didn't receive the email?</strong> Check your spam folder or contact us at <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a></p>
-    `;
-    document.getElementById('resultsContainer').classList.add('active');
-    lucide.createIcons();
-    setTimeout(() => {
-        document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    const radioLabels = document.querySelectorAll('.option-label');
-    radioLabels.forEach(label => {
-        label.addEventListener('click', function() {
-            const siblings = this.parentElement.querySelectorAll('.option-label');
-            siblings.forEach(s => s.classList.remove('selected'));
-            this.classList.add('selected');
-        });
-    });
-    updateProgress();
-    lucide.createIcons();
-
-    /* ── Hero video: play + fade in on first interaction ── */
-    const heroVideo = document.getElementById('heroVideo');
-    const heroSection = document.getElementById('hero');
-
-    const playHeroVideo = () => {
-        if (heroVideo && heroVideo.paused) {
-            heroVideo.play().then(() => {
-                heroVideo.classList.add('playing');
-                if (heroSection) heroSection.classList.add('video-playing');
-            }).catch(() => {});
-        }
-    };
-
-    // Try autoplay immediately (muted = allowed on most browsers)
-    if (heroVideo) {
-        heroVideo.play().then(() => {
-            heroVideo.classList.add('playing');
-            if (heroSection) heroSection.classList.add('video-playing');
-        }).catch(() => {
-            // Autoplay blocked — wait for any interaction
-            document.addEventListener('scroll', playHeroVideo, { once: true });
-            document.addEventListener('click', playHeroVideo, { once: true });
-            document.addEventListener('mousemove', playHeroVideo, { once: true });
-            document.addEventListener('touchstart', playHeroVideo, { once: true });
-        });
+    function showResults(score, message) {
+        const v = getVerdict(score);
+        document.getElementById('scoreNumber').textContent = score + '/25';
+        document.getElementById('scoreVerdict').textContent = v.text;
+        document.getElementById('scoreDescription').textContent = v.desc;
+        document.getElementById('analysisContent').innerHTML = `
+            <h3><i data-lucide="mail" style="width:18px;height:18px;color:var(--brand);"></i> Check Your Email</h3>
+            <p>${message}</p>
+            <p>We've sent you a comprehensive analysis including:</p>
+            <ul>
+                <li>Detailed breakdown of your marketing strengths and weaknesses</li>
+                <li>Personalised recommendations for improvement</li>
+                <li>Priority action items to boost your property marketing</li>
+                <li>How Markeb Media can help you achieve better results</li>
+            </ul>
+            <p><strong style="color:var(--text);">Didn't receive the email?</strong> Check your spam folder or contact us at <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a></p>
+        `;
+        document.getElementById('resultsContainer').classList.add('active');
+        lucide.createIcons();
+        setTimeout(() => document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
     }
-
-    /* ── Header: transparent over hero, white on scroll ── */
-    const siteHeader = document.getElementById('siteHeader');
-    const headerLogo = document.getElementById('headerLogo');
-    const headerCta = document.getElementById('headerCta');
-
-    const updateHeader = () => {
-        const scrolled = window.scrollY > 60;
-        if (scrolled) {
-            siteHeader.classList.add('scrolled');
-            if (headerLogo) { headerLogo.style.filter = 'none'; headerLogo.style.opacity = '1'; }
-            if (headerCta) {
-                headerCta.style.background = '#FF6B00';
-                headerCta.style.border = 'none';
-                headerCta.style.color = '#fff';
-                headerCta.style.backdropFilter = 'none';
-            }
-        } else {
-            siteHeader.classList.remove('scrolled');
-            if (headerLogo) { headerLogo.style.filter = 'brightness(10)'; headerLogo.style.opacity = '0'; }
-            if (headerCta) {
-                headerCta.style.background = 'rgba(255,255,255,0.15)';
-                headerCta.style.border = '2px solid rgba(255,255,255,0.7)';
-                headerCta.style.color = '#fff';
-                headerCta.style.backdropFilter = 'blur(4px)';
-            }
-        }
-    };
-
-    window.addEventListener('scroll', updateHeader, { passive: true });
-    updateHeader();
-});
 </script>
 </body>
 </html>
