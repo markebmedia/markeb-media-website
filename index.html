@@ -304,6 +304,77 @@
 
         @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
 
+        /* ── BRAND MARQUEE ── */
+        .brand-marquee-section {
+            padding: 72px 0;
+            background: #fff;
+            overflow: hidden;
+            position: relative;
+        }
+        .brand-marquee-section::before,
+        .brand-marquee-section::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 160px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .brand-marquee-section::before {
+            left: 0;
+            background: linear-gradient(to right, #fff 0%, transparent 100%);
+        }
+        .brand-marquee-section::after {
+            right: 0;
+            background: linear-gradient(to left, #fff 0%, transparent 100%);
+        }
+        .brand-marquee-label {
+            text-align: center;
+            font-size: 11px;
+            font-family: 'DM Mono', monospace;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            margin-bottom: 36px;
+        }
+        .marquee-track {
+            display: flex;
+            width: max-content;
+            animation: marqueeScroll 28s linear infinite;
+        }
+        .marquee-track:hover { animation-play-state: paused; }
+        @keyframes marqueeScroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-50%); }
+        }
+        .marquee-item {
+            display: flex;
+            align-items: center;
+            padding: 0 56px;
+            white-space: nowrap;
+            opacity: 0.55;
+            transition: opacity 0.3s;
+        }
+        .marquee-item:hover { opacity: 1; }
+        .marquee-wordmark {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 18px;
+            color: var(--text);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .marquee-wordmark .wm-accent { color: var(--brand); }
+        .marquee-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--border-bright);
+            flex-shrink: 0;
+            margin-left: 56px;
+        }
+
         /* ── SECTION LABEL ── */
         .section-label {
             display: inline-flex;
@@ -352,40 +423,109 @@
         }
 
         /* ── PROOF BAR ── */
+        /* ── PROOF STRIP ── */
         .proof-bar {
-            padding: 40px 20px;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            background: #F9FAFB;
+            padding: 80px 20px;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        .proof-bar::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(255,107,0,0.04) 0%, transparent 70%);
+            pointer-events: none;
         }
         .proof-bar-inner {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 48px;
-            flex-wrap: wrap;
         }
         .proof-label {
-            width: 100%;
             text-align: center;
             font-size: 11px;
             font-family: 'DM Mono', monospace;
-            color: var(--text-dim);
+            color: var(--brand);
             text-transform: uppercase;
-            letter-spacing: 0.12em;
-            margin-bottom: 20px;
+            letter-spacing: 0.14em;
+            margin-bottom: 16px;
+        }
+        .proof-heading {
+            text-align: center;
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(24px, 3.5vw, 40px);
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -1px;
+            margin-bottom: 64px;
+        }
+        .proof-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            overflow: hidden;
         }
         .proof-item {
+            background: #fff;
+            padding: 40px 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0;
+            transition: background 0.2s;
+            position: relative;
+        }
+        .proof-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--brand), var(--brand-light));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .proof-item:hover { background: #FFFAF6; }
+        .proof-item:hover::before { opacity: 1; }
+        .proof-item-icon {
+            width: 44px; height: 44px;
+            background: var(--brand-dim);
+            border-radius: 12px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
+            color: var(--brand);
+            margin-bottom: 20px;
+            transition: background 0.2s, transform 0.2s;
         }
-        .proof-item-icon { color: var(--brand); flex-shrink: 0; }
-        .proof-item-title { font-size: 14px; font-weight: 600; color: var(--text); }
-        .proof-item-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-        .proof-divider { width: 1px; height: 40px; background: var(--border); }
+        .proof-item:hover .proof-item-icon {
+            background: rgba(255,107,0,0.15);
+            transform: scale(1.05);
+        }
+        .proof-item-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        .proof-item-sub {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            font-weight: 300;
+        }
+        .proof-divider { display: none; }
+        @media (max-width: 900px) {
+            .proof-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 560px) {
+            .proof-grid { grid-template-columns: 1fr; }
+            .proof-item { padding: 28px 24px; }
+        }
 
         /* ── AUDIT SECTION ── */
         .audit-wrap {
@@ -1267,38 +1407,30 @@
 </section>
 
 <!-- ── PROOF BAR ── -->
-<div class="proof-bar">
+<div class="proof-bar reveal">
     <div class="proof-bar-inner">
-        <div class="proof-label">Why estate agents across the UK choose Markeb Media</div>
-        <div class="proof-item">
-            <div class="proof-item-icon"><i data-lucide="zap" style="width:20px;height:20px;"></i></div>
-            <div>
+        <div class="proof-label">— Why agents choose us</div>
+        <h2 class="proof-heading">Why estate agents across the UK<br>choose Markeb Media</h2>
+        <div class="proof-grid">
+            <div class="proof-item">
+                <div class="proof-item-icon"><i data-lucide="zap" style="width:22px;height:22px;"></i></div>
                 <div class="proof-item-title">48-Hour Delivery</div>
-                <div class="proof-item-sub">Shoot to inbox in 2 days</div>
+                <div class="proof-item-sub">Shoot to inbox in 2 days — no chasing, no delays.</div>
             </div>
-        </div>
-        <div class="proof-divider"></div>
-        <div class="proof-item">
-            <div class="proof-item-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px;"></i></div>
-            <div>
+            <div class="proof-item">
+                <div class="proof-item-icon"><i data-lucide="bar-chart-2" style="width:22px;height:22px;"></i></div>
                 <div class="proof-item-title">Live Tracking</div>
-                <div class="proof-item-sub">See every stage in real time</div>
+                <div class="proof-item-sub">See every stage of your project updated in real time.</div>
             </div>
-        </div>
-        <div class="proof-divider"></div>
-        <div class="proof-item">
-            <div class="proof-item-icon"><i data-lucide="target" style="width:20px;height:20px;"></i></div>
-            <div>
+            <div class="proof-item">
+                <div class="proof-item-icon"><i data-lucide="target" style="width:22px;height:22px;"></i></div>
                 <div class="proof-item-title">Platform Optimised</div>
-                <div class="proof-item-sub">Rightmove, Zoopla & social</div>
+                <div class="proof-item-sub">Content crafted for Rightmove, Zoopla & social.</div>
             </div>
-        </div>
-        <div class="proof-divider"></div>
-        <div class="proof-item">
-            <div class="proof-item-icon"><i data-lucide="navigation" style="width:20px;height:20px;"></i></div>
-            <div>
+            <div class="proof-item">
+                <div class="proof-item-icon"><i data-lucide="navigation" style="width:22px;height:22px;"></i></div>
                 <div class="proof-item-title">CAA-Approved Drones</div>
-                <div class="proof-item-sub">Cinematic aerial coverage</div>
+                <div class="proof-item-sub">Cinematic aerial coverage, fully legal and insured.</div>
             </div>
         </div>
     </div>
