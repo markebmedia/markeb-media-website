@@ -1340,18 +1340,20 @@
             .step-card { max-width: 320px; width: 90%; min-height: auto; }
         }
         @media (max-width: 640px) {
-            .hero-landing h1 { letter-spacing: -1.5px; }
-            .hero-actions { flex-direction: column; width: 100%; }
-            .btn-primary, .btn-ghost { width: 100%; text-align: center; }
-            .benefits-grid { grid-template-columns: 1fr; }
-            .services-grid { grid-template-columns: 1fr; }
-            .photo-gallery { flex-direction: column; align-items: center; }
-            .photo-card { width: 95% !important; }
-            .photo-card:first-child, .photo-card:last-child { transform: none; }
-            .audit-wrap { padding: 32px 20px; }
-            .button-group { flex-direction: column; }
-            .cta-buttons { flex-direction: column; align-items: center; }
-        }
+    .hero-landing h1 { letter-spacing: -1.5px; }
+    .hero-actions { flex-direction: column; width: 100%; }
+    .btn-primary, .btn-ghost { width: 100%; text-align: center; }
+    .benefits-grid { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: 1fr; }
+    .service-card { padding: 28px 20px; }
+    .service-card[style*="grid-column"] { grid-column: span 1 !important; }
+    .photo-gallery { flex-direction: column; align-items: center; }
+    .photo-card { width: 95% !important; }
+    .photo-card:first-child, .photo-card:last-child { transform: none; }
+    .audit-wrap { padding: 32px 20px; }
+    .button-group { flex-direction: column; }
+    .cta-buttons { flex-direction: column; align-items: center; }
+}
     </style>
 </head>
 <body>
