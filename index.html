@@ -83,9 +83,9 @@
             border-color: var(--border);
             box-shadow: 0 2px 16px rgba(0,0,0,0.08);
         }
-        /* Logo: white on dark hero, normal on scrolled white header */
-        #headerLogo { filter: brightness(10); transition: filter 0.4s ease; }
-        .site-header.scrolled #headerLogo { filter: none; }
+        /* Logo: hidden over hero, fades in only when scrolled */
+        #headerLogo { opacity: 0; transition: opacity 0.4s ease; }
+        .site-header.scrolled #headerLogo { opacity: 1; }
         /* CTA: ghost on dark hero, solid orange on white header */
         #headerCta {
             background: rgba(255,255,255,0.15);
