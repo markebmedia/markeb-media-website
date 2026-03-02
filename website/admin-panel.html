@@ -3213,6 +3213,32 @@ We wanted to reach out..." required></textarea>
   </div> <!-- ✅ Close discount modal-dialog -->
 </div> <!-- ✅ Close discountModal -->
 
+<!-- Edit Price Modal -->
+<div class="modal" id="editPriceModal" onclick="closeModal('editPriceModal')">
+  <div class="modal-dialog" style="max-width: 480px;" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3>💷 Edit Final Price</h3>
+      <button class="modal-close" onclick="closeModal('editPriceModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="editPriceBookingInfo" style="padding: 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 20px; font-size: 14px;"></div>
+      <div class="form-group">
+        <label class="form-label">New Final Price (£) *</label>
+        <input type="number" id="editPriceInput" class="form-input" min="0" step="0.01" style="font-size: 22px; font-weight: 700; color: #3b82f6;"/>
+        <div style="font-size: 12px; color: #64748b; margin-top: 6px;">⚡ When you charge their card, Stripe will use this updated amount.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reason (Optional)</label>
+        <input type="text" id="editPriceReason" class="form-input" placeholder="e.g. Custom quote, loyalty discount, correction..."/>
+      </div>
+      <div class="button-group" style="margin-top: 24px;">
+        <button class="btn btn-secondary" onclick="closeModal('editPriceModal')" style="flex: 1;">Cancel</button>
+        <button class="btn btn-success" id="editPriceBtn" onclick="confirmEditPrice()" style="flex: 2;">✅ Update Price</button>
+      </div>
+    </div>
+  </div>
+</div>
+
        <!-- Block Time Modal -->
 <div class="modal" id="blockTimeModal" onclick="closeModal('blockTimeModal')">
   <div class="modal-dialog" onclick="event.stopPropagation()">
@@ -4922,6 +4948,9 @@ function viewBookingById(bookingId) {
         <button class="btn btn-warning" onclick="showModifyService('${booking.id}')">
           ✏️ Modify Service
         </button>
+        <button class="btn btn-secondary" onclick="closeModal('bookingModal'); showEditPriceModal('${booking.id}')">
+  💷 Edit Price
+</button>
         <button class="btn btn-danger" onclick="showAdminCancel('${booking.id}')">
           ❌ Cancel
         </button>
@@ -5111,6 +5140,9 @@ function renderPendingBookingsTable(bookings) {
             <button class="btn btn-warning btn-small" onclick="markAsPaid('${booking.id}')">
               ✅ Mark Paid
             </button>
+            <button class="btn btn-secondary btn-small" onclick="showEditPriceModal('${booking.id}')">
+  💷 Edit Price
+</button>
             <button class="btn btn-primary btn-small" onclick="viewBookingById('${booking.id}')">
               👁️ View
             </button>
@@ -7095,6 +7127,101 @@ async function deleteBlockedTime(recordId, date) {
 document.addEventListener('DOMContentLoaded', function() {
   lucide.createIcons();
 });
+
+// ===== EDIT PRICE FUNCTIONS =====
+
+let editPriceBookingId = null;
+
+function showEditPriceModal(bookingId) {
+  const booking = allBookings.find(b => b.id === bookingId);
+  if (!booking) return;
+
+  editPriceBookingId = bookingId;
+  const fields = booking.fields;
+  const currentPrice = fields['Final Price'] || 0;
+  const discountCode = fields['Discount Code'] || '';
+  const discountAmount = fields['Discount Amount'] || 0;
+
+  document.getElementById('editPriceBookingInfo').innerHTML = `
+    <div style="margin-bottom: 6px;"><strong>Ref:</strong> ${fields['Booking Reference']}</div>
+    <div style="margin-bottom: 6px;"><strong>Client:</strong> ${fields['Client Name']}</div>
+    <div style="margin-bottom: 6px;"><strong>Service:</strong> ${fields['Service']}</div>
+    <div style="margin-bottom: 6px;"><strong>Date:</strong> ${fields['Date']} at ${fields['Time']}</div>
+    <div style="margin-bottom: 6px;"><strong>Current Price:</strong> <span style="color: #3b82f6; font-weight: 700;">£${currentPrice.toFixed(2)}</span></div>
+    ${discountCode ? `<div style="color: #10b981; font-size: 12px;">🎁 Discount "${discountCode}" applied (-£${discountAmount.toFixed(2)})</div>` : ''}
+    ${fields['Stripe Payment Method ID'] 
+      ? '<div style="margin-top: 8px; padding: 8px; background: #d1fae5; border-radius: 6px; color: #065f46; font-size: 12px;">💳 Card on file — Stripe will charge the new amount when you click Charge Card</div>' 
+      : '<div style="margin-top: 8px; padding: 8px; background: #fef3c7; border-radius: 6px; color: #92400e; font-size: 12px;">⚠️ No card on file — update is for record keeping only</div>'}
+  `;
+
+  document.getElementById('editPriceInput').value = currentPrice.toFixed(2);
+  document.getElementById('editPriceReason').value = '';
+  document.getElementById('editPriceModal').classList.add('active');
+}
+
+async function confirmEditPrice() {
+  const newPrice = parseFloat(document.getElementById('editPriceInput').value);
+  const reason = document.getElementById('editPriceReason').value.trim();
+
+  if (isNaN(newPrice) || newPrice < 0) {
+    alert('❌ Please enter a valid price');
+    return;
+  }
+
+  const booking = allBookings.find(b => b.id === editPriceBookingId);
+  if (!booking) return;
+
+  const oldPrice = booking.fields['Final Price'] || 0;
+  const hasCard = !!booking.fields['Stripe Payment Method ID'];
+
+  if (!confirm(
+    `Update price for ${booking.fields['Client Name']}?\n\n` +
+    `Old: £${oldPrice.toFixed(2)}\n` +
+    `New: £${newPrice.toFixed(2)}\n` +
+    (hasCard ? `\n💳 Stripe will charge £${newPrice.toFixed(2)} when you hit Charge Card` : '\n⚠️ No card on file') +
+    (reason ? `\nReason: ${reason}` : '')
+  )) return;
+
+  const btn = document.getElementById('editPriceBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Updating...';
+
+  try {
+    const updateFields = { 'Final Price': newPrice };
+    if (reason) updateFields['Admin Notes'] = `Price manually set to £${newPrice.toFixed(2)}: ${reason}`;
+
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'PATCH',
+        table: 'Bookings',
+        recordId: editPriceBookingId,
+        body: { fields: updateFields }
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error?.message || 'Update failed');
+
+    const idx = allBookings.findIndex(b => b.id === editPriceBookingId);
+    if (idx !== -1) allBookings[idx].fields['Final Price'] = newPrice;
+
+    alert(`✅ Price updated to £${newPrice.toFixed(2)}!${hasCard ? '\n\nCharge Card will now use this amount.' : ''}`);
+    closeModal('editPriceModal');
+    closeModal('bookingModal');
+    loadPendingBookings();
+    loadBookings();
+    loadDashboardStats();
+
+  } catch (error) {
+    console.error('Error updating price:', error);
+    alert('❌ Failed to update price: ' + error.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✅ Update Price';
+  }
+}
 
 // Re-initialize icons after dynamic content changes
 function reinitializeLucideIcons() {
