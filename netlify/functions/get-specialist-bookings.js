@@ -1,6 +1,5 @@
 // netlify/functions/get-specialist-bookings.js
 // Returns all bookings assigned to a specific media specialist
-
 const Airtable = require('airtable');
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
@@ -40,33 +39,42 @@ exports.handler = async (event) => {
     const bookings = records.map(record => {
       const fields = record.fields;
 
+      // ── Add-ons ────────────────────────────────────────────────────────
+      // Stored in Airtable as plain text e.g. "Standard Floor Plan (+£24.00)"
+      // Multiple add-ons are comma-separated e.g. "Floor Plan, Virtual Tour"
       let addonsArray = [];
-      try {
-        addonsArray = JSON.parse(fields['Add-Ons'] || '[]');
-      } catch (e) {
-        addonsArray = [];
+      const rawAddons = fields['Add-Ons'] || '';
+
+      if (typeof rawAddons === 'string' && rawAddons.trim()) {
+        addonsArray = rawAddons
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
+          .map(name => ({ name }));
+      } else if (Array.isArray(rawAddons)) {
+        addonsArray = rawAddons;
       }
 
       return {
         id: record.id,
-        bookingRef: fields['Booking Reference'],
-        date: fields['Date'],
-        time: fields['Time'],
-        propertyAddress: fields['Property Address'],
-        postcode: fields['Postcode'] || '',
-        region: fields['Region'] || '',
-        service: fields['Service'],
-        serviceId: fields['Service ID'] || '',
-        duration: fields['Duration (mins)'] || 0,
-        bedrooms: fields['Bedrooms'] || 0,
-        addons: addonsArray,
-        bookingStatus: fields['Booking Status'] || 'Booked',
-        clientName: fields['Client Name'],
-        clientPhone: fields['Client Phone'] || '',
-        clientNotes: fields['Client Notes'] || '',
-        accessType: fields['Access Type'] || '',
+        bookingRef:        fields['Booking Reference'],
+        date:              fields['Date'],
+        time:              fields['Time'],
+        propertyAddress:   fields['Property Address'],
+        postcode:          fields['Postcode'] || '',
+        region:            fields['Region'] || '',
+        service:           fields['Service'],
+        serviceId:         fields['Service ID'] || '',
+        duration:          fields['Duration (mins)'] || 0,
+        bedrooms:          fields['Bedrooms'] || 0,
+        addons:            addonsArray,
+        bookingStatus:     fields['Booking Status'] || 'Booked',
+        clientName:        fields['Client Name'],
+        clientPhone:       fields['Client Phone'] || '',
+        clientNotes:       fields['Client Notes'] || '',
+        accessType:        fields['Access Type'] || '',
         keyPickupLocation: fields['Key Pickup Location'] || '',
-        mediaSpecialist: fields['Media Specialist']
+        mediaSpecialist:   fields['Media Specialist']
         // Note: price fields intentionally excluded
       };
     });
