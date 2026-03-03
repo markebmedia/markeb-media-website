@@ -1924,6 +1924,57 @@ body {
   color: #ef4444;
 }
 
+/* ===== FIX TABLE OVERFLOW ===== */
+.data-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* All Customers table */
+#customersContainer .data-table th:nth-child(1) { width: 12%; } /* Name */
+#customersContainer .data-table th:nth-child(2) { width: 18%; } /* Email */
+#customersContainer .data-table th:nth-child(3) { width: 12%; } /* Company */
+#customersContainer .data-table th:nth-child(4) { width: 16%; } /* Region */
+#customersContainer .data-table th:nth-child(5) { width: 9%;  } /* Status */
+#customersContainer .data-table th:nth-child(6) { width: 9%;  } /* Email Alerts */
+#customersContainer .data-table th:nth-child(7) { width: 9%;  } /* Skip Payment */
+#customersContainer .data-table th:nth-child(8) { width: 10%; } /* Actions */
+
+/* All Bookings table */
+#bookingsContainer .data-table th:nth-child(1) { width: 10%; } /* Reference */
+#bookingsContainer .data-table th:nth-child(2) { width: 16%; } /* Client */
+#bookingsContainer .data-table th:nth-child(3) { width: 18%; } /* Service */
+#bookingsContainer .data-table th:nth-child(4) { width: 12%; } /* Date & Time */
+#bookingsContainer .data-table th:nth-child(5) { width: 9%;  } /* Region */
+#bookingsContainer .data-table th:nth-child(6) { width: 9%;  } /* Total */
+#bookingsContainer .data-table th:nth-child(7) { width: 9%;  } /* Payment */
+#bookingsContainer .data-table th:nth-child(8) { width: 9%;  } /* Status */
+#bookingsContainer .data-table th:nth-child(9) { width: 8%;  } /* Actions */
+
+/* Pending Bookings table */
+#pendingContainer .data-table th:nth-child(1) { width: 11%; } /* Reference */
+#pendingContainer .data-table th:nth-child(2) { width: 16%; } /* Client */
+#pendingContainer .data-table th:nth-child(3) { width: 18%; } /* Service */
+#pendingContainer .data-table th:nth-child(4) { width: 12%; } /* Date & Time */
+#pendingContainer .data-table th:nth-child(5) { width: 9%;  } /* Total */
+#pendingContainer .data-table th:nth-child(6) { width: 12%; } /* Payment Method */
+#pendingContainer .data-table th:nth-child(7) { width: 22%; } /* Actions */
+
+/* Prevent text overflow in all cells */
+.data-table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Allow wrapping for specific columns */
+#bookingsContainer .data-table td:nth-child(3),
+#pendingContainer .data-table td:nth-child(3),
+#customersContainer .data-table td:nth-child(2) {
+  white-space: normal;
+  word-break: break-word;
+}
+
   </style>
 </head>
 <body>
@@ -8264,12 +8315,10 @@ Markeb Media Team`;
           
           content = `Hi [Name],
 
-Great news! We have availability in ${userUKRegion}:
+Great news! Our in-house media specialist is available in your area.
 
 ✅ <strong>AVAILABLE TIME SLOTS:</strong>
-
 ${availabilityHTML}
-
 These slots are filling up as clients book throughout the week. You can reserve your preferred time through your dashboard.
 
 <strong><a href="https://markebmedia.com/login">View Full Calendar & Book</a></strong>
