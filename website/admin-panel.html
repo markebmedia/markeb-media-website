@@ -1950,6 +1950,182 @@ body {
       white-space: nowrap;
     }
 
+    /* =====================================================
+   MOBILE CARD STYLES — Customers / Bookings / Pending
+   Add this AFTER your existing styles
+   ===================================================== */
+
+/* ── Scoped overrides: only affect the three data sections ── */
+
+@media (max-width: 768px) {
+
+  /* Remove forced min-width that causes horizontal scroll */
+  #customersContainer .data-table,
+  #bookingsContainer  .data-table,
+  #pendingContainer   .data-table {
+    min-width: unset;
+    table-layout: auto;
+  }
+
+  /* Hide the desktop thead */
+  #customersContainer .data-table thead,
+  #bookingsContainer  .data-table thead,
+  #pendingContainer   .data-table thead {
+    display: none;
+  }
+
+  /* Turn table / tbody / tr / td into block */
+  #customersContainer .data-table,
+  #customersContainer .data-table tbody,
+  #customersContainer .data-table tr,
+  #customersContainer .data-table td,
+  #bookingsContainer  .data-table,
+  #bookingsContainer  .data-table tbody,
+  #bookingsContainer  .data-table tr,
+  #bookingsContainer  .data-table td,
+  #pendingContainer   .data-table,
+  #pendingContainer   .data-table tbody,
+  #pendingContainer   .data-table tr,
+  #pendingContainer   .data-table td {
+    display: block;
+    width: 100%;
+    white-space: normal;        /* allow wrapping */
+    overflow-wrap: break-word;
+  }
+
+  /* Each row becomes a card */
+  #customersContainer .data-table tr,
+  #bookingsContainer  .data-table tr,
+  #pendingContainer   .data-table tr {
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  #customersContainer .data-table tr:hover,
+  #bookingsContainer  .data-table tr:hover,
+  #pendingContainer   .data-table tr:hover {
+    border-color: #bfdbfe;
+    background: #fafcff;
+  }
+
+  /* Cell layout: label on top, value below */
+  #customersContainer .data-table td,
+  #bookingsContainer  .data-table td,
+  #pendingContainer   .data-table td {
+    padding: 10px 0;
+    border: none;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  #customersContainer .data-table td:last-child,
+  #bookingsContainer  .data-table td:last-child,
+  #pendingContainer   .data-table td:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  /* Label (from data-label attribute) */
+  #customersContainer .data-table td::before,
+  #bookingsContainer  .data-table td::before,
+  #pendingContainer   .data-table td::before {
+    content: attr(data-label);
+    position: static;
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    width: 100%;
+    padding: 0;
+  }
+
+  /* Keep inline elements (badges, etc.) from stretching */
+  #customersContainer .data-table td .status-badge,
+  #customersContainer .data-table td .region-badge,
+  #bookingsContainer  .data-table td .status-badge,
+  #bookingsContainer  .data-table td .region-badge,
+  #pendingContainer   .data-table td .status-badge,
+  #pendingContainer   .data-table td .region-badge {
+    display: inline-block;
+    width: auto;
+  }
+
+  /* Actions cell — stack buttons vertically */
+  #customersContainer .data-table td[data-label="Actions"],
+  #bookingsContainer  .data-table td[data-label="Actions"],
+  #pendingContainer   .data-table td[data-label="Actions"] {
+    padding-top: 14px;
+    border-top: 2px solid #e2e8f0;
+    border-bottom: none;
+    margin-top: 4px;
+  }
+
+  #customersContainer .data-table td[data-label="Actions"] > div,
+  #bookingsContainer  .data-table td[data-label="Actions"] > div,
+  #pendingContainer   .data-table td[data-label="Actions"] > div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  #customersContainer .data-table td[data-label="Actions"] .btn,
+  #bookingsContainer  .data-table td[data-label="Actions"] .btn,
+  #pendingContainer   .data-table td[data-label="Actions"] .btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 13px;
+    padding: 11px 16px;
+  }
+
+  /* Remove the overflow-x wrappers — no longer needed */
+  #customersContainer,
+  #bookingsContainer,
+  #pendingContainer {
+    overflow-x: unset;
+  }
+}
+
+/* ── Extra-small phones ── */
+@media (max-width: 480px) {
+
+  #customersContainer .data-table tr,
+  #bookingsContainer  .data-table tr,
+  #pendingContainer   .data-table tr {
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+  }
+
+  #customersContainer .data-table td,
+  #bookingsContainer  .data-table td,
+  #pendingContainer   .data-table td {
+    padding: 8px 0;
+    font-size: 13px;
+  }
+
+  #customersContainer .data-table td::before,
+  #bookingsContainer  .data-table td::before,
+  #pendingContainer   .data-table td::before {
+    font-size: 9px;
+  }
+
+  #customersContainer .data-table td[data-label="Actions"] .btn,
+  #bookingsContainer  .data-table td[data-label="Actions"] .btn,
+  #pendingContainer   .data-table td[data-label="Actions"] .btn {
+    font-size: 12px;
+    padding: 10px 14px;
+    min-height: 42px;
+  }
+}
+
   </style>
 </head>
 <body>
