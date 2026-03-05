@@ -2855,11 +2855,66 @@ function renderRoadmap() {
       </div>
     </div>`;
 
+  // ── Funnel explanation box ──
+  const signupTarget2026 = yearData.find(y => y.key === 'y1')?.tgtSignups || '—';
+  const newBkTarget2026  = yearData.find(y => y.key === 'y1')?.tgtNewBk   || '—';
+  const repBkTarget2026  = yearData.find(y => y.key === 'y1')?.tgtRepeatBk || '—';
+  const funnelBox = `
+    <div style="background:linear-gradient(135deg,#f8fafc,#f0f9ff);border:1.5px solid #e2e8f0;border-radius:14px;padding:20px 24px;margin-top:4px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <i data-lucide="waypoints" style="width:15px;height:15px;color:#6366f1;flex-shrink:0;"></i>
+        <span style="font-size:12px;font-weight:800;color:#334155;text-transform:uppercase;letter-spacing:0.5px;">How the two cards connect</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;">
+
+        <!-- Step 1 -->
+        <div style="background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:12px 16px;text-align:center;min-width:110px;flex:1;">
+          <div style="font-size:20px;font-weight:800;color:#3b82f6;">${signupTarget2026}</div>
+          <div style="font-size:10px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:0.4px;">Sign-ups / mo</div>
+          <div style="font-size:10px;color:#64748b;margin-top:3px;">needed this year</div>
+        </div>
+
+        <!-- Arrow + label -->
+        <div style="display:flex;flex-direction:column;align-items:center;padding:0 10px;flex-shrink:0;">
+          <div style="font-size:10px;font-weight:600;color:#94a3b8;white-space:nowrap;">${cohortConvPct}% convert</div>
+          <div style="font-size:20px;color:#cbd5e1;">→</div>
+        </div>
+
+        <!-- Step 2 -->
+        <div style="background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:12px 16px;text-align:center;min-width:110px;flex:1;">
+          <div style="font-size:20px;font-weight:800;color:#3b82f6;">${newBkTarget2026}</div>
+          <div style="font-size:10px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:0.4px;">New bookings / mo</div>
+          <div style="font-size:10px;color:#64748b;margin-top:3px;">first-time clients</div>
+        </div>
+
+        <!-- Arrow + label -->
+        <div style="display:flex;flex-direction:column;align-items:center;padding:0 10px;flex-shrink:0;">
+          <div style="font-size:10px;font-weight:600;color:#94a3b8;white-space:nowrap;">graduate to</div>
+          <div style="font-size:20px;color:#cbd5e1;">→</div>
+        </div>
+
+        <!-- Step 3 -->
+        <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:12px 16px;text-align:center;min-width:110px;flex:1;">
+          <div style="font-size:20px;font-weight:800;color:#10b981;">${repBkTarget2026}</div>
+          <div style="font-size:10px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:0.4px;">Repeat bookings / mo</div>
+          <div style="font-size:10px;color:#64748b;margin-top:3px;">existing client target</div>
+        </div>
+
+      </div>
+      <div style="font-size:11px;color:#64748b;margin-top:14px;line-height:1.6;border-top:1px solid #e2e8f0;padding-top:12px;">
+        Every new client who books graduates into your existing base — growing the pool that drives repeat revenue.
+        Today <strong style="color:#334155;">${cohortConvPct}%</strong> of sign-ups go on to book, so you need
+        <strong style="color:#3b82f6;">${signupTarget2026} sign-ups</strong> to land
+        <strong style="color:#3b82f6;">${newBkTarget2026} new bookings</strong>, each of whom then adds to the
+        <strong style="color:#10b981;">${repBkTarget2026} repeat bookings/mo</strong> target over time.
+      </div>
+    </div>`;
+
   document.getElementById('monthlyTargetsGrid').innerHTML = revRowHtml + `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
       ${acqCard}
       ${retCard}
-    </div>`;
+    </div>` + funnelBox;
 
   // ── Single Lever Sensitivity Analysis — 2026 target ──
   // Full formula: Monthly Revenue = totalClients × bookingRate × bppm × ATV
