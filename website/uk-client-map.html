@@ -1029,8 +1029,15 @@
       .milestone-year { font-size: 12px; }
       .milestone-bar-wrap { height: 22px; }
 
-      /* Monthly targets grid — stack to 1 col */
-      #monthlyTargetsGrid { grid-template-columns: 1fr !important; }
+      /* Monthly targets — stack everything to single column */
+      #monthlyTargetsGrid > div { grid-template-columns: 1fr !important; }
+      #monthlyTargetsGrid > div > div { grid-template-columns: 1fr !important; }
+      /* Acquisition & retention inner year columns — stack */
+      #monthlyTargetsGrid .acq-years,
+      #monthlyTargetsGrid .ret-years { grid-template-columns: 1fr !important; }
+      /* Dashboard snapshot equation — stack vertically */
+      .ret-snapshot { flex-direction: column !important; gap: 6px !important; align-items: flex-start !important; }
+      .ret-snapshot > div { text-align: left !important; }
 
       /* Leaderboard */
       .leaderboard-item { padding: 10px; gap: 8px; }
@@ -1046,7 +1053,28 @@
       #intelStats .stat-card { min-width: 130px; }
     }
 
-    @media (max-width: 420px) {
+    @media (max-width: 900px) and (min-width: 769px) {
+      /* Tablet — keep two cards side by side but stack year columns inside each */
+      #monthlyTargetsGrid > div { grid-template-columns: 1fr 1fr; }
+      #monthlyTargetsGrid .acq-years,
+      #monthlyTargetsGrid .ret-years { grid-template-columns: 1fr !important; }
+    }
+
+    @media (max-width: 768px) {
+      /* Mobile — two revenue boxes stack */
+      #monthlyTargetsGrid > div:first-child { grid-template-columns: 1fr !important; }
+      /* Two main cards stack */
+      #monthlyTargetsGrid > div:last-child { grid-template-columns: 1fr !important; }
+      /* Year columns inside each card stack */
+      .acq-years, .ret-years { grid-template-columns: 1fr !important; }
+      /* Dashboard equation wraps */
+      .ret-snapshot { flex-wrap: wrap !important; gap: 8px !important; }
+      .ret-snapshot > div { min-width: 80px; }
+      /* Traj row numbers slightly smaller */
+      .traj-number { font-size: 18px !important; }
+    }
+
+        @media (max-width: 420px) {
       .main-tab-btn span, .main-tab-btn { font-size: 11px; padding: 9px 6px; }
       .stats-overview { grid-template-columns: 1fr 1fr; gap: 8px; }
       .stat-value { font-size: 22px; }
@@ -1593,6 +1621,36 @@ function calcLiveMonthlyAverages() {
     ? monthlyRates.reduce((s, v) => s + v, 0) / monthlyRates.length
     : 0;
 
+  // ── Existing client booking rate ──
+  // Of clients who have ever booked, what % book in any given month?
+  // Correct denominator for retention targets — not the blended all-client rate.
+  const firstBookingMonthByEmail = {};
+  [...bookingData]
+    .filter(b => b.date && b.bookingStatus !== 'Cancelled' && b.clientEmail)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .forEach(b => {
+      const email = (b.clientEmail || '').toLowerCase();
+      if (!firstBookingMonthByEmail[email]) firstBookingMonthByEmail[email] = b.date.slice(0, 7);
+    });
+  const everBookedEmails = new Set(Object.keys(firstBookingMonthByEmail).filter(e => clientEmails.has(e)));
+  const existingClientCount = everBookedEmails.size;
+  const existingBookingsByMonth = {};
+  bookingData.forEach(b => {
+    if (!b.date || b.bookingStatus === 'Cancelled' || !b.clientEmail) return;
+    const email = b.clientEmail.toLowerCase();
+    if (!clientEmails.has(email)) return;
+    const month = b.date.slice(0, 7);
+    const firstMonth = firstBookingMonthByEmail[email];
+    if (!firstMonth || firstMonth >= month) return; // skip first-ever booking month
+    if (!existingBookingsByMonth[month]) existingBookingsByMonth[month] = new Set();
+    existingBookingsByMonth[month].add(email);
+  });
+  const existingMonthlyRates = Object.values(existingBookingsByMonth)
+    .map(s => s.size / Math.max(1, existingClientCount));
+  const existingClientBookingRate = existingMonthlyRates.length > 0
+    ? existingMonthlyRates.reduce((s, v) => s + v, 0) / existingMonthlyRates.length
+    : clientBookingRate;
+
   // ── Per-month cohort conversion rate ──
   // For each sign-up month, count how many of that cohort eventually made a booking.
   // Average across all months = true monthly conversion rate.
@@ -1740,7 +1798,7 @@ function calcLiveMonthlyAverages() {
     newClientBookingsByMonth, repeatClientBookingsByMonth,
     liveNewSplit, liveExSplit,
     monthlyRevRunRate, monthlyRevRunRateAllTime, monthsActive,
-    clientBookingRate, lifetimeBookingRate, clientsWhoBooked,
+    clientBookingRate, existingClientBookingRate, existingClientCount, lifetimeBookingRate, clientsWhoBooked,
     totalDashboardClients: clientEmails.size,
     bookingsPerBookedClientPerMonth,
     // Sign-up lag
@@ -2501,8 +2559,8 @@ function renderRoadmap() {
   // This is the monthly booking rate target — how many unique clients need to book each month
   const y1TargetMonthlyBk  = T.monthly.totalBookings.y1;
   const y2TargetMonthlyBk  = T.monthly.totalBookings.y2;
-  const clientsNeededY1    = live.clientBookingRate > 0 ? Math.ceil(y1TargetMonthlyBk / live.clientBookingRate) : y1TargetMonthlyBk;
-  const clientsNeededY2    = live.clientBookingRate > 0 ? Math.ceil(y2TargetMonthlyBk / live.clientBookingRate) : y2TargetMonthlyBk;
+  const clientsNeededY1    = live.existingClientBookingRate > 0 ? Math.ceil(y1TargetMonthlyBk / live.existingClientBookingRate) : y1TargetMonthlyBk;
+  const clientsNeededY2    = live.existingClientBookingRate > 0 ? Math.ceil(y2TargetMonthlyBk / live.existingClientBookingRate) : y2TargetMonthlyBk;
   const currentClientsBookingPerMonth = live.clientBookingRate > 0
     ? Math.round(live.totalDashboardClients * live.clientBookingRate)
     : live.clientsWhoBooked;
@@ -2529,9 +2587,9 @@ function renderRoadmap() {
     },
     {
       icon: 'percent', color: bookingRateColor, bg: bookingRateColor === '#10b981' ? '#f0fdf4' : bookingRateColor === '#f59e0b' ? '#fffbeb' : '#fef2f2',
-      label: 'Monthly Booking Rate',
+      label: 'Overall Booking Rate',
       value: `${bookingRatePct}%`,
-      sub: `${(live.lifetimeBookingRate * 100).toFixed(1)}% have booked at least once`
+      sub: `Existing clients: ${(live.existingClientBookingRate * 100).toFixed(1)}%/mo · ${(live.lifetimeBookingRate * 100).toFixed(1)}% ever booked`
     },
     {
       icon: 'user-plus', color: '#3b82f6', bg: '#eff6ff',
@@ -2666,7 +2724,7 @@ function renderRoadmap() {
       <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;">
         <div style="background:#f8fafc;border-radius:10px;padding:12px;text-align:center;">
           <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">This Month</div>
-          <div style="font-size:22px;font-weight:800;color:#334155;line-height:1;">${curLabel}</div>
+          <div class="traj-number" style="font-size:22px;font-weight:800;color:#334155;line-height:1;">${curLabel}</div>
         </div>
         <div style="color:#cbd5e1;font-size:18px;">→</div>
         <div style="background:${col}0d;border:1.5px solid ${col}44;border-radius:10px;padding:12px;text-align:center;">
@@ -2688,7 +2746,7 @@ function renderRoadmap() {
     const revPct       = y.isCurrent ? Math.min((actualRev / y.annualRev) * 100, 100) : 0;
     const revBarColor  = revPct >= 80 ? '#10b981' : revPct >= 40 ? '#f59e0b' : '#ef4444';
     const growthMult   = live.monthlyRevRunRate > 0 ? targetMonthlyRev / live.monthlyRevRunRate : 0;
-    const clientsNeeded = live.clientBookingRate > 0 ? Math.ceil(tgtRepeatBk / live.clientBookingRate) : tgtRepeatBk;
+    const clientsNeeded = live.existingClientBookingRate > 0 ? Math.ceil(tgtRepeatBk / live.existingClientBookingRate) : tgtRepeatBk;
     return { ...y, targetMonthlyRev, tgtTotalBk, tgtNewBk, tgtRepeatBk, tgtSignups, actualRev, revPct, revBarColor, growthMult, clientsNeeded };
   });
 
@@ -2741,7 +2799,7 @@ function renderRoadmap() {
       </div>
 
       <!-- Year columns -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="acq-years" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         ${yearData.map(y => `
           <div style="border:1px solid ${y.col}22;border-radius:12px;padding:16px;background:${y.col}05;">
             <div style="font-size:12px;font-weight:700;color:${y.col};margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid ${y.col}22;">${y.label}</div>
@@ -2765,7 +2823,7 @@ function renderRoadmap() {
       </div>
 
       <!-- Dashboard snapshot -->
-      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:11px 14px;margin:16px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+      <div class="ret-snapshot" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:11px 14px;margin:16px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
         <div style="text-align:center;">
           <div style="font-size:22px;font-weight:800;color:#10b981;">${curDashboard}</div>
           <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Clients on Dashboard</div>
@@ -2783,14 +2841,14 @@ function renderRoadmap() {
       </div>
 
       <!-- Year columns -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="ret-years" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         ${yearData.map(y => `
           <div style="border:1px solid ${y.col}22;border-radius:12px;padding:16px;background:${y.col}05;">
             <div style="font-size:12px;font-weight:700;color:${y.col};margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid ${y.col}22;">${y.label}</div>
             ${mtTrajRow(y.col, 'repeat-2', 'Repeat Bookings / mo', curRepeatBkAvg, y.tgtRepeatBk, curRepeatBkAvg, y.tgtRepeatBk,
               `${exPct}% of all bookings · clients who have booked before`, '')}
             ${mtTrajRow(y.col, 'users', 'Dashboard Clients Needed', curDashboard, y.clientsNeeded, curDashboard, y.clientsNeeded,
-              `At ${(live.clientBookingRate * 100).toFixed(1)}% avg booking rate · need ${y.clientsNeeded} clients on dashboard to hit ${y.tgtRepeatBk} repeat bookings/mo`, '')}
+              `At ${(live.existingClientBookingRate * 100).toFixed(1)}% existing client booking rate · need ${y.clientsNeeded} on dashboard to hit ${y.tgtRepeatBk} repeat bookings/mo`, '')}
           </div>`).join('')}
       </div>
     </div>`;
