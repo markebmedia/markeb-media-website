@@ -73,7 +73,433 @@
     .btn-secondary { background: #1e293b; color: #60a5fa; border: 2px solid #334155; }
     .btn-secondary:hover { border-color: #60a5fa; background: #334155; }
 
-    /* Data source toggle */
+    /* ── MAIN TAB ROW ── */
+    .main-tab-row {
+      display: flex;
+      gap: 0;
+      background: #f1f5f9;
+      border-radius: 14px;
+      padding: 4px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 24px;
+    }
+
+    .main-tab-btn {
+      flex: 1;
+      padding: 13px 20px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all .2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .main-tab-btn.active.clients    { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; box-shadow: 0 2px 10px rgba(59,130,246,0.35); }
+    .main-tab-btn.active.bookings   { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; box-shadow: 0 2px 10px rgba(139,92,246,0.35); }
+    .main-tab-btn.active.performance{ background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 2px 10px rgba(245,158,11,0.35); }
+
+    /* ── PERFORMANCE SECTION ── */
+    #performanceSection { display: none; }
+
+    .perf-header {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border-radius: 16px;
+      padding: 28px;
+      border: 1px solid #334155;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .perf-header h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Period toggle inside performance */
+    .period-toggle {
+      display: flex;
+      gap: 0;
+      background: #0f172a;
+      border-radius: 10px;
+      padding: 4px;
+      border: 1px solid #334155;
+    }
+
+    .period-btn {
+      padding: 10px 18px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .2s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .period-btn.active {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(245,158,11,0.4);
+    }
+
+    /* KPI Cards grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 24px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      transition: all .25s ease;
+    }
+
+    .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 14px 14px 0 0;
+    }
+
+    .kpi-card.signups::before    { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .kpi-card.revenue::before    { background: linear-gradient(90deg, #10b981, #34d399); }
+    .kpi-card.new-booking::before{ background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+    .kpi-card.exist-booking::before{ background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .kpi-card.total-booking::before{ background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+
+    .kpi-current {
+      font-size: 42px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .kpi-card.signups .kpi-current     { color: #3b82f6; }
+    .kpi-card.revenue .kpi-current     { color: #10b981; }
+    .kpi-card.new-booking .kpi-current { color: #8b5cf6; }
+    .kpi-card.exist-booking .kpi-current{ color: #f59e0b; }
+    .kpi-card.total-booking .kpi-current{ color: #06b6d4; }
+
+    .kpi-period-label {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 16px;
+    }
+
+    .kpi-compare-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-top: 16px;
+      border-top: 1px solid #f1f5f9;
+      gap: 12px;
+    }
+
+    .kpi-prev {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    .kpi-prev strong { color: #64748b; font-size: 14px; }
+
+    .kpi-delta {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    .kpi-delta.up    { background: rgba(16,185,129,0.12); color: #10b981; }
+    .kpi-delta.down  { background: rgba(239,68,68,0.12);  color: #ef4444; }
+    .kpi-delta.flat  { background: rgba(148,163,184,0.12); color: #94a3b8; }
+
+    /* Target progress bar inside kpi */
+    .kpi-target-row {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .kpi-target-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .kpi-target-header .target-pct {
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .kpi-target-header .target-pct.on-track  { color: #10b981; }
+    .kpi-target-header .target-pct.behind    { color: #f59e0b; }
+    .kpi-target-header .target-pct.critical  { color: #ef4444; }
+
+    .target-bar-bg {
+      background: #f1f5f9;
+      border-radius: 6px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .target-bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.8s ease;
+    }
+
+    .on-track-fill  { background: linear-gradient(90deg, #10b981, #34d399); }
+    .behind-fill    { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .critical-fill  { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+    .kpi-target-sub {
+      font-size: 10px;
+      color: #cbd5e1;
+      margin-top: 4px;
+    }
+
+    /* ── Comparison table ── */
+    .comparison-section {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border-radius: 16px;
+      padding: 28px;
+      border: 1px solid #334155;
+      margin-bottom: 24px;
+    }
+
+    .comparison-section h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 20px;
+    }
+
+    .comp-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .comp-table th {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #64748b;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid #334155;
+    }
+
+    .comp-table td {
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #94a3b8;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .comp-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .comp-table td.metric-name {
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .comp-table td.current-val {
+      font-weight: 700;
+      color: #e2e8f0;
+      font-size: 14px;
+    }
+
+    .comp-delta-cell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .micro-delta {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    .micro-delta.up    { background: rgba(16,185,129,0.15); color: #10b981; }
+    .micro-delta.down  { background: rgba(239,68,68,0.15);  color: #ef4444; }
+    .micro-delta.flat  { background: rgba(148,163,184,0.15); color: #94a3b8; }
+
+    /* ── Road to £1M section ── */
+    .roadmap-section {
+      background: linear-gradient(135deg, #0f172a, #1a0a2e);
+      border-radius: 16px;
+      padding: 28px;
+      border: 1px solid #4c1d95;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .roadmap-section::after {
+      content: '£1M';
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: clamp(60px, 10vw, 120px);
+      font-weight: 900;
+      color: rgba(245,158,11,0.04);
+      pointer-events: none;
+      letter-spacing: -4px;
+    }
+
+    .roadmap-section h3 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .roadmap-sub {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 24px;
+    }
+
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .roadmap-target {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .roadmap-target .rt-value {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .roadmap-target .rt-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+
+    .roadmap-target .rt-progress {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* Year milestone bars */
+    .milestone-track {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .milestone-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .milestone-year {
+      font-size: 13px;
+      font-weight: 700;
+      color: #94a3b8;
+      width: 60px;
+      flex-shrink: 0;
+    }
+
+    .milestone-bar-wrap {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      height: 28px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .milestone-bar-fill {
+      height: 100%;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      padding-left: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+      transition: width 1s ease;
+    }
+
+    .milestone-target-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+      white-space: nowrap;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    /* Data source toggle — reused */
     .data-source-toggle {
       display: flex;
       gap: 0;
@@ -102,7 +528,7 @@
       font-family: 'Inter', sans-serif;
     }
 
-    .ds-btn.active.clients { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; box-shadow: 0 2px 8px rgba(59,130,246,0.3); }
+    .ds-btn.active.clients  { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; box-shadow: 0 2px 8px rgba(59,130,246,0.3); }
     .ds-btn.active.bookings { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; box-shadow: 0 2px 8px rgba(139,92,246,0.3); }
 
     /* Stats */
@@ -231,7 +657,6 @@
 
     .date-input:focus { outline: none; border-color: #3b82f6; }
 
-    /* Region list */
     .region-list {
       background: linear-gradient(135deg, #1e293b, #0f172a);
       border-radius: 16px;
@@ -266,7 +691,6 @@
     .region-item.empty .region-count { background: #334155; color: #94a3b8; }
     .region-item.active { background: #1e293b; border-left: 3px solid #60a5fa; }
 
-    /* Detail panel */
     .detail-panel {
       background: linear-gradient(135deg, #1e293b, #0f172a);
       border-radius: 16px;
@@ -306,13 +730,13 @@
       margin-right: 4px;
     }
 
-    .badge-active { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
-    .badge-inactive { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; }
+    .badge-active    { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
+    .badge-inactive  { background: rgba(239,68,68,0.2);  color: #ef4444; border: 1px solid #ef4444; }
     .badge-confirmed { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
-    .badge-reserved { background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid #fb923c; }
-    .badge-booked { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; }
+    .badge-reserved  { background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid #fb923c; }
+    .badge-booked    { background: rgba(59,130,246,0.2);  color: #60a5fa; border: 1px solid #3b82f6; }
     .badge-completed { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
-    .badge-cancelled { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid #ef4444; }
+    .badge-cancelled { background: rgba(239,68,68,0.2);  color: #ef4444; border: 1px solid #ef4444; }
 
     .revenue-total {
       background: rgba(16,185,129,0.1);
@@ -337,7 +761,6 @@
       margin-top: 4px;
     }
 
-    /* Panel tabs */
     .panel-tabs {
       display: flex;
       gap: 4px;
@@ -362,15 +785,9 @@
       font-family: 'Inter', sans-serif;
     }
 
-    .panel-tab.active {
-      background: #1e293b;
-      color: #e2e8f0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    }
-
+    .panel-tab.active { background: #1e293b; color: #e2e8f0; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
     .panel-tab:hover:not(.active) { color: #94a3b8; }
 
-    /* Intelligence panel */
     .intel-section { margin-bottom: 20px; }
 
     .intel-section-title {
@@ -399,20 +816,12 @@
       text-align: center;
     }
 
-    .intel-stat-value {
-      font-size: 22px;
-      font-weight: 700;
-      color: #3b82f6;
-      margin-bottom: 4px;
-    }
-
-    .intel-stat-value.gold { color: #f59e0b; }
-    .intel-stat-value.green { color: #10b981; }
+    .intel-stat-value { font-size: 22px; font-weight: 700; color: #3b82f6; margin-bottom: 4px; }
+    .intel-stat-value.gold   { color: #f59e0b; }
+    .intel-stat-value.green  { color: #10b981; }
     .intel-stat-value.purple { color: #8b5cf6; }
-
     .intel-stat-label { font-size: 10px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* Booking rate bar */
     .rate-bar-wrap {
       background: #0f172a;
       border: 1px solid #334155;
@@ -421,43 +830,12 @@
       margin-bottom: 16px;
     }
 
-    .rate-bar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 12px;
-      color: #94a3b8;
-      font-weight: 600;
-    }
+    .rate-bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; color: #94a3b8; font-weight: 600; }
+    .rate-bar-pct { font-size: 20px; font-weight: 700; color: #10b981; }
+    .rate-bar-bg { background: #1e293b; border-radius: 6px; height: 10px; overflow: hidden; }
+    .rate-bar-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #10b981, #3b82f6); transition: width 1s ease; }
+    .rate-bar-sub { font-size: 11px; color: #64748b; margin-top: 6px; }
 
-    .rate-bar-pct {
-      font-size: 20px;
-      font-weight: 700;
-      color: #10b981;
-    }
-
-    .rate-bar-bg {
-      background: #1e293b;
-      border-radius: 6px;
-      height: 10px;
-      overflow: hidden;
-    }
-
-    .rate-bar-fill {
-      height: 100%;
-      border-radius: 6px;
-      background: linear-gradient(90deg, #10b981, #3b82f6);
-      transition: width 1s ease;
-    }
-
-    .rate-bar-sub {
-      font-size: 11px;
-      color: #64748b;
-      margin-top: 6px;
-    }
-
-    /* Top clients leaderboard */
     .leaderboard-item {
       display: flex;
       align-items: center;
@@ -476,8 +854,7 @@
     .leaderboard-item.rank-3 { border-color: #cd7c2f; }
 
     .rank-badge {
-      width: 28px;
-      height: 28px;
+      width: 28px; height: 28px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -493,16 +870,15 @@
     .rank-other .rank-badge { background: #1e293b; color: #64748b; border: 1px solid #334155; }
 
     .leaderboard-info { flex: 1; min-width: 0; }
-    .leaderboard-name { font-weight: 700; color: #e2e8f0; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .leaderboard-name  { font-weight: 700; color: #e2e8f0; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .leaderboard-email { font-size: 11px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .leaderboard-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .leaderboard-sub   { font-size: 11px; color: #94a3b8; margin-top: 2px; }
 
     .leaderboard-right { text-align: right; flex-shrink: 0; }
-    .ltv-value { font-size: 15px; font-weight: 700; color: #10b981; }
-    .ltv-label { font-size: 10px; color: #64748b; }
-    .booking-count { font-size: 11px; color: #60a5fa; font-weight: 600; margin-top: 2px; }
+    .ltv-value      { font-size: 15px; font-weight: 700; color: #10b981; }
+    .ltv-label      { font-size: 10px; color: #64748b; }
+    .booking-count  { font-size: 11px; color: #60a5fa; font-weight: 600; margin-top: 2px; }
 
-    /* Legend */
     .map-legend {
       background: linear-gradient(135deg, #1e293b, #0f172a);
       border-radius: 12px;
@@ -514,24 +890,21 @@
     .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; color: #94a3b8; }
     .legend-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.3); }
 
-    /* Cluster */
-    .marker-cluster-small { background: rgba(59,130,246,0.85); border: 3px solid #60a5fa; }
-    .marker-cluster-medium { background: rgba(251,146,60,0.85); border: 3px solid #fb923c; }
-    .marker-cluster-large { background: rgba(239,68,68,0.85); border: 3px solid #ef4444; }
-    .marker-cluster-small.bk { background: rgba(139,92,246,0.85); border: 3px solid #a78bfa; }
+    .marker-cluster-small  { background: rgba(59,130,246,0.85);  border: 3px solid #60a5fa; }
+    .marker-cluster-medium { background: rgba(251,146,60,0.85);  border: 3px solid #fb923c; }
+    .marker-cluster-large  { background: rgba(239,68,68,0.85);   border: 3px solid #ef4444; }
+    .marker-cluster-small.bk  { background: rgba(139,92,246,0.85); border: 3px solid #a78bfa; }
     .marker-cluster-medium.bk { background: rgba(167,139,250,0.85); border: 3px solid #c4b5fd; }
-    .marker-cluster-large.bk { background: rgba(196,181,253,0.85); border: 3px solid #ddd6fe; }
+    .marker-cluster-large.bk  { background: rgba(196,181,253,0.85); border: 3px solid #ddd6fe; }
     .marker-cluster div { background: transparent; color: #fff; font-weight: 700; font-size: 13px; }
 
-    /* Popups */
     .leaflet-popup-content-wrapper { background: #1e293b; color: #e2e8f0; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid #334155; }
     .leaflet-popup-tip { background: #1e293b; }
     .leaflet-popup-content { margin: 14px; font-family: 'Inter', sans-serif; min-width: 220px; }
-    .popup-title { font-size: 15px; font-weight: 700; color: #e2e8f0; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
-    .popup-row { font-size: 12px; color: #94a3b8; margin-bottom: 5px; }
+    .popup-title  { font-size: 15px; font-weight: 700; color: #e2e8f0; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #334155; }
+    .popup-row    { font-size: 12px; color: #94a3b8; margin-bottom: 5px; }
     .popup-footer { margin-top: 10px; padding-top: 10px; border-top: 1px solid #334155; }
 
-    /* Scrollbar */
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; border-radius: 4px; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -547,14 +920,101 @@
       .content-grid { grid-template-columns: 1fr; }
       .sidebar { display: grid; grid-template-columns: 1fr 1fr; }
       #map { height: 600px; }
+      .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    }
+
+    @media (max-width: 900px) {
+      .perf-header { flex-direction: column; align-items: flex-start; }
+      .period-toggle { width: 100%; flex-wrap: wrap; }
+      .period-btn { flex: 1 1 calc(50% - 4px); text-align: center; font-size: 12px; padding: 9px 10px; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+      .roadmap-grid { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 768px) {
-      body { padding: 12px; }
-      .stats-overview { grid-template-columns: 1fr 1fr; }
-      .content-grid { grid-template-columns: 1fr; }
+      body { padding: 10px; }
+
+      /* Header */
+      .header { padding: 20px; flex-direction: column; align-items: flex-start; gap: 14px; }
+      .header-content h1 { font-size: 20px; gap: 8px; }
+      .header-content h1 i { width: 22px !important; height: 22px !important; }
+      .header-actions { width: 100%; }
+      .header-actions .btn { flex: 1; justify-content: center; padding: 10px 12px; font-size: 13px; }
+
+      /* Main tabs */
+      .main-tab-row { border-radius: 10px; gap: 2px; }
+      .main-tab-btn { font-size: 12px; padding: 10px 8px; gap: 5px; }
+      .main-tab-btn i { width: 14px !important; height: 14px !important; }
+
+      /* Stats grids */
+      .stats-overview { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stat-card { padding: 16px 12px; }
+      .stat-value { font-size: 26px; }
+      .stat-label { font-size: 11px; }
+
+      /* Map */
+      .content-grid { grid-template-columns: 1fr; gap: 14px; }
       .sidebar { grid-template-columns: 1fr; }
-      #map { height: 400px; }
+      #map { height: 340px; }
+      .map-section { padding: 14px; }
+
+      /* Performance section */
+      .perf-header { padding: 18px; }
+      .perf-header h2 { font-size: 17px; }
+      .period-toggle { width: 100%; }
+      .period-btn { flex: 1 1 calc(50% - 4px); font-size: 11px; padding: 8px 6px; }
+
+      /* KPI cards */
+      .kpi-grid { grid-template-columns: 1fr; gap: 12px; }
+      .kpi-card { padding: 18px; }
+      .kpi-current { font-size: 32px; }
+      .kpi-label { font-size: 11px; }
+      .kpi-period-label { font-size: 11px; }
+      .kpi-delta { font-size: 13px; }
+
+      /* Comparison table */
+      .comparison-section { padding: 18px; overflow-x: auto; }
+      .comparison-section h3 { font-size: 15px; margin-bottom: 14px; }
+      .comp-table { min-width: 520px; }
+      .comp-table th, .comp-table td { padding: 8px 10px; font-size: 12px; }
+
+      /* Roadmap */
+      .roadmap-section { padding: 18px; }
+      .roadmap-section h3 { font-size: 16px; }
+      .roadmap-sub { font-size: 12px; }
+      .roadmap-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .roadmap-target { padding: 12px; }
+      .roadmap-target .rt-value { font-size: 22px; }
+      .roadmap-target .rt-label { font-size: 10px; }
+      .roadmap-target .rt-progress { font-size: 11px; }
+      .milestone-year { font-size: 12px; }
+      .milestone-bar-wrap { height: 22px; }
+
+      /* Monthly targets grid — stack to 1 col */
+      #monthlyTargetsGrid { grid-template-columns: 1fr !important; }
+
+      /* Leaderboard */
+      .leaderboard-item { padding: 10px; gap: 8px; }
+      .leaderboard-name { font-size: 12px; }
+      .ltv-value { font-size: 13px; }
+      .booking-count { font-size: 10px; }
+
+      /* Region list & detail panel */
+      .region-list, .detail-panel { max-height: 400px; padding: 16px; }
+      .control-panel { padding: 16px; }
+      /* Intel stats row wraps to scrollable on mobile */
+      #intelStats { -webkit-overflow-scrolling: touch; }
+      #intelStats .stat-card { min-width: 130px; }
+    }
+
+    @media (max-width: 420px) {
+      .main-tab-btn span, .main-tab-btn { font-size: 11px; padding: 9px 6px; }
+      .stats-overview { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .stat-value { font-size: 22px; }
+      .kpi-current { font-size: 28px; }
+      .roadmap-grid { grid-template-columns: 1fr; }
+      .period-btn { flex: 1 1 100%; }
+      .header-content h1 { font-size: 17px; }
     }
   </style>
 </head>
@@ -564,8 +1024,8 @@
   <!-- Header -->
   <div class="header">
     <div class="header-content">
-      <h1><i data-lucide="map" style="width:32px;height:32px;"></i> Data & Insight For Perfomance</h1>
-      <p class="header-subtitle">Key metrics &amp; bookings geographic visualisation</p>
+      <h1><i data-lucide="map" style="width:32px;height:32px;"></i> Data &amp; Insight For Performance</h1>
+      <p class="header-subtitle">Key metrics, bookings geographic visualisation &amp; growth analytics</p>
     </div>
     <div class="header-actions">
       <button class="btn btn-secondary" onclick="window.location.href='admin-panel.html'">
@@ -577,1002 +1037,1398 @@
     </div>
   </div>
 
-  <!-- Data Source Toggle -->
-  <div class="data-source-toggle">
-    <button class="ds-btn active clients" id="dsClients" onclick="setDataSource('clients')">
+  <!-- ── MAIN 3-WAY TAB ── -->
+  <div class="main-tab-row">
+    <button class="main-tab-btn active clients" id="tabClients" onclick="setMainTab('clients')">
       <i data-lucide="users" style="width:16px;height:16px;"></i> Clients
     </button>
-    <button class="ds-btn" id="dsBookings" onclick="setDataSource('bookings')">
+    <button class="main-tab-btn" id="tabBookings" onclick="setMainTab('bookings')">
       <i data-lucide="calendar-check" style="width:16px;height:16px;"></i> Bookings
+    </button>
+    <button class="main-tab-btn" id="tabPerformance" onclick="setMainTab('performance')">
+      <i data-lucide="trending-up" style="width:16px;height:16px;"></i> Performance Analytics
     </button>
   </div>
 
-  <!-- Client Stats -->
-  <div class="stats-overview" id="clientStats">
-    <div class="stat-card">
-      <div class="stat-value" id="totalClients">-</div>
-      <div class="stat-label">Total Clients</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="regionsWithClients">-</div>
-      <div class="stat-label">Regions Covered</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="emptyRegions">-</div>
-      <div class="stat-label">Opportunities</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="topRegion">-</div>
-      <div class="stat-label">Top Region</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="clientGrowth">-</div>
-      <div class="stat-label">30-Day Growth</div>
-    </div>
-  </div>
+  <!-- ══════════════════════════════════════════════
+       MAP VIEW (clients + bookings)
+  ══════════════════════════════════════════════ -->
+  <div id="mapView">
 
-  <!-- Booking Stats -->
-  <div class="stats-overview" id="bookingStats" style="display:none;">
-    <div class="stat-card booking-stat">
-      <div class="stat-value purple" id="totalBookings">-</div>
-      <div class="stat-label">Total Bookings</div>
-    </div>
-    <div class="stat-card booking-stat">
-      <div class="stat-value purple" id="confirmedBookings">-</div>
-      <div class="stat-label">Confirmed</div>
-    </div>
-    <div class="stat-card booking-stat">
-      <div class="stat-value purple" id="reservedBookings">-</div>
-      <div class="stat-label">Reserved</div>
-    </div>
-    <div class="stat-card booking-stat">
-      <div class="stat-value purple" id="totalRevenue">-</div>
-      <div class="stat-label">Total Revenue</div>
-    </div>
-    <div class="stat-card booking-stat">
-      <div class="stat-value purple" id="bookingGrowth">-</div>
-      <div class="stat-label">30-Day Bookings</div>
-    </div>
-  </div>
-
-  <!-- Intelligence Stats Row (always visible) -->
-  <div class="stats-overview" id="intelStats">
-    <div class="stat-card" style="border-color:#f59e0b20;">
-      <div class="stat-value gold" id="intelBookingRate" style="color:#f59e0b;">-</div>
-      <div class="stat-label">Booking Rate</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value green" id="intelAvgLTV" style="color:#10b981;">-</div>
-      <div class="stat-label">Avg Client LTV</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value purple" id="intelAvgBookings" style="color:#8b5cf6;">-</div>
-      <div class="stat-label">Avg Bookings / Client</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value gold" id="intelTotalLTV" style="color:#f59e0b;">-</div>
-      <div class="stat-label">Total Client LTV</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="intelNeverBooked">-</div>
-      <div class="stat-label">Never Booked</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="intelATV" style="color:#06b6d4;">-</div>
-      <div class="stat-label">Avg Transaction Value</div>
-    </div>
-  </div>
-
-  <!-- Main Grid -->
-  <div class="content-grid">
-
-    <!-- Left Sidebar -->
-    <div class="sidebar">
-      <div class="control-panel">
-        <h3><i data-lucide="settings" style="width:18px;height:18px;"></i> Map Controls</h3>
-
-        <!-- View mode -->
-        <div class="control-section">
-          <div class="control-label">View Mode</div>
-          <div class="view-toggle">
-            <button class="view-btn active" id="viewMarkers" onclick="setViewMode('markers')">
-              <i data-lucide="map-pin" style="width:15px;height:15px;"></i> Markers
-            </button>
-            <button class="view-btn" id="viewHeatmap" onclick="setViewMode('heatmap')">
-              <i data-lucide="flame" style="width:15px;height:15px;"></i> Heat Map
-            </button>
-          </div>
-        </div>
-
-        <!-- Client filters -->
-        <div class="control-section" id="clientFilters">
-          <div class="control-label">Filter</div>
-          <button class="filter-btn active" onclick="filterClients('all', event)">
-            <span>All Clients</span><span class="filter-count" id="cAll">-</span>
-          </button>
-          <button class="filter-btn" onclick="filterClients('active', event)">
-            <span>Active Only</span><span class="filter-count" id="cActive">-</span>
-          </button>
-          <button class="filter-btn" onclick="filterClients('with-clients', event)">
-            <span>Regions With Clients</span><span class="filter-count" id="cWithClients">-</span>
-          </button>
-        </div>
-
-        <!-- Booking filters -->
-        <div class="control-section" id="bookingFilters" style="display:none;">
-          <div class="control-label">Booking Status</div>
-          <button class="filter-btn active" onclick="filterBookings('all', event)">
-            <span>All Bookings</span><span class="filter-count" id="bAll">-</span>
-          </button>
-          <button class="filter-btn" onclick="filterBookings('Confirmed', event)">
-            <span>Confirmed</span><span class="filter-count" id="bConfirmed">-</span>
-          </button>
-          <button class="filter-btn" onclick="filterBookings('Reserved', event)">
-            <span>Reserved</span><span class="filter-count" id="bReserved">-</span>
-          </button>
-          <button class="filter-btn" onclick="filterBookings('Cancelled', event)">
-            <span>Cancelled</span><span class="filter-count" id="bCancelled">-</span>
-          </button>
-        </div>
-
-        <!-- Date range -->
-        <div class="control-section">
-          <div class="control-label">Date Range</div>
-          <div class="date-filter">
-            <input type="date" class="date-input" id="dateFrom" onchange="applyDateFilter()">
-            <input type="date" class="date-input" id="dateTo" onchange="applyDateFilter()">
-          </div>
-        </div>
-
-        <!-- Legend -->
-        <div class="control-section">
-          <div class="control-label">Legend</div>
-          <div class="map-legend" id="clientLegend">
-            <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div> Client marker</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;border-radius:4px;"></div> Small cluster (2–10)</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#fb923c;border-radius:4px;"></div> Medium (10–20)</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#ef4444;border-radius:4px;"></div> Large (20+)</div>
-          </div>
-          <div class="map-legend" id="bookingLegend" style="display:none;">
-            <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6;"></div> Booking (exact postcode)</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div> Confirmed</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#fb923c;"></div> Reserved</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div> Cancelled</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6;border-radius:4px;"></div> Cluster</div>
-          </div>
-        </div>
+    <!-- Client Stats -->
+    <div class="stats-overview" id="clientStats">
+      <div class="stat-card">
+        <div class="stat-value" id="totalClients">-</div>
+        <div class="stat-label">Total Clients</div>
       </div>
-
-      <!-- Region list (clients mode) / Postcode summary (bookings mode) -->
-      <div class="region-list" id="regionListPanel">
-        <h3>
-          <span id="regionListTitle">Regions</span>
-          <span id="regionTotal" style="color:#94a3b8;font-size:13px;font-weight:500;">-</span>
-        </h3>
-        <div id="regionListContainer">
-          <div style="text-align:center;padding:40px 20px;color:#94a3b8;">
-            <div class="spinner"></div>
-            <p>Loading...</p>
-          </div>
-        </div>
+      <div class="stat-card">
+        <div class="stat-value" id="regionsWithClients">-</div>
+        <div class="stat-label">Regions Covered</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="emptyRegions">-</div>
+        <div class="stat-label">Opportunities</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="topRegion">-</div>
+        <div class="stat-label">Top Region</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="clientGrowth">-</div>
+        <div class="stat-label">30-Day Growth</div>
       </div>
     </div>
 
-    <!-- Map -->
-    <div class="map-section">
-      <div id="map"></div>
+    <!-- Booking Stats -->
+    <div class="stats-overview" id="bookingStats" style="display:none;">
+      <div class="stat-card booking-stat">
+        <div class="stat-value purple" id="totalBookings">-</div>
+        <div class="stat-label">Total Bookings</div>
+      </div>
+      <div class="stat-card booking-stat">
+        <div class="stat-value purple" id="confirmedBookings">-</div>
+        <div class="stat-label">Confirmed</div>
+      </div>
+      <div class="stat-card booking-stat">
+        <div class="stat-value purple" id="reservedBookings">-</div>
+        <div class="stat-label">Reserved</div>
+      </div>
+      <div class="stat-card booking-stat">
+        <div class="stat-value purple" id="totalRevenue">-</div>
+        <div class="stat-label">Total Revenue</div>
+      </div>
+      <div class="stat-card booking-stat">
+        <div class="stat-value purple" id="bookingGrowth">-</div>
+        <div class="stat-label">30-Day Bookings</div>
+      </div>
     </div>
 
-    <!-- Detail Panel -->
-    <div class="sidebar">
-      <div class="detail-panel" id="detailPanel">
-        <div class="panel-tabs">
-          <button class="panel-tab active" id="tabData" onclick="switchTab('data')">&#128203; Data</button>
-          <button class="panel-tab" id="tabIntel" onclick="switchTab('intel')">&#127942; Intelligence</button>
-        </div>
-        <div id="tabDataContent">
-          <h3 id="detailTitle" style="margin-bottom:12px;">All Clients</h3>
-          <div id="detailContent">
-            <div class="empty-state">
-              <div class="spinner"></div>
-              <p class="empty-state-text">Loading data...</p>
+    <!-- Intelligence Stats Row -->
+    <div class="stats-overview" id="intelStats">
+      <div class="stat-card" style="border-color:#f59e0b20;">
+        <div class="stat-value gold" id="intelBookingRate" style="color:#f59e0b;">-</div>
+        <div class="stat-label">Booking Rate</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value green" id="intelAvgLTV" style="color:#10b981;">-</div>
+        <div class="stat-label">Avg Client LTV</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value purple" id="intelAvgBookings" style="color:#8b5cf6;">-</div>
+        <div class="stat-label">Avg Bookings / Client</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value gold" id="intelTotalLTV" style="color:#f59e0b;">-</div>
+        <div class="stat-label">Total Client LTV</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="intelNeverBooked">-</div>
+        <div class="stat-label">Never Booked</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="intelATV" style="color:#06b6d4;">-</div>
+        <div class="stat-label">Avg Transaction Value</div>
+      </div>
+    </div>
+
+    <!-- Map grid -->
+    <div class="content-grid">
+      <div class="sidebar">
+        <div class="control-panel">
+          <h3><i data-lucide="settings" style="width:18px;height:18px;"></i> Map Controls</h3>
+
+          <div class="control-section">
+            <div class="control-label">View Mode</div>
+            <div class="view-toggle">
+              <button class="view-btn active" id="viewMarkers" onclick="setViewMode('markers')">
+                <i data-lucide="map-pin" style="width:15px;height:15px;"></i> Markers
+              </button>
+              <button class="view-btn" id="viewHeatmap" onclick="setViewMode('heatmap')">
+                <i data-lucide="flame" style="width:15px;height:15px;"></i> Heat Map
+              </button>
+            </div>
+          </div>
+
+          <div class="control-section" id="clientFilters">
+            <div class="control-label">Filter</div>
+            <button class="filter-btn active" onclick="filterClients('all', event)">
+              <span>All Clients</span><span class="filter-count" id="cAll">-</span>
+            </button>
+            <button class="filter-btn" onclick="filterClients('active', event)">
+              <span>Active Only</span><span class="filter-count" id="cActive">-</span>
+            </button>
+            <button class="filter-btn" onclick="filterClients('with-clients', event)">
+              <span>Regions With Clients</span><span class="filter-count" id="cWithClients">-</span>
+            </button>
+          </div>
+
+          <div class="control-section" id="bookingFilters" style="display:none;">
+            <div class="control-label">Booking Status</div>
+            <button class="filter-btn active" onclick="filterBookings('all', event)">
+              <span>All Bookings</span><span class="filter-count" id="bAll">-</span>
+            </button>
+            <button class="filter-btn" onclick="filterBookings('Confirmed', event)">
+              <span>Confirmed</span><span class="filter-count" id="bConfirmed">-</span>
+            </button>
+            <button class="filter-btn" onclick="filterBookings('Reserved', event)">
+              <span>Reserved</span><span class="filter-count" id="bReserved">-</span>
+            </button>
+            <button class="filter-btn" onclick="filterBookings('Cancelled', event)">
+              <span>Cancelled</span><span class="filter-count" id="bCancelled">-</span>
+            </button>
+          </div>
+
+          <div class="control-section">
+            <div class="control-label">Date Range</div>
+            <div class="date-filter">
+              <input type="date" class="date-input" id="dateFrom" onchange="applyDateFilter()">
+              <input type="date" class="date-input" id="dateTo"   onchange="applyDateFilter()">
+            </div>
+          </div>
+
+          <div class="control-section">
+            <div class="control-label">Legend</div>
+            <div class="map-legend" id="clientLegend">
+              <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div> Client marker</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;border-radius:4px;"></div> Small cluster (2–10)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#fb923c;border-radius:4px;"></div> Medium (10–20)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#ef4444;border-radius:4px;"></div> Large (20+)</div>
+            </div>
+            <div class="map-legend" id="bookingLegend" style="display:none;">
+              <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6;"></div> Booking (exact postcode)</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div> Confirmed</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#fb923c;"></div> Reserved</div>
+              <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div> Cancelled</div>
             </div>
           </div>
         </div>
-        <div id="tabIntelContent" style="display:none;">
-          <div id="intelContent">
-            <div class="empty-state"><div class="spinner"></div><p class="empty-state-text">Loading...</p></div>
+
+        <div class="region-list" id="regionListPanel">
+          <h3>
+            <span id="regionListTitle">Regions</span>
+            <span id="regionTotal" style="color:#94a3b8;font-size:13px;font-weight:500;">-</span>
+          </h3>
+          <div id="regionListContainer">
+            <div style="text-align:center;padding:40px 20px;color:#94a3b8;">
+              <div class="spinner"></div><p>Loading...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-section">
+        <div id="map"></div>
+      </div>
+
+      <div class="sidebar">
+        <div class="detail-panel" id="detailPanel">
+          <div class="panel-tabs">
+            <button class="panel-tab active" id="tabData"  onclick="switchTab('data')">&#128203; Data</button>
+            <button class="panel-tab"         id="tabIntel" onclick="switchTab('intel')">&#127942; Intelligence</button>
+          </div>
+          <div id="tabDataContent">
+            <h3 id="detailTitle" style="margin-bottom:12px;">All Clients</h3>
+            <div id="detailContent">
+              <div class="empty-state"><div class="spinner"></div><p class="empty-state-text">Loading data...</p></div>
+            </div>
+          </div>
+          <div id="tabIntelContent" style="display:none;">
+            <div id="intelContent">
+              <div class="empty-state"><div class="spinner"></div><p class="empty-state-text">Loading...</p></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-  </div>
+    <!-- Leaderboard section -->
+    <div id="intelSection" style="margin-top:24px;">
+      <div style="background:linear-gradient(135deg,#1e293b,#0f172a);border-radius:16px;padding:28px;border:1px solid #334155;box-shadow:0 4px 16px rgba(0,0,0,0.3);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+          <h2 style="font-size:22px;font-weight:700;color:#e2e8f0;display:flex;align-items:center;gap:10px;">
+            🏆 Client Intelligence — Top Clients Leaderboard
+          </h2>
+          <div style="font-size:13px;color:#64748b;">Ranked by Lifetime Value (excl. cancelled bookings)</div>
+        </div>
 
-  <!-- Intelligence Section (below map) -->
-  <div id="intelSection" style="margin-top:24px;">
-    <div style="background:linear-gradient(135deg,#1e293b,#0f172a);border-radius:16px;padding:28px;border:1px solid #334155;box-shadow:0 4px 16px rgba(0,0,0,0.3);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
-        <h2 style="font-size:22px;font-weight:700;color:#e2e8f0;display:flex;align-items:center;gap:10px;">
-          🏆 Client Intelligence — Top Clients Leaderboard
-        </h2>
-        <div style="font-size:13px;color:#64748b;">Ranked by Lifetime Value (excl. cancelled bookings)</div>
-      </div>
+        <div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:18px;margin-bottom:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <span style="font-size:14px;font-weight:600;color:#94a3b8;">Client → Booking Conversion Rate</span>
+            <span style="font-size:clamp(20px,4vw,28px);font-weight:700;color:#10b981;" id="bigBookingRate">-</span>
+          </div>
+          <div style="background:#1e293b;border-radius:8px;height:14px;overflow:hidden;">
+            <div id="bigRateBar" style="height:100%;border-radius:8px;background:linear-gradient(90deg,#10b981,#3b82f6);transition:width 1.2s ease;width:0%"></div>
+          </div>
+          <div style="font-size:12px;color:#64748b;margin-top:8px;" id="bigRateSub">Loading...</div>
+        </div>
 
-      <!-- Conversion rate bar -->
-      <div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:18px;margin-bottom:24px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <span style="font-size:14px;font-weight:600;color:#94a3b8;">Client → Booking Conversion Rate</span>
-          <span style="font-size:28px;font-weight:700;color:#10b981;" id="bigBookingRate">-</span>
+        <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:140px;background:#0f172a;border:1px solid #334155;border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:28px;font-weight:700;color:#06b6d4;" id="bigATV">-</div>
+            <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Avg Transaction Value</div>
+          </div>
+          <div style="flex:1;min-width:140px;background:#0f172a;border:1px solid #334155;border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:28px;font-weight:700;color:#10b981;" id="bigAvgLTV">-</div>
+            <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Avg Client LTV</div>
+          </div>
+          <div style="flex:1;min-width:140px;background:#0f172a;border:1px solid #334155;border-radius:12px;padding:16px;text-align:center;">
+            <div style="font-size:28px;font-weight:700;color:#f59e0b;" id="bigTotalLTV">-</div>
+            <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Total LTV</div>
+          </div>
         </div>
-        <div style="background:#1e293b;border-radius:8px;height:14px;overflow:hidden;">
-          <div id="bigRateBar" style="height:100%;border-radius:8px;background:linear-gradient(90deg,#10b981,#3b82f6);transition:width 1.2s ease;width:0%"></div>
-        </div>
-        <div style="font-size:12px;color:#64748b;margin-top:8px;" id="bigRateSub">Loading...</div>
-      </div>
 
-      <!-- ATV highlight -->
-      <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
-        <div style="flex:1;min-width:140px;background:#0f172a;border:1px solid #334155;border-radius:12px;padding:16px;text-align:center;">
-          <div style="font-size:28px;font-weight:700;color:#06b6d4;" id="bigATV">-</div>
-          <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Avg Transaction Value</div>
+        <div id="fullLeaderboard" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;">
+          <div style="text-align:center;padding:40px;color:#64748b;">Loading leaderboard...</div>
         </div>
-        <div style="flex:1;min-width:140px;background:#0f172a;border:1px solid #334155;border-radius:12px;padding:16px;text-align:center;">
-          <div style="font-size:28px;font-weight:700;color:#10b981;" id="bigAvgLTV">-</div>
-          <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Avg Client LTV</div>
-        </div>
-        <div style="flex:1;min-width:140px;background:#0f172a;border:1px solid #334155;border-radius:12px;padding:16px;text-align:center;">
-          <div style="font-size:28px;font-weight:700;color:#f59e0b;" id="bigTotalLTV">-</div>
-          <div style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Total LTV</div>
-        </div>
-      </div>
-
-      <!-- Full leaderboard grid -->
-      <div id="fullLeaderboard" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;">
-        <div style="text-align:center;padding:40px;color:#64748b;">Loading leaderboard...</div>
       </div>
     </div>
-  </div>
 
-</div>
+  </div><!-- end #mapView -->
+
+
+  <!-- ══════════════════════════════════════════════
+       PERFORMANCE ANALYTICS VIEW
+  ══════════════════════════════════════════════ -->
+  <div id="performanceSection">
+
+    <!-- Performance header with period toggle -->
+    <div class="perf-header">
+      <div>
+        <h2>📊 Performance Analytics</h2>
+        <p style="font-size:13px;color:#64748b;margin-top:4px;" id="perfPeriodLabel">Month vs Month</p>
+      </div>
+      <div class="period-toggle">
+        <button class="period-btn active" onclick="setPeriod('mom')"  id="periodMoM">Month vs Month</button>
+        <button class="period-btn"        onclick="setPeriod('qoq')"  id="periodQoQ">Quarter vs Quarter</button>
+        <button class="period-btn"        onclick="setPeriod('6m')"   id="period6M">6 Month View</button>
+        <button class="period-btn"        onclick="setPeriod('yoy')"  id="periodYoY">Year on Year</button>
+      </div>
+    </div>
+
+    <!-- KPI cards -->
+    <div class="kpi-grid" id="kpiGrid">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="comparison-section">
+      <h3>📋 Detailed Comparison — <span id="compTableTitle">This Month vs Last Month</span></h3>
+      <div style="overflow-x:auto;">
+        <table class="comp-table" id="compTable">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th id="colCurrent">This Month</th>
+              <th id="colPrev">Last Month</th>
+              <th>Change</th>
+              <th>Monthly Target</th>
+              <th>vs Target</th>
+            </tr>
+          </thead>
+          <tbody id="compTableBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Road to £1M section -->
+    <div class="roadmap-section">
+      <h3>🎯 Road to £1,000,000 — 3 Year Growth Plan</h3>
+      <p class="roadmap-sub" id="roadmapSub">Target: 400 clients on dashboard · £1M annual revenue by 2027 · Booking targets calculated from live ATV</p>
+
+      <div class="roadmap-grid" id="roadmapTargets">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Year milestones -->
+      <div style="margin-bottom:20px;">
+        <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px;">Annual Revenue Milestones</div>
+        <div class="milestone-track" id="milestoneTrack">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Monthly targets breakdown -->
+      <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,0.06);">
+        <div style="font-size:13px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:16px;">Monthly Targets by Year</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;" id="monthlyTargetsGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end #performanceSection -->
+
+</div><!-- end .map-container -->
 
 <script>
-  // ── Region coords (for client mode only) ──
-  const REGION_COORDS = {
-    'Cheshire East': [53.1603, -2.2119], 'Cheshire West and Chester': [53.1905, -2.8909],
-    'Greater London': [51.5074, -0.1278], 'Greater Manchester': [53.4808, -2.2426],
-    'Essex': [51.7341, 0.4700], 'West Midlands': [52.4862, -1.8904],
-    'Leicestershire': [52.6369, -1.1398], 'South Yorkshire': [53.5400, -1.3500],
-    'West Yorkshire': [53.7900, -1.7500], 'North Yorkshire': [54.2766, -1.4090],
-    'East Riding of Yorkshire': [53.8429, -0.4380], 'York': [53.9600, -1.0873],
-    'Cumbria': [54.5772, -2.7974], 'Lancashire': [53.7632, -2.7044],
-    'Merseyside': [53.4106, -2.9779], 'Blackburn with Darwen': [53.7480, -2.4820],
-    'Blackpool': [53.8175, -3.0357], 'Halton': [53.3340, -2.7350],
-    'Warrington': [53.3900, -2.5970], 'County Durham': [54.7753, -1.5849],
-    'Northumberland': [55.2083, -2.0784], 'Tyne and Wear': [54.9783, -1.6178],
-    'Derbyshire': [53.1235, -1.5650], 'Derby': [52.9219, -1.4746],
-    'Herefordshire': [52.0564, -2.7160], 'Lincolnshire': [53.2307, -0.5406],
-    'Northamptonshire': [52.2700, -0.8700], 'Nottinghamshire': [53.1000, -0.9900],
-    'Nottingham': [52.9548, -1.1581], 'Rutland': [52.6558, -0.6389],
-    'Shropshire': [52.7069, -2.7464], 'Telford and Wrekin': [52.6766, -2.4469],
-    'Staffordshire': [52.8700, -2.0800], 'Stoke-on-Trent': [53.0027, -2.1794],
-    'Warwickshire': [52.2819, -1.5849], 'Worcestershire': [52.2500, -2.2200],
-    'Bedford': [52.1363, -0.4667], 'Central Bedfordshire': [52.0029, -0.2982],
-    'Cambridgeshire': [52.2053, 0.1218], 'Peterborough': [52.5695, -0.2405],
-    'Hertfordshire': [51.8090, -0.2376], 'Norfolk': [52.6295, 0.7100],
-    'Suffolk': [52.1872, 0.9708], 'Berkshire': [51.4543, -1.0000],
-    'Brighton and Hove': [50.8225, -0.1372], 'Buckinghamshire': [51.8133, -0.8084],
-    'East Sussex': [50.9085, 0.2500], 'Hampshire': [51.0577, -1.3081],
-    'Portsmouth': [50.8198, -1.0880], 'Southampton': [50.9097, -1.4044],
-    'Isle of Wight': [50.6938, -1.3047], 'Kent': [51.2787, 0.5217],
-    'Medway': [51.4021, 0.5501], 'Oxfordshire': [51.7612, -1.2500],
-    'Surrey': [51.3148, -0.5600], 'West Sussex': [50.9200, -0.6000],
-    'Bath and North East Somerset': [51.3811, -2.3590], 'Bournemouth, Christchurch and Poole': [50.7192, -1.8808],
-    'Bristol': [51.4545, -2.5879], 'Cornwall': [50.2660, -5.0527],
-    'Devon': [50.7184, -3.5339], 'Plymouth': [50.3755, -4.1427],
-    'Torbay': [50.4619, -3.5253], 'Dorset': [50.7480, -2.3440],
-    'Gloucestershire': [51.8642, -2.2381], 'North Somerset': [51.3877, -2.7780],
-    'Somerset': [51.1054, -2.9260], 'South Gloucestershire': [51.5260, -2.4729],
-    'Swindon': [51.5558, -1.7797], 'Wiltshire': [51.3493, -1.9927],
-    'Aberdeen City': [57.1497, -2.0943], 'City of Edinburgh': [55.9533, -3.1883],
-    'Glasgow City': [55.8642, -4.2518], 'Highland': [57.4778, -4.2247],
-    'Cardiff': [51.4816, -3.1791], 'Swansea': [51.6214, -3.9436],
-    'Belfast': [54.5973, -5.9301]
+// ── Region coords ──
+const REGION_COORDS = {
+  'Cheshire East':[53.1603,-2.2119],'Cheshire West and Chester':[53.1905,-2.8909],
+  'Greater London':[51.5074,-0.1278],'Greater Manchester':[53.4808,-2.2426],
+  'Essex':[51.7341,0.4700],'West Midlands':[52.4862,-1.8904],
+  'Leicestershire':[52.6369,-1.1398],'South Yorkshire':[53.5400,-1.3500],
+  'West Yorkshire':[53.7900,-1.7500],'North Yorkshire':[54.2766,-1.4090],
+  'East Riding of Yorkshire':[53.8429,-0.4380],'York':[53.9600,-1.0873],
+  'Cumbria':[54.5772,-2.7974],'Lancashire':[53.7632,-2.7044],
+  'Merseyside':[53.4106,-2.9779],'Blackburn with Darwen':[53.7480,-2.4820],
+  'Blackpool':[53.8175,-3.0357],'Halton':[53.3340,-2.7350],
+  'Warrington':[53.3900,-2.5970],'County Durham':[54.7753,-1.5849],
+  'Northumberland':[55.2083,-2.0784],'Tyne and Wear':[54.9783,-1.6178],
+  'Derbyshire':[53.1235,-1.5650],'Derby':[52.9219,-1.4746],
+  'Herefordshire':[52.0564,-2.7160],'Lincolnshire':[53.2307,-0.5406],
+  'Northamptonshire':[52.2700,-0.8700],'Nottinghamshire':[53.1000,-0.9900],
+  'Nottingham':[52.9548,-1.1581],'Rutland':[52.6558,-0.6389],
+  'Shropshire':[52.7069,-2.7464],'Telford and Wrekin':[52.6766,-2.4469],
+  'Staffordshire':[52.8700,-2.0800],'Stoke-on-Trent':[53.0027,-2.1794],
+  'Warwickshire':[52.2819,-1.5849],'Worcestershire':[52.2500,-2.2200],
+  'Bedford':[52.1363,-0.4667],'Central Bedfordshire':[52.0029,-0.2982],
+  'Cambridgeshire':[52.2053,0.1218],'Peterborough':[52.5695,-0.2405],
+  'Hertfordshire':[51.8090,-0.2376],'Norfolk':[52.6295,0.7100],
+  'Suffolk':[52.1872,0.9708],'Berkshire':[51.4543,-1.0000],
+  'Brighton and Hove':[50.8225,-0.1372],'Buckinghamshire':[51.8133,-0.8084],
+  'East Sussex':[50.9085,0.2500],'Hampshire':[51.0577,-1.3081],
+  'Portsmouth':[50.8198,-1.0880],'Southampton':[50.9097,-1.4044],
+  'Isle of Wight':[50.6938,-1.3047],'Kent':[51.2787,0.5217],
+  'Medway':[51.4021,0.5501],'Oxfordshire':[51.7612,-1.2500],
+  'Surrey':[51.3148,-0.5600],'West Sussex':[50.9200,-0.6000],
+  'Bath and North East Somerset':[51.3811,-2.3590],'Bournemouth, Christchurch and Poole':[50.7192,-1.8808],
+  'Bristol':[51.4545,-2.5879],'Cornwall':[50.2660,-5.0527],
+  'Devon':[50.7184,-3.5339],'Plymouth':[50.3755,-4.1427],
+  'Torbay':[50.4619,-3.5253],'Dorset':[50.7480,-2.3440],
+  'Gloucestershire':[51.8642,-2.2381],'North Somerset':[51.3877,-2.7780],
+  'Somerset':[51.1054,-2.9260],'South Gloucestershire':[51.5260,-2.4729],
+  'Swindon':[51.5558,-1.7797],'Wiltshire':[51.3493,-1.9927],
+  'Aberdeen City':[57.1497,-2.0943],'City of Edinburgh':[55.9533,-3.1883],
+  'Glasgow City':[55.8642,-4.2518],'Highland':[57.4778,-4.2247],
+  'Cardiff':[51.4816,-3.1791],'Swansea':[51.6214,-3.9436],
+  'Belfast':[54.5973,-5.9301]
+};
+const UK_REGIONS = Object.keys(REGION_COORDS).sort();
+
+// ── State ──
+let clientData = [], filteredClientData = [];
+let bookingData = [], filteredBookingData = [];
+let regionCounts = {};
+let map, markerCluster, heatLayer;
+let currentDataSource = 'clients';
+let currentViewMode  = 'markers';
+let currentMainTab   = 'clients';
+let currentPeriod    = 'mom';
+
+// ══════════════════════════════════════════════════════════════
+// TARGETS — Road to £1M / 3 years (all ATV-driven from live data)
+//
+//  Revenue targets (annual):
+//    Year 1 (2025) → £200,000
+//    Year 2 (2026) → £500,000
+//    Year 3 (2027) → £1,000,000
+//
+//  Booking targets = revenue target ÷ live ATV (recalculated each render)
+//  Sign-up targets are fixed (independent of ATV):
+//    Y1: 8/mo, Y2: 11/mo, Y3: 11/mo
+//
+//  New vs Existing split assumption:
+//    Y1: 30% new / 70% existing
+//    Y2: 25% new / 75% existing
+//    Y3: 20% new / 80% existing  (repeat business grows as client base matures)
+// ══════════════════════════════════════════════════════════════
+
+// Revenue targets only — booking counts derived at render time from live ATV
+const REVENUE_TARGETS = { y1: 200000, y2: 500000, y3: 1000000 };
+const SIGNUP_TARGETS  = { y1: 8, y2: 11, y3: 11 };
+const NEW_BOOKING_SPLIT = { y1: 0.30, y2: 0.25, y3: 0.20 }; // % of total that are new clients
+
+// Year is calendar-year based: 2025=Y1, 2026=Y2, 2027+=Y3
+function getCurrentYear() {
+  const yr = new Date().getFullYear();
+  if (yr <= 2025) return 1;
+  if (yr === 2026) return 2;
+  return 3;
+}
+
+// Calculate live ATV from booking data (non-cancelled bookings with a price)
+function calcLiveATV() {
+  const paid = bookingData.filter(b => b.bookingStatus !== 'Cancelled' && parseFloat(b.finalPrice) > 0);
+  if (paid.length === 0) return 350; // sensible fallback if no data yet
+  const total = paid.reduce((s, b) => s + parseFloat(b.finalPrice), 0);
+  return total / paid.length;
+}
+
+// Build full targets object dynamically using live ATV
+function buildTargets() {
+  const atv = calcLiveATV();
+  const mk  = (annualRev, newSplit) => {
+    const monthlyRev   = annualRev / 12;
+    const totalMonthly = Math.ceil(monthlyRev / atv);
+    const newMonthly   = Math.ceil(totalMonthly * newSplit);
+    const exMonthly    = totalMonthly - newMonthly;
+    return { revenue: Math.round(monthlyRev), totalBookings: totalMonthly, newBookings: newMonthly, existBookings: exMonthly };
   };
+  return {
+    atv,
+    monthly: {
+      signups:      { y1: SIGNUP_TARGETS.y1,         y2: SIGNUP_TARGETS.y2,         y3: SIGNUP_TARGETS.y3 },
+      revenue:      { y1: mk(REVENUE_TARGETS.y1, NEW_BOOKING_SPLIT.y1).revenue,      y2: mk(REVENUE_TARGETS.y2, NEW_BOOKING_SPLIT.y2).revenue,      y3: mk(REVENUE_TARGETS.y3, NEW_BOOKING_SPLIT.y3).revenue },
+      totalBookings:{ y1: mk(REVENUE_TARGETS.y1, NEW_BOOKING_SPLIT.y1).totalBookings, y2: mk(REVENUE_TARGETS.y2, NEW_BOOKING_SPLIT.y2).totalBookings, y3: mk(REVENUE_TARGETS.y3, NEW_BOOKING_SPLIT.y3).totalBookings },
+      newBookings:  { y1: mk(REVENUE_TARGETS.y1, NEW_BOOKING_SPLIT.y1).newBookings,   y2: mk(REVENUE_TARGETS.y2, NEW_BOOKING_SPLIT.y2).newBookings,   y3: mk(REVENUE_TARGETS.y3, NEW_BOOKING_SPLIT.y3).newBookings },
+      existBookings:{ y1: mk(REVENUE_TARGETS.y1, NEW_BOOKING_SPLIT.y1).existBookings, y2: mk(REVENUE_TARGETS.y2, NEW_BOOKING_SPLIT.y2).existBookings,  y3: mk(REVENUE_TARGETS.y3, NEW_BOOKING_SPLIT.y3).existBookings }
+    }
+  };
+}
 
-  const UK_REGIONS = Object.keys(REGION_COORDS).sort();
+// Returns the correct monthly target for the current calendar year
+function getYearTarget(metric) {
+  const yr  = getCurrentYear();
+  const key = 'y' + yr;
+  const T   = buildTargets();
+  return { target: T.monthly[metric][key], year: yr, atv: T.atv };
+}
 
-  // ── State ──
-  let clientData = [];
-  let filteredClientData = [];
-  let bookingData = [];
-  let filteredBookingData = [];
-  let regionCounts = {};
+// ── Init ──
+document.addEventListener('DOMContentLoaded', () => {
+  initMap();
+  initDateFilters();
+  loadMapData();
+  lucide.createIcons();
+});
 
-  let map, markerCluster, heatLayer;
-  let currentDataSource = 'clients';
-  let currentViewMode = 'markers';
+function initMap() {
+  map = L.map('map').setView([54.0, -2.5], 6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors', maxZoom: 18, minZoom: 5
+  }).addTo(map);
+  resetCluster();
+}
 
-  // ── Init ──
-  document.addEventListener('DOMContentLoaded', () => {
-    initMap();
-    initDateFilters();
-    loadMapData();
-    lucide.createIcons();
+function resetCluster() {
+  if (markerCluster) map.removeLayer(markerCluster);
+  const isBookings = currentDataSource === 'bookings';
+  markerCluster = L.markerClusterGroup({
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
+    spiderfyOnMaxZoom: true,
+    iconCreateFunction: function(cluster) {
+      const count = cluster.getChildCount();
+      const size  = count >= 20 ? 'large' : count >= 10 ? 'medium' : 'small';
+      const extra = isBookings ? ' bk' : '';
+      return L.divIcon({
+        html: '<div><span>' + count + '</span></div>',
+        className: 'marker-cluster marker-cluster-' + size + extra,
+        iconSize: L.point(40, 40)
+      });
+    }
+  });
+}
+
+function initDateFilters() {
+  const today = new Date();
+  const yearAgo = new Date(); yearAgo.setFullYear(today.getFullYear() - 1);
+  document.getElementById('dateTo').value   = today.toISOString().split('T')[0];
+  document.getElementById('dateFrom').value = yearAgo.toISOString().split('T')[0];
+}
+
+// ── Load Data ──
+async function loadMapData() {
+  try {
+    const [usersRes, bookingsRes] = await Promise.all([
+      fetch('/.netlify/functions/admin-users'),
+      fetch('/.netlify/functions/get-all-bookings')
+    ]);
+    if (!usersRes.ok)   throw new Error('Failed to load user data');
+    if (!bookingsRes.ok) throw new Error('Failed to load booking data');
+
+    const userData = await usersRes.json();
+    const bData    = await bookingsRes.json();
+
+    clientData          = userData.users  || [];
+    filteredClientData  = [...clientData];
+    bookingData         = bData.bookings  || [];
+    filteredBookingData = [...bookingData];
+
+    buildRegionCounts();
+    updateClientStats();
+    updateBookingStats(bData.meta || {});
+    updateClientFilterCounts();
+    updateBookingFilterCounts();
+    addMarkersToMap();
+    renderRegionList();
+    renderDetailPanel();
+    renderIntelligence();
+    renderPerformanceSection();
+
+  } catch (err) {
+    console.error('Error loading map data:', err);
+    alert('Failed to load map data: ' + err.message);
+  }
+}
+
+function buildRegionCounts() {
+  regionCounts = {};
+  UK_REGIONS.forEach(r => regionCounts[r] = 0);
+  clientData.forEach(u => {
+    const r = u.fields['Region'];
+    if (r && regionCounts.hasOwnProperty(r)) regionCounts[r]++;
+  });
+}
+
+// ── Stats ──
+function updateClientStats() {
+  const total   = clientData.filter(u => u.fields['Region']).length;
+  const covered = Object.values(regionCounts).filter(c => c > 0).length;
+  let top = '-', max = 0;
+  for (const [r, c] of Object.entries(regionCounts)) { if (c > max) { max = c; top = r; } }
+  const ago    = new Date(); ago.setDate(ago.getDate() - 30);
+  const recent = clientData.filter(u => new Date(u.fields['Created Date']) >= ago).length;
+  document.getElementById('totalClients').textContent      = total;
+  document.getElementById('regionsWithClients').textContent = covered;
+  document.getElementById('emptyRegions').textContent      = UK_REGIONS.length - covered;
+  document.getElementById('topRegion').textContent         = max > 0 ? top : '-';
+  document.getElementById('clientGrowth').textContent      = '+' + recent;
+}
+
+function updateBookingStats(meta) {
+  document.getElementById('totalBookings').textContent     = meta.total || 0;
+  document.getElementById('confirmedBookings').textContent = meta.confirmed || 0;
+  document.getElementById('reservedBookings').textContent  = meta.reserved || 0;
+  document.getElementById('totalRevenue').textContent      = meta.totalRevenue ? '£' + meta.totalRevenue.toLocaleString() : '£0';
+  document.getElementById('bookingGrowth').textContent     = '+' + (meta.recentBookings || 0);
+}
+
+function updateClientFilterCounts() {
+  document.getElementById('cAll').textContent         = clientData.length;
+  document.getElementById('cActive').textContent      = clientData.filter(u => u.fields['Account Status'] === 'Active').length;
+  document.getElementById('cWithClients').textContent = Object.values(regionCounts).filter(c => c > 0).length;
+}
+
+function updateBookingFilterCounts() {
+  document.getElementById('bAll').textContent        = bookingData.length;
+  document.getElementById('bConfirmed').textContent  = bookingData.filter(b => b.bookingStatus === 'Confirmed').length;
+  document.getElementById('bReserved').textContent   = bookingData.filter(b => b.bookingStatus === 'Reserved').length;
+  document.getElementById('bCancelled').textContent  = bookingData.filter(b => b.bookingStatus === 'Cancelled').length;
+}
+
+// ══════════════════════════════════════════════════════
+//  MAIN TAB SWITCHING (clients / bookings / performance)
+// ══════════════════════════════════════════════════════
+function setMainTab(tab) {
+  currentMainTab = tab;
+
+  // Update tab buttons
+  ['clients','bookings','performance'].forEach(t => {
+    const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+    btn.className = 'main-tab-btn' + (t === tab ? ' active ' + t : '');
   });
 
-  function initMap() {
-    map = L.map('map').setView([54.0, -2.5], 6);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors', maxZoom: 18, minZoom: 5
-    }).addTo(map);
-    resetCluster();
-  }
+  const isPerf = tab === 'performance';
+  document.getElementById('mapView').style.display          = isPerf ? 'none' : 'block';
+  document.getElementById('performanceSection').style.display = isPerf ? 'block' : 'none';
 
-  function resetCluster() {
-    if (markerCluster) map.removeLayer(markerCluster);
-    const isBookings = currentDataSource === 'bookings';
-    markerCluster = L.markerClusterGroup({
-      showCoverageOnHover: false,
-      zoomToBoundsOnClick: true,
-      spiderfyOnMaxZoom: true,
-      iconCreateFunction: function(cluster) {
-        const count = cluster.getChildCount();
-        const size = count >= 20 ? 'large' : count >= 10 ? 'medium' : 'small';
-        const extra = isBookings ? ' bk' : '';
-        return L.divIcon({
-          html: '<div><span>' + count + '</span></div>',
-          className: 'marker-cluster marker-cluster-' + size + extra,
-          iconSize: L.point(40, 40)
-        });
-      }
-    });
-  }
-
-  function initDateFilters() {
-    const today = new Date();
-    const yearAgo = new Date();
-    yearAgo.setFullYear(today.getFullYear() - 1);
-    document.getElementById('dateTo').value = today.toISOString().split('T')[0];
-    document.getElementById('dateFrom').value = yearAgo.toISOString().split('T')[0];
-  }
-
-  // ── Load Data ──
-  async function loadMapData() {
-    try {
-      const [usersRes, bookingsRes] = await Promise.all([
-        fetch('/.netlify/functions/admin-users'),
-        fetch('/.netlify/functions/get-all-bookings')
-      ]);
-
-      if (!usersRes.ok) throw new Error('Failed to load user data');
-      if (!bookingsRes.ok) throw new Error('Failed to load booking data');
-
-      const userData = await usersRes.json();
-      const bData = await bookingsRes.json();
-
-      clientData = userData.users || [];
-      filteredClientData = [...clientData];
-      bookingData = bData.bookings || [];
-      filteredBookingData = [...bookingData];
-
-      buildRegionCounts();
-      updateClientStats();
-      updateBookingStats(bData.meta || {});
-      updateClientFilterCounts();
-      updateBookingFilterCounts();
-      addMarkersToMap();
-      renderRegionList();
-      renderDetailPanel();
-      renderIntelligence();
-
-    } catch (err) {
-      console.error('Error loading map data:', err);
-      alert('Failed to load map data: ' + err.message);
-    }
-  }
-
-  function buildRegionCounts() {
-    regionCounts = {};
-    UK_REGIONS.forEach(r => regionCounts[r] = 0);
-    clientData.forEach(u => {
-      const r = u.fields['Region'];
-      if (r && regionCounts.hasOwnProperty(r)) regionCounts[r]++;
-    });
-  }
-
-  // ── Stats ──
-  function updateClientStats() {
-    const total = clientData.filter(u => u.fields['Region']).length;
-    const covered = Object.values(regionCounts).filter(c => c > 0).length;
-    let top = '-', max = 0;
-    for (const [r, c] of Object.entries(regionCounts)) { if (c > max) { max = c; top = r; } }
-    const ago = new Date(); ago.setDate(ago.getDate() - 30);
-    const recent = clientData.filter(u => new Date(u.fields['Created Date']) >= ago).length;
-
-    document.getElementById('totalClients').textContent = total;
-    document.getElementById('regionsWithClients').textContent = covered;
-    document.getElementById('emptyRegions').textContent = UK_REGIONS.length - covered;
-    document.getElementById('topRegion').textContent = max > 0 ? top : '-';
-    document.getElementById('clientGrowth').textContent = `+${recent}`;
-  }
-
-  function updateBookingStats(meta) {
-    document.getElementById('totalBookings').textContent = meta.total || 0;
-    document.getElementById('confirmedBookings').textContent = meta.confirmed || 0;
-    document.getElementById('reservedBookings').textContent = meta.reserved || 0;
-    document.getElementById('totalRevenue').textContent = meta.totalRevenue ? `£${meta.totalRevenue.toLocaleString()}` : '£0';
-    document.getElementById('bookingGrowth').textContent = `+${meta.recentBookings || 0}`;
-  }
-
-  function updateClientFilterCounts() {
-    document.getElementById('cAll').textContent = clientData.length;
-    document.getElementById('cActive').textContent = clientData.filter(u => u.fields['Account Status'] === 'Active').length;
-    document.getElementById('cWithClients').textContent = Object.values(regionCounts).filter(c => c > 0).length;
-  }
-
-  function updateBookingFilterCounts() {
-    document.getElementById('bAll').textContent = bookingData.length;
-    document.getElementById('bConfirmed').textContent = bookingData.filter(b => b.bookingStatus === 'Confirmed').length;
-    document.getElementById('bReserved').textContent = bookingData.filter(b => b.bookingStatus === 'Reserved').length;
-    document.getElementById('bCancelled').textContent = bookingData.filter(b => b.bookingStatus === 'Cancelled').length;
-  }
-
-  // ── Data Source Toggle ──
-  function setDataSource(source) {
-    currentDataSource = source;
-    const isBookings = source === 'bookings';
-
-    document.getElementById('dsClients').className = `ds-btn${!isBookings ? ' active clients' : ''}`;
-    document.getElementById('dsBookings').className = `ds-btn${isBookings ? ' active bookings' : ''}`;
-
-    document.getElementById('clientStats').style.display = isBookings ? 'none' : 'grid';
+  if (!isPerf) {
+    // Sync the internal clients/bookings state
+    const isBookings = tab === 'bookings';
+    currentDataSource = tab === 'bookings' ? 'bookings' : 'clients';
+    document.getElementById('clientStats').style.display  = isBookings ? 'none' : 'grid';
     document.getElementById('bookingStats').style.display = isBookings ? 'grid' : 'none';
-    document.getElementById('clientFilters').style.display = isBookings ? 'none' : 'block';
+    document.getElementById('clientFilters').style.display  = isBookings ? 'none' : 'block';
     document.getElementById('bookingFilters').style.display = isBookings ? 'block' : 'none';
-    document.getElementById('clientLegend').style.display = isBookings ? 'none' : 'block';
+    document.getElementById('clientLegend').style.display  = isBookings ? 'none' : 'block';
     document.getElementById('bookingLegend').style.display = isBookings ? 'block' : 'none';
     document.getElementById('regionListTitle').textContent = isBookings ? 'Bookings by Area' : 'Regions';
-
-    // Reset filters
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    const firstBtn = document.querySelector(`#${isBookings ? 'booking' : 'client'}Filters .filter-btn`);
-    if (firstBtn) firstBtn.classList.add('active');
-
-    if (isBookings) filteredBookingData = [...bookingData];
-    else filteredClientData = [...clientData];
-
     resetCluster();
     addMarkersToMap();
     renderRegionList();
     renderDetailPanel();
-    lucide.createIcons();
+  } else {
+    if (clientData.length || bookingData.length) renderPerformanceSection();
+  }
+  lucide.createIcons();
+}
+
+// ── Old toggle kept for backward compat (used internally) ──
+function setDataSource(source) {
+  setMainTab(source);
+}
+
+// ── Map Rendering ──
+function addMarkersToMap() {
+  if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+  markerCluster.clearLayers();
+  if (currentDataSource === 'clients') renderClientLayer();
+  else renderBookingLayer();
+}
+
+function renderClientLayer() {
+  if (currentViewMode === 'markers') {
+    filteredClientData.forEach(user => {
+      const region = user.fields['Region'];
+      if (!region || !REGION_COORDS[region]) return;
+      const [lat, lng] = REGION_COORDS[region];
+      const jLat = lat + (Math.random() - 0.5) * 0.06;
+      const jLng = lng + (Math.random() - 0.5) * 0.06;
+      const icon = L.divIcon({
+        className: '',
+        html: '<div style="background:linear-gradient(135deg,#ef4444,#dc2626);border:3px solid #fff;border-radius:50%;width:22px;height:22px;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>',
+        iconSize: [22,22], iconAnchor: [11,11]
+      });
+      const m = L.marker([jLat, jLng], { icon });
+      m.bindPopup(`
+        <div class="popup-title">${user.fields['Name'] || 'Client'}</div>
+        <div class="popup-row">🏢 ${user.fields['Company'] || 'N/A'}</div>
+        <div class="popup-row">✉️ ${user.fields['Email'] || 'N/A'}</div>
+        <div class="popup-row">📍 ${region}</div>
+        <div class="popup-footer">
+          <span class="badge badge-${(user.fields['Account Status'] || 'inactive').toLowerCase()}">${user.fields['Account Status'] || 'Unknown'}</span>
+        </div>
+      `);
+      markerCluster.addLayer(m);
+    });
+    map.addLayer(markerCluster);
+  } else {
+    const heatData = UK_REGIONS
+      .filter(r => regionCounts[r] > 0 && REGION_COORDS[r])
+      .map(r => [...REGION_COORDS[r], regionCounts[r] / 10]);
+    heatLayer = L.heatLayer(heatData, {
+      radius: 40, blur: 50, maxZoom: 10,
+      gradient: { 0.0: '#3b82f6', 0.5: '#fb923c', 1.0: '#ef4444' }
+    }).addTo(map);
+  }
+}
+
+function renderBookingLayer() {
+  if (currentViewMode === 'markers') {
+    filteredBookingData.forEach(booking => {
+      if (!booking.lat || !booking.lng) return;
+      const statusColor = { Confirmed: '#10b981', Reserved: '#fb923c', Cancelled: '#ef4444' }[booking.bookingStatus] || '#8b5cf6';
+      const icon = L.divIcon({
+        className: '',
+        html: '<div style="background:' + statusColor + ';border:3px solid #fff;border-radius:50%;width:18px;height:18px;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>',
+        iconSize: [18,18], iconAnchor: [9,9]
+      });
+      const isUpcoming = booking.date && new Date(booking.date) >= new Date();
+      const m = L.marker([booking.lat, booking.lng], { icon });
+      m.bindPopup(`
+        <div class="popup-title">${booking.bookingRef || 'Booking'}</div>
+        <div class="popup-row">👤 ${booking.clientName || 'N/A'}</div>
+        <div class="popup-row">🏠 ${booking.propertyAddress || booking.postcode || 'N/A'}</div>
+        <div class="popup-row">🎬 ${booking.service || 'N/A'}</div>
+        <div class="popup-row">📅 ${formatDate(booking.date)}${booking.time ? ' at ' + booking.time : ''}</div>
+        ${booking.mediaSpecialist ? '<div class="popup-row">📸 ' + booking.mediaSpecialist + '</div>' : ''}
+        <div class="popup-footer">
+          <span class="badge badge-${(booking.bookingStatus||'').toLowerCase()}">${booking.bookingStatus||'Unknown'}</span>
+          ${isUpcoming ? '<span class="badge" style="background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid #3b82f6;">Upcoming</span>' : ''}
+          ${booking.finalPrice ? '<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid #10b981;">£' + parseFloat(booking.finalPrice).toFixed(2) + '</span>' : ''}
+        </div>
+      `);
+      markerCluster.addLayer(m);
+    });
+    map.addLayer(markerCluster);
+  } else {
+    const heatData = filteredBookingData.filter(b => b.lat && b.lng).map(b => [b.lat, b.lng, 0.5]);
+    heatLayer = L.heatLayer(heatData, {
+      radius: 35, blur: 45, maxZoom: 12,
+      gradient: { 0.0: '#8b5cf6', 0.5: '#a78bfa', 1.0: '#c4b5fd' }
+    }).addTo(map);
+  }
+}
+
+// ── Controls ──
+function setViewMode(mode) {
+  currentViewMode = mode;
+  document.getElementById('viewMarkers').classList.toggle('active', mode === 'markers');
+  document.getElementById('viewHeatmap').classList.toggle('active', mode === 'heatmap');
+  addMarkersToMap();
+}
+
+function filterClients(type, e) {
+  document.querySelectorAll('#clientFilters .filter-btn').forEach(b => b.classList.remove('active'));
+  if (e) e.target.closest('.filter-btn').classList.add('active');
+  filteredClientData = type === 'active' ? clientData.filter(u => u.fields['Account Status'] === 'Active') : [...clientData];
+  addMarkersToMap(); renderRegionList(); renderDetailPanel();
+}
+
+function filterBookings(status, e) {
+  document.querySelectorAll('#bookingFilters .filter-btn').forEach(b => b.classList.remove('active'));
+  if (e) e.target.closest('.filter-btn').classList.add('active');
+  filteredBookingData = status === 'all' ? [...bookingData] : bookingData.filter(b => b.bookingStatus === status);
+  addMarkersToMap(); renderRegionList(); renderDetailPanel();
+}
+
+function applyDateFilter() {
+  const from = document.getElementById('dateFrom').value;
+  const to   = document.getElementById('dateTo').value;
+  if (!from || !to) return;
+  const dFrom = new Date(from);
+  const dTo   = new Date(to); dTo.setHours(23,59,59);
+  if (currentDataSource === 'clients') {
+    filteredClientData = clientData.filter(u => { const d = new Date(u.fields['Created Date']); return d >= dFrom && d <= dTo; });
+  } else {
+    filteredBookingData = bookingData.filter(b => { const d = new Date(b.date || b.createdTime); return d >= dFrom && d <= dTo; });
+  }
+  addMarkersToMap(); renderRegionList(); renderDetailPanel();
+}
+
+// ── Region List ──
+function renderRegionList() {
+  const container  = document.getElementById('regionListContainer');
+  const regionTotal = document.getElementById('regionTotal');
+  if (currentDataSource === 'clients') {
+    regionTotal.textContent = Object.values(regionCounts).filter(c => c > 0).length + ' active';
+    container.innerHTML = UK_REGIONS.map(r => {
+      const count = regionCounts[r] || 0;
+      return `<div class="region-item ${count === 0 ? 'empty' : ''}" onclick="flyToRegion('${r}', event)">
+        <div class="region-name">${r}</div><span class="region-count">${count}</span></div>`;
+    }).join('');
+  } else {
+    const areaCounts = {}, areaRevenue = {};
+    filteredBookingData.forEach(b => {
+      if (!b.postcode) return;
+      const area = b.postcode.split(' ')[0].toUpperCase();
+      areaCounts[area]  = (areaCounts[area]  || 0) + 1;
+      areaRevenue[area] = (areaRevenue[area] || 0) + (parseFloat(b.finalPrice) || 0);
+    });
+    const sorted = Object.entries(areaCounts).sort((a,b) => b[1]-a[1]);
+    regionTotal.textContent = sorted.length + ' areas';
+    if (sorted.length === 0) { container.innerHTML = '<div class="empty-state"><div class="empty-state-text">No bookings</div></div>'; return; }
+    container.innerHTML = sorted.map(([area, count]) => `
+      <div class="region-item" onclick="flyToPostcodeArea('${area}', event)">
+        <div><div class="region-name">${area}</div>
+        ${areaRevenue[area] > 0 ? '<div class="region-sub">£' + areaRevenue[area].toFixed(2) + '</div>' : ''}</div>
+        <span class="region-count booking">${count}</span>
+      </div>`).join('');
+  }
+}
+
+function flyToRegion(region, e) {
+  if (REGION_COORDS[region]) { map.flyTo(REGION_COORDS[region], 10, {duration:1.5}); showClientsInRegion(region); }
+  document.querySelectorAll('.region-item').forEach(i => i.classList.remove('active'));
+  if (e) e.target.closest('.region-item').classList.add('active');
+}
+
+function flyToPostcodeArea(area, e) {
+  const booking = filteredBookingData.find(b => b.postcode && b.postcode.toUpperCase().startsWith(area) && b.lat);
+  if (booking) map.flyTo([booking.lat, booking.lng], 12, {duration:1.5});
+  showBookingsInArea(area);
+  document.querySelectorAll('.region-item').forEach(i => i.classList.remove('active'));
+  if (e) e.target.closest('.region-item').classList.add('active');
+}
+
+// ── Detail Panel ──
+function renderDetailPanel() {
+  if (currentDataSource === 'clients') showAllClients();
+  else showAllBookings();
+}
+
+function showAllClients() {
+  document.getElementById('detailTitle').textContent = 'All Clients (' + filteredClientData.length + ')';
+  const items = filteredClientData.filter(u => u.fields['Region']).slice(0,50);
+  document.getElementById('detailContent').innerHTML = items.length === 0
+    ? '<div class="empty-state"><div class="empty-state-text">No clients found</div></div>'
+    : items.map(c => clientCard(c)).join('')
+      + (filteredClientData.length > 50 ? '<div style="text-align:center;padding:16px;color:#64748b;font-size:12px;">Showing 50 of ' + filteredClientData.length + '</div>' : '');
+}
+
+function showAllBookings() {
+  const geocoded    = filteredBookingData.filter(b => b.lat).length;
+  const total       = filteredBookingData.length;
+  const totalRevenue = filteredBookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice)||0), 0);
+  document.getElementById('detailTitle').textContent = 'Bookings (' + total + ')';
+  const revenueHtml  = totalRevenue > 0 ? '<div class="revenue-total">Total Revenue: £' + totalRevenue.toFixed(2) + '</div>' : '';
+  const geocodeNote  = '<div style="font-size:11px;color:#64748b;margin-bottom:12px;">📍 ' + geocoded + ' of ' + total + ' plotted on map</div>';
+  const items = filteredBookingData.slice(0,50);
+  document.getElementById('detailContent').innerHTML = revenueHtml + geocodeNote
+    + (items.length === 0 ? '<div class="empty-state"><div class="empty-state-text">No bookings found</div></div>' : items.map(b => bookingCard(b)).join(''))
+    + (filteredBookingData.length > 50 ? '<div style="text-align:center;padding:16px;color:#64748b;font-size:12px;">Showing 50 of ' + filteredBookingData.length + '</div>' : '');
+}
+
+function showClientsInRegion(region) {
+  const clients = filteredClientData.filter(u => u.fields['Region'] === region);
+  document.getElementById('detailTitle').textContent = region + ' (' + clients.length + ')';
+  document.getElementById('detailContent').innerHTML = clients.length === 0
+    ? '<div class="empty-state"><div class="empty-state-text">No clients in ' + region + '</div></div>'
+    : clients.map(c => clientCard(c)).join('');
+}
+
+function showBookingsInArea(area) {
+  const bookings = filteredBookingData.filter(b => b.postcode && b.postcode.toUpperCase().startsWith(area));
+  const totalRevenue = bookings.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice)||0), 0);
+  document.getElementById('detailTitle').textContent = area + ' — ' + bookings.length + ' bookings';
+  const revenueHtml = totalRevenue > 0 ? '<div class="revenue-total">Revenue: £' + totalRevenue.toFixed(2) + '</div>' : '';
+  document.getElementById('detailContent').innerHTML = revenueHtml + (bookings.length === 0
+    ? '<div class="empty-state"><div class="empty-state-text">No bookings in ' + area + '</div></div>'
+    : bookings.map(b => bookingCard(b)).join(''));
+}
+
+// ── Cards ──
+function clientCard(c) {
+  const status = c.fields['Account Status'] || 'Unknown';
+  return '<div class="card" onclick="flyToRegion(\'' + c.fields['Region'] + '\', event)">'
+    + '<div class="card-title">' + (c.fields['Name'] || 'Client') + '</div>'
+    + '<div class="card-info">🏢 ' + (c.fields['Company'] || 'N/A') + '</div>'
+    + '<div class="card-info">📍 ' + (c.fields['Region'] || 'N/A') + '</div>'
+    + '<div class="card-info">📅 ' + formatDate(c.fields['Created Date']) + '</div>'
+    + '<span class="badge badge-' + status.toLowerCase() + '">' + status + '</span></div>';
+}
+
+function bookingCard(b) {
+  const status = b.bookingStatus || 'Unknown';
+  const isUpcoming = b.date && new Date(b.date) >= new Date();
+  return '<div class="card booking">'
+    + '<div class="card-title">' + (b.bookingRef || 'Booking') + '</div>'
+    + '<div class="card-info">👤 ' + (b.clientName || 'N/A') + '</div>'
+    + '<div class="card-info">🏠 ' + (b.propertyAddress || b.postcode || 'N/A') + '</div>'
+    + '<div class="card-info">🎬 ' + (b.service || 'N/A') + '</div>'
+    + '<div class="card-info">📅 ' + formatDate(b.date) + (b.time ? ' at ' + b.time : '') + '</div>'
+    + (b.mediaSpecialist ? '<div class="card-info">📸 ' + b.mediaSpecialist + '</div>' : '')
+    + '<span class="badge badge-' + status.toLowerCase() + '">' + status + '</span>'
+    + (isUpcoming ? '<span class="badge" style="background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid #3b82f6;">Upcoming</span>' : '')
+    + (b.finalPrice ? '<span class="revenue-tag">£' + parseFloat(b.finalPrice).toFixed(2) + '</span>' : '')
+    + (!b.lat ? '<div style="font-size:10px;color:#64748b;margin-top:4px;">⚠️ Postcode not geocoded</div>' : '')
+    + '</div>';
+}
+
+function formatDate(d) {
+  if (!d) return 'N/A';
+  return new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+// ── Tab switching (detail panel) ──
+function switchTab(tab) {
+  const isIntel = tab === 'intel';
+  document.getElementById('tabData').classList.toggle('active', !isIntel);
+  document.getElementById('tabIntel').classList.toggle('active', isIntel);
+  document.getElementById('tabDataContent').style.display  = isIntel ? 'none' : 'block';
+  document.getElementById('tabIntelContent').style.display = isIntel ? 'block' : 'none';
+  if (isIntel) renderIntelligence();
+}
+
+// ══════════════════════════════════════════════════════
+//  PERFORMANCE ANALYTICS
+// ══════════════════════════════════════════════════════
+
+function setPeriod(period) {
+  currentPeriod = period;
+  ['mom','qoq','6m','yoy'].forEach(p => {
+    const map = { mom:'MoM', qoq:'QoQ', '6m':'6M', yoy:'YoY' };
+    const id  = 'period' + map[p];
+    document.getElementById(id).classList.toggle('active', p === period);
+  });
+  renderPerformanceSection();
+}
+
+// Slice data into windows based on period
+function getPeriodWindows() {
+  const now = new Date();
+
+  if (currentPeriod === 'mom') {
+    // This month vs last month
+    const s1 = new Date(now.getFullYear(), now.getMonth(), 1);
+    const e1 = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    const s2 = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const e2 = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+    const label1 = s1.toLocaleString('en-GB', {month:'long', year:'numeric'});
+    const label2 = s2.toLocaleString('en-GB', {month:'long', year:'numeric'});
+    return { current: [s1,e1], previous: [s2,e2], label1, label2,
+      periodLabel: 'Month vs Month — ' + label1 + ' vs ' + label2 };
   }
 
-  // ── Map Rendering ──
-  function addMarkersToMap() {
-    if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
-    markerCluster.clearLayers();
-
-    if (currentDataSource === 'clients') renderClientLayer();
-    else renderBookingLayer();
+  if (currentPeriod === 'qoq') {
+    const q  = Math.floor(now.getMonth() / 3);
+    const s1 = new Date(now.getFullYear(), q * 3, 1);
+    const e1 = new Date(now.getFullYear(), q * 3 + 3, 0, 23, 59, 59);
+    const s2 = new Date(now.getFullYear(), (q-1) * 3, 1);
+    const e2 = new Date(now.getFullYear(), q * 3, 0, 23, 59, 59);
+    const label1 = 'Q' + (q+1) + ' ' + now.getFullYear();
+    const prevQ  = q === 0 ? 4 : q;
+    const prevY  = q === 0 ? now.getFullYear()-1 : now.getFullYear();
+    const label2 = 'Q' + prevQ + ' ' + prevY;
+    return { current: [s1,e1], previous: [s2,e2], label1, label2,
+      periodLabel: 'Quarter vs Quarter — ' + label1 + ' vs ' + label2 };
   }
 
-  function renderClientLayer() {
-    if (currentViewMode === 'markers') {
-      filteredClientData.forEach(user => {
-        const region = user.fields['Region'];
-        if (!region || !REGION_COORDS[region]) return;
-        const [lat, lng] = REGION_COORDS[region];
-        const jLat = lat + (Math.random() - 0.5) * 0.06;
-        const jLng = lng + (Math.random() - 0.5) * 0.06;
+  if (currentPeriod === '6m') {
+    const s1 = new Date(now); s1.setMonth(s1.getMonth()-6); s1.setDate(1); s1.setHours(0,0,0,0);
+    const e1 = new Date(now); e1.setHours(23,59,59,999);
+    const s2 = new Date(s1); s2.setMonth(s2.getMonth()-6);
+    const e2 = new Date(s1); e2.setDate(e2.getDate()-1); e2.setHours(23,59,59,999);
+    const fmt = d => d.toLocaleString('en-GB',{month:'short',year:'numeric'});
+    const label1 = fmt(s1) + ' – ' + fmt(e1);
+    const label2 = fmt(s2) + ' – ' + fmt(e2);
+    return { current: [s1,e1], previous: [s2,e2], label1, label2,
+      periodLabel: '6 Month View — Last 6M vs Prior 6M' };
+  }
 
-        const icon = L.divIcon({
-          className: '',
-          html: `<div style="background:linear-gradient(135deg,#ef4444,#dc2626);border:3px solid #fff;border-radius:50%;width:22px;height:22px;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>`,
-          iconSize: [22, 22], iconAnchor: [11, 11]
-        });
+  // YoY
+  const s1 = new Date(now.getFullYear(), 0, 1);
+  const e1 = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
+  const s2 = new Date(now.getFullYear()-1, 0, 1);
+  const e2 = new Date(now.getFullYear()-1, 11, 31, 23, 59, 59);
+  const label1 = now.getFullYear().toString();
+  const label2 = (now.getFullYear()-1).toString();
+  return { current: [s1,e1], previous: [s2,e2], label1, label2,
+    periodLabel: 'Year on Year — ' + label1 + ' vs ' + label2 };
+}
 
-        const m = L.marker([jLat, jLng], { icon });
-        m.bindPopup(`
-          <div class="popup-title">${user.fields['Name'] || 'Client'}</div>
-          <div class="popup-row">🏢 ${user.fields['Company'] || 'N/A'}</div>
-          <div class="popup-row">✉️ ${user.fields['Email'] || 'N/A'}</div>
-          <div class="popup-row">📍 ${region}</div>
-          <div class="popup-footer">
-            <span class="badge badge-${(user.fields['Account Status'] || 'inactive').toLowerCase()}">${user.fields['Account Status'] || 'Unknown'}</span>
+// Filter arrays into a window
+function filterToWindow(window) {
+  const [start, end] = window;
+  return {
+    clients:  clientData.filter(u => { const d = new Date(u.fields['Created Date']); return d >= start && d <= end; }),
+    bookings: bookingData.filter(b => { if (!b.date) return false; const d = new Date(b.date); return d >= start && d <= end; })
+  };
+}
+
+// Determine if a booking is from a new client (first ever booking)
+function splitNewVsExisting(windowBookings, windowStart) {
+  // Build a set of clients who had bookings BEFORE this window
+  const priorEmails = new Set();
+  bookingData.forEach(b => {
+    if (!b.date) return;
+    const d = new Date(b.date);
+    if (d < windowStart && b.clientEmail) priorEmails.add((b.clientEmail||'').toLowerCase());
+  });
+
+  const newB = windowBookings.filter(b => !priorEmails.has((b.clientEmail||'').toLowerCase()));
+  const exB  = windowBookings.filter(b =>  priorEmails.has((b.clientEmail||'').toLowerCase()));
+  return { newB, exB };
+}
+
+function calcRevenue(bookings) {
+  return bookings.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice)||0), 0);
+}
+
+function renderPerformanceSection() {
+  const windows = getPeriodWindows();
+  document.getElementById('perfPeriodLabel').textContent = windows.periodLabel;
+
+  const curr = filterToWindow(windows.current);
+  const prev = filterToWindow(windows.previous);
+
+  const currNewVsEx = splitNewVsExisting(curr.bookings, windows.current[0]);
+  const prevNewVsEx = splitNewVsExisting(prev.bookings, windows.previous[0]);
+
+  // Sign-ups: exclude anyone who signed up within the last 3 days of each window end
+  // Avoids counting people who just signed up and haven't engaged yet
+  const signupsInWindow = (clients, windowEnd) => {
+    const cutoff = new Date(windowEnd);
+    cutoff.setDate(cutoff.getDate() - 3);
+    return clients.filter(u => new Date(u.fields['Created Date']) <= cutoff);
+  };
+  const currSignups = signupsInWindow(curr.clients, windows.current[1]);
+  const prevSignups = signupsInWindow(prev.clients, windows.previous[1]);
+
+  const metrics = [
+    {
+      key: 'signups',
+      label: 'Dashboard Sign-Ups',
+      sub: 'Excl. last 3 days',
+      icon: '👤',
+      css: 'signups',
+      curr: currSignups.length,
+      prev: prevSignups.length,
+      fmt: v => v.toString(),
+      targetKey: 'signups'
+    },
+    {
+      key: 'revenue',
+      label: 'Revenue',
+      sub: 'Excl. cancelled bookings',
+      icon: '💰',
+      css: 'revenue',
+      curr: calcRevenue(curr.bookings),
+      prev: calcRevenue(prev.bookings),
+      fmt: v => '£' + Math.round(v).toLocaleString(),
+      targetKey: 'revenue'
+    },
+    {
+      key: 'newBookings',
+      label: 'New Client Bookings',
+      sub: 'First time booking',
+      icon: '✨',
+      css: 'new-booking',
+      curr: currNewVsEx.newB.filter(b => b.bookingStatus !== 'Cancelled').length,
+      prev: prevNewVsEx.newB.filter(b => b.bookingStatus !== 'Cancelled').length,
+      fmt: v => v.toString(),
+      targetKey: 'newBookings'
+    },
+    {
+      key: 'existBookings',
+      label: 'Existing Client Bookings',
+      sub: 'Repeat clients',
+      icon: '🔁',
+      css: 'exist-booking',
+      curr: currNewVsEx.exB.filter(b => b.bookingStatus !== 'Cancelled').length,
+      prev: prevNewVsEx.exB.filter(b => b.bookingStatus !== 'Cancelled').length,
+      fmt: v => v.toString(),
+      targetKey: 'existBookings'
+    },
+    {
+      key: 'totalBookings',
+      label: 'Total Bookings',
+      sub: 'Confirmed + Reserved',
+      icon: '📅',
+      css: 'total-booking',
+      curr: curr.bookings.filter(b => b.bookingStatus !== 'Cancelled').length,
+      prev: prev.bookings.filter(b => b.bookingStatus !== 'Cancelled').length,
+      fmt: v => v.toString(),
+      targetKey: 'totalBookings'
+    }
+  ];
+
+  // Scale target based on period length vs monthly target
+  function scaledTarget(metricKey) {
+    const T   = buildTargets();
+    const yr  = getCurrentYear();
+    const key = 'y' + yr;
+    const monthly = T.monthly[metricKey][key];
+    if (currentPeriod === 'mom')  return monthly;
+    if (currentPeriod === 'qoq') return monthly * 3;
+    if (currentPeriod === '6m')  return monthly * 6;
+    return monthly * 12; // yoy
+  }
+
+  // Render KPI cards
+  const kpiGrid = document.getElementById('kpiGrid');
+  kpiGrid.innerHTML = metrics.map(m => {
+    const delta = m.prev > 0 ? ((m.curr - m.prev) / m.prev * 100) : (m.curr > 0 ? 100 : 0);
+    const deltaClass = delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
+    const deltaArrow = delta > 0 ? '▲' : delta < 0 ? '▼' : '—';
+    const deltaText  = Math.abs(delta).toFixed(1) + '%';
+
+    const target  = scaledTarget(m.targetKey);
+    const pct     = target > 0 ? Math.min((m.curr / target) * 100, 100) : 0;
+    const trackClass = pct >= 80 ? 'on-track' : pct >= 50 ? 'behind' : 'critical';
+    const trackFill  = pct >= 80 ? 'on-track-fill' : pct >= 50 ? 'behind-fill' : 'critical-fill';
+    const trackLabel = pct >= 80 ? '✅ On Track' : pct >= 50 ? '⚠️ Behind' : '🔴 Critical';
+
+    const periodFmt = { mom:'This Month', qoq:'This Quarter', '6m':'Last 6 Months', yoy:'This Year' };
+
+    return `<div class="kpi-card ${m.css}">
+      <div class="kpi-label">${m.icon} ${m.label}</div>
+      <div class="kpi-current">${m.fmt(m.curr)}</div>
+      <div class="kpi-period-label">${periodFmt[currentPeriod]} · ${m.sub}</div>
+      <div class="kpi-compare-row">
+        <div class="kpi-prev">Prev: <strong>${m.fmt(m.prev)}</strong></div>
+        <div class="kpi-delta ${deltaClass}">${deltaArrow} ${deltaText}</div>
+      </div>
+      <div class="kpi-target-row">
+        <div class="kpi-target-header">
+          <span>Target: ${m.fmt(target)}</span>
+          <span class="target-pct ${trackClass}">${pct.toFixed(0)}% · ${trackLabel}</span>
+        </div>
+        <div class="target-bar-bg">
+          <div class="target-bar-fill ${trackFill}" style="width:${pct}%"></div>
+        </div>
+        <div class="kpi-target-sub">${m.fmt(m.curr)} of ${m.fmt(target)} target</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Render comparison table
+  document.getElementById('compTableTitle').textContent = windows.label1 + ' vs ' + windows.label2;
+  document.getElementById('colCurrent').textContent = windows.label1;
+  document.getElementById('colPrev').textContent    = windows.label2;
+
+  const rows = metrics.map(m => {
+    const delta = m.prev > 0 ? ((m.curr - m.prev) / m.prev * 100) : (m.curr > 0 ? 100 : 0);
+    const dClass = delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
+    const dArr   = delta > 0 ? '▲' : delta < 0 ? '▼' : '—';
+    const target  = scaledTarget(m.targetKey);
+    const vsTarget = target > 0 ? ((m.curr / target) * 100).toFixed(1) + '%' : 'N/A';
+    const vtClass  = parseFloat(vsTarget) >= 80 ? 'style="color:#10b981;font-weight:700;"'
+                   : parseFloat(vsTarget) >= 50 ? 'style="color:#f59e0b;font-weight:700;"'
+                   : 'style="color:#ef4444;font-weight:700;"';
+    return `<tr>
+      <td class="metric-name">${m.icon} ${m.label}</td>
+      <td class="current-val">${m.fmt(m.curr)}</td>
+      <td>${m.fmt(m.prev)}</td>
+      <td><div class="comp-delta-cell"><span class="micro-delta ${dClass}">${dArr} ${Math.abs(delta).toFixed(1)}%</span></div></td>
+      <td style="color:#64748b;">${m.fmt(target)}</td>
+      <td ${vtClass}>${vsTarget}</td>
+    </tr>`;
+  });
+  document.getElementById('compTableBody').innerHTML = rows.join('');
+
+  // Render roadmap
+  renderRoadmap();
+}
+
+function renderRoadmap() {
+  const totalClients   = clientData.length;
+  const totalRevenue   = bookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice)||0), 0);
+  const clientsTarget  = 400;
+  const revenueTarget  = 1000000;
+
+  const clientPct  = Math.min((totalClients / clientsTarget) * 100, 100);
+  const revenuePct = Math.min((totalRevenue / revenueTarget) * 100, 100);
+
+  // ── Revenue/clients by calendar year — from live booking data ──
+  function revenueForYear(yr) {
+    return bookingData
+      .filter(b => b.bookingStatus !== 'Cancelled' && b.date && new Date(b.date).getFullYear() === yr)
+      .reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
+  }
+  function clientsSignedByEndOf(yr) {
+    return clientData.filter(u => u.fields['Created Date'] && new Date(u.fields['Created Date']).getFullYear() <= yr).length;
+  }
+
+  const rev2026 = revenueForYear(2026);
+  const rev2027 = revenueForYear(2027);
+
+  // Monthly run rate
+  const allDates = bookingData.filter(b => b.date).map(b => new Date(b.date));
+  const earliest = allDates.length ? new Date(Math.min(...allDates)) : new Date();
+  const monthsActive = Math.max(1, ((new Date() - earliest) / (1000*60*60*24*30)));
+  const monthlyRunRate = totalRevenue / monthsActive;
+  const monthsToMillion = monthlyRunRate > 0 ? Math.ceil((revenueTarget - totalRevenue) / monthlyRunRate) : '∞';
+
+  // Live ATV + derived targets
+  const liveATV = calcLiveATV();
+  const T = buildTargets();
+
+  document.getElementById('roadmapTargets').innerHTML = `
+    <div class="roadmap-target">
+      <div class="rt-value" style="color:#3b82f6;">${totalClients}</div>
+      <div class="rt-label">Clients on Dashboard</div>
+      <div class="rt-progress" style="color:${clientPct >= 80 ? '#10b981' : '#f59e0b'};">${clientPct.toFixed(1)}% of ${clientsTarget} target</div>
+    </div>
+    <div class="roadmap-target">
+      <div class="rt-value" style="color:#10b981;">£${Math.round(totalRevenue).toLocaleString()}</div>
+      <div class="rt-label">Total Revenue to Date</div>
+      <div class="rt-progress" style="color:${revenuePct >= 80 ? '#10b981' : '#f59e0b'};">${revenuePct.toFixed(2)}% of £1M target</div>
+    </div>
+    <div class="roadmap-target">
+      <div class="rt-value" style="color:#f59e0b;">£${Math.round(monthlyRunRate).toLocaleString()}</div>
+      <div class="rt-label">Monthly Revenue Run Rate</div>
+      <div class="rt-progress" style="color:#94a3b8;">${monthsToMillion === '∞' ? 'No data yet' : monthsToMillion + ' months to £1M'}</div>
+    </div>
+    <div class="roadmap-target">
+      <div class="rt-value" style="color:#06b6d4;">£${Math.round(liveATV).toLocaleString()}</div>
+      <div class="rt-label">Live ATV (from bookings)</div>
+      <div class="rt-progress" style="color:#64748b;">Drives all booking targets below</div>
+    </div>
+    <div class="roadmap-target">
+      <div class="rt-value" style="color:#8b5cf6;">${clientsTarget - totalClients > 0 ? clientsTarget - totalClients : '✅'}</div>
+      <div class="rt-label">Clients Still Needed</div>
+      <div class="rt-progress" style="color:#64748b;">${clientsTarget - totalClients > 0 ? 'to hit 400 client target' : 'Target reached!'}</div>
+    </div>
+    <div class="roadmap-target" style="border-color:rgba(139,92,246,0.4);">
+      <div class="rt-value" style="color:#8b5cf6;font-size:18px;">2026</div>
+      <div class="rt-label">Current Year — Scaling</div>
+      <div class="rt-progress" style="color:#64748b;">£${Math.round(revenueForYear(2026)).toLocaleString()} earned so far this year</div>
+    </div>
+  `;
+
+  // Milestones show each year's actual progress vs that year's target
+  const milestones = [
+    { year: '2026 — Now',  targetRev: REVENUE_TARGETS.y2, actualRev: rev2026, targetClients: 266, actualClients: clientsSignedByEndOf(2026), color: '#8b5cf6', isCurrent: true  },
+    { year: '2027 — Goal', targetRev: REVENUE_TARGETS.y3, actualRev: rev2027, targetClients: 400, actualClients: clientsSignedByEndOf(2027), color: '#f59e0b', isCurrent: false }
+  ];
+
+  document.getElementById('milestoneTrack').innerHTML = milestones.map(m => {
+    const revPct     = Math.min((m.actualRev / m.targetRev) * 100, 100);
+    const clientsPct = Math.min((m.actualClients / m.targetClients) * 100, 100);
+    const pctLabel   = revPct.toFixed(1) + '%';
+    return `
+    <div style="margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="milestone-year" style="width:auto;color:${m.color};font-weight:700;">${m.year}</span>
+          ${m.isCurrent ? '<span style="font-size:10px;background:' + m.color + '33;color:' + m.color + ';padding:2px 8px;border-radius:6px;font-weight:700;">In Progress</span>' : ''}
+        </div>
+        <div style="font-size:12px;color:#64748b;">£${Math.round(m.actualRev).toLocaleString()} / £${(m.targetRev/1000).toFixed(0)}k target</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:4px;">
+        <div style="flex:1;">
+          <div style="font-size:10px;color:#64748b;margin-bottom:3px;">Revenue</div>
+          <div class="milestone-bar-wrap">
+            <div class="milestone-bar-fill" style="width:${revPct}%;background:linear-gradient(90deg,${m.color},${m.color}99);">
+              ${revPct > 12 ? pctLabel : ''}
+            </div>
           </div>
-        `);
-        markerCluster.addLayer(m);
-      });
-      map.addLayer(markerCluster);
-
-    } else {
-      // Heatmap
-      const heatData = UK_REGIONS
-        .filter(r => regionCounts[r] > 0 && REGION_COORDS[r])
-        .map(r => [...REGION_COORDS[r], regionCounts[r] / 10]);
-
-      heatLayer = L.heatLayer(heatData, {
-        radius: 40, blur: 50, maxZoom: 10,
-        gradient: { 0.0: '#3b82f6', 0.5: '#fb923c', 1.0: '#ef4444' }
-      }).addTo(map);
-    }
-  }
-
-  function renderBookingLayer() {
-    if (currentViewMode === 'markers') {
-      let plotted = 0;
-      filteredBookingData.forEach(booking => {
-        // Only plot if we have exact coords from postcode geocoding
-        if (!booking.lat || !booking.lng) return;
-        plotted++;
-
-        const statusColor = { 'Confirmed': '#10b981', 'Reserved': '#fb923c', 'Cancelled': '#ef4444' }[booking.bookingStatus] || '#8b5cf6';
-
-        const icon = L.divIcon({
-          className: '',
-          html: `<div style="background:${statusColor};border:3px solid #fff;border-radius:50%;width:18px;height:18px;box-shadow:0 2px 8px rgba(0,0,0,0.4);"></div>`,
-          iconSize: [18, 18], iconAnchor: [9, 9]
-        });
-
-        const isUpcoming = booking.date && new Date(booking.date) >= new Date();
-        const m = L.marker([booking.lat, booking.lng], { icon });
-        m.bindPopup(`
-          <div class="popup-title">${booking.bookingRef || 'Booking'}</div>
-          <div class="popup-row">👤 ${booking.clientName || 'N/A'}</div>
-          <div class="popup-row">🏠 ${booking.propertyAddress || booking.postcode || 'N/A'}</div>
-          <div class="popup-row">🎬 ${booking.service || 'N/A'}</div>
-          <div class="popup-row">📅 ${formatDate(booking.date)}${booking.time ? ' at ' + booking.time : ''}</div>
-          ${booking.mediaSpecialist ? `<div class="popup-row">📸 ${booking.mediaSpecialist}</div>` : ''}
-          <div class="popup-footer">
-            <span class="badge badge-${(booking.bookingStatus || '').toLowerCase()}">${booking.bookingStatus || 'Unknown'}</span>
-            ${isUpcoming ? '<span class="badge" style="background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid #3b82f6;">Upcoming</span>' : ''}
-            ${booking.finalPrice ? `<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid #10b981;">£${parseFloat(booking.finalPrice).toFixed(2)}</span>` : ''}
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:10px;color:#64748b;margin-bottom:3px;">Clients — ${m.actualClients} / ${m.targetClients}</div>
+          <div class="milestone-bar-wrap">
+            <div class="milestone-bar-fill" style="width:${clientsPct}%;background:linear-gradient(90deg,#3b82f6,#60a5fa99);">
+              ${clientsPct > 12 ? clientsPct.toFixed(0) + '%' : ''}
+            </div>
           </div>
-        `);
-        markerCluster.addLayer(m);
-      });
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 
-      console.log(`Plotted ${plotted} of ${filteredBookingData.length} bookings`);
-      map.addLayer(markerCluster);
+  // Monthly breakdown — only show current year (2026) + next year (2027)
+  const fmtMoney = v => '£' + Math.round(v).toLocaleString();
+  const fmtBk    = v => v + ' / mo';
 
-    } else {
-      // Heatmap using exact coords
-      const heatData = filteredBookingData
-        .filter(b => b.lat && b.lng)
-        .map(b => [b.lat, b.lng, 0.5]);
+  const years = [
+    { label: '2026 — This Year',  col: '#8b5cf6', key: 'y2', annualRev: REVENUE_TARGETS.y2, isCurrent: true  },
+    { label: '2027 — Final Push', col: '#f59e0b', key: 'y3', annualRev: REVENUE_TARGETS.y3, isCurrent: false }
+  ];
 
-      heatLayer = L.heatLayer(heatData, {
-        radius: 35, blur: 45, maxZoom: 12,
-        gradient: { 0.0: '#8b5cf6', 0.5: '#a78bfa', 1.0: '#c4b5fd' }
-      }).addTo(map);
+  // How many months left in 2026?
+  const now2 = new Date();
+  const monthsLeftThisYear = now2.getFullYear() === 2026 ? (12 - now2.getMonth()) : 12;
+  const rev2026Remaining   = Math.max(0, REVENUE_TARGETS.y2 - rev2026);
+  const bookingsNeededRestOfYear = monthsLeftThisYear > 0 ? Math.ceil((rev2026Remaining / liveATV) / monthsLeftThisYear) : 0;
+
+  document.getElementById('monthlyTargetsGrid').innerHTML = years.map(y => {
+    const rows = [
+      { name: 'Monthly Revenue Target', val: fmtMoney(T.monthly.revenue[y.key]) + ' / mo' },
+      { name: 'Total Bookings Needed',  val: fmtBk(T.monthly.totalBookings[y.key]) },
+      { name: 'New Client Bookings',    val: fmtBk(T.monthly.newBookings[y.key]) },
+      { name: 'Repeat Bookings',        val: fmtBk(T.monthly.existBookings[y.key]) },
+      { name: 'New Sign-Ups',           val: fmtBk(T.monthly.signups[y.key]) },
+      { name: 'Annual Revenue Goal',    val: fmtMoney(y.annualRev) },
+    ];
+    if (y.isCurrent) {
+      rows.push({ name: '⚡ Bookings/mo to hit 2026 target', val: fmtBk(bookingsNeededRestOfYear), highlight: true });
+      rows.push({ name: '⚡ Revenue still needed in 2026',   val: fmtMoney(rev2026Remaining),       highlight: true });
     }
-  }
+    return `
+    <div style="background:rgba(255,255,255,0.03);border:1px solid ${y.isCurrent ? y.col + '55' : 'rgba(255,255,255,0.07)'};border-radius:10px;padding:16px;border-top:3px solid ${y.col};">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;color:${y.col};">${y.label}</div>
+        ${y.isCurrent ? '<span style="font-size:10px;font-weight:700;background:' + y.col + '33;color:' + y.col + ';padding:2px 8px;border-radius:6px;">▶ Now</span>' : ''}
+      </div>
+      <div style="font-size:10px;color:#475569;margin-bottom:10px;font-style:italic;">Booking targets use live ATV of £${Math.round(liveATV).toLocaleString()}</div>
+      ${rows.map(d => `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;font-size:12px;${d.highlight ? 'background:rgba(245,158,11,0.08);padding:4px 8px;border-radius:6px;margin-left:-8px;margin-right:-8px;' : ''}">
+          <span style="color:${d.highlight ? '#f59e0b' : '#64748b'};">${d.name}</span>
+          <span style="font-weight:700;color:${d.highlight ? '#f59e0b' : '#e2e8f0'};">${d.val}</span>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+}
 
-  // ── Controls ──
-  function setViewMode(mode) {
-    currentViewMode = mode;
-    document.getElementById('viewMarkers').classList.toggle('active', mode === 'markers');
-    document.getElementById('viewHeatmap').classList.toggle('active', mode === 'heatmap');
-    addMarkersToMap();
-  }
+// ── Client Intelligence ──
+function renderIntelligence() {
+  const el = document.getElementById('intelContent');
+  const clientMap = {};
+  clientData.forEach(c => {
+    const email = (c.fields['Email']||'').toLowerCase();
+    if (!email) return;
+    clientMap[email] = { name: c.fields['Name']||'Unknown', company: c.fields['Company']||'', email, region: c.fields['Region']||'', status: c.fields['Account Status']||'', bookings: [], ltv: 0, bookingCount: 0, avgSpend: 0, lastBooking: null };
+  });
+  bookingData.forEach(b => {
+    const email = (b.clientEmail||'').toLowerCase();
+    if (!email) return;
+    if (!clientMap[email]) clientMap[email] = { name: b.clientName||'Guest', company:'', email, region:'', status:'Guest', bookings:[], ltv:0, bookingCount:0, avgSpend:0, lastBooking:null };
+    clientMap[email].bookings.push(b);
+    if (b.bookingStatus !== 'Cancelled') clientMap[email].ltv += parseFloat(b.finalPrice)||0;
+  });
+  Object.values(clientMap).forEach(c => {
+    c.bookingCount = c.bookings.length;
+    const nonCancelled = c.bookings.filter(b => b.bookingStatus !== 'Cancelled');
+    c.avgSpend = nonCancelled.length > 0 ? c.ltv / nonCancelled.length : 0;
+    const dates = c.bookings.map(b => b.date).filter(Boolean).sort();
+    c.lastBooking = dates[dates.length-1] || null;
+  });
 
-  function filterClients(type, e) {
-    document.querySelectorAll('#clientFilters .filter-btn').forEach(b => b.classList.remove('active'));
-    if (e) e.target.closest('.filter-btn').classList.add('active');
+  const allClients = Object.values(clientMap);
+  const totalClients = clientData.length;
+  const cwb  = allClients.filter(c => c.bookingCount > 0).length;
+  const rate = totalClients > 0 ? ((cwb / totalClients) * 100).toFixed(1) : 0;
+  const totalLTV = allClients.reduce((s,c) => s+c.ltv, 0);
+  const avgLTV   = cwb > 0 ? (totalLTV/cwb).toFixed(2) : 0;
+  const avgBPC   = cwb > 0 ? (allClients.reduce((s,c) => s+c.bookingCount, 0)/cwb).toFixed(1) : 0;
+  const ncb = bookingData.filter(b => b.bookingStatus !== 'Cancelled').length;
+  const atv = ncb > 0 ? (totalLTV/ncb).toFixed(2) : 0;
 
-    if (type === 'active') filteredClientData = clientData.filter(u => u.fields['Account Status'] === 'Active');
-    else filteredClientData = [...clientData];
+  const topClients = allClients.filter(c => c.bookingCount > 0).sort((a,b) => b.ltv-a.ltv).slice(0,10);
+  const rankEmoji = ['🥇','🥈','🥉'];
+  const rankClass = ['rank-1','rank-2','rank-3'];
 
-    addMarkersToMap();
-    renderRegionList();
-    renderDetailPanel();
-  }
+  document.getElementById('intelBookingRate').textContent = rate + '%';
+  document.getElementById('intelAvgLTV').textContent      = '£' + parseFloat(avgLTV).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('intelAvgBookings').textContent = avgBPC;
+  document.getElementById('intelTotalLTV').textContent    = '£' + parseFloat(totalLTV).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('intelNeverBooked').textContent = totalClients - cwb;
+  document.getElementById('intelATV').textContent        = '£' + parseFloat(atv).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
 
-  function filterBookings(status, e) {
-    document.querySelectorAll('#bookingFilters .filter-btn').forEach(b => b.classList.remove('active'));
-    if (e) e.target.closest('.filter-btn').classList.add('active');
+  document.getElementById('bigBookingRate').textContent = rate + '%';
+  document.getElementById('bigRateBar').style.width     = Math.min(rate,100) + '%';
+  document.getElementById('bigRateSub').textContent     = cwb + ' of ' + totalClients + ' clients have made at least 1 booking · ' + (totalClients-cwb) + ' yet to book';
+  document.getElementById('bigATV').textContent    = '£' + parseFloat(atv).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('bigAvgLTV').textContent = '£' + parseFloat(avgLTV).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('bigTotalLTV').textContent = '£' + parseFloat(totalLTV).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
 
-    filteredBookingData = status === 'all' ? [...bookingData] : bookingData.filter(b => b.bookingStatus === status);
-    addMarkersToMap();
-    renderRegionList();
-    renderDetailPanel();
-  }
-
-  function applyDateFilter() {
-    const from = document.getElementById('dateFrom').value;
-    const to = document.getElementById('dateTo').value;
-    if (!from || !to) return;
-
-    const dFrom = new Date(from);
-    const dTo = new Date(to); dTo.setHours(23, 59, 59);
-
-    if (currentDataSource === 'clients') {
-      filteredClientData = clientData.filter(u => {
-        const d = new Date(u.fields['Created Date']);
-        return d >= dFrom && d <= dTo;
-      });
-    } else {
-      filteredBookingData = bookingData.filter(b => {
-        const d = new Date(b.date || b.createdTime);
-        return d >= dFrom && d <= dTo;
-      });
-    }
-
-    addMarkersToMap();
-    renderRegionList();
-    renderDetailPanel();
-  }
-
-  // ── Region List ──
-  function renderRegionList() {
-    const container = document.getElementById('regionListContainer');
-    const regionTotal = document.getElementById('regionTotal');
-
-    if (currentDataSource === 'clients') {
-      const rows = UK_REGIONS.map(r => {
-        const count = regionCounts[r] || 0;
-        return `
-          <div class="region-item ${count === 0 ? 'empty' : ''}" onclick="flyToRegion('${r}', event)">
-            <div class="region-name">${r}</div>
-            <span class="region-count">${count}</span>
-          </div>`;
+  const allTop = allClients.filter(c => c.bookingCount > 0).sort((a,b) => b.ltv-a.ltv);
+  document.getElementById('fullLeaderboard').innerHTML = allTop.length === 0
+    ? '<div style="text-align:center;padding:40px;color:#64748b;grid-column:1/-1;">No booking data available</div>'
+    : allTop.map((c,i) => {
+        const rank = i < 3 ? rankEmoji[i] : '#' + (i+1);
+        const cls  = i < 3 ? rankClass[i] : 'rank-other';
+        const cc = c.bookings.filter(b => b.bookingStatus === 'Cancelled').length;
+        const cf = c.bookings.filter(b => b.bookingStatus === 'Confirmed').length;
+        const rv = c.bookings.filter(b => b.bookingStatus === 'Reserved').length;
+        return `<div class="leaderboard-item ${cls}" style="background:#1e293b;">
+          <div class="rank-badge">${rank}</div>
+          <div class="leaderboard-info">
+            <div class="leaderboard-name">${c.name}</div>
+            ${c.company ? '<div class="leaderboard-email">🏢 ' + c.company + '</div>' : ''}
+            <div class="leaderboard-sub" style="margin-top:4px;">📅 Last: ${formatDate(c.lastBooking)}</div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
+              ${cf > 0 ? '<span style="font-size:10px;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid #10b981;padding:1px 6px;border-radius:4px;">' + cf + ' confirmed</span>' : ''}
+              ${rv > 0 ? '<span style="font-size:10px;background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid #fb923c;padding:1px 6px;border-radius:4px;">' + rv + ' reserved</span>' : ''}
+              ${cc > 0 ? '<span style="font-size:10px;background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid #ef4444;padding:1px 6px;border-radius:4px;">' + cc + ' cancelled</span>' : ''}
+            </div>
+          </div>
+          <div class="leaderboard-right" style="min-width:90px;">
+            <div class="ltv-value">£${c.ltv.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
+            <div class="ltv-label">LTV</div>
+            <div class="booking-count">${c.bookingCount} booking${c.bookingCount !== 1 ? 's' : ''}</div>
+            <div style="font-size:10px;color:#64748b;margin-top:2px;">avg £${isNaN(c.avgSpend) ? 0 : c.avgSpend.toFixed(0)} / booking</div>
+          </div>
+        </div>`;
       }).join('');
-      regionTotal.textContent = `${Object.values(regionCounts).filter(c => c > 0).length} active`;
-      container.innerHTML = rows;
 
-    } else {
-      // For bookings: group by postcode area (first half of postcode)
-      const areaCounts = {};
-      const areaRevenue = {};
-      filteredBookingData.forEach(b => {
-        if (!b.postcode) return;
-        const area = b.postcode.split(' ')[0].toUpperCase();
-        areaCounts[area] = (areaCounts[area] || 0) + 1;
-        areaRevenue[area] = (areaRevenue[area] || 0) + (parseFloat(b.finalPrice) || 0);
-      });
-
-      const sorted = Object.entries(areaCounts).sort((a, b) => b[1] - a[1]);
-      regionTotal.textContent = `${sorted.length} areas`;
-
-      if (sorted.length === 0) {
-        container.innerHTML = `<div class="empty-state"><div class="empty-state-text">No bookings to display</div></div>`;
-        return;
-      }
-
-      container.innerHTML = sorted.map(([area, count]) => `
-        <div class="region-item" onclick="flyToPostcodeArea('${area}', event)">
-          <div>
-            <div class="region-name">${area}</div>
-            ${areaRevenue[area] > 0 ? `<div class="region-sub">£${areaRevenue[area].toFixed(2)}</div>` : ''}
-          </div>
-          <span class="region-count booking">${count}</span>
-        </div>
-      `).join('');
-    }
-  }
-
-  function flyToRegion(region, e) {
-    if (REGION_COORDS[region]) {
-      map.flyTo(REGION_COORDS[region], 10, { duration: 1.5 });
-      showClientsInRegion(region);
-    }
-    document.querySelectorAll('.region-item').forEach(i => i.classList.remove('active'));
-    if (e) e.target.closest('.region-item').classList.add('active');
-  }
-
-  function flyToPostcodeArea(area, e) {
-    // Find first booking in this area with coords and fly there
-    const booking = filteredBookingData.find(b => b.postcode && b.postcode.toUpperCase().startsWith(area) && b.lat);
-    if (booking) {
-      map.flyTo([booking.lat, booking.lng], 12, { duration: 1.5 });
-    }
-    showBookingsInArea(area);
-    document.querySelectorAll('.region-item').forEach(i => i.classList.remove('active'));
-    if (e) e.target.closest('.region-item').classList.add('active');
-  }
-
-  // ── Detail Panel ──
-  function renderDetailPanel() {
-    if (currentDataSource === 'clients') showAllClients();
-    else showAllBookings();
-  }
-
-  function showAllClients() {
-    document.getElementById('detailTitle').textContent = `All Clients (${filteredClientData.length})`;
-    const items = filteredClientData.filter(u => u.fields['Region']).slice(0, 50);
-    document.getElementById('detailContent').innerHTML = items.length === 0
-      ? `<div class="empty-state"><div class="empty-state-text">No clients found</div></div>`
-      : items.map(c => clientCard(c)).join('') + (filteredClientData.length > 50 ? `<div style="text-align:center;padding:16px;color:#64748b;font-size:12px;">Showing 50 of ${filteredClientData.length}</div>` : '');
-  }
-
-  function showAllBookings() {
-    const geocoded = filteredBookingData.filter(b => b.lat).length;
-    const total = filteredBookingData.length;
-    const totalRevenue = filteredBookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
-    document.getElementById('detailTitle').textContent = `Bookings (${total})`;
-
-    const revenueHtml = totalRevenue > 0
-      ? `<div class="revenue-total">Total Revenue: £${totalRevenue.toFixed(2)}</div>`
-      : '';
-    const geocodeNote = `<div style="font-size:11px;color:#64748b;margin-bottom:12px;">📍 ${geocoded} of ${total} plotted on map</div>`;
-
-    const items = filteredBookingData.slice(0, 50);
-    document.getElementById('detailContent').innerHTML = revenueHtml + geocodeNote
-      + (items.length === 0
-        ? `<div class="empty-state"><div class="empty-state-text">No bookings found</div></div>`
-        : items.map(b => bookingCard(b)).join(''))
-      + (filteredBookingData.length > 50 ? `<div style="text-align:center;padding:16px;color:#64748b;font-size:12px;">Showing 50 of ${filteredBookingData.length}</div>` : '');
-  }
-
-  function showClientsInRegion(region) {
-    const clients = filteredClientData.filter(u => u.fields['Region'] === region);
-    document.getElementById('detailTitle').textContent = `${region} (${clients.length})`;
-    document.getElementById('detailContent').innerHTML = clients.length === 0
-      ? `<div class="empty-state"><div class="empty-state-text">No clients in ${region}</div></div>`
-      : clients.map(c => clientCard(c)).join('');
-  }
-
-  function showBookingsInArea(area) {
-    const bookings = filteredBookingData.filter(b => b.postcode && b.postcode.toUpperCase().startsWith(area));
-    const totalRevenue = bookings.filter(b => b.bookingStatus !== 'Cancelled').reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
-    document.getElementById('detailTitle').textContent = `${area} — ${bookings.length} bookings`;
-    const revenueHtml = totalRevenue > 0 ? `<div class="revenue-total">Revenue: £${totalRevenue.toFixed(2)}</div>` : '';
-    document.getElementById('detailContent').innerHTML = revenueHtml
-      + (bookings.length === 0
-        ? `<div class="empty-state"><div class="empty-state-text">No bookings in ${area}</div></div>`
-        : bookings.map(b => bookingCard(b)).join(''));
-  }
-
-  // ── Card Templates ──
-  function clientCard(c) {
-    const status = c.fields['Account Status'] || 'Unknown';
-    return `
-      <div class="card" onclick="flyToRegion('${c.fields['Region']}', event)">
-        <div class="card-title">${c.fields['Name'] || 'Client'}</div>
-        <div class="card-info">🏢 ${c.fields['Company'] || 'N/A'}</div>
-        <div class="card-info">📍 ${c.fields['Region'] || 'N/A'}</div>
-        <div class="card-info">📅 ${formatDate(c.fields['Created Date'])}</div>
-        <span class="badge badge-${status.toLowerCase()}">${status}</span>
-      </div>`;
-  }
-
-  function bookingCard(b) {
-    const status = b.bookingStatus || 'Unknown';
-    const isUpcoming = b.date && new Date(b.date) >= new Date();
-    return `
-      <div class="card booking">
-        <div class="card-title">${b.bookingRef || 'Booking'}</div>
-        <div class="card-info">👤 ${b.clientName || 'N/A'}</div>
-        <div class="card-info">🏠 ${b.propertyAddress || b.postcode || 'N/A'}</div>
-        <div class="card-info">🎬 ${b.service || 'N/A'}</div>
-        <div class="card-info">📅 ${formatDate(b.date)}${b.time ? ' at ' + b.time : ''}</div>
-        ${b.mediaSpecialist ? `<div class="card-info">📸 ${b.mediaSpecialist}</div>` : ''}
-        <span class="badge badge-${status.toLowerCase()}">${status}</span>
-        ${isUpcoming ? '<span class="badge" style="background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid #3b82f6;">Upcoming</span>' : ''}
-        ${b.finalPrice ? `<span class="revenue-tag">£${parseFloat(b.finalPrice).toFixed(2)}</span>` : ''}
-        ${!b.lat ? '<div style="font-size:10px;color:#64748b;margin-top:4px;">⚠️ Postcode not geocoded</div>' : ''}
-      </div>`;
-  }
-
-  function formatDate(d) {
-    if (!d) return 'N/A';
-    return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-  }
-
-  // ── Tab switching ──
-  function switchTab(tab) {
-    const isIntel = tab === 'intel';
-    document.getElementById('tabData').classList.toggle('active', !isIntel);
-    document.getElementById('tabIntel').classList.toggle('active', isIntel);
-    document.getElementById('tabDataContent').style.display = isIntel ? 'none' : 'block';
-    document.getElementById('tabIntelContent').style.display = isIntel ? 'block' : 'none';
-    if (isIntel) renderIntelligence();
-  }
-
-  // ── Client Intelligence ──
-  function renderIntelligence() {
-    const el = document.getElementById('intelContent');
-
-    // Match clients to bookings by email
-    const clientMap = {};
-    clientData.forEach(c => {
-      const email = (c.fields['Email'] || '').toLowerCase();
-      if (!email) return;
-      clientMap[email] = {
-        name: c.fields['Name'] || 'Unknown',
-        company: c.fields['Company'] || '',
-        email: email,
-        region: c.fields['Region'] || '',
-        status: c.fields['Account Status'] || '',
-        bookings: [],
-        ltv: 0,
-        bookingCount: 0,
-        avgSpend: 0,
-        lastBooking: null
-      };
-    });
-
-    // Assign bookings to clients (exclude cancelled from LTV)
-    bookingData.forEach(b => {
-      const email = (b.clientEmail || '').toLowerCase();
-      if (!email) return;
-      if (!clientMap[email]) {
-        // Guest booking - create entry
-        clientMap[email] = {
-          name: b.clientName || 'Guest',
-          company: '',
-          email: email,
-          region: '',
-          status: 'Guest',
-          bookings: [],
-          ltv: 0,
-          bookingCount: 0,
-          avgSpend: 0,
-          lastBooking: null
-        };
-      }
-      clientMap[email].bookings.push(b);
-      if (b.bookingStatus !== 'Cancelled') {
-        clientMap[email].ltv += parseFloat(b.finalPrice) || 0;
-      }
-    });
-
-    // Calculate stats per client
-    Object.values(clientMap).forEach(c => {
-      c.bookingCount = c.bookings.length;
-      c.avgSpend = c.bookingCount > 0 ? c.ltv / c.bookings.filter(b => b.bookingStatus !== 'Cancelled').length || 0 : 0;
-      const dates = c.bookings.map(b => b.date).filter(Boolean).sort();
-      c.lastBooking = dates[dates.length - 1] || null;
-    });
-
-    const allClients = Object.values(clientMap);
-    const totalClients = clientData.length;
-    const clientsWithBookings = allClients.filter(c => c.bookingCount > 0).length;
-    const bookingRate = totalClients > 0 ? ((clientsWithBookings / totalClients) * 100).toFixed(1) : 0;
-
-    const totalLTV = allClients.reduce((s, c) => s + c.ltv, 0);
-    const avgLTV = clientsWithBookings > 0 ? (totalLTV / clientsWithBookings).toFixed(2) : 0;
-    const avgBookingsPerClient = clientsWithBookings > 0
-      ? (allClients.reduce((s, c) => s + c.bookingCount, 0) / clientsWithBookings).toFixed(1)
-      : 0;
-
-    // ATV = total revenue / total non-cancelled bookings across all clients
-    const totalNonCancelledBookings = bookingData.filter(b => b.bookingStatus !== 'Cancelled').length;
-    const atv = totalNonCancelledBookings > 0 ? (totalLTV / totalNonCancelledBookings).toFixed(2) : 0;
-
-    // Top clients by LTV
-    const topClients = allClients
-      .filter(c => c.bookingCount > 0)
-      .sort((a, b) => b.ltv - a.ltv)
-      .slice(0, 10);
-
-    const rankEmoji = ['🥇', '🥈', '🥉'];
-    const rankClass = ['rank-1', 'rank-2', 'rank-3'];
-
-    // ── Update top stat cards row (always visible) ──
-    document.getElementById('intelBookingRate').textContent = bookingRate + '%';
-    document.getElementById('intelAvgLTV').textContent = '£' + parseFloat(avgLTV).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0});
-    document.getElementById('intelAvgBookings').textContent = avgBookingsPerClient;
-    document.getElementById('intelTotalLTV').textContent = '£' + parseFloat(totalLTV).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0});
-    document.getElementById('intelNeverBooked').textContent = totalClients - clientsWithBookings;
-    document.getElementById('intelATV').textContent = '£' + parseFloat(atv).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0});
-
-    // ── Update big leaderboard section below map ──
-    document.getElementById('bigBookingRate').textContent = bookingRate + '%';
-    document.getElementById('bigRateBar').style.width = Math.min(bookingRate, 100) + '%';
-    document.getElementById('bigRateSub').textContent = `${clientsWithBookings} of ${totalClients} clients have made at least 1 booking · ${totalClients - clientsWithBookings} yet to book`;
-    document.getElementById('bigATV').textContent = '£' + parseFloat(atv).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0});
-    document.getElementById('bigAvgLTV').textContent = '£' + parseFloat(avgLTV).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0});
-    document.getElementById('bigTotalLTV').textContent = '£' + parseFloat(totalLTV).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0});
-
-    const allTopClients = allClients.filter(c => c.bookingCount > 0).sort((a, b) => b.ltv - a.ltv);
-
-    document.getElementById('fullLeaderboard').innerHTML = allTopClients.length === 0
-      ? '<div style="text-align:center;padding:40px;color:#64748b;grid-column:1/-1;">No booking data available</div>'
-      : allTopClients.map((c, i) => {
-          const rank = i < 3 ? rankEmoji[i] : `#${i+1}`;
-          const cls = i < 3 ? rankClass[i] : 'rank-other';
-          const cancelledCount = c.bookings.filter(b => b.bookingStatus === 'Cancelled').length;
-          const confirmedCount = c.bookings.filter(b => b.bookingStatus === 'Confirmed').length;
-          const reservedCount = c.bookings.filter(b => b.bookingStatus === 'Reserved').length;
-          return `
-          <div class="leaderboard-item ${cls}" style="background:#1e293b;">
-            <div class="rank-badge">${rank}</div>
-            <div class="leaderboard-info">
-              <div class="leaderboard-name">${c.name}</div>
-              ${c.company ? `<div class="leaderboard-email">🏢 ${c.company}</div>` : ''}
-              <div class="leaderboard-sub" style="margin-top:4px;">
-                📅 Last: ${formatDate(c.lastBooking)}
-              </div>
-              <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
-                ${confirmedCount > 0 ? `<span style="font-size:10px;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid #10b981;padding:1px 6px;border-radius:4px;">${confirmedCount} confirmed</span>` : ''}
-                ${reservedCount > 0 ? `<span style="font-size:10px;background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid #fb923c;padding:1px 6px;border-radius:4px;">${reservedCount} reserved</span>` : ''}
-                ${cancelledCount > 0 ? `<span style="font-size:10px;background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid #ef4444;padding:1px 6px;border-radius:4px;">${cancelledCount} cancelled</span>` : ''}
-              </div>
-            </div>
-            <div class="leaderboard-right" style="min-width:90px;">
-              <div class="ltv-value">£${c.ltv.toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0})}</div>
-              <div class="ltv-label">LTV</div>
-              <div class="booking-count">${c.bookingCount} booking${c.bookingCount !== 1 ? 's' : ''}</div>
-              <div style="font-size:10px;color:#64748b;margin-top:2px;">avg £${isNaN(c.avgSpend) ? 0 : c.avgSpend.toFixed(0)} / booking</div>
-            </div>
-          </div>`;
-        }).join('');
-
-    // ── Update the side panel intelligence tab ──
-    el.innerHTML = `
-      <!-- Booking Rate -->
-      <div class="intel-section">
-        <div class="intel-section-title">Booking Conversion</div>
-        <div class="rate-bar-wrap">
-          <div class="rate-bar-header">
-            <span>Clients who have booked</span>
-            <span class="rate-bar-pct">${bookingRate}%</span>
-          </div>
-          <div class="rate-bar-bg">
-            <div class="rate-bar-fill" style="width:${Math.min(bookingRate, 100)}%"></div>
-          </div>
-          <div class="rate-bar-sub">${clientsWithBookings} of ${totalClients} clients · ${totalClients - clientsWithBookings} yet to book</div>
-        </div>
+  el.innerHTML = `
+    <div class="intel-section">
+      <div class="intel-section-title">Booking Conversion</div>
+      <div class="rate-bar-wrap">
+        <div class="rate-bar-header"><span>Clients who have booked</span><span class="rate-bar-pct">${rate}%</span></div>
+        <div class="rate-bar-bg"><div class="rate-bar-fill" style="width:${Math.min(rate,100)}%"></div></div>
+        <div class="rate-bar-sub">${cwb} of ${totalClients} · ${totalClients-cwb} yet to book</div>
       </div>
-
-      <!-- Key metrics -->
-      <div class="intel-section">
-        <div class="intel-section-title">Client Metrics</div>
-        <div class="intel-stat-grid">
-          <div class="intel-stat">
-            <div class="intel-stat-value green">£${parseFloat(avgLTV).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0})}</div>
-            <div class="intel-stat-label">Avg LTV</div>
-          </div>
-          <div class="intel-stat">
-            <div class="intel-stat-value purple">${avgBookingsPerClient}</div>
-            <div class="intel-stat-label">Avg Bookings</div>
-          </div>
-          <div class="intel-stat">
-            <div class="intel-stat-value gold">£${parseFloat(totalLTV).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0})}</div>
-            <div class="intel-stat-label">Total LTV</div>
-          </div>
-          <div class="intel-stat">
-            <div class="intel-stat-value">${totalClients - clientsWithBookings}</div>
-            <div class="intel-stat-label">Never Booked</div>
-          </div>
-          <div class="intel-stat">
-            <div class="intel-stat-value" style="color:#06b6d4;font-size:18px;">£${parseFloat(atv).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0})}</div>
-            <div class="intel-stat-label">ATV</div>
-          </div>
-        </div>
+    </div>
+    <div class="intel-section">
+      <div class="intel-section-title">Client Metrics</div>
+      <div class="intel-stat-grid">
+        <div class="intel-stat"><div class="intel-stat-value green">£${parseFloat(avgLTV).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0})}</div><div class="intel-stat-label">Avg LTV</div></div>
+        <div class="intel-stat"><div class="intel-stat-value purple">${avgBPC}</div><div class="intel-stat-label">Avg Bookings</div></div>
+        <div class="intel-stat"><div class="intel-stat-value gold">£${parseFloat(totalLTV).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0})}</div><div class="intel-stat-label">Total LTV</div></div>
+        <div class="intel-stat"><div class="intel-stat-value">${totalClients-cwb}</div><div class="intel-stat-label">Never Booked</div></div>
+        <div class="intel-stat"><div class="intel-stat-value" style="color:#06b6d4;font-size:18px;">£${parseFloat(atv).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0})}</div><div class="intel-stat-label">ATV</div></div>
       </div>
-
-      <!-- Top 10 in side panel -->
-      <div class="intel-section">
-        <div class="intel-section-title">Top 10 by LTV</div>
-        ${topClients.length === 0
-          ? '<div class="empty-state"><div class="empty-state-text">No booking data to rank clients</div></div>'
-          : topClients.map((c, i) => {
-              const rank = i < 3 ? rankEmoji[i] : '#' + (i+1);
-              const cls = i < 3 ? rankClass[i] : 'rank-other';
-              const cancelledCount = c.bookings.filter(b => b.bookingStatus === 'Cancelled').length;
-              return '<div class="leaderboard-item ' + cls + '">' +
-                '<div class="rank-badge">' + rank + '</div>' +
-                '<div class="leaderboard-info">' +
-                  '<div class="leaderboard-name">' + c.name + '</div>' +
-                  (c.company ? '<div class="leaderboard-email">🏢 ' + c.company + '</div>' : '') +
-                  '<div class="leaderboard-sub">📅 ' + formatDate(c.lastBooking) + (cancelledCount > 0 ? ' · ' + cancelledCount + ' cancelled' : '') + '</div>' +
-                '</div>' +
-                '<div class="leaderboard-right">' +
-                  '<div class="ltv-value">£' + c.ltv.toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0}) + '</div>' +
-                  '<div class="ltv-label">LTV</div>' +
-                  '<div class="booking-count">' + c.bookingCount + ' booking' + (c.bookingCount !== 1 ? 's' : '') + '</div>' +
-                  '<div style="font-size:10px;color:#64748b;">avg £' + (isNaN(c.avgSpend) ? 0 : c.avgSpend.toFixed(0)) + '</div>' +
-                '</div>' +
-              '</div>';
-            }).join('')
-        }
-      </div>
-    `;
-  }
+    </div>
+    <div class="intel-section">
+      <div class="intel-section-title">Top 10 by LTV</div>
+      ${topClients.length === 0
+        ? '<div class="empty-state"><div class="empty-state-text">No booking data to rank clients</div></div>'
+        : topClients.map((c,i) => {
+            const rank = i < 3 ? rankEmoji[i] : '#'+(i+1);
+            const cls  = i < 3 ? rankClass[i] : 'rank-other';
+            const cc = c.bookings.filter(b => b.bookingStatus === 'Cancelled').length;
+            return '<div class="leaderboard-item ' + cls + '">'
+              + '<div class="rank-badge">' + rank + '</div>'
+              + '<div class="leaderboard-info">'
+              + '<div class="leaderboard-name">' + c.name + '</div>'
+              + (c.company ? '<div class="leaderboard-email">🏢 ' + c.company + '</div>' : '')
+              + '<div class="leaderboard-sub">📅 ' + formatDate(c.lastBooking) + (cc > 0 ? ' · ' + cc + ' cancelled' : '') + '</div>'
+              + '</div>'
+              + '<div class="leaderboard-right">'
+              + '<div class="ltv-value">£' + c.ltv.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0}) + '</div>'
+              + '<div class="ltv-label">LTV</div>'
+              + '<div class="booking-count">' + c.bookingCount + ' booking' + (c.bookingCount !== 1 ? 's' : '') + '</div>'
+              + '<div style="font-size:10px;color:#64748b;">avg £' + (isNaN(c.avgSpend)?0:c.avgSpend.toFixed(0)) + '</div>'
+              + '</div></div>';
+          }).join('')
+      }
+    </div>`;
+}
 </script>
 </body>
 </html>
