@@ -303,10 +303,11 @@
 
     /* ── Comparison table ── */
     .comparison-section {
-      background: linear-gradient(135deg, #f8fafc, #ffffff);
+      background: #fff;
       border-radius: 16px;
-      padding: 28px;
+      padding: 24px;
       border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       margin-bottom: 24px;
     }
 
@@ -340,7 +341,7 @@
       border-bottom: 1px solid #f8fafc;
     }
 
-    .comp-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .comp-table tr:hover td { background: #f8fafc; }
 
     .comp-table td.metric-name {
       font-weight: 600;
@@ -421,31 +422,69 @@
     }
 
     .roadmap-target {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(0,0,0,0.04);
-      border-radius: 12px;
-      padding: 16px;
-      text-align: center;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 0;
+      text-align: left;
+      overflow: hidden;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+      transition: box-shadow .2s ease, transform .2s ease;
     }
 
-    .roadmap-target .rt-value {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 4px;
+    .roadmap-target:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      transform: translateY(-1px);
+    }
+
+    .roadmap-target .rt-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px 10px;
+    }
+
+    .roadmap-target .rt-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
     .roadmap-target .rt-label {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.6px;
-      color: #475569;
-      margin-bottom: 8px;
+      color: #64748b;
+      line-height: 1.3;
+    }
+
+    .roadmap-target .rt-body {
+      padding: 0 16px 14px;
+    }
+
+    .roadmap-target .rt-value {
+      font-size: 30px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      line-height: 1;
+      letter-spacing: -0.5px;
     }
 
     .roadmap-target .rt-progress {
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 500;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .roadmap-target .rt-accent {
+      height: 3px;
+      width: 100%;
     }
 
     /* Year milestone bars */
@@ -471,7 +510,7 @@
 
     .milestone-bar-wrap {
       flex: 1;
-      background: rgba(255,255,255,0.05);
+      background: #e2e8f0;
       border-radius: 8px;
       height: 28px;
       overflow: hidden;
@@ -486,7 +525,7 @@
       padding-left: 12px;
       font-size: 12px;
       font-weight: 700;
-      color: rgba(255,255,255,0.9);
+      color: #fff;
       transition: width 1s ease;
     }
 
@@ -1246,7 +1285,7 @@
       <div style="background:linear-gradient(135deg,#f8fafc,#ffffff);border-radius:16px;padding:28px;border:1px solid #e2e8f0;box-shadow:0 4px 16px rgba(0,0,0,0.3);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
           <h2 style="font-size:22px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:10px;">
-            🏆 Client Intelligence — Top Clients Leaderboard
+            <i data-lucide="trophy" style="width:18px;height:18px;vertical-align:-3px;margin-right:6px;"></i>Client Intelligence — Top Clients Leaderboard
           </h2>
           <div style="font-size:13px;color:#475569;">Ranked by Lifetime Value (excl. cancelled bookings)</div>
         </div>
@@ -1291,28 +1330,28 @@
   ══════════════════════════════════════════════ -->
   <div id="performanceSection">
 
-    <!-- Performance header with period toggle -->
-    <div class="perf-header">
+    <!-- Period toggle — same style as map view/filter controls -->
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
       <div>
-        <h2>📊 Performance Analytics</h2>
-        <p style="font-size:13px;color:#475569;margin-top:4px;" id="perfPeriodLabel">Month vs Month</p>
+        <h2 style="font-size:20px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;"><i data-lucide="bar-chart-2" style="width:20px;height:20px;"></i>Performance Analytics</h2>
+        <p style="font-size:13px;color:#64748b;margin-top:3px;" id="perfPeriodLabel">Month vs Month</p>
       </div>
       <div class="period-toggle">
-        <button class="period-btn active" onclick="setPeriod('mom')"  id="periodMoM">Month vs Month</button>
-        <button class="period-btn"        onclick="setPeriod('qoq')"  id="periodQoQ">Quarter vs Quarter</button>
-        <button class="period-btn"        onclick="setPeriod('6m')"   id="period6M">6 Month View</button>
+        <button class="period-btn active" onclick="setPeriod('mom')"  id="periodMoM">Month</button>
+        <button class="period-btn"        onclick="setPeriod('qoq')"  id="periodQoQ">Quarter</button>
+        <button class="period-btn"        onclick="setPeriod('6m')"   id="period6M">6 Month</button>
         <button class="period-btn"        onclick="setPeriod('yoy')"  id="periodYoY">Year on Year</button>
       </div>
     </div>
 
-    <!-- KPI cards -->
-    <div class="kpi-grid" id="kpiGrid">
+    <!-- KPI stat cards — same as clients/bookings -->
+    <div class="stats-overview" id="kpiGrid">
       <!-- Populated by JS -->
     </div>
 
     <!-- Comparison Table -->
     <div class="comparison-section">
-      <h3>📋 Detailed Comparison — <span id="compTableTitle">This Month vs Last Month</span></h3>
+      <h3><i data-lucide="table-2" style="width:16px;height:16px;vertical-align:-3px;margin-right:6px;"></i>Detailed Comparison — <span id="compTableTitle">This Month vs Last Month</span></h3>
       <div style="overflow-x:auto;">
         <table class="comp-table" id="compTable">
           <thead>
@@ -1332,34 +1371,34 @@
     </div>
 
     <!-- Road to £1M section -->
-    <div class="roadmap-section">
-      <h3>🎯 Road to £1,000,000 — 3 Year Growth Plan</h3>
-      <p class="roadmap-sub" id="roadmapSub">2026 target: £200k · 2027 target: £500k · £1M by 2028 · Booking targets calculated from live ATV</p>
+    <div class="map-section" style="margin-bottom:24px;">
+      <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:4px;display:flex;align-items:center;gap:8px;"><i data-lucide="target" style="width:18px;height:18px;"></i>Road to £1,000,000</h3>
+      <p style="font-size:13px;color:#64748b;margin-bottom:20px;" id="roadmapSub">3 year growth plan · targets calculated from live ATV</p>
 
-      <div class="roadmap-grid" id="roadmapTargets">
+      <div class="stats-overview" id="roadmapTargets" style="margin-bottom:24px;">
         <!-- Populated by JS -->
       </div>
 
       <!-- Year milestones -->
-      <div style="margin-bottom:20px;">
-        <div style="font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px;">Annual Revenue Milestones</div>
+      <div style="margin-bottom:24px;">
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px;">Annual Revenue Milestones</div>
         <div class="milestone-track" id="milestoneTrack">
           <!-- Populated by JS -->
         </div>
       </div>
 
       <!-- Monthly targets breakdown -->
-      <div style="background:rgba(0,0,0,0.02);border-radius:12px;padding:20px;border:1px solid rgba(0,0,0,0.06);">
-        <div style="font-size:13px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:16px;">Monthly Targets by Year</div>
+      <div style="margin-bottom:24px;">
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px;">Monthly Targets by Year</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;" id="monthlyTargetsGrid">
           <!-- Populated by JS -->
         </div>
       </div>
 
       <!-- Sensitivity analysis -->
-      <div style="background:rgba(0,0,0,0.02);border-radius:12px;padding:20px;border:1px solid rgba(99,102,241,0.2);margin-top:16px;">
-        <div style="font-size:13px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;">🔬 Single Lever Analysis — 2026 Target</div>
-        <div style="font-size:12px;color:#475569;margin-bottom:16px;">If everything else stays the same and you only improve <em>one</em> metric, what does it need to be?</div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px;display:flex;align-items:center;gap:6px;"><i data-lucide="flask-conical" style="width:13px;height:13px;"></i>Single Lever Analysis — 2026 Target</div>
+        <div style="font-size:12px;color:#64748b;margin-bottom:16px;">If everything else stays the same and you only improve <em>one</em> metric, what does it need to be?</div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;" id="sensitivityGrid">
           <!-- Populated by JS -->
         </div>
@@ -1793,9 +1832,9 @@ function renderClientLayer() {
       const m = L.marker([jLat, jLng], { icon });
       m.bindPopup(`
         <div class="popup-title">${user.fields['Name'] || 'Client'}</div>
-        <div class="popup-row">🏢 ${user.fields['Company'] || 'N/A'}</div>
+        <div class="popup-row"><i data-lucide="building-2" style="width:11px;height:11px;vertical-align:-2px;margin-right:3px;"></i>${user.fields['Company'] || 'N/A'}</div>
         <div class="popup-row">✉️ ${user.fields['Email'] || 'N/A'}</div>
-        <div class="popup-row">📍 ${region}</div>
+        <div class="popup-row"><i data-lucide="map-pin" style="width:12px;height:12px;vertical-align:-2px;margin-right:4px;color:#64748b;"></i>${region}</div>
         <div class="popup-footer">
           <span class="badge badge-${(user.fields['Account Status'] || 'inactive').toLowerCase()}">${user.fields['Account Status'] || 'Unknown'}</span>
         </div>
@@ -1828,10 +1867,10 @@ function renderBookingLayer() {
       const m = L.marker([booking.lat, booking.lng], { icon });
       m.bindPopup(`
         <div class="popup-title">${booking.bookingRef || 'Booking'}</div>
-        <div class="popup-row">👤 ${booking.clientName || 'N/A'}</div>
+        <div class="popup-row"><i data-lucide="user" style="width:11px;height:11px;vertical-align:-2px;margin-right:3px;"></i>${booking.clientName || 'N/A'}</div>
         <div class="popup-row">🏠 ${booking.propertyAddress || booking.postcode || 'N/A'}</div>
         <div class="popup-row">🎬 ${booking.service || 'N/A'}</div>
-        <div class="popup-row">📅 ${formatDate(booking.date)}${booking.time ? ' at ' + booking.time : ''}</div>
+        <div class="popup-row"><i data-lucide="calendar" style="width:12px;height:12px;vertical-align:-2px;margin-right:4px;color:#64748b;"></i>${formatDate(booking.date)}${booking.time ? ' at ' + booking.time : ''}</div>
         ${booking.mediaSpecialist ? '<div class="popup-row">📸 ' + booking.mediaSpecialist + '</div>' : ''}
         <div class="popup-footer">
           <span class="badge badge-${(booking.bookingStatus||'').toLowerCase()}">${booking.bookingStatus||'Unknown'}</span>
@@ -1953,7 +1992,7 @@ function showAllBookings() {
   const totalRevenue = filteredBookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice)||0), 0);
   document.getElementById('detailTitle').textContent = 'Bookings (' + total + ')';
   const revenueHtml  = totalRevenue > 0 ? '<div class="revenue-total">Total Revenue: £' + totalRevenue.toFixed(2) + '</div>' : '';
-  const geocodeNote  = '<div style="font-size:11px;color:#475569;margin-bottom:12px;">📍 ' + geocoded + ' of ' + total + ' plotted on map</div>';
+  const geocodeNote  = '<div style="font-size:11px;color:#475569;margin-bottom:12px;"><i data-lucide="map-pin" style="width:11px;height:11px;vertical-align:-2px;margin-right:3px;"></i>' + geocoded + ' of ' + total + ' plotted on map</div>';
   const items = filteredBookingData.slice(0,50);
   document.getElementById('detailContent').innerHTML = revenueHtml + geocodeNote
     + (items.length === 0 ? '<div class="empty-state"><div class="empty-state-text">No bookings found</div></div>' : items.map(b => bookingCard(b)).join(''))
@@ -1983,9 +2022,9 @@ function clientCard(c) {
   const status = c.fields['Account Status'] || 'Unknown';
   return '<div class="card" onclick="flyToRegion(\'' + c.fields['Region'] + '\', event)">'
     + '<div class="card-title">' + (c.fields['Name'] || 'Client') + '</div>'
-    + '<div class="card-info">🏢 ' + (c.fields['Company'] || 'N/A') + '</div>'
-    + '<div class="card-info">📍 ' + (c.fields['Region'] || 'N/A') + '</div>'
-    + '<div class="card-info">📅 ' + formatDate(c.fields['Created Date']) + '</div>'
+    + '<div class="card-info"><i data-lucide="building-2" style="width:11px;height:11px;vertical-align:-2px;margin-right:3px;"></i>' + (c.fields['Company'] || 'N/A') + '</div>'
+    + '<div class="card-info"><i data-lucide="map-pin" style="width:11px;height:11px;vertical-align:-2px;margin-right:3px;"></i>' + (c.fields['Region'] || 'N/A') + '</div>'
+    + '<div class="card-info"><i data-lucide="calendar" style="width:11px;height:11px;vertical-align:-2px;margin-right:3px;"></i>' + formatDate(c.fields['Created Date']) + '</div>'
     + '<span class="badge badge-' + status.toLowerCase() + '">' + status + '</span></div>';
 }
 
@@ -1994,15 +2033,15 @@ function bookingCard(b) {
   const isUpcoming = b.date && new Date(b.date) >= new Date();
   return '<div class="card booking">'
     + '<div class="card-title">' + (b.bookingRef || 'Booking') + '</div>'
-    + '<div class="card-info">👤 ' + (b.clientName || 'N/A') + '</div>'
+    + '<div class="card-info"><i data-lucide="user" style="width:11px;height:11px;vertical-align:-2px;margin-right:3px;"></i>' + (b.clientName || 'N/A') + '</div>'
     + '<div class="card-info">🏠 ' + (b.propertyAddress || b.postcode || 'N/A') + '</div>'
     + '<div class="card-info">🎬 ' + (b.service || 'N/A') + '</div>'
-    + '<div class="card-info">📅 ' + formatDate(b.date) + (b.time ? ' at ' + b.time : '') + '</div>'
+    + '<div class="card-info"><i data-lucide="calendar" style="width:11px;height:11px;vertical-align:-2px;margin-right:3px;"></i>' + formatDate(b.date) + (b.time ? ' at ' + b.time : '') + '</div>'
     + (b.mediaSpecialist ? '<div class="card-info">📸 ' + b.mediaSpecialist + '</div>' : '')
     + '<span class="badge badge-' + status.toLowerCase() + '">' + status + '</span>'
     + (isUpcoming ? '<span class="badge" style="background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid #3b82f6;">Upcoming</span>' : '')
     + (b.finalPrice ? '<span class="revenue-tag">£' + parseFloat(b.finalPrice).toFixed(2) + '</span>' : '')
-    + (!b.lat ? '<div style="font-size:10px;color:#475569;margin-top:4px;">⚠️ Postcode not geocoded</div>' : '')
+    + (!b.lat ? '<div style="font-size:10px;color:#f59e0b;margin-top:4px;"><i data-lucide="alert-triangle" style="width:10px;height:10px;vertical-align:-2px;margin-right:3px;"></i>Postcode not geocoded</div>' : '')
     + '</div>';
 }
 
@@ -2139,7 +2178,7 @@ function renderPerformanceSection() {
       key: 'signups',
       label: 'Dashboard Sign-Ups',
       sub: 'All signups in period',
-      icon: '👤',
+      icon: '<i data-lucide="user-round" style="width:14px;height:14px;vertical-align:-3px;"></i>',
       css: 'signups',
       curr: currSignups.length,
       prev: prevSignups.length,
@@ -2150,7 +2189,7 @@ function renderPerformanceSection() {
       key: 'revenue',
       label: 'Revenue',
       sub: 'Excl. cancelled bookings',
-      icon: '💰',
+      icon: '<i data-lucide="pound-sterling" style="width:14px;height:14px;vertical-align:-3px;"></i>',
       css: 'revenue',
       curr: calcRevenue(curr.bookings),
       prev: calcRevenue(prev.bookings),
@@ -2161,7 +2200,7 @@ function renderPerformanceSection() {
       key: 'newBookings',
       label: 'New Client Bookings',
       sub: 'First time booking',
-      icon: '✨',
+      icon: '<i data-lucide="user-plus" style="width:14px;height:14px;vertical-align:-3px;"></i>',
       css: 'new-booking',
       curr: currNewVsEx.newB.filter(b => b.bookingStatus !== 'Cancelled').length,
       prev: prevNewVsEx.newB.filter(b => b.bookingStatus !== 'Cancelled').length,
@@ -2172,7 +2211,7 @@ function renderPerformanceSection() {
       key: 'existBookings',
       label: 'Existing Client Bookings',
       sub: 'Repeat clients',
-      icon: '🔁',
+      icon: '<i data-lucide="repeat" style="width:14px;height:14px;vertical-align:-3px;"></i>',
       css: 'exist-booking',
       curr: currNewVsEx.exB.filter(b => b.bookingStatus !== 'Cancelled').length,
       prev: prevNewVsEx.exB.filter(b => b.bookingStatus !== 'Cancelled').length,
@@ -2183,7 +2222,7 @@ function renderPerformanceSection() {
       key: 'totalBookings',
       label: 'Total Bookings',
       sub: 'Confirmed + Reserved',
-      icon: '📅',
+      icon: '<i data-lucide="calendar-check" style="width:14px;height:14px;vertical-align:-3px;"></i>',
       css: 'total-booking',
       curr: curr.bookings.filter(b => b.bookingStatus !== 'Cancelled').length,
       prev: prev.bookings.filter(b => b.bookingStatus !== 'Cancelled').length,
@@ -2204,42 +2243,30 @@ function renderPerformanceSection() {
     return monthly * 12; // yoy
   }
 
-  // Render KPI cards
+  // Render KPI cards — same stat-card style as clients/bookings
+  const colourMap = { signups:'#3b82f6', revenue:'#10b981', 'new-booking':'#8b5cf6', 'exist-booking':'#f59e0b', 'total-booking':'#06b6d4' };
   const kpiGrid = document.getElementById('kpiGrid');
   kpiGrid.innerHTML = metrics.map(m => {
+    const col = colourMap[m.css] || '#3b82f6';
     const delta = m.prev > 0 ? ((m.curr - m.prev) / m.prev * 100) : (m.curr > 0 ? 100 : 0);
-    const deltaClass = delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
-    const deltaArrow = delta > 0 ? '▲' : delta < 0 ? '▼' : '—';
-    const deltaText  = Math.abs(delta).toFixed(1) + '%';
-
+    const deltaArrow = delta > 0 ? '↑' : delta < 0 ? '↓' : '';
+    const deltaColour = delta > 0 ? '#10b981' : delta < 0 ? '#ef4444' : '#64748b';
     const target  = scaledTarget(m.targetKey);
     const pct     = target > 0 ? Math.min((m.curr / target) * 100, 100) : 0;
-    const trackClass = pct >= 80 ? 'on-track' : pct >= 50 ? 'behind' : 'critical';
-    const trackFill  = pct >= 80 ? 'on-track-fill' : pct >= 50 ? 'behind-fill' : 'critical-fill';
-    const trackLabel = pct >= 80 ? '✅ On Track' : pct >= 50 ? '⚠️ Behind' : '🔴 Critical';
+    const trackColour = pct >= 80 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444';
+    const trackLabel  = pct >= 80 ? 'On Track' : pct >= 50 ? 'Behind' : 'Critical';
 
-    const periodFmt = { mom:'This Month', qoq:'This Quarter', '6m':'Last 6 Months', yoy:'This Year' };
-
-    return `<div class="kpi-card ${m.css}">
-      <div class="kpi-label">${m.icon} ${m.label}</div>
-      <div class="kpi-current">${m.fmt(m.curr)}</div>
-      <div class="kpi-period-label">${periodFmt[currentPeriod]} · ${m.sub}</div>
-      <div class="kpi-compare-row">
-        <div class="kpi-prev">Prev: <strong>${m.fmt(m.prev)}</strong></div>
-        <div class="kpi-delta ${deltaClass}">${deltaArrow} ${deltaText}</div>
+    return `<div class="stat-card" style="border-top:3px solid ${col};text-align:center;">
+      <div class="stat-value" style="color:${col};font-size:36px;">${m.fmt(m.curr)}</div>
+      <div class="stat-label" style="margin-bottom:8px;">${m.label}</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:6px;">vs prev: <strong style="color:${deltaColour};">${deltaArrow} ${Math.abs(delta).toFixed(1)}%</strong> (${m.fmt(m.prev)})</div>
+      <div style="background:#f1f5f9;border-radius:6px;height:5px;overflow:hidden;margin-bottom:4px;">
+        <div style="width:${pct}%;height:100%;background:${trackColour};border-radius:6px;transition:width 0.8s ease;"></div>
       </div>
-      <div class="kpi-target-row">
-        <div class="kpi-target-header">
-          <span>Target: ${m.fmt(target)}</span>
-          <span class="target-pct ${trackClass}">${pct.toFixed(0)}% · ${trackLabel}</span>
-        </div>
-        <div class="target-bar-bg">
-          <div class="target-bar-fill ${trackFill}" style="width:${pct}%"></div>
-        </div>
-        <div class="kpi-target-sub">${m.fmt(m.curr)} of ${m.fmt(target)} target</div>
-      </div>
+      <div style="font-size:10px;color:${trackColour};font-weight:700;">${pct.toFixed(0)}% of target · ${trackLabel}</div>
     </div>`;
   }).join('');
+  lucide.createIcons();
 
   // Render comparison table
   document.getElementById('compTableTitle').textContent = windows.label1 + ' vs ' + windows.label2;
@@ -2249,7 +2276,7 @@ function renderPerformanceSection() {
   const rows = metrics.map(m => {
     const delta = m.prev > 0 ? ((m.curr - m.prev) / m.prev * 100) : (m.curr > 0 ? 100 : 0);
     const dClass = delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
-    const dArr   = delta > 0 ? '▲' : delta < 0 ? '▼' : '—';
+    const dArr   = delta > 0 ? '↑' : delta < 0 ? '↓' : '—';
     const target  = scaledTarget(m.targetKey);
     const vsTarget = target > 0 ? ((m.curr / target) * 100).toFixed(1) + '%' : 'N/A';
     const vtClass  = parseFloat(vsTarget) >= 80 ? 'style="color:#10b981;font-weight:700;"'
@@ -2268,6 +2295,7 @@ function renderPerformanceSection() {
 
   // Render roadmap
   renderRoadmap();
+  lucide.createIcons();
 }
 
 function renderRoadmap() {
@@ -2321,38 +2349,52 @@ function renderRoadmap() {
   const currentClientsBookingPerMonth = bppm > 0 ? Math.round(live.avgMonthlyBookings / bppm) : live.clientsWhoBooked;
 
   // ── Summary cards ──
-  document.getElementById('roadmapTargets').innerHTML = `
-    <div class="roadmap-target">
-      <div class="rt-value" style="color:#06b6d4;">£${Math.round(liveATV).toLocaleString()}</div>
-      <div class="rt-label">Avg Booking Value (ATV)</div>
-      <div class="rt-progress" style="color:#475569;">Live from all paid bookings</div>
-    </div>
-    <div class="roadmap-target">
-      <div class="rt-value" style="color:#10b981;">${Math.round(live.avgMonthlyBookings * 10) / 10}</div>
-      <div class="rt-label">Avg Bookings / Month</div>
-      <div class="rt-progress" style="color:#475569;">${newPct}% new · ${exPct}% repeat (live split)</div>
-    </div>
-    <div class="roadmap-target">
-      <div class="rt-value" style="color:#a78bfa;">${bppmDisplay}</div>
-      <div class="rt-label">Avg Bookings / Client / Month</div>
-      <div class="rt-progress" style="color:#475569;">Among ${live.clientsWhoBooked} clients who have booked · ~${currentClientsBookingPerMonth} clients booking/mo now</div>
-    </div>
-    <div class="roadmap-target">
-      <div class="rt-value" style="color:${bookingRateColor};">${bookingRatePct}%</div>
-      <div class="rt-label">Client Booking Rate / Month</div>
-      <div class="rt-progress" style="color:#475569;">Avg % booking each month · ${(live.lifetimeBookingRate * 100).toFixed(1)}% have ever booked</div>
-    </div>
-    <div class="roadmap-target">
-      <div class="rt-value" style="color:#3b82f6;">${Math.round(live.avgMonthlySignups * 10) / 10}</div>
-      <div class="rt-label">Avg Sign-Ups / Month</div>
-      <div class="rt-progress" style="color:#475569;">Excl. current partial month from avg</div>
-    </div>
-    <div class="roadmap-target">
-      <div class="rt-value" style="color:#f59e0b;">£${Math.round(live.monthlyRevRunRate).toLocaleString()}</div>
-      <div class="rt-label">Monthly Revenue Run Rate</div>
-      <div class="rt-progress" style="color:#475569;">${monthsToMillion === '∞' ? 'No data yet' : monthsToMillion + ' months to £1M at this rate'}</div>
-    </div>
-  `;
+  const summaryCards = [
+    {
+      icon: 'pound-sterling', color: '#06b6d4', bg: '#ecfeff',
+      label: 'Avg Booking Value',
+      value: `£${Math.round(liveATV).toLocaleString()}`,
+      sub: 'Live from all paid bookings'
+    },
+    {
+      icon: 'calendar-check', color: '#10b981', bg: '#f0fdf4',
+      label: 'Avg Bookings / Month',
+      value: `${Math.round(live.avgMonthlyBookings * 10) / 10}`,
+      sub: `${newPct}% new · ${exPct}% repeat`
+    },
+    {
+      icon: 'repeat-2', color: '#a78bfa', bg: '#faf5ff',
+      label: 'Bookings / Client / Month',
+      value: bppmDisplay,
+      sub: `~${currentClientsBookingPerMonth} clients booking each month`
+    },
+    {
+      icon: 'percent', color: bookingRateColor, bg: bookingRateColor === '#10b981' ? '#f0fdf4' : bookingRateColor === '#f59e0b' ? '#fffbeb' : '#fef2f2',
+      label: 'Monthly Booking Rate',
+      value: `${bookingRatePct}%`,
+      sub: `${(live.lifetimeBookingRate * 100).toFixed(1)}% have booked at least once`
+    },
+    {
+      icon: 'user-plus', color: '#3b82f6', bg: '#eff6ff',
+      label: 'Avg Sign-Ups / Month',
+      value: `${Math.round(live.avgMonthlySignups * 10) / 10}`,
+      sub: 'Excl. current partial month'
+    },
+    {
+      icon: 'trending-up', color: '#f59e0b', bg: '#fffbeb',
+      label: 'Monthly Revenue Run Rate',
+      value: `£${Math.round(live.monthlyRevRunRate).toLocaleString()}`,
+      sub: monthsToMillion === '∞' ? 'No data yet' : `${monthsToMillion} months to £1M at this rate`
+    },
+  ];
+
+  document.getElementById('roadmapTargets').innerHTML = summaryCards.map(c => `
+    <div class="stat-card" style="border-top:3px solid ${c.color};">
+      <div class="stat-value" style="color:${c.color};font-size:32px;">${c.value}</div>
+      <div class="stat-label">${c.label}</div>
+      <div style="font-size:11px;color:#94a3b8;margin-top:6px;">${c.sub}</div>
+    </div>`).join('');
+  lucide.createIcons();
 
   // ── Milestone progress bars (2026 + 2027) ──
   const milestones = [
@@ -2496,7 +2538,7 @@ function renderRoadmap() {
 
   const levers = [
     {
-      icon: '👥', label: 'Dashboard Clients', color: '#3b82f6',
+      icon: 'users', label: 'Dashboard Clients', color: '#3b82f6',
       current: `${curClients} clients · ${curBookingRatePctDisplay} booking`,
       needed: neededClients !== null ? `${neededClients.toLocaleString()} clients` : '—',
       change: neededClients !== null
@@ -2506,7 +2548,7 @@ function renderRoadmap() {
       held: `${curBookingRatePctDisplay} booking rate · ${bppmDisplay}×/mo · ${fmtSens(curATV)} ATV — all unchanged`
     },
     {
-      icon: '📈', label: 'Monthly Booking Rate', color: '#10b981',
+      icon: 'trending-up', label: 'Monthly Booking Rate', color: '#10b981',
       current: `${curBookingRatePctDisplay} of clients book per month`,
       needed: neededBookingRate !== null
         ? (neededBookingRate >= 1 ? 'Not achievable alone' : fmtPct(neededBookingRate) + ' of clients')
@@ -2518,7 +2560,7 @@ function renderRoadmap() {
       held: `${curClients} clients · ${bppmDisplay}×/mo freq · ${fmtSens(curATV)} ATV — all unchanged`
     },
     {
-      icon: '💷', label: 'Avg Transaction Value', color: '#f59e0b',
+      icon: 'pound-sterling', label: 'Avg Transaction Value', color: '#f59e0b',
       current: `${fmtSens(curATV)} per booking`,
       needed: neededATV !== null ? `${fmtSens(neededATV)} per booking` : '—',
       change: neededATV !== null ? `+${fmtSens(Math.max(0, neededATV - curATV))} more per job` : '—',
@@ -2526,7 +2568,7 @@ function renderRoadmap() {
       held: `${curClients} clients · ${curBookingRatePctDisplay} booking rate · ${bppmDisplay}×/mo — all unchanged`
     },
     {
-      icon: '🔁', label: 'Booking Frequency', color: '#a78bfa',
+      icon: 'repeat-2', label: 'Booking Frequency', color: '#a78bfa',
       current: `${bppmDisplay} bookings/client/mo`,
       needed: neededBppm !== null ? `${neededBppm.toFixed(2)}× per client/mo` : '—',
       change: neededBppm !== null
@@ -2542,7 +2584,7 @@ function renderRoadmap() {
       
       <!-- Coloured header band -->
       <div style="background:linear-gradient(135deg,${l.color},${l.color}cc);padding:16px 18px 14px;">
-        <div style="font-size:22px;margin-bottom:4px;">${l.icon}</div>
+        <div style="margin-bottom:8px;"><i data-lucide="${l.icon}" style="width:24px;height:24px;color:#fff;opacity:0.9;"></i></div>
         <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:0.3px;">${l.label}</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px;">Keep everything else the same</div>
       </div>
@@ -2609,7 +2651,7 @@ function renderIntelligence() {
   const atv = ncb > 0 ? (totalLTV/ncb).toFixed(2) : 0;
 
   const topClients = allClients.filter(c => c.bookingCount > 0).sort((a,b) => b.ltv-a.ltv).slice(0,10);
-  const rankEmoji = ['🥇','🥈','🥉'];
+  const rankEmoji = ['1','2','3'];
   const rankClass = ['rank-1','rank-2','rank-3'];
 
   document.getElementById('intelBookingRate').textContent = rate + '%';
@@ -2639,8 +2681,8 @@ function renderIntelligence() {
           <div class="rank-badge">${rank}</div>
           <div class="leaderboard-info">
             <div class="leaderboard-name">${c.name}</div>
-            ${c.company ? '<div class="leaderboard-email">🏢 ' + c.company + '</div>' : ''}
-            <div class="leaderboard-sub" style="margin-top:4px;">📅 Last: ${formatDate(c.lastBooking)}</div>
+            ${c.company ? '<div class="leaderboard-email"><i data-lucide="building-2" style="width:11px;height:11px;vertical-align:-2px;margin-right:3px;"></i>' + c.company + '</div>' : ''}
+            <div class="leaderboard-sub" style="margin-top:4px;"><i data-lucide="calendar" style="width:11px;height:11px;vertical-align:-2px;margin-right:3px;"></i>Last: ${formatDate(c.lastBooking)}</div>
             <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
               ${cf > 0 ? '<span style="font-size:10px;background:rgba(16,185,129,0.15);color:#10b981;border:1px solid #10b981;padding:1px 6px;border-radius:4px;">' + cf + ' confirmed</span>' : ''}
               ${rv > 0 ? '<span style="font-size:10px;background:rgba(251,146,60,0.15);color:#fb923c;border:1px solid #fb923c;padding:1px 6px;border-radius:4px;">' + rv + ' reserved</span>' : ''}
@@ -2687,8 +2729,8 @@ function renderIntelligence() {
               + '<div class="rank-badge">' + rank + '</div>'
               + '<div class="leaderboard-info">'
               + '<div class="leaderboard-name">' + c.name + '</div>'
-              + (c.company ? '<div class="leaderboard-email">🏢 ' + c.company + '</div>' : '')
-              + '<div class="leaderboard-sub">📅 ' + formatDate(c.lastBooking) + (cc > 0 ? ' · ' + cc + ' cancelled' : '') + '</div>'
+              + (c.company ? '<div class="leaderboard-email"><i data-lucide="building-2" style="width:11px;height:11px;vertical-align:-2px;margin-right:3px;"></i>' + c.company + '</div>' : '')
+              + '<div class="leaderboard-sub"><i data-lucide="calendar" style="width:11px;height:11px;vertical-align:-2px;margin-right:3px;"></i>' + formatDate(c.lastBooking) + (cc > 0 ? ' · ' + cc + ' cancelled' : '') + '</div>'
               + '</div>'
               + '<div class="leaderboard-right">'
               + '<div class="ltv-value">£' + c.ltv.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0}) + '</div>'
