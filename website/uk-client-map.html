@@ -1458,7 +1458,7 @@ function calcLiveMonthlyAverages() {
   const bMonths = {};
   bookingData.forEach(b => {
     if (!b.date || b.bookingStatus === 'Cancelled') return;
-    const key = b.date.slice(0, 7); // 2026-03
+    const key = b.date.slice(0, 7);
     bMonths[key] = (bMonths[key] || 0) + 1;
   });
   const bValues = Object.values(bMonths);
@@ -1466,7 +1466,7 @@ function calcLiveMonthlyAverages() {
     ? bValues.reduce((s, v) => s + v, 0) / bValues.length
     : 0;
 
-  // Sign-ups: group by YYYY-MM using Created Date
+  // Sign-ups: group by YYYY-MM, exclude current partial month
   const sMonths = {};
   clientData.forEach(u => {
     const d = u.fields['Created Date'];
@@ -1474,7 +1474,6 @@ function calcLiveMonthlyAverages() {
     const key = d.slice(0, 7);
     sMonths[key] = (sMonths[key] || 0) + 1;
   });
-  // Exclude the current partial month and the last 3 days window
   const currentMonth = now.toISOString().slice(0, 7);
   const sValues = Object.entries(sMonths)
     .filter(([k]) => k < currentMonth)
@@ -1483,10 +1482,9 @@ function calcLiveMonthlyAverages() {
     ? sValues.reduce((s, v) => s + v, 0) / sValues.length
     : 0;
 
-  // New vs existing split from actual booking history
+  // New vs existing split from actual booking history (chronological order)
   const priorEmails = new Set();
   let newCount = 0, existCount = 0;
-  // Sort bookings chronologically to determine first-ever booking per client
   const sorted = [...bookingData]
     .filter(b => b.date && b.bookingStatus !== 'Cancelled' && b.clientEmail)
     .sort((a, b) => a.date.localeCompare(b.date));
@@ -1496,9 +1494,9 @@ function calcLiveMonthlyAverages() {
     if (priorEmails.has(email)) existCount++;
     else { newCount++; priorEmails.add(email); }
   });
-  const total = newCount + existCount;
-  const liveNewSplit  = total > 0 ? newCount  / total : 0.30;
-  const liveExSplit   = total > 0 ? existCount / total : 0.70;
+  const totalBookings = newCount + existCount;
+  const liveNewSplit = totalBookings > 0 ? newCount  / totalBookings : 0.30;
+  const liveExSplit  = totalBookings > 0 ? existCount / totalBookings : 0.70;
 
   // Monthly revenue run rate (all time)
   const allDates = bookingData.filter(b => b.date).map(b => new Date(b.date));
@@ -1509,7 +1507,28 @@ function calcLiveMonthlyAverages() {
     .reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
   const monthlyRevRunRate = totalRev / monthsActive;
 
-  return { avgMonthlyBookings, avgMonthlySignups, liveNewSplit, liveExSplit, monthlyRevRunRate, monthsActive };
+  // ── Client booking rate: % of dashboard clients who have ever booked ──
+  const clientEmails = new Set(clientData.map(u => (u.fields['Email'] || '').toLowerCase()).filter(Boolean));
+  const bookedEmails = new Set(
+    bookingData
+      .filter(b => b.bookingStatus !== 'Cancelled' && b.clientEmail)
+      .map(b => (b.clientEmail || '').toLowerCase())
+  );
+  const clientsWhoBooked = [...bookedEmails].filter(e => clientEmails.has(e)).length;
+  const clientBookingRate = clientEmails.size > 0 ? clientsWhoBooked / clientEmails.size : 0;
+
+  // ── Bookings per active client per month (intensity metric) ──
+  // How many bookings does each booked client place per month on average
+  const bookingsPerBookedClient = clientsWhoBooked > 0 ? avgMonthlyBookings / clientsWhoBooked : 0;
+
+  return {
+    avgMonthlyBookings, avgMonthlySignups,
+    liveNewSplit, liveExSplit,
+    monthlyRevRunRate, monthsActive,
+    clientBookingRate, clientsWhoBooked,
+    totalDashboardClients: clientEmails.size,
+    bookingsPerBookedClient
+  };
 }
 
 // ── Build all targets from live data ──
@@ -2080,9 +2099,7 @@ function renderPerformanceSection() {
   // Sign-ups: exclude anyone who signed up within the last 3 days of each window end
   // Avoids counting people who just signed up and haven't engaged yet
   const signupsInWindow = (clients, windowEnd) => {
-    const cutoff = new Date(windowEnd);
-    cutoff.setDate(cutoff.getDate() - 3);
-    return clients.filter(u => new Date(u.fields['Created Date']) <= cutoff);
+    return clients.filter(u => new Date(u.fields['Created Date']) <= windowEnd);
   };
   const currSignups = signupsInWindow(curr.clients, windows.current[1]);
   const prevSignups = signupsInWindow(prev.clients, windows.previous[1]);
@@ -2091,7 +2108,7 @@ function renderPerformanceSection() {
     {
       key: 'signups',
       label: 'Dashboard Sign-Ups',
-      sub: 'Excl. last 3 days',
+      sub: 'All signups in period',
       icon: '👤',
       css: 'signups',
       curr: currSignups.length,
@@ -2257,6 +2274,9 @@ function renderRoadmap() {
   const newPct = Math.round(live.liveNewSplit * 100);
   const exPct  = 100 - newPct;
 
+  const bookingRatePct   = (live.clientBookingRate * 100).toFixed(1);
+  const bookingRateColor = live.clientBookingRate >= 0.6 ? '#10b981' : live.clientBookingRate >= 0.35 ? '#f59e0b' : '#ef4444';
+
   // ── Summary cards ──
   document.getElementById('roadmapTargets').innerHTML = `
     <div class="roadmap-target">
@@ -2270,9 +2290,14 @@ function renderRoadmap() {
       <div class="rt-progress" style="color:#64748b;">${newPct}% new · ${exPct}% repeat (live split)</div>
     </div>
     <div class="roadmap-target">
+      <div class="rt-value" style="color:${bookingRateColor};">${bookingRatePct}%</div>
+      <div class="rt-label">Client Booking Rate</div>
+      <div class="rt-progress" style="color:#64748b;">${live.clientsWhoBooked} of ${live.totalDashboardClients} dashboard clients have booked</div>
+    </div>
+    <div class="roadmap-target">
       <div class="rt-value" style="color:#3b82f6;">${Math.round(live.avgMonthlySignups * 10) / 10}</div>
       <div class="rt-label">Avg Sign-Ups / Month</div>
-      <div class="rt-progress" style="color:#64748b;">Excl. current partial month</div>
+      <div class="rt-progress" style="color:#64748b;">Excl. current partial month from avg</div>
     </div>
     <div class="roadmap-target">
       <div class="rt-value" style="color:#f59e0b;">£${Math.round(live.monthlyRevRunRate).toLocaleString()}</div>
@@ -2283,11 +2308,6 @@ function renderRoadmap() {
       <div class="rt-value" style="color:#8b5cf6;">£${Math.round(totalRevenue).toLocaleString()}</div>
       <div class="rt-label">Total Revenue to Date</div>
       <div class="rt-progress" style="color:#64748b;">${((totalRevenue/1000000)*100).toFixed(2)}% of £1M goal</div>
-    </div>
-    <div class="roadmap-target">
-      <div class="rt-value" style="color:#e2e8f0;">${totalClients}</div>
-      <div class="rt-label">Clients on Dashboard</div>
-      <div class="rt-progress" style="color:#64748b;">${clientsTarget - totalClients > 0 ? (clientsTarget - totalClients) + ' still needed for 400 target' : '✅ Target reached!'}</div>
     </div>
   `;
 
@@ -2342,17 +2362,25 @@ function renderRoadmap() {
   ];
 
   document.getElementById('monthlyTargetsGrid').innerHTML = years.map(y => {
-    const revenueMultiple = live.monthlyRevRunRate > 0
-      ? ((REVENUE_TARGETS[y.key] / 12) / live.monthlyRevRunRate).toFixed(1) + '×'
+    const targetMonthlyRev  = REVENUE_TARGETS[y.key] / 12;
+    const growthMultiple    = live.monthlyRevRunRate > 0 ? targetMonthlyRev / live.monthlyRevRunRate : 0;
+    const extraBookingsNeed = Math.max(0, Math.ceil(targetMonthlyRev / liveATV) - Math.round(live.avgMonthlyBookings));
+    const bookingRateNeeded = live.totalDashboardClients > 0
+      ? ((Math.ceil(targetMonthlyRev / liveATV) / live.totalDashboardClients) * 100).toFixed(1) + '%'
       : 'N/A';
+    const growthLabel = growthMultiple > 0
+      ? `${growthMultiple.toFixed(1)}× — need £${Math.round(targetMonthlyRev).toLocaleString()}/mo vs current £${Math.round(live.monthlyRevRunRate).toLocaleString()}/mo`
+      : 'No run rate data yet';
     const rows = [
-      { name: 'Monthly Revenue Target',  val: fmtMoney(T.monthly.revenue[y.key]) + ' / mo' },
-      { name: 'Total Bookings Needed',   val: fmtBk(T.monthly.totalBookings[y.key]) },
-      { name: 'New Client Bookings',     val: fmtBk(T.monthly.newBookings[y.key]) },
-      { name: 'Repeat Bookings',         val: fmtBk(T.monthly.existBookings[y.key]) },
-      { name: 'Sign-Ups Needed',         val: fmtBk(T.monthly.signups[y.key]) },
-      { name: 'Growth vs Current Rate',  val: revenueMultiple },
-      { name: 'Annual Revenue Goal',     val: fmtMoney(y.annualRev) },
+      { name: 'Monthly Revenue Target',      val: fmtMoney(T.monthly.revenue[y.key]) + ' / mo' },
+      { name: 'Total Bookings Needed',        val: fmtBk(T.monthly.totalBookings[y.key]) },
+      { name: 'Extra Bookings vs Now',        val: '+' + extraBookingsNeed + ' / mo vs current avg' },
+      { name: 'Booking Rate Needed',          val: bookingRateNeeded + ' of dashboard clients/mo' },
+      { name: 'New Client Bookings',          val: fmtBk(T.monthly.newBookings[y.key]) },
+      { name: 'Repeat Bookings',              val: fmtBk(T.monthly.existBookings[y.key]) },
+      { name: 'Sign-Ups Needed',              val: fmtBk(T.monthly.signups[y.key]) },
+      { name: 'Growth Required',              val: growthLabel },
+      { name: 'Annual Revenue Goal',          val: fmtMoney(y.annualRev) },
     ];
     if (y.isCurrent) {
       rows.push({ name: '⚡ Bookings/mo still needed', val: fmtBk(bookingsNeededNow),      highlight: true });
@@ -2365,7 +2393,7 @@ function renderRoadmap() {
         ${y.isCurrent ? '<span style="font-size:10px;font-weight:700;background:' + y.col + '33;color:' + y.col + ';padding:2px 8px;border-radius:6px;">▶ Now</span>' : ''}
       </div>
       <div style="font-size:10px;color:#475569;margin-bottom:10px;font-style:italic;">
-        ATV £${Math.round(liveATV).toLocaleString()} · ${newPct}% new / ${exPct}% repeat split · sign-ups scaled ${revenueMultiple} from current avg
+        ATV £${Math.round(liveATV).toLocaleString()} · ${newPct}% new / ${exPct}% repeat · current booking rate ${bookingRatePct}% of clients
       </div>
       ${rows.map(d => `
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;font-size:12px;${d.highlight ? 'background:rgba(245,158,11,0.08);padding:4px 8px;border-radius:6px;margin-left:-8px;margin-right:-8px;' : ''}">
