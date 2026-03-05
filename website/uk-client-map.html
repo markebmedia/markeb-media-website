@@ -1072,6 +1072,8 @@
       .ret-snapshot > div { min-width: 80px; }
       /* Traj row numbers slightly smaller */
       .traj-number { font-size: 18px !important; }
+      /* Sensitivity grid — single column, no overflow */
+      #sensitivityGrid { grid-template-columns: 1fr !important; }
     }
 
         @media (max-width: 420px) {
@@ -2869,29 +2871,31 @@ function renderRoadmap() {
 
   const targetMonthlyRevY1  = REVENUE_TARGETS.y1 / 12;
   const curClients          = live.totalDashboardClients;
-  const sensCurBookingRate  = live.clientBookingRate;   // raw decimal — used in sensitivity maths
+  // Blended rate — sensitivity is a whole-business lever covering both new and existing clients
+  // Formula is monthly: clients × bookingRate/mo × bookings/client/mo × ATV = monthly revenue
+  const sensCurBookingRate  = live.clientBookingRate;
   const curBppm             = bppm;
   const curATV              = liveATV;
 
-  // Lever 1: Dashboard Clients — fix bookingRate + bppm + ATV
+  // Lever 1: Dashboard Clients — fix bookingRate/mo + bppm + ATV
   const neededClients = (sensCurBookingRate > 0 && curBppm > 0 && curATV > 0)
     ? Math.ceil(targetMonthlyRevY1 / (sensCurBookingRate * curBppm * curATV)) : null;
 
-  // Lever 2: Client Booking Rate — fix clients + bppm + ATV
+  // Lever 2: Monthly Booking Rate — fix clients + bppm + ATV
   const neededBookingRate = (curClients > 0 && curBppm > 0 && curATV > 0)
     ? Math.min(1, targetMonthlyRevY1 / (curClients * curBppm * curATV)) : null;
 
-  // Lever 3: ATV — fix clients + bookingRate + bppm
+  // Lever 3: ATV — fix clients + bookingRate/mo + bppm
   const neededATV = (curClients > 0 && sensCurBookingRate > 0 && curBppm > 0)
     ? Math.ceil(targetMonthlyRevY1 / (curClients * sensCurBookingRate * curBppm)) : null;
 
-  // Lever 4: Booking Frequency — fix clients + bookingRate + ATV
+  // Lever 4: Booking Frequency — fix clients + bookingRate/mo + ATV
   const neededBppm = (curClients > 0 && sensCurBookingRate > 0 && curATV > 0)
     ? targetMonthlyRevY1 / (curClients * sensCurBookingRate * curATV) : null;
 
   const fmtSens = v => '£' + Math.round(v).toLocaleString();
   const fmtPct  = v => (v * 100).toFixed(1) + '%';
-  const curBookingRatePctDisplay = fmtPct(sensCurBookingRate);
+  const curBookingRatePctDisplay = fmtPct(sensCurBookingRate) + '/mo';
 
   const levers = [
     {
@@ -2899,22 +2903,22 @@ function renderRoadmap() {
       current: `${curClients} clients · ${curBookingRatePctDisplay} booking`,
       needed: neededClients !== null ? `${neededClients.toLocaleString()} clients` : '—',
       change: neededClients !== null
-        ? `+${Math.max(0, neededClients - curClients).toLocaleString()} more — ${curBookingRatePctDisplay} of them will book`
+        ? `+${Math.max(0, neededClients - curClients).toLocaleString()} more clients needed`
         : '—',
       feasible: neededClients !== null,
-      held: `${curBookingRatePctDisplay} booking rate · ${bppmDisplay}×/mo · ${fmtSens(curATV)} ATV — all unchanged`
+      held: `${curBookingRatePctDisplay} booking rate · ${bppmDisplay} bookings/client/mo · ${fmtSens(curATV)} ATV`
     },
     {
       icon: 'trending-up', label: 'Monthly Booking Rate', color: '#10b981',
-      current: `${curBookingRatePctDisplay} of clients book per month`,
+      current: `${curBookingRatePctDisplay} book each month`,
       needed: neededBookingRate !== null
-        ? (neededBookingRate >= 1 ? 'Not achievable alone' : fmtPct(neededBookingRate) + ' of clients')
+        ? (neededBookingRate >= 1 ? 'Not achievable alone' : fmtPct(neededBookingRate) + '/mo')
         : '—',
       change: neededBookingRate !== null && neededBookingRate < 1
         ? `${Math.ceil(neededBookingRate * curClients)} clients booking/mo — up from ${Math.round(sensCurBookingRate * curClients)} now`
-        : 'Rate would exceed 100% — use another lever too',
+        : 'Rate would exceed 100% — combine with another lever',
       feasible: neededBookingRate !== null && neededBookingRate < 1,
-      held: `${curClients} clients · ${bppmDisplay}×/mo freq · ${fmtSens(curATV)} ATV — all unchanged`
+      held: `${curClients} clients · ${bppmDisplay} bookings/client/mo · ${fmtSens(curATV)} ATV`
     },
     {
       icon: 'pound-sterling', label: 'Avg Transaction Value', color: '#f59e0b',
@@ -2922,53 +2926,53 @@ function renderRoadmap() {
       needed: neededATV !== null ? `${fmtSens(neededATV)} per booking` : '—',
       change: neededATV !== null ? `+${fmtSens(Math.max(0, neededATV - curATV))} more per job` : '—',
       feasible: neededATV !== null,
-      held: `${curClients} clients · ${curBookingRatePctDisplay} booking rate · ${bppmDisplay}×/mo — all unchanged`
+      held: `${curClients} clients · ${curBookingRatePctDisplay} booking rate · ${bppmDisplay} bookings/client/mo`
     },
     {
       icon: 'repeat-2', label: 'Booking Frequency', color: '#a78bfa',
       current: `${bppmDisplay} bookings/client/mo`,
-      needed: neededBppm !== null ? `${neededBppm.toFixed(2)}× per client/mo` : '—',
+      needed: neededBppm !== null ? `${neededBppm.toFixed(2)} bookings/client/mo` : '—',
       change: neededBppm !== null
-        ? `Once every ${Math.round(1 / neededBppm)} months per client · ${Math.ceil(neededBppm * curClients * sensCurBookingRate)} bookings/mo total`
+        ? `Once every ${Math.round(1 / neededBppm)} months per client · ${Math.ceil(neededBppm * curClients * sensCurBookingRate)} total/mo`
         : '—',
       feasible: neededBppm !== null,
-      held: `${curClients} clients · ${curBookingRatePctDisplay} booking rate · ${fmtSens(curATV)} ATV — all unchanged`
+      held: `${curClients} clients · ${curBookingRatePctDisplay} booking rate · ${fmtSens(curATV)} ATV`
     }
   ];
 
   document.getElementById('sensitivityGrid').innerHTML = levers.map(l => `
-    <div style="background:#fff;border:1px solid ${l.color}33;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-      
+    <div style="background:#fff;border:1px solid ${l.color}33;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);min-width:0;word-break:break-word;overflow-wrap:anywhere;">
+
       <!-- Coloured header band -->
-      <div style="background:linear-gradient(135deg,${l.color},${l.color}cc);padding:16px 18px 14px;">
-        <div style="margin-bottom:8px;"><i data-lucide="${l.icon}" style="width:24px;height:24px;color:#fff;opacity:0.9;"></i></div>
-        <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:0.3px;">${l.label}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px;">Keep everything else the same</div>
+      <div style="background:linear-gradient(135deg,${l.color},${l.color}cc);padding:14px 16px 12px;">
+        <div style="margin-bottom:6px;"><i data-lucide="${l.icon}" style="width:20px;height:20px;color:#fff;opacity:0.9;"></i></div>
+        <div style="font-size:12px;font-weight:700;color:#fff;letter-spacing:0.3px;">${l.label}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.75);margin-top:2px;">Keep everything else the same</div>
       </div>
 
       <!-- Body -->
-      <div style="padding:16px 18px;">
+      <div style="padding:14px 16px;">
 
-        <!-- Current vs Target -->
-        <div style="display:flex;gap:10px;margin-bottom:14px;">
-          <div style="flex:1;background:#f8fafc;border-radius:8px;padding:10px 12px;">
-            <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Now</div>
-            <div style="font-size:14px;font-weight:700;color:#475569;">${l.current}</div>
+        <!-- Current vs Target — stacked on small screens via flex-wrap -->
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+          <div style="flex:1;min-width:80px;background:#f8fafc;border-radius:8px;padding:9px 11px;">
+            <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Now</div>
+            <div style="font-size:12px;font-weight:700;color:#475569;line-height:1.3;word-break:break-word;">${l.current}</div>
           </div>
-          <div style="display:flex;align-items:center;color:#94a3b8;font-size:16px;">→</div>
-          <div style="flex:1;background:${l.color}12;border:1.5px solid ${l.color}44;border-radius:8px;padding:10px 12px;">
-            <div style="font-size:10px;font-weight:700;color:${l.color};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Target</div>
-            <div style="font-size:16px;font-weight:800;color:${l.feasible ? l.color : '#ef4444'};">${l.needed}</div>
+          <div style="display:flex;align-items:center;color:#94a3b8;font-size:14px;flex-shrink:0;">→</div>
+          <div style="flex:1;min-width:80px;background:${l.color}12;border:1.5px solid ${l.color}44;border-radius:8px;padding:9px 11px;">
+            <div style="font-size:9px;font-weight:700;color:${l.color};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Target</div>
+            <div style="font-size:13px;font-weight:800;color:${l.feasible ? l.color : '#ef4444'};line-height:1.3;word-break:break-word;">${l.needed}</div>
           </div>
         </div>
 
         <!-- Gap callout -->
-        <div style="background:${l.feasible ? l.color + '10' : 'rgba(239,68,68,0.08)'};border-left:3px solid ${l.feasible ? l.color : '#ef4444'};border-radius:0 6px 6px 0;padding:8px 12px;margin-bottom:12px;">
-          <div style="font-size:12px;font-weight:700;color:${l.feasible ? l.color : '#ef4444'};">${l.change}</div>
+        <div style="background:${l.feasible ? l.color + '10' : 'rgba(239,68,68,0.08)'};border-left:3px solid ${l.feasible ? l.color : '#ef4444'};border-radius:0 6px 6px 0;padding:7px 10px;margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:700;color:${l.feasible ? l.color : '#ef4444'};line-height:1.4;word-break:break-word;">${l.change}</div>
         </div>
 
         <!-- What's held constant -->
-        <div style="font-size:10px;color:#94a3b8;line-height:1.5;">${l.held}</div>
+        <div style="font-size:10px;color:#94a3b8;line-height:1.5;word-break:break-word;">${l.held}</div>
       </div>
     </div>`).join('');
 }
