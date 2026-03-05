@@ -1719,9 +1719,9 @@ function buildTargets() {
     const exMonthly       = totalMonthly - newMonthly;
     // Sign-up target: new bookings needed ÷ cohort conversion rate
     // avgCohortConversionRate = % of a sign-up cohort who eventually book (after lag has elapsed)
-    const conversionRate  = live.avgCohortConversionRate > 0
-      ? live.avgCohortConversionRate
-      : (live.lifetimeBookingRate > 0 ? live.lifetimeBookingRate : 0.5);
+    const conversionRate  = live.lifetimeBookingRate > 0
+      ? live.lifetimeBookingRate
+      : 0.5;
     const signupTarget    = Math.ceil(newMonthly / conversionRate);
     return { revenue: Math.round(monthlyRev), totalBookings: totalMonthly, newBookings: newMonthly, existBookings: exMonthly, signups: signupTarget };
   };
@@ -2579,7 +2579,7 @@ function renderRoadmap() {
   const lagStr = live.lagSampleSize > 0
     ? `${Math.round(live.avgLagDays)}d avg · ${Math.round(live.medianLagDays)}d median · ${live.lagSampleSize} clients measured`
     : 'Not enough data yet';
-  const cohortConvPct = (live.avgCohortConversionRate * 100).toFixed(0);
+  const cohortConvPct = (live.lifetimeBookingRate * 100).toFixed(0);
 
   document.getElementById('monthlyTargetsGrid').innerHTML = years.map(y => {
     const targetMonthlyRev  = REVENUE_TARGETS[y.key] / 12;
@@ -2677,7 +2677,7 @@ function renderRoadmap() {
       ${trajRow('user-plus',      'Dashboard Sign-Ups / Month',
           curSignupsAvg, tgtSignups,
           curSignupsAvg, tgtSignups,
-          `${cohortConvPct}% of sign-up cohorts convert to a booking · sign-up target = new bookings needed ÷ conversion rate`, '#0369a1'
+          `${cohortConvPct} in every 100 sign-ups go on to make a booking · so to get ${tgtNewBk} new client bookings/mo, you need ${tgtSignups} sign-ups`, '#0369a1'
         )}
       ${trajRow('user-round',     'New Client Bookings / Month',
           curNewBkAvg, tgtNewBk,
