@@ -1355,6 +1355,15 @@
           <!-- Populated by JS -->
         </div>
       </div>
+
+      <!-- Sensitivity analysis -->
+      <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:20px;border:1px solid rgba(99,102,241,0.2);margin-top:16px;">
+        <div style="font-size:13px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;">🔬 Single Lever Analysis — 2026 Target</div>
+        <div style="font-size:12px;color:#475569;margin-bottom:16px;">If everything else stays the same and you only improve <em>one</em> metric, what does it need to be?</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;" id="sensitivityGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
     </div>
 
   </div><!-- end #performanceSection -->
@@ -2427,6 +2436,95 @@ function renderRoadmap() {
         </div>`).join('')}
     </div>`;
   }).join('');
+
+  // ── Single Lever Sensitivity Analysis — 2026 target ──
+  // Formula: Monthly Revenue = Clients × bppm × ATV
+  // Each lever solves for one unknown while the other two stay at live values
+
+  const targetMonthlyRevY1 = REVENUE_TARGETS.y1 / 12;
+  const curClients = live.totalDashboardClients;
+  const curBppm    = bppm;
+  const curATV     = liveATV;
+
+  // Lever 1: Clients — fix bppm + ATV
+  const neededClients = (curBppm > 0 && curATV > 0)
+    ? Math.ceil(targetMonthlyRevY1 / (curBppm * curATV)) : null;
+
+  // Lever 2: ATV — fix clients + bppm
+  const neededATV = (curClients > 0 && curBppm > 0)
+    ? Math.ceil(targetMonthlyRevY1 / (curClients * curBppm)) : null;
+
+  // Lever 3: Booking frequency (bppm) — fix clients + ATV
+  const neededBppm = (curClients > 0 && curATV > 0)
+    ? targetMonthlyRevY1 / (curClients * curATV) : null;
+
+  // Lever 4: Balanced growth — grow clients AND bppm equally (same multiplier on both)
+  // target = (clients × m) × (bppm × m) × ATV  →  m² = target ÷ (clients × bppm × ATV)
+  // So m = √(target ÷ (clients × bppm × ATV))
+  const currentMonthlyRev = curClients * curBppm * curATV;
+  const balancedMultiplier = currentMonthlyRev > 0
+    ? Math.sqrt(targetMonthlyRevY1 / currentMonthlyRev) : null;
+  const neededClientsBalanced = balancedMultiplier !== null ? Math.ceil(curClients * balancedMultiplier) : null;
+  const neededBppmBalanced    = balancedMultiplier !== null ? curBppm * balancedMultiplier : null;
+
+  const fmtSens = v => '£' + Math.round(v).toLocaleString();
+
+  const levers = [
+    {
+      icon: '👥', label: 'Dashboard Clients', color: '#3b82f6',
+      current: `${curClients} clients`,
+      needed: neededClients !== null ? `${neededClients.toLocaleString()} clients` : '—',
+      change: neededClients !== null ? `+${Math.max(0, neededClients - curClients).toLocaleString()} more needed` : '—',
+      feasible: neededClients !== null,
+      held: `bppm ${bppmDisplay}/mo · ATV ${fmtSens(curATV)} — unchanged`
+    },
+    {
+      icon: '💷', label: 'Avg Transaction Value', color: '#f59e0b',
+      current: `${fmtSens(curATV)} per booking`,
+      needed: neededATV !== null ? `${fmtSens(neededATV)} per booking` : '—',
+      change: neededATV !== null ? `+${fmtSens(Math.max(0, neededATV - curATV))} per job` : '—',
+      feasible: neededATV !== null,
+      held: `${curClients} clients · bppm ${bppmDisplay}/mo — unchanged`
+    },
+    {
+      icon: '🔁', label: 'Booking Frequency', color: '#a78bfa',
+      current: `${bppmDisplay} bookings/client/mo`,
+      needed: neededBppm !== null ? `${neededBppm.toFixed(2)} bookings/client/mo` : '—',
+      change: neededBppm !== null
+        ? `Once every ${Math.round(1 / neededBppm)} months per client · ${Math.ceil(neededBppm * curClients)} bookings/mo total`
+        : '—',
+      feasible: neededBppm !== null,
+      held: `${curClients} clients · ATV ${fmtSens(curATV)} — unchanged`
+    },
+    {
+      icon: '⚖️', label: 'Balanced Growth', color: '#10b981',
+      current: `${curClients} clients · ${bppmDisplay}/mo`,
+      needed: neededClientsBalanced !== null && neededBppmBalanced !== null
+        ? `${neededClientsBalanced} clients · ${neededBppmBalanced.toFixed(2)}/mo`
+        : '—',
+      change: balancedMultiplier !== null
+        ? `${balancedMultiplier.toFixed(2)}× growth on both — +${Math.max(0, neededClientsBalanced - curClients)} clients, frequency ×${balancedMultiplier.toFixed(2)}`
+        : '—',
+      feasible: balancedMultiplier !== null,
+      held: `ATV ${fmtSens(curATV)} — unchanged · clients & frequency grow equally`
+    }
+  ];
+
+  document.getElementById('sensitivityGrid').innerHTML = levers.map(l => `
+    <div style="background:rgba(255,255,255,0.03);border:1px solid ${l.feasible ? l.color + '44' : 'rgba(239,68,68,0.25)'};border-radius:10px;padding:16px;border-top:3px solid ${l.color};">
+      <div style="font-size:18px;margin-bottom:6px;">${l.icon}</div>
+      <div style="font-size:12px;font-weight:700;color:${l.color};margin-bottom:10px;text-transform:uppercase;letter-spacing:0.4px;">${l.label}</div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:10px;color:#475569;margin-bottom:2px;">Currently</div>
+        <div style="font-size:13px;font-weight:600;color:#64748b;">${l.current}</div>
+      </div>
+      <div style="margin-bottom:8px;">
+        <div style="font-size:10px;color:#475569;margin-bottom:3px;">Needs to be</div>
+        <div style="font-size:18px;font-weight:700;color:${l.feasible ? '#e2e8f0' : '#ef4444'};">${l.needed}</div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:${l.feasible ? l.color : '#ef4444'};margin-bottom:10px;">${l.change}</div>
+      <div style="font-size:10px;color:#334155;font-style:italic;border-top:1px solid rgba(255,255,255,0.06);padding-top:8px;">${l.held}</div>
+    </div>`).join('');
 }
 
 // ── Client Intelligence ──
