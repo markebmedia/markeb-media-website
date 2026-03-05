@@ -1546,14 +1546,25 @@ function calcLiveMonthlyAverages() {
   const liveNewSplit = totalBookings > 0 ? newCount  / totalBookings : 0.30;
   const liveExSplit  = totalBookings > 0 ? existCount / totalBookings : 0.70;
 
-  // Monthly revenue run rate (all time)
+  // Monthly revenue run rate — use last 3 complete months for a current picture
   const allDates = bookingData.filter(b => b.date).map(b => new Date(b.date));
   const earliest = allDates.length ? new Date(Math.min(...allDates)) : now;
   const monthsActive = Math.max(1, (now - earliest) / (1000 * 60 * 60 * 24 * 30));
   const totalRev = bookingData
     .filter(b => b.bookingStatus !== 'Cancelled')
     .reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
-  const monthlyRevRunRate = totalRev / monthsActive;
+  // Last 3 complete months run rate (more representative of current trajectory)
+  const currentMonthKey = now.toISOString().slice(0, 7);
+  const revByMonth = {};
+  bookingData.filter(b => b.date && b.bookingStatus !== 'Cancelled').forEach(b => {
+    const k = b.date.slice(0, 7);
+    if (k < currentMonthKey) revByMonth[k] = (revByMonth[k] || 0) + (parseFloat(b.finalPrice) || 0);
+  });
+  const sortedRevMonths = Object.keys(revByMonth).sort().reverse();
+  const last3Months = sortedRevMonths.slice(0, 3);
+  const last3Rev = last3Months.reduce((s, k) => s + revByMonth[k], 0);
+  const monthlyRevRunRate = last3Months.length > 0 ? last3Rev / last3Months.length : totalRev / monthsActive;
+  const monthlyRevRunRateAllTime = totalRev / monthsActive; // keep for context
 
   // ── Monthly client booking rate: avg % of dashboard clients who book in any given month ──
   // Method: for each calendar month, count unique clients who placed a booking,
@@ -1590,13 +1601,108 @@ function calcLiveMonthlyAverages() {
     ? totalNonCancelledBookings / monthsActive / clientsWhoBooked
     : 0;
 
+  // ── Sign-up → First Booking Lag Analysis ──
+  // For every dashboard client who has booked, measure days from sign-up to their first booking.
+  // Build a lookup: email → signup date
+  const signupByEmail = {};
+  clientData.forEach(u => {
+    const email = (u.fields['Email'] || '').toLowerCase();
+    const d = u.fields['Created Date'];
+    if (email && d) signupByEmail[email] = new Date(d);
+  });
+
+  // Find each client's first non-cancelled booking date
+  const firstBookingByEmail = {};
+  bookingData
+    .filter(b => b.date && b.bookingStatus !== 'Cancelled' && b.clientEmail)
+    .forEach(b => {
+      const email = (b.clientEmail || '').toLowerCase();
+      const d = new Date(b.date);
+      if (!firstBookingByEmail[email] || d < firstBookingByEmail[email]) {
+        firstBookingByEmail[email] = d;
+      }
+    });
+
+  // Calculate lag in days for clients where we have both dates
+  const lagDays = [];
+  Object.entries(firstBookingByEmail).forEach(([email, firstBookDate]) => {
+    const signupDate = signupByEmail[email];
+    if (!signupDate) return; // no dashboard record for this booker — skip
+    const days = (firstBookDate - signupDate) / (1000 * 60 * 60 * 24);
+    if (days >= 0) lagDays.push(days); // ignore negative (booking before signup = data error)
+  });
+
+  const avgLagDays = lagDays.length > 0
+    ? lagDays.reduce((s, v) => s + v, 0) / lagDays.length
+    : 30; // default 30 days if no data
+  const avgLagMonths = avgLagDays / 30.44;
+  const medianLagDays = lagDays.length > 0
+    ? [...lagDays].sort((a, b) => a - b)[Math.floor(lagDays.length / 2)]
+    : 30;
+
+  // Monthly new client bookings: group non-cancelled bookings by month, count those from new clients
+  // "New client" = it's their first ever booking
+  const newClientBookingsByMonth = {};
+  const seenEmails = new Set();
+  [...bookingData]
+    .filter(b => b.date && b.bookingStatus !== 'Cancelled' && b.clientEmail)
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .forEach(b => {
+      const email = (b.clientEmail || '').toLowerCase();
+      const month = b.date.slice(0, 7);
+      if (!seenEmails.has(email)) {
+        seenEmails.add(email);
+        newClientBookingsByMonth[month] = (newClientBookingsByMonth[month] || 0) + 1;
+      }
+    });
+
+  // Repeat client bookings by month
+  const repeatClientBookingsByMonth = {};
+  Object.keys(bMonths).forEach(month => {
+    const totalThatMonth = bMonths[month] || 0;
+    const newThatMonth = newClientBookingsByMonth[month] || 0;
+    repeatClientBookingsByMonth[month] = Math.max(0, totalThatMonth - newThatMonth);
+  });
+
+  const newBkValues = Object.values(newClientBookingsByMonth);
+  const repBkValues = Object.values(repeatClientBookingsByMonth);
+  const avgMonthlyNewClientBookings    = newBkValues.length > 0 ? newBkValues.reduce((s,v)=>s+v,0)/newBkValues.length : 0;
+  const avgMonthlyRepeatClientBookings = repBkValues.length > 0 ? repBkValues.reduce((s,v)=>s+v,0)/repBkValues.length : 0;
+
+  // Monthly sign-up cohort conversion: for each completed month's sign-ups,
+  // what % eventually booked (after enough time has passed for the lag)?
+  // Only count cohort months where avgLagDays has passed since sign-up
+  const lagCutoff = new Date(now.getTime() - avgLagDays * 1000 * 60 * 60 * 24);
+  const cohortConversionRates = [];
+  Object.entries(sMonths).forEach(([month, count]) => {
+    const cohortDate = new Date(month + '-01');
+    if (cohortDate > lagCutoff) return; // too recent — lag hasn't elapsed
+    if (count === 0) return;
+    // Find clients who signed up this month
+    const cohortEmails = clientData
+      .filter(u => (u.fields['Created Date'] || '').startsWith(month))
+      .map(u => (u.fields['Email'] || '').toLowerCase())
+      .filter(Boolean);
+    if (cohortEmails.length === 0) return;
+    const converted = cohortEmails.filter(e => firstBookingByEmail[e]).length;
+    cohortConversionRates.push(converted / cohortEmails.length);
+  });
+  const avgCohortConversionRate = cohortConversionRates.length > 0
+    ? cohortConversionRates.reduce((s,v)=>s+v,0) / cohortConversionRates.length
+    : lifetimeBookingRate;
+
   return {
     avgMonthlyBookings, avgMonthlySignups,
+    avgMonthlyNewClientBookings, avgMonthlyRepeatClientBookings,
+    newClientBookingsByMonth, repeatClientBookingsByMonth,
     liveNewSplit, liveExSplit,
-    monthlyRevRunRate, monthsActive,
+    monthlyRevRunRate, monthlyRevRunRateAllTime, monthsActive,
     clientBookingRate, lifetimeBookingRate, clientsWhoBooked,
     totalDashboardClients: clientEmails.size,
-    bookingsPerBookedClientPerMonth
+    bookingsPerBookedClientPerMonth,
+    // Sign-up lag
+    avgLagDays, avgLagMonths, medianLagDays, lagSampleSize: lagDays.length,
+    avgCohortConversionRate
   };
 }
 
@@ -1606,16 +1712,17 @@ function buildTargets() {
   const live = calcLiveMonthlyAverages();
 
   // For each year target: work out what monthly numbers are NEEDED
-  // Then show the growth multiple vs current run rate as context
   const mk = (annualRev) => {
     const monthlyRev      = annualRev / 12;
     const totalMonthly    = Math.ceil(monthlyRev / atv);
-    // Use live new/existing split (from real booking history) to split the target
     const newMonthly      = Math.max(1, Math.ceil(totalMonthly * live.liveNewSplit));
     const exMonthly       = totalMonthly - newMonthly;
-    // Sign-up target: grow proportionally to the revenue growth multiple vs current
-    const revenueMultiple = live.monthlyRevRunRate > 0 ? (monthlyRev / live.monthlyRevRunRate) : 1;
-    const signupTarget    = Math.ceil(Math.max(1, live.avgMonthlySignups) * revenueMultiple);
+    // Sign-up target: new bookings needed ÷ cohort conversion rate
+    // avgCohortConversionRate = % of a sign-up cohort who eventually book (after lag has elapsed)
+    const conversionRate  = live.avgCohortConversionRate > 0
+      ? live.avgCohortConversionRate
+      : (live.lifetimeBookingRate > 0 ? live.lifetimeBookingRate : 0.5);
+    const signupTarget    = Math.ceil(newMonthly / conversionRate);
     return { revenue: Math.round(monthlyRev), totalBookings: totalMonthly, newBookings: newMonthly, existBookings: exMonthly, signups: signupTarget };
   };
 
@@ -1746,15 +1853,11 @@ function updateClientStats() {
 }
 
 function updateBookingStats(meta) {
-  const activeBookings = bookingData.filter(b => b.bookingStatus !== 'Cancelled');
-  const ago = new Date(); ago.setDate(ago.getDate() - 30);
-  const recentActive = activeBookings.filter(b => b.date && new Date(b.date) >= ago).length;
-
-  document.getElementById('totalBookings').textContent     = activeBookings.length;
+  document.getElementById('totalBookings').textContent     = meta.total || 0;
   document.getElementById('confirmedBookings').textContent = meta.confirmed || 0;
   document.getElementById('reservedBookings').textContent  = meta.reserved || 0;
   document.getElementById('totalRevenue').textContent      = meta.totalRevenue ? '£' + meta.totalRevenue.toLocaleString() : '£0';
-  document.getElementById('bookingGrowth').textContent     = '+' + recentActive;
+  document.getElementById('bookingGrowth').textContent     = '+' + (meta.recentBookings || 0);
 }
 
 function updateClientFilterCounts() {
@@ -2348,9 +2451,11 @@ function renderRoadmap() {
   // This is the monthly booking rate target — how many unique clients need to book each month
   const y1TargetMonthlyBk  = T.monthly.totalBookings.y1;
   const y2TargetMonthlyBk  = T.monthly.totalBookings.y2;
-  const clientsNeededY1    = bppm > 0 ? Math.ceil(y1TargetMonthlyBk / bppm) : y1TargetMonthlyBk;
-  const clientsNeededY2    = bppm > 0 ? Math.ceil(y2TargetMonthlyBk / bppm) : y2TargetMonthlyBk;
-  const currentClientsBookingPerMonth = bppm > 0 ? Math.round(live.avgMonthlyBookings / bppm) : live.clientsWhoBooked;
+  const clientsNeededY1    = live.clientBookingRate > 0 ? Math.ceil(y1TargetMonthlyBk / live.clientBookingRate) : y1TargetMonthlyBk;
+  const clientsNeededY2    = live.clientBookingRate > 0 ? Math.ceil(y2TargetMonthlyBk / live.clientBookingRate) : y2TargetMonthlyBk;
+  const currentClientsBookingPerMonth = live.clientBookingRate > 0
+    ? Math.round(live.totalDashboardClients * live.clientBookingRate)
+    : live.clientsWhoBooked;
 
   // ── Summary cards ──
   const summaryCards = [
@@ -2386,7 +2491,7 @@ function renderRoadmap() {
     },
     {
       icon: 'trending-up', color: '#f59e0b', bg: '#fffbeb',
-      label: 'Monthly Revenue Run Rate',
+      label: 'Monthly Run Rate (Last 3M)',
       value: `£${Math.round(live.monthlyRevRunRate).toLocaleString()}`,
       sub: monthsToMillion === '∞' ? 'No data yet' : `${monthsToMillion} months to £1M at this rate`
     },
@@ -2401,9 +2506,14 @@ function renderRoadmap() {
   lucide.createIcons();
 
   // ── Milestone progress bars (2026 + 2027) ──
+  // Target clients = total bookings needed per year ÷ avg bookings per client per year
+  // = (annualRev / ATV) ÷ (bppm * 12) — how many unique clients needed on book for that revenue
+  const bppy = bppm * 12; // bookings per client per year
+  const targetClientsY1 = liveATV > 0 && bppy > 0 ? Math.ceil((REVENUE_TARGETS.y1 / liveATV) / bppy) : 133;
+  const targetClientsY2 = liveATV > 0 && bppy > 0 ? Math.ceil((REVENUE_TARGETS.y2 / liveATV) / bppy) : 266;
   const milestones = [
-    { year: '2026 — Now',    targetRev: REVENUE_TARGETS.y1, actualRev: rev2026, targetClients: 133, actualClients: clientsSignedByEndOf(2026), color: '#8b5cf6', isCurrent: true  },
-    { year: '2027 — Target', targetRev: REVENUE_TARGETS.y2, actualRev: rev2027, targetClients: 266, actualClients: clientsSignedByEndOf(2027), color: '#f59e0b', isCurrent: false }
+    { year: '2026 — Now',    targetRev: REVENUE_TARGETS.y1, actualRev: rev2026, targetClients: targetClientsY1, actualClients: clientsSignedByEndOf(2026), color: '#8b5cf6', isCurrent: true  },
+    { year: '2027 — Target', targetRev: REVENUE_TARGETS.y2, actualRev: rev2027, targetClients: targetClientsY2, actualClients: clientsSignedByEndOf(2027), color: '#f59e0b', isCurrent: false }
   ];
 
   document.getElementById('milestoneTrack').innerHTML = milestones.map(m => {
@@ -2441,7 +2551,7 @@ function renderRoadmap() {
 
   // ── Monthly targets grid: 2026 + 2027, all smart-calculated ──
   const now2 = new Date();
-  const monthsLeftThisYear = now2.getFullYear() === 2026 ? (12 - now2.getMonth()) : 12;
+  const monthsLeftThisYear = 12 - now2.getMonth(); // remaining months in current year incl. current
   const rev2026Remaining   = Math.max(0, REVENUE_TARGETS.y1 - rev2026);
   const bookingsNeededNow  = monthsLeftThisYear > 0 ? Math.ceil((rev2026Remaining / liveATV) / monthsLeftThisYear) : 0;
 
@@ -2450,54 +2560,153 @@ function renderRoadmap() {
     { label: '2027 — Next Year',  col: '#f59e0b', key: 'y2', annualRev: REVENUE_TARGETS.y2, isCurrent: false }
   ];
 
+  // ── Shared trajectory values (same for both year cards) ──
+  const curSignupsAvg   = Math.round(live.avgMonthlySignups * 10) / 10;
+  const curNewBkAvg     = Math.round(live.avgMonthlyNewClientBookings * 10) / 10;
+  const curRepeatBkAvg  = Math.round(live.avgMonthlyRepeatClientBookings * 10) / 10;
+  const curTotalBkAvg   = Math.round(live.avgMonthlyBookings * 10) / 10;
+  const curBookingRate  = (live.clientBookingRate * 100).toFixed(1);
+  const curDashboard    = live.totalDashboardClients;
+  const curClientsBookingMo = live.clientBookingRate > 0
+    ? Math.round(live.totalDashboardClients * live.clientBookingRate) : '—';
+
+  // Lag insight string
+  const lagStr = live.lagSampleSize > 0
+    ? `${Math.round(live.avgLagDays)}d avg · ${Math.round(live.medianLagDays)}d median · ${live.lagSampleSize} clients measured`
+    : 'Not enough data yet';
+  const cohortConvPct = (live.avgCohortConversionRate * 100).toFixed(0);
+
   document.getElementById('monthlyTargetsGrid').innerHTML = years.map(y => {
-    const targetMonthlyRev   = REVENUE_TARGETS[y.key] / 12;
-    const targetMonthlyBk    = T.monthly.totalBookings[y.key];
-    const growthMultiple     = live.monthlyRevRunRate > 0 ? targetMonthlyRev / live.monthlyRevRunRate : 0;
-    const extraBookingsNeed  = Math.max(0, targetMonthlyBk - Math.round(live.avgMonthlyBookings));
+    const targetMonthlyRev  = REVENUE_TARGETS[y.key] / 12;
+    const tgtTotalBk        = T.monthly.totalBookings[y.key];
+    const tgtNewBk          = T.monthly.newBookings[y.key];
+    const tgtRepeatBk       = T.monthly.existBookings[y.key];
+    const tgtSignups        = T.monthly.signups[y.key];
+    const growthMultiple    = live.monthlyRevRunRate > 0 ? targetMonthlyRev / live.monthlyRevRunRate : 0;
 
-    // Clients needed to book per month = target bookings ÷ avg bookings per client per month
-    // Uses live booking frequency so the number reflects actual client behaviour
-    const clientsNeededPerMonth = bppm > 0 ? Math.ceil(targetMonthlyBk / bppm) : targetMonthlyBk;
-    const clientsNeededPct      = live.totalDashboardClients > 0
-      ? ((clientsNeededPerMonth / live.totalDashboardClients) * 100).toFixed(1)
-      : '—';
-    const currentClientsBookingMo = bppm > 0 ? Math.round(live.avgMonthlyBookings / bppm) : '—';
+    // Dashboard size needed to deliver target bookings at current booking rate
+    const clientsNeededForTarget = live.clientBookingRate > 0
+      ? Math.ceil(tgtTotalBk / live.clientBookingRate) : tgtTotalBk;
 
-    const growthLabel = growthMultiple > 0
-      ? `${growthMultiple.toFixed(1)}× current — need £${Math.round(targetMonthlyRev).toLocaleString()}/mo vs £${Math.round(live.monthlyRevRunRate).toLocaleString()}/mo now`
-      : 'No run rate data yet';
+    // Revenue progress (current year only)
+    const actualRev   = y.isCurrent ? revenueForYear(new Date().getFullYear()) : 0;
+    const revPct      = y.isCurrent ? Math.min((actualRev / y.annualRev) * 100, 100) : 0;
+    const revBarColor = revPct >= 80 ? '#10b981' : revPct >= 40 ? '#f59e0b' : '#ef4444';
 
-    const rows = [
-      { name: 'Monthly Revenue Target',         val: fmtMoney(T.monthly.revenue[y.key]) + ' / mo' },
-      { name: 'Total Bookings Needed / Month',   val: fmtBk(targetMonthlyBk) },
-      { name: 'Extra Bookings vs Current Avg',   val: `+${extraBookingsNeed} / mo (currently ~${Math.round(live.avgMonthlyBookings)})` },
-      { name: 'Clients Needed to Book / Month',  val: `${clientsNeededPerMonth} clients (${clientsNeededPct}% of dashboard)` },
-      { name: 'Currently Booking / Month',       val: `~${currentClientsBookingMo} clients (${bppmDisplay} bookings each)` },
-      { name: 'New Client Bookings',             val: fmtBk(T.monthly.newBookings[y.key]) },
-      { name: 'Repeat Bookings',                 val: fmtBk(T.monthly.existBookings[y.key]) },
-      { name: 'Sign-Ups Needed',                 val: fmtBk(T.monthly.signups[y.key]) },
-      { name: 'Growth Required',                 val: growthLabel },
-      { name: 'Annual Revenue Goal',             val: fmtMoney(y.annualRev) },
-    ];
-    if (y.isCurrent) {
-      rows.push({ name: '⚡ Bookings/mo still needed', val: fmtBk(bookingsNeededNow),  highlight: true });
-      rows.push({ name: '⚡ Revenue gap to 2026 goal', val: fmtMoney(rev2026Remaining), highlight: true });
-    }
+    // Gap helpers
+    const gap     = (cur, tgt) => tgt - cur;
+    const gapCol  = v => v <= 0 ? '#10b981' : '#ef4444';
+    const gapSign = v => v > 0 ? '+' : '';
+    const gapBadge = (cur, tgt, suffix = '') => {
+      const g = gap(cur, tgt);
+      return `<span style="font-size:10px;font-weight:700;color:${gapCol(g)};background:${gapCol(g)}18;padding:2px 8px;border-radius:5px;white-space:nowrap;">${gapSign(g)}${Math.round(Math.abs(g))}${suffix}</span>`;
+    };
+
+    // Trajectory vs Target row component
+    const trajRow = (icon, label, curVal, tgtVal, curLabel, tgtLabel, note, noteCol) => `
+      <div style="border-bottom:1px solid #f1f5f9;padding:12px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <i data-lucide="${icon}" style="width:12px;height:12px;color:#94a3b8;flex-shrink:0;"></i>
+            <span style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.4px;">${label}</span>
+          </div>
+          ${gapBadge(curVal, tgtVal, ' / mo')}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;">
+          <div style="background:#f8fafc;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Trajectory</div>
+            <div style="font-size:20px;font-weight:800;color:#334155;line-height:1;">${curLabel}</div>
+          </div>
+          <div style="color:#cbd5e1;font-size:16px;text-align:center;">→</div>
+          <div style="background:${y.col}10;border:1.5px solid ${y.col}40;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;font-weight:700;color:${y.col};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Target</div>
+            <div style="font-size:20px;font-weight:800;color:${y.col};line-height:1;">${tgtLabel}</div>
+          </div>
+        </div>
+        ${note ? `<div style="font-size:10px;color:${noteCol||'#94a3b8'};margin-top:7px;line-height:1.4;">${note}</div>` : ''}
+      </div>`;
+
     return `
-    <div style="background:rgba(0,0,0,0.02);border:1px solid ${y.isCurrent ? y.col + '55' : 'rgba(0,0,0,0.07)'};border-radius:10px;padding:16px;border-top:3px solid ${y.col};">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <div style="font-size:13px;font-weight:700;color:${y.col};">${y.label}</div>
-        ${y.isCurrent ? '<span style="font-size:10px;font-weight:700;background:' + y.col + '33;color:' + y.col + ';padding:2px 8px;border-radius:6px;">▶ Now</span>' : ''}
+    <div style="background:#fff;border:1.5px solid ${y.isCurrent ? y.col+'55' : '#e2e8f0'};border-radius:16px;padding:22px;border-top:4px solid ${y.col};box-shadow:0 2px 10px rgba(0,0,0,0.05);">
+
+      <!-- Card header -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+        <span style="font-size:15px;font-weight:800;color:${y.col};">${y.label}</span>
+        ${y.isCurrent ? `<span style="font-size:10px;font-weight:700;background:${y.col}20;color:${y.col};padding:3px 9px;border-radius:6px;">▶ In Progress</span>` : ''}
       </div>
-      <div style="font-size:10px;color:#475569;margin-bottom:10px;font-style:italic;">
-        ATV £${Math.round(liveATV).toLocaleString()} · ${bppmDisplay} bookings/client/mo · ${newPct}% new / ${exPct}% repeat
+      <div style="font-size:11px;color:#94a3b8;margin-bottom:18px;">ATV £${Math.round(liveATV).toLocaleString()} · ${cohortConvPct}% cohort conversion · ${Math.round(live.avgLagDays)}d avg sign-up lag</div>
+
+      <!-- Revenue block -->
+      <div style="background:${y.col}08;border:1px solid ${y.col}30;border-radius:10px;padding:14px;margin-bottom:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+          <span style="font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Annual Revenue</span>
+          ${y.isCurrent ? `<span style="font-size:11px;font-weight:700;color:${revBarColor};">${revPct.toFixed(1)}% achieved</span>` : `<span style="font-size:11px;color:#94a3b8;">${growthMultiple.toFixed(1)}× current run rate</span>`}
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${y.isCurrent ? 8 : 0}px;">
+          ${y.isCurrent
+            ? `<span style="font-size:24px;font-weight:800;color:#0f172a;">£${Math.round(actualRev).toLocaleString()}</span>
+               <span style="font-size:13px;color:#64748b;">/ £${(y.annualRev/1000).toFixed(0)}k target · £${Math.round(targetMonthlyRev).toLocaleString()}/mo needed</span>`
+            : `<span style="font-size:24px;font-weight:800;color:${y.col};">£${(y.annualRev/1000).toFixed(0)}k</span>
+               <span style="font-size:12px;color:#64748b;">£${Math.round(targetMonthlyRev).toLocaleString()} / month</span>`
+          }
+        </div>
+        ${y.isCurrent ? `
+          <div style="background:#e2e8f0;border-radius:4px;height:6px;overflow:hidden;">
+            <div style="width:${revPct}%;height:100%;background:${revBarColor};border-radius:4px;transition:width 0.8s;"></div>
+          </div>
+          ${rev2026Remaining > 0 ? `<div style="font-size:10px;color:#94a3b8;margin-top:5px;">${fmtMoney(rev2026Remaining)} remaining · ${monthsLeftThisYear} months left · need ${fmtBk(bookingsNeededNow)} more</div>` : `<div style="font-size:10px;color:#10b981;margin-top:5px;">✓ Target achieved!</div>`}
+        ` : ''}
       </div>
-      ${rows.map(d => `
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;font-size:12px;${d.highlight ? 'background:rgba(245,158,11,0.08);padding:4px 8px;border-radius:6px;margin-left:-8px;margin-right:-8px;' : ''}">
-          <span style="color:${d.highlight ? '#f59e0b' : '#475569'};">${d.name}</span>
-          <span style="font-weight:700;color:${d.highlight ? '#f59e0b' : '#0f172a'};">${d.val}</span>
-        </div>`).join('')}
+
+      <!-- Sign-up lag insight box -->
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:11px 13px;margin-bottom:18px;display:flex;align-items:flex-start;gap:10px;">
+        <i data-lucide="clock" style="width:14px;height:14px;color:#0284c7;flex-shrink:0;margin-top:1px;"></i>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#0284c7;margin-bottom:2px;">Sign-Up → First Booking Lag</div>
+          <div style="font-size:11px;color:#0369a1;">${lagStr}</div>
+          <div style="font-size:10px;color:#64748b;margin-top:2px;">Sign-ups today will, on average, book their first job ~${Math.round(live.avgLagDays)} days later. Target sign-ups account for this delay.</div>
+        </div>
+      </div>
+
+      <!-- KPI rows -->
+      ${trajRow('user-plus',      'Dashboard Sign-Ups / Month',
+          curSignupsAvg, tgtSignups,
+          curSignupsAvg, tgtSignups,
+          `${cohortConvPct}% of sign-up cohorts convert to a booking · sign-up target = new bookings needed ÷ conversion rate`, '#0369a1'
+        )}
+      ${trajRow('user-round',     'New Client Bookings / Month',
+          curNewBkAvg, tgtNewBk,
+          curNewBkAvg, tgtNewBk,
+          `Actual avg from booking history — clients whose first-ever booking fell in each month · ${newPct}% of total bookings`, ''
+        )}
+      ${trajRow('repeat-2',       'Repeat Client Bookings / Month',
+          curRepeatBkAvg, tgtRepeatBk,
+          curRepeatBkAvg, tgtRepeatBk,
+          `Clients who had already booked before — ${exPct}% of total bookings · avg booking rate ${curBookingRate}% of dashboard/mo`, ''
+        )}
+      <div style="border-bottom:1px solid #f1f5f9;padding:12px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <i data-lucide="calendar-check" style="width:12px;height:12px;color:#94a3b8;"></i>
+            <span style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.4px;">Total Bookings / Month</span>
+          </div>
+          ${gapBadge(curTotalBkAvg, tgtTotalBk, ' / mo')}
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;">
+          <div style="background:#f8fafc;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Trajectory</div>
+            <div style="font-size:20px;font-weight:800;color:#334155;">${curTotalBkAvg}</div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${curNewBkAvg} new + ${curRepeatBkAvg} repeat</div>
+          </div>
+          <div style="color:#cbd5e1;font-size:16px;text-align:center;">→</div>
+          <div style="background:${y.col}10;border:1.5px solid ${y.col}40;border-radius:8px;padding:10px;text-align:center;">
+            <div style="font-size:9px;font-weight:700;color:${y.col};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Target</div>
+            <div style="font-size:20px;font-weight:800;color:${y.col};">${tgtTotalBk}</div>
+            <div style="font-size:10px;color:${y.col}99;margin-top:2px;">${tgtNewBk} new + ${tgtRepeatBk} repeat</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:7px;">Needs ${clientsNeededForTarget} clients on dashboard booking at ${curBookingRate}%/mo · currently ${curDashboard} clients, ~${curClientsBookingMo} booking/mo</div>
+      </div>
     </div>`;
   }).join('');
 
@@ -2509,36 +2718,31 @@ function renderRoadmap() {
   //   ATV            = avg transaction value
   // Each lever solves for one unknown while the other THREE stay at live values
 
-  const targetMonthlyRevY1 = REVENUE_TARGETS.y1 / 12;
-  const curClients     = live.totalDashboardClients;
-  const curBookingRate = live.clientBookingRate;        // % of dashboard who book
-  const curBppm        = bppm;                          // bookings/booked-client/mo
-  const curATV         = liveATV;
+  const targetMonthlyRevY1  = REVENUE_TARGETS.y1 / 12;
+  const curClients          = live.totalDashboardClients;
+  const sensCurBookingRate  = live.clientBookingRate;   // raw decimal — used in sensitivity maths
+  const curBppm             = bppm;
+  const curATV              = liveATV;
 
   // Lever 1: Dashboard Clients — fix bookingRate + bppm + ATV
-  // neededClients = target ÷ (bookingRate × bppm × ATV)
-  // Meaning: if same % still book at same frequency & price, how many clients total?
-  const neededClients = (curBookingRate > 0 && curBppm > 0 && curATV > 0)
-    ? Math.ceil(targetMonthlyRevY1 / (curBookingRate * curBppm * curATV)) : null;
+  const neededClients = (sensCurBookingRate > 0 && curBppm > 0 && curATV > 0)
+    ? Math.ceil(targetMonthlyRevY1 / (sensCurBookingRate * curBppm * curATV)) : null;
 
   // Lever 2: Client Booking Rate — fix clients + bppm + ATV
-  // neededRate = target ÷ (clients × bppm × ATV)
   const neededBookingRate = (curClients > 0 && curBppm > 0 && curATV > 0)
     ? Math.min(1, targetMonthlyRevY1 / (curClients * curBppm * curATV)) : null;
 
   // Lever 3: ATV — fix clients + bookingRate + bppm
-  // neededATV = target ÷ (clients × bookingRate × bppm)
-  const neededATV = (curClients > 0 && curBookingRate > 0 && curBppm > 0)
-    ? Math.ceil(targetMonthlyRevY1 / (curClients * curBookingRate * curBppm)) : null;
+  const neededATV = (curClients > 0 && sensCurBookingRate > 0 && curBppm > 0)
+    ? Math.ceil(targetMonthlyRevY1 / (curClients * sensCurBookingRate * curBppm)) : null;
 
   // Lever 4: Booking Frequency — fix clients + bookingRate + ATV
-  // neededBppm = target ÷ (clients × bookingRate × ATV)
-  const neededBppm = (curClients > 0 && curBookingRate > 0 && curATV > 0)
-    ? targetMonthlyRevY1 / (curClients * curBookingRate * curATV) : null;
+  const neededBppm = (curClients > 0 && sensCurBookingRate > 0 && curATV > 0)
+    ? targetMonthlyRevY1 / (curClients * sensCurBookingRate * curATV) : null;
 
   const fmtSens = v => '£' + Math.round(v).toLocaleString();
   const fmtPct  = v => (v * 100).toFixed(1) + '%';
-  const curBookingRatePctDisplay = fmtPct(curBookingRate);
+  const curBookingRatePctDisplay = fmtPct(sensCurBookingRate);
 
   const levers = [
     {
@@ -2558,7 +2762,7 @@ function renderRoadmap() {
         ? (neededBookingRate >= 1 ? 'Not achievable alone' : fmtPct(neededBookingRate) + ' of clients')
         : '—',
       change: neededBookingRate !== null && neededBookingRate < 1
-        ? `${Math.ceil(neededBookingRate * curClients)} clients booking/mo — up from ${Math.round(curBookingRate * curClients)} now`
+        ? `${Math.ceil(neededBookingRate * curClients)} clients booking/mo — up from ${Math.round(sensCurBookingRate * curClients)} now`
         : 'Rate would exceed 100% — use another lever too',
       feasible: neededBookingRate !== null && neededBookingRate < 1,
       held: `${curClients} clients · ${bppmDisplay}×/mo freq · ${fmtSens(curATV)} ATV — all unchanged`
@@ -2576,7 +2780,7 @@ function renderRoadmap() {
       current: `${bppmDisplay} bookings/client/mo`,
       needed: neededBppm !== null ? `${neededBppm.toFixed(2)}× per client/mo` : '—',
       change: neededBppm !== null
-        ? `Once every ${Math.round(1 / neededBppm)} months per client · ${Math.ceil(neededBppm * curClients * curBookingRate)} bookings/mo total`
+        ? `Once every ${Math.round(1 / neededBppm)} months per client · ${Math.ceil(neededBppm * curClients * sensCurBookingRate)} bookings/mo total`
         : '—',
       feasible: neededBppm !== null,
       held: `${curClients} clients · ${curBookingRatePctDisplay} booking rate · ${fmtSens(curATV)} ATV — all unchanged`
