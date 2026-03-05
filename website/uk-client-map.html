@@ -1813,7 +1813,7 @@ async function loadMapData() {
 
     buildRegionCounts();
     updateClientStats();
-    updateBookingStats(bData.meta || {});
+    updateBookingStats();
     updateClientFilterCounts();
     updateBookingFilterCounts();
     addMarkersToMap();
@@ -1852,12 +1852,17 @@ function updateClientStats() {
   document.getElementById('clientGrowth').textContent      = '+' + recent;
 }
 
-function updateBookingStats(meta) {
-  document.getElementById('totalBookings').textContent     = meta.total || 0;
-  document.getElementById('confirmedBookings').textContent = meta.confirmed || 0;
-  document.getElementById('reservedBookings').textContent  = meta.reserved || 0;
-  document.getElementById('totalRevenue').textContent      = meta.totalRevenue ? '£' + meta.totalRevenue.toLocaleString() : '£0';
-  document.getElementById('bookingGrowth').textContent     = '+' + (meta.recentBookings || 0);
+function updateBookingStats() {
+  const active   = bookingData.filter(b => b.bookingStatus !== 'Cancelled');
+  const ago30    = new Date(); ago30.setDate(ago30.getDate() - 30);
+  const recent30 = active.filter(b => b.date && new Date(b.date) >= ago30).length;
+  const revenue  = active.reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
+
+  document.getElementById('totalBookings').textContent     = active.length;
+  document.getElementById('confirmedBookings').textContent = active.filter(b => b.bookingStatus === 'Confirmed').length;
+  document.getElementById('reservedBookings').textContent  = active.filter(b => b.bookingStatus === 'Reserved').length;
+  document.getElementById('totalRevenue').textContent      = '£' + Math.round(revenue).toLocaleString();
+  document.getElementById('bookingGrowth').textContent     = '+' + recent30;
 }
 
 function updateClientFilterCounts() {
