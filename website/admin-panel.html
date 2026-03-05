@@ -4680,9 +4680,10 @@ accessInstructions: document.getElementById('bookingAccess').value || '',
         const data = await response.json();
         
         if (data.success) {
-          document.getElementById('totalBookings').textContent = data.stats.total;
-          document.getElementById('upcomingBookings').textContent = data.stats.upcoming;
-          document.getElementById('pendingBookings').textContent = data.stats.pending;
+          const activeTotal = data.bookings.filter(b => b.fields['Booking Status'] !== 'Cancelled').length;
+document.getElementById('totalBookings').textContent = activeTotal;
+document.getElementById('upcomingBookings').textContent = data.stats.upcoming;
+document.getElementById('pendingBookings').textContent = data.stats.pending;
         }
 
         // Load customer count
