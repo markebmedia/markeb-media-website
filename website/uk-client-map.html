@@ -2629,14 +2629,17 @@ function renderRoadmap() {
   const curNewBkAvg     = thisMonthSplit.newB.length;
   const curRepeatBkAvg  = thisMonthSplit.exB.length;
   const curTotalBkAvg   = thisMonthBookings.length;
-  const curBookingRate  = (live.clientBookingRate * 100).toFixed(1);
   const curDashboard    = live.totalDashboardClients;
-  const clientEmails2 = new Set(clientData.map(u => (u.fields["Email"] || "").toLowerCase()).filter(Boolean));
+  const clientEmails2   = new Set(clientData.map(u => (u.fields["Email"] || "").toLowerCase()).filter(Boolean));
   const curClientsBookingMo = new Set(
     thisMonthBookings
       .filter(b => b.clientEmail && clientEmails2.has(b.clientEmail.toLowerCase()))
       .map(b => b.clientEmail.toLowerCase())
   ).size;
+  // This month actual rate: unique clients booked / dashboard size — keeps the equation consistent
+  const curBookingRate = curDashboard > 0
+    ? ((curClientsBookingMo / curDashboard) * 100).toFixed(1)
+    : (live.clientBookingRate * 100).toFixed(1);
 
   // Lag insight string
   const lagStr = live.lagSampleSize > 0
@@ -2770,7 +2773,7 @@ function renderRoadmap() {
         <div style="color:#d1fae5;font-size:20px;">×</div>
         <div style="text-align:center;">
           <div style="font-size:22px;font-weight:800;color:#10b981;">${curBookingRate}%</div>
-          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Book Each Month</div>
+          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Booking Rate This Month</div>
         </div>
         <div style="color:#d1fae5;font-size:20px;">=</div>
         <div style="text-align:center;">
@@ -2787,7 +2790,7 @@ function renderRoadmap() {
             ${mtTrajRow(y.col, 'repeat-2', 'Repeat Bookings / mo', curRepeatBkAvg, y.tgtRepeatBk, curRepeatBkAvg, y.tgtRepeatBk,
               `${exPct}% of all bookings · clients who have booked before`, '')}
             ${mtTrajRow(y.col, 'users', 'Dashboard Clients Needed', curDashboard, y.clientsNeeded, curDashboard, y.clientsNeeded,
-              `At ${curBookingRate}%/mo booking rate · need ${y.clientsNeeded} clients on dashboard to hit ${y.tgtRepeatBk} repeat bookings/mo`, '')}
+              `At ${(live.clientBookingRate * 100).toFixed(1)}% avg booking rate · need ${y.clientsNeeded} clients on dashboard to hit ${y.tgtRepeatBk} repeat bookings/mo`, '')}
           </div>`).join('')}
       </div>
     </div>`;
