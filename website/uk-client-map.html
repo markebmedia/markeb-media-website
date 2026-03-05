@@ -1746,11 +1746,15 @@ function updateClientStats() {
 }
 
 function updateBookingStats(meta) {
-  document.getElementById('totalBookings').textContent     = meta.total || 0;
+  const activeBookings = bookingData.filter(b => b.bookingStatus !== 'Cancelled');
+  const ago = new Date(); ago.setDate(ago.getDate() - 30);
+  const recentActive = activeBookings.filter(b => b.date && new Date(b.date) >= ago).length;
+
+  document.getElementById('totalBookings').textContent     = activeBookings.length;
   document.getElementById('confirmedBookings').textContent = meta.confirmed || 0;
   document.getElementById('reservedBookings').textContent  = meta.reserved || 0;
   document.getElementById('totalRevenue').textContent      = meta.totalRevenue ? '£' + meta.totalRevenue.toLocaleString() : '£0';
-  document.getElementById('bookingGrowth').textContent     = '+' + (meta.recentBookings || 0);
+  document.getElementById('bookingGrowth').textContent     = '+' + recentActive;
 }
 
 function updateClientFilterCounts() {
