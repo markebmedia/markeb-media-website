@@ -1390,7 +1390,7 @@
       <!-- Monthly targets breakdown -->
       <div style="margin-bottom:24px;">
         <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px;">Monthly Targets by Year</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;" id="monthlyTargetsGrid">
+        <div id="monthlyTargetsGrid">
           <!-- Populated by JS -->
         </div>
       </div>
@@ -1583,7 +1583,7 @@ function calcLiveMonthlyAverages() {
   bookingData.forEach(b => {
     if (!b.date || b.bookingStatus === 'Cancelled' || !b.clientEmail) return;
     const email = b.clientEmail.toLowerCase();
-    if (!clientEmails.has(email)) return; // only count dashboard clients
+    if (!clientEmails.has(email)) return;
     const month = b.date.slice(0, 7);
     if (!bookingsByMonth[month]) bookingsByMonth[month] = new Set();
     bookingsByMonth[month].add(email);
@@ -1592,8 +1592,51 @@ function calcLiveMonthlyAverages() {
   const clientBookingRate = monthlyRates.length > 0
     ? monthlyRates.reduce((s, v) => s + v, 0) / monthlyRates.length
     : 0;
-  // Also keep lifetime rate for context display
-  const lifetimeBookingRate = clientEmails.size > 0 ? clientsWhoBooked / clientEmails.size : 0;
+
+  // ── Per-month cohort conversion rate ──
+  // For each sign-up month, count how many of that cohort eventually made a booking.
+  // Average across all months = true monthly conversion rate.
+  // Build email → first booking date lookup
+  const firstBookingDateByEmail = {};
+  bookingData
+    .filter(b => b.date && b.bookingStatus !== 'Cancelled' && b.clientEmail)
+    .forEach(b => {
+      const email = (b.clientEmail || '').toLowerCase();
+      const d = new Date(b.date);
+      if (!firstBookingDateByEmail[email] || d < firstBookingDateByEmail[email]) {
+        firstBookingDateByEmail[email] = d;
+      }
+    });
+
+  // Group clients by their sign-up month
+  const signupCohorts = {};
+  clientData.forEach(u => {
+    const email = (u.fields['Email'] || '').toLowerCase();
+    const d = u.fields['Created Date'];
+    if (!email || !d) return;
+    const month = d.slice(0, 7);
+    if (!signupCohorts[month]) signupCohorts[month] = [];
+    signupCohorts[month].push(email);
+  });
+
+  // For each cohort month, calculate conversion rate
+  // Only include months that are complete (not the current partial month)
+  const cohortCurrentMonth = now.toISOString().slice(0, 7);
+  const monthlyConversionRates = [];
+  const cohortBreakdown = {}; // month → { signups, converted, rate }
+
+  Object.entries(signupCohorts).forEach(([month, emails]) => {
+    if (month >= cohortCurrentMonth) return; // skip current partial month
+    if (emails.length === 0) return;
+    const converted = emails.filter(e => firstBookingDateByEmail[e]).length;
+    const rate = converted / emails.length;
+    monthlyConversionRates.push(rate);
+    cohortBreakdown[month] = { signups: emails.length, converted, rate };
+  });
+
+  const lifetimeBookingRate = monthlyConversionRates.length > 0
+    ? monthlyConversionRates.reduce((s, v) => s + v, 0) / monthlyConversionRates.length
+    : (clientEmails.size > 0 ? clientsWhoBooked / clientEmails.size : 0);
 
   // ── Avg bookings per client per month (for active bookers) ──
   const totalNonCancelledBookings = bookingData.filter(b => b.bookingStatus !== 'Cancelled').length;
@@ -1702,7 +1745,9 @@ function calcLiveMonthlyAverages() {
     bookingsPerBookedClientPerMonth,
     // Sign-up lag
     avgLagDays, avgLagMonths, medianLagDays, lagSampleSize: lagDays.length,
-    avgCohortConversionRate
+    avgCohortConversionRate,
+    // Per-month cohort breakdown
+    cohortBreakdown, monthlyConversionRates
   };
 }
 
@@ -2581,139 +2626,159 @@ function renderRoadmap() {
     : 'Not enough data yet';
   const cohortConvPct = (live.lifetimeBookingRate * 100).toFixed(0);
 
-  document.getElementById('monthlyTargetsGrid').innerHTML = years.map(y => {
-    const targetMonthlyRev  = REVENUE_TARGETS[y.key] / 12;
-    const tgtTotalBk        = T.monthly.totalBookings[y.key];
-    const tgtNewBk          = T.monthly.newBookings[y.key];
-    const tgtRepeatBk       = T.monthly.existBookings[y.key];
-    const tgtSignups        = T.monthly.signups[y.key];
-    const growthMultiple    = live.monthlyRevRunRate > 0 ? targetMonthlyRev / live.monthlyRevRunRate : 0;
-
-    // Dashboard size needed to deliver target bookings at current booking rate
-    const clientsNeededForTarget = live.clientBookingRate > 0
-      ? Math.ceil(tgtTotalBk / live.clientBookingRate) : tgtTotalBk;
-
-    // Revenue progress (current year only)
-    const actualRev   = y.isCurrent ? revenueForYear(new Date().getFullYear()) : 0;
-    const revPct      = y.isCurrent ? Math.min((actualRev / y.annualRev) * 100, 100) : 0;
-    const revBarColor = revPct >= 80 ? '#10b981' : revPct >= 40 ? '#f59e0b' : '#ef4444';
-
-    // Gap helpers
-    const gap     = (cur, tgt) => tgt - cur;
-    const gapCol  = v => v <= 0 ? '#10b981' : '#ef4444';
-    const gapSign = v => v > 0 ? '+' : '';
-    const gapBadge = (cur, tgt, suffix = '') => {
-      const g = gap(cur, tgt);
-      return `<span style="font-size:10px;font-weight:700;color:${gapCol(g)};background:${gapCol(g)}18;padding:2px 8px;border-radius:5px;white-space:nowrap;">${gapSign(g)}${Math.round(Math.abs(g))}${suffix}</span>`;
-    };
-
-    // Trajectory vs Target row component
-    const trajRow = (icon, label, curVal, tgtVal, curLabel, tgtLabel, note, noteCol) => `
-      <div style="border-bottom:1px solid #f1f5f9;padding:12px 0;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div style="display:flex;align-items:center;gap:5px;">
-            <i data-lucide="${icon}" style="width:12px;height:12px;color:#94a3b8;flex-shrink:0;"></i>
-            <span style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.4px;">${label}</span>
-          </div>
-          ${gapBadge(curVal, tgtVal, ' / mo')}
+  // ── Shared gap helpers ──
+  const mtGapCol  = v => v <= 0 ? '#10b981' : '#ef4444';
+  const mtGapSign = v => v > 0 ? '+' : '';
+  const mtGapBadge = (cur, tgt, suffix = '') => {
+    const g = tgt - cur;
+    return `<span style="font-size:10px;font-weight:700;color:${mtGapCol(g)};background:${mtGapCol(g)}18;padding:2px 8px;border-radius:5px;white-space:nowrap;">${mtGapSign(g)}${Math.round(Math.abs(g))}${suffix}</span>`;
+  };
+  const mtTrajRow = (col, icon, label, curVal, tgtVal, curLabel, tgtLabel, note, noteCol) => `
+    <div style="padding:14px 0;border-bottom:1px solid #f1f5f9;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <i data-lucide="${icon}" style="width:13px;height:13px;color:#94a3b8;flex-shrink:0;"></i>
+          <span style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.4px;">${label}</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;">
-          <div style="background:#f8fafc;border-radius:8px;padding:10px;text-align:center;">
-            <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Trajectory</div>
-            <div style="font-size:20px;font-weight:800;color:#334155;line-height:1;">${curLabel}</div>
-          </div>
-          <div style="color:#cbd5e1;font-size:16px;text-align:center;">→</div>
-          <div style="background:${y.col}10;border:1.5px solid ${y.col}40;border-radius:8px;padding:10px;text-align:center;">
-            <div style="font-size:9px;font-weight:700;color:${y.col};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Target</div>
-            <div style="font-size:20px;font-weight:800;color:${y.col};line-height:1;">${tgtLabel}</div>
-          </div>
-        </div>
-        ${note ? `<div style="font-size:10px;color:${noteCol||'#94a3b8'};margin-top:7px;line-height:1.4;">${note}</div>` : ''}
-      </div>`;
-
-    return `
-    <div style="background:#fff;border:1.5px solid ${y.isCurrent ? y.col+'55' : '#e2e8f0'};border-radius:16px;padding:22px;border-top:4px solid ${y.col};box-shadow:0 2px 10px rgba(0,0,0,0.05);">
-
-      <!-- Card header -->
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-        <span style="font-size:15px;font-weight:800;color:${y.col};">${y.label}</span>
-        ${y.isCurrent ? `<span style="font-size:10px;font-weight:700;background:${y.col}20;color:${y.col};padding:3px 9px;border-radius:6px;">▶ In Progress</span>` : ''}
+        ${mtGapBadge(curVal, tgtVal, ' / mo')}
       </div>
-      <div style="font-size:11px;color:#94a3b8;margin-bottom:18px;">ATV £${Math.round(liveATV).toLocaleString()} · ${cohortConvPct}% cohort conversion · ${Math.round(live.avgLagDays)}d avg sign-up lag</div>
-
-      <!-- Revenue block -->
-      <div style="background:${y.col}08;border:1px solid ${y.col}30;border-radius:10px;padding:14px;margin-bottom:18px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-          <span style="font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Annual Revenue</span>
-          ${y.isCurrent ? `<span style="font-size:11px;font-weight:700;color:${revBarColor};">${revPct.toFixed(1)}% achieved</span>` : `<span style="font-size:11px;color:#94a3b8;">${growthMultiple.toFixed(1)}× current run rate</span>`}
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;">
+        <div style="background:#f8fafc;border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Now</div>
+          <div style="font-size:22px;font-weight:800;color:#334155;line-height:1;">${curLabel}</div>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${y.isCurrent ? 8 : 0}px;">
-          ${y.isCurrent
-            ? `<span style="font-size:24px;font-weight:800;color:#0f172a;">£${Math.round(actualRev).toLocaleString()}</span>
-               <span style="font-size:13px;color:#64748b;">/ £${(y.annualRev/1000).toFixed(0)}k target · £${Math.round(targetMonthlyRev).toLocaleString()}/mo needed</span>`
-            : `<span style="font-size:24px;font-weight:800;color:${y.col};">£${(y.annualRev/1000).toFixed(0)}k</span>
-               <span style="font-size:12px;color:#64748b;">£${Math.round(targetMonthlyRev).toLocaleString()} / month</span>`
-          }
+        <div style="color:#cbd5e1;font-size:18px;">→</div>
+        <div style="background:${col}0d;border:1.5px solid ${col}44;border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-size:9px;font-weight:700;color:${col};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Target</div>
+          <div style="font-size:22px;font-weight:800;color:${col};line-height:1;">${tgtLabel}</div>
         </div>
-        ${y.isCurrent ? `
-          <div style="background:#e2e8f0;border-radius:4px;height:6px;overflow:hidden;">
-            <div style="width:${revPct}%;height:100%;background:${revBarColor};border-radius:4px;transition:width 0.8s;"></div>
-          </div>
-          ${rev2026Remaining > 0 ? `<div style="font-size:10px;color:#94a3b8;margin-top:5px;">${fmtMoney(rev2026Remaining)} remaining · ${monthsLeftThisYear} months left · need ${fmtBk(bookingsNeededNow)} more</div>` : `<div style="font-size:10px;color:#10b981;margin-top:5px;">✓ Target achieved!</div>`}
-        ` : ''}
       </div>
+      ${note ? `<div style="font-size:10px;color:${noteCol||'#94a3b8'};margin-top:8px;line-height:1.5;">${note}</div>` : ''}
+    </div>`;
 
-      <!-- Sign-up lag insight box -->
-      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:11px 13px;margin-bottom:18px;display:flex;align-items:flex-start;gap:10px;">
-        <i data-lucide="clock" style="width:14px;height:14px;color:#0284c7;flex-shrink:0;margin-top:1px;"></i>
+  // Pre-compute per-year values
+  const yearData = years.map(y => {
+    const targetMonthlyRev = REVENUE_TARGETS[y.key] / 12;
+    const tgtTotalBk   = T.monthly.totalBookings[y.key];
+    const tgtNewBk     = T.monthly.newBookings[y.key];
+    const tgtRepeatBk  = T.monthly.existBookings[y.key];
+    const tgtSignups   = T.monthly.signups[y.key];
+    const actualRev    = y.isCurrent ? revenueForYear(new Date().getFullYear()) : 0;
+    const revPct       = y.isCurrent ? Math.min((actualRev / y.annualRev) * 100, 100) : 0;
+    const revBarColor  = revPct >= 80 ? '#10b981' : revPct >= 40 ? '#f59e0b' : '#ef4444';
+    const growthMult   = live.monthlyRevRunRate > 0 ? targetMonthlyRev / live.monthlyRevRunRate : 0;
+    const clientsNeeded = live.clientBookingRate > 0 ? Math.ceil(tgtRepeatBk / live.clientBookingRate) : tgtRepeatBk;
+    return { ...y, targetMonthlyRev, tgtTotalBk, tgtNewBk, tgtRepeatBk, tgtSignups, actualRev, revPct, revBarColor, growthMult, clientsNeeded };
+  });
+
+  // ── Revenue summary row (spans both cards) ──
+  const revRowHtml = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+      ${yearData.map(y => `
+        <div style="background:${y.col}08;border:1px solid ${y.col}30;border-radius:12px;padding:16px;border-top:3px solid ${y.col};">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:13px;font-weight:800;color:${y.col};">${y.label}</span>
+            ${y.isCurrent
+              ? `<span style="font-size:10px;font-weight:700;background:${y.col}22;color:${y.col};padding:2px 8px;border-radius:6px;">▶ In Progress</span>`
+              : `<span style="font-size:10px;color:#94a3b8;">${y.growthMult.toFixed(1)}× run rate needed</span>`}
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${y.isCurrent ? 8 : 0}px;">
+            ${y.isCurrent
+              ? `<span style="font-size:22px;font-weight:800;color:#0f172a;">£${Math.round(y.actualRev).toLocaleString()}</span>
+                 <span style="font-size:12px;color:#64748b;">/ £${(y.annualRev/1000).toFixed(0)}k · £${Math.round(y.targetMonthlyRev).toLocaleString()}/mo</span>`
+              : `<span style="font-size:22px;font-weight:800;color:${y.col};">£${(y.annualRev/1000).toFixed(0)}k</span>
+                 <span style="font-size:12px;color:#64748b;">£${Math.round(y.targetMonthlyRev).toLocaleString()} / month</span>`}
+          </div>
+          ${y.isCurrent ? `
+            <div style="background:#e2e8f0;border-radius:4px;height:5px;overflow:hidden;">
+              <div style="width:${y.revPct}%;height:100%;background:${y.revBarColor};border-radius:4px;transition:width 0.8s;"></div>
+            </div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:5px;">${y.revPct.toFixed(1)}% achieved · ${rev2026Remaining > 0 ? fmtMoney(rev2026Remaining) + ' remaining · ' + monthsLeftThisYear + ' months left' : '✓ Target achieved!'}</div>
+          ` : ''}
+        </div>`).join('')}
+    </div>`;
+
+  // ── Card 1: New Client Acquisition ──
+  const acqCard = `
+    <div style="background:#fff;border:1.5px solid #3b82f633;border-radius:16px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border-top:4px solid #3b82f6;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <div style="background:#eff6ff;border-radius:8px;padding:7px;"><i data-lucide="user-plus" style="width:16px;height:16px;color:#3b82f6;"></i></div>
         <div>
-          <div style="font-size:11px;font-weight:700;color:#0284c7;margin-bottom:2px;">Sign-Up → First Booking Lag</div>
-          <div style="font-size:11px;color:#0369a1;">${lagStr}</div>
-          <div style="font-size:10px;color:#64748b;margin-top:2px;">Sign-ups today will, on average, book their first job ~${Math.round(live.avgLagDays)} days later. Target sign-ups account for this delay.</div>
+          <div style="font-size:15px;font-weight:800;color:#3b82f6;">New Client Acquisition</div>
+          <div style="font-size:11px;color:#94a3b8;">Sign-ups → first booking. Once they book, they become existing clients.</div>
         </div>
       </div>
 
-      <!-- KPI rows -->
-      ${trajRow('user-plus',      'Dashboard Sign-Ups / Month',
-          curSignupsAvg, tgtSignups,
-          curSignupsAvg, tgtSignups,
-          `${cohortConvPct} in every 100 sign-ups go on to make a booking · so to get ${tgtNewBk} new client bookings/mo, you need ${tgtSignups} sign-ups`, '#0369a1'
-        )}
-      ${trajRow('user-round',     'New Client Bookings / Month',
-          curNewBkAvg, tgtNewBk,
-          curNewBkAvg, tgtNewBk,
-          `Actual avg from booking history — clients whose first-ever booking fell in each month · ${newPct}% of total bookings`, ''
-        )}
-      ${trajRow('repeat-2',       'Repeat Client Bookings / Month',
-          curRepeatBkAvg, tgtRepeatBk,
-          curRepeatBkAvg, tgtRepeatBk,
-          `Clients who had already booked before — ${exPct}% of total bookings · avg booking rate ${curBookingRate}% of dashboard/mo`, ''
-        )}
-      <div style="border-bottom:1px solid #f1f5f9;padding:12px 0;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div style="display:flex;align-items:center;gap:5px;">
-            <i data-lucide="calendar-check" style="width:12px;height:12px;color:#94a3b8;"></i>
-            <span style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.4px;">Total Bookings / Month</span>
-          </div>
-          ${gapBadge(curTotalBkAvg, tgtTotalBk, ' / mo')}
+      <!-- Lag insight -->
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:11px 14px;margin:16px 0;display:flex;gap:10px;align-items:flex-start;">
+        <i data-lucide="clock" style="width:13px;height:13px;color:#0284c7;flex-shrink:0;margin-top:1px;"></i>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#0284c7;">Sign-Up → First Booking Lag</div>
+          <div style="font-size:11px;color:#0369a1;margin-top:2px;">${lagStr}</div>
+          <div style="font-size:10px;color:#64748b;margin-top:3px;">On average ~${Math.round(live.avgLagDays)} days pass between signing up and their first booking.</div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;">
-          <div style="background:#f8fafc;border-radius:8px;padding:10px;text-align:center;">
-            <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Trajectory</div>
-            <div style="font-size:20px;font-weight:800;color:#334155;">${curTotalBkAvg}</div>
-            <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${curNewBkAvg} new + ${curRepeatBkAvg} repeat</div>
-          </div>
-          <div style="color:#cbd5e1;font-size:16px;text-align:center;">→</div>
-          <div style="background:${y.col}10;border:1.5px solid ${y.col}40;border-radius:8px;padding:10px;text-align:center;">
-            <div style="font-size:9px;font-weight:700;color:${y.col};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Target</div>
-            <div style="font-size:20px;font-weight:800;color:${y.col};">${tgtTotalBk}</div>
-            <div style="font-size:10px;color:${y.col}99;margin-top:2px;">${tgtNewBk} new + ${tgtRepeatBk} repeat</div>
-          </div>
-        </div>
-        <div style="font-size:10px;color:#94a3b8;margin-top:7px;">Needs ${clientsNeededForTarget} clients on dashboard booking at ${curBookingRate}%/mo · currently ${curDashboard} clients, ~${curClientsBookingMo} booking/mo</div>
+      </div>
+
+      <!-- Year columns -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        ${yearData.map(y => `
+          <div style="border:1px solid ${y.col}22;border-radius:12px;padding:16px;background:${y.col}05;">
+            <div style="font-size:12px;font-weight:700;color:${y.col};margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid ${y.col}22;">${y.label}</div>
+            ${mtTrajRow(y.col, 'user-plus', 'Sign-Ups / mo', curSignupsAvg, y.tgtSignups, curSignupsAvg, y.tgtSignups,
+              `${cohortConvPct} in every 100 sign-ups book · need ${y.tgtSignups} sign-ups to get ${y.tgtNewBk} new bookings`, '#0369a1')}
+            ${mtTrajRow(y.col, 'star', 'New Client Bookings / mo', curNewBkAvg, y.tgtNewBk, curNewBkAvg, y.tgtNewBk,
+              `${newPct}% of all bookings · avg £${Math.round(liveATV).toLocaleString()} per job · clients then move to existing`, '')}
+          </div>`).join('')}
       </div>
     </div>`;
-  }).join('');
+
+  // ── Card 2: Existing Client Retention ──
+  const retCard = `
+    <div style="background:#fff;border:1.5px solid #10b98133;border-radius:16px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border-top:4px solid #10b981;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <div style="background:#f0fdf4;border-radius:8px;padding:7px;"><i data-lucide="repeat-2" style="width:16px;height:16px;color:#10b981;"></i></div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:#10b981;">Existing Client Retention</div>
+          <div style="font-size:11px;color:#94a3b8;">Your current dashboard · booking rate · repeat revenue.</div>
+        </div>
+      </div>
+
+      <!-- Dashboard snapshot -->
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:11px 14px;margin:16px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+        <div style="text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#10b981;">${curDashboard}</div>
+          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Clients on Dashboard</div>
+        </div>
+        <div style="color:#d1fae5;font-size:20px;">×</div>
+        <div style="text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#10b981;">${curBookingRate}%</div>
+          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Book Each Month</div>
+        </div>
+        <div style="color:#d1fae5;font-size:20px;">=</div>
+        <div style="text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#10b981;">~${curClientsBookingMo}</div>
+          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Bookings / Month Now</div>
+        </div>
+      </div>
+
+      <!-- Year columns -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        ${yearData.map(y => `
+          <div style="border:1px solid ${y.col}22;border-radius:12px;padding:16px;background:${y.col}05;">
+            <div style="font-size:12px;font-weight:700;color:${y.col};margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid ${y.col}22;">${y.label}</div>
+            ${mtTrajRow(y.col, 'repeat-2', 'Repeat Bookings / mo', curRepeatBkAvg, y.tgtRepeatBk, curRepeatBkAvg, y.tgtRepeatBk,
+              `${exPct}% of all bookings · clients who have booked before`, '')}
+            ${mtTrajRow(y.col, 'users', 'Dashboard Clients Needed', curDashboard, y.clientsNeeded, curDashboard, y.clientsNeeded,
+              `At ${curBookingRate}%/mo booking rate · need ${y.clientsNeeded} clients on dashboard to hit ${y.tgtRepeatBk} repeat bookings/mo`, '')}
+          </div>`).join('')}
+      </div>
+    </div>`;
+
+  document.getElementById('monthlyTargetsGrid').innerHTML = revRowHtml + `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      ${acqCard}
+      ${retCard}
+    </div>`;
 
   // ── Single Lever Sensitivity Analysis — 2026 target ──
   // Full formula: Monthly Revenue = totalClients × bookingRate × bppm × ATV
