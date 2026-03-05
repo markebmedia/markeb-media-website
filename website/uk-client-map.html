@@ -2538,19 +2538,39 @@ function renderRoadmap() {
   ];
 
   document.getElementById('sensitivityGrid').innerHTML = levers.map(l => `
-    <div style="background:rgba(0,0,0,0.02);border:1px solid ${l.feasible ? l.color + '44' : 'rgba(239,68,68,0.25)'};border-radius:10px;padding:16px;border-top:3px solid ${l.color};">
-      <div style="font-size:18px;margin-bottom:6px;">${l.icon}</div>
-      <div style="font-size:12px;font-weight:700;color:${l.color};margin-bottom:10px;text-transform:uppercase;letter-spacing:0.4px;">${l.label}</div>
-      <div style="margin-bottom:10px;">
-        <div style="font-size:10px;color:#475569;margin-bottom:2px;">Currently</div>
-        <div style="font-size:13px;font-weight:600;color:#475569;">${l.current}</div>
+    <div style="background:#fff;border:1px solid ${l.color}33;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+      
+      <!-- Coloured header band -->
+      <div style="background:linear-gradient(135deg,${l.color},${l.color}cc);padding:16px 18px 14px;">
+        <div style="font-size:22px;margin-bottom:4px;">${l.icon}</div>
+        <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:0.3px;">${l.label}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px;">Keep everything else the same</div>
       </div>
-      <div style="margin-bottom:8px;">
-        <div style="font-size:10px;color:#475569;margin-bottom:3px;">Needs to be</div>
-        <div style="font-size:18px;font-weight:700;color:${l.feasible ? '#0f172a' : '#ef4444'};">${l.needed}</div>
+
+      <!-- Body -->
+      <div style="padding:16px 18px;">
+
+        <!-- Current vs Target -->
+        <div style="display:flex;gap:10px;margin-bottom:14px;">
+          <div style="flex:1;background:#f8fafc;border-radius:8px;padding:10px 12px;">
+            <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Now</div>
+            <div style="font-size:14px;font-weight:700;color:#475569;">${l.current}</div>
+          </div>
+          <div style="display:flex;align-items:center;color:#94a3b8;font-size:16px;">→</div>
+          <div style="flex:1;background:${l.color}12;border:1.5px solid ${l.color}44;border-radius:8px;padding:10px 12px;">
+            <div style="font-size:10px;font-weight:700;color:${l.color};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Target</div>
+            <div style="font-size:16px;font-weight:800;color:${l.feasible ? l.color : '#ef4444'};">${l.needed}</div>
+          </div>
+        </div>
+
+        <!-- Gap callout -->
+        <div style="background:${l.feasible ? l.color + '10' : 'rgba(239,68,68,0.08)'};border-left:3px solid ${l.feasible ? l.color : '#ef4444'};border-radius:0 6px 6px 0;padding:8px 12px;margin-bottom:12px;">
+          <div style="font-size:12px;font-weight:700;color:${l.feasible ? l.color : '#ef4444'};">${l.change}</div>
+        </div>
+
+        <!-- What's held constant -->
+        <div style="font-size:10px;color:#94a3b8;line-height:1.5;">${l.held}</div>
       </div>
-      <div style="font-size:11px;font-weight:600;color:${l.feasible ? l.color : '#ef4444'};margin-bottom:10px;">${l.change}</div>
-      <div style="font-size:10px;color:#0f172a;font-style:italic;border-top:1px solid rgba(0,0,0,0.06);padding-top:8px;">${l.held}</div>
     </div>`).join('');
 }
 
