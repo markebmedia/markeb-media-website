@@ -1943,30 +1943,131 @@ function renderRoadmap() {
     </div>` + funnelBox;
 
   // ── Single Lever Sensitivity Analysis ──
-  const targetMonthlyRevY1 = REVENUE_TARGETS.y1 / 12;
-  const curClients         = live.totalDashboardClients;
-  const sensCurBookingRate = live.clientBookingRate; // blended — for whole-business lever
-  const curBppm            = bppm;
-  const curATV             = liveATV;
-
-  const neededClients     = (sensCurBookingRate > 0 && curBppm > 0 && curATV > 0)
-    ? Math.ceil(targetMonthlyRevY1 / (sensCurBookingRate * curBppm * curATV)) : null;
-  const neededBookingRate = (curClients > 0 && curBppm > 0 && curATV > 0)
-    ? Math.min(1, targetMonthlyRevY1 / (curClients * curBppm * curATV)) : null;
-  const neededATV         = (curClients > 0 && sensCurBookingRate > 0 && curBppm > 0)
-    ? Math.ceil(targetMonthlyRevY1 / (curClients * sensCurBookingRate * curBppm)) : null;
-  const neededBppm        = (curClients > 0 && sensCurBookingRate > 0 && curATV > 0)
-    ? targetMonthlyRevY1 / (curClients * sensCurBookingRate * curATV) : null;
+  // Formula: Revenue = Clients × BookingRate × ATV
+  // Period-aware: monthly target for MoM, annual for YoY, scaled for QoQ/6M
+  // Each lever solves for one unknown, all others held at current live values.
+  // Always uses THIS MONTH's actual data vs the monthly target (£200k ÷ 12).
+  // Question: "If we only changed ONE thing this month, what would it need to be?"
 
   const fmtSens = v => '£' + Math.round(v).toLocaleString();
   const fmtPct  = v => (v * 100).toFixed(1) + '%';
-  const curBRDisplay = fmtPct(sensCurBookingRate) + '/mo';
+
+  // Fixed monthly target — always
+  const sensTargetRev = REVENUE_TARGETS.y1 / 12;
+
+  // This month's actual live baseline values
+  const curClients     = live.totalDashboardClients;
+  const curBookingRate = live.newClientBookingRate > 0 || live.existingClientBookingRate > 0
+    ? live.clientBookingRate  // blended: clients who booked this month ÷ total dashboard clients
+    : 0;
+  const curATV         = liveATV;
+
+  // This month's actual bookings (non-cancelled)
+  const sensNow        = new Date();
+  const thisMonthKey2  = sensNow.toISOString().slice(0, 7);
+  const thisMonthBks   = bookingData.filter(b =>
+    b.bookingStatus !== 'Cancelled' &&
+    b.date && b.date.slice(0, 7) === thisMonthKey2
+  );
+  const thisMonthCount = thisMonthBks.length;
+  const thisMonthRev   = thisMonthBks.reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
+
+  // Unique clients who booked this month
+  const uniqueBookersThisMonth = new Set(thisMonthBks.map(b => (b.clientEmail||'').toLowerCase()).filter(Boolean)).size;
+
+  // Lever 1: Dashboard Clients
+  // How many clients do we need at the current booking rate and ATV to hit £16,667/mo?
+  const neededClients = (curBookingRate > 0 && curATV > 0)
+    ? Math.ceil(sensTargetRev / (curBookingRate * curATV)) : null;
+
+  // Lever 2: Booking Rate
+  // What % of our current clients need to book this month at current ATV?
+  // neededRate = target ÷ (clients × ATV) — but we need total bookings, so:
+  // target = clients × rate × avgBkPerBooker × ATV
+  // Simplified: target = totalBookings × ATV → totalBookings = target ÷ ATV
+  // rate = totalBookings ÷ clients
+  const totalBkNeededForRate = curATV > 0 ? sensTargetRev / curATV : null;
+  const neededBookingRate = (curClients > 0 && totalBkNeededForRate !== null)
+    ? Math.min(2, totalBkNeededForRate / curClients) : null; // allow >1 (multiple bk per client)
+
+  // Lever 3: ATV
+  // What does each job need to be worth at current clients, rate and booking count?
+  // Use actual bookings this month as the denominator — real jobs done
+  const neededATV = thisMonthCount > 0
+    ? Math.ceil(sensTargetRev / thisMonthCount)
+    : (curClients > 0 && curBookingRate > 0
+      ? Math.ceil(sensTargetRev / (curClients * curBookingRate))
+      : null);
+
+  // Lever 4: Bookings per client this month
+  // How many times does each booking client need to book to hit the target?
+  // total bookings needed = target ÷ ATV; per booker = total ÷ unique bookers
+  const totalBkNeededForFreq = curATV > 0 ? Math.ceil(sensTargetRev / curATV) : null;
+  const curBkPerBooker       = uniqueBookersThisMonth > 0 ? (thisMonthCount / uniqueBookersThisMonth).toFixed(1) : '0';
+  const neededBkPerBooker    = (totalBkNeededForFreq !== null && uniqueBookersThisMonth > 0)
+    ? (totalBkNeededForFreq / uniqueBookersThisMonth).toFixed(2) : null;
+
+  const curBRDisplay = fmtPct(curBookingRate);
 
   const levers = [
-    { icon:'users',        label:'Dashboard Clients',      color:'#3b82f6', current:`${curClients} clients · ${curBRDisplay} booking`,      needed:neededClients!==null?`${neededClients.toLocaleString()} clients`:'—',                                                                                    change:neededClients!==null?`+${Math.max(0,neededClients-curClients).toLocaleString()} more clients needed`:'—',                                                                       feasible:neededClients!==null, held:`${curBRDisplay} booking rate · ${bppmDisplay} bookings/client/mo · ${fmtSens(curATV)} ATV` },
-    { icon:'trending-up',  label:'Monthly Booking Rate',   color:'#10b981', current:`${curBRDisplay} book each month`,                       needed:neededBookingRate!==null?(neededBookingRate>=1?'Not achievable alone':fmtPct(neededBookingRate)+'/mo'):'—',                                           change:neededBookingRate!==null&&neededBookingRate<1?`${Math.ceil(neededBookingRate*curClients)} clients booking/mo — up from ${Math.round(sensCurBookingRate*curClients)} now`:'Rate would exceed 100% — combine with another lever', feasible:neededBookingRate!==null&&neededBookingRate<1, held:`${curClients} clients · ${bppmDisplay} bookings/client/mo · ${fmtSens(curATV)} ATV` },
-    { icon:'pound-sterling',label:'Avg Transaction Value', color:'#f59e0b', current:`${fmtSens(curATV)} per booking`,                        needed:neededATV!==null?`${fmtSens(neededATV)} per booking`:'—',                                                                                              change:neededATV!==null?`+${fmtSens(Math.max(0,neededATV-curATV))} more per job`:'—',                                                                                                    feasible:neededATV!==null,     held:`${curClients} clients · ${curBRDisplay} booking rate · ${bppmDisplay} bookings/client/mo` },
-    { icon:'repeat-2',     label:'Booking Frequency',      color:'#a78bfa', current:`${bppmDisplay} bookings/client/mo`,                     needed:neededBppm!==null?`${neededBppm.toFixed(2)} bookings/client/mo`:'—',                                                                                   change:neededBppm!==null?`Once every ${Math.round(1/neededBppm)} months per client · ${Math.ceil(neededBppm*curClients*sensCurBookingRate)} total/mo`:'—',                                 feasible:neededBppm!==null,    held:`${curClients} clients · ${curBRDisplay} booking rate · ${fmtSens(curATV)} ATV` }
+    {
+      icon: 'users',
+      label: 'Dashboard Clients',
+      color: '#3b82f6',
+      current: `${curClients} clients`,
+      currentSub: `${uniqueBookersThisMonth} booked this month · ${curBRDisplay} rate · ${fmtSens(curATV)} ATV`,
+      needed: neededClients !== null ? `${neededClients.toLocaleString()} clients` : '—',
+      change: neededClients !== null
+        ? neededClients > curClients
+          ? `We need ${neededClients.toLocaleString()} clients at ${curBRDisplay}/mo booking rate & ${fmtSens(curATV)} ATV — that's +${(neededClients - curClients).toLocaleString()} more than our current ${curClients}`
+          : `At current figures we already have enough clients — focus on rate or ATV`
+        : '—',
+      feasible: neededClients !== null,
+      held: `${curBRDisplay}/mo booking rate · ${fmtSens(curATV)} ATV`
+    },
+    {
+      icon: 'trending-up',
+      label: 'Monthly Booking Rate',
+      color: '#10b981',
+      current: `${curBRDisplay}/mo`,
+      currentSub: `${uniqueBookersThisMonth} of ${curClients} clients booked this month`,
+      needed: neededBookingRate !== null
+        ? neededBookingRate > 1
+          ? `${(neededBookingRate * 100).toFixed(1)}% (avg ${neededBookingRate.toFixed(1)}× per client)`
+          : `${fmtPct(neededBookingRate)}/mo`
+        : '—',
+      change: neededBookingRate !== null
+        ? `We need ${Math.ceil(neededBookingRate * curClients)} bookings from our ${curClients} clients this month at ${fmtSens(curATV)} ATV — currently at ${uniqueBookersThisMonth}`
+        : '—',
+      feasible: neededBookingRate !== null,
+      held: `${curClients} clients · ${fmtSens(curATV)} ATV`
+    },
+    {
+      icon: 'pound-sterling',
+      label: 'Avg Transaction Value',
+      color: '#f59e0b',
+      current: `${fmtSens(curATV)} per booking`,
+      currentSub: `${thisMonthCount} booking${thisMonthCount !== 1 ? 's' : ''} this month · ${fmtSens(thisMonthRev)} total revenue`,
+      needed: neededATV !== null ? `${fmtSens(neededATV)} per booking` : '—',
+      change: neededATV !== null
+        ? `We need ${fmtSens(neededATV)} per job across our ${thisMonthCount} booking${thisMonthCount !== 1 ? 's' : ''} this month — currently averaging ${fmtSens(curATV)}, that's +${fmtSens(Math.max(0, neededATV - curATV))} more per job`
+        : '—',
+      feasible: neededATV !== null,
+      held: `${curClients} clients · ${curBRDisplay}/mo · ${thisMonthCount} bookings this month`
+    },
+    {
+      icon: 'repeat-2',
+      label: 'Bookings per Client this Month',
+      color: '#a78bfa',
+      current: `${curBkPerBooker}× per booking client`,
+      currentSub: `${uniqueBookersThisMonth} booking clients · ${thisMonthCount} total bookings`,
+      needed: neededBkPerBooker !== null ? `${neededBkPerBooker}× per booking client` : '—',
+      change: totalBkNeededForFreq !== null && uniqueBookersThisMonth > 0
+        ? `We need ${totalBkNeededForFreq} total bookings at ${fmtSens(curATV)} ATV — that's ${neededBkPerBooker}× from each of our ${uniqueBookersThisMonth} active clients, currently at ${curBkPerBooker}×`
+        : uniqueBookersThisMonth === 0 ? 'No bookings this month yet — rate and ATV levers are more actionable' : '—',
+      feasible: neededBkPerBooker !== null,
+      held: `${curClients} clients · ${curBRDisplay}/mo rate · ${fmtSens(curATV)} ATV`
+    }
   ];
 
   document.getElementById('sensitivityGrid').innerHTML = levers.map(l => `
@@ -1974,13 +2075,14 @@ function renderRoadmap() {
       <div style="background:linear-gradient(135deg,${l.color},${l.color}cc);padding:14px 16px 12px;">
         <div style="margin-bottom:6px;"><i data-lucide="${l.icon}" style="width:20px;height:20px;color:#fff;opacity:0.9;"></i></div>
         <div style="font-size:12px;font-weight:700;color:#fff;letter-spacing:0.3px;">${l.label}</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.75);margin-top:2px;">Keep everything else the same</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.75);margin-top:2px;">Keep everything else the same · monthly target: ${fmtSens(sensTargetRev)}</div>
       </div>
       <div style="padding:14px 16px;">
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
           <div style="flex:1;min-width:80px;background:#f8fafc;border-radius:8px;padding:9px 11px;">
             <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Now</div>
-            <div style="font-size:12px;font-weight:700;color:#475569;line-height:1.3;">${l.current}</div>
+            <div style="font-size:13px;font-weight:700;color:#475569;line-height:1.3;">${l.current}</div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:3px;">${l.currentSub}</div>
           </div>
           <div style="display:flex;align-items:center;color:#94a3b8;font-size:14px;flex-shrink:0;">→</div>
           <div style="flex:1;min-width:80px;background:${l.color}12;border:1.5px solid ${l.color}44;border-radius:8px;padding:9px 11px;">
