@@ -1832,7 +1832,7 @@ function renderRoadmap() {
               `${cohortConvPct} in every 100 sign-ups go on to book · need ${y.tgtSignups} sign-ups to land ${y.tgtNewBk} new bookings`, '#0369a1')}
             ${mtTrajRow(y.col, 'star', 'New Client Bookings / mo', curFirstTimers, y.tgtNewBk,
               `${curFirstTimers} / ${neverBookedCount}`,
-              `${y.tgtNewBk} from pool of ${y.neverBookedNeeded}`,
+              `${y.tgtNewBk} / ${y.neverBookedNeeded}`,
               `${newRatePct}% of never-booked pool converted this month · avg £${Math.round(liveATV).toLocaleString()} per job`, '')}
           </div>`).join('')}
       </div>
@@ -1869,7 +1869,7 @@ function renderRoadmap() {
             <div style="font-size:12px;font-weight:700;color:${y.col};margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid ${y.col}22;">${y.label}</div>
             ${mtTrajRow(y.col, 'repeat-2', 'Repeat Bookings / mo', curRepeatBk, y.tgtRepeatBk,
               `${curRepeatBk} / ${everBookedCount}`,
-              `${y.tgtRepeatBk} from pool of ${y.clientsNeeded}`,
+              `${y.tgtRepeatBk} / ${y.clientsNeeded}`,
               `${existRatePct}% of existing clients booked again this month · ${exPct}% of all bookings`, '')}
             ${mtTrajRow(y.col, 'users', 'Existing Client Pool Needed', everBookedCount, y.clientsNeeded,
               everBookedCount, y.clientsNeeded,
