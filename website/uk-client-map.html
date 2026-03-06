@@ -73,7 +73,6 @@
     .btn-secondary { background: #f8fafc; color: #60a5fa; border: 2px solid #e2e8f0; }
     .btn-secondary:hover { border-color: #60a5fa; background: #f1f5f9; }
 
-    /* ── MAIN TAB ROW ── */
     .main-tab-row {
       display: flex;
       gap: 0;
@@ -106,32 +105,8 @@
     .main-tab-btn.active.bookings   { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; box-shadow: 0 2px 10px rgba(139,92,246,0.35); }
     .main-tab-btn.active.performance{ background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; box-shadow: 0 2px 10px rgba(245,158,11,0.35); }
 
-    /* ── PERFORMANCE SECTION ── */
     #performanceSection { display: none; }
 
-    .perf-header {
-      background: linear-gradient(135deg, #f8fafc, #ffffff);
-      border-radius: 16px;
-      padding: 28px;
-      border: 1px solid #e2e8f0;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-
-    .perf-header h2 {
-      font-size: 22px;
-      font-weight: 700;
-      color: #0f172a;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* Period toggle inside performance */
     .period-toggle {
       display: flex;
       gap: 0;
@@ -160,7 +135,6 @@
       box-shadow: 0 2px 8px rgba(245,158,11,0.4);
     }
 
-    /* KPI Cards grid */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -168,140 +142,6 @@
       margin-bottom: 24px;
     }
 
-    .kpi-card {
-      background: #fff;
-      border-radius: 14px;
-      padding: 24px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      position: relative;
-      overflow: hidden;
-      transition: all .25s ease;
-    }
-
-    .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-
-    .kpi-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      border-radius: 14px 14px 0 0;
-    }
-
-    .kpi-card.signups::before    { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-    .kpi-card.revenue::before    { background: linear-gradient(90deg, #10b981, #34d399); }
-    .kpi-card.new-booking::before{ background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
-    .kpi-card.exist-booking::before{ background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-    .kpi-card.total-booking::before{ background: linear-gradient(90deg, #06b6d4, #22d3ee); }
-
-    .kpi-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: #475569;
-      margin-bottom: 8px;
-    }
-
-    .kpi-current {
-      font-size: 42px;
-      font-weight: 700;
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-
-    .kpi-card.signups .kpi-current     { color: #3b82f6; }
-    .kpi-card.revenue .kpi-current     { color: #10b981; }
-    .kpi-card.new-booking .kpi-current { color: #8b5cf6; }
-    .kpi-card.exist-booking .kpi-current{ color: #f59e0b; }
-    .kpi-card.total-booking .kpi-current{ color: #06b6d4; }
-
-    .kpi-period-label {
-      font-size: 12px;
-      color: #475569;
-      margin-bottom: 16px;
-    }
-
-    .kpi-compare-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      padding-top: 16px;
-      border-top: 1px solid #f1f5f9;
-      gap: 12px;
-    }
-
-    .kpi-prev {
-      font-size: 12px;
-      color: #475569;
-    }
-
-    .kpi-prev strong { color: #475569; font-size: 14px; }
-
-    .kpi-delta {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 14px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 8px;
-    }
-
-    .kpi-delta.up    { background: rgba(16,185,129,0.12); color: #10b981; }
-    .kpi-delta.down  { background: rgba(239,68,68,0.12);  color: #ef4444; }
-    .kpi-delta.flat  { background: rgba(148,163,184,0.12); color: #475569; }
-
-    /* Target progress bar inside kpi */
-    .kpi-target-row {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid #f1f5f9;
-    }
-
-    .kpi-target-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      color: #475569;
-      margin-bottom: 6px;
-    }
-
-    .kpi-target-header .target-pct {
-      font-weight: 700;
-      font-size: 13px;
-    }
-
-    .kpi-target-header .target-pct.on-track  { color: #10b981; }
-    .kpi-target-header .target-pct.behind    { color: #f59e0b; }
-    .kpi-target-header .target-pct.critical  { color: #ef4444; }
-
-    .target-bar-bg {
-      background: #f1f5f9;
-      border-radius: 6px;
-      height: 8px;
-      overflow: hidden;
-    }
-
-    .target-bar-fill {
-      height: 100%;
-      border-radius: 6px;
-      transition: width 0.8s ease;
-    }
-
-    .on-track-fill  { background: linear-gradient(90deg, #10b981, #34d399); }
-    .behind-fill    { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-    .critical-fill  { background: linear-gradient(90deg, #ef4444, #f87171); }
-
-    .kpi-target-sub {
-      font-size: 10px;
-      color: #334155;
-      margin-top: 4px;
-    }
-
-    /* ── Comparison table ── */
     .comparison-section {
       background: #fff;
       border-radius: 16px;
@@ -318,259 +158,19 @@
       margin-bottom: 20px;
     }
 
-    .comp-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .comp-table th {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: #475569;
-      padding: 10px 14px;
-      text-align: left;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    .comp-table td {
-      padding: 12px 14px;
-      font-size: 13px;
-      color: #475569;
-      border-bottom: 1px solid #f8fafc;
-    }
-
+    .comp-table { width: 100%; border-collapse: collapse; }
+    .comp-table th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #475569; padding: 10px 14px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    .comp-table td { padding: 12px 14px; font-size: 13px; color: #475569; border-bottom: 1px solid #f8fafc; }
     .comp-table tr:hover td { background: #f8fafc; }
+    .comp-table td.metric-name { font-weight: 600; color: #0f172a; }
+    .comp-table td.current-val { font-weight: 700; color: #0f172a; font-size: 14px; }
 
-    .comp-table td.metric-name {
-      font-weight: 600;
-      color: #0f172a;
-    }
-
-    .comp-table td.current-val {
-      font-weight: 700;
-      color: #0f172a;
-      font-size: 14px;
-    }
-
-    .comp-delta-cell {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .micro-delta {
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 6px;
-    }
-
+    .comp-delta-cell { display: flex; align-items: center; gap: 6px; }
+    .micro-delta { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 700; padding: 2px 7px; border-radius: 6px; }
     .micro-delta.up    { background: rgba(16,185,129,0.15); color: #10b981; }
     .micro-delta.down  { background: rgba(239,68,68,0.15);  color: #ef4444; }
     .micro-delta.flat  { background: rgba(148,163,184,0.15); color: #475569; }
 
-    /* ── Road to £1M section ── */
-    .roadmap-section {
-      background: linear-gradient(135deg, #faf5ff, #eff6ff);
-      border-radius: 16px;
-      padding: 28px;
-      border: 1px solid #ddd6fe;
-      margin-bottom: 24px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .roadmap-section::after {
-      content: '£1M';
-      position: absolute;
-      right: -10px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: clamp(60px, 10vw, 120px);
-      font-weight: 900;
-      color: rgba(139,92,246,0.06);
-      pointer-events: none;
-      letter-spacing: -4px;
-    }
-
-    .roadmap-section h3 {
-      font-size: 20px;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .roadmap-sub {
-      font-size: 13px;
-      color: #475569;
-      margin-bottom: 24px;
-    }
-
-    .roadmap-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-
-    .roadmap-target {
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 0;
-      text-align: left;
-      overflow: hidden;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
-      transition: box-shadow .2s ease, transform .2s ease;
-    }
-
-    .roadmap-target:hover {
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-      transform: translateY(-1px);
-    }
-
-    .roadmap-target .rt-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 16px 10px;
-    }
-
-    .roadmap-target .rt-icon-wrap {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .roadmap-target .rt-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: #64748b;
-      line-height: 1.3;
-    }
-
-    .roadmap-target .rt-body {
-      padding: 0 16px 14px;
-    }
-
-    .roadmap-target .rt-value {
-      font-size: 30px;
-      font-weight: 800;
-      margin-bottom: 4px;
-      line-height: 1;
-      letter-spacing: -0.5px;
-    }
-
-    .roadmap-target .rt-progress {
-      font-size: 11px;
-      font-weight: 500;
-      color: #64748b;
-      line-height: 1.4;
-    }
-
-    .roadmap-target .rt-accent {
-      height: 3px;
-      width: 100%;
-    }
-
-    /* Year milestone bars */
-    .milestone-track {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .milestone-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .milestone-year {
-      font-size: 13px;
-      font-weight: 700;
-      color: #475569;
-      width: 60px;
-      flex-shrink: 0;
-    }
-
-    .milestone-bar-wrap {
-      flex: 1;
-      background: #e2e8f0;
-      border-radius: 8px;
-      height: 28px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .milestone-bar-fill {
-      height: 100%;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      padding-left: 12px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #fff;
-      transition: width 1s ease;
-    }
-
-    .milestone-target-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #475569;
-      white-space: nowrap;
-      min-width: 80px;
-      text-align: right;
-    }
-
-    /* Data source toggle — reused */
-    .data-source-toggle {
-      display: flex;
-      gap: 0;
-      background: #f1f5f9;
-      border-radius: 12px;
-      padding: 4px;
-      border: 1px solid #e2e8f0;
-      margin-bottom: 24px;
-    }
-
-    .ds-btn {
-      flex: 1;
-      padding: 12px 20px;
-      border-radius: 8px;
-      border: none;
-      background: transparent;
-      color: #475569;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all .2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .ds-btn.active.clients  { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; box-shadow: 0 2px 8px rgba(59,130,246,0.3); }
-    .ds-btn.active.bookings { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff; box-shadow: 0 2px 8px rgba(139,92,246,0.3); }
-
-    /* Stats */
     .stats-overview {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -595,7 +195,6 @@
     .stat-value.purple { color: #8b5cf6; }
     .stat-label { color: #475569; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* Layout */
     .content-grid {
       display: grid;
       grid-template-columns: 380px 1fr 340px;
@@ -610,28 +209,15 @@
       border: 1px solid #e2e8f0;
     }
 
-    #map {
-      height: 720px;
-      border-radius: 12px;
-      border: 2px solid #e2e8f0;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    }
+    #map { height: 720px; border-radius: 12px; border: 2px solid #e2e8f0; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
 
     .sidebar { display: flex; flex-direction: column; gap: 20px; }
 
-    .control-panel {
-      background: #fff;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      border: 1px solid #e2e8f0;
-    }
-
+    .control-panel { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
     .control-panel h3 { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
 
     .control-section { margin-bottom: 24px; }
     .control-section:last-child { margin-bottom: 0; }
-
     .control-label { font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 
     .view-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -682,93 +268,33 @@
     .filter-btn.active .filter-count { background: rgba(255,255,255,0.3); color: #fff; }
 
     .date-filter { display: flex; gap: 8px; margin-top: 8px; }
-
-    .date-input {
-      flex: 1;
-      padding: 10px;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      background: #fff;
-      color: #0f172a;
-      font-size: 12px;
-      font-family: 'Inter', sans-serif;
-    }
-
+    .date-input { flex: 1; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; background: #fff; color: #0f172a; font-size: 12px; font-family: 'Inter', sans-serif; }
     .date-input:focus { outline: none; border-color: #3b82f6; }
 
-    .region-list {
-      background: linear-gradient(135deg, #f8fafc, #ffffff);
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-      border: 1px solid #e2e8f0;
-      max-height: 580px;
-      overflow-y: auto;
-    }
-
+    .region-list { background: linear-gradient(135deg, #f8fafc, #ffffff); border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; max-height: 580px; overflow-y: auto; }
     .region-list h3 { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
 
-    .region-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 12px;
-      border-bottom: 1px solid #f8fafc;
-      cursor: pointer;
-      transition: all .2s ease;
-      border-radius: 8px;
-      margin-bottom: 2px;
-    }
-
+    .region-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid #f8fafc; cursor: pointer; transition: all .2s ease; border-radius: 8px; margin-bottom: 2px; }
     .region-item:hover { background: #eff6ff; }
     .region-name { font-weight: 600; color: #0f172a; font-size: 13px; }
     .region-sub { font-size: 11px; color: #10b981; margin-top: 2px; }
-
     .region-count { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 700; white-space: nowrap; }
     .region-count.booking { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
     .region-item.empty { opacity: 0.4; }
     .region-item.empty .region-count { background: #e2e8f0; color: #475569; }
     .region-item.active { background: #f8fafc; border-left: 3px solid #60a5fa; }
 
-    .detail-panel {
-      background: linear-gradient(135deg, #f8fafc, #ffffff);
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-      border: 1px solid #e2e8f0;
-      max-height: 740px;
-      overflow-y: auto;
-    }
-
+    .detail-panel { background: linear-gradient(135deg, #f8fafc, #ffffff); border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; max-height: 740px; overflow-y: auto; }
     .detail-panel h3 { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 16px; }
 
-    .card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 10px;
-      transition: all .2s ease;
-      cursor: pointer;
-    }
-
+    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-bottom: 10px; transition: all .2s ease; cursor: pointer; }
     .card:hover { border-color: #60a5fa; transform: translateX(3px); }
     .card.booking:hover { border-color: #a78bfa; }
 
     .card-title { font-weight: 700; color: #0f172a; font-size: 14px; margin-bottom: 6px; }
     .card-info { font-size: 12px; color: #475569; margin-bottom: 3px; display: flex; align-items: center; gap: 5px; }
 
-    .badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 8px;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      margin-top: 6px;
-      margin-right: 4px;
-    }
-
+    .badge { display: inline-block; padding: 3px 8px; border-radius: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 6px; margin-right: 4px; }
     .badge-active    { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
     .badge-inactive  { background: rgba(239,68,68,0.2);  color: #ef4444; border: 1px solid #ef4444; }
     .badge-confirmed { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
@@ -777,132 +303,37 @@
     .badge-completed { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981; }
     .badge-cancelled { background: rgba(239,68,68,0.2);  color: #ef4444; border: 1px solid #ef4444; }
 
-    .revenue-total {
-      background: rgba(16,185,129,0.1);
-      border: 1px solid rgba(16,185,129,0.3);
-      border-radius: 8px;
-      padding: 10px 14px;
-      color: #10b981;
-      font-weight: 700;
-      font-size: 14px;
-      margin-bottom: 12px;
-    }
+    .revenue-total { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 10px 14px; color: #10b981; font-weight: 700; font-size: 14px; margin-bottom: 12px; }
+    .revenue-tag { display: inline-block; background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid #10b981; padding: 2px 7px; border-radius: 6px; font-size: 11px; font-weight: 700; margin-top: 4px; }
 
-    .revenue-tag {
-      display: inline-block;
-      background: rgba(16,185,129,0.15);
-      color: #10b981;
-      border: 1px solid #10b981;
-      padding: 2px 7px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-
-    .panel-tabs {
-      display: flex;
-      gap: 4px;
-      background: #ffffff;
-      border-radius: 10px;
-      padding: 4px;
-      margin-bottom: 16px;
-      border: 1px solid #e2e8f0;
-    }
-
-    .panel-tab {
-      flex: 1;
-      padding: 8px 10px;
-      border-radius: 7px;
-      border: none;
-      background: transparent;
-      color: #475569;
-      font-weight: 600;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all .2s ease;
-      font-family: 'Inter', sans-serif;
-    }
-
+    .panel-tabs { display: flex; gap: 4px; background: #ffffff; border-radius: 10px; padding: 4px; margin-bottom: 16px; border: 1px solid #e2e8f0; }
+    .panel-tab { flex: 1; padding: 8px 10px; border-radius: 7px; border: none; background: transparent; color: #475569; font-weight: 600; font-size: 12px; cursor: pointer; transition: all .2s ease; font-family: 'Inter', sans-serif; }
     .panel-tab.active { background: #f8fafc; color: #0f172a; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
-    .panel-tab:hover:not(.active) { color: #475569; }
 
     .intel-section { margin-bottom: 20px; }
-
-    .intel-section-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: #475569;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 10px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid #f8fafc;
-    }
-
-    .intel-stat-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .intel-stat {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 12px;
-      text-align: center;
-    }
-
+    .intel-section-title { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #f8fafc; }
+    .intel-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .intel-stat { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; text-align: center; }
     .intel-stat-value { font-size: 22px; font-weight: 700; color: #3b82f6; margin-bottom: 4px; }
     .intel-stat-value.gold   { color: #f59e0b; }
     .intel-stat-value.green  { color: #10b981; }
     .intel-stat-value.purple { color: #8b5cf6; }
     .intel-stat-label { font-size: 10px; color: #475569; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    .rate-bar-wrap {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 14px;
-      margin-bottom: 16px;
-    }
-
+    .rate-bar-wrap { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 16px; }
     .rate-bar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; color: #475569; font-weight: 600; }
     .rate-bar-pct { font-size: 20px; font-weight: 700; color: #10b981; }
     .rate-bar-bg { background: #f8fafc; border-radius: 6px; height: 10px; overflow: hidden; }
     .rate-bar-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #10b981, #3b82f6); transition: width 1s ease; }
     .rate-bar-sub { font-size: 11px; color: #475569; margin-top: 6px; }
 
-    .leaderboard-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 8px;
-      transition: all .2s ease;
-    }
-
+    .leaderboard-item { display: flex; align-items: center; gap: 10px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-bottom: 8px; transition: all .2s ease; }
     .leaderboard-item:hover { border-color: #60a5fa; transform: translateX(3px); }
     .leaderboard-item.rank-1 { border-color: #f59e0b; }
     .leaderboard-item.rank-2 { border-color: #475569; }
     .leaderboard-item.rank-3 { border-color: #cd7c2f; }
 
-    .rank-badge {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 13px;
-      flex-shrink: 0;
-    }
-
+    .rank-badge { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
     .rank-1 .rank-badge { background: #f59e0b; color: #000; }
     .rank-2 .rank-badge { background: #475569; color: #000; }
     .rank-3 .rank-badge { background: #cd7c2f; color: #fff; }
@@ -912,20 +343,12 @@
     .leaderboard-name  { font-weight: 700; color: #0f172a; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .leaderboard-email { font-size: 11px; color: #475569; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .leaderboard-sub   { font-size: 11px; color: #475569; margin-top: 2px; }
-
     .leaderboard-right { text-align: right; flex-shrink: 0; }
     .ltv-value      { font-size: 15px; font-weight: 700; color: #10b981; }
     .ltv-label      { font-size: 10px; color: #475569; }
     .booking-count  { font-size: 11px; color: #60a5fa; font-weight: 600; margin-top: 2px; }
 
-    .map-legend {
-      background: linear-gradient(135deg, #f8fafc, #ffffff);
-      border-radius: 12px;
-      padding: 16px;
-      border: 1px solid #e2e8f0;
-      margin-top: 16px;
-    }
-
+    .map-legend { background: linear-gradient(135deg, #f8fafc, #ffffff); border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; margin-top: 16px; }
     .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; color: #475569; }
     .legend-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.3); }
 
@@ -955,134 +378,43 @@
     .empty-state { text-align: center; padding: 40px 20px; }
     .empty-state-text { font-size: 13px; color: #475569; }
 
+    .milestone-track { display: flex; flex-direction: column; gap: 12px; }
+    .milestone-year { font-size: 13px; font-weight: 700; color: #475569; width: 60px; flex-shrink: 0; }
+    .milestone-bar-wrap { flex: 1; background: #e2e8f0; border-radius: 8px; height: 28px; overflow: hidden; position: relative; }
+    .milestone-bar-fill { height: 100%; border-radius: 8px; display: flex; align-items: center; padding-left: 12px; font-size: 12px; font-weight: 700; color: #fff; transition: width 1s ease; }
+    .milestone-target-label { font-size: 13px; font-weight: 600; color: #475569; white-space: nowrap; min-width: 80px; text-align: right; }
+
     @media (max-width: 1400px) {
       .content-grid { grid-template-columns: 1fr; }
       .sidebar { display: grid; grid-template-columns: 1fr 1fr; }
       #map { height: 600px; }
-      .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
-    }
-
-    @media (max-width: 900px) {
-      .perf-header { flex-direction: column; align-items: flex-start; }
-      .period-toggle { width: 100%; flex-wrap: wrap; }
-      .period-btn { flex: 1 1 calc(50% - 4px); text-align: center; font-size: 12px; padding: 9px 10px; }
-      .kpi-grid { grid-template-columns: 1fr 1fr; }
-      .roadmap-grid { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 768px) {
       body { padding: 10px; }
-
-      /* Header */
       .header { padding: 20px; flex-direction: column; align-items: flex-start; gap: 14px; }
-      .header-content h1 { font-size: 20px; gap: 8px; }
-      .header-content h1 i { width: 22px !important; height: 22px !important; }
+      .header-content h1 { font-size: 20px; }
       .header-actions { width: 100%; }
       .header-actions .btn { flex: 1; justify-content: center; padding: 10px 12px; font-size: 13px; }
-
-      /* Main tabs */
-      .main-tab-row { border-radius: 10px; gap: 2px; }
-      .main-tab-btn { font-size: 12px; padding: 10px 8px; gap: 5px; }
-      .main-tab-btn i { width: 14px !important; height: 14px !important; }
-
-      /* Stats grids */
+      .main-tab-row { border-radius: 10px; }
+      .main-tab-btn { font-size: 12px; padding: 10px 8px; }
       .stats-overview { grid-template-columns: 1fr 1fr; gap: 10px; }
       .stat-card { padding: 16px 12px; }
       .stat-value { font-size: 26px; }
-      .stat-label { font-size: 11px; }
-
-      /* Map */
       .content-grid { grid-template-columns: 1fr; gap: 14px; }
       .sidebar { grid-template-columns: 1fr; }
       #map { height: 340px; }
       .map-section { padding: 14px; }
-
-      /* Performance section */
-      .perf-header { padding: 18px; }
-      .perf-header h2 { font-size: 17px; }
-      .period-toggle { width: 100%; }
-      .period-btn { flex: 1 1 calc(50% - 4px); font-size: 11px; padding: 8px 6px; }
-
-      /* KPI cards */
-      .kpi-grid { grid-template-columns: 1fr; gap: 12px; }
-      .kpi-card { padding: 18px; }
-      .kpi-current { font-size: 32px; }
-      .kpi-label { font-size: 11px; }
-      .kpi-period-label { font-size: 11px; }
-      .kpi-delta { font-size: 13px; }
-
-      /* Comparison table */
-      .comparison-section { padding: 18px; overflow-x: auto; }
-      .comparison-section h3 { font-size: 15px; margin-bottom: 14px; }
-      .comp-table { min-width: 520px; }
-      .comp-table th, .comp-table td { padding: 8px 10px; font-size: 12px; }
-
-      /* Roadmap */
-      .roadmap-section { padding: 18px; }
-      .roadmap-section h3 { font-size: 16px; }
-      .roadmap-sub { font-size: 12px; }
-      .roadmap-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
-      .roadmap-target { padding: 12px; }
-      .roadmap-target .rt-value { font-size: 22px; }
-      .roadmap-target .rt-label { font-size: 10px; }
-      .roadmap-target .rt-progress { font-size: 11px; }
-      .milestone-year { font-size: 12px; }
-      .milestone-bar-wrap { height: 22px; }
-
-      /* Monthly targets — stack everything to single column */
       #monthlyTargetsGrid > div { grid-template-columns: 1fr !important; }
-      #monthlyTargetsGrid > div > div { grid-template-columns: 1fr !important; }
-      /* Acquisition & retention inner year columns — stack */
-      #monthlyTargetsGrid .acq-years,
-      #monthlyTargetsGrid .ret-years { grid-template-columns: 1fr !important; }
-      /* Dashboard snapshot equation — stack vertically */
-      .ret-snapshot { flex-direction: column !important; gap: 6px !important; align-items: flex-start !important; }
-      .ret-snapshot > div { text-align: left !important; }
-
-      /* Leaderboard */
-      .leaderboard-item { padding: 10px; gap: 8px; }
-      .leaderboard-name { font-size: 12px; }
-      .ltv-value { font-size: 13px; }
-      .booking-count { font-size: 10px; }
-
-      /* Region list & detail panel */
-      .region-list, .detail-panel { max-height: 400px; padding: 16px; }
-      .control-panel { padding: 16px; }
-      /* Intel stats row wraps to scrollable on mobile */
-      #intelStats { -webkit-overflow-scrolling: touch; }
-      #intelStats .stat-card { min-width: 130px; }
-    }
-
-    @media (max-width: 900px) and (min-width: 769px) {
-      /* Tablet — keep two cards side by side but stack year columns inside each */
-      #monthlyTargetsGrid > div { grid-template-columns: 1fr 1fr; }
-      #monthlyTargetsGrid .acq-years,
-      #monthlyTargetsGrid .ret-years { grid-template-columns: 1fr !important; }
-    }
-
-    @media (max-width: 768px) {
-      /* Mobile — two revenue boxes stack */
-      #monthlyTargetsGrid > div:first-child { grid-template-columns: 1fr !important; }
-      /* Two main cards stack */
-      #monthlyTargetsGrid > div:last-child { grid-template-columns: 1fr !important; }
-      /* Year columns inside each card stack */
       .acq-years, .ret-years { grid-template-columns: 1fr !important; }
-      /* Dashboard equation wraps */
-      .ret-snapshot { flex-wrap: wrap !important; gap: 8px !important; }
-      .ret-snapshot > div { min-width: 80px; }
-      /* Traj row numbers slightly smaller */
-      .traj-number { font-size: 18px !important; }
-      /* Sensitivity grid — single column, no overflow */
+      .ret-snapshot { flex-direction: column !important; gap: 6px !important; align-items: flex-start !important; }
       #sensitivityGrid { grid-template-columns: 1fr !important; }
     }
 
-        @media (max-width: 420px) {
-      .main-tab-btn span, .main-tab-btn { font-size: 11px; padding: 9px 6px; }
+    @media (max-width: 420px) {
+      .main-tab-btn { font-size: 11px; padding: 9px 6px; }
       .stats-overview { grid-template-columns: 1fr 1fr; gap: 8px; }
       .stat-value { font-size: 22px; }
-      .kpi-current { font-size: 28px; }
-      .roadmap-grid { grid-template-columns: 1fr; }
-      .period-btn { flex: 1 1 100%; }
       .header-content h1 { font-size: 17px; }
     }
   </style>
@@ -1090,7 +422,6 @@
 <body>
 <div class="map-container">
 
-  <!-- Header -->
   <div class="header">
     <div class="header-content">
       <h1><i data-lucide="map" style="width:32px;height:32px;"></i> Data &amp; Insight For Performance</h1>
@@ -1106,7 +437,6 @@
     </div>
   </div>
 
-  <!-- ── MAIN 3-WAY TAB ── -->
   <div class="main-tab-row">
     <button class="main-tab-btn active clients" id="tabClients" onclick="setMainTab('clients')">
       <i data-lucide="users" style="width:16px;height:16px;"></i> Clients
@@ -1119,142 +449,65 @@
     </button>
   </div>
 
-  <!-- ══════════════════════════════════════════════
-       MAP VIEW (clients + bookings)
-  ══════════════════════════════════════════════ -->
+  <!-- MAP VIEW -->
   <div id="mapView">
 
-    <!-- Client Stats -->
     <div class="stats-overview" id="clientStats">
-      <div class="stat-card">
-        <div class="stat-value" id="totalClients">-</div>
-        <div class="stat-label">Total Clients</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="regionsWithClients">-</div>
-        <div class="stat-label">Regions Covered</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="emptyRegions">-</div>
-        <div class="stat-label">Opportunities</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="topRegion">-</div>
-        <div class="stat-label">Top Region</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="clientGrowth">-</div>
-        <div class="stat-label">30-Day Growth</div>
-      </div>
+      <div class="stat-card"><div class="stat-value" id="totalClients">-</div><div class="stat-label">Total Clients</div></div>
+      <div class="stat-card"><div class="stat-value" id="regionsWithClients">-</div><div class="stat-label">Regions Covered</div></div>
+      <div class="stat-card"><div class="stat-value" id="emptyRegions">-</div><div class="stat-label">Opportunities</div></div>
+      <div class="stat-card"><div class="stat-value" id="topRegion">-</div><div class="stat-label">Top Region</div></div>
+      <div class="stat-card"><div class="stat-value" id="clientGrowth">-</div><div class="stat-label">30-Day Growth</div></div>
     </div>
 
-    <!-- Booking Stats -->
     <div class="stats-overview" id="bookingStats" style="display:none;">
-      <div class="stat-card booking-stat">
-        <div class="stat-value purple" id="totalBookings">-</div>
-        <div class="stat-label">Total Bookings</div>
-      </div>
-      <div class="stat-card booking-stat">
-        <div class="stat-value purple" id="confirmedBookings">-</div>
-        <div class="stat-label">Confirmed</div>
-      </div>
-      <div class="stat-card booking-stat">
-        <div class="stat-value purple" id="reservedBookings">-</div>
-        <div class="stat-label">Reserved</div>
-      </div>
-      <div class="stat-card booking-stat">
-        <div class="stat-value purple" id="totalRevenue">-</div>
-        <div class="stat-label">Total Revenue</div>
-      </div>
-      <div class="stat-card booking-stat">
-        <div class="stat-value purple" id="bookingGrowth">-</div>
-        <div class="stat-label">30-Day Bookings</div>
-      </div>
+      <div class="stat-card booking-stat"><div class="stat-value purple" id="totalBookings">-</div><div class="stat-label">Total Bookings</div></div>
+      <div class="stat-card booking-stat"><div class="stat-value purple" id="confirmedBookings">-</div><div class="stat-label">Confirmed</div></div>
+      <div class="stat-card booking-stat"><div class="stat-value purple" id="reservedBookings">-</div><div class="stat-label">Reserved</div></div>
+      <div class="stat-card booking-stat"><div class="stat-value purple" id="totalRevenue">-</div><div class="stat-label">Total Revenue</div></div>
+      <div class="stat-card booking-stat"><div class="stat-value purple" id="bookingGrowth">-</div><div class="stat-label">30-Day Bookings</div></div>
     </div>
 
-    <!-- Intelligence Stats Row -->
     <div class="stats-overview" id="intelStats">
-      <div class="stat-card" style="border-color:#f59e0b20;">
-        <div class="stat-value gold" id="intelBookingRate" style="color:#f59e0b;">-</div>
-        <div class="stat-label">Booking Rate</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value green" id="intelAvgLTV" style="color:#10b981;">-</div>
-        <div class="stat-label">Avg Client LTV</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value purple" id="intelAvgBookings" style="color:#8b5cf6;">-</div>
-        <div class="stat-label">Avg Bookings / Client</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value gold" id="intelTotalLTV" style="color:#f59e0b;">-</div>
-        <div class="stat-label">Total Client LTV</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="intelNeverBooked">-</div>
-        <div class="stat-label">Never Booked</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value" id="intelATV" style="color:#06b6d4;">-</div>
-        <div class="stat-label">Avg Transaction Value</div>
-      </div>
+      <div class="stat-card" style="border-color:#f59e0b20;"><div class="stat-value gold" id="intelBookingRate" style="color:#f59e0b;">-</div><div class="stat-label">Overall Booking Rate</div></div>
+      <div class="stat-card"><div class="stat-value green" id="intelAvgLTV" style="color:#10b981;">-</div><div class="stat-label">Avg Client LTV</div></div>
+      <div class="stat-card"><div class="stat-value purple" id="intelAvgBookings" style="color:#8b5cf6;">-</div><div class="stat-label">Avg Bookings / Client</div></div>
+      <div class="stat-card"><div class="stat-value gold" id="intelTotalLTV" style="color:#f59e0b;">-</div><div class="stat-label">Total Client LTV</div></div>
+      <div class="stat-card"><div class="stat-value" id="intelNeverBooked">-</div><div class="stat-label">Never Booked</div></div>
+      <div class="stat-card"><div class="stat-value" id="intelATV" style="color:#06b6d4;">-</div><div class="stat-label">Avg Transaction Value</div></div>
     </div>
 
-    <!-- Map grid -->
     <div class="content-grid">
       <div class="sidebar">
         <div class="control-panel">
           <h3><i data-lucide="settings" style="width:18px;height:18px;"></i> Map Controls</h3>
-
           <div class="control-section">
             <div class="control-label">View Mode</div>
             <div class="view-toggle">
-              <button class="view-btn active" id="viewMarkers" onclick="setViewMode('markers')">
-                <i data-lucide="map-pin" style="width:15px;height:15px;"></i> Markers
-              </button>
-              <button class="view-btn" id="viewHeatmap" onclick="setViewMode('heatmap')">
-                <i data-lucide="flame" style="width:15px;height:15px;"></i> Heat Map
-              </button>
+              <button class="view-btn active" id="viewMarkers" onclick="setViewMode('markers')"><i data-lucide="map-pin" style="width:15px;height:15px;"></i> Markers</button>
+              <button class="view-btn" id="viewHeatmap" onclick="setViewMode('heatmap')"><i data-lucide="flame" style="width:15px;height:15px;"></i> Heat Map</button>
             </div>
           </div>
-
           <div class="control-section" id="clientFilters">
             <div class="control-label">Filter</div>
-            <button class="filter-btn active" onclick="filterClients('all', event)">
-              <span>All Clients</span><span class="filter-count" id="cAll">-</span>
-            </button>
-            <button class="filter-btn" onclick="filterClients('active', event)">
-              <span>Active Only</span><span class="filter-count" id="cActive">-</span>
-            </button>
-            <button class="filter-btn" onclick="filterClients('with-clients', event)">
-              <span>Regions With Clients</span><span class="filter-count" id="cWithClients">-</span>
-            </button>
+            <button class="filter-btn active" onclick="filterClients('all', event)"><span>All Clients</span><span class="filter-count" id="cAll">-</span></button>
+            <button class="filter-btn" onclick="filterClients('active', event)"><span>Active Only</span><span class="filter-count" id="cActive">-</span></button>
+            <button class="filter-btn" onclick="filterClients('with-clients', event)"><span>Regions With Clients</span><span class="filter-count" id="cWithClients">-</span></button>
           </div>
-
           <div class="control-section" id="bookingFilters" style="display:none;">
             <div class="control-label">Booking Status</div>
-            <button class="filter-btn active" onclick="filterBookings('all', event)">
-              <span>All Bookings</span><span class="filter-count" id="bAll">-</span>
-            </button>
-            <button class="filter-btn" onclick="filterBookings('Confirmed', event)">
-              <span>Confirmed</span><span class="filter-count" id="bConfirmed">-</span>
-            </button>
-            <button class="filter-btn" onclick="filterBookings('Reserved', event)">
-              <span>Reserved</span><span class="filter-count" id="bReserved">-</span>
-            </button>
-            <button class="filter-btn" onclick="filterBookings('Cancelled', event)">
-              <span>Cancelled</span><span class="filter-count" id="bCancelled">-</span>
-            </button>
+            <button class="filter-btn active" onclick="filterBookings('all', event)"><span>All Bookings</span><span class="filter-count" id="bAll">-</span></button>
+            <button class="filter-btn" onclick="filterBookings('Confirmed', event)"><span>Confirmed</span><span class="filter-count" id="bConfirmed">-</span></button>
+            <button class="filter-btn" onclick="filterBookings('Reserved', event)"><span>Reserved</span><span class="filter-count" id="bReserved">-</span></button>
+            <button class="filter-btn" onclick="filterBookings('Cancelled', event)"><span>Cancelled</span><span class="filter-count" id="bCancelled">-</span></button>
           </div>
-
           <div class="control-section">
             <div class="control-label">Date Range</div>
             <div class="date-filter">
               <input type="date" class="date-input" id="dateFrom" onchange="applyDateFilter()">
-              <input type="date" class="date-input" id="dateTo"   onchange="applyDateFilter()">
+              <input type="date" class="date-input" id="dateTo" onchange="applyDateFilter()">
             </div>
           </div>
-
           <div class="control-section">
             <div class="control-label">Legend</div>
             <div class="map-legend" id="clientLegend">
@@ -1273,44 +526,30 @@
         </div>
 
         <div class="region-list" id="regionListPanel">
-          <h3>
-            <span id="regionListTitle">Regions</span>
-            <span id="regionTotal" style="color:#475569;font-size:13px;font-weight:500;">-</span>
-          </h3>
-          <div id="regionListContainer">
-            <div style="text-align:center;padding:40px 20px;color:#475569;">
-              <div class="spinner"></div><p>Loading...</p>
-            </div>
-          </div>
+          <h3><span id="regionListTitle">Regions</span><span id="regionTotal" style="color:#475569;font-size:13px;font-weight:500;">-</span></h3>
+          <div id="regionListContainer"><div style="text-align:center;padding:40px 20px;color:#475569;"><div class="spinner"></div><p>Loading...</p></div></div>
         </div>
       </div>
 
-      <div class="map-section">
-        <div id="map"></div>
-      </div>
+      <div class="map-section"><div id="map"></div></div>
 
       <div class="sidebar">
         <div class="detail-panel" id="detailPanel">
           <div class="panel-tabs">
-            <button class="panel-tab active" id="tabData"  onclick="switchTab('data')">&#128203; Data</button>
-            <button class="panel-tab"         id="tabIntel" onclick="switchTab('intel')">&#127942; Intelligence</button>
+            <button class="panel-tab active" id="tabData" onclick="switchTab('data')">&#128203; Data</button>
+            <button class="panel-tab" id="tabIntel" onclick="switchTab('intel')">&#127942; Intelligence</button>
           </div>
           <div id="tabDataContent">
             <h3 id="detailTitle" style="margin-bottom:12px;">All Clients</h3>
-            <div id="detailContent">
-              <div class="empty-state"><div class="spinner"></div><p class="empty-state-text">Loading data...</p></div>
-            </div>
+            <div id="detailContent"><div class="empty-state"><div class="spinner"></div><p class="empty-state-text">Loading data...</p></div></div>
           </div>
           <div id="tabIntelContent" style="display:none;">
-            <div id="intelContent">
-              <div class="empty-state"><div class="spinner"></div><p class="empty-state-text">Loading...</p></div>
-            </div>
+            <div id="intelContent"><div class="empty-state"><div class="spinner"></div><p class="empty-state-text">Loading...</p></div></div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Leaderboard section -->
     <div id="intelSection" style="margin-top:24px;">
       <div style="background:linear-gradient(135deg,#f8fafc,#ffffff);border-radius:16px;padding:28px;border:1px solid #e2e8f0;box-shadow:0 4px 16px rgba(0,0,0,0.3);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
@@ -1354,32 +593,24 @@
 
   </div><!-- end #mapView -->
 
-
-  <!-- ══════════════════════════════════════════════
-       PERFORMANCE ANALYTICS VIEW
-  ══════════════════════════════════════════════ -->
+  <!-- PERFORMANCE ANALYTICS VIEW -->
   <div id="performanceSection">
 
-    <!-- Period toggle — same style as map view/filter controls -->
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
       <div>
         <h2 style="font-size:20px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;"><i data-lucide="bar-chart-2" style="width:20px;height:20px;"></i>Performance Analytics</h2>
         <p style="font-size:13px;color:#64748b;margin-top:3px;" id="perfPeriodLabel">Month vs Month</p>
       </div>
       <div class="period-toggle">
-        <button class="period-btn active" onclick="setPeriod('mom')"  id="periodMoM">Month</button>
-        <button class="period-btn"        onclick="setPeriod('qoq')"  id="periodQoQ">Quarter</button>
-        <button class="period-btn"        onclick="setPeriod('6m')"   id="period6M">6 Month</button>
-        <button class="period-btn"        onclick="setPeriod('yoy')"  id="periodYoY">Year on Year</button>
+        <button class="period-btn active" onclick="setPeriod('mom')" id="periodMoM">Month</button>
+        <button class="period-btn" onclick="setPeriod('qoq')" id="periodQoQ">Quarter</button>
+        <button class="period-btn" onclick="setPeriod('6m')" id="period6M">6 Month</button>
+        <button class="period-btn" onclick="setPeriod('yoy')" id="periodYoY">Year on Year</button>
       </div>
     </div>
 
-    <!-- KPI stat cards — same as clients/bookings -->
-    <div class="stats-overview" id="kpiGrid">
-      <!-- Populated by JS -->
-    </div>
+    <div class="stats-overview" id="kpiGrid"></div>
 
-    <!-- Comparison Table -->
     <div class="comparison-section">
       <h3><i data-lucide="table-2" style="width:16px;height:16px;vertical-align:-3px;margin-right:6px;"></i>Detailed Comparison — <span id="compTableTitle">This Month vs Last Month</span></h3>
       <div style="overflow-x:auto;">
@@ -1394,53 +625,39 @@
               <th>vs Target</th>
             </tr>
           </thead>
-          <tbody id="compTableBody">
-          </tbody>
+          <tbody id="compTableBody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- Road to £1M section -->
     <div class="map-section" style="margin-bottom:24px;">
       <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:4px;display:flex;align-items:center;gap:8px;"><i data-lucide="target" style="width:18px;height:18px;"></i>Road to £1,000,000</h3>
       <p style="font-size:13px;color:#64748b;margin-bottom:20px;" id="roadmapSub">3 year growth plan · targets calculated from live ATV</p>
 
-      <div class="stats-overview" id="roadmapTargets" style="margin-bottom:24px;">
-        <!-- Populated by JS -->
-      </div>
+      <div class="stats-overview" id="roadmapTargets" style="margin-bottom:24px;"></div>
 
-      <!-- Year milestones -->
       <div style="margin-bottom:24px;">
         <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px;">Annual Revenue Milestones</div>
-        <div class="milestone-track" id="milestoneTrack">
-          <!-- Populated by JS -->
-        </div>
+        <div class="milestone-track" id="milestoneTrack"></div>
       </div>
 
-      <!-- Monthly targets breakdown -->
       <div style="margin-bottom:24px;">
         <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px;">Monthly Targets by Year</div>
-        <div id="monthlyTargetsGrid">
-          <!-- Populated by JS -->
-        </div>
+        <div id="monthlyTargetsGrid"></div>
       </div>
 
-      <!-- Sensitivity analysis -->
       <div>
         <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px;display:flex;align-items:center;gap:6px;"><i data-lucide="flask-conical" style="width:13px;height:13px;"></i>Single Lever Analysis — 2026 Target</div>
         <div style="font-size:12px;color:#64748b;margin-bottom:16px;">If everything else stays the same and you only improve <em>one</em> metric, what does it need to be?</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;" id="sensitivityGrid">
-          <!-- Populated by JS -->
-        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;" id="sensitivityGrid"></div>
       </div>
     </div>
 
   </div><!-- end #performanceSection -->
 
-</div><!-- end .map-container -->
+</div>
 
 <script>
-// ── Region coords ──
 const REGION_COORDS = {
   'Cheshire East':[53.1603,-2.2119],'Cheshire West and Chester':[53.1905,-2.8909],
   'Greater London':[51.5074,-0.1278],'Greater Manchester':[53.4808,-2.2426],
@@ -1484,7 +701,6 @@ const REGION_COORDS = {
 };
 const UK_REGIONS = Object.keys(REGION_COORDS).sort();
 
-// ── State ──
 let clientData = [], filteredClientData = [];
 let bookingData = [], filteredBookingData = [];
 let regionCounts = {};
@@ -1494,26 +710,8 @@ let currentViewMode  = 'markers';
 let currentMainTab   = 'clients';
 let currentPeriod    = 'mom';
 
-// ══════════════════════════════════════════════════════════════
-// TARGETS — fully derived from live booking + client data
-//
-//  Revenue targets (fixed goalposts):
-//    2026 = Y1 → £200,000
-//    2027 = Y2 → £500,000
-//    2028 = Y3 → £1,000,000  (not shown in UI)
-//
-//  Everything else calculated from live data:
-//    ATV             → avg of all non-cancelled booking prices
-//    Monthly bookings needed → annual revenue target ÷ ATV ÷ 12
-//    New vs existing split   → actual ratio from booking history
-//    Monthly sign-up target  → current avg sign-ups × growth multiplier
-//    Growth multiplier       → target revenue ÷ current run rate
-// ══════════════════════════════════════════════════════════════
-
-// Only the revenue goalposts are fixed — everything else is live
 const REVENUE_TARGETS = { y1: 200000, y2: 500000, y3: 1000000 };
 
-// Year is calendar-year based: 2026=Y1 (now), 2027=Y2, 2028=Y3
 function getCurrentYear() {
   const yr = new Date().getFullYear();
   if (yr <= 2026) return 1;
@@ -1521,18 +719,107 @@ function getCurrentYear() {
   return 3;
 }
 
-// ── Live ATV: avg price across all non-cancelled bookings with a price ──
 function calcLiveATV() {
   const paid = bookingData.filter(b => b.bookingStatus !== 'Cancelled' && parseFloat(b.finalPrice) > 0);
   if (paid.length === 0) return 350;
   return paid.reduce((s, b) => s + parseFloat(b.finalPrice), 0) / paid.length;
 }
 
-// ── Live monthly averages from actual booking + signup history ──
+// ══════════════════════════════════════════════════════════════
+//  calcLiveMonthlyAverages
+//
+//  KEY CHANGE: New client and existing client rates are now
+//  calculated against FIXED POOLS based on booking history
+//  relative to the current calendar month:
+//
+//  neverBookedPool  = dashboard clients with ZERO non-cancelled
+//                     bookings dated before this calendar month
+//  everBookedPool   = dashboard clients with AT LEAST ONE
+//                     non-cancelled booking before this month
+//
+//  newClientRate    = first-time bookers this month
+//                     ÷ neverBookedPool.size
+//  existingRate     = unique repeat bookers this month
+//                     ÷ everBookedPool.size
+//
+//  Both reset each calendar month so the performance analytics
+//  page always reflects the current month's picture.
+// ══════════════════════════════════════════════════════════════
 function calcLiveMonthlyAverages() {
   const now = new Date();
+  const thisMonthKey = now.toISOString().slice(0, 7); // YYYY-MM
 
-  // Bookings: use actual shoot dates, group by YYYY-MM
+  // All dashboard client emails
+  const clientEmails = new Set(
+    clientData.map(u => (u.fields['Email'] || '').toLowerCase()).filter(Boolean)
+  );
+
+  // ── Build each dashboard client's booking history BEFORE this month ──
+  // Key: email → Set of booking months (YYYY-MM) that are before thisMonthKey
+  const priorBookingsByEmail = {};
+  clientData.forEach(u => {
+    const email = (u.fields['Email'] || '').toLowerCase();
+    if (email) priorBookingsByEmail[email] = new Set();
+  });
+
+  bookingData.forEach(b => {
+    if (!b.date || b.bookingStatus === 'Cancelled' || !b.clientEmail) return;
+    const email = (b.clientEmail || '').toLowerCase();
+    if (!clientEmails.has(email)) return; // only dashboard clients
+    const bookingMonth = b.date.slice(0, 7);
+    if (bookingMonth < thisMonthKey) {
+      if (!priorBookingsByEmail[email]) priorBookingsByEmail[email] = new Set();
+      priorBookingsByEmail[email].add(bookingMonth);
+    }
+  });
+
+  // ── The two fixed pools ──
+  // neverBookedPool: dashboard clients who have ZERO non-cancelled bookings before this month
+  const neverBookedPool = new Set(
+    [...clientEmails].filter(e => !priorBookingsByEmail[e] || priorBookingsByEmail[e].size === 0)
+  );
+  // everBookedPool: dashboard clients who have AT LEAST ONE booking before this month
+  const everBookedPool = new Set(
+    [...clientEmails].filter(e => priorBookingsByEmail[e] && priorBookingsByEmail[e].size > 0)
+  );
+
+  // ── This calendar month's bookings (non-cancelled, dashboard clients only) ──
+  const thisMonthBookings = bookingData.filter(b => {
+    if (!b.date || b.bookingStatus === 'Cancelled' || !b.clientEmail) return false;
+    const email = (b.clientEmail || '').toLowerCase();
+    return clientEmails.has(email) && b.date.slice(0, 7) === thisMonthKey;
+  });
+
+  // First-time bookers this month = dashboard clients in neverBookedPool who have a booking this month
+  const firstTimeBookersThisMonth = new Set(
+    thisMonthBookings
+      .map(b => (b.clientEmail || '').toLowerCase())
+      .filter(e => neverBookedPool.has(e))
+  );
+
+  // Repeat bookers this month = dashboard clients in everBookedPool who have a booking this month
+  const repeatBookersThisMonth = new Set(
+    thisMonthBookings
+      .map(b => (b.clientEmail || '').toLowerCase())
+      .filter(e => everBookedPool.has(e))
+  );
+
+  // ── Rates ──
+  const newClientBookingRate = neverBookedPool.size > 0
+    ? firstTimeBookersThisMonth.size / neverBookedPool.size
+    : 0;
+
+  const existingClientBookingRate = everBookedPool.size > 0
+    ? repeatBookersThisMonth.size / everBookedPool.size
+    : 0;
+
+  // Blended overall rate for reference (all dashboard clients who booked this month)
+  const allBookersThisMonth = new Set(thisMonthBookings.map(b => (b.clientEmail || '').toLowerCase()));
+  const clientBookingRate = clientEmails.size > 0
+    ? allBookersThisMonth.size / clientEmails.size
+    : 0;
+
+  // ── Avg monthly bookings (historical, for trajectory calculations) ──
   const bMonths = {};
   bookingData.forEach(b => {
     if (!b.date || b.bookingStatus === 'Cancelled') return;
@@ -1541,10 +828,9 @@ function calcLiveMonthlyAverages() {
   });
   const bValues = Object.values(bMonths);
   const avgMonthlyBookings = bValues.length > 0
-    ? bValues.reduce((s, v) => s + v, 0) / bValues.length
-    : 0;
+    ? bValues.reduce((s, v) => s + v, 0) / bValues.length : 0;
 
-  // Sign-ups: group by YYYY-MM, exclude current partial month
+  // ── Avg monthly sign-ups (excl. current partial month) ──
   const sMonths = {};
   clientData.forEach(u => {
     const d = u.fields['Created Date'];
@@ -1552,15 +838,13 @@ function calcLiveMonthlyAverages() {
     const key = d.slice(0, 7);
     sMonths[key] = (sMonths[key] || 0) + 1;
   });
-  const currentMonth = now.toISOString().slice(0, 7);
   const sValues = Object.entries(sMonths)
-    .filter(([k]) => k < currentMonth)
+    .filter(([k]) => k < thisMonthKey)
     .map(([, v]) => v);
   const avgMonthlySignups = sValues.length > 0
-    ? sValues.reduce((s, v) => s + v, 0) / sValues.length
-    : 0;
+    ? sValues.reduce((s, v) => s + v, 0) / sValues.length : 0;
 
-  // New vs existing split from actual booking history (chronological order)
+  // ── New vs existing split from booking history ──
   const priorEmails = new Set();
   let newCount = 0, existCount = 0;
   const sorted = [...bookingData]
@@ -1572,149 +856,42 @@ function calcLiveMonthlyAverages() {
     if (priorEmails.has(email)) existCount++;
     else { newCount++; priorEmails.add(email); }
   });
-  const totalBookings = newCount + existCount;
-  const liveNewSplit = totalBookings > 0 ? newCount  / totalBookings : 0.30;
-  const liveExSplit  = totalBookings > 0 ? existCount / totalBookings : 0.70;
+  const totalBookingsSplit = newCount + existCount;
+  const liveNewSplit = totalBookingsSplit > 0 ? newCount / totalBookingsSplit : 0.30;
+  const liveExSplit  = totalBookingsSplit > 0 ? existCount / totalBookingsSplit : 0.70;
 
-  // Monthly revenue run rate — use last 3 complete months for a current picture
-  const allDates = bookingData.filter(b => b.date).map(b => new Date(b.date));
-  const earliest = allDates.length ? new Date(Math.min(...allDates)) : now;
-  const monthsActive = Math.max(1, (now - earliest) / (1000 * 60 * 60 * 24 * 30));
-  const totalRev = bookingData
-    .filter(b => b.bookingStatus !== 'Cancelled')
-    .reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
-  // Last 3 complete months run rate (more representative of current trajectory)
-  const currentMonthKey = now.toISOString().slice(0, 7);
+  // ── Monthly revenue run rate (last 3 complete months) ──
   const revByMonth = {};
   bookingData.filter(b => b.date && b.bookingStatus !== 'Cancelled').forEach(b => {
     const k = b.date.slice(0, 7);
-    if (k < currentMonthKey) revByMonth[k] = (revByMonth[k] || 0) + (parseFloat(b.finalPrice) || 0);
+    if (k < thisMonthKey) revByMonth[k] = (revByMonth[k] || 0) + (parseFloat(b.finalPrice) || 0);
   });
   const sortedRevMonths = Object.keys(revByMonth).sort().reverse();
   const last3Months = sortedRevMonths.slice(0, 3);
   const last3Rev = last3Months.reduce((s, k) => s + revByMonth[k], 0);
-  const monthlyRevRunRate = last3Months.length > 0 ? last3Rev / last3Months.length : totalRev / monthsActive;
-  const monthlyRevRunRateAllTime = totalRev / monthsActive; // keep for context
+  const monthlyRevRunRate = last3Months.length > 0 ? last3Rev / last3Months.length : 0;
 
-  // ── Monthly client booking rate: avg % of dashboard clients who book in any given month ──
-  // Method: for each calendar month, count unique clients who placed a booking,
-  // divide by total dashboard clients, then average across all months.
-  // This is the true "what % of my base books per month" metric.
-  const clientEmails = new Set(clientData.map(u => (u.fields['Email'] || '').toLowerCase()).filter(Boolean));
-  const bookedEmails = new Set(
-    bookingData
-      .filter(b => b.bookingStatus !== 'Cancelled' && b.clientEmail)
-      .map(b => (b.clientEmail || '').toLowerCase())
-  );
-  const clientsWhoBooked = [...bookedEmails].filter(e => clientEmails.has(e)).length;
-
-  // Group bookings by month, count unique dashboard clients booking that month
-  const bookingsByMonth = {};
-  bookingData.forEach(b => {
-    if (!b.date || b.bookingStatus === 'Cancelled' || !b.clientEmail) return;
-    const email = b.clientEmail.toLowerCase();
-    if (!clientEmails.has(email)) return;
-    const month = b.date.slice(0, 7);
-    if (!bookingsByMonth[month]) bookingsByMonth[month] = new Set();
-    bookingsByMonth[month].add(email);
-  });
-  const monthlyRates = Object.values(bookingsByMonth).map(s => s.size / Math.max(1, clientEmails.size));
-  const clientBookingRate = monthlyRates.length > 0
-    ? monthlyRates.reduce((s, v) => s + v, 0) / monthlyRates.length
-    : 0;
-
-  // ── Existing client booking rate ──
-  // Of clients who have ever booked, what % book in any given month?
-  // Correct denominator for retention targets — not the blended all-client rate.
-  const firstBookingMonthByEmail = {};
-  [...bookingData]
-    .filter(b => b.date && b.bookingStatus !== 'Cancelled' && b.clientEmail)
-    .sort((a, b) => a.date.localeCompare(b.date))
-    .forEach(b => {
-      const email = (b.clientEmail || '').toLowerCase();
-      if (!firstBookingMonthByEmail[email]) firstBookingMonthByEmail[email] = b.date.slice(0, 7);
-    });
-  const everBookedEmails = new Set(Object.keys(firstBookingMonthByEmail).filter(e => clientEmails.has(e)));
-  const existingClientCount = everBookedEmails.size;
-  const existingBookingsByMonth = {};
-  bookingData.forEach(b => {
-    if (!b.date || b.bookingStatus === 'Cancelled' || !b.clientEmail) return;
-    const email = b.clientEmail.toLowerCase();
-    if (!clientEmails.has(email)) return;
-    const month = b.date.slice(0, 7);
-    const firstMonth = firstBookingMonthByEmail[email];
-    if (!firstMonth || firstMonth >= month) return; // skip first-ever booking month
-    if (!existingBookingsByMonth[month]) existingBookingsByMonth[month] = new Set();
-    existingBookingsByMonth[month].add(email);
-  });
-  const existingMonthlyRates = Object.values(existingBookingsByMonth)
-    .map(s => s.size / Math.max(1, existingClientCount));
-  const existingClientBookingRate = existingMonthlyRates.length > 0
-    ? existingMonthlyRates.reduce((s, v) => s + v, 0) / existingMonthlyRates.length
-    : clientBookingRate;
-
-  // ── Per-month cohort conversion rate ──
-  // For each sign-up month, count how many of that cohort eventually made a booking.
-  // Average across all months = true monthly conversion rate.
-  // Build email → first booking date lookup
-  const firstBookingDateByEmail = {};
-  bookingData
-    .filter(b => b.date && b.bookingStatus !== 'Cancelled' && b.clientEmail)
-    .forEach(b => {
-      const email = (b.clientEmail || '').toLowerCase();
-      const d = new Date(b.date);
-      if (!firstBookingDateByEmail[email] || d < firstBookingDateByEmail[email]) {
-        firstBookingDateByEmail[email] = d;
-      }
-    });
-
-  // Group clients by their sign-up month
-  const signupCohorts = {};
-  clientData.forEach(u => {
-    const email = (u.fields['Email'] || '').toLowerCase();
-    const d = u.fields['Created Date'];
-    if (!email || !d) return;
-    const month = d.slice(0, 7);
-    if (!signupCohorts[month]) signupCohorts[month] = [];
-    signupCohorts[month].push(email);
-  });
-
-  // For each cohort month, calculate conversion rate
-  // Only include months that are complete (not the current partial month)
-  const cohortCurrentMonth = now.toISOString().slice(0, 7);
-  const monthlyConversionRates = [];
-  const cohortBreakdown = {}; // month → { signups, converted, rate }
-
-  Object.entries(signupCohorts).forEach(([month, emails]) => {
-    if (month >= cohortCurrentMonth) return; // skip current partial month
-    if (emails.length === 0) return;
-    const converted = emails.filter(e => firstBookingDateByEmail[e]).length;
-    const rate = converted / emails.length;
-    monthlyConversionRates.push(rate);
-    cohortBreakdown[month] = { signups: emails.length, converted, rate };
-  });
-
-  const lifetimeBookingRate = monthlyConversionRates.length > 0
-    ? monthlyConversionRates.reduce((s, v) => s + v, 0) / monthlyConversionRates.length
-    : (clientEmails.size > 0 ? clientsWhoBooked / clientEmails.size : 0);
-
-  // ── Avg bookings per client per month (for active bookers) ──
-  const totalNonCancelledBookings = bookingData.filter(b => b.bookingStatus !== 'Cancelled').length;
+  // ── Avg bookings per booking client per month ──
+  const allDates = bookingData.filter(b => b.date).map(b => new Date(b.date));
+  const earliest = allDates.length ? new Date(Math.min(...allDates)) : now;
+  const monthsActive = Math.max(1, (now - earliest) / (1000 * 60 * 60 * 24 * 30));
+  const totalNonCancelled = bookingData.filter(b => b.bookingStatus !== 'Cancelled').length;
+  const clientsWhoBooked = everBookedPool.size; // those who booked at least once before this month
   const bookingsPerBookedClientPerMonth = (clientsWhoBooked > 0 && monthsActive > 0)
-    ? totalNonCancelledBookings / monthsActive / clientsWhoBooked
-    : 0;
+    ? totalNonCancelled / monthsActive / clientsWhoBooked : 0;
 
-  // ── Sign-up → First Booking Lag Analysis ──
-  // For every dashboard client who has booked, measure days from sign-up to their first booking.
-  // Build a lookup: email → signup date
+  // ── Lifetime booking rate: % of dashboard clients who have EVER booked ──
+  // Denominator = all dashboard clients; numerator = those in everBookedPool + first-timers this month
+  const totalEverBooked = everBookedPool.size + firstTimeBookersThisMonth.size;
+  const lifetimeBookingRate = clientEmails.size > 0 ? totalEverBooked / clientEmails.size : 0;
+
+  // ── Sign-up lag (sign-up to first booking) ──
   const signupByEmail = {};
   clientData.forEach(u => {
     const email = (u.fields['Email'] || '').toLowerCase();
     const d = u.fields['Created Date'];
     if (email && d) signupByEmail[email] = new Date(d);
   });
-
-  // Find each client's first non-cancelled booking date
   const firstBookingByEmail = {};
   bookingData
     .filter(b => b.date && b.bookingStatus !== 'Cancelled' && b.clientEmail)
@@ -1725,26 +902,37 @@ function calcLiveMonthlyAverages() {
         firstBookingByEmail[email] = d;
       }
     });
-
-  // Calculate lag in days for clients where we have both dates
   const lagDays = [];
   Object.entries(firstBookingByEmail).forEach(([email, firstBookDate]) => {
     const signupDate = signupByEmail[email];
-    if (!signupDate) return; // no dashboard record for this booker — skip
+    if (!signupDate) return;
     const days = (firstBookDate - signupDate) / (1000 * 60 * 60 * 24);
-    if (days >= 0) lagDays.push(days); // ignore negative (booking before signup = data error)
+    if (days >= 0) lagDays.push(days);
   });
-
   const avgLagDays = lagDays.length > 0
-    ? lagDays.reduce((s, v) => s + v, 0) / lagDays.length
-    : 30; // default 30 days if no data
-  const avgLagMonths = avgLagDays / 30.44;
+    ? lagDays.reduce((s, v) => s + v, 0) / lagDays.length : 30;
   const medianLagDays = lagDays.length > 0
-    ? [...lagDays].sort((a, b) => a - b)[Math.floor(lagDays.length / 2)]
-    : 30;
+    ? [...lagDays].sort((a, b) => a - b)[Math.floor(lagDays.length / 2)] : 30;
 
-  // Monthly new client bookings: group non-cancelled bookings by month, count those from new clients
-  // "New client" = it's their first ever booking
+  // ── Per-cohort conversion rate ──
+  const lagCutoff = new Date(now.getTime() - avgLagDays * 1000 * 60 * 60 * 24);
+  const cohortConversionRates = [];
+  Object.entries(sMonths).forEach(([month, count]) => {
+    const cohortDate = new Date(month + '-01');
+    if (cohortDate > lagCutoff || count === 0) return;
+    const cohortEmails = clientData
+      .filter(u => (u.fields['Created Date'] || '').startsWith(month))
+      .map(u => (u.fields['Email'] || '').toLowerCase())
+      .filter(Boolean);
+    if (cohortEmails.length === 0) return;
+    const converted = cohortEmails.filter(e => firstBookingByEmail[e]).length;
+    cohortConversionRates.push(converted / cohortEmails.length);
+  });
+  const avgCohortConversionRate = cohortConversionRates.length > 0
+    ? cohortConversionRates.reduce((s, v) => s + v, 0) / cohortConversionRates.length
+    : lifetimeBookingRate;
+
+  // ── New/repeat bookings by month (for trajectory) ──
   const newClientBookingsByMonth = {};
   const seenEmails = new Set();
   [...bookingData]
@@ -1758,76 +946,49 @@ function calcLiveMonthlyAverages() {
         newClientBookingsByMonth[month] = (newClientBookingsByMonth[month] || 0) + 1;
       }
     });
-
-  // Repeat client bookings by month
   const repeatClientBookingsByMonth = {};
   Object.keys(bMonths).forEach(month => {
     const totalThatMonth = bMonths[month] || 0;
     const newThatMonth = newClientBookingsByMonth[month] || 0;
     repeatClientBookingsByMonth[month] = Math.max(0, totalThatMonth - newThatMonth);
   });
-
   const newBkValues = Object.values(newClientBookingsByMonth);
   const repBkValues = Object.values(repeatClientBookingsByMonth);
   const avgMonthlyNewClientBookings    = newBkValues.length > 0 ? newBkValues.reduce((s,v)=>s+v,0)/newBkValues.length : 0;
   const avgMonthlyRepeatClientBookings = repBkValues.length > 0 ? repBkValues.reduce((s,v)=>s+v,0)/repBkValues.length : 0;
 
-  // Monthly sign-up cohort conversion: for each completed month's sign-ups,
-  // what % eventually booked (after enough time has passed for the lag)?
-  // Only count cohort months where avgLagDays has passed since sign-up
-  const lagCutoff = new Date(now.getTime() - avgLagDays * 1000 * 60 * 60 * 24);
-  const cohortConversionRates = [];
-  Object.entries(sMonths).forEach(([month, count]) => {
-    const cohortDate = new Date(month + '-01');
-    if (cohortDate > lagCutoff) return; // too recent — lag hasn't elapsed
-    if (count === 0) return;
-    // Find clients who signed up this month
-    const cohortEmails = clientData
-      .filter(u => (u.fields['Created Date'] || '').startsWith(month))
-      .map(u => (u.fields['Email'] || '').toLowerCase())
-      .filter(Boolean);
-    if (cohortEmails.length === 0) return;
-    const converted = cohortEmails.filter(e => firstBookingByEmail[e]).length;
-    cohortConversionRates.push(converted / cohortEmails.length);
-  });
-  const avgCohortConversionRate = cohortConversionRates.length > 0
-    ? cohortConversionRates.reduce((s,v)=>s+v,0) / cohortConversionRates.length
-    : lifetimeBookingRate;
-
   return {
+    // Core pools
+    neverBookedPool, everBookedPool,
+    firstTimeBookersThisMonth, repeatBookersThisMonth,
+    thisMonthBookings,
+    // Rates (calendar-month based)
+    newClientBookingRate, existingClientBookingRate, clientBookingRate,
+    // Legacy / trajectory
     avgMonthlyBookings, avgMonthlySignups,
     avgMonthlyNewClientBookings, avgMonthlyRepeatClientBookings,
-    newClientBookingsByMonth, repeatClientBookingsByMonth,
     liveNewSplit, liveExSplit,
-    monthlyRevRunRate, monthlyRevRunRateAllTime, monthsActive,
-    clientBookingRate, existingClientBookingRate, existingClientCount, lifetimeBookingRate, clientsWhoBooked,
+    monthlyRevRunRate, monthsActive,
+    lifetimeBookingRate, clientsWhoBooked,
     totalDashboardClients: clientEmails.size,
     bookingsPerBookedClientPerMonth,
-    // Sign-up lag
-    avgLagDays, avgLagMonths, medianLagDays, lagSampleSize: lagDays.length,
+    avgLagDays, medianLagDays, lagSampleSize: lagDays.length,
     avgCohortConversionRate,
-    // Per-month cohort breakdown
-    cohortBreakdown, monthlyConversionRates
+    thisMonthKey
   };
 }
 
-// ── Build all targets from live data ──
 function buildTargets() {
   const atv  = calcLiveATV();
   const live = calcLiveMonthlyAverages();
 
-  // For each year target: work out what monthly numbers are NEEDED
   const mk = (annualRev) => {
-    const monthlyRev      = annualRev / 12;
-    const totalMonthly    = Math.ceil(monthlyRev / atv);
-    const newMonthly      = Math.max(1, Math.ceil(totalMonthly * live.liveNewSplit));
-    const exMonthly       = totalMonthly - newMonthly;
-    // Sign-up target: new bookings needed ÷ cohort conversion rate
-    // avgCohortConversionRate = % of a sign-up cohort who eventually book (after lag has elapsed)
-    const conversionRate  = live.lifetimeBookingRate > 0
-      ? live.lifetimeBookingRate
-      : 0.5;
-    const signupTarget    = Math.ceil(newMonthly / conversionRate);
+    const monthlyRev  = annualRev / 12;
+    const totalMonthly = Math.ceil(monthlyRev / atv);
+    const newMonthly   = Math.max(1, Math.ceil(totalMonthly * live.liveNewSplit));
+    const exMonthly    = totalMonthly - newMonthly;
+    const conversionRate = live.lifetimeBookingRate > 0 ? live.lifetimeBookingRate : 0.5;
+    const signupTarget = Math.ceil(newMonthly / conversionRate);
     return { revenue: Math.round(monthlyRev), totalBookings: totalMonthly, newBookings: newMonthly, existBookings: exMonthly, signups: signupTarget };
   };
 
@@ -1838,16 +999,15 @@ function buildTargets() {
   return {
     atv, live,
     monthly: {
-      signups:      { y1: y1.signups,      y2: y2.signups,      y3: y3.signups      },
-      revenue:      { y1: y1.revenue,      y2: y2.revenue,      y3: y3.revenue      },
-      totalBookings:{ y1: y1.totalBookings, y2: y2.totalBookings, y3: y3.totalBookings },
-      newBookings:  { y1: y1.newBookings,  y2: y2.newBookings,  y3: y3.newBookings  },
-      existBookings:{ y1: y1.existBookings, y2: y2.existBookings, y3: y3.existBookings }
+      signups:       { y1: y1.signups,       y2: y2.signups,       y3: y3.signups       },
+      revenue:       { y1: y1.revenue,        y2: y2.revenue,       y3: y3.revenue       },
+      totalBookings: { y1: y1.totalBookings,  y2: y2.totalBookings, y3: y3.totalBookings },
+      newBookings:   { y1: y1.newBookings,    y2: y2.newBookings,   y3: y3.newBookings   },
+      existBookings: { y1: y1.existBookings,  y2: y2.existBookings, y3: y3.existBookings }
     }
   };
 }
 
-// Returns the correct monthly target for the current calendar year
 function getYearTarget(metric) {
   const yr  = getCurrentYear();
   const key = 'y' + yr;
@@ -1855,7 +1015,6 @@ function getYearTarget(metric) {
   return { target: T.monthly[metric][key], year: yr, atv: T.atv };
 }
 
-// ── Init ──
 document.addEventListener('DOMContentLoaded', () => {
   initMap();
   initDateFilters();
@@ -1898,22 +1057,21 @@ function initDateFilters() {
   document.getElementById('dateFrom').value = yearAgo.toISOString().split('T')[0];
 }
 
-// ── Load Data ──
 async function loadMapData() {
   try {
     const [usersRes, bookingsRes] = await Promise.all([
       fetch('/.netlify/functions/admin-users'),
       fetch('/.netlify/functions/get-all-bookings')
     ]);
-    if (!usersRes.ok)   throw new Error('Failed to load user data');
+    if (!usersRes.ok)    throw new Error('Failed to load user data');
     if (!bookingsRes.ok) throw new Error('Failed to load booking data');
 
     const userData = await usersRes.json();
     const bData    = await bookingsRes.json();
 
-    clientData          = userData.users  || [];
+    clientData          = userData.users   || [];
     filteredClientData  = [...clientData];
-    bookingData         = bData.bookings  || [];
+    bookingData         = bData.bookings   || [];
     filteredBookingData = [...bookingData];
 
     buildRegionCounts();
@@ -1942,7 +1100,6 @@ function buildRegionCounts() {
   });
 }
 
-// ── Stats ──
 function updateClientStats() {
   const total   = clientData.filter(u => u.fields['Region']).length;
   const covered = Object.values(regionCounts).filter(c => c > 0).length;
@@ -1950,11 +1107,11 @@ function updateClientStats() {
   for (const [r, c] of Object.entries(regionCounts)) { if (c > max) { max = c; top = r; } }
   const ago    = new Date(); ago.setDate(ago.getDate() - 30);
   const recent = clientData.filter(u => new Date(u.fields['Created Date']) >= ago).length;
-  document.getElementById('totalClients').textContent      = total;
+  document.getElementById('totalClients').textContent       = total;
   document.getElementById('regionsWithClients').textContent = covered;
-  document.getElementById('emptyRegions').textContent      = UK_REGIONS.length - covered;
-  document.getElementById('topRegion').textContent         = max > 0 ? top : '-';
-  document.getElementById('clientGrowth').textContent      = '+' + recent;
+  document.getElementById('emptyRegions').textContent       = UK_REGIONS.length - covered;
+  document.getElementById('topRegion').textContent          = max > 0 ? top : '-';
+  document.getElementById('clientGrowth').textContent       = '+' + recent;
 }
 
 function updateBookingStats() {
@@ -1962,7 +1119,6 @@ function updateBookingStats() {
   const ago30    = new Date(); ago30.setDate(ago30.getDate() - 30);
   const recent30 = active.filter(b => b.date && new Date(b.date) >= ago30).length;
   const revenue  = active.reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
-
   document.getElementById('totalBookings').textContent     = active.length;
   document.getElementById('confirmedBookings').textContent = active.filter(b => b.bookingStatus === 'Confirmed').length;
   document.getElementById('reservedBookings').textContent  = active.filter(b => b.bookingStatus === 'Reserved').length;
@@ -1977,39 +1133,31 @@ function updateClientFilterCounts() {
 }
 
 function updateBookingFilterCounts() {
-  document.getElementById('bAll').textContent        = bookingData.length;
-  document.getElementById('bConfirmed').textContent  = bookingData.filter(b => b.bookingStatus === 'Confirmed').length;
-  document.getElementById('bReserved').textContent   = bookingData.filter(b => b.bookingStatus === 'Reserved').length;
-  document.getElementById('bCancelled').textContent  = bookingData.filter(b => b.bookingStatus === 'Cancelled').length;
+  document.getElementById('bAll').textContent       = bookingData.length;
+  document.getElementById('bConfirmed').textContent = bookingData.filter(b => b.bookingStatus === 'Confirmed').length;
+  document.getElementById('bReserved').textContent  = bookingData.filter(b => b.bookingStatus === 'Reserved').length;
+  document.getElementById('bCancelled').textContent = bookingData.filter(b => b.bookingStatus === 'Cancelled').length;
 }
 
-// ══════════════════════════════════════════════════════
-//  MAIN TAB SWITCHING (clients / bookings / performance)
-// ══════════════════════════════════════════════════════
 function setMainTab(tab) {
   currentMainTab = tab;
-
-  // Update tab buttons
   ['clients','bookings','performance'].forEach(t => {
     const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
     btn.className = 'main-tab-btn' + (t === tab ? ' active ' + t : '');
   });
-
   const isPerf = tab === 'performance';
-  document.getElementById('mapView').style.display          = isPerf ? 'none' : 'block';
+  document.getElementById('mapView').style.display           = isPerf ? 'none' : 'block';
   document.getElementById('performanceSection').style.display = isPerf ? 'block' : 'none';
-
   if (!isPerf) {
-    // Sync the internal clients/bookings state
     const isBookings = tab === 'bookings';
-    currentDataSource = tab === 'bookings' ? 'bookings' : 'clients';
-    document.getElementById('clientStats').style.display  = isBookings ? 'none' : 'grid';
-    document.getElementById('bookingStats').style.display = isBookings ? 'grid' : 'none';
+    currentDataSource = isBookings ? 'bookings' : 'clients';
+    document.getElementById('clientStats').style.display   = isBookings ? 'none' : 'grid';
+    document.getElementById('bookingStats').style.display  = isBookings ? 'grid' : 'none';
     document.getElementById('clientFilters').style.display  = isBookings ? 'none' : 'block';
     document.getElementById('bookingFilters').style.display = isBookings ? 'block' : 'none';
-    document.getElementById('clientLegend').style.display  = isBookings ? 'none' : 'block';
-    document.getElementById('bookingLegend').style.display = isBookings ? 'block' : 'none';
-    document.getElementById('regionListTitle').textContent = isBookings ? 'Bookings by Area' : 'Regions';
+    document.getElementById('clientLegend').style.display   = isBookings ? 'none' : 'block';
+    document.getElementById('bookingLegend').style.display  = isBookings ? 'block' : 'none';
+    document.getElementById('regionListTitle').textContent  = isBookings ? 'Bookings by Area' : 'Regions';
     resetCluster();
     addMarkersToMap();
     renderRegionList();
@@ -2020,12 +1168,8 @@ function setMainTab(tab) {
   lucide.createIcons();
 }
 
-// ── Old toggle kept for backward compat (used internally) ──
-function setDataSource(source) {
-  setMainTab(source);
-}
+function setDataSource(source) { setMainTab(source); }
 
-// ── Map Rendering ──
 function addMarkersToMap() {
   if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
   markerCluster.clearLayers();
@@ -2107,7 +1251,6 @@ function renderBookingLayer() {
   }
 }
 
-// ── Controls ──
 function setViewMode(mode) {
   currentViewMode = mode;
   document.getElementById('viewMarkers').classList.toggle('active', mode === 'markers');
@@ -2143,9 +1286,8 @@ function applyDateFilter() {
   addMarkersToMap(); renderRegionList(); renderDetailPanel();
 }
 
-// ── Region List ──
 function renderRegionList() {
-  const container  = document.getElementById('regionListContainer');
+  const container   = document.getElementById('regionListContainer');
   const regionTotal = document.getElementById('regionTotal');
   if (currentDataSource === 'clients') {
     regionTotal.textContent = Object.values(regionCounts).filter(c => c > 0).length + ' active';
@@ -2188,7 +1330,6 @@ function flyToPostcodeArea(area, e) {
   if (e) e.target.closest('.region-item').classList.add('active');
 }
 
-// ── Detail Panel ──
 function renderDetailPanel() {
   if (currentDataSource === 'clients') showAllClients();
   else showAllBookings();
@@ -2204,8 +1345,8 @@ function showAllClients() {
 }
 
 function showAllBookings() {
-  const geocoded    = filteredBookingData.filter(b => b.lat).length;
-  const total       = filteredBookingData.length;
+  const geocoded     = filteredBookingData.filter(b => b.lat).length;
+  const total        = filteredBookingData.length;
   const totalRevenue = filteredBookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice)||0), 0);
   document.getElementById('detailTitle').textContent = 'Bookings (' + total + ')';
   const revenueHtml  = totalRevenue > 0 ? '<div class="revenue-total">Total Revenue: £' + totalRevenue.toFixed(2) + '</div>' : '';
@@ -2225,16 +1366,15 @@ function showClientsInRegion(region) {
 }
 
 function showBookingsInArea(area) {
-  const bookings = filteredBookingData.filter(b => b.postcode && b.postcode.toUpperCase().startsWith(area));
+  const bookings     = filteredBookingData.filter(b => b.postcode && b.postcode.toUpperCase().startsWith(area));
   const totalRevenue = bookings.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice)||0), 0);
   document.getElementById('detailTitle').textContent = area + ' — ' + bookings.length + ' bookings';
-  const revenueHtml = totalRevenue > 0 ? '<div class="revenue-total">Revenue: £' + totalRevenue.toFixed(2) + '</div>' : '';
+  const revenueHtml  = totalRevenue > 0 ? '<div class="revenue-total">Revenue: £' + totalRevenue.toFixed(2) + '</div>' : '';
   document.getElementById('detailContent').innerHTML = revenueHtml + (bookings.length === 0
     ? '<div class="empty-state"><div class="empty-state-text">No bookings in ' + area + '</div></div>'
     : bookings.map(b => bookingCard(b)).join(''));
 }
 
-// ── Cards ──
 function clientCard(c) {
   const status = c.fields['Account Status'] || 'Unknown';
   return '<div class="card" onclick="flyToRegion(\'' + c.fields['Region'] + '\', event)">'
@@ -2246,7 +1386,7 @@ function clientCard(c) {
 }
 
 function bookingCard(b) {
-  const status = b.bookingStatus || 'Unknown';
+  const status     = b.bookingStatus || 'Unknown';
   const isUpcoming = b.date && new Date(b.date) >= new Date();
   return '<div class="card booking">'
     + '<div class="card-title">' + (b.bookingRef || 'Booking') + '</div>'
@@ -2258,7 +1398,7 @@ function bookingCard(b) {
     + '<span class="badge badge-' + status.toLowerCase() + '">' + status + '</span>'
     + (isUpcoming ? '<span class="badge" style="background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid #3b82f6;">Upcoming</span>' : '')
     + (b.finalPrice ? '<span class="revenue-tag">£' + parseFloat(b.finalPrice).toFixed(2) + '</span>' : '')
-    + (!b.lat ? '<div style="font-size:10px;color:#f59e0b;margin-top:4px;"><i data-lucide="alert-triangle" style="width:10px;height:10px;vertical-align:-2px;margin-right:3px;"></i>Postcode not geocoded</div>' : '')
+    + (!b.lat ? '<div style="font-size:10px;color:#f59e0b;margin-top:4px;">⚠ Postcode not geocoded</div>' : '')
     + '</div>';
 }
 
@@ -2267,7 +1407,6 @@ function formatDate(d) {
   return new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
 }
 
-// ── Tab switching (detail panel) ──
 function switchTab(tab) {
   const isIntel = tab === 'intel';
   document.getElementById('tabData').classList.toggle('active', !isIntel);
@@ -2284,29 +1423,23 @@ function switchTab(tab) {
 function setPeriod(period) {
   currentPeriod = period;
   ['mom','qoq','6m','yoy'].forEach(p => {
-    const map = { mom:'MoM', qoq:'QoQ', '6m':'6M', yoy:'YoY' };
-    const id  = 'period' + map[p];
-    document.getElementById(id).classList.toggle('active', p === period);
+    const map2 = { mom:'MoM', qoq:'QoQ', '6m':'6M', yoy:'YoY' };
+    document.getElementById('period' + map2[p]).classList.toggle('active', p === period);
   });
   renderPerformanceSection();
 }
 
-// Slice data into windows based on period
 function getPeriodWindows() {
   const now = new Date();
-
   if (currentPeriod === 'mom') {
-    // This month vs last month
     const s1 = new Date(now.getFullYear(), now.getMonth(), 1);
     const e1 = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
     const s2 = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const e2 = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
     const label1 = s1.toLocaleString('en-GB', {month:'long', year:'numeric'});
     const label2 = s2.toLocaleString('en-GB', {month:'long', year:'numeric'});
-    return { current: [s1,e1], previous: [s2,e2], label1, label2,
-      periodLabel: 'Month vs Month — ' + label1 + ' vs ' + label2 };
+    return { current: [s1,e1], previous: [s2,e2], label1, label2, periodLabel: 'Month vs Month — ' + label1 + ' vs ' + label2 };
   }
-
   if (currentPeriod === 'qoq') {
     const q  = Math.floor(now.getMonth() / 3);
     const s1 = new Date(now.getFullYear(), q * 3, 1);
@@ -2317,10 +1450,8 @@ function getPeriodWindows() {
     const prevQ  = q === 0 ? 4 : q;
     const prevY  = q === 0 ? now.getFullYear()-1 : now.getFullYear();
     const label2 = 'Q' + prevQ + ' ' + prevY;
-    return { current: [s1,e1], previous: [s2,e2], label1, label2,
-      periodLabel: 'Quarter vs Quarter — ' + label1 + ' vs ' + label2 };
+    return { current: [s1,e1], previous: [s2,e2], label1, label2, periodLabel: 'Quarter vs Quarter — ' + label1 + ' vs ' + label2 };
   }
-
   if (currentPeriod === '6m') {
     const s1 = new Date(now); s1.setMonth(s1.getMonth()-6); s1.setDate(1); s1.setHours(0,0,0,0);
     const e1 = new Date(now); e1.setHours(23,59,59,999);
@@ -2329,22 +1460,15 @@ function getPeriodWindows() {
     const fmt = d => d.toLocaleString('en-GB',{month:'short',year:'numeric'});
     const label1 = fmt(s1) + ' – ' + fmt(e1);
     const label2 = fmt(s2) + ' – ' + fmt(e2);
-    return { current: [s1,e1], previous: [s2,e2], label1, label2,
-      periodLabel: '6 Month View — Last 6M vs Prior 6M' };
+    return { current: [s1,e1], previous: [s2,e2], label1, label2, periodLabel: '6 Month View — Last 6M vs Prior 6M' };
   }
-
-  // YoY
   const s1 = new Date(now.getFullYear(), 0, 1);
   const e1 = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
   const s2 = new Date(now.getFullYear()-1, 0, 1);
   const e2 = new Date(now.getFullYear()-1, 11, 31, 23, 59, 59);
-  const label1 = now.getFullYear().toString();
-  const label2 = (now.getFullYear()-1).toString();
-  return { current: [s1,e1], previous: [s2,e2], label1, label2,
-    periodLabel: 'Year on Year — ' + label1 + ' vs ' + label2 };
+  return { current: [s1,e1], previous: [s2,e2], label1: now.getFullYear().toString(), label2: (now.getFullYear()-1).toString(), periodLabel: 'Year on Year — ' + now.getFullYear() + ' vs ' + (now.getFullYear()-1) };
 }
 
-// Filter arrays into a window
 function filterToWindow(window) {
   const [start, end] = window;
   return {
@@ -2353,16 +1477,13 @@ function filterToWindow(window) {
   };
 }
 
-// Determine if a booking is from a new client (first ever booking)
 function splitNewVsExisting(windowBookings, windowStart) {
-  // Build a set of clients who had bookings BEFORE this window
   const priorEmails = new Set();
   bookingData.forEach(b => {
     if (!b.date) return;
     const d = new Date(b.date);
     if (d < windowStart && b.clientEmail) priorEmails.add((b.clientEmail||'').toLowerCase());
   });
-
   const newB = windowBookings.filter(b => !priorEmails.has((b.clientEmail||'').toLowerCase()));
   const exB  = windowBookings.filter(b =>  priorEmails.has((b.clientEmail||'').toLowerCase()));
   return { newB, exB };
@@ -2378,154 +1499,85 @@ function renderPerformanceSection() {
 
   const curr = filterToWindow(windows.current);
   const prev = filterToWindow(windows.previous);
-
   const currNewVsEx = splitNewVsExisting(curr.bookings, windows.current[0]);
   const prevNewVsEx = splitNewVsExisting(prev.bookings, windows.previous[0]);
 
-  // Sign-ups: exclude anyone who signed up within the last 3 days of each window end
-  // Avoids counting people who just signed up and haven't engaged yet
-  const signupsInWindow = (clients, windowEnd) => {
-    return clients.filter(u => new Date(u.fields['Created Date']) <= windowEnd);
-  };
-  const currSignups = signupsInWindow(curr.clients, windows.current[1]);
-  const prevSignups = signupsInWindow(prev.clients, windows.previous[1]);
+  const currSignups = curr.clients.filter(u => new Date(u.fields['Created Date']) <= windows.current[1]);
+  const prevSignups = prev.clients.filter(u => new Date(u.fields['Created Date']) <= windows.previous[1]);
 
   const metrics = [
-    {
-      key: 'signups',
-      label: 'Dashboard Sign-Ups',
-      sub: 'All signups in period',
-      icon: '<i data-lucide="user-round" style="width:14px;height:14px;vertical-align:-3px;"></i>',
-      css: 'signups',
-      curr: currSignups.length,
-      prev: prevSignups.length,
-      fmt: v => v.toString(),
-      targetKey: 'signups'
-    },
-    {
-      key: 'revenue',
-      label: 'Revenue',
-      sub: 'Excl. cancelled bookings',
-      icon: '<i data-lucide="pound-sterling" style="width:14px;height:14px;vertical-align:-3px;"></i>',
-      css: 'revenue',
-      curr: calcRevenue(curr.bookings),
-      prev: calcRevenue(prev.bookings),
-      fmt: v => '£' + Math.round(v).toLocaleString(),
-      targetKey: 'revenue'
-    },
-    {
-      key: 'newBookings',
-      label: 'New Client Bookings',
-      sub: 'First time booking',
-      icon: '<i data-lucide="user-plus" style="width:14px;height:14px;vertical-align:-3px;"></i>',
-      css: 'new-booking',
-      curr: currNewVsEx.newB.filter(b => b.bookingStatus !== 'Cancelled').length,
-      prev: prevNewVsEx.newB.filter(b => b.bookingStatus !== 'Cancelled').length,
-      fmt: v => v.toString(),
-      targetKey: 'newBookings'
-    },
-    {
-      key: 'existBookings',
-      label: 'Existing Client Bookings',
-      sub: 'Repeat clients',
-      icon: '<i data-lucide="repeat" style="width:14px;height:14px;vertical-align:-3px;"></i>',
-      css: 'exist-booking',
-      curr: currNewVsEx.exB.filter(b => b.bookingStatus !== 'Cancelled').length,
-      prev: prevNewVsEx.exB.filter(b => b.bookingStatus !== 'Cancelled').length,
-      fmt: v => v.toString(),
-      targetKey: 'existBookings'
-    },
-    {
-      key: 'totalBookings',
-      label: 'Total Bookings',
-      sub: 'Confirmed + Reserved',
-      icon: '<i data-lucide="calendar-check" style="width:14px;height:14px;vertical-align:-3px;"></i>',
-      css: 'total-booking',
-      curr: curr.bookings.filter(b => b.bookingStatus !== 'Cancelled').length,
-      prev: prev.bookings.filter(b => b.bookingStatus !== 'Cancelled').length,
-      fmt: v => v.toString(),
-      targetKey: 'totalBookings'
-    }
+    { key:'signups',      label:'Dashboard Sign-Ups',           sub:'All signups in period',         icon:'<i data-lucide="user-round" style="width:14px;height:14px;vertical-align:-3px;"></i>',     css:'signups',       curr:currSignups.length,                                                              prev:prevSignups.length,                                                               fmt:v=>v.toString(),                         targetKey:'signups'      },
+    { key:'revenue',      label:'Revenue',                      sub:'Excl. cancelled bookings',       icon:'<i data-lucide="pound-sterling" style="width:14px;height:14px;vertical-align:-3px;"></i>', css:'revenue',       curr:calcRevenue(curr.bookings),                                                       prev:calcRevenue(prev.bookings),                                                       fmt:v=>'£'+Math.round(v).toLocaleString(), targetKey:'revenue'      },
+    { key:'newBookings',  label:'New Client Bookings',          sub:'First time booking',             icon:'<i data-lucide="user-plus" style="width:14px;height:14px;vertical-align:-3px;"></i>',      css:'new-booking',   curr:currNewVsEx.newB.filter(b=>b.bookingStatus!=='Cancelled').length,                prev:prevNewVsEx.newB.filter(b=>b.bookingStatus!=='Cancelled').length,                 fmt:v=>v.toString(),                         targetKey:'newBookings'  },
+    { key:'existBookings',label:'Existing Client Bookings',     sub:'Repeat clients',                 icon:'<i data-lucide="repeat" style="width:14px;height:14px;vertical-align:-3px;"></i>',         css:'exist-booking', curr:currNewVsEx.exB.filter(b=>b.bookingStatus!=='Cancelled').length,                 prev:prevNewVsEx.exB.filter(b=>b.bookingStatus!=='Cancelled').length,                  fmt:v=>v.toString(),                         targetKey:'existBookings'},
+    { key:'totalBookings',label:'Total Bookings',               sub:'Confirmed + Reserved',           icon:'<i data-lucide="calendar-check" style="width:14px;height:14px;vertical-align:-3px;"></i>',  css:'total-booking', curr:curr.bookings.filter(b=>b.bookingStatus!=='Cancelled').length,                  prev:prev.bookings.filter(b=>b.bookingStatus!=='Cancelled').length,                    fmt:v=>v.toString(),                         targetKey:'totalBookings'}
   ];
 
-  // Scale target based on period length vs monthly target
   function scaledTarget(metricKey) {
     const T   = buildTargets();
     const yr  = getCurrentYear();
-    const key = 'y' + yr; // y1=2026, y2=2027, y3=2028
+    const key = 'y' + yr;
     const monthly = T.monthly[metricKey][key];
     if (currentPeriod === 'mom')  return monthly;
     if (currentPeriod === 'qoq') return monthly * 3;
     if (currentPeriod === '6m')  return monthly * 6;
-    return monthly * 12; // yoy
+    return monthly * 12;
   }
 
-  // Render KPI cards — same stat-card style as clients/bookings
   const colourMap = { signups:'#3b82f6', revenue:'#10b981', 'new-booking':'#8b5cf6', 'exist-booking':'#f59e0b', 'total-booking':'#06b6d4' };
-  const kpiGrid = document.getElementById('kpiGrid');
-  kpiGrid.innerHTML = metrics.map(m => {
-    const col = colourMap[m.css] || '#3b82f6';
-    const delta = m.prev > 0 ? ((m.curr - m.prev) / m.prev * 100) : (m.curr > 0 ? 100 : 0);
-    const deltaArrow = delta > 0 ? '↑' : delta < 0 ? '↓' : '';
-    const deltaColour = delta > 0 ? '#10b981' : delta < 0 ? '#ef4444' : '#64748b';
+  document.getElementById('kpiGrid').innerHTML = metrics.map(m => {
+    const col     = colourMap[m.css] || '#3b82f6';
+    const delta   = m.prev > 0 ? ((m.curr - m.prev) / m.prev * 100) : (m.curr > 0 ? 100 : 0);
+    const dArrow  = delta > 0 ? '↑' : delta < 0 ? '↓' : '';
+    const dColour = delta > 0 ? '#10b981' : delta < 0 ? '#ef4444' : '#64748b';
     const target  = scaledTarget(m.targetKey);
     const pct     = target > 0 ? Math.min((m.curr / target) * 100, 100) : 0;
-    const trackColour = pct >= 80 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444';
-    const trackLabel  = pct >= 80 ? 'On Track' : pct >= 50 ? 'Behind' : 'Critical';
-
+    const tColour = pct >= 80 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444';
+    const tLabel  = pct >= 80 ? 'On Track' : pct >= 50 ? 'Behind' : 'Critical';
     return `<div class="stat-card" style="border-top:3px solid ${col};text-align:center;">
       <div class="stat-value" style="color:${col};font-size:36px;">${m.fmt(m.curr)}</div>
       <div class="stat-label" style="margin-bottom:8px;">${m.label}</div>
-      <div style="font-size:11px;color:#64748b;margin-bottom:6px;">vs prev: <strong style="color:${deltaColour};">${deltaArrow} ${Math.abs(delta).toFixed(1)}%</strong> (${m.fmt(m.prev)})</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:6px;">vs prev: <strong style="color:${dColour};">${dArrow} ${Math.abs(delta).toFixed(1)}%</strong> (${m.fmt(m.prev)})</div>
       <div style="background:#f1f5f9;border-radius:6px;height:5px;overflow:hidden;margin-bottom:4px;">
-        <div style="width:${pct}%;height:100%;background:${trackColour};border-radius:6px;transition:width 0.8s ease;"></div>
+        <div style="width:${pct}%;height:100%;background:${tColour};border-radius:6px;transition:width 0.8s ease;"></div>
       </div>
-      <div style="font-size:10px;color:${trackColour};font-weight:700;">${pct.toFixed(0)}% of target · ${trackLabel}</div>
+      <div style="font-size:10px;color:${tColour};font-weight:700;">${pct.toFixed(0)}% of target · ${tLabel}</div>
     </div>`;
   }).join('');
   lucide.createIcons();
 
-  // Render comparison table
   document.getElementById('compTableTitle').textContent = windows.label1 + ' vs ' + windows.label2;
   document.getElementById('colCurrent').textContent = windows.label1;
   document.getElementById('colPrev').textContent    = windows.label2;
 
-  const rows = metrics.map(m => {
-    const delta = m.prev > 0 ? ((m.curr - m.prev) / m.prev * 100) : (m.curr > 0 ? 100 : 0);
-    const dClass = delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
-    const dArr   = delta > 0 ? '↑' : delta < 0 ? '↓' : '—';
-    const target  = scaledTarget(m.targetKey);
+  document.getElementById('compTableBody').innerHTML = metrics.map(m => {
+    const delta    = m.prev > 0 ? ((m.curr - m.prev) / m.prev * 100) : (m.curr > 0 ? 100 : 0);
+    const dClass   = delta > 0 ? 'up' : delta < 0 ? 'down' : 'flat';
+    const dArr     = delta > 0 ? '↑' : delta < 0 ? '↓' : '—';
+    const target   = scaledTarget(m.targetKey);
     const vsTarget = target > 0 ? ((m.curr / target) * 100).toFixed(1) + '%' : 'N/A';
-    const vtClass  = parseFloat(vsTarget) >= 80 ? 'style="color:#10b981;font-weight:700;"'
-                   : parseFloat(vsTarget) >= 50 ? 'style="color:#f59e0b;font-weight:700;"'
-                   : 'style="color:#ef4444;font-weight:700;"';
+    const vtStyle  = parseFloat(vsTarget) >= 80 ? 'color:#10b981;font-weight:700;' : parseFloat(vsTarget) >= 50 ? 'color:#f59e0b;font-weight:700;' : 'color:#ef4444;font-weight:700;';
     return `<tr>
       <td class="metric-name">${m.icon} ${m.label}</td>
       <td class="current-val">${m.fmt(m.curr)}</td>
       <td>${m.fmt(m.prev)}</td>
       <td><div class="comp-delta-cell"><span class="micro-delta ${dClass}">${dArr} ${Math.abs(delta).toFixed(1)}%</span></div></td>
       <td style="color:#475569;">${m.fmt(target)}</td>
-      <td ${vtClass}>${vsTarget}</td>
+      <td style="${vtStyle}">${vsTarget}</td>
     </tr>`;
-  });
-  document.getElementById('compTableBody').innerHTML = rows.join('');
+  }).join('');
 
-  // Render roadmap
   renderRoadmap();
   lucide.createIcons();
 }
 
 function renderRoadmap() {
-  // ── All live calculations ──
   const T    = buildTargets();
   const live = T.live;
   const liveATV = T.atv;
 
-  const totalClients  = clientData.length;
-  const totalRevenue  = bookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice)||0), 0);
-  const clientsTarget = 400;
+  const totalRevenue = bookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice)||0), 0);
 
-  // Revenue by calendar year
   function revenueForYear(yr) {
     return bookingData
       .filter(b => b.bookingStatus !== 'Cancelled' && b.date && new Date(b.date).getFullYear() === yr)
@@ -2535,76 +1587,27 @@ function renderRoadmap() {
     return clientData.filter(u => u.fields['Created Date'] && new Date(u.fields['Created Date']).getFullYear() <= yr).length;
   }
 
+  const now2    = new Date();
   const rev2026 = revenueForYear(2026);
   const rev2027 = revenueForYear(2027);
   const fmtMoney = v => '£' + Math.round(v).toLocaleString();
-  const fmtBk    = v => v + ' / mo';
 
-  // Months to £1M at current run rate
   const monthsToMillion = live.monthlyRevRunRate > 0
-    ? Math.ceil((1000000 - totalRevenue) / live.monthlyRevRunRate)
-    : '∞';
+    ? Math.ceil((1000000 - totalRevenue) / live.monthlyRevRunRate) : '∞';
 
-  // New/existing split as readable %
   const newPct = Math.round(live.liveNewSplit * 100);
   const exPct  = 100 - newPct;
-
-  const bookingRatePct   = (live.clientBookingRate * 100).toFixed(1);
-  // Monthly thresholds: ≥15%/mo = healthy, ≥7% = amber, <7% = needs attention
-  const bookingRateColor = live.clientBookingRate >= 0.15 ? '#10b981' : live.clientBookingRate >= 0.07 ? '#f59e0b' : '#ef4444';
-
-  // Avg bookings per client per month — the key frequency metric
-  const bppm = live.bookingsPerBookedClientPerMonth;
+  const bppm   = live.bookingsPerBookedClientPerMonth;
   const bppmDisplay = bppm > 0 ? bppm.toFixed(2) : '—';
-
-  // Clients needed to book per month = target monthly bookings ÷ avg bookings per client per month
-  // This is the monthly booking rate target — how many unique clients need to book each month
-  const y1TargetMonthlyBk  = T.monthly.totalBookings.y1;
-  const y2TargetMonthlyBk  = T.monthly.totalBookings.y2;
-  const clientsNeededY1    = live.existingClientBookingRate > 0 ? Math.ceil(y1TargetMonthlyBk / live.existingClientBookingRate) : y1TargetMonthlyBk;
-  const clientsNeededY2    = live.existingClientBookingRate > 0 ? Math.ceil(y2TargetMonthlyBk / live.existingClientBookingRate) : y2TargetMonthlyBk;
-  const currentClientsBookingPerMonth = live.clientBookingRate > 0
-    ? Math.round(live.totalDashboardClients * live.clientBookingRate)
-    : live.clientsWhoBooked;
 
   // ── Summary cards ──
   const summaryCards = [
-    {
-      icon: 'pound-sterling', color: '#06b6d4', bg: '#ecfeff',
-      label: 'Avg Booking Value',
-      value: `£${Math.round(liveATV).toLocaleString()}`,
-      sub: 'Live from all paid bookings'
-    },
-    {
-      icon: 'calendar-check', color: '#10b981', bg: '#f0fdf4',
-      label: 'Avg Bookings / Month',
-      value: `${Math.round(live.avgMonthlyBookings * 10) / 10}`,
-      sub: `${newPct}% new · ${exPct}% repeat`
-    },
-    {
-      icon: 'repeat-2', color: '#a78bfa', bg: '#faf5ff',
-      label: 'Bookings / Client / Month',
-      value: bppmDisplay,
-      sub: `~${currentClientsBookingPerMonth} clients booking each month`
-    },
-    {
-      icon: 'percent', color: bookingRateColor, bg: bookingRateColor === '#10b981' ? '#f0fdf4' : bookingRateColor === '#f59e0b' ? '#fffbeb' : '#fef2f2',
-      label: 'Overall Booking Rate',
-      value: `${bookingRatePct}%`,
-      sub: `Existing clients: ${(live.existingClientBookingRate * 100).toFixed(1)}%/mo · ${(live.lifetimeBookingRate * 100).toFixed(1)}% ever booked`
-    },
-    {
-      icon: 'user-plus', color: '#3b82f6', bg: '#eff6ff',
-      label: 'Avg Sign-Ups / Month',
-      value: `${Math.round(live.avgMonthlySignups * 10) / 10}`,
-      sub: 'Excl. current partial month'
-    },
-    {
-      icon: 'trending-up', color: '#f59e0b', bg: '#fffbeb',
-      label: 'Monthly Run Rate (Last 3M)',
-      value: `£${Math.round(live.monthlyRevRunRate).toLocaleString()}`,
-      sub: monthsToMillion === '∞' ? 'No data yet' : `${monthsToMillion} months to £1M at this rate`
-    },
+    { icon:'pound-sterling', color:'#06b6d4', label:'Avg Booking Value',         value:`£${Math.round(liveATV).toLocaleString()}`,                                          sub:'Live from all paid bookings' },
+    { icon:'calendar-check', color:'#10b981', label:'Avg Bookings / Month',       value:`${Math.round(live.avgMonthlyBookings*10)/10}`,                                      sub:`${newPct}% new · ${exPct}% repeat` },
+    { icon:'repeat-2',       color:'#a78bfa', label:'Bookings / Client / Month',  value:bppmDisplay,                                                                         sub:`Among clients who have ever booked` },
+    { icon:'user-plus',      color:'#3b82f6', label:'Avg Sign-Ups / Month',       value:`${Math.round(live.avgMonthlySignups*10)/10}`,                                       sub:'Excl. current partial month' },
+    { icon:'trending-up',    color:'#f59e0b', label:'Monthly Run Rate (Last 3M)', value:`£${Math.round(live.monthlyRevRunRate).toLocaleString()}`,                            sub: monthsToMillion === '∞' ? 'No data yet' : `${monthsToMillion} months to £1M at this rate` },
+    { icon:'percent',        color:'#10b981', label:'Overall Booking Rate',       value:`${(live.lifetimeBookingRate*100).toFixed(1)}%`,                                      sub:`${live.everBookedPool.size + live.firstTimeBookersThisMonth.size} of ${live.totalDashboardClients} clients have ever booked` }
   ];
 
   document.getElementById('roadmapTargets').innerHTML = summaryCards.map(c => `
@@ -2615,15 +1618,13 @@ function renderRoadmap() {
     </div>`).join('');
   lucide.createIcons();
 
-  // ── Milestone progress bars (2026 + 2027) ──
-  // Target clients = total bookings needed per year ÷ avg bookings per client per year
-  // = (annualRev / ATV) ÷ (bppm * 12) — how many unique clients needed on book for that revenue
-  const bppy = bppm * 12; // bookings per client per year
+  // ── Milestone bars ──
+  const bppy = bppm * 12;
   const targetClientsY1 = liveATV > 0 && bppy > 0 ? Math.ceil((REVENUE_TARGETS.y1 / liveATV) / bppy) : 133;
   const targetClientsY2 = liveATV > 0 && bppy > 0 ? Math.ceil((REVENUE_TARGETS.y2 / liveATV) / bppy) : 266;
   const milestones = [
-    { year: '2026 — Now',    targetRev: REVENUE_TARGETS.y1, actualRev: rev2026, targetClients: targetClientsY1, actualClients: clientsSignedByEndOf(2026), color: '#8b5cf6', isCurrent: true  },
-    { year: '2027 — Target', targetRev: REVENUE_TARGETS.y2, actualRev: rev2027, targetClients: targetClientsY2, actualClients: clientsSignedByEndOf(2027), color: '#f59e0b', isCurrent: false }
+    { year:'2026 — Now',    targetRev:REVENUE_TARGETS.y1, actualRev:rev2026, targetClients:targetClientsY1, actualClients:clientsSignedByEndOf(2026), color:'#8b5cf6', isCurrent:true  },
+    { year:'2027 — Target', targetRev:REVENUE_TARGETS.y2, actualRev:rev2027, targetClients:targetClientsY2, actualClients:clientsSignedByEndOf(2027), color:'#f59e0b', isCurrent:false }
   ];
 
   document.getElementById('milestoneTrack').innerHTML = milestones.map(m => {
@@ -2633,8 +1634,8 @@ function renderRoadmap() {
     <div style="margin-bottom:16px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div style="display:flex;align-items:center;gap:8px;">
-          <span class="milestone-year" style="width:auto;color:${m.color};font-weight:700;">${m.year}</span>
-          ${m.isCurrent ? '<span style="font-size:10px;background:' + m.color + '33;color:' + m.color + ';padding:2px 8px;border-radius:6px;font-weight:700;">In Progress</span>' : ''}
+          <span style="font-size:13px;font-weight:700;color:${m.color};">${m.year}</span>
+          ${m.isCurrent ? `<span style="font-size:10px;font-weight:700;background:${m.color}33;color:${m.color};padding:2px 8px;border-radius:6px;">In Progress</span>` : ''}
         </div>
         <div style="font-size:12px;color:#475569;">£${Math.round(m.actualRev).toLocaleString()} / £${(m.targetRev/1000).toFixed(0)}k</div>
       </div>
@@ -2642,83 +1643,89 @@ function renderRoadmap() {
         <div style="flex:1;">
           <div style="font-size:10px;color:#475569;margin-bottom:3px;">Revenue</div>
           <div class="milestone-bar-wrap">
-            <div class="milestone-bar-fill" style="width:${revPct}%;background:linear-gradient(90deg,${m.color},${m.color}99);">
-              ${revPct > 12 ? revPct.toFixed(1) + '%' : ''}
-            </div>
+            <div class="milestone-bar-fill" style="width:${revPct}%;background:linear-gradient(90deg,${m.color},${m.color}99);">${revPct > 12 ? revPct.toFixed(1)+'%' : ''}</div>
           </div>
         </div>
         <div style="flex:1;">
           <div style="font-size:10px;color:#475569;margin-bottom:3px;">Clients — ${m.actualClients} / ${m.targetClients}</div>
           <div class="milestone-bar-wrap">
-            <div class="milestone-bar-fill" style="width:${clientsPct}%;background:linear-gradient(90deg,#3b82f6,#60a5fa99);">
-              ${clientsPct > 12 ? clientsPct.toFixed(0) + '%' : ''}
-            </div>
+            <div class="milestone-bar-fill" style="width:${clientsPct}%;background:linear-gradient(90deg,#3b82f6,#60a5fa99);">${clientsPct > 12 ? clientsPct.toFixed(0)+'%' : ''}</div>
           </div>
         </div>
       </div>
     </div>`;
   }).join('');
 
-  // ── Monthly targets grid: 2026 + 2027, all smart-calculated ──
-  const now2 = new Date();
-  const monthsLeftThisYear = 12 - now2.getMonth(); // remaining months in current year incl. current
-  const rev2026Remaining   = Math.max(0, REVENUE_TARGETS.y1 - rev2026);
-  const bookingsNeededNow  = monthsLeftThisYear > 0 ? Math.ceil((rev2026Remaining / liveATV) / monthsLeftThisYear) : 0;
+  // ══════════════════════════════════════════════════════════════
+  //  MONTHLY TARGETS GRID
+  //
+  //  New Client card now shows:
+  //    numerator   = first-time bookers this calendar month
+  //    denominator = neverBookedPool (dashboard clients with 0 prior bookings)
+  //    rate        = newClientBookingRate (already calc'd in calcLiveMonthlyAverages)
+  //
+  //  Existing Client card now shows:
+  //    numerator   = repeat bookers this calendar month
+  //    denominator = everBookedPool (dashboard clients with ≥1 prior booking)
+  //    rate        = existingClientBookingRate
+  // ══════════════════════════════════════════════════════════════
+
+  const monthsLeftThisYear  = 12 - now2.getMonth();
+  const rev2026Remaining    = Math.max(0, REVENUE_TARGETS.y1 - rev2026);
 
   const years = [
-    { label: '2026 — This Year',  col: '#8b5cf6', key: 'y1', annualRev: REVENUE_TARGETS.y1, isCurrent: true  },
-    { label: '2027 — Next Year',  col: '#f59e0b', key: 'y2', annualRev: REVENUE_TARGETS.y2, isCurrent: false }
+    { label:'2026 — This Year', col:'#8b5cf6', key:'y1', annualRev:REVENUE_TARGETS.y1, isCurrent:true  },
+    { label:'2027 — Next Year', col:'#f59e0b', key:'y2', annualRev:REVENUE_TARGETS.y2, isCurrent:false }
   ];
 
-  // ── Current month actuals — same logic as KPI cards ──
+  // ── Current month actuals ──
   const thisMonthStart = new Date(now2.getFullYear(), now2.getMonth(), 1);
   const thisMonthEnd   = new Date(now2.getFullYear(), now2.getMonth() + 1, 0, 23, 59, 59);
-  const thisMonthBookings = bookingData.filter(b => {
+
+  // Confirmed new/existing split for this month (using period window logic)
+  const thisMonthAllBookings = bookingData.filter(b => {
     if (!b.date || b.bookingStatus === 'Cancelled') return false;
     const d = new Date(b.date);
     return d >= thisMonthStart && d <= thisMonthEnd;
   });
-  const thisMonthSplit = splitNewVsExisting(thisMonthBookings, thisMonthStart);
+  const thisMonthSplit = splitNewVsExisting(thisMonthAllBookings, thisMonthStart);
+
   const thisMonthSignups = clientData.filter(u => {
     const d = new Date(u.fields['Created Date']);
     return d >= thisMonthStart && d <= thisMonthEnd;
   }).length;
 
-  // ── Shared trajectory values — current month actuals ──
-  const curSignupsAvg   = thisMonthSignups;
-  const curNewBkAvg     = thisMonthSplit.newB.length;
-  const curRepeatBkAvg  = thisMonthSplit.exB.length;
-  const curTotalBkAvg   = thisMonthBookings.length;
-  const curDashboard    = live.totalDashboardClients;
-  const clientEmails2   = new Set(clientData.map(u => (u.fields["Email"] || "").toLowerCase()).filter(Boolean));
-  const curClientsBookingMo = new Set(
-    thisMonthBookings
-      .filter(b => b.clientEmail && clientEmails2.has(b.clientEmail.toLowerCase()))
-      .map(b => b.clientEmail.toLowerCase())
-  ).size;
-  // This month actual rate: unique clients booked / dashboard size — keeps the equation consistent
-  const curBookingRate = curDashboard > 0
-    ? ((curClientsBookingMo / curDashboard) * 100).toFixed(1)
-    : (live.clientBookingRate * 100).toFixed(1);
+  // Pool sizes
+  const neverBookedCount = live.neverBookedPool.size;
+  const everBookedCount  = live.everBookedPool.size;
 
-  // Lag insight string
+  // Actuals from the corrected pools
+  const curFirstTimers = live.firstTimeBookersThisMonth.size;
+  const curRepeatBk    = live.repeatBookersThisMonth.size;
+  const curTotalBk     = thisMonthAllBookings.length;
+  const curSignups     = thisMonthSignups;
+
+  // Rates as percentages
+  const newRatePct      = neverBookedCount > 0 ? ((curFirstTimers / neverBookedCount) * 100).toFixed(1) : '0.0';
+  const existRatePct    = everBookedCount  > 0 ? ((curRepeatBk   / everBookedCount)  * 100).toFixed(1) : '0.0';
+
+  const cohortConvPct = (live.lifetimeBookingRate * 100).toFixed(0);
   const lagStr = live.lagSampleSize > 0
     ? `${Math.round(live.avgLagDays)}d avg · ${Math.round(live.medianLagDays)}d median · ${live.lagSampleSize} clients measured`
     : 'Not enough data yet';
-  const cohortConvPct = (live.lifetimeBookingRate * 100).toFixed(0);
 
-  // ── Shared gap helpers ──
-  const mtGapCol  = v => v <= 0 ? '#10b981' : '#ef4444';
-  const mtGapSign = v => v > 0 ? '+' : '';
-  const mtGapBadge = (cur, tgt, suffix = '') => {
+  const mtGapCol   = v => v <= 0 ? '#10b981' : '#ef4444';
+  const mtGapSign  = v => v > 0 ? '+' : '';
+  const mtGapBadge = (cur, tgt, suffix='') => {
     const g = tgt - cur;
     return `<span style="font-size:10px;font-weight:700;color:${mtGapCol(g)};background:${mtGapCol(g)}18;padding:2px 8px;border-radius:5px;white-space:nowrap;">${mtGapSign(g)}${Math.round(Math.abs(g))}${suffix}</span>`;
   };
+
   const mtTrajRow = (col, icon, label, curVal, tgtVal, curLabel, tgtLabel, note, noteCol) => `
     <div style="padding:14px 0;border-bottom:1px solid #f1f5f9;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <div style="display:flex;align-items:center;gap:6px;">
-          <i data-lucide="${icon}" style="width:13px;height:13px;color:#94a3b8;flex-shrink:0;"></i>
+          <i data-lucide="${icon}" style="width:13px;height:13px;color:#94a3b8;flex-shrink:0;margin-top:1px;"></i>
           <span style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.4px;">${label}</span>
         </div>
         ${mtGapBadge(curVal, tgtVal, ' / mo')}
@@ -2737,7 +1744,6 @@ function renderRoadmap() {
       ${note ? `<div style="font-size:10px;color:${noteCol||'#94a3b8'};margin-top:8px;line-height:1.5;">${note}</div>` : ''}
     </div>`;
 
-  // Pre-compute per-year values
   const yearData = years.map(y => {
     const targetMonthlyRev = REVENUE_TARGETS[y.key] / 12;
     const tgtTotalBk   = T.monthly.totalBookings[y.key];
@@ -2748,11 +1754,15 @@ function renderRoadmap() {
     const revPct       = y.isCurrent ? Math.min((actualRev / y.annualRev) * 100, 100) : 0;
     const revBarColor  = revPct >= 80 ? '#10b981' : revPct >= 40 ? '#f59e0b' : '#ef4444';
     const growthMult   = live.monthlyRevRunRate > 0 ? targetMonthlyRev / live.monthlyRevRunRate : 0;
-    const clientsNeeded = live.existingClientBookingRate > 0 ? Math.ceil(tgtRepeatBk / live.existingClientBookingRate) : tgtRepeatBk;
-    return { ...y, targetMonthlyRev, tgtTotalBk, tgtNewBk, tgtRepeatBk, tgtSignups, actualRev, revPct, revBarColor, growthMult, clientsNeeded };
+    // Clients needed in existing pool to hit target repeat bookings at current existing rate
+    const clientsNeeded = live.existingClientBookingRate > 0
+      ? Math.ceil(tgtRepeatBk / live.existingClientBookingRate) : tgtRepeatBk;
+    // Sign-ups needed in never-booked pool to hit target new bookings at current new client rate
+    const neverBookedNeeded = live.newClientBookingRate > 0
+      ? Math.ceil(tgtNewBk / live.newClientBookingRate) : tgtSignups;
+    return { ...y, targetMonthlyRev, tgtTotalBk, tgtNewBk, tgtRepeatBk, tgtSignups, actualRev, revPct, revBarColor, growthMult, clientsNeeded, neverBookedNeeded };
   });
 
-  // ── Revenue summary row (spans both cards) ──
   const revRowHtml = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
       ${yearData.map(y => `
@@ -2779,19 +1789,41 @@ function renderRoadmap() {
         </div>`).join('')}
     </div>`;
 
-  // ── Card 1: New Client Acquisition ──
+  // ── New Client Acquisition card ──
+  // Shows: X of Y never-booked clients booked for the first time this month
   const acqCard = `
     <div style="background:#fff;border:1.5px solid #3b82f633;border-radius:16px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border-top:4px solid #3b82f6;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
         <div style="background:#eff6ff;border-radius:8px;padding:7px;"><i data-lucide="user-plus" style="width:16px;height:16px;color:#3b82f6;"></i></div>
         <div>
           <div style="font-size:15px;font-weight:800;color:#3b82f6;">New Client Acquisition</div>
-          <div style="font-size:11px;color:#94a3b8;">Sign-ups → first booking. Once they book, they become existing clients.</div>
+          <div style="font-size:11px;color:#94a3b8;">Dashboard sign-ups who have never booked — tracking first conversions.</div>
+        </div>
+      </div>
+
+      <!-- This month's new client snapshot -->
+      <div class="ret-snapshot" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:11px 14px;margin:16px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+        <div style="text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#3b82f6;">${neverBookedCount}</div>
+          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Never Booked</div>
+          <div style="font-size:10px;color:#64748b;">on dashboard</div>
+        </div>
+        <div style="color:#bfdbfe;font-size:20px;">×</div>
+        <div style="text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#3b82f6;">${newRatePct}%</div>
+          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Conversion Rate</div>
+          <div style="font-size:10px;color:#64748b;">this calendar month</div>
+        </div>
+        <div style="color:#bfdbfe;font-size:20px;">=</div>
+        <div style="text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#3b82f6;">${curFirstTimers} / ${neverBookedCount}</div>
+          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">First Bookings</div>
+          <div style="font-size:10px;color:#64748b;">this month</div>
         </div>
       </div>
 
       <!-- Lag insight -->
-      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:11px 14px;margin:16px 0;display:flex;gap:10px;align-items:flex-start;">
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:11px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;">
         <i data-lucide="clock" style="width:13px;height:13px;color:#0284c7;flex-shrink:0;margin-top:1px;"></i>
         <div>
           <div style="font-size:11px;font-weight:700;color:#0284c7;">Sign-Up → First Booking Lag</div>
@@ -2800,113 +1832,123 @@ function renderRoadmap() {
         </div>
       </div>
 
-      <!-- Year columns -->
       <div class="acq-years" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         ${yearData.map(y => `
           <div style="border:1px solid ${y.col}22;border-radius:12px;padding:16px;background:${y.col}05;">
             <div style="font-size:12px;font-weight:700;color:${y.col};margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid ${y.col}22;">${y.label}</div>
-            ${mtTrajRow(y.col, 'user-plus', 'Sign-Ups / mo', curSignupsAvg, y.tgtSignups, curSignupsAvg, y.tgtSignups,
-              `${cohortConvPct} in every 100 sign-ups book · need ${y.tgtSignups} sign-ups to get ${y.tgtNewBk} new bookings`, '#0369a1')}
-            ${mtTrajRow(y.col, 'star', 'New Client Bookings / mo', curNewBkAvg, y.tgtNewBk, curNewBkAvg, y.tgtNewBk,
-              `${newPct}% of all bookings · avg £${Math.round(liveATV).toLocaleString()} per job · clients then move to existing`, '')}
+            ${mtTrajRow(y.col, 'user-plus', 'Sign-Ups / mo', curSignups, y.tgtSignups, curSignups, y.tgtSignups,
+              `${cohortConvPct} in every 100 sign-ups go on to book · need ${y.tgtSignups} sign-ups to land ${y.tgtNewBk} new bookings`, '#0369a1')}
+            ${mtTrajRow(y.col, 'star', 'New Client Bookings / mo', curFirstTimers, y.tgtNewBk,
+              `${curFirstTimers} / ${neverBookedCount}`,
+              `${y.tgtNewBk} from pool of ${y.neverBookedNeeded}`,
+              `${newRatePct}% of never-booked pool converted this month · avg £${Math.round(liveATV).toLocaleString()} per job`, '')}
           </div>`).join('')}
       </div>
     </div>`;
 
-  // ── Card 2: Existing Client Retention ──
+  // ── Existing Client Retention card ──
+  // Shows: X of Y ever-booked clients booked again this month
   const retCard = `
     <div style="background:#fff;border:1.5px solid #10b98133;border-radius:16px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border-top:4px solid #10b981;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
         <div style="background:#f0fdf4;border-radius:8px;padding:7px;"><i data-lucide="repeat-2" style="width:16px;height:16px;color:#10b981;"></i></div>
         <div>
           <div style="font-size:15px;font-weight:800;color:#10b981;">Existing Client Retention</div>
-          <div style="font-size:11px;color:#94a3b8;">Your current dashboard · booking rate · repeat revenue.</div>
+          <div style="font-size:11px;color:#94a3b8;">Dashboard clients who have already booked at least once — tracking repeat bookings.</div>
         </div>
       </div>
 
-      <!-- Dashboard snapshot -->
+      <!-- This month's existing client snapshot -->
       <div class="ret-snapshot" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:11px 14px;margin:16px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
         <div style="text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#10b981;">${curDashboard}</div>
-          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Clients on Dashboard</div>
+          <div style="font-size:22px;font-weight:800;color:#10b981;">${everBookedCount}</div>
+          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Existing Clients</div>
+          <div style="font-size:10px;color:#64748b;">booked at least once</div>
         </div>
         <div style="color:#d1fae5;font-size:20px;">×</div>
         <div style="text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#10b981;">${curBookingRate}%</div>
-          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Booking Rate This Month</div>
+          <div style="font-size:22px;font-weight:800;color:#10b981;">${existRatePct}%</div>
+          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Repeat Rate</div>
+          <div style="font-size:10px;color:#64748b;">this calendar month</div>
         </div>
         <div style="color:#d1fae5;font-size:20px;">=</div>
         <div style="text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#10b981;">${curClientsBookingMo}</div>
-          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Bookings This Month</div>
+          <div style="font-size:22px;font-weight:800;color:#10b981;">${curRepeatBk} / ${everBookedCount}</div>
+          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Booked Again</div>
+          <div style="font-size:10px;color:#64748b;">this month</div>
         </div>
       </div>
 
-      <!-- Year columns -->
       <div class="ret-years" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         ${yearData.map(y => `
           <div style="border:1px solid ${y.col}22;border-radius:12px;padding:16px;background:${y.col}05;">
             <div style="font-size:12px;font-weight:700;color:${y.col};margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid ${y.col}22;">${y.label}</div>
-            ${mtTrajRow(y.col, 'repeat-2', 'Repeat Bookings / mo', curRepeatBkAvg, y.tgtRepeatBk, curRepeatBkAvg, y.tgtRepeatBk,
-              `${exPct}% of all bookings · clients who have booked before`, '')}
-            ${mtTrajRow(y.col, 'users', 'Dashboard Clients Needed', curDashboard, y.clientsNeeded, curDashboard, y.clientsNeeded,
-              `At ${(live.existingClientBookingRate * 100).toFixed(1)}% existing client booking rate · need ${y.clientsNeeded} on dashboard to hit ${y.tgtRepeatBk} repeat bookings/mo`, '')}
+            ${mtTrajRow(y.col, 'repeat-2', 'Repeat Bookings / mo', curRepeatBk, y.tgtRepeatBk,
+              `${curRepeatBk} / ${everBookedCount}`,
+              `${y.tgtRepeatBk} from pool of ${y.clientsNeeded}`,
+              `${existRatePct}% of existing clients booked again this month · ${exPct}% of all bookings`, '')}
+            ${mtTrajRow(y.col, 'users', 'Existing Client Pool Needed', everBookedCount, y.clientsNeeded,
+              everBookedCount, y.clientsNeeded,
+              `At ${existRatePct}% repeat rate · need ${y.clientsNeeded} existing clients on dashboard to hit ${y.tgtRepeatBk} repeat bookings/mo`, '')}
           </div>`).join('')}
       </div>
     </div>`;
 
-  // ── Funnel explanation box ──
-  const signupTarget2026 = yearData.find(y => y.key === 'y1')?.tgtSignups || '—';
-  const newBkTarget2026  = yearData.find(y => y.key === 'y1')?.tgtNewBk   || '—';
-  const repBkTarget2026  = yearData.find(y => y.key === 'y1')?.tgtRepeatBk || '—';
+  // ── How the two cards connect ──
+  // Updated to reflect the two separate pools clearly
+  const signupTarget2026  = yearData.find(y => y.key === 'y1')?.tgtSignups   || '—';
+  const newBkTarget2026   = yearData.find(y => y.key === 'y1')?.tgtNewBk     || '—';
+  const repBkTarget2026   = yearData.find(y => y.key === 'y1')?.tgtRepeatBk  || '—';
+  const neverNeeded2026   = yearData.find(y => y.key === 'y1')?.neverBookedNeeded || '—';
+  const existNeeded2026   = yearData.find(y => y.key === 'y1')?.clientsNeeded || '—';
+
   const funnelBox = `
     <div style="background:linear-gradient(135deg,#f8fafc,#f0f9ff);border:1.5px solid #e2e8f0;border-radius:14px;padding:20px 24px;margin-top:4px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
         <i data-lucide="waypoints" style="width:15px;height:15px;color:#6366f1;flex-shrink:0;"></i>
-        <span style="font-size:12px;font-weight:800;color:#334155;text-transform:uppercase;letter-spacing:0.5px;">How the two cards connect</span>
+        <span style="font-size:12px;font-weight:800;color:#334155;text-transform:uppercase;letter-spacing:0.5px;">How the two pools connect</span>
       </div>
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0;">
 
-        <!-- Step 1 -->
-        <div style="background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:12px 16px;text-align:center;min-width:110px;flex:1;">
-          <div style="font-size:20px;font-weight:800;color:#3b82f6;">${signupTarget2026}</div>
-          <div style="font-size:10px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:0.4px;">Sign-ups / mo</div>
-          <div style="font-size:10px;color:#64748b;margin-top:3px;">needed this year</div>
+      <!-- Two-pool equation -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+
+        <!-- Pool 1: Never booked -->
+        <div style="background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:14px;">
+          <div style="font-size:10px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">🔵 Never-Booked Pool — ${neverBookedCount} clients</div>
+          <div style="font-size:11px;color:#334155;line-height:1.6;">
+            <strong>${curFirstTimers}</strong> of <strong>${neverBookedCount}</strong> converted this month (<strong>${newRatePct}%</strong>)<br>
+            Target: <strong style="color:#3b82f6;">${newBkTarget2026} new bookings/mo</strong><br>
+            Needs pool of <strong style="color:#3b82f6;">${neverNeeded2026}</strong> never-booked clients
+          </div>
+          <div style="margin-top:10px;font-size:10px;color:#64748b;">
+            Every convert graduates → moves to existing pool next month
+          </div>
         </div>
 
-        <!-- Arrow + label -->
-        <div style="display:flex;flex-direction:column;align-items:center;padding:0 10px;flex-shrink:0;">
-          <div style="font-size:10px;font-weight:600;color:#94a3b8;white-space:nowrap;">${cohortConvPct}% convert</div>
-          <div style="font-size:20px;color:#cbd5e1;">→</div>
-        </div>
-
-        <!-- Step 2 -->
-        <div style="background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:12px 16px;text-align:center;min-width:110px;flex:1;">
-          <div style="font-size:20px;font-weight:800;color:#3b82f6;">${newBkTarget2026}</div>
-          <div style="font-size:10px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:0.4px;">New bookings / mo</div>
-          <div style="font-size:10px;color:#64748b;margin-top:3px;">first-time clients</div>
-        </div>
-
-        <!-- Arrow + label -->
-        <div style="display:flex;flex-direction:column;align-items:center;padding:0 10px;flex-shrink:0;">
-          <div style="font-size:10px;font-weight:600;color:#94a3b8;white-space:nowrap;">graduate to</div>
-          <div style="font-size:20px;color:#cbd5e1;">→</div>
-        </div>
-
-        <!-- Step 3 -->
-        <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:12px 16px;text-align:center;min-width:110px;flex:1;">
-          <div style="font-size:20px;font-weight:800;color:#10b981;">${repBkTarget2026}</div>
-          <div style="font-size:10px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:0.4px;">Repeat bookings / mo</div>
-          <div style="font-size:10px;color:#64748b;margin-top:3px;">existing client target</div>
+        <!-- Pool 2: Ever booked -->
+        <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:14px;">
+          <div style="font-size:10px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">🟢 Existing Client Pool — ${everBookedCount} clients</div>
+          <div style="font-size:11px;color:#334155;line-height:1.6;">
+            <strong>${curRepeatBk}</strong> of <strong>${everBookedCount}</strong> booked again this month (<strong>${existRatePct}%</strong>)<br>
+            Target: <strong style="color:#10b981;">${repBkTarget2026} repeat bookings/mo</strong><br>
+            Needs pool of <strong style="color:#10b981;">${existNeeded2026}</strong> existing clients
+          </div>
+          <div style="margin-top:10px;font-size:10px;color:#64748b;">
+            Pool grows as new clients convert from the blue pool
+          </div>
         </div>
 
       </div>
-      <div style="font-size:11px;color:#64748b;margin-top:14px;line-height:1.6;border-top:1px solid #e2e8f0;padding-top:12px;">
-        Every new client who books graduates into your existing base — growing the pool that drives repeat revenue.
-        Today <strong style="color:#334155;">${cohortConvPct}%</strong> of sign-ups go on to book, so you need
-        <strong style="color:#3b82f6;">${signupTarget2026} sign-ups</strong> to land
-        <strong style="color:#3b82f6;">${newBkTarget2026} new bookings</strong>, each of whom then adds to the
-        <strong style="color:#10b981;">${repBkTarget2026} repeat bookings/mo</strong> target over time.
+
+      <!-- Narrative -->
+      <div style="font-size:11px;color:#64748b;line-height:1.7;border-top:1px solid #e2e8f0;padding-top:12px;">
+        Your dashboard has <strong style="color:#334155;">${neverBookedCount} never-booked</strong> clients and
+        <strong style="color:#334155;">${everBookedCount} existing</strong> clients.
+        This month <strong style="color:#3b82f6;">${curFirstTimers} of ${neverBookedCount} (${newRatePct}%)</strong> never-booked clients made their first booking,
+        and <strong style="color:#10b981;">${curRepeatBk} of ${everBookedCount} (${existRatePct}%)</strong> existing clients booked again.
+        Each first-timer permanently moves into the existing pool, growing the base that drives repeat revenue over time.
+        To hit the 2026 target you need <strong style="color:#3b82f6;">${signupTarget2026} sign-ups/mo</strong> feeding the new pool and
+        <strong style="color:#10b981;">${existNeeded2026} existing clients</strong> in the repeat pool.
       </div>
     </div>`;
 
@@ -2916,118 +1958,56 @@ function renderRoadmap() {
       ${retCard}
     </div>` + funnelBox;
 
-  // ── Single Lever Sensitivity Analysis — 2026 target ──
-  // Full formula: Monthly Revenue = totalClients × bookingRate × bppm × ATV
-  //   totalClients   = all clients on dashboard
-  //   bookingRate    = % of those clients who book (live from data)
-  //   bppm           = avg bookings per booking client per month
-  //   ATV            = avg transaction value
-  // Each lever solves for one unknown while the other THREE stay at live values
+  // ── Single Lever Sensitivity Analysis ──
+  const targetMonthlyRevY1 = REVENUE_TARGETS.y1 / 12;
+  const curClients         = live.totalDashboardClients;
+  const sensCurBookingRate = live.clientBookingRate; // blended — for whole-business lever
+  const curBppm            = bppm;
+  const curATV             = liveATV;
 
-  const targetMonthlyRevY1  = REVENUE_TARGETS.y1 / 12;
-  const curClients          = live.totalDashboardClients;
-  // Blended rate — sensitivity is a whole-business lever covering both new and existing clients
-  // Formula is monthly: clients × bookingRate/mo × bookings/client/mo × ATV = monthly revenue
-  const sensCurBookingRate  = live.clientBookingRate;
-  const curBppm             = bppm;
-  const curATV              = liveATV;
-
-  // Lever 1: Dashboard Clients — fix bookingRate/mo + bppm + ATV
-  const neededClients = (sensCurBookingRate > 0 && curBppm > 0 && curATV > 0)
+  const neededClients     = (sensCurBookingRate > 0 && curBppm > 0 && curATV > 0)
     ? Math.ceil(targetMonthlyRevY1 / (sensCurBookingRate * curBppm * curATV)) : null;
-
-  // Lever 2: Monthly Booking Rate — fix clients + bppm + ATV
   const neededBookingRate = (curClients > 0 && curBppm > 0 && curATV > 0)
     ? Math.min(1, targetMonthlyRevY1 / (curClients * curBppm * curATV)) : null;
-
-  // Lever 3: ATV — fix clients + bookingRate/mo + bppm
-  const neededATV = (curClients > 0 && sensCurBookingRate > 0 && curBppm > 0)
+  const neededATV         = (curClients > 0 && sensCurBookingRate > 0 && curBppm > 0)
     ? Math.ceil(targetMonthlyRevY1 / (curClients * sensCurBookingRate * curBppm)) : null;
-
-  // Lever 4: Booking Frequency — fix clients + bookingRate/mo + ATV
-  const neededBppm = (curClients > 0 && sensCurBookingRate > 0 && curATV > 0)
+  const neededBppm        = (curClients > 0 && sensCurBookingRate > 0 && curATV > 0)
     ? targetMonthlyRevY1 / (curClients * sensCurBookingRate * curATV) : null;
 
   const fmtSens = v => '£' + Math.round(v).toLocaleString();
   const fmtPct  = v => (v * 100).toFixed(1) + '%';
-  const curBookingRatePctDisplay = fmtPct(sensCurBookingRate) + '/mo';
+  const curBRDisplay = fmtPct(sensCurBookingRate) + '/mo';
 
   const levers = [
-    {
-      icon: 'users', label: 'Dashboard Clients', color: '#3b82f6',
-      current: `${curClients} clients · ${curBookingRatePctDisplay} booking`,
-      needed: neededClients !== null ? `${neededClients.toLocaleString()} clients` : '—',
-      change: neededClients !== null
-        ? `+${Math.max(0, neededClients - curClients).toLocaleString()} more clients needed`
-        : '—',
-      feasible: neededClients !== null,
-      held: `${curBookingRatePctDisplay} booking rate · ${bppmDisplay} bookings/client/mo · ${fmtSens(curATV)} ATV`
-    },
-    {
-      icon: 'trending-up', label: 'Monthly Booking Rate', color: '#10b981',
-      current: `${curBookingRatePctDisplay} book each month`,
-      needed: neededBookingRate !== null
-        ? (neededBookingRate >= 1 ? 'Not achievable alone' : fmtPct(neededBookingRate) + '/mo')
-        : '—',
-      change: neededBookingRate !== null && neededBookingRate < 1
-        ? `${Math.ceil(neededBookingRate * curClients)} clients booking/mo — up from ${Math.round(sensCurBookingRate * curClients)} now`
-        : 'Rate would exceed 100% — combine with another lever',
-      feasible: neededBookingRate !== null && neededBookingRate < 1,
-      held: `${curClients} clients · ${bppmDisplay} bookings/client/mo · ${fmtSens(curATV)} ATV`
-    },
-    {
-      icon: 'pound-sterling', label: 'Avg Transaction Value', color: '#f59e0b',
-      current: `${fmtSens(curATV)} per booking`,
-      needed: neededATV !== null ? `${fmtSens(neededATV)} per booking` : '—',
-      change: neededATV !== null ? `+${fmtSens(Math.max(0, neededATV - curATV))} more per job` : '—',
-      feasible: neededATV !== null,
-      held: `${curClients} clients · ${curBookingRatePctDisplay} booking rate · ${bppmDisplay} bookings/client/mo`
-    },
-    {
-      icon: 'repeat-2', label: 'Booking Frequency', color: '#a78bfa',
-      current: `${bppmDisplay} bookings/client/mo`,
-      needed: neededBppm !== null ? `${neededBppm.toFixed(2)} bookings/client/mo` : '—',
-      change: neededBppm !== null
-        ? `Once every ${Math.round(1 / neededBppm)} months per client · ${Math.ceil(neededBppm * curClients * sensCurBookingRate)} total/mo`
-        : '—',
-      feasible: neededBppm !== null,
-      held: `${curClients} clients · ${curBookingRatePctDisplay} booking rate · ${fmtSens(curATV)} ATV`
-    }
+    { icon:'users',        label:'Dashboard Clients',      color:'#3b82f6', current:`${curClients} clients · ${curBRDisplay} booking`,      needed:neededClients!==null?`${neededClients.toLocaleString()} clients`:'—',                                                                                    change:neededClients!==null?`+${Math.max(0,neededClients-curClients).toLocaleString()} more clients needed`:'—',                                                                       feasible:neededClients!==null, held:`${curBRDisplay} booking rate · ${bppmDisplay} bookings/client/mo · ${fmtSens(curATV)} ATV` },
+    { icon:'trending-up',  label:'Monthly Booking Rate',   color:'#10b981', current:`${curBRDisplay} book each month`,                       needed:neededBookingRate!==null?(neededBookingRate>=1?'Not achievable alone':fmtPct(neededBookingRate)+'/mo'):'—',                                           change:neededBookingRate!==null&&neededBookingRate<1?`${Math.ceil(neededBookingRate*curClients)} clients booking/mo — up from ${Math.round(sensCurBookingRate*curClients)} now`:'Rate would exceed 100% — combine with another lever', feasible:neededBookingRate!==null&&neededBookingRate<1, held:`${curClients} clients · ${bppmDisplay} bookings/client/mo · ${fmtSens(curATV)} ATV` },
+    { icon:'pound-sterling',label:'Avg Transaction Value', color:'#f59e0b', current:`${fmtSens(curATV)} per booking`,                        needed:neededATV!==null?`${fmtSens(neededATV)} per booking`:'—',                                                                                              change:neededATV!==null?`+${fmtSens(Math.max(0,neededATV-curATV))} more per job`:'—',                                                                                                    feasible:neededATV!==null,     held:`${curClients} clients · ${curBRDisplay} booking rate · ${bppmDisplay} bookings/client/mo` },
+    { icon:'repeat-2',     label:'Booking Frequency',      color:'#a78bfa', current:`${bppmDisplay} bookings/client/mo`,                     needed:neededBppm!==null?`${neededBppm.toFixed(2)} bookings/client/mo`:'—',                                                                                   change:neededBppm!==null?`Once every ${Math.round(1/neededBppm)} months per client · ${Math.ceil(neededBppm*curClients*sensCurBookingRate)} total/mo`:'—',                                 feasible:neededBppm!==null,    held:`${curClients} clients · ${curBRDisplay} booking rate · ${fmtSens(curATV)} ATV` }
   ];
 
   document.getElementById('sensitivityGrid').innerHTML = levers.map(l => `
     <div style="background:#fff;border:1px solid ${l.color}33;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);min-width:0;word-break:break-word;overflow-wrap:anywhere;">
-
-      <!-- Coloured header band -->
       <div style="background:linear-gradient(135deg,${l.color},${l.color}cc);padding:14px 16px 12px;">
         <div style="margin-bottom:6px;"><i data-lucide="${l.icon}" style="width:20px;height:20px;color:#fff;opacity:0.9;"></i></div>
         <div style="font-size:12px;font-weight:700;color:#fff;letter-spacing:0.3px;">${l.label}</div>
         <div style="font-size:10px;color:rgba(255,255,255,0.75);margin-top:2px;">Keep everything else the same</div>
       </div>
-
-      <!-- Body -->
       <div style="padding:14px 16px;">
-
-        <!-- Current vs Target — stacked on small screens via flex-wrap -->
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
           <div style="flex:1;min-width:80px;background:#f8fafc;border-radius:8px;padding:9px 11px;">
             <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Now</div>
-            <div style="font-size:12px;font-weight:700;color:#475569;line-height:1.3;word-break:break-word;">${l.current}</div>
+            <div style="font-size:12px;font-weight:700;color:#475569;line-height:1.3;">${l.current}</div>
           </div>
           <div style="display:flex;align-items:center;color:#94a3b8;font-size:14px;flex-shrink:0;">→</div>
           <div style="flex:1;min-width:80px;background:${l.color}12;border:1.5px solid ${l.color}44;border-radius:8px;padding:9px 11px;">
             <div style="font-size:9px;font-weight:700;color:${l.color};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Target</div>
-            <div style="font-size:13px;font-weight:800;color:${l.feasible ? l.color : '#ef4444'};line-height:1.3;word-break:break-word;">${l.needed}</div>
+            <div style="font-size:13px;font-weight:800;color:${l.feasible ? l.color : '#ef4444'};line-height:1.3;">${l.needed}</div>
           </div>
         </div>
-
-        <!-- Gap callout -->
-        <div style="background:${l.feasible ? l.color + '10' : 'rgba(239,68,68,0.08)'};border-left:3px solid ${l.feasible ? l.color : '#ef4444'};border-radius:0 6px 6px 0;padding:7px 10px;margin-bottom:10px;">
-          <div style="font-size:11px;font-weight:700;color:${l.feasible ? l.color : '#ef4444'};line-height:1.4;word-break:break-word;">${l.change}</div>
+        <div style="background:${l.feasible ? l.color+'10' : 'rgba(239,68,68,0.08)'};border-left:3px solid ${l.feasible ? l.color : '#ef4444'};border-radius:0 6px 6px 0;padding:7px 10px;margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:700;color:${l.feasible ? l.color : '#ef4444'};line-height:1.4;">${l.change}</div>
         </div>
-
-        <!-- What's held constant -->
-        <div style="font-size:10px;color:#94a3b8;line-height:1.5;word-break:break-word;">${l.held}</div>
+        <div style="font-size:10px;color:#94a3b8;line-height:1.5;">${l.held}</div>
       </div>
     </div>`).join('');
 }
@@ -3039,60 +2019,60 @@ function renderIntelligence() {
   clientData.forEach(c => {
     const email = (c.fields['Email']||'').toLowerCase();
     if (!email) return;
-    clientMap[email] = { name: c.fields['Name']||'Unknown', company: c.fields['Company']||'', email, region: c.fields['Region']||'', status: c.fields['Account Status']||'', bookings: [], ltv: 0, bookingCount: 0, avgSpend: 0, lastBooking: null };
+    clientMap[email] = { name:c.fields['Name']||'Unknown', company:c.fields['Company']||'', email, region:c.fields['Region']||'', status:c.fields['Account Status']||'', bookings:[], ltv:0, bookingCount:0, avgSpend:0, lastBooking:null };
   });
   bookingData.forEach(b => {
     const email = (b.clientEmail||'').toLowerCase();
     if (!email) return;
-    if (!clientMap[email]) clientMap[email] = { name: b.clientName||'Guest', company:'', email, region:'', status:'Guest', bookings:[], ltv:0, bookingCount:0, avgSpend:0, lastBooking:null };
+    if (!clientMap[email]) clientMap[email] = { name:b.clientName||'Guest', company:'', email, region:'', status:'Guest', bookings:[], ltv:0, bookingCount:0, avgSpend:0, lastBooking:null };
     clientMap[email].bookings.push(b);
     if (b.bookingStatus !== 'Cancelled') clientMap[email].ltv += parseFloat(b.finalPrice)||0;
   });
   Object.values(clientMap).forEach(c => {
     c.bookingCount = c.bookings.length;
-    const nonCancelled = c.bookings.filter(b => b.bookingStatus !== 'Cancelled');
-    c.avgSpend = nonCancelled.length > 0 ? c.ltv / nonCancelled.length : 0;
-    const dates = c.bookings.map(b => b.date).filter(Boolean).sort();
+    const nc = c.bookings.filter(b => b.bookingStatus !== 'Cancelled');
+    c.avgSpend    = nc.length > 0 ? c.ltv / nc.length : 0;
+    const dates   = c.bookings.map(b => b.date).filter(Boolean).sort();
     c.lastBooking = dates[dates.length-1] || null;
   });
 
-  const allClients = Object.values(clientMap);
+  const allClients   = Object.values(clientMap);
   const totalClients = clientData.length;
-  const cwb  = allClients.filter(c => c.bookingCount > 0).length;
-  const rate = totalClients > 0 ? ((cwb / totalClients) * 100).toFixed(1) : 0;
-  const totalLTV = allClients.reduce((s,c) => s+c.ltv, 0);
-  const avgLTV   = cwb > 0 ? (totalLTV/cwb).toFixed(2) : 0;
-  const avgBPC   = cwb > 0 ? (allClients.reduce((s,c) => s+c.bookingCount, 0)/cwb).toFixed(1) : 0;
-  const ncb = bookingData.filter(b => b.bookingStatus !== 'Cancelled').length;
-  const atv = ncb > 0 ? (totalLTV/ncb).toFixed(2) : 0;
+  const cwb          = allClients.filter(c => c.bookingCount > 0).length;
+  const rate         = totalClients > 0 ? ((cwb / totalClients) * 100).toFixed(1) : 0;
+  const totalLTV     = allClients.reduce((s,c) => s+c.ltv, 0);
+  const avgLTV       = cwb > 0 ? (totalLTV/cwb).toFixed(2) : 0;
+  const avgBPC       = cwb > 0 ? (allClients.reduce((s,c) => s+c.bookingCount, 0)/cwb).toFixed(1) : 0;
+  const ncb          = bookingData.filter(b => b.bookingStatus !== 'Cancelled').length;
+  const atv          = ncb > 0 ? (totalLTV/ncb).toFixed(2) : 0;
 
-  const topClients = allClients.filter(c => c.bookingCount > 0).sort((a,b) => b.ltv-a.ltv).slice(0,10);
-  const rankEmoji = ['1','2','3'];
-  const rankClass = ['rank-1','rank-2','rank-3'];
+  const topClients   = allClients.filter(c => c.bookingCount > 0).sort((a,b) => b.ltv-a.ltv).slice(0,10);
+  const rankEmoji    = ['1','2','3'];
+  const rankClass    = ['rank-1','rank-2','rank-3'];
 
   document.getElementById('intelBookingRate').textContent = rate + '%';
   document.getElementById('intelAvgLTV').textContent      = '£' + parseFloat(avgLTV).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
   document.getElementById('intelAvgBookings').textContent = avgBPC;
   document.getElementById('intelTotalLTV').textContent    = '£' + parseFloat(totalLTV).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
   document.getElementById('intelNeverBooked').textContent = totalClients - cwb;
-  document.getElementById('intelATV').textContent        = '£' + parseFloat(atv).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('intelATV').textContent         = '£' + parseFloat(atv).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
 
   document.getElementById('bigBookingRate').textContent = rate + '%';
   document.getElementById('bigRateBar').style.width     = Math.min(rate,100) + '%';
   document.getElementById('bigRateSub').textContent     = cwb + ' of ' + totalClients + ' clients have made at least 1 booking · ' + (totalClients-cwb) + ' yet to book';
-  document.getElementById('bigATV').textContent    = '£' + parseFloat(atv).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
-  document.getElementById('bigAvgLTV').textContent = '£' + parseFloat(avgLTV).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
-  document.getElementById('bigTotalLTV').textContent = '£' + parseFloat(totalLTV).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('bigATV').textContent         = '£' + parseFloat(atv).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('bigAvgLTV').textContent      = '£' + parseFloat(avgLTV).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('bigTotalLTV').textContent    = '£' + parseFloat(totalLTV).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
 
   const allTop = allClients.filter(c => c.bookingCount > 0).sort((a,b) => b.ltv-a.ltv);
   document.getElementById('fullLeaderboard').innerHTML = allTop.length === 0
     ? '<div style="text-align:center;padding:40px;color:#475569;grid-column:1/-1;">No booking data available</div>'
     : allTop.map((c,i) => {
-        const rank = i < 3 ? rankEmoji[i] : '#' + (i+1);
+        const rank = i < 3 ? rankEmoji[i] : '#'+(i+1);
         const cls  = i < 3 ? rankClass[i] : 'rank-other';
-        const cc = c.bookings.filter(b => b.bookingStatus === 'Cancelled').length;
-        const cf = c.bookings.filter(b => b.bookingStatus === 'Confirmed').length;
-        const rv = c.bookings.filter(b => b.bookingStatus === 'Reserved').length;
+        const cc   = c.bookings.filter(b => b.bookingStatus === 'Cancelled').length;
+        const cf   = c.bookings.filter(b => b.bookingStatus === 'Confirmed').length;
+        const rv   = c.bookings.filter(b => b.bookingStatus === 'Reserved').length;
         return `<div class="leaderboard-item ${cls}" style="background:#f8fafc;">
           <div class="rank-badge">${rank}</div>
           <div class="leaderboard-info">
@@ -3108,8 +2088,8 @@ function renderIntelligence() {
           <div class="leaderboard-right" style="min-width:90px;">
             <div class="ltv-value">£${c.ltv.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
             <div class="ltv-label">LTV</div>
-            <div class="booking-count">${c.bookingCount} booking${c.bookingCount !== 1 ? 's' : ''}</div>
-            <div style="font-size:10px;color:#475569;margin-top:2px;">avg £${isNaN(c.avgSpend) ? 0 : c.avgSpend.toFixed(0)} / booking</div>
+            <div class="booking-count">${c.bookingCount} booking${c.bookingCount!==1?'s':''}</div>
+            <div style="font-size:10px;color:#475569;margin-top:2px;">avg £${isNaN(c.avgSpend)?0:c.avgSpend.toFixed(0)} / booking</div>
           </div>
         </div>`;
       }).join('');
@@ -3118,7 +2098,7 @@ function renderIntelligence() {
     <div class="intel-section">
       <div class="intel-section-title">Booking Conversion</div>
       <div class="rate-bar-wrap">
-        <div class="rate-bar-header"><span>Clients who have booked</span><span class="rate-bar-pct">${rate}%</span></div>
+        <div class="rate-bar-header"><span>Clients who have ever booked</span><span class="rate-bar-pct">${rate}%</span></div>
         <div class="rate-bar-bg"><div class="rate-bar-fill" style="width:${Math.min(rate,100)}%"></div></div>
         <div class="rate-bar-sub">${cwb} of ${totalClients} · ${totalClients-cwb} yet to book</div>
       </div>
@@ -3140,7 +2120,7 @@ function renderIntelligence() {
         : topClients.map((c,i) => {
             const rank = i < 3 ? rankEmoji[i] : '#'+(i+1);
             const cls  = i < 3 ? rankClass[i] : 'rank-other';
-            const cc = c.bookings.filter(b => b.bookingStatus === 'Cancelled').length;
+            const cc   = c.bookings.filter(b => b.bookingStatus === 'Cancelled').length;
             return '<div class="leaderboard-item ' + cls + '">'
               + '<div class="rank-badge">' + rank + '</div>'
               + '<div class="leaderboard-info">'
@@ -3151,7 +2131,7 @@ function renderIntelligence() {
               + '<div class="leaderboard-right">'
               + '<div class="ltv-value">£' + c.ltv.toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0}) + '</div>'
               + '<div class="ltv-label">LTV</div>'
-              + '<div class="booking-count">' + c.bookingCount + ' booking' + (c.bookingCount !== 1 ? 's' : '') + '</div>'
+              + '<div class="booking-count">' + c.bookingCount + ' booking' + (c.bookingCount!==1?'s':'') + '</div>'
               + '<div style="font-size:10px;color:#475569;">avg £' + (isNaN(c.avgSpend)?0:c.avgSpend.toFixed(0)) + '</div>'
               + '</div></div>';
           }).join('')
