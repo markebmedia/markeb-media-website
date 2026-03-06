@@ -378,10 +378,6 @@
     .empty-state { text-align: center; padding: 40px 20px; }
     .empty-state-text { font-size: 13px; color: #475569; }
 
-    .milestone-track { display: flex; flex-direction: column; gap: 12px; }
-    .milestone-year { font-size: 13px; font-weight: 700; color: #475569; width: 60px; flex-shrink: 0; }
-    .milestone-bar-wrap { flex: 1; background: #e2e8f0; border-radius: 8px; height: 28px; overflow: hidden; position: relative; }
-    .milestone-bar-fill { height: 100%; border-radius: 8px; display: flex; align-items: center; padding-left: 12px; font-size: 12px; font-weight: 700; color: #fff; transition: width 1s ease; }
     .milestone-target-label { font-size: 13px; font-weight: 600; color: #475569; white-space: nowrap; min-width: 80px; text-align: right; }
 
     @media (max-width: 1400px) {
@@ -637,11 +633,6 @@
       <div class="stats-overview" id="roadmapTargets" style="margin-bottom:24px;"></div>
 
       <div style="margin-bottom:24px;">
-        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px;">Annual Revenue Milestones</div>
-        <div class="milestone-track" id="milestoneTrack"></div>
-      </div>
-
-      <div style="margin-bottom:24px;">
         <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px;">Monthly Targets by Year</div>
         <div id="monthlyTargetsGrid"></div>
       </div>
@@ -727,37 +718,14 @@ function calcLiveATV() {
   return paid.reduce((s, b) => s + parseFloat(b.finalPrice), 0) / paid.length;
 }
 
-// ══════════════════════════════════════════════════════════════
-//  calcLiveMonthlyAverages
-//
-//  KEY CHANGE: New client and existing client rates are now
-//  calculated against FIXED POOLS based on booking history
-//  relative to the current calendar month:
-//
-//  neverBookedPool  = dashboard clients with ZERO non-cancelled
-//                     bookings dated before this calendar month
-//  everBookedPool   = dashboard clients with AT LEAST ONE
-//                     non-cancelled booking before this month
-//
-//  newClientRate    = first-time bookers this month
-//                     ÷ neverBookedPool.size
-//  existingRate     = unique repeat bookers this month
-//                     ÷ everBookedPool.size
-//
-//  Both reset each calendar month so the performance analytics
-//  page always reflects the current month's picture.
-// ══════════════════════════════════════════════════════════════
 function calcLiveMonthlyAverages() {
   const now = new Date();
-  const thisMonthKey = now.toISOString().slice(0, 7); // YYYY-MM
+  const thisMonthKey = now.toISOString().slice(0, 7);
 
-  // All dashboard client emails
   const clientEmails = new Set(
     clientData.map(u => (u.fields['Email'] || '').toLowerCase()).filter(Boolean)
   );
 
-  // ── Build each dashboard client's booking history BEFORE this month ──
-  // Key: email → Set of booking months (YYYY-MM) that are before thisMonthKey
   const priorBookingsByEmail = {};
   clientData.forEach(u => {
     const email = (u.fields['Email'] || '').toLowerCase();
@@ -767,7 +735,7 @@ function calcLiveMonthlyAverages() {
   bookingData.forEach(b => {
     if (!b.date || b.bookingStatus === 'Cancelled' || !b.clientEmail) return;
     const email = (b.clientEmail || '').toLowerCase();
-    if (!clientEmails.has(email)) return; // only dashboard clients
+    if (!clientEmails.has(email)) return;
     const bookingMonth = b.date.slice(0, 7);
     if (bookingMonth < thisMonthKey) {
       if (!priorBookingsByEmail[email]) priorBookingsByEmail[email] = new Set();
@@ -775,38 +743,31 @@ function calcLiveMonthlyAverages() {
     }
   });
 
-  // ── The two fixed pools ──
-  // neverBookedPool: dashboard clients who have ZERO non-cancelled bookings before this month
   const neverBookedPool = new Set(
     [...clientEmails].filter(e => !priorBookingsByEmail[e] || priorBookingsByEmail[e].size === 0)
   );
-  // everBookedPool: dashboard clients who have AT LEAST ONE booking before this month
   const everBookedPool = new Set(
     [...clientEmails].filter(e => priorBookingsByEmail[e] && priorBookingsByEmail[e].size > 0)
   );
 
-  // ── This calendar month's bookings (non-cancelled, dashboard clients only) ──
   const thisMonthBookings = bookingData.filter(b => {
     if (!b.date || b.bookingStatus === 'Cancelled' || !b.clientEmail) return false;
     const email = (b.clientEmail || '').toLowerCase();
     return clientEmails.has(email) && b.date.slice(0, 7) === thisMonthKey;
   });
 
-  // First-time bookers this month = dashboard clients in neverBookedPool who have a booking this month
   const firstTimeBookersThisMonth = new Set(
     thisMonthBookings
       .map(b => (b.clientEmail || '').toLowerCase())
       .filter(e => neverBookedPool.has(e))
   );
 
-  // Repeat bookers this month = dashboard clients in everBookedPool who have a booking this month
   const repeatBookersThisMonth = new Set(
     thisMonthBookings
       .map(b => (b.clientEmail || '').toLowerCase())
       .filter(e => everBookedPool.has(e))
   );
 
-  // ── Rates ──
   const newClientBookingRate = neverBookedPool.size > 0
     ? firstTimeBookersThisMonth.size / neverBookedPool.size
     : 0;
@@ -815,13 +776,11 @@ function calcLiveMonthlyAverages() {
     ? repeatBookersThisMonth.size / everBookedPool.size
     : 0;
 
-  // Blended overall rate for reference (all dashboard clients who booked this month)
   const allBookersThisMonth = new Set(thisMonthBookings.map(b => (b.clientEmail || '').toLowerCase()));
   const clientBookingRate = clientEmails.size > 0
     ? allBookersThisMonth.size / clientEmails.size
     : 0;
 
-  // ── Avg monthly bookings (historical, for trajectory calculations) ──
   const bMonths = {};
   bookingData.forEach(b => {
     if (!b.date || b.bookingStatus === 'Cancelled') return;
@@ -832,7 +791,6 @@ function calcLiveMonthlyAverages() {
   const avgMonthlyBookings = bValues.length > 0
     ? bValues.reduce((s, v) => s + v, 0) / bValues.length : 0;
 
-  // ── Avg monthly sign-ups (excl. current partial month) ──
   const sMonths = {};
   clientData.forEach(u => {
     const d = u.fields['Created Date'];
@@ -846,7 +804,6 @@ function calcLiveMonthlyAverages() {
   const avgMonthlySignups = sValues.length > 0
     ? sValues.reduce((s, v) => s + v, 0) / sValues.length : 0;
 
-  // ── New vs existing split from booking history ──
   const priorEmails = new Set();
   let newCount = 0, existCount = 0;
   const sorted = [...bookingData]
@@ -862,7 +819,6 @@ function calcLiveMonthlyAverages() {
   const liveNewSplit = totalBookingsSplit > 0 ? newCount / totalBookingsSplit : 0.30;
   const liveExSplit  = totalBookingsSplit > 0 ? existCount / totalBookingsSplit : 0.70;
 
-  // ── Monthly revenue run rate (last 3 complete months) ──
   const revByMonth = {};
   bookingData.filter(b => b.date && b.bookingStatus !== 'Cancelled').forEach(b => {
     const k = b.date.slice(0, 7);
@@ -873,21 +829,17 @@ function calcLiveMonthlyAverages() {
   const last3Rev = last3Months.reduce((s, k) => s + revByMonth[k], 0);
   const monthlyRevRunRate = last3Months.length > 0 ? last3Rev / last3Months.length : 0;
 
-  // ── Avg bookings per booking client per month ──
   const allDates = bookingData.filter(b => b.date).map(b => new Date(b.date));
   const earliest = allDates.length ? new Date(Math.min(...allDates)) : now;
   const monthsActive = Math.max(1, (now - earliest) / (1000 * 60 * 60 * 24 * 30));
   const totalNonCancelled = bookingData.filter(b => b.bookingStatus !== 'Cancelled').length;
-  const clientsWhoBooked = everBookedPool.size; // those who booked at least once before this month
+  const clientsWhoBooked = everBookedPool.size;
   const bookingsPerBookedClientPerMonth = (clientsWhoBooked > 0 && monthsActive > 0)
     ? totalNonCancelled / monthsActive / clientsWhoBooked : 0;
 
-  // ── Lifetime booking rate: % of dashboard clients who have EVER booked ──
-  // Denominator = all dashboard clients; numerator = those in everBookedPool + first-timers this month
   const totalEverBooked = everBookedPool.size + firstTimeBookersThisMonth.size;
   const lifetimeBookingRate = clientEmails.size > 0 ? totalEverBooked / clientEmails.size : 0;
 
-  // ── Sign-up lag (sign-up to first booking) ──
   const signupByEmail = {};
   clientData.forEach(u => {
     const email = (u.fields['Email'] || '').toLowerCase();
@@ -916,7 +868,6 @@ function calcLiveMonthlyAverages() {
   const medianLagDays = lagDays.length > 0
     ? [...lagDays].sort((a, b) => a - b)[Math.floor(lagDays.length / 2)] : 30;
 
-  // ── Per-cohort conversion rate ──
   const lagCutoff = new Date(now.getTime() - avgLagDays * 1000 * 60 * 60 * 24);
   const cohortConversionRates = [];
   Object.entries(sMonths).forEach(([month, count]) => {
@@ -934,7 +885,6 @@ function calcLiveMonthlyAverages() {
     ? cohortConversionRates.reduce((s, v) => s + v, 0) / cohortConversionRates.length
     : lifetimeBookingRate;
 
-  // ── New/repeat bookings by month (for trajectory) ──
   const newClientBookingsByMonth = {};
   const seenEmails = new Set();
   [...bookingData]
@@ -960,13 +910,10 @@ function calcLiveMonthlyAverages() {
   const avgMonthlyRepeatClientBookings = repBkValues.length > 0 ? repBkValues.reduce((s,v)=>s+v,0)/repBkValues.length : 0;
 
   return {
-    // Core pools
     neverBookedPool, everBookedPool,
     firstTimeBookersThisMonth, repeatBookersThisMonth,
     thisMonthBookings,
-    // Rates (calendar-month based)
     newClientBookingRate, existingClientBookingRate, clientBookingRate,
-    // Legacy / trajectory
     avgMonthlyBookings, avgMonthlySignups,
     avgMonthlyNewClientBookings, avgMonthlyRepeatClientBookings,
     liveNewSplit, liveExSplit,
@@ -1418,9 +1365,9 @@ function switchTab(tab) {
   if (isIntel) renderIntelligence();
 }
 
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 //  PERFORMANCE ANALYTICS
-// ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
 
 function setPeriod(period) {
   currentPeriod = period;
@@ -1591,7 +1538,6 @@ function renderRoadmap() {
 
   const now2    = new Date();
   const rev2026 = revenueForYear(2026);
-  const rev2027 = revenueForYear(2027);
   const fmtMoney = v => '£' + Math.round(v).toLocaleString();
 
   const monthsToMillion = live.monthlyRevRunRate > 0
@@ -1620,56 +1566,8 @@ function renderRoadmap() {
     </div>`).join('');
   lucide.createIcons();
 
-  // ── Milestone bars ──
-  const bppy = bppm * 12;
-  const targetClientsY1 = liveATV > 0 && bppy > 0 ? Math.ceil((REVENUE_TARGETS.y1 / liveATV) / bppy) : 133;
-  const targetClientsY2 = liveATV > 0 && bppy > 0 ? Math.ceil((REVENUE_TARGETS.y2 / liveATV) / bppy) : 266;
-  const milestones = [
-    { year:'2026 — Now',    targetRev:REVENUE_TARGETS.y1, actualRev:rev2026, targetClients:targetClientsY1, actualClients:clientsSignedByEndOf(2026), color:'#8b5cf6', isCurrent:true  },
-    { year:'2027 — Target', targetRev:REVENUE_TARGETS.y2, actualRev:rev2027, targetClients:targetClientsY2, actualClients:clientsSignedByEndOf(2027), color:'#f59e0b', isCurrent:false }
-  ];
-
-  document.getElementById('milestoneTrack').innerHTML = milestones.map(m => {
-    const revPct     = Math.min((m.actualRev / m.targetRev) * 100, 100);
-    const clientsPct = Math.min((m.actualClients / m.targetClients) * 100, 100);
-    return `
-    <div style="margin-bottom:16px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:13px;font-weight:700;color:${m.color};">${m.year}</span>
-          ${m.isCurrent ? `<span style="font-size:10px;font-weight:700;background:${m.color}33;color:${m.color};padding:2px 8px;border-radius:6px;">In Progress</span>` : ''}
-        </div>
-        <div style="font-size:12px;color:#475569;">£${Math.round(m.actualRev).toLocaleString()} / £${(m.targetRev/1000).toFixed(0)}k</div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <div style="flex:1;">
-          <div style="font-size:10px;color:#475569;margin-bottom:3px;">Revenue</div>
-          <div class="milestone-bar-wrap">
-            <div class="milestone-bar-fill" style="width:${revPct}%;background:linear-gradient(90deg,${m.color},${m.color}99);">${revPct > 12 ? revPct.toFixed(1)+'%' : ''}</div>
-          </div>
-        </div>
-        <div style="flex:1;">
-          <div style="font-size:10px;color:#475569;margin-bottom:3px;">Clients — ${m.actualClients} / ${m.targetClients}</div>
-          <div class="milestone-bar-wrap">
-            <div class="milestone-bar-fill" style="width:${clientsPct}%;background:linear-gradient(90deg,#3b82f6,#60a5fa99);">${clientsPct > 12 ? clientsPct.toFixed(0)+'%' : ''}</div>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-
   // ══════════════════════════════════════════════════════════════
   //  MONTHLY TARGETS GRID
-  //
-  //  New Client card now shows:
-  //    numerator   = first-time bookers this calendar month
-  //    denominator = neverBookedPool (dashboard clients with 0 prior bookings)
-  //    rate        = newClientBookingRate (already calc'd in calcLiveMonthlyAverages)
-  //
-  //  Existing Client card now shows:
-  //    numerator   = repeat bookers this calendar month
-  //    denominator = everBookedPool (dashboard clients with ≥1 prior booking)
-  //    rate        = existingClientBookingRate
   // ══════════════════════════════════════════════════════════════
 
   const monthsLeftThisYear  = 12 - now2.getMonth();
@@ -1680,11 +1578,9 @@ function renderRoadmap() {
     { label:'2027 — Next Year', col:'#f59e0b', key:'y2', annualRev:REVENUE_TARGETS.y2, isCurrent:false }
   ];
 
-  // ── Current month actuals ──
   const thisMonthStart = new Date(now2.getFullYear(), now2.getMonth(), 1);
   const thisMonthEnd   = new Date(now2.getFullYear(), now2.getMonth() + 1, 0, 23, 59, 59);
 
-  // Confirmed new/existing split for this month (using period window logic)
   const thisMonthAllBookings = bookingData.filter(b => {
     if (!b.date || b.bookingStatus === 'Cancelled') return false;
     const d = new Date(b.date);
@@ -1697,17 +1593,14 @@ function renderRoadmap() {
     return d >= thisMonthStart && d <= thisMonthEnd;
   }).length;
 
-  // Pool sizes
   const neverBookedCount = live.neverBookedPool.size;
   const everBookedCount  = live.everBookedPool.size;
 
-  // Actuals from the corrected pools
   const curFirstTimers = live.firstTimeBookersThisMonth.size;
   const curRepeatBk    = live.repeatBookersThisMonth.size;
   const curTotalBk     = thisMonthAllBookings.length;
   const curSignups     = thisMonthSignups;
 
-  // Rates as percentages
   const newRatePct      = neverBookedCount > 0 ? ((curFirstTimers / neverBookedCount) * 100).toFixed(1) : '0.0';
   const existRatePct    = everBookedCount  > 0 ? ((curRepeatBk   / everBookedCount)  * 100).toFixed(1) : '0.0';
 
@@ -1756,10 +1649,8 @@ function renderRoadmap() {
     const revPct       = y.isCurrent ? Math.min((actualRev / y.annualRev) * 100, 100) : 0;
     const revBarColor  = revPct >= 80 ? '#10b981' : revPct >= 40 ? '#f59e0b' : '#ef4444';
     const growthMult   = live.monthlyRevRunRate > 0 ? targetMonthlyRev / live.monthlyRevRunRate : 0;
-    // Clients needed in existing pool to hit target repeat bookings at current existing rate
     const clientsNeeded = live.existingClientBookingRate > 0
       ? Math.ceil(tgtRepeatBk / live.existingClientBookingRate) : tgtRepeatBk;
-    // Sign-ups needed in never-booked pool to hit target new bookings at current new client rate
     const neverBookedNeeded = live.newClientBookingRate > 0
       ? Math.ceil(tgtNewBk / live.newClientBookingRate) : tgtSignups;
     return { ...y, targetMonthlyRev, tgtTotalBk, tgtNewBk, tgtRepeatBk, tgtSignups, actualRev, revPct, revBarColor, growthMult, clientsNeeded, neverBookedNeeded };
@@ -1791,8 +1682,6 @@ function renderRoadmap() {
         </div>`).join('')}
     </div>`;
 
-  // ── New Client Acquisition card ──
-  // Shows: X of Y never-booked clients booked for the first time this month
   const acqCard = `
     <div style="background:#fff;border:1.5px solid #3b82f633;border-radius:16px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border-top:4px solid #3b82f6;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
@@ -1803,7 +1692,6 @@ function renderRoadmap() {
         </div>
       </div>
 
-      <!-- This month's new client snapshot -->
       <div class="ret-snapshot" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:11px 14px;margin:16px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
         <div style="text-align:center;">
           <div style="font-size:32px;font-weight:800;color:#3b82f6;line-height:1;">${curFirstTimers} <span style="font-size:18px;font-weight:600;color:#93c5fd;">of</span> ${neverBookedCount}</div>
@@ -1816,7 +1704,6 @@ function renderRoadmap() {
         </div>
       </div>
 
-      <!-- Lag insight -->
       <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:11px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;">
         <i data-lucide="clock" style="width:13px;height:13px;color:#0284c7;flex-shrink:0;margin-top:1px;"></i>
         <div>
@@ -1840,8 +1727,6 @@ function renderRoadmap() {
       </div>
     </div>`;
 
-  // ── Existing Client Retention card ──
-  // Shows: X of Y ever-booked clients booked again this month
   const retCard = `
     <div style="background:#fff;border:1.5px solid #10b98133;border-radius:16px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border-top:4px solid #10b981;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
@@ -1852,7 +1737,6 @@ function renderRoadmap() {
         </div>
       </div>
 
-      <!-- This month's existing client snapshot -->
       <div class="ret-snapshot" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:11px 14px;margin:16px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
         <div style="text-align:center;">
           <div style="font-size:32px;font-weight:800;color:#10b981;line-height:1;">${curRepeatBk} <span style="font-size:18px;font-weight:600;color:#6ee7b7;">of</span> ${everBookedCount}</div>
@@ -1880,8 +1764,6 @@ function renderRoadmap() {
       </div>
     </div>`;
 
-  // ── How the two cards connect ──
-  // Updated to reflect the two separate pools clearly
   const signupTarget2026  = yearData.find(y => y.key === 'y1')?.tgtSignups   || '—';
   const newBkTarget2026   = yearData.find(y => y.key === 'y1')?.tgtNewBk     || '—';
   const repBkTarget2026   = yearData.find(y => y.key === 'y1')?.tgtRepeatBk  || '—';
@@ -1895,10 +1777,7 @@ function renderRoadmap() {
         <span style="font-size:12px;font-weight:800;color:#334155;text-transform:uppercase;letter-spacing:0.5px;">How the two pools connect</span>
       </div>
 
-      <!-- Two-pool equation -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
-
-        <!-- Pool 1: Never booked -->
         <div style="background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:14px;">
           <div style="font-size:10px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">🔵 Never-Booked Pool — ${neverBookedCount} clients</div>
           <div style="font-size:11px;color:#334155;line-height:1.6;">
@@ -1911,7 +1790,6 @@ function renderRoadmap() {
           </div>
         </div>
 
-        <!-- Pool 2: Ever booked -->
         <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:14px;">
           <div style="font-size:10px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">🟢 Existing Client Pool — ${everBookedCount} clients</div>
           <div style="font-size:11px;color:#334155;line-height:1.6;">
@@ -1923,10 +1801,8 @@ function renderRoadmap() {
             Pool grows as new clients convert from the blue pool
           </div>
         </div>
-
       </div>
 
-      <!-- Narrative -->
       <div style="font-size:11px;color:#64748b;line-height:1.7;border-top:1px solid #e2e8f0;padding-top:12px;">
         We have <strong style="color:#334155;">${neverBookedCount} never-booked</strong> clients and
         <strong style="color:#334155;">${everBookedCount} existing</strong> clients on the dashboard.
@@ -1945,26 +1821,16 @@ function renderRoadmap() {
     </div>` + funnelBox;
 
   // ── Single Lever Sensitivity Analysis ──
-  // Formula: Revenue = Clients × BookingRate × ATV
-  // Period-aware: monthly target for MoM, annual for YoY, scaled for QoQ/6M
-  // Each lever solves for one unknown, all others held at current live values.
-  // Always uses THIS MONTH's actual data vs the monthly target (£200k ÷ 12).
-  // Question: "If we only changed ONE thing this month, what would it need to be?"
-
   const fmtSens = v => '£' + Math.round(v).toLocaleString();
   const fmtPct  = v => (v * 100).toFixed(1) + '%';
 
-  // Fixed monthly target — always
   const sensTargetRev = REVENUE_TARGETS.y1 / 12;
 
-  // This month's actual live baseline values
   const curClients     = live.totalDashboardClients;
   const curBookingRate = live.newClientBookingRate > 0 || live.existingClientBookingRate > 0
-    ? live.clientBookingRate  // blended: clients who booked this month ÷ total dashboard clients
-    : 0;
+    ? live.clientBookingRate : 0;
   const curATV         = liveATV;
 
-  // This month's actual bookings (non-cancelled)
   const sensNow        = new Date();
   const thisMonthKey2  = sensNow.toISOString().slice(0, 7);
   const thisMonthBks   = bookingData.filter(b =>
@@ -1974,36 +1840,21 @@ function renderRoadmap() {
   const thisMonthCount = thisMonthBks.length;
   const thisMonthRev   = thisMonthBks.reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
 
-  // Unique clients who booked this month
   const uniqueBookersThisMonth = new Set(thisMonthBks.map(b => (b.clientEmail||'').toLowerCase()).filter(Boolean)).size;
 
-  // Lever 1: Dashboard Clients
-  // How many clients do we need at the current booking rate and ATV to hit £16,667/mo?
   const neededClients = (curBookingRate > 0 && curATV > 0)
     ? Math.ceil(sensTargetRev / (curBookingRate * curATV)) : null;
 
-  // Lever 2: Booking Rate
-  // What % of our current clients need to book this month at current ATV?
-  // neededRate = target ÷ (clients × ATV) — but we need total bookings, so:
-  // target = clients × rate × avgBkPerBooker × ATV
-  // Simplified: target = totalBookings × ATV → totalBookings = target ÷ ATV
-  // rate = totalBookings ÷ clients
   const totalBkNeededForRate = curATV > 0 ? sensTargetRev / curATV : null;
   const neededBookingRate = (curClients > 0 && totalBkNeededForRate !== null)
-    ? Math.min(2, totalBkNeededForRate / curClients) : null; // allow >1 (multiple bk per client)
+    ? Math.min(2, totalBkNeededForRate / curClients) : null;
 
-  // Lever 3: ATV
-  // What does each job need to be worth at current clients, rate and booking count?
-  // Use actual bookings this month as the denominator — real jobs done
   const neededATV = thisMonthCount > 0
     ? Math.ceil(sensTargetRev / thisMonthCount)
     : (curClients > 0 && curBookingRate > 0
       ? Math.ceil(sensTargetRev / (curClients * curBookingRate))
       : null);
 
-  // Lever 4: Bookings per client this month
-  // How many times does each booking client need to book to hit the target?
-  // total bookings needed = target ÷ ATV; per booker = total ÷ unique bookers
   const totalBkNeededForFreq = curATV > 0 ? Math.ceil(sensTargetRev / curATV) : null;
   const curBkPerBooker       = uniqueBookersThisMonth > 0 ? (thisMonthCount / uniqueBookersThisMonth).toFixed(1) : '0';
   const neededBkPerBooker    = (totalBkNeededForFreq !== null && uniqueBookersThisMonth > 0)
@@ -2072,7 +1923,6 @@ function renderRoadmap() {
     }
   ];
 
-  // ── Context bar ──
   document.getElementById('sensContextBar').innerHTML =
     `<strong style="color:#1e293b;">${curClients} clients · ${curBRDisplay}/mo · ${thisMonthCount} bookings · ${fmtSens(curATV)} ATV</strong><br>
     <span style="color:#64748b;">If these figures remain the same and we focused only on one lever, here's what each would need to be to hit <strong style="color:#1e293b;">${fmtSens(sensTargetRev)}/mo target</strong></span>`;
