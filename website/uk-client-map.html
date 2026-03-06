@@ -2015,7 +2015,7 @@ function renderRoadmap() {
       label: 'Dashboard Clients',
       color: '#3b82f6',
       current: `${curClients} clients`,
-      currentSub: `${uniqueBookersThisMonth} booked this month · ${curBRDisplay} rate · ${fmtSens(curATV)} ATV`,
+      currentSub: `${uniqueBookersThisMonth} unique clients booked · ${thisMonthCount} total bookings · ${fmtSens(curATV)} ATV`,
       needed: neededClients !== null ? `${neededClients.toLocaleString()} clients` : '—',
       change: neededClients !== null
         ? neededClients > curClients
@@ -2030,7 +2030,7 @@ function renderRoadmap() {
       label: 'Monthly Booking Rate',
       color: '#10b981',
       current: `${curBRDisplay}/mo`,
-      currentSub: `${uniqueBookersThisMonth} of ${curClients} clients booked this month`,
+      currentSub: `${uniqueBookersThisMonth} unique clients booked this month (${thisMonthCount} total bookings)`,
       needed: neededBookingRate !== null
         ? neededBookingRate > 1
           ? `${(neededBookingRate * 100).toFixed(1)}% (avg ${neededBookingRate.toFixed(1)}× per client)`
