@@ -1804,21 +1804,13 @@ function renderRoadmap() {
       <!-- This month's new client snapshot -->
       <div class="ret-snapshot" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:11px 14px;margin:16px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
         <div style="text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#3b82f6;">${neverBookedCount}</div>
-          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Never Booked</div>
-          <div style="font-size:10px;color:#64748b;">on dashboard</div>
+          <div style="font-size:32px;font-weight:800;color:#3b82f6;line-height:1;">${curFirstTimers} <span style="font-size:18px;font-weight:600;color:#93c5fd;">of</span> ${neverBookedCount}</div>
+          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;margin-top:4px;">First Bookings This Month</div>
         </div>
-        <div style="color:#bfdbfe;font-size:20px;">×</div>
+        <div style="color:#bfdbfe;font-size:20px;padding:0 8px;">=</div>
         <div style="text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#3b82f6;">${newRatePct}%</div>
-          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Conversion Rate</div>
-          <div style="font-size:10px;color:#64748b;">this calendar month</div>
-        </div>
-        <div style="color:#bfdbfe;font-size:20px;">=</div>
-        <div style="text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#3b82f6;">${curFirstTimers} / ${neverBookedCount}</div>
-          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">First Bookings</div>
-          <div style="font-size:10px;color:#64748b;">this month</div>
+          <div style="font-size:32px;font-weight:800;color:#3b82f6;line-height:1;">${newRatePct}%</div>
+          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;margin-top:4px;">Conversion Rate</div>
         </div>
       </div>
 
@@ -1861,21 +1853,13 @@ function renderRoadmap() {
       <!-- This month's existing client snapshot -->
       <div class="ret-snapshot" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:11px 14px;margin:16px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
         <div style="text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#10b981;">${everBookedCount}</div>
-          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Existing Clients</div>
-          <div style="font-size:10px;color:#64748b;">booked at least once</div>
+          <div style="font-size:32px;font-weight:800;color:#10b981;line-height:1;">${curRepeatBk} <span style="font-size:18px;font-weight:600;color:#6ee7b7;">of</span> ${everBookedCount}</div>
+          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;margin-top:4px;">Booked Again This Month</div>
         </div>
-        <div style="color:#d1fae5;font-size:20px;">×</div>
+        <div style="color:#d1fae5;font-size:20px;padding:0 8px;">=</div>
         <div style="text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#10b981;">${existRatePct}%</div>
-          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Repeat Rate</div>
-          <div style="font-size:10px;color:#64748b;">this calendar month</div>
-        </div>
-        <div style="color:#d1fae5;font-size:20px;">=</div>
-        <div style="text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#10b981;">${curRepeatBk} / ${everBookedCount}</div>
-          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;">Booked Again</div>
-          <div style="font-size:10px;color:#64748b;">this month</div>
+          <div style="font-size:32px;font-weight:800;color:#10b981;line-height:1;">${existRatePct}%</div>
+          <div style="font-size:10px;color:#475569;font-weight:600;text-transform:uppercase;margin-top:4px;">Repeat Rate</div>
         </div>
       </div>
 
