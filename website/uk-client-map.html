@@ -684,7 +684,10 @@
       <h3 style="font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;">
         <i data-lucide="trending-up" style="width:18px;height:18px;"></i> Run Rate Projection
       </h3>
-      <p style="font-size:13px;color:#64748b;margin-top:3px;">At current pace, here's where this month ends vs target</p>
+      <p style="font-size:13px;color:#64748b;margin-top:3px;line-height:1.6;">
+  Tracks <strong style="color:#0f172a;">booking velocity</strong> — how fast we're winning work, by the date each booking was created. 
+  <span style="color:#94a3b8;">Note: "Won So Far" will differ from the KPI cards above — KPI cards show all jobs scheduled this period regardless of when they were booked.</span>
+</p>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="rr-btn active" id="rrRevenue"  onclick="setRunRateMetric('revenue')">£ Revenue</button>
@@ -1653,7 +1656,12 @@ function bookingCard(b) {
 
 function formatDate(d) {
   if (!d) return 'N/A';
-  return new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  // Parse YYYY-MM-DD safely without UTC shift
+  if (typeof d === 'string' && d.length >= 10) {
+    const [y, m, day] = d.slice(0, 10).split('-').map(Number);
+    return new Date(y, m - 1, day).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  }
+  return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
 function switchTab(tab) {
@@ -2341,16 +2349,10 @@ function renderRunRateChart() {
   const now = new Date();
   const metric = currentRunRateMetric;
 
-  const totalDays = Math.ceil((periodEnd - periodStart) / (1000 * 60 * 60 * 24)) + 1;
-  const elapsedDays = Math.ceil((now - periodStart) / (1000 * 60 * 60 * 24));
+  const totalDays = Math.round((periodEnd - periodStart) / (1000 * 60 * 60 * 24));
+  const elapsedDays = Math.max(1, Math.round((now - periodStart) / (1000 * 60 * 60 * 24)));
 
-  const dailyActuals = Array(totalDays).fill(0);
-
-  const periodBookings = bookingData.filter(b => {
-    if (!b.date || b.bookingStatus === 'Cancelled') return false;
-    const d = new Date(b.date);
-    return d >= periodStart && d <= periodEnd;
-  });
+  const dailyWon = Array(totalDays).fill(0);
 
   const priorEmails = new Set();
   bookingData.forEach(b => {
@@ -2358,44 +2360,48 @@ function renderRunRateChart() {
     if (new Date(b.date) < periodStart) priorEmails.add((b.clientEmail || '').toLowerCase());
   });
 
-  periodBookings.forEach(b => {
-    const d = new Date(b.date);
-    const dayIndex = Math.floor((d - periodStart) / (1000 * 60 * 60 * 24));
-    if (dayIndex < 0 || dayIndex >= totalDays) return;
+  // Only count bookings CREATED within this period
+  bookingData.forEach(b => {
+    if (!b.createdTime || b.bookingStatus === 'Cancelled') return;
+    const ct = new Date(b.createdTime);
+    const ctLocal = new Date(ct.getFullYear(), ct.getMonth(), ct.getDate());
+    const ctIndex = Math.round((ctLocal - periodStart) / (1000 * 60 * 60 * 24));
+    if (ctIndex < 0 || ctIndex >= totalDays) return;
+
     const email = (b.clientEmail || '').toLowerCase();
     const val = metric === 'revenue'  ? (parseFloat(b.finalPrice) || 0)
               : metric === 'new'      ? (!priorEmails.has(email) ? 1 : 0)
               : metric === 'existing' ? (priorEmails.has(email)  ? 1 : 0)
               : 1;
-    dailyActuals[dayIndex] += val;
+
+    dailyWon[ctIndex] += val;
   });
 
-  // Cumulative actuals — all booked days including future
+  // Cumulative won — solid line up to today, null for future
   let running = 0;
-  const cumActuals = [];
+  const cumWon = [];
   for (let i = 0; i < totalDays; i++) {
-    running += dailyActuals[i];
-    cumActuals.push(parseFloat(running.toFixed(2)));
+    if (i < elapsedDays) {
+      running += dailyWon[i];
+      cumWon.push(parseFloat(running.toFixed(2)));
+    } else {
+      cumWon.push(null);
+    }
   }
 
-  const totalSoFar = running;
-  // Run rate based on days elapsed so far (not total days)
-  const dailyRunRate = elapsedDays > 0 ? totalSoFar / elapsedDays : 0;
+  const totalWonSoFar = running;
+  const dailyRunRate = elapsedDays > 0 ? totalWonSoFar / elapsedDays : 0;
   const projectedEOP = parseFloat((dailyRunRate * totalDays).toFixed(2));
 
-  // Projection only extends beyond the last day that has a booking
-  const lastBookedDayIndex = dailyActuals.reduce((last, v, i) => v > 0 ? i : last, elapsedDays - 1);
-
+  // Projection starts from today
   const cumProjection = [];
-  let projRunning = 0;
   for (let i = 0; i < totalDays; i++) {
-    projRunning += dailyActuals[i];
-    if (i < lastBookedDayIndex) {
+    if (i < elapsedDays - 1) {
       cumProjection.push(null);
-    } else if (i === lastBookedDayIndex) {
-      cumProjection.push(parseFloat(projRunning.toFixed(2)));
+    } else if (i === elapsedDays - 1) {
+      cumProjection.push(parseFloat(totalWonSoFar.toFixed(2)));
     } else {
-      cumProjection.push(parseFloat((projRunning + dailyRunRate * (i - lastBookedDayIndex)).toFixed(2)));
+      cumProjection.push(parseFloat((totalWonSoFar + dailyRunRate * (i - elapsedDays + 1)).toFixed(2)));
     }
   }
 
@@ -2430,22 +2436,22 @@ function renderRunRateChart() {
   const fmtVal = v => metric === 'revenue' ? '£' + Math.round(v).toLocaleString() : Math.round(v).toString();
   const metricLabel = metric === 'revenue' ? 'Revenue' : metric === 'total' ? 'Total Bookings' : metric === 'new' ? 'New Client Bookings' : 'Existing Client Bookings';
 
-  const onTrack = totalSoFar >= periodTarget;
-  const gapToTarget = periodTarget - totalSoFar;
+  const onTrack = projectedEOP >= periodTarget;
+  const gapToTarget = periodTarget - totalWonSoFar;
   const daysLeft = totalDays - elapsedDays;
   const neededPerDay = daysLeft > 0 ? gapToTarget / daysLeft : 0;
   const periodLabel = windows.label1;
 
   document.getElementById('runRateCallout').innerHTML = `
     <div style="flex:1;min-width:140px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
-      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">So Far — ${periodLabel}</div>
-      <div style="font-size:24px;font-weight:800;color:${col};">${fmtVal(totalSoFar)}</div>
-      <div style="font-size:11px;color:#64748b;margin-top:2px;">Day ${elapsedDays} of ${totalDays}</div>
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Won So Far — ${periodLabel}</div>
+      <div style="font-size:24px;font-weight:800;color:${col};">${fmtVal(totalWonSoFar)}</div>
+      <div style="font-size:11px;color:#64748b;margin-top:2px;">Day ${elapsedDays} of ${totalDays} · ${fmtVal(Math.round(dailyRunRate))}/day</div>
     </div>
     <div style="flex:1;min-width:140px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
       <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Projected End of Period</div>
       <div style="font-size:24px;font-weight:800;color:${onTrack ? '#10b981' : '#ef4444'};">${fmtVal(projectedEOP)}</div>
-      <div style="font-size:11px;color:#64748b;margin-top:2px;">at ${fmtVal(Math.round(dailyRunRate))}/day run rate</div>
+      <div style="font-size:11px;color:#64748b;margin-top:2px;">at current win rate</div>
     </div>
     <div style="flex:1;min-width:140px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
       <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Period Target</div>
@@ -2454,12 +2460,12 @@ function renderRunRateChart() {
     </div>
     <div style="flex:1;min-width:140px;background:${onTrack ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)'};border:1px solid ${onTrack ? '#10b981' : '#ef4444'}44;border-radius:12px;padding:14px 16px;">
       <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${onTrack ? 'Surplus' : 'Shortfall'}</div>
-      <div style="font-size:24px;font-weight:800;color:${onTrack ? '#10b981' : '#ef4444'};">${fmtVal(Math.abs(totalSoFar - periodTarget))}</div>
+      <div style="font-size:24px;font-weight:800;color:${onTrack ? '#10b981' : '#ef4444'};">${fmtVal(Math.abs(projectedEOP - periodTarget))}</div>
       <div style="font-size:11px;color:#64748b;margin-top:2px;">${daysLeft} days remaining</div>
     </div>`;
 
   document.querySelector('#runRateSection p').textContent =
-    `All booked ${currentPeriod === 'mom' ? 'this month' : currentPeriod === 'qoq' ? 'this quarter' : currentPeriod === '6m' ? 'in the last 6 months' : 'this year'} vs target · dotted line projects remaining days at current run rate`;
+    `Bookings won this ${currentPeriod === 'mom' ? 'month' : currentPeriod === 'qoq' ? 'quarter' : currentPeriod === '6m' ? '6 months' : 'year'} by date created · dotted line projects forward at ${fmtVal(Math.round(dailyRunRate))}/day`;
 
   const ctx = document.getElementById('runRateChart').getContext('2d');
   if (runRateChartInstance) runRateChartInstance.destroy();
@@ -2469,7 +2475,7 @@ function renderRunRateChart() {
     data: {
       labels,
       datasets: [
-        { label: metricLabel + ' (Booked)', data: cumActuals, borderColor: col, backgroundColor: col + '18', borderWidth: 3, pointRadius: currentPeriod === 'mom' ? 3 : 0, pointHoverRadius: 6, tension: 0.3, fill: true, spanGaps: false },
+        { label: metricLabel + ' (won)', data: cumWon, borderColor: col, backgroundColor: col + '18', borderWidth: 3, pointRadius: currentPeriod === 'mom' ? 3 : 0, pointHoverRadius: 6, tension: 0.3, fill: true, spanGaps: false },
         { label: 'Projected at current pace', data: cumProjection, borderColor: col, backgroundColor: 'transparent', borderWidth: 2, borderDash: [6,4], pointRadius: 0, tension: 0.3, fill: false, spanGaps: false },
         { label: 'Period Target', data: targetLine, borderColor: '#ef4444', backgroundColor: 'transparent', borderWidth: 2, borderDash: [4,4], pointRadius: 0, tension: 0, fill: false }
       ]
