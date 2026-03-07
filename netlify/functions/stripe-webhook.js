@@ -1,5 +1,8 @@
 // netlify/functions/stripe-webhook.js
-// UPDATED: Now handles cancellation payments and moves bookings to Cancelled Bookings table + SUPPORTS GUEST BOOKINGS
+// UPDATED: Handles cancellation payments, moves bookings to Cancelled Bookings,
+// supports guest bookings, access type fields
+// SECURITY FIX: isBase64Encoded handling to prevent body parsing corruption on Netlify
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Airtable = require('airtable');
 
@@ -21,22 +24,34 @@ exports.handler = async (event, context) => {
   }
 
   const sig = event.headers['stripe-signature'];
+
+  // ✅ FIX: Netlify sometimes base64-encodes the raw body
+  // Stripe signature verification requires the exact raw bytes —
+  // if the body has been transformed at all, constructEvent throws
+  const rawBody = event.isBase64Encoded
+    ? Buffer.from(event.body, 'base64').toString('utf8')
+    : event.body;
+
   let stripeEvent;
 
   try {
     stripeEvent = stripe.webhooks.constructEvent(
-      event.body,
+      rawBody,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
   } catch (err) {
     console.error('❌ Webhook signature verification failed:', err.message);
+    console.error('Signature header present:', !!sig);
+    console.error('Body length:', rawBody?.length);
     return {
       statusCode: 400,
       headers,
       body: JSON.stringify({ error: `Webhook Error: ${err.message}` })
     };
   }
+
+  console.log('✅ Webhook verified. Event type:', stripeEvent.type);
 
   // Handle the checkout.session.completed event
   if (stripeEvent.type === 'checkout.session.completed') {
@@ -45,7 +60,7 @@ exports.handler = async (event, context) => {
     try {
       const metadata = session.metadata;
       
-      // ✅ NEW: Check if this is a cancellation payment
+      // ✅ Check if this is a cancellation payment
       if (metadata.cancellationType) {
         console.log('Processing paid cancellation:', metadata.bookingRef);
         
@@ -53,11 +68,9 @@ exports.handler = async (event, context) => {
         const bookingRef = metadata.bookingRef;
         const cancellationFee = parseFloat(metadata.cancellationFee);
         
-        // Fetch booking to get region
         const booking = await base('Bookings').find(bookingId);
         const region = booking.fields['Region'];
         
-        // Update main booking to Cancelled
         await base('Bookings').update(bookingId, {
           'Booking Status': 'Cancelled',
           'Cancellation Date': new Date().toISOString().split('T')[0],
@@ -73,7 +86,6 @@ exports.handler = async (event, context) => {
         
         console.log(`✅ Booking ${bookingRef} cancelled (paid)`);
         
-        // Move Active Booking to Cancelled Bookings
         try {
           const activeBookings = await base('tblRgcv7M9dUU3YuL')
             .select({
@@ -86,7 +98,6 @@ exports.handler = async (event, context) => {
             const activeBooking = activeBookings[0];
             const activeBookingData = activeBooking.fields;
             
-            // Create record in Cancelled Bookings
             await base('Cancelled Bookings').create({
               'Project Address': activeBookingData['Project Address'],
               'Customer Name': activeBookingData['Customer Name'],
@@ -105,7 +116,6 @@ exports.handler = async (event, context) => {
             
             console.log(`✓ Booking moved to Cancelled Bookings`);
             
-            // Delete from Active Bookings
             await base('tblRgcv7M9dUU3YuL').destroy(activeBooking.id);
             console.log(`✓ Booking removed from Active Bookings`);
           }
@@ -113,7 +123,6 @@ exports.handler = async (event, context) => {
           console.error('Error moving Active Booking:', activeBookingError);
         }
         
-        // Send cancellation confirmation email with region
         await sendCancellationConfirmation(metadata, session, cancellationFee, region);
         
         return {
@@ -127,7 +136,6 @@ exports.handler = async (event, context) => {
       if (metadata.bookingId) {
         console.log('Updating existing booking:', metadata.bookingId);
         
-        // UPDATE existing booking from Pending → Paid
         await base('Bookings').update(metadata.bookingId, {
           'Payment Status': 'Paid',
           'Booking Status': 'Confirmed',
@@ -139,7 +147,6 @@ exports.handler = async (event, context) => {
         
         console.log('✅ Booking updated to Paid');
         
-        // ✅ Send payment confirmation email via email-service
         if (process.env.RESEND_API_KEY) {
           try {
             const { sendPaymentConfirmation } = require('./email-service');
@@ -183,7 +190,6 @@ exports.handler = async (event, context) => {
         clientEmail: metadata.clientEmail
       });
 
-      // ✅ NEW: Fetch user from Airtable (but allow guest bookings if not found)
       let userId = null;
       
       try {
@@ -203,7 +209,6 @@ exports.handler = async (event, context) => {
           userId = userResult.records[0].id;
           console.log(`✓ Found existing user: ${userEmail} (ID: ${userId})`);
           
-          // Update user's last booking date and region
           await fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}/${userId}`, {
             method: 'PATCH',
             headers: {
@@ -220,15 +225,12 @@ exports.handler = async (event, context) => {
           
         } else {
           console.log(`⚠️ User not found for email: ${userEmail} - proceeding as GUEST booking`);
-          // userId remains null - this is a guest booking
         }
         
       } catch (userError) {
         console.error('Error fetching user:', userError);
-        // Continue with guest booking if user lookup fails
       }
 
-      // Parse add-ons
       const addons = JSON.parse(metadata.addons || '[]');
       const addonsText = addons.length > 0
         ? addons.map(a => `${a.name} (+£${parseFloat(a.price).toFixed(2)})`).join('\n')
@@ -236,12 +238,10 @@ exports.handler = async (event, context) => {
       
       const addonsPrice = addons.reduce((sum, a) => sum + parseFloat(a.price || 0), 0);
 
-      // Extract discount information
       const discountCode = metadata.discountCode || '';
       const discountAmount = parseFloat(metadata.discountAmount || '0');
       const priceBeforeDiscount = parseFloat(metadata.priceBeforeDiscount || '0');
 
-      // Calculate prices
       const totalPrice = session.amount_total / 100;
       const bedrooms = parseInt(metadata.bedrooms) || 0;
       const extraBedrooms = Math.max(0, bedrooms - 4);
@@ -258,11 +258,9 @@ exports.handler = async (event, context) => {
         ? metadata.region.charAt(0).toUpperCase() + metadata.region.slice(1).toLowerCase()
         : 'Unknown';
 
-      // ✅ CREATE booking - conditionally include User field
       const bookingFields = {
         'Booking Reference': bookingRef,
         
-        // ✅ UPDATED: Only link to User if userId exists (registered customer)
         ...(userId && { 'User': [userId] }),
         
         'Date': metadata.date,
@@ -286,13 +284,12 @@ exports.handler = async (event, context) => {
         'Final Price': totalPrice,
         
         'Client Name': metadata.clientName,
-'Client Email': metadata.clientEmail,
-'Client Phone': metadata.clientPhone || '',
-'Client Notes': metadata.clientNotes || '',
+        'Client Email': metadata.clientEmail,
+        'Client Phone': metadata.clientPhone || '',
+        'Client Notes': metadata.clientNotes || '',
 
-// ✅ ADD THESE TWO LINES:
-'Access Type': metadata.accessType || '',
-'Key Pickup Location': metadata.keyPickupLocation || '',
+        'Access Type': metadata.accessType || '',
+        'Key Pickup Location': metadata.keyPickupLocation || '',
         
         'Booking Status': 'Confirmed',
         'Payment Status': 'Paid',
@@ -314,28 +311,27 @@ exports.handler = async (event, context) => {
 
       console.log('✅ Booking created from webhook:', bookingRecord[0].id);
 
-      // ✅ NEW: Create Active Booking record + Dropbox folders
       let trackingCode = '';
       
       try {
         const { createActiveBooking } = require('./create-active-booking');
         
         const activeBookingData = {
-  bookingRef: bookingRef,
-  propertyAddress: metadata.propertyAddress,
-  postcode: metadata.postcode,
-  clientName: metadata.clientName,
-  clientEmail: metadata.clientEmail,
-  clientPhone: metadata.clientPhone,
-  service: metadata.service,
-  date: metadata.date,
-  time: metadata.time,
-  region: capitalizedRegion,
-  mediaSpecialist: metadata.mediaSpecialist,
-  bookingStatus: 'Confirmed',
-  paymentStatus: 'Paid',
-  addons: addons  // ✅ ADD THIS LINE (addons is already parsed on line 236)
-};
+          bookingRef: bookingRef,
+          propertyAddress: metadata.propertyAddress,
+          postcode: metadata.postcode,
+          clientName: metadata.clientName,
+          clientEmail: metadata.clientEmail,
+          clientPhone: metadata.clientPhone,
+          service: metadata.service,
+          date: metadata.date,
+          time: metadata.time,
+          region: capitalizedRegion,
+          mediaSpecialist: metadata.mediaSpecialist,
+          bookingStatus: 'Confirmed',
+          paymentStatus: 'Paid',
+          addons: addons
+        };
 
         const activeBookingResult = await createActiveBooking(activeBookingData);
         
@@ -352,35 +348,34 @@ exports.handler = async (event, context) => {
         console.error('Error creating Active Booking:', activeBookingError);
       }
 
-      // ✅ Send booking confirmation email via email-service
       if (process.env.RESEND_API_KEY) {
         try {
           const { sendBookingConfirmation } = require('./email-service');
           
           const emailData = {
-  bookingRef: bookingRef,
-  clientName: metadata.clientName,
-  clientEmail: metadata.clientEmail,
-  service: metadata.service,
-  date: metadata.date,
-  time: metadata.time,
-  propertyAddress: metadata.propertyAddress,
-  postcode: metadata.postcode,
-  mediaSpecialist: metadata.mediaSpecialist,
-  totalPrice: totalPrice,
-  duration: parseInt(metadata.duration) || 90,
-  paymentStatus: 'Paid',
-  bookingStatus: 'Confirmed',
-  createdBy: 'Customer',
-  cardLast4: '',
-  discountCode: discountCode,
-  discountAmount: discountAmount,
-  trackingCode: trackingCode,
-  region: capitalizedRegion,
-  accessType: metadata.accessType || '',
-  keyPickupLocation: metadata.keyPickupLocation || '',
-  addons: addons  // ✅ ADD THIS LINE
-};
+            bookingRef: bookingRef,
+            clientName: metadata.clientName,
+            clientEmail: metadata.clientEmail,
+            service: metadata.service,
+            date: metadata.date,
+            time: metadata.time,
+            propertyAddress: metadata.propertyAddress,
+            postcode: metadata.postcode,
+            mediaSpecialist: metadata.mediaSpecialist,
+            totalPrice: totalPrice,
+            duration: parseInt(metadata.duration) || 90,
+            paymentStatus: 'Paid',
+            bookingStatus: 'Confirmed',
+            createdBy: 'Customer',
+            cardLast4: '',
+            discountCode: discountCode,
+            discountAmount: discountAmount,
+            trackingCode: trackingCode,
+            region: capitalizedRegion,
+            accessType: metadata.accessType || '',
+            keyPickupLocation: metadata.keyPickupLocation || '',
+            addons: addons
+          };
           
           await sendBookingConfirmation(emailData);
           console.log(`✓ Confirmation email sent to ${metadata.clientEmail}`);
@@ -418,7 +413,7 @@ exports.handler = async (event, context) => {
   };
 };
 
-// ✅ Send cancellation confirmation email
+// Send cancellation confirmation email
 async function sendCancellationConfirmation(metadata, session, cancellationFee, region = '') {
   if (!process.env.RESEND_API_KEY) {
     console.log('Resend not configured - skipping email');
@@ -431,16 +426,12 @@ async function sendCancellationConfirmation(metadata, session, cancellationFee, 
 
     const refundAmount = parseFloat(metadata.originalTotalPrice) - cancellationFee;
 
-    // ✅ Determine BCC recipients based on region
     const bccRecipients = ['commercial@markebmedia.com'];
     
     if (region) {
       if (region.toLowerCase() === 'north') {
         bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
         console.log('✓ BCC: Adding Jodie (North region)');
-      } else if (region.toLowerCase() === 'south') {
-        bccRecipients.push('Maeve.Darley@markebmedia.com');
-        console.log('✓ BCC: Adding Maeve (South region)');
       }
     }
 

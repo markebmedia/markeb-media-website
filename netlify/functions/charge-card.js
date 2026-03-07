@@ -1,5 +1,6 @@
 // netlify/functions/charge-card.js
 // Charges a saved payment method for reserved bookings
+// SECURITY UPDATES: idempotency key, intent ID guard, confirm: false pattern
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Airtable = require('airtable');
@@ -37,10 +38,11 @@ exports.handler = async (event, context) => {
     console.log('Booking details:', {
       reference: fields['Booking Reference'],
       paymentStatus: fields['Payment Status'],
-      hasPaymentMethod: !!fields['Stripe Payment Method ID']
+      hasPaymentMethod: !!fields['Stripe Payment Method ID'],
+      hasExistingIntent: !!fields['Stripe Payment Intent ID']
     });
 
-    // Check if already paid
+    // ✅ GUARD 1: Check if already paid
     if (fields['Payment Status'] === 'Paid') {
       return {
         statusCode: 400,
@@ -49,6 +51,22 @@ exports.handler = async (event, context) => {
           success: false, 
           error: 'This booking has already been paid',
           bookingRef: fields['Booking Reference']
+        })
+      };
+    }
+
+    // ✅ GUARD 2: Check if a PaymentIntent already exists
+    // This prevents double charges if Airtable failed to update last time
+    if (fields['Stripe Payment Intent ID']) {
+      console.warn('⚠️ PaymentIntent already exists for this booking:', fields['Stripe Payment Intent ID']);
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: 'A charge has already been attempted for this booking',
+          paymentIntentId: fields['Stripe Payment Intent ID'],
+          userMessage: 'A payment was already processed for this booking. Check the Stripe dashboard before retrying. If the charge failed, contact support.'
         })
       };
     }
@@ -76,7 +94,6 @@ exports.handler = async (event, context) => {
     if (!customerId) {
       console.log('Creating Stripe customer...');
       
-      // Search for existing customer by email
       const customers = await stripe.customers.list({
         email: fields['Client Email'],
         limit: 1
@@ -86,7 +103,6 @@ exports.handler = async (event, context) => {
         customerId = customers.data[0].id;
         console.log('Found existing customer:', customerId);
       } else {
-        // Create new customer (WITHOUT payment_method - we attach it separately)
         const customer = await stripe.customers.create({
           email: fields['Client Email'],
           name: fields['Client Name'],
@@ -100,19 +116,17 @@ exports.handler = async (event, context) => {
         customerId = customer.id;
         console.log('Created new customer:', customerId);
         
-        // Update booking with customer ID
         await base('Bookings').update(bookingId, {
           'Stripe Customer ID': customerId
         });
       }
     }
 
-    // ✅ CRITICAL FIX: Attach payment method to customer BEFORE charging
+    // Attach payment method to customer
     console.log('Attaching payment method to customer...');
     try {
       const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
       
-      // Only attach if not already attached to this customer
       if (!paymentMethod.customer || paymentMethod.customer !== customerId) {
         await stripe.paymentMethods.attach(paymentMethodId, {
           customer: customerId,
@@ -122,21 +136,21 @@ exports.handler = async (event, context) => {
         console.log('✅ Payment method already attached');
       }
     } catch (attachError) {
-  console.error('⚠️ Error attaching payment method:', attachError);
-  
-  return {
-    statusCode: 400,
-    headers,
-    body: JSON.stringify({
-      success: false,
-      error: 'Payment method cannot be used',
-      userMessage: 'This payment method was saved incorrectly and cannot be charged. Please use "Mark as Paid" if they paid another way, or send them a new payment link.',
-      bookingRef: fields['Booking Reference']
-    })
-  };
-}
+      console.error('⚠️ Error attaching payment method:', attachError);
+      
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: 'Payment method cannot be used',
+          userMessage: 'This payment method was saved incorrectly and cannot be charged. Please use "Mark as Paid" if they paid another way, or send them a new payment link.',
+          bookingRef: fields['Booking Reference']
+        })
+      };
+    }
 
-    // Get final price
+    // Validate price
     const finalPrice = fields['Final Price'] || 0;
     
     if (finalPrice <= 0) {
@@ -152,36 +166,62 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Charge the card using Payment Intent
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(finalPrice * 100),
-      currency: 'gbp',
-      payment_method: paymentMethodId,
-      customer: customerId,
-      confirm: true,
-      off_session: true,
-      description: `${fields['Service']} - ${fields['Booking Reference']}`,
-      metadata: {
-        bookingReference: fields['Booking Reference'],
-        bookingId: bookingId,
-        clientEmail: fields['Client Email'],
-        clientName: fields['Client Name'],
-        service: fields['Service'],
-        date: fields['Date'],
-        time: fields['Time'],
-        region: fields['Region'],
-        type: 'pending_payment_charge'
+    // ✅ FIX: Create PaymentIntent with confirm: false first
+    // This lets us save the intent ID to Airtable BEFORE charging,
+    // so we always have a record even if the Airtable update after charging fails
+    console.log('Creating PaymentIntent (unconfirmed)...');
+    const paymentIntent = await stripe.paymentIntents.create(
+      {
+        amount: Math.round(finalPrice * 100),
+        currency: 'gbp',
+        payment_method: paymentMethodId,
+        customer: customerId,
+        confirm: false, // ← Don't charge yet
+        off_session: true,
+        description: `${fields['Service']} - ${fields['Booking Reference']}`,
+        metadata: {
+          bookingReference: fields['Booking Reference'],
+          bookingId: bookingId,
+          clientEmail: fields['Client Email'],
+          clientName: fields['Client Name'],
+          service: fields['Service'],
+          date: fields['Date'],
+          time: fields['Time'],
+          region: fields['Region'],
+          type: 'pending_payment_charge'
+        },
+        receipt_email: fields['Client Email']
       },
-      receipt_email: fields['Client Email']
+      {
+        // ✅ FIX: Idempotency key prevents duplicate charges
+        // if this function is called twice for the same booking
+        idempotencyKey: `charge-${bookingId}`
+      }
+    );
+
+    console.log('PaymentIntent created:', paymentIntent.id);
+
+    // ✅ FIX: Save intent ID to Airtable BEFORE confirming payment
+    // If the confirmation or subsequent update fails, we still have the intent ID
+    // and the admin guard above will catch any retry attempts
+    await base('Bookings').update(bookingId, {
+      'Stripe Payment Intent ID': paymentIntent.id,
+      'Payment Status': 'Processing'
     });
 
-    console.log('✅ Payment intent created:', paymentIntent.id, 'Status:', paymentIntent.status);
+    console.log('✅ Intent ID saved to Airtable - now confirming payment...');
 
-    // Update booking
+    // Now confirm (charge) the payment
+    const confirmedIntent = await stripe.paymentIntents.confirm(paymentIntent.id, {
+      payment_method: paymentMethodId,
+    });
+
+    console.log('✅ Payment confirmed:', confirmedIntent.id, 'Status:', confirmedIntent.status);
+
+    // Update booking to Paid
     await base('Bookings').update(bookingId, {
       'Payment Status': 'Paid',
       'Booking Status': 'Confirmed',
-      'Stripe Payment Intent ID': paymentIntent.id,
       'Payment Date': new Date().toISOString(),
       'Amount Paid': finalPrice
     });
@@ -263,7 +303,7 @@ exports.handler = async (event, context) => {
         success: true,
         message: 'Payment charged successfully',
         amount: finalPrice,
-        paymentIntentId: paymentIntent.id,
+        paymentIntentId: confirmedIntent.id,
         bookingRef: fields['Booking Reference']
       })
     };
@@ -271,7 +311,6 @@ exports.handler = async (event, context) => {
   } catch (error) {
     console.error('❌ Error charging card:', error);
 
-    // Better error handling for Stripe errors
     if (error.type === 'StripeCardError') {
       return {
         statusCode: 400,

@@ -32,16 +32,15 @@ exports.handler = async (event, context) => {
     const Airtable = require('airtable');
     const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-    // Find user by email
+    // ✅ FIX: Case-insensitive email lookup using LOWER()
     const records = await base(process.env.AIRTABLE_USER_TABLE || 'Markeb Media Users')
       .select({
-        filterByFormula: `{Email} = '${email}'`,
+        filterByFormula: `LOWER({Email}) = '${email.toLowerCase()}'`,
         maxRecords: 1
       })
       .firstPage();
 
     if (records.length === 0) {
-      // New customer - no privilege
       return {
         statusCode: 200,
         headers,
@@ -71,9 +70,9 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ 
-        success: false, 
-        error: error.message 
+      body: JSON.stringify({
+        success: false,
+        error: error.message
       })
     };
   }
