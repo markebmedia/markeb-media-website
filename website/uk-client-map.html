@@ -380,6 +380,57 @@
 
     .milestone-target-label { font-size: 13px; font-weight: 600; color: #475569; white-space: nowrap; min-width: 80px; text-align: right; }
 
+    /* Insight cards */
+    .insight-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .insight-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 20px 22px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border-top: 3px solid #e2e8f0;
+      transition: all .3s ease;
+    }
+
+    .insight-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+
+    .insight-card-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .insight-card-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    .insight-card-value {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 6px;
+    }
+
+    .insight-card-sub {
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    .insight-card-sub strong { color: #334155; }
+
     @media (max-width: 1400px) {
       .content-grid { grid-template-columns: 1fr; }
       .sidebar { display: grid; grid-template-columns: 1fr 1fr; }
@@ -401,6 +452,7 @@
       .sidebar { grid-template-columns: 1fr; }
       #map { height: 340px; }
       .map-section { padding: 14px; }
+      .insight-cards-grid { grid-template-columns: 1fr 1fr; }
       #monthlyTargetsGrid > div { grid-template-columns: 1fr !important; }
       .acq-years, .ret-years { grid-template-columns: 1fr !important; }
       .ret-snapshot { flex-direction: column !important; gap: 6px !important; align-items: flex-start !important; }
@@ -412,6 +464,7 @@
       .stats-overview { grid-template-columns: 1fr 1fr; gap: 8px; }
       .stat-value { font-size: 22px; }
       .header-content h1 { font-size: 17px; }
+      .insight-cards-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -628,9 +681,10 @@
 
     <div class="map-section" style="margin-bottom:24px;">
       <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:4px;display:flex;align-items:center;gap:8px;"><i data-lucide="target" style="width:18px;height:18px;"></i>Road to £1,000,000</h3>
-      <p style="font-size:13px;color:#64748b;margin-bottom:20px;" id="roadmapSub">3 year growth plan · targets calculated from live ATV</p>
+      <p style="font-size:13px;color:#64748b;margin-bottom:20px;" id="roadmapSub">Live calculations · updates automatically with our data</p>
 
-      <div class="stats-overview" id="roadmapTargets" style="margin-bottom:24px;"></div>
+      <!-- NEW INSIGHT CARDS replacing the old summary stat cards -->
+      <div class="insight-cards-grid" id="insightCards"></div>
 
       <div style="margin-bottom:24px;">
         <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:14px;">Monthly Targets by Year</div>
@@ -639,9 +693,7 @@
 
       <div>
         <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px;display:flex;align-items:center;gap:6px;"><i data-lucide="flask-conical" style="width:13px;height:13px;"></i>Single Lever Analysis — 2026 Target</div>
-        <div id="sensContextBar" style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#475569;line-height:1.6;">
-          <!-- populated by renderRoadmap() -->
-        </div>
+        <div id="sensContextBar" style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#475569;line-height:1.6;"></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;" id="sensitivityGrid"></div>
       </div>
     </div>
@@ -769,17 +821,14 @@ function calcLiveMonthlyAverages() {
   );
 
   const newClientBookingRate = neverBookedPool.size > 0
-    ? firstTimeBookersThisMonth.size / neverBookedPool.size
-    : 0;
+    ? firstTimeBookersThisMonth.size / neverBookedPool.size : 0;
 
   const existingClientBookingRate = everBookedPool.size > 0
-    ? repeatBookersThisMonth.size / everBookedPool.size
-    : 0;
+    ? repeatBookersThisMonth.size / everBookedPool.size : 0;
 
   const allBookersThisMonth = new Set(thisMonthBookings.map(b => (b.clientEmail || '').toLowerCase()));
   const clientBookingRate = clientEmails.size > 0
-    ? allBookersThisMonth.size / clientEmails.size
-    : 0;
+    ? allBookersThisMonth.size / clientEmails.size : 0;
 
   const bMonths = {};
   bookingData.forEach(b => {
@@ -923,7 +972,9 @@ function calcLiveMonthlyAverages() {
     bookingsPerBookedClientPerMonth,
     avgLagDays, medianLagDays, lagSampleSize: lagDays.length,
     avgCohortConversionRate,
-    thisMonthKey
+    thisMonthKey,
+    revByMonth, bMonths,
+    newClientBookingsByMonth, repeatClientBookingsByMonth
   };
 }
 
@@ -962,6 +1013,201 @@ function getYearTarget(metric) {
   const key = 'y' + yr;
   const T   = buildTargets();
   return { target: T.monthly[metric][key], year: yr, atv: T.atv };
+}
+
+// ══════════════════════════════════════════════════════════════
+//  NEW INSIGHT CARDS
+// ══════════════════════════════════════════════════════════════
+
+function calcInsightCards() {
+  const now = new Date();
+  const thisMonthKey = now.toISOString().slice(0, 7);
+  const fmtMoney = v => '£' + Math.round(v).toLocaleString();
+
+  // ── 1. CHURN RISK ──
+  // Clients who have booked at least once but not in last 90 days
+  const CHURN_DAYS = 90;
+  const churnCutoff = new Date(now.getTime() - CHURN_DAYS * 24 * 60 * 60 * 1000);
+  const clientEmailMap = {};
+  clientData.forEach(u => {
+    const email = (u.fields['Email'] || '').toLowerCase();
+    if (email) clientEmailMap[email] = u.fields['Name'] || email;
+  });
+
+  const lastBookingByEmail = {};
+  bookingData.filter(b => b.date && b.bookingStatus !== 'Cancelled' && b.clientEmail)
+    .forEach(b => {
+      const email = (b.clientEmail || '').toLowerCase();
+      const d = new Date(b.date);
+      if (!lastBookingByEmail[email] || d > lastBookingByEmail[email]) {
+        lastBookingByEmail[email] = d;
+      }
+    });
+
+  const churnRisk = Object.entries(lastBookingByEmail)
+    .filter(([email, lastDate]) => lastDate < churnCutoff && clientEmailMap[email])
+    .map(([email, lastDate]) => ({ email, name: clientEmailMap[email], lastDate }));
+
+  const churnCount = churnRisk.length;
+  const worstChurn = churnRisk.sort((a, b) => a.lastDate - b.lastDate)[0];
+  const churnSub = churnCount > 0
+    ? `Longest gap: <strong>${worstChurn.name}</strong> — last booked ${Math.round((now - worstChurn.lastDate) / (1000*60*60*24))} days ago`
+    : 'No clients at risk right now';
+
+  // ── 2. BEST PERFORMING MONTH ──
+  const live = calcLiveMonthlyAverages();
+  const revByMonth = live.revByMonth || {};
+  let bestMonth = null, bestRev = 0;
+  Object.entries(revByMonth).forEach(([k, v]) => {
+    if (v > bestRev) { bestRev = v; bestMonth = k; }
+  });
+  const bestMonthLabel = bestMonth
+    ? new Date(bestMonth + '-01').toLocaleString('en-GB', { month: 'long', year: 'numeric' })
+    : '—';
+  const bestMonthSub = bestMonth
+    ? `<strong>${bestMonthLabel}</strong> is your highest revenue month on record`
+    : 'Not enough data yet';
+
+  // ── 3. NEW vs REPEAT REVENUE (THIS MONTH) ──
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const thisMonthEnd   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+  const priorEmailsSeen = new Set();
+  bookingData
+    .filter(b => b.date && b.bookingStatus !== 'Cancelled' && b.clientEmail && new Date(b.date) < thisMonthStart)
+    .forEach(b => priorEmailsSeen.add((b.clientEmail || '').toLowerCase()));
+
+  const thisMonthPaid = bookingData.filter(b => {
+    if (!b.date || b.bookingStatus === 'Cancelled') return false;
+    const d = new Date(b.date);
+    return d >= thisMonthStart && d <= thisMonthEnd;
+  });
+
+  let newRev = 0, repeatRev = 0;
+  thisMonthPaid.forEach(b => {
+    const email = (b.clientEmail || '').toLowerCase();
+    const val = parseFloat(b.finalPrice) || 0;
+    if (priorEmailsSeen.has(email)) repeatRev += val;
+    else newRev += val;
+  });
+  const totalThisMonthRev = newRev + repeatRev;
+  const newPct    = totalThisMonthRev > 0 ? Math.round((newRev / totalThisMonthRev) * 100) : 0;
+  const repeatPct = 100 - newPct;
+  const revSplitSub = totalThisMonthRev > 0
+    ? `<strong style="color:#3b82f6;">${fmtMoney(newRev)} new</strong> · <strong style="color:#10b981;">${fmtMoney(repeatRev)} repeat</strong> — ${newPct}% / ${repeatPct}% split`
+    : 'No bookings this month yet';
+
+  // ── 4. DAYS TO NEXT MILESTONE ──
+  const totalRevenue = bookingData
+    .filter(b => b.bookingStatus !== 'Cancelled')
+    .reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
+
+  // Find next rolling £10k milestone above current total
+  const milestoneStep = 10000;
+  const nextMilestone = Math.ceil((totalRevenue + 1) / milestoneStep) * milestoneStep;
+  const remaining     = nextMilestone - totalRevenue;
+  const runRate       = live.monthlyRevRunRate;
+  const daysToNext    = runRate > 0 ? Math.ceil((remaining / runRate) * 30) : null;
+
+  const milestoneLabel = fmtMoney(nextMilestone);
+  const milestoneSub = daysToNext !== null
+    ? `<strong>${fmtMoney(Math.round(remaining))}</strong> away · at current run rate <strong>~${daysToNext} days</strong>`
+    : `<strong>${fmtMoney(Math.round(remaining))}</strong> away · no run rate data yet`;
+
+  // ── 5. MOST VALUABLE REGION ──
+  // Map client emails to regions, sum LTV per region
+  const regionLTV = {};
+  const clientRegionMap = {};
+  clientData.forEach(u => {
+    const email = (u.fields['Email'] || '').toLowerCase();
+    const region = u.fields['Region'];
+    if (email && region) clientRegionMap[email] = region;
+  });
+
+  bookingData.filter(b => b.bookingStatus !== 'Cancelled' && b.clientEmail).forEach(b => {
+    const email = (b.clientEmail || '').toLowerCase();
+    const region = clientRegionMap[email];
+    if (!region) return;
+    regionLTV[region] = (regionLTV[region] || 0) + (parseFloat(b.finalPrice) || 0);
+  });
+
+  const sortedRegions = Object.entries(regionLTV).sort((a, b) => b[1] - a[1]);
+  const topRegion     = sortedRegions[0];
+  const regionSub     = topRegion
+    ? `<strong>${topRegion[0]}</strong> has generated <strong>${fmtMoney(topRegion[1])}</strong> in total revenue`
+    : 'Not enough data yet';
+
+  return { churnCount, churnSub, bestRev, bestMonthSub, totalThisMonthRev, revSplitSub, nextMilestone, milestoneLabel, milestoneSub, topRegion, regionSub };
+}
+
+function renderInsightCards() {
+  const d = calcInsightCards();
+  const fmtMoney = v => '£' + Math.round(v).toLocaleString();
+
+  const cards = [
+    {
+      color: '#ef4444',
+      bg: '#fef2f2',
+      icon: 'user-x',
+      label: 'Churn Risk',
+      value: d.churnCount,
+      valueSuffix: ' clients',
+      sub: d.churnSub,
+      alert: d.churnCount > 0
+    },
+    {
+      color: '#f59e0b',
+      bg: '#fffbeb',
+      icon: 'star',
+      label: 'Best Month Ever',
+      value: fmtMoney(d.bestRev),
+      valueSuffix: '',
+      sub: d.bestMonthSub,
+      alert: false
+    },
+    {
+      color: '#3b82f6',
+      bg: '#eff6ff',
+      icon: 'split',
+      label: 'Revenue This Month',
+      value: fmtMoney(d.totalThisMonthRev),
+      valueSuffix: '',
+      sub: d.revSplitSub,
+      alert: false
+    },
+    {
+      color: '#8b5cf6',
+      bg: '#f5f3ff',
+      icon: 'flag',
+      label: 'Next Milestone',
+      value: d.milestoneLabel,
+      valueSuffix: '',
+      sub: d.milestoneSub,
+      alert: false
+    },
+    {
+      color: '#10b981',
+      bg: '#f0fdf4',
+      icon: 'map-pin',
+      label: 'Most Valuable Region',
+      value: d.topRegion ? d.topRegion[0] : '—',
+      valueSuffix: '',
+      sub: d.regionSub,
+      alert: false
+    }
+  ];
+
+  document.getElementById('insightCards').innerHTML = cards.map(c => `
+    <div class="insight-card" style="border-top-color:${c.color};">
+      <div class="insight-card-icon" style="background:${c.bg};">
+        <i data-lucide="${c.icon}" style="width:18px;height:18px;color:${c.color};"></i>
+      </div>
+      <div class="insight-card-label">${c.label}</div>
+      <div class="insight-card-value" style="color:${c.color};">${c.value}<span style="font-size:16px;font-weight:600;">${c.valueSuffix}</span></div>
+      <div class="insight-card-sub">${c.sub}</div>
+      ${c.alert && c.value > 0 ? `<div style="margin-top:10px;background:${c.bg};border:1px solid ${c.color}44;border-radius:7px;padding:6px 10px;font-size:11px;color:${c.color};font-weight:600;">⚠ Action needed — re-engage these clients</div>` : ''}
+    </div>`).join('');
+
+  lucide.createIcons();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1392,7 +1638,7 @@ function getPeriodWindows() {
   if (currentPeriod === 'qoq') {
     const q     = Math.floor(now.getMonth() / 3);
     const currY = now.getFullYear();
-    const prevQ = q === 0 ? 3 : q - 1;       // 0-indexed: Q4=3, Q3=2, Q2=1, Q1=0
+    const prevQ = q === 0 ? 3 : q - 1;
     const prevY = q === 0 ? currY - 1 : currY;
     const s1 = new Date(currY, q * 3, 1);
     const e1 = new Date(currY, q * 3 + 3, 0, 23, 59, 59);
@@ -1526,53 +1772,25 @@ function renderRoadmap() {
   const live = T.live;
   const liveATV = T.atv;
 
-  const totalRevenue = bookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice)||0), 0);
+  // Render the new insight cards
+  renderInsightCards();
+
+  const now2    = new Date();
+  const totalRevenue = bookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice) || 0), 0);
 
   function revenueForYear(yr) {
     return bookingData
       .filter(b => b.bookingStatus !== 'Cancelled' && b.date && new Date(b.date).getFullYear() === yr)
       .reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
   }
-  function clientsSignedByEndOf(yr) {
-    return clientData.filter(u => u.fields['Created Date'] && new Date(u.fields['Created Date']).getFullYear() <= yr).length;
-  }
 
-  const now2    = new Date();
   const rev2026 = revenueForYear(2026);
+  const monthsLeftThisYear  = 12 - now2.getMonth();
+  const rev2026Remaining    = Math.max(0, REVENUE_TARGETS.y1 - rev2026);
   const fmtMoney = v => '£' + Math.round(v).toLocaleString();
-
-  const monthsToMillion = live.monthlyRevRunRate > 0
-    ? Math.ceil((1000000 - totalRevenue) / live.monthlyRevRunRate) : '∞';
 
   const newPct = Math.round(live.liveNewSplit * 100);
   const exPct  = 100 - newPct;
-  const bppm   = live.bookingsPerBookedClientPerMonth;
-  const bppmDisplay = bppm > 0 ? bppm.toFixed(2) : '—';
-
-  // ── Summary cards ──
-  const summaryCards = [
-    { icon:'pound-sterling', color:'#06b6d4', label:'Avg Booking Value',         value:`£${Math.round(liveATV).toLocaleString()}`,                                          sub:'Live from all paid bookings' },
-    { icon:'calendar-check', color:'#10b981', label:'Avg Bookings / Month',       value:`${Math.round(live.avgMonthlyBookings*10)/10}`,                                      sub:`${newPct}% new · ${exPct}% repeat` },
-    { icon:'repeat-2',       color:'#a78bfa', label:'Bookings / Client / Month',  value:bppmDisplay,                                                                         sub:`Among clients who have ever booked` },
-    { icon:'user-plus',      color:'#3b82f6', label:'Avg Sign-Ups / Month',       value:`${Math.round(live.avgMonthlySignups*10)/10}`,                                       sub:'Excl. current partial month' },
-    { icon:'trending-up',    color:'#f59e0b', label:'Monthly Run Rate (Last 3M)', value:`£${Math.round(live.monthlyRevRunRate).toLocaleString()}`,                            sub: monthsToMillion === '∞' ? 'No data yet' : `${monthsToMillion} months to £1M at this rate` },
-    { icon:'percent',        color:'#10b981', label:'Overall Booking Rate',       value:`${(live.lifetimeBookingRate*100).toFixed(1)}%`,                                      sub:`${live.everBookedPool.size + live.firstTimeBookersThisMonth.size} of ${live.totalDashboardClients} clients have ever booked` }
-  ];
-
-  document.getElementById('roadmapTargets').innerHTML = summaryCards.map(c => `
-    <div class="stat-card" style="border-top:3px solid ${c.color};">
-      <div class="stat-value" style="color:${c.color};font-size:32px;">${c.value}</div>
-      <div class="stat-label">${c.label}</div>
-      <div style="font-size:11px;color:#94a3b8;margin-top:6px;">${c.sub}</div>
-    </div>`).join('');
-  lucide.createIcons();
-
-  // ══════════════════════════════════════════════════════════════
-  //  MONTHLY TARGETS GRID
-  // ══════════════════════════════════════════════════════════════
-
-  const monthsLeftThisYear  = 12 - now2.getMonth();
-  const rev2026Remaining    = Math.max(0, REVENUE_TARGETS.y1 - rev2026);
 
   const years = [
     { label:'2026 — This Year', col:'#8b5cf6', key:'y1', annualRev:REVENUE_TARGETS.y1, isCurrent:true  },
@@ -1599,13 +1817,11 @@ function renderRoadmap() {
 
   const curFirstTimers = live.firstTimeBookersThisMonth.size;
   const curRepeatBk    = live.repeatBookersThisMonth.size;
-  const curTotalBk     = thisMonthAllBookings.length;
   const curSignups     = thisMonthSignups;
 
   const newRatePct      = neverBookedCount > 0 ? ((curFirstTimers / neverBookedCount) * 100).toFixed(1) : '0.0';
   const existRatePct    = everBookedCount  > 0 ? ((curRepeatBk   / everBookedCount)  * 100).toFixed(1) : '0.0';
-
-  const cohortConvPct = (live.lifetimeBookingRate * 100).toFixed(0);
+  const cohortConvPct   = (live.lifetimeBookingRate * 100).toFixed(0);
   const lagStr = live.lagSampleSize > 0
     ? `${Math.round(live.avgLagDays)}d avg · ${Math.round(live.medianLagDays)}d median · ${live.lagSampleSize} clients measured`
     : 'Not enough data yet';
@@ -1629,7 +1845,7 @@ function renderRoadmap() {
       <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;">
         <div style="background:#f8fafc;border-radius:10px;padding:12px;text-align:center;">
           <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">This Month</div>
-          <div class="traj-number" style="font-size:22px;font-weight:800;color:#334155;line-height:1;">${curLabel}</div>
+          <div style="font-size:22px;font-weight:800;color:#334155;line-height:1;">${curLabel}</div>
         </div>
         <div style="color:#cbd5e1;font-size:18px;">→</div>
         <div style="background:${col}0d;border:1.5px solid ${col}44;border-radius:10px;padding:12px;text-align:center;">
@@ -1646,42 +1862,13 @@ function renderRoadmap() {
     const tgtNewBk     = T.monthly.newBookings[y.key];
     const tgtRepeatBk  = T.monthly.existBookings[y.key];
     const tgtSignups   = T.monthly.signups[y.key];
-    const actualRev    = y.isCurrent ? revenueForYear(new Date().getFullYear()) : 0;
-    const revPct       = y.isCurrent ? Math.min((actualRev / y.annualRev) * 100, 100) : 0;
-    const revBarColor  = revPct >= 80 ? '#10b981' : revPct >= 40 ? '#f59e0b' : '#ef4444';
     const growthMult   = live.monthlyRevRunRate > 0 ? targetMonthlyRev / live.monthlyRevRunRate : 0;
     const clientsNeeded = live.existingClientBookingRate > 0
       ? Math.ceil(tgtRepeatBk / live.existingClientBookingRate) : tgtRepeatBk;
     const neverBookedNeeded = live.newClientBookingRate > 0
       ? Math.ceil(tgtNewBk / live.newClientBookingRate) : tgtSignups;
-    return { ...y, targetMonthlyRev, tgtTotalBk, tgtNewBk, tgtRepeatBk, tgtSignups, actualRev, revPct, revBarColor, growthMult, clientsNeeded, neverBookedNeeded };
+    return { ...y, targetMonthlyRev, tgtTotalBk, tgtNewBk, tgtRepeatBk, tgtSignups, growthMult, clientsNeeded, neverBookedNeeded };
   });
-
-  const revRowHtml = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
-      ${yearData.map(y => `
-        <div style="background:${y.col}08;border:1px solid ${y.col}30;border-radius:12px;padding:16px;border-top:3px solid ${y.col};">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-            <span style="font-size:13px;font-weight:800;color:${y.col};">${y.label}</span>
-            ${y.isCurrent
-              ? `<span style="font-size:10px;font-weight:700;background:${y.col}22;color:${y.col};padding:2px 8px;border-radius:6px;">▶ In Progress</span>`
-              : `<span style="font-size:10px;color:#94a3b8;">${y.growthMult.toFixed(1)}× run rate needed</span>`}
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:${y.isCurrent ? 8 : 0}px;">
-            ${y.isCurrent
-              ? `<span style="font-size:22px;font-weight:800;color:#0f172a;">£${Math.round(y.actualRev).toLocaleString()}</span>
-                 <span style="font-size:12px;color:#64748b;">/ £${(y.annualRev/1000).toFixed(0)}k · £${Math.round(y.targetMonthlyRev).toLocaleString()}/mo</span>`
-              : `<span style="font-size:22px;font-weight:800;color:${y.col};">£${(y.annualRev/1000).toFixed(0)}k</span>
-                 <span style="font-size:12px;color:#64748b;">£${Math.round(y.targetMonthlyRev).toLocaleString()} / month</span>`}
-          </div>
-          ${y.isCurrent ? `
-            <div style="background:#e2e8f0;border-radius:4px;height:5px;overflow:hidden;">
-              <div style="width:${y.revPct}%;height:100%;background:${y.revBarColor};border-radius:4px;transition:width 0.8s;"></div>
-            </div>
-            <div style="font-size:10px;color:#94a3b8;margin-top:5px;">${y.revPct.toFixed(1)}% achieved · ${rev2026Remaining > 0 ? fmtMoney(rev2026Remaining) + ' remaining · ' + monthsLeftThisYear + ' months left' : '✓ Target achieved!'}</div>
-          ` : ''}
-        </div>`).join('')}
-    </div>`;
 
   const acqCard = `
     <div style="background:#fff;border:1.5px solid #3b82f633;border-radius:16px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,0.05);border-top:4px solid #3b82f6;">
@@ -1786,9 +1973,7 @@ function renderRoadmap() {
             Target: <strong style="color:#3b82f6;">${newBkTarget2026} new bookings/mo</strong><br>
             Needs pool of <strong style="color:#3b82f6;">${neverNeeded2026}</strong> never-booked clients at <strong style="color:#3b82f6;">${newRatePct}%</strong> conversion
           </div>
-          <div style="margin-top:10px;font-size:10px;color:#64748b;">
-            Every convert graduates → moves to existing pool next month
-          </div>
+          <div style="margin-top:10px;font-size:10px;color:#64748b;">Every convert graduates → moves to existing pool next month</div>
         </div>
 
         <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:14px;">
@@ -1798,9 +1983,7 @@ function renderRoadmap() {
             Target: <strong style="color:#10b981;">${repBkTarget2026} repeat bookings/mo</strong><br>
             Needs pool of <strong style="color:#10b981;">${existNeeded2026}</strong> existing clients at <strong style="color:#10b981;">${existRatePct}%</strong> repeat rate
           </div>
-          <div style="margin-top:10px;font-size:10px;color:#64748b;">
-            Pool grows as new clients convert from the blue pool
-          </div>
+          <div style="margin-top:10px;font-size:10px;color:#64748b;">Pool grows as new clients convert from the blue pool</div>
         </div>
       </div>
 
@@ -1815,7 +1998,7 @@ function renderRoadmap() {
       </div>
     </div>`;
 
-  document.getElementById('monthlyTargetsGrid').innerHTML = revRowHtml + `
+  document.getElementById('monthlyTargetsGrid').innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
       ${acqCard}
       ${retCard}
@@ -1865,9 +2048,7 @@ function renderRoadmap() {
 
   const levers = [
     {
-      icon: 'users',
-      label: 'Dashboard Clients',
-      color: '#3b82f6',
+      icon: 'users', label: 'Dashboard Clients', color: '#3b82f6',
       current: `${curClients} clients`,
       currentSub: `${uniqueBookersThisMonth} unique clients booked · ${thisMonthCount} total bookings · ${fmtSens(curATV)} ATV`,
       needed: neededClients !== null ? `${neededClients.toLocaleString()} clients` : '—',
@@ -1880,15 +2061,11 @@ function renderRoadmap() {
       held: `${curBRDisplay}/mo booking rate · ${fmtSens(curATV)} ATV`
     },
     {
-      icon: 'trending-up',
-      label: 'Monthly Booking Rate',
-      color: '#10b981',
+      icon: 'trending-up', label: 'Monthly Booking Rate', color: '#10b981',
       current: `${curBRDisplay}/mo`,
       currentSub: `${uniqueBookersThisMonth} unique clients booked this month (${thisMonthCount} total bookings)`,
       needed: neededBookingRate !== null
-        ? neededBookingRate > 1
-          ? `${(neededBookingRate * 100).toFixed(1)}% (avg ${neededBookingRate.toFixed(1)}× per client)`
-          : `${fmtPct(neededBookingRate)}/mo`
+        ? neededBookingRate > 1 ? `${(neededBookingRate * 100).toFixed(1)}% (avg ${neededBookingRate.toFixed(1)}× per client)` : `${fmtPct(neededBookingRate)}/mo`
         : '—',
       change: neededBookingRate !== null
         ? `We need ${Math.ceil(neededBookingRate * curClients)} bookings from our ${curClients} clients this month at ${fmtSens(curATV)} ATV — currently at ${uniqueBookersThisMonth}`
@@ -1897,9 +2074,7 @@ function renderRoadmap() {
       held: `${curClients} clients · ${fmtSens(curATV)} ATV`
     },
     {
-      icon: 'pound-sterling',
-      label: 'Avg Transaction Value',
-      color: '#f59e0b',
+      icon: 'pound-sterling', label: 'Avg Transaction Value', color: '#f59e0b',
       current: `${fmtSens(curATV)} per booking`,
       currentSub: `${thisMonthCount} booking${thisMonthCount !== 1 ? 's' : ''} this month · ${fmtSens(thisMonthRev)} total revenue`,
       needed: neededATV !== null ? `${fmtSens(neededATV)} per booking` : '—',
@@ -1910,9 +2085,7 @@ function renderRoadmap() {
       held: `${curClients} clients · ${curBRDisplay}/mo · ${thisMonthCount} bookings this month`
     },
     {
-      icon: 'repeat-2',
-      label: 'Bookings per Client this Month',
-      color: '#a78bfa',
+      icon: 'repeat-2', label: 'Bookings per Client this Month', color: '#a78bfa',
       current: `${curBkPerBooker}× per booking client`,
       currentSub: `${uniqueBookersThisMonth} booking clients · ${thisMonthCount} total bookings`,
       needed: neededBkPerBooker !== null ? `${neededBkPerBooker}× per booking client` : '—',
