@@ -702,6 +702,7 @@
       <button class="rr-btn" id="rrTotal"    onclick="setRunRateMetric('total')">Total Bookings</button>
       <button class="rr-btn" id="rrNew"      onclick="setRunRateMetric('new')">New Client</button>
       <button class="rr-btn" id="rrExisting" onclick="setRunRateMetric('existing')">Existing Client</button>
+      <button class="rr-btn" id="rrSignups" onclick="setRunRateMetric('signups')">Sign-Ups</button>
     </div>
   </div>
   <div id="runRateCallout" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;"></div>
@@ -2348,9 +2349,9 @@ let currentRunRateMetric = 'revenue';
 
 function setRunRateMetric(metric) {
   currentRunRateMetric = metric;
-  ['revenue','total','new','existing'].forEach(m => {
-    const ids = { revenue:'rrRevenue', total:'rrTotal', new:'rrNew', existing:'rrExisting' };
-    document.getElementById(ids[m]).className = 'rr-btn' + (m === metric ? ' active' : '');
+  const ids = { revenue:'rrRevenue', total:'rrTotal', new:'rrNew', existing:'rrExisting', signups:'rrSignups' };
+  Object.entries(ids).forEach(([m, id]) => {
+    document.getElementById(id).className = 'rr-btn' + (m === metric ? ' active' : '');
   });
   renderRunRateChart();
 }
@@ -2422,6 +2423,7 @@ function renderRunRateChart() {
   const monthlyTarget = metric === 'revenue'  ? T.monthly.revenue[key]
                       : metric === 'new'      ? T.monthly.newBookings[key]
                       : metric === 'existing' ? T.monthly.existBookings[key]
+                      : metric === 'signups'  ? T.monthly.signups[key]
                       : T.monthly.totalBookings[key];
 
   const periodMonths = currentPeriod === 'mom' ? 1
@@ -2443,10 +2445,14 @@ function renderRunRateChart() {
     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   });
 
-  const colMap = { revenue:'#10b981', total:'#06b6d4', new:'#8b5cf6', existing:'#f59e0b' };
+ const colMap = { revenue:'#10b981', total:'#06b6d4', new:'#8b5cf6', existing:'#f59e0b', signups:'#3b82f6' };
   const col = colMap[metric];
   const fmtVal = v => metric === 'revenue' ? '£' + Math.round(v).toLocaleString() : Math.round(v).toString();
-  const metricLabel = metric === 'revenue' ? 'Revenue' : metric === 'total' ? 'Total Bookings' : metric === 'new' ? 'New Client Bookings' : 'Existing Client Bookings';
+  const metricLabel = metric === 'revenue'  ? 'Revenue'
+                    : metric === 'total'    ? 'Total Bookings'
+                    : metric === 'new'      ? 'New Client Bookings'
+                    : metric === 'existing' ? 'Existing Client Bookings'
+                    : 'Dashboard Sign-Ups';
 
   const onTrack = projectedEOP >= periodTarget;
   const gapToTarget = periodTarget - totalWonSoFar;
