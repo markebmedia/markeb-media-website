@@ -1111,12 +1111,24 @@ function calcInsightCards() {
   const milestoneLabel = fmtMoney(nextMilestone);
   const dailyRev      = runRate > 0 ? runRate / 30 : 0;
   const dailyBookings = live.avgMonthlyBookings > 0 ? live.avgMonthlyBookings / 30 : 0;
-  const dailyRevStr   = dailyRev > 0 ? `${fmtMoney(Math.round(dailyRev))}/day` : null;
-  const dailyBkStr    = dailyBookings > 0 ? `${dailyBookings.toFixed(2)} bookings/day` : null;
-  const dailyLine     = dailyRevStr ? `<strong>${dailyRevStr}</strong> · ${dailyBkStr}` : null;
-  const milestoneSub = daysToNext !== null
-    ? `<strong>${fmtMoney(Math.round(remaining))}</strong> away · at current run rate <strong>~${daysToNext} days</strong>${dailyLine ? '<br>' + dailyLine : ''}`
-    : `<strong>${fmtMoney(Math.round(remaining))}</strong> away · no run rate data yet`;
+  const currentFreqDays = dailyBookings > 0 ? Math.round(1 / dailyBookings) : null;
+
+  // Target pace — based on monthly revenue target (y1)
+  const monthlyRevTarget  = REVENUE_TARGETS.y1 / 12;
+  const targetDailyRev    = monthlyRevTarget / 30;
+  const targetDaysToReach = targetDailyRev > 0 ? Math.ceil(remaining / targetDailyRev) : null;
+  const targetDailyBk     = calcLiveATV() > 0 ? targetDailyRev / calcLiveATV() : 0;
+  const targetFreqDays    = targetDailyBk > 0 ? (1 / targetDailyBk).toFixed(1) : null;
+
+  const currentLine = daysToNext !== null && dailyRev > 0
+    ? `At <strong>${fmtMoney(Math.round(dailyRev))}/day</strong>${currentFreqDays ? ' · 1 booking every <strong>' + currentFreqDays + ' days</strong>' : ''} = <strong>~${daysToNext} days</strong> to reach this milestone`
+    : `No run rate data yet`;
+
+  const targetLine = targetDaysToReach !== null
+    ? `To hit our <strong>${fmtMoney(Math.round(monthlyRevTarget))}/mo</strong> target we need to clear this in <strong>~${targetDaysToReach} days</strong> · that means <strong>${fmtMoney(Math.round(targetDailyRev))}/day</strong>${targetFreqDays ? ' · 1 booking every <strong>' + targetFreqDays + ' days</strong>' : ''}`
+    : null;
+
+  const milestoneSub = `<strong>${fmtMoney(Math.round(remaining))}</strong> to next milestone<br><span style="color:#64748b;">${currentLine}</span>${targetLine ? '<br><span style="margin-top:4px;display:block;padding:6px 8px;background:#fef9ec;border-left:3px solid #f59e0b;border-radius:0 6px 6px 0;color:#92400e;">' + targetLine + '</span>' : ''}`;
 
   // ── 5. MOST VALUABLE REGION ──
   // Map client emails to regions, sum LTV per region
