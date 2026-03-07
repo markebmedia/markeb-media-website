@@ -2373,22 +2373,34 @@ function renderRunRateChart() {
     if (new Date(b.date) < periodStart) priorEmails.add((b.clientEmail || '').toLowerCase());
   });
 
-  // Only count bookings CREATED within this period
-  bookingData.forEach(b => {
-    if (!b.createdTime || b.bookingStatus === 'Cancelled') return;
-    const ct = new Date(b.createdTime);
-    const ctLocal = new Date(ct.getFullYear(), ct.getMonth(), ct.getDate());
-    const ctIndex = Math.round((ctLocal - periodStart) / (1000 * 60 * 60 * 24));
-    if (ctIndex < 0 || ctIndex >= totalDays) return;
+  if (metric === 'signups') {
+    const windowClients = filterToWindow(windows.current).clients;
+    windowClients.forEach(u => {
+      const raw = u.fields['Created Date'];
+      if (!raw) return;
+      const d = new Date(raw);
+      const ctLocal = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const ctIndex = Math.round((ctLocal - periodStart) / (1000 * 60 * 60 * 24));
+      if (ctIndex < 0 || ctIndex >= totalDays) return;
+      dailyWon[ctIndex] += 1;
+    });
+  } else {
+    bookingData.forEach(b => {
+      if (!b.createdTime || b.bookingStatus === 'Cancelled') return;
+      const ct = new Date(b.createdTime);
+      const ctLocal = new Date(ct.getFullYear(), ct.getMonth(), ct.getDate());
+      const ctIndex = Math.round((ctLocal - periodStart) / (1000 * 60 * 60 * 24));
+      if (ctIndex < 0 || ctIndex >= totalDays) return;
 
-    const email = (b.clientEmail || '').toLowerCase();
-    const val = metric === 'revenue'  ? (parseFloat(b.finalPrice) || 0)
-              : metric === 'new'      ? (!priorEmails.has(email) ? 1 : 0)
-              : metric === 'existing' ? (priorEmails.has(email)  ? 1 : 0)
-              : 1;
+      const email = (b.clientEmail || '').toLowerCase();
+      const val = metric === 'revenue'  ? (parseFloat(b.finalPrice) || 0)
+                : metric === 'new'      ? (!priorEmails.has(email) ? 1 : 0)
+                : metric === 'existing' ? (priorEmails.has(email)  ? 1 : 0)
+                : 1;
 
-    dailyWon[ctIndex] += val;
-  });
+      dailyWon[ctIndex] += val;
+    });
+  }
 
   // Cumulative won — solid line up to today, null for future
   let running = 0;
