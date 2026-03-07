@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
   <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.min.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -466,6 +467,22 @@
       .header-content h1 { font-size: 17px; }
       .insight-cards-grid { grid-template-columns: 1fr; }
     }
+
+.rr-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  border: 2px solid #e2e8f0;
+  font-family: 'Inter', sans-serif;
+  transition: all .2s ease;
+}
+.rr-btn.active { background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; border-color: #60a5fa; }
+.rr-btn:not(.active) { background: #f8fafc; color: #475569; }
+.rr-btn:not(.active):hover { border-color: #3b82f6; color: #3b82f6;
+}
+
   </style>
 </head>
 <body>
@@ -659,6 +676,26 @@
     </div>
 
     <div class="stats-overview" id="kpiGrid"></div>
+
+    <!-- Run Rate Projection Chart -->
+<div class="map-section" style="margin-bottom:24px;" id="runRateSection">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+    <div>
+      <h3 style="font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;">
+        <i data-lucide="trending-up" style="width:18px;height:18px;"></i> Run Rate Projection
+      </h3>
+      <p style="font-size:13px;color:#64748b;margin-top:3px;">At current pace, here's where this month ends vs target</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="rr-btn active" id="rrRevenue"  onclick="setRunRateMetric('revenue')">£ Revenue</button>
+      <button class="rr-btn" id="rrTotal"    onclick="setRunRateMetric('total')">Total Bookings</button>
+      <button class="rr-btn" id="rrNew"      onclick="setRunRateMetric('new')">New Client</button>
+      <button class="rr-btn" id="rrExisting" onclick="setRunRateMetric('existing')">Existing Client</button>
+    </div>
+  </div>
+  <div id="runRateCallout" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;"></div>
+  <canvas id="runRateChart" style="max-height:340px;"></canvas>
+</div>
 
     <div class="comparison-section">
       <h3><i data-lucide="table-2" style="width:16px;height:16px;vertical-align:-3px;margin-right:6px;"></i>Detailed Comparison — <span id="compTableTitle">This Month vs Last Month</span></h3>
@@ -1771,7 +1808,8 @@ function renderPerformanceSection() {
     </div>` +
     kpiCards.find(c => c.key === 'totalBookings').html;
   lucide.createIcons();
-  
+  renderRunRateChart();
+
   document.getElementById('compTableTitle').textContent = windows.label1 + ' vs ' + windows.label2;
   document.getElementById('colCurrent').textContent = windows.label1;
   document.getElementById('colPrev').textContent    = windows.label2;
@@ -2284,6 +2322,172 @@ function renderIntelligence() {
       }
     </div>`;
 }
+
+let runRateChartInstance = null;
+let currentRunRateMetric = 'revenue';
+
+function setRunRateMetric(metric) {
+  currentRunRateMetric = metric;
+  ['revenue','total','new','existing'].forEach(m => {
+    const ids = { revenue:'rrRevenue', total:'rrTotal', new:'rrNew', existing:'rrExisting' };
+    document.getElementById(ids[m]).className = 'rr-btn' + (m === metric ? ' active' : '');
+  });
+  renderRunRateChart();
+}
+
+function renderRunRateChart() {
+  const windows = getPeriodWindows();
+  const [periodStart, periodEnd] = windows.current;
+  const now = new Date();
+  const effectiveEnd = now < periodEnd ? now : periodEnd;
+  const metric = currentRunRateMetric;
+
+  // Build a day-by-day array for the period
+  const totalDays = Math.ceil((periodEnd - periodStart) / (1000 * 60 * 60 * 24)) + 1;
+  const elapsedDays = Math.ceil((effectiveEnd - periodStart) / (1000 * 60 * 60 * 24));
+
+  const dailyActuals = Array(totalDays).fill(0);
+
+  const periodBookings = bookingData.filter(b => {
+    if (!b.date || b.bookingStatus === 'Cancelled') return false;
+    const d = new Date(b.date);
+    return d >= periodStart && d <= periodEnd;
+  });
+
+  const priorEmails = new Set();
+  bookingData.forEach(b => {
+    if (!b.date || !b.clientEmail) return;
+    if (new Date(b.date) < periodStart) priorEmails.add((b.clientEmail || '').toLowerCase());
+  });
+
+  periodBookings.forEach(b => {
+    const d = new Date(b.date);
+    const dayIndex = Math.floor((d - periodStart) / (1000 * 60 * 60 * 24));
+    if (dayIndex < 0 || dayIndex >= totalDays) return;
+    const email = (b.clientEmail || '').toLowerCase();
+    const val = metric === 'revenue'  ? (parseFloat(b.finalPrice) || 0)
+              : metric === 'new'      ? (!priorEmails.has(email) ? 1 : 0)
+              : metric === 'existing' ? (priorEmails.has(email)  ? 1 : 0)
+              : 1;
+    dailyActuals[dayIndex] += val;
+  });
+
+  // Cumulative actuals up to today
+  let running = 0;
+  const cumActuals = [];
+  for (let i = 0; i < totalDays; i++) {
+    if (i < elapsedDays) { running += dailyActuals[i]; cumActuals.push(parseFloat(running.toFixed(2))); }
+    else cumActuals.push(null);
+  }
+
+  const totalSoFar = running;
+  const dailyRunRate = elapsedDays > 0 ? totalSoFar / elapsedDays : 0;
+  const projectedEOP = parseFloat((dailyRunRate * totalDays).toFixed(2));
+
+  // Dotted projection from today to end of period
+  const cumProjection = [];
+  for (let i = 0; i < totalDays; i++) {
+    if (i < elapsedDays - 1) cumProjection.push(null);
+    else if (i === elapsedDays - 1) cumProjection.push(parseFloat(totalSoFar.toFixed(2)));
+    else cumProjection.push(parseFloat((dailyRunRate * (i + 1)).toFixed(2)));
+  }
+
+  // Scaled target for this period
+  const T = buildTargets();
+  const key = 'y' + getCurrentYear();
+  const monthlyTarget = metric === 'revenue'  ? T.monthly.revenue[key]
+                      : metric === 'new'      ? T.monthly.newBookings[key]
+                      : metric === 'existing' ? T.monthly.existBookings[key]
+                      : T.monthly.totalBookings[key];
+
+  const periodMonths = currentPeriod === 'mom' ? 1
+                     : currentPeriod === 'qoq' ? 3
+                     : currentPeriod === '6m'  ? 6
+                     : 12;
+  const periodTarget = monthlyTarget * periodMonths;
+  const targetLine = Array(totalDays).fill(periodTarget);
+
+  // X-axis labels — thin out for longer periods
+  const labelEvery = currentPeriod === 'mom' ? 1
+                   : currentPeriod === 'qoq' ? 7
+                   : currentPeriod === '6m'  ? 14
+                   : 30;
+
+  const labels = Array.from({ length: totalDays }, (_, i) => {
+    const d = new Date(periodStart);
+    d.setDate(d.getDate() + i);
+    if (i % labelEvery !== 0) return '';
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  });
+
+  const colMap = { revenue:'#10b981', total:'#06b6d4', new:'#8b5cf6', existing:'#f59e0b' };
+  const col = colMap[metric];
+  const fmtVal = v => metric === 'revenue' ? '£' + Math.round(v).toLocaleString() : Math.round(v).toString();
+  const metricLabel = metric === 'revenue' ? 'Revenue' : metric === 'total' ? 'Total Bookings' : metric === 'new' ? 'New Client Bookings' : 'Existing Client Bookings';
+
+  const onTrack = projectedEOP >= periodTarget;
+  const gapToTarget = periodTarget - totalSoFar;
+  const daysLeft = totalDays - elapsedDays;
+  const neededPerDay = daysLeft > 0 ? gapToTarget / daysLeft : 0;
+
+  const periodLabel = windows.label1;
+
+  document.getElementById('runRateCallout').innerHTML = `
+    <div style="flex:1;min-width:140px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">So Far — ${periodLabel}</div>
+      <div style="font-size:24px;font-weight:800;color:${col};">${fmtVal(totalSoFar)}</div>
+      <div style="font-size:11px;color:#64748b;margin-top:2px;">Day ${elapsedDays} of ${totalDays}</div>
+    </div>
+    <div style="flex:1;min-width:140px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Projected End of Period</div>
+      <div style="font-size:24px;font-weight:800;color:${onTrack ? '#10b981' : '#ef4444'};">${fmtVal(projectedEOP)}</div>
+      <div style="font-size:11px;color:#64748b;margin-top:2px;">at ${fmtVal(Math.round(dailyRunRate))}/day run rate</div>
+    </div>
+    <div style="flex:1;min-width:140px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Period Target</div>
+      <div style="font-size:24px;font-weight:800;color:#0f172a;">${fmtVal(periodTarget)}</div>
+      <div style="font-size:11px;color:${onTrack ? '#10b981' : '#ef4444'};margin-top:2px;font-weight:600;">${onTrack ? '✓ On track' : `Need ${fmtVal(Math.round(neededPerDay))}/day to close gap`}</div>
+    </div>
+    <div style="flex:1;min-width:140px;background:${onTrack ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)'};border:1px solid ${onTrack ? '#10b981' : '#ef4444'}44;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${onTrack ? 'Surplus' : 'Shortfall'}</div>
+      <div style="font-size:24px;font-weight:800;color:${onTrack ? '#10b981' : '#ef4444'};">${fmtVal(Math.abs(projectedEOP - periodTarget))}</div>
+      <div style="font-size:11px;color:#64748b;margin-top:2px;">${daysLeft} days remaining</div>
+    </div>`;
+
+  const ctx = document.getElementById('runRateChart').getContext('2d');
+  if (runRateChartInstance) runRateChartInstance.destroy();
+
+  runRateChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: metricLabel + ' (Actual)', data: cumActuals, borderColor: col, backgroundColor: col + '18', borderWidth: 3, pointRadius: currentPeriod === 'mom' ? 3 : 0, pointHoverRadius: 6, tension: 0.3, fill: true, spanGaps: false },
+        { label: 'Projected at current pace', data: cumProjection, borderColor: col, backgroundColor: 'transparent', borderWidth: 2, borderDash: [6,4], pointRadius: 0, tension: 0.3, fill: false, spanGaps: false },
+        { label: 'Period Target', data: targetLine, borderColor: '#ef4444', backgroundColor: 'transparent', borderWidth: 2, borderDash: [4,4], pointRadius: 0, tension: 0, fill: false }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: true, position: 'top', labels: { font: { family: 'Inter', size: 12 }, color: '#475569', boxWidth: 20, padding: 16 } },
+        tooltip: {
+          backgroundColor: '#0f172a',
+          titleFont: { family: 'Inter', size: 12 },
+          bodyFont:  { family: 'Inter', size: 12 },
+          padding: 12,
+          callbacks: { label: ctx => ctx.parsed.y === null ? null : ' ' + ctx.dataset.label + ': ' + fmtVal(ctx.parsed.y) }
+        }
+      },
+      scales: {
+        x: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Inter', size: 11 }, color: '#94a3b8', maxTicksLimit: currentPeriod === 'mom' ? 10 : 8 } },
+        y: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Inter', size: 11 }, color: '#94a3b8', callback: v => fmtVal(v) }, beginAtZero: true }
+      }
+    }
+  });
+}
+
 </script>
 </body>
 </html>
