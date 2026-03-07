@@ -1737,8 +1737,9 @@ function renderPerformanceSection() {
     return monthly * 12;
   }
 
-  const colourMap = { signups:'#3b82f6', revenue:'#10b981', 'new-booking':'#8b5cf6', 'exist-booking':'#f59e0b', 'total-booking':'#06b6d4' };
-  document.getElementById('kpiGrid').innerHTML = metrics.map(m => {
+ const colourMap = { signups:'#3b82f6', revenue:'#10b981', 'new-booking':'#8b5cf6', 'exist-booking':'#f59e0b', 'total-booking':'#06b6d4' };
+
+  const kpiCards = metrics.map(m => {
     const col     = colourMap[m.css] || '#3b82f6';
     const delta   = m.prev > 0 ? ((m.curr - m.prev) / m.prev * 100) : (m.curr > 0 ? 100 : 0);
     const dArrow  = delta > 0 ? '↑' : delta < 0 ? '↓' : '';
@@ -1747,7 +1748,7 @@ function renderPerformanceSection() {
     const pct     = target > 0 ? Math.min((m.curr / target) * 100, 100) : 0;
     const tColour = pct >= 80 ? '#10b981' : pct >= 50 ? '#f59e0b' : '#ef4444';
     const tLabel  = pct >= 80 ? 'On Track' : pct >= 50 ? 'Behind' : 'Critical';
-    return `<div class="stat-card" style="border-top:3px solid ${col};text-align:center;">
+    return { key: m.key, html: `<div class="stat-card" style="border-top:3px solid ${col};text-align:center;">
       <div class="stat-value" style="color:${col};font-size:36px;">${m.fmt(m.curr)}</div>
       <div class="stat-label" style="margin-bottom:8px;">${m.label}</div>
       <div style="font-size:11px;color:#64748b;margin-bottom:6px;">vs prev: <strong style="color:${dColour};">${dArrow} ${Math.abs(delta).toFixed(1)}%</strong> (${m.fmt(m.prev)})</div>
@@ -1755,10 +1756,22 @@ function renderPerformanceSection() {
         <div style="width:${pct}%;height:100%;background:${tColour};border-radius:6px;transition:width 0.8s ease;"></div>
       </div>
       <div style="font-size:10px;color:${tColour};font-weight:700;">${pct.toFixed(0)}% of target · ${tLabel}</div>
-    </div>`;
-  }).join('');
-  lucide.createIcons();
+    </div>` };
+  });
 
+  document.getElementById('kpiGrid').innerHTML =
+    kpiCards.find(c => c.key === 'signups').html +
+    kpiCards.find(c => c.key === 'revenue').html +
+    `<div style="grid-column:span 2;border:2px solid #e2e8f0;border-radius:14px;padding:16px;background:#f8fafc;">
+      <p style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;text-align:center;">How many bookings came from new clients vs existing clients</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        ${kpiCards.find(c => c.key === 'newBookings').html}
+        ${kpiCards.find(c => c.key === 'existBookings').html}
+      </div>
+    </div>` +
+    kpiCards.find(c => c.key === 'totalBookings').html;
+  lucide.createIcons();
+  
   document.getElementById('compTableTitle').textContent = windows.label1 + ' vs ' + windows.label2;
   document.getElementById('colCurrent').textContent = windows.label1;
   document.getElementById('colPrev').textContent    = windows.label2;
@@ -2016,9 +2029,6 @@ function renderRoadmap() {
     </div>`;
 
   document.getElementById('monthlyTargetsGrid').innerHTML = `
-    <p style="font-size:13px;color:#64748b;margin-bottom:14px;font-style:italic;">
-      How many bookings came from new clients vs existing clients this month
-    </p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
       ${acqCard}
       ${retCard}
