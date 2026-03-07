@@ -675,20 +675,28 @@
       </div>
     </div>
 
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:12px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;">
+  <i data-lucide="package" style="width:18px;height:18px;color:#64748b;flex-shrink:0;"></i>
+  <div>
+    <div style="font-size:13px;font-weight:700;color:#0f172a;">Fulfilment — Jobs Delivered This Period</div>
+    <div style="font-size:12px;color:#64748b;margin-top:2px;">Shoots scheduled within the selected period · reflects actual work delivered on the ground</div>
+  </div>
+</div>
+
     <div class="stats-overview" id="kpiGrid"></div>
 
     <!-- Run Rate Projection Chart -->
 <div class="map-section" style="margin-bottom:24px;" id="runRateSection">
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
-    <div>
-      <h3 style="font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;">
-        <i data-lucide="trending-up" style="width:18px;height:18px;"></i> Run Rate Projection
-      </h3>
-      <p style="font-size:13px;color:#64748b;margin-top:3px;line-height:1.6;">
-  Tracks <strong style="color:#0f172a;">booking velocity</strong> — how fast we're winning work, by the date each booking was created. 
-  <span style="color:#94a3b8;">Note: "Won So Far" will differ from the KPI cards above — KPI cards show all jobs scheduled this period regardless of when they were booked.</span>
-</p>
-    </div>
+   <div>
+  <h3 style="font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;">
+    <i data-lucide="trending-up" style="width:18px;height:18px;"></i> Booking Activity — Work Won This Period
+  </h3>
+  <p style="font-size:13px;color:#64748b;margin-top:3px;line-height:1.6;">
+    Tracks <strong style="color:#0f172a;">when bookings were created</strong> — shows commercial momentum and where the period is heading.
+    <span style="color:#94a3b8;">Numbers will differ from Fulfilment above — a booking made this month for a shoot next month counts here but not above.</span>
+  </p>
+</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="rr-btn active" id="rrRevenue"  onclick="setRunRateMetric('revenue')">£ Revenue</button>
       <button class="rr-btn" id="rrTotal"    onclick="setRunRateMetric('total')">Total Bookings</button>
@@ -2224,8 +2232,12 @@ function renderIntelligence() {
     c.bookingCount = c.bookings.length;
     const nc = c.bookings.filter(b => b.bookingStatus !== 'Cancelled');
     c.avgSpend    = nc.length > 0 ? c.ltv / nc.length : 0;
-    const dates   = c.bookings.map(b => b.date).filter(Boolean).sort();
-    c.lastBooking = dates[dates.length-1] || null;
+    const now = new Date();
+const dates = c.bookings
+  .map(b => b.date)
+  .filter(b => b && new Date(b) <= now)
+  .sort();
+c.lastBooking = dates[dates.length - 1] || null;
   });
 
   const allClients   = Object.values(clientMap);
