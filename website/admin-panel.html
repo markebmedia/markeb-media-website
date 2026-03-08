@@ -2517,30 +2517,30 @@ body {
 
 <!-- Discount Codes Section -->
 <div class="admin-section" id="discount-codes">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-    <div>
-      <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Discount Codes</h2>
-      <p style="color: #64748b; font-size: 14px;">Create and manage promotional discount codes</p>
-    </div>
-    <button class="btn btn-primary" onclick="showCreateDiscountModal()">
-      ➕ Create Discount Code
-    </button>
-  </div>
-
-  <div class="filters-bar">
-    <select class="filter-select" id="discountStatusFilter" onchange="loadDiscountCodes()">
-      <option value="">All Status</option>
-      <option value="Active">Active</option>
-      <option value="Inactive">Inactive</option>
-    </select>
-    <button class="btn btn-primary" onclick="loadDiscountCodes()">🔄 Refresh</button>
-  </div>
-
-  <div class="calendar-container" id="discountCodesContainer">
-    <div style="text-align: center; padding: 40px;">
-      <div class="spinner"></div>
-    </div>
-  </div>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+<div>
+<h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Discount Codes</h2>
+<p style="color: #64748b; font-size: 14px;">Create and manage promotional discount codes</p>
+</div>
+<button class="btn btn-primary" onclick="showCreateDiscountModal()">
+  <i data-lucide="plus-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Create Discount Code
+</button>
+</div>
+<div class="filters-bar">
+<select class="filter-select" id="discountStatusFilter" onchange="loadDiscountCodes()">
+<option value="">All Status</option>
+<option value="Active">Active</option>
+<option value="Inactive">Inactive</option>
+</select>
+<button class="btn btn-primary" onclick="loadDiscountCodes()">
+  <i data-lucide="refresh-cw" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Refresh
+</button>
+</div>
+<div class="calendar-container" id="discountCodesContainer">
+<div style="text-align: center; padding: 40px;">
+<div class="spinner"></div>
+</div>
+</div>
 </div>
 
     <!-- Calendar Section -->
