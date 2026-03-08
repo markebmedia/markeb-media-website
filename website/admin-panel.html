@@ -2548,9 +2548,9 @@ body {
       <div class="calendar-container">
         <div class="calendar-header">
           <div class="calendar-nav">
-            <button class="btn btn-primary btn-small" onclick="previousPeriod()">◀ Previous</button>
+            <button class="btn btn-primary btn-small" onclick="previousPeriod()">&#9664; Previous</button>
             <div class="calendar-current" id="calendarCurrent">Loading...</div>
-            <button class="btn btn-primary btn-small" onclick="nextPeriod()">Next ▶</button>
+            <button class="btn btn-primary btn-small" onclick="nextPeriod()">Next &#9654;</button>
           </div>
           <div class="calendar-view-selector">
             <button class="calendar-view-btn active" data-view="month" onclick="setCalendarView('month')">Month</button>
@@ -2565,7 +2565,9 @@ body {
             <option value="North">North</option>
             <option value="South">South</option>
           </select>
-          <button class="btn btn-primary" onclick="loadCalendar()">🔄 Refresh</button>
+          <button class="btn btn-primary" onclick="loadCalendar()">
+            <i data-lucide="refresh-cw" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Refresh
+          </button>
         </div>
 
         <div id="calendarGrid">
@@ -2590,7 +2592,9 @@ body {
           <option value="Booked">Booked</option>
           <option value="Cancelled">Cancelled</option>
         </select>
-        <button class="btn btn-primary" onclick="loadBookings()">🔍 Search</button>
+        <button class="btn btn-primary" onclick="loadBookings()">
+          <i data-lucide="search" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Search
+        </button>
       </div>
 
       <div class="calendar-container" id="bookingsContainer">
@@ -2603,7 +2607,7 @@ body {
    <!-- Pending Bookings Section -->
 <div class="admin-section" id="pending">
   <div class="info-box" style="margin-bottom: 24px;">
-    <strong>💳 Reserved Bookings</strong><br>
+    <i data-lucide="credit-card" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:6px;"></i><strong>Reserved Bookings</strong><br>
     These bookings have been reserved but require payment. You can either charge the customer's saved card or send them a payment link via email.
   </div>
 
@@ -2618,7 +2622,9 @@ body {
     <div class="admin-section" id="customers">
       <div class="filters-bar">
         <input type="text" class="filter-input" id="customerSearch" placeholder="Search by name, email, company...">
-        <button class="btn btn-primary" onclick="loadCustomers()">🔍 Search</button>
+        <button class="btn btn-primary" onclick="loadCustomers()">
+          <i data-lucide="search" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Search
+        </button>
       </div>
 
       <div class="calendar-container" id="customersContainer">
@@ -2627,7 +2633,6 @@ body {
         </div>
       </div>
     </div>
-  
 
   <!-- Blocked Times Section -->
 <div class="admin-section" id="blocked-times">
@@ -2637,7 +2642,7 @@ body {
       <p style="color: #64748b; font-size: 14px;">Block out dates and times when bookings cannot be made</p>
     </div>
     <button class="btn btn-primary" onclick="showCreateBlockModal()">
-      ➕ Block Time
+      <i data-lucide="ban" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Block Time
     </button>
   </div>
 
@@ -2647,7 +2652,9 @@ body {
       <option value="North">North</option>
       <option value="South">South</option>
     </select>
-    <button class="btn btn-primary" onclick="loadBlockedTimes()">🔄 Refresh</button>
+    <button class="btn btn-primary" onclick="loadBlockedTimes()">
+      <i data-lucide="refresh-cw" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Refresh
+    </button>
   </div>
 
   <div class="calendar-container" id="blockedTimesContainer">
@@ -4810,60 +4817,48 @@ async function loadCalendar() {
 
 function renderMonthView(bookings, blockedTimes) {
   const grid = document.getElementById('calendarGrid');
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
-  
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const daysInMonth = lastDay.getDate();
-  const startingDayOfWeek = firstDay.getDay() || 7;
-
-  const totalBookings = bookings.length;
-  const totalBlocks = blockedTimes.length;
-
-  let html = `
+const year = currentDate.getFullYear();
+const month = currentDate.getMonth();
+const firstDay = new Date(year, month, 1);
+const lastDay = new Date(year, month + 1, 0);
+const daysInMonth = lastDay.getDate();
+const startingDayOfWeek = firstDay.getDay() || 7;
+const totalBookings = bookings.length;
+const totalBlocks = blockedTimes.length;
+let html = `
     <div class="calendar-booking-counter">
       <span class="calendar-booking-counter-value">${totalBookings}</span>
       <span class="calendar-booking-counter-label">booking${totalBookings !== 1 ? 's' : ''}</span>
-      ${totalBlocks > 0 ? `
+${totalBlocks > 0 ? `
         <span style="margin-left: 16px; color: #ef4444; font-size: 14px;">
-          | 🚫 ${totalBlocks} blocked time${totalBlocks !== 1 ? 's' : ''}
+          | ${totalBlocks} blocked time${totalBlocks !== 1 ? 's' : ''}
         </span>
       ` : ''}
     </div>
-    
     <div class="calendar-grid month">
   `;
-  
   ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(day => {
-    html += `<div class="calendar-day-header">${day}</div>`;
+html += `<div class="calendar-day-header">${day}</div>`;
   });
-
-  for (let i = 1; i < startingDayOfWeek; i++) {
-    html += '<div class="calendar-day other-month"></div>';
+for (let i = 1; i < startingDayOfWeek; i++) {
+html += '<div class="calendar-day other-month"></div>';
   }
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const dayBookings = bookings.filter(b => b.fields['Date'] === dateStr);
-    const dayBlocks = blockedTimes.filter(b => b.fields['Date'] === dateStr);
-    
-    const today = new Date();
-    const isToday = dateStr === today.toISOString().split('T')[0];
-    
-    // ✅ Add click handler to create block
-    html += `<div class="calendar-day ${isToday ? 'today' : ''}" onclick="showQuickBlockModal('${dateStr}')" style="cursor: pointer;">`;
-    html += `<div class="calendar-day-number">${day}</div>`;
-    
-    // ✅ Show blocked times FIRST (red)
-    dayBlocks.forEach(block => {
-      const fields = block.fields;
-      html += `
+for (let day = 1; day <= daysInMonth; day++) {
+const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+const dayBookings = bookings.filter(b => b.fields['Date'] === dateStr);
+const dayBlocks = blockedTimes.filter(b => b.fields['Date'] === dateStr);
+const today = new Date();
+const isToday = dateStr === today.toISOString().split('T')[0];
+html += `<div class="calendar-day ${isToday ? 'today' : ''}" onclick="showQuickBlockModal('${dateStr}')" style="cursor: pointer;">`;
+html += `<div class="calendar-day-number">${day}</div>`;
+dayBlocks.forEach(block => {
+const fields = block.fields;
+html += `
         <div class="calendar-booking blocked" 
              onclick="event.stopPropagation(); viewBlockedTime('${block.id}')"
              title="${fields['Reason'] || 'Blocked'}"
              style="background: #ef4444; cursor: pointer;">
-          🚫 ${fields['Start Time']}-${fields['End Time']} ${fields['Region']}
+          ${fields['Start Time']}-${fields['End Time']} ${fields['Region']}
         </div>
       `;
     });
@@ -5481,19 +5476,17 @@ function showQuickBlockModal(dateStr) {
   modal.innerHTML = `
     <div class="modal-dialog" style="max-width: 500px;">
       <div class="modal-header">
-        <h3>🚫 Block Time</h3>
+        <h3><i data-lucide="ban" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> Block Time</h3>
         <button class="modal-close" onclick="closeQuickBlockModal()">×</button>
       </div>
       <div class="modal-body">
         <form id="quickBlockForm" onsubmit="saveQuickBlock(event, '${dateStr}')">
-          
           <div class="form-group">
             <label class="form-label">Date</label>
             <div style="padding: 12px; background: #f8fafc; border-radius: 8px; font-weight: 600;">
-              ${date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+${date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </div>
           </div>
-
           <div class="form-group">
             <label class="form-label" for="quickBlockRegion">Region *</label>
             <select id="quickBlockRegion" class="form-input" required>
@@ -5502,25 +5495,22 @@ function showQuickBlockModal(dateStr) {
               <option value="South">South</option>
             </select>
           </div>
-
           <div class="form-row">
             <div class="form-group">
               <label class="form-label" for="quickBlockStartTime">Start Time *</label>
               <select id="quickBlockStartTime" class="form-input" required>
                 <option value="">-- Select --</option>
-                ${generateTimeOptions('09:00')}
+${generateTimeOptions('09:00')}
               </select>
             </div>
-
             <div class="form-group">
               <label class="form-label" for="quickBlockEndTime">End Time *</label>
               <select id="quickBlockEndTime" class="form-input" required>
                 <option value="">-- Select --</option>
-                ${generateTimeOptions('18:00')}
+${generateTimeOptions('18:00')}
               </select>
             </div>
           </div>
-
           <div class="form-group">
             <label class="form-label" for="quickBlockReason">Reason (Optional)</label>
             <input 
@@ -5530,19 +5520,19 @@ function showQuickBlockModal(dateStr) {
               placeholder="e.g., Team meeting, Weather, Equipment maintenance"
             />
           </div>
-
           <div class="button-group" style="margin-top: 24px;">
             <button type="button" class="btn btn-secondary" onclick="closeQuickBlockModal()" style="flex: 1;">
               Cancel
             </button>
             <button type="submit" class="btn btn-danger" style="flex: 2;">
-              🚫 Block Time
+              <i data-lucide="ban" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Block Time
             </button>
           </div>
         </form>
       </div>
     </div>
   `;
+  lucide.createIcons();
   
   document.body.appendChild(modal);
 }
@@ -5624,7 +5614,7 @@ function viewBlockedTime(blockId) {
     modal.innerHTML = `
       <div class="modal-dialog" style="max-width: 500px;">
         <div class="modal-header" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
-          <h3>🚫 Blocked Time</h3>
+          <h3><i data-lucide="ban" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> Blocked Time</h3>
           <button class="modal-close" onclick="closeViewBlockModal()">×</button>
         </div>
         <div class="modal-body">
@@ -5654,15 +5644,15 @@ function viewBlockedTime(blockId) {
             <span class="detail-label">Created Date</span>
             <span class="detail-value">${new Date(fields['Created Date']).toLocaleDateString('en-GB')}</span>
           </div>
-          
           <div style="margin-top: 24px;">
             <button class="btn btn-danger" style="width: 100%;" onclick="deleteBlockFromCalendar('${blockId}', '${fields['Date']}')">
-              🗑️ Remove Block
+              <i data-lucide="trash-2" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Remove Block
             </button>
           </div>
         </div>
       </div>
     `;
+    lucide.createIcons();
     
     document.body.appendChild(modal);
   })
@@ -7147,31 +7137,27 @@ async function loadBlockedTimes() {
 
 // Render Blocked Times Table
 function renderBlockedTimesTable(blocks) {
-  const container = document.getElementById('blockedTimesContainer');
-  
-  if (blocks.length === 0) {
-    container.innerHTML = `
+const container = document.getElementById('blockedTimesContainer');
+if (blocks.length === 0) {
+container.innerHTML = `
       <div style="text-align: center; padding: 60px;">
-        <div style="font-size: 48px; margin-bottom: 16px;">🚫</div>
+        <div style="margin-bottom: 16px;"><i data-lucide="ban" style="width:48px;height:48px;color:#94a3b8;"></i></div>
         <h3 style="color: #64748b; margin-bottom: 8px;">No Blocked Times</h3>
         <p style="color: #94a3b8;">Click "Block Time" to prevent bookings for specific dates and times</p>
       </div>
     `;
-    return;
+lucide.createIcons();
+return;
   }
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const upcomingBlocks = blocks.filter(b => new Date(b.fields['Date']) >= today);
-  const pastBlocks = blocks.filter(b => new Date(b.fields['Date']) < today);
-
-  let html = '';
-
-  if (upcomingBlocks.length > 0) {
-    html += `
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const upcomingBlocks = blocks.filter(b => new Date(b.fields['Date']) >= today);
+const pastBlocks = blocks.filter(b => new Date(b.fields['Date']) < today);
+let html = '';
+if (upcomingBlocks.length > 0) {
+html += `
       <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 16px;">
-        📅 Upcoming Blocks (${upcomingBlocks.length})
+        Upcoming Blocks (${upcomingBlocks.length})
       </h3>
       <table class="data-table" style="margin-bottom: 32px;">
         <thead>
@@ -7186,13 +7172,11 @@ function renderBlockedTimesTable(blocks) {
         </thead>
         <tbody>
     `;
-
-    upcomingBlocks.forEach(block => {
-      const fields = block.fields;
-      const date = new Date(fields['Date']);
-      const formattedDate = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-      
-      html += `
+upcomingBlocks.forEach(block => {
+const fields = block.fields;
+const date = new Date(fields['Date']);
+const formattedDate = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+html += `
         <tr>
           <td data-label="Region">
             <span class="region-badge ${fields['Region'].toLowerCase()}">${fields['Region']}</span>
@@ -7205,21 +7189,19 @@ function renderBlockedTimesTable(blocks) {
           <td data-label="Created By">${fields['Created By'] || 'Admin'}</td>
           <td data-label="Actions">
             <button class="btn btn-danger btn-small" onclick="deleteBlockedTime('${block.id}', '${fields['Date']}')">
-              🗑️ Remove
+              <i data-lucide="trash-2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Remove
             </button>
           </td>
         </tr>
       `;
     });
-
-    html += '</tbody></table>';
+html += '</tbody></table>';
   }
-
-  if (pastBlocks.length > 0) {
-    html += `
+if (pastBlocks.length > 0) {
+html += `
       <details style="margin-top: 24px;">
         <summary style="font-size: 16px; font-weight: 700; color: #64748b; cursor: pointer; padding: 12px; background: #f8fafc; border-radius: 8px;">
-          📜 Past Blocks (${pastBlocks.length})
+          Past Blocks (${pastBlocks.length})
         </summary>
         <table class="data-table" style="margin-top: 16px;">
           <thead>
@@ -7377,15 +7359,16 @@ function showEditPriceModal(bookingId) {
     <div style="margin-bottom: 6px;"><strong>Service:</strong> ${fields['Service']}</div>
     <div style="margin-bottom: 6px;"><strong>Date:</strong> ${fields['Date']} at ${fields['Time']}</div>
     <div style="margin-bottom: 6px;"><strong>Current Price:</strong> <span style="color: #3b82f6; font-weight: 700;">£${currentPrice.toFixed(2)}</span></div>
-    ${discountCode ? `<div style="color: #10b981; font-size: 12px;">🎁 Discount "${discountCode}" applied (-£${discountAmount.toFixed(2)})</div>` : ''}
+    ${discountCode ? `<div style="color: #10b981; font-size: 12px;"><i data-lucide="gift" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:3px;"></i> Discount "${discountCode}" applied (-£${discountAmount.toFixed(2)})</div>` : ''}
     ${fields['Stripe Payment Method ID'] 
-      ? '<div style="margin-top: 8px; padding: 8px; background: #d1fae5; border-radius: 6px; color: #065f46; font-size: 12px;">💳 Card on file — Stripe will charge the new amount when you click Charge Card</div>' 
-      : '<div style="margin-top: 8px; padding: 8px; background: #fef3c7; border-radius: 6px; color: #92400e; font-size: 12px;">⚠️ No card on file — update is for record keeping only</div>'}
+      ? '<div style="margin-top: 8px; padding: 8px; background: #d1fae5; border-radius: 6px; color: #065f46; font-size: 12px;"><i data-lucide="credit-card" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:3px;"></i> Card on file — Stripe will charge the new amount when you click Charge Card</div>' 
+      : '<div style="margin-top: 8px; padding: 8px; background: #fef3c7; border-radius: 6px; color: #92400e; font-size: 12px;"><i data-lucide="alert-triangle" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:3px;"></i> No card on file — update is for record keeping only</div>'}
   `;
 
   document.getElementById('editPriceInput').value = currentPrice.toFixed(2);
   document.getElementById('editPriceReason').value = '';
   document.getElementById('editPriceModal').classList.add('active');
+  lucide.createIcons();
 }
 
 async function confirmEditPrice() {
@@ -7393,7 +7376,7 @@ async function confirmEditPrice() {
   const reason = document.getElementById('editPriceReason').value.trim();
 
   if (isNaN(newPrice) || newPrice < 0) {
-    alert('❌ Please enter a valid price');
+    alert('Please enter a valid price');
     return;
   }
 
@@ -7407,13 +7390,13 @@ async function confirmEditPrice() {
     `Update price for ${booking.fields['Client Name']}?\n\n` +
     `Old: £${oldPrice.toFixed(2)}\n` +
     `New: £${newPrice.toFixed(2)}\n` +
-    (hasCard ? `\n💳 Stripe will charge £${newPrice.toFixed(2)} when you hit Charge Card` : '\n⚠️ No card on file') +
+    (hasCard ? `\nStripe will charge £${newPrice.toFixed(2)} when you hit Charge Card` : '\nNo card on file') +
     (reason ? `\nReason: ${reason}` : '')
   )) return;
 
   const btn = document.getElementById('editPriceBtn');
   btn.disabled = true;
-  btn.textContent = '⏳ Updating...';
+  btn.textContent = 'Updating...';
 
   try {
     const updateFields = { 'Final Price': newPrice };
@@ -7436,7 +7419,7 @@ async function confirmEditPrice() {
     const idx = allBookings.findIndex(b => b.id === editPriceBookingId);
     if (idx !== -1) allBookings[idx].fields['Final Price'] = newPrice;
 
-    alert(`✅ Price updated to £${newPrice.toFixed(2)}!${hasCard ? '\n\nCharge Card will now use this amount.' : ''}`);
+    alert(`Price updated to £${newPrice.toFixed(2)}!${hasCard ? '\n\nCharge Card will now use this amount.' : ''}`);
     closeModal('editPriceModal');
     closeModal('bookingModal');
     loadPendingBookings();
@@ -7445,10 +7428,11 @@ async function confirmEditPrice() {
 
   } catch (error) {
     console.error('Error updating price:', error);
-    alert('❌ Failed to update price: ' + error.message);
+    alert('Failed to update price: ' + error.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = '✅ Update Price';
+    btn.innerHTML = '<i data-lucide="check-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Update Price';
+    lucide.createIcons();
   }
 }
 
