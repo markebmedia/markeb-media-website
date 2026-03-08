@@ -4806,11 +4806,6 @@ endDate = toLocalDateString(sunday);
     if (bookingsData.success) {
       allBookings = bookingsData.bookings;
       const blockedTimes = blockedTimesData.records || [];
-
-      // TEMP DEBUG
-  console.log('Calendar range:', startDate, 'to', endDate);
-  console.log('Bookings returned:', bookingsData.bookings.length);
-  bookingsData.bookings.forEach(b => console.log(b.fields['Date'], b.fields['Booking Reference']));
       
       if (currentView === 'month') {
         renderMonthView(bookingsData.bookings, blockedTimes);
