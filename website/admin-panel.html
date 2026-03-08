@@ -5331,59 +5331,58 @@ function renderPendingBookingsTable(bookings) {
 
   bookings.forEach(booking => {
     const fields = booking.fields;
-    const hasPaymentMethod = !!fields['Stripe Payment Method ID'];
-    const finalPrice = fields['Final Price'] || 0;
-    const discountCode = fields['Discount Code'] || '';
-    const discountAmount = fields['Discount Amount'] || 0;
-    
-    html += `
+const hasPaymentMethod = !!fields['Stripe Payment Method ID'];
+const finalPrice = fields['Final Price'] || 0;
+const discountCode = fields['Discount Code'] || '';
+const discountAmount = fields['Discount Amount'] || 0;
+html += `
       <tr>
         <td data-label="Reference">
           <strong>${fields['Booking Reference']}</strong>
-          ${discountCode ? `<br><small style="color: #10b981;">🎁 ${discountCode}</small>` : ''}
+${discountCode ? `<br><small style="color: #10b981;"><i data-lucide="gift" style="width:10px;height:10px;display:inline-block;vertical-align:middle;margin-right:2px;"></i> ${discountCode}</small>` : ''}
         </td>
         <td data-label="Client">
-          ${fields['Client Name']}<br>
+${fields['Client Name']}<br>
           <small style="color: #64748b;">${fields['Client Email']}</small>
         </td>
         <td data-label="Service">${fields['Service']}</td>
         <td data-label="Date & Time">
-          ${fields['Date']}<br>
+${fields['Date']}<br>
           <strong>${fields['Time']}</strong>
         </td>
         <td data-label="Total">
           <strong>£${finalPrice.toFixed(2)}</strong>
-          ${discountAmount > 0 ? `<br><small style="color: #10b981;">-£${discountAmount.toFixed(2)} off</small>` : ''}
+${discountAmount > 0 ? `<br><small style="color: #10b981;">-£${discountAmount.toFixed(2)} off</small>` : ''}
         </td>
         <td data-label="Payment Method">
-          ${hasPaymentMethod 
-            ? '<span class="status-badge status-active">💳 Card on File</span>' 
-            : '<span class="status-badge" style="background: #fee2e2; color: #991b1b;">❌ No Card</span>'}
+${hasPaymentMethod 
+            ? '<span class="status-badge status-active"><i data-lucide="credit-card" style="width:10px;height:10px;display:inline-block;vertical-align:middle;margin-right:2px;"></i> Card on File</span>' 
+            : '<span class="status-badge" style="background: #fee2e2; color: #991b1b;">No Card</span>'}
         </td>
         <td data-label="Actions">
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            ${hasPaymentMethod ? `
+${hasPaymentMethod ? `
               <button class="btn btn-success btn-small" onclick="chargeCard('${booking.id}', '${fields['Booking Reference']}', ${finalPrice})">
-                💳 Charge Card
+                <i data-lucide="credit-card" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Charge Card
               </button>
             ` : ''}
             <button class="btn btn-warning btn-small" onclick="markAsPaid('${booking.id}')">
-              ✅ Mark Paid
+              <i data-lucide="check-circle" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Mark Paid
             </button>
             <button class="btn btn-secondary btn-small" onclick="showEditPriceModal('${booking.id}')">
-  💷 Edit Price
-</button>
+              <i data-lucide="pound-sterling" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Edit Price
+            </button>
             <button class="btn btn-primary btn-small" onclick="viewBookingById('${booking.id}')">
-              👁️ View
+              <i data-lucide="eye" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> View
             </button>
           </div>
         </td>
       </tr>
     `;
   });
-
-  html += '</tbody></table>';
-  container.innerHTML = html;
+html += '</tbody></table>';
+container.innerHTML = html;
+lucide.createIcons();
 }
 
 // ===== MARK AS PAID FUNCTION - CORRECTED =====
