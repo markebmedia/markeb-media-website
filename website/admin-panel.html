@@ -5046,7 +5046,7 @@ function viewBookingById(bookingId) {
   
   const date = new Date(fields['Date']);
   const formattedDate = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  
+ 
   // ✅ Extract discount information
   const totalPrice = fields['Final Price'] || 0;
   const discountCode = fields['Discount Code'] || '';
@@ -5056,64 +5056,89 @@ function viewBookingById(bookingId) {
   
   body.innerHTML = `
     <div class="detail-item">
-      <span class="detail-label">📋 Reference</span>
+      <span class="detail-label">Reference</span>
       <span class="detail-value"><strong>${fields['Booking Reference']}</strong></span>
     </div>
     
     <div class="detail-item">
-      <span class="detail-label">👤 Client Name</span>
+      <span class="detail-label">Client Name</span>
       <span class="detail-value">${fields['Client Name']}</span>
     </div>
     
     <div class="detail-item">
-      <span class="detail-label">📧 Client Email</span>
+      <span class="detail-label">Client Email</span>
       <span class="detail-value">${fields['Client Email']}</span>
     </div>
     
     <div class="detail-item">
-      <span class="detail-label">📍 Region</span>
+      <span class="detail-label">Region</span>
       <span class="detail-value">
         <span class="region-badge ${(fields['Region'] || '').toLowerCase()}">${fields['Region']}</span>
       </span>
     </div>
-    
+
+    ${fields['Media Specialist'] ? `
     <div class="detail-item">
-      <span class="detail-label">🎬 Service</span>
+      <span class="detail-label">Specialist</span>
+      <span class="detail-value"><strong>${fields['Media Specialist']}</strong></span>
+    </div>` : ''}
+
+    <div class="detail-item">
+      <span class="detail-label">Service</span>
       <span class="detail-value">${fields['Service']}</span>
     </div>
+
+    ${(() => {
+      const addons = fields['Add-ons'] || fields['Addons'] || '';
+      const bedrooms = fields['Bedrooms'] || 0;
+      const bedroomFee = fields['Extra Bedroom Fee'] || 0;
+      const addonsPrice = fields['Add-ons Price'] || fields['Addons Price'] || 0;
+      if (!addons && !bedrooms) return '';
+      return `
+      <div class="detail-item">
+        <span class="detail-label">Add-ons &amp; Details</span>
+        <span class="detail-value" style="text-align:left;">
+          ${bedrooms > 0 ? `<div style="margin-bottom:6px;"><strong>${bedrooms}</strong> bedrooms${bedroomFee > 0 ? ` <span style="color:#64748b;font-size:12px;">(+£${bedroomFee.toFixed(2)})</span>` : ''}</div>` : ''}
+          ${addons ? addons.split(',').map(a => a.trim()).filter(Boolean).map(a =>
+            `<span style="display:inline-block;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin:2px 2px 2px 0;">${a}</span>`
+          ).join('') : ''}
+          ${addonsPrice > 0 ? `<div style="margin-top:6px;font-size:12px;color:#64748b;">Add-ons subtotal: £${addonsPrice.toFixed(2)}</div>` : ''}
+        </span>
+      </div>`;
+    })()}
     
     <div class="detail-item">
-      <span class="detail-label">📅 Date</span>
+      <span class="detail-label">Date</span>
       <span class="detail-value">${formattedDate}</span>
     </div>
     
     <div class="detail-item">
-      <span class="detail-label">🕐 Time</span>
+      <span class="detail-label">Time</span>
       <span class="detail-value"><strong>${fields['Time']}</strong></span>
     </div>
     
     <div class="detail-item">
-      <span class="detail-label">🏠 Property Address</span>
+      <span class="detail-label">Property Address</span>
       <span class="detail-value">${fields['Property Address']}</span>
     </div>
 
     ${hasDiscount ? `
       <div class="detail-item">
-        <span class="detail-label">🎁 Discount Code</span>
+        <span class="detail-label">Discount Code</span>
         <span class="detail-value">
           <strong style="color: #10b981;">${discountCode}</strong>
         </span>
       </div>
       
       <div class="detail-item">
-        <span class="detail-label">💰 Original Price</span>
+        <span class="detail-label">Original Price</span>
         <span class="detail-value" style="text-decoration: line-through; color: #94a3b8;">
           £${priceBeforeDiscount.toFixed(2)}
         </span>
       </div>
       
       <div class="detail-item">
-        <span class="detail-label">💚 Discount Applied</span>
+        <span class="detail-label">Discount Applied</span>
         <span class="detail-value" style="color: #10b981; font-weight: 700;">
           -£${discountAmount.toFixed(2)}
         </span>
@@ -5121,12 +5146,12 @@ function viewBookingById(bookingId) {
     ` : ''}
 
     <div class="detail-item">
-      <span class="detail-label">💷 ${hasDiscount ? 'Final Price' : 'Total Price'}</span>
+      <span class="detail-label">${hasDiscount ? 'Final Price' : 'Total Price'}</span>
       <span class="detail-value"><strong style="font-size: 18px; color: #3b82f6;">£${totalPrice.toFixed(2)}</strong></span>
     </div>
     
     <div class="detail-item">
-      <span class="detail-label">💳 Payment Status</span>
+      <span class="detail-label">Payment Status</span>
       <span class="detail-value">
         <span class="status-badge status-${(fields['Payment Status'] || '').toLowerCase()}">
           ${fields['Payment Status'] || 'Pending'}
@@ -5135,7 +5160,7 @@ function viewBookingById(bookingId) {
     </div>
     
     <div class="detail-item">
-      <span class="detail-label">📊 Booking Status</span>
+      <span class="detail-label">Booking Status</span>
       <span class="detail-value">
         <span class="status-badge status-${(fields['Booking Status'] || '').toLowerCase()}">
           ${fields['Booking Status'] || 'Booked'}
@@ -5146,16 +5171,16 @@ function viewBookingById(bookingId) {
     <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
       <div class="action-buttons-grid">
         <button class="btn btn-primary" onclick="showAdminReschedule('${booking.id}')">
-          📅 Reschedule
+          <i data-lucide="calendar" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Reschedule
         </button>
         <button class="btn btn-warning" onclick="showModifyService('${booking.id}')">
-          ✏️ Modify Service
+          <i data-lucide="pencil" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Modify Service
         </button>
         <button class="btn btn-secondary" onclick="closeModal('bookingModal'); showEditPriceModal('${booking.id}')">
-  💷 Edit Price
-</button>
+          <i data-lucide="pound-sterling" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Edit Price
+        </button>
         <button class="btn btn-danger" onclick="showAdminCancel('${booking.id}')">
-          ❌ Cancel
+          <i data-lucide="x-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Cancel
         </button>
       </div>
     </div>
@@ -6245,118 +6270,121 @@ async function confirmModifyService(bookingId) {
       const emailNotificationsColor = emailNotificationsEnabled ? '#10b981' : '#ef4444';
 
       body.innerHTML = `
-        <div class="warning-box">
-          ⚠️ <strong>Security Note:</strong> Passwords are hashed and cannot be viewed for security reasons.
-        </div>
+  <div class="warning-box">
+    <i data-lucide="alert-triangle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>
+    <strong>Security Note:</strong> Passwords are hashed and cannot be viewed for security reasons.
+  </div>
 
-        <div class="detail-item">
-          <span class="detail-label">👤 Full Name</span>
-          <span class="detail-value">${customer.fields['Name']}</span>
-        </div>
+  <div class="detail-item">
+    <span class="detail-label">Full Name</span>
+    <span class="detail-value">${customer.fields['Name']}</span>
+  </div>
 
-        <div class="detail-item">
-          <span class="detail-label">📧 Email Address</span>
-          <span class="detail-value">${customer.fields['Email']}</span>
-        </div>
+  <div class="detail-item">
+    <span class="detail-label">Email Address</span>
+    <span class="detail-value">${customer.fields['Email']}</span>
+  </div>
 
-        <div class="detail-item">
-          <span class="detail-label">🏢 Company</span>
-          <span class="detail-value">${customer.fields['Company'] || 'N/A'}</span>
-        </div>
+  <div class="detail-item">
+    <span class="detail-label">Company</span>
+    <span class="detail-value">${customer.fields['Company'] || 'N/A'}</span>
+  </div>
 
-        <div class="detail-item">
-          <span class="detail-label">📍 Region</span>
-          <span class="detail-value">
-            ${customer.fields['Region'] ? 
-              `<span class="region-badge">${customer.fields['Region']}</span>` : 
-              '<span class="region-badge empty">Not set</span>'
-            }
-          </span>
-        </div>
+  <div class="detail-item">
+    <span class="detail-label">Region</span>
+    <span class="detail-value">
+      ${customer.fields['Region'] ? 
+        `<span class="region-badge">${customer.fields['Region']}</span>` : 
+        '<span class="region-badge empty">Not set</span>'
+      }
+    </span>
+  </div>
 
-        <div class="detail-item">
-          <span class="detail-label">📅 Account Created</span>
-          <span class="detail-value">${customer.fields['Created Date']}</span>
-        </div>
+  <div class="detail-item">
+    <span class="detail-label">Account Created</span>
+    <span class="detail-value">${customer.fields['Created Date']}</span>
+  </div>
 
-        <div class="detail-item">
-          <span class="detail-label">✅ Account Status</span>
-          <span class="detail-value">
-            <span class="status-badge status-${(customer.fields['Account Status'] || '').toLowerCase()}">
-              ${customer.fields['Account Status'] || 'Unknown'}
-            </span>
-          </span>
-        </div>
+  <div class="detail-item">
+    <span class="detail-label">Account Status</span>
+    <span class="detail-value">
+      <span class="status-badge status-${(customer.fields['Account Status'] || '').toLowerCase()}">
+        ${customer.fields['Account Status'] || 'Unknown'}
+      </span>
+    </span>
+  </div>
 
-        <div class="detail-item">
-          <span class="detail-label">📬 Milestone Emails</span>
-          <span class="detail-value">
-            <span style="color: ${emailNotificationsColor}; font-weight: 600;">
-              ${emailNotificationsStatus}
-            </span>
-          </span>
-        </div>
+  <div class="detail-item">
+    <span class="detail-label">Milestone Emails</span>
+    <span class="detail-value">
+      <span style="color: ${emailNotificationsColor}; font-weight: 600;">
+        ${emailNotificationsStatus}
+      </span>
+    </span>
+  </div>
 
-       <div class="detail-item">
-  <span class="detail-label">🚫 Skip Payment Requirement</span>
-  <span class="detail-value">
-    <label class="toggle-switch">
-      <input 
-        type="checkbox" 
-        ${allowReserve ? 'checked' : ''} 
-        onchange='toggleReservePrivilege("${customer.id}", "${customer.fields['Email']}", this.checked)'
-      >
-      <span class="toggle-slider"></span>
-    </label>
-    <br>
-    <small style="color: #64748b; font-size: 12px; margin-top: 4px; display: block;">
-      ✅ Enabled = Customer books without payment details (invoice later)<br>
-      ❌ Disabled = Customer must pay or save card details
-    </small>
-  </span>
-</div>
+  <div class="detail-item">
+    <span class="detail-label">Skip Payment Requirement</span>
+    <span class="detail-value">
+      <label class="toggle-switch">
+        <input 
+          type="checkbox" 
+          ${allowReserve ? 'checked' : ''} 
+          onchange='toggleReservePrivilege("${customer.id}", "${customer.fields['Email']}", this.checked)'
+        >
+        <span class="toggle-slider"></span>
+      </label>
+      <br>
+      <small style="color: #64748b; font-size: 12px; margin-top: 4px; display: block;">
+        <i data-lucide="check-circle" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:3px;"></i> Enabled = Customer books without payment details (invoice later)<br>
+        <i data-lucide="x-circle" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:3px;"></i> Disabled = Customer must pay or save card details
+      </small>
+    </span>
+  </div>
 
-        <div class="detail-item">
-          <span class="detail-label">🔐 Password</span>
-          <span class="detail-value" style="color: #64748b; font-style: italic;">Encrypted (not visible)</span>
-        </div>
+  <div class="detail-item">
+    <span class="detail-label">Password</span>
+    <span class="detail-value" style="color: #64748b; font-style: italic;">Encrypted (not visible)</span>
+  </div>
 
-        <div class="detail-item">
-          <span class="detail-label">🆔 Record ID</span>
-          <span class="detail-value" style="font-family: monospace; font-size: 12px;">${customer.id}</span>
-        </div>
+  <div class="detail-item">
+    <span class="detail-label">Record ID</span>
+    <span class="detail-value" style="font-family: monospace; font-size: 12px;">${customer.id}</span>
+  </div>
 
-        <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
-          <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
-            <button class="btn btn-danger" style="flex: 1;" onclick='redeemPoints("${customer.fields['Email']}", "${customer.fields['Name']}")'>
-              ⭐ Redeem Points
-            </button>
-            <button class="btn btn-primary" style="flex: 1;" onclick='impersonateUser("${customer.fields['Email']}")'>
-              🔑 Login as ${customer.fields['Name']}
-            </button>
-            <button class="btn btn-secondary" style="flex: 1;" onclick='checkMilestone("${customer.fields['Email']}", "${customer.fields['Name']}")'>
-              📧 Check Milestone
-            </button>
-          </div>
-          
-          <div style="padding: 16px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px;">
-            <div style="font-weight: 600; color: #065f46; margin-bottom: 12px; font-size: 14px;">➕ Manually Add Points</div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-              <input 
-                type="number" 
-                id="manualPoints-${customer.id}" 
-                placeholder="Enter points amount" 
-                min="1"
-                style="flex: 1; padding: 10px 14px; border: 2px solid #10b981; border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif;"
-              >
-              <button class="btn btn-primary" style="white-space: nowrap;" onclick='addManualPoints("${customer.fields['Email']}", "${customer.fields['Name']}", "${customer.id}")'>
-                ➕ Add Points
-              </button>
-            </div>
-            <div style="font-size: 12px; color: #047857; margin-top: 8px;">Use this to add bonus/promotional points to the account</div>
-          </div>
-        </div>
-      `;
+  <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
+      <button class="btn btn-danger" style="flex: 1;" onclick='redeemPoints("${customer.fields['Email']}", "${customer.fields['Name']}")'>
+        <i data-lucide="star" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Redeem Points
+      </button>
+      <button class="btn btn-primary" style="flex: 1;" onclick='impersonateUser("${customer.fields['Email']}")'>
+        <i data-lucide="key" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Login as ${customer.fields['Name']}
+      </button>
+      <button class="btn btn-secondary" style="flex: 1;" onclick='checkMilestone("${customer.fields['Email']}", "${customer.fields['Name']}")'>
+        <i data-lucide="mail" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Check Milestone
+      </button>
+    </div>
+    
+    <div style="padding: 16px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px;">
+      <div style="font-weight: 600; color: #065f46; margin-bottom: 12px; font-size: 14px;">
+        <i data-lucide="plus" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Manually Add Points
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <input 
+          type="number" 
+          id="manualPoints-${customer.id}" 
+          placeholder="Enter points amount" 
+          min="1"
+          style="flex: 1; padding: 10px 14px; border: 2px solid #10b981; border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif;"
+        >
+        <button class="btn btn-primary" style="white-space: nowrap;" onclick='addManualPoints("${customer.fields['Email']}", "${customer.fields['Name']}", "${customer.id}")'>
+          <i data-lucide="plus" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Add Points
+        </button>
+      </div>
+      <div style="font-size: 12px; color: #047857; margin-top: 8px;">Use this to add bonus/promotional points to the account</div>
+    </div>
+  </div>
+`;
 
       modal.classList.add('active');
     }
