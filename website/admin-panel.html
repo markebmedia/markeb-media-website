@@ -3815,6 +3815,12 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
         price: 36.00,
         description: 'Enhanced 2D floor plan with measurements and room labels'
       },
+      'floor-plan-3d': {
+  id: 'floor-plan-3d',
+  name: 'Floor Plan Bundle',
+  price: 100.00,
+  description: 'Immersive 3D floor plan giving buyers a realistic sense of space and layout — includes a 2D & 3D floor plan at no extra cost.'
+},
       'elevate-edit': {
         id: 'elevate-edit',
         name: 'Elevate Your Edit',
@@ -3851,12 +3857,6 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
         price: 0.00,
         description: 'Add your branded outro to any video content'
       },
-      'floor-plan-3d': {
-  id: 'floor-plan-3d',
-  name: 'Floor Plan Bundle',
-  price: 100.00,
-  description: 'Immersive 3D floor plan giving buyers a realistic sense of space and layout — includes a 2D & 3D floor plan at no extra cost.'
-},
     };
 
     // Global state
@@ -4806,7 +4806,7 @@ endDate = toLocalDateString(sunday);
     if (bookingsData.success) {
       allBookings = bookingsData.bookings;
       const blockedTimes = blockedTimesData.records || [];
-      
+
       if (currentView === 'month') {
         renderMonthView(bookingsData.bookings, blockedTimes);
       } else if (currentView === 'week') {
