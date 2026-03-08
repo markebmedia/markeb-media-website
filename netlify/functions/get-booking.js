@@ -72,14 +72,17 @@ exports.handler = async (event, context) => {
     const canCancel = !isCancelled && hoursUntilBooking > 24;
     const canReschedule = !isCancelled && hoursUntilBooking > 24;
 
-    // Parse add-ons from JSON string to array
+    // Parse add-ons — safely handles JSON arrays, comma-separated strings, or plain strings
     let addonsArray = [];
-    try {
-      const addonsString = fields['Add-Ons'] || '[]';
-      addonsArray = JSON.parse(addonsString);
-    } catch (e) {
-      console.error('Error parsing add-ons:', e);
-      addonsArray = [];
+    const rawAddons = fields['Add-Ons'];
+    if (rawAddons) {
+      try {
+        const parsed = JSON.parse(rawAddons);
+        addonsArray = Array.isArray(parsed) ? parsed : [parsed];
+      } catch {
+        // Not valid JSON — treat as plain string or comma-separated list
+        addonsArray = rawAddons.split(',').map(s => s.trim()).filter(Boolean);
+      }
     }
 
     // Return booking data aligned with create-booking.js
@@ -115,7 +118,7 @@ exports.handler = async (event, context) => {
         clientPhone: fields['Client Phone'],
         clientNotes: fields['Client Notes'] || '',
         
-        // ✅ NEW: Access Type fields
+        // ✅ Access Type fields
         accessType: fields['Access Type'] || '',
         keyPickupLocation: fields['Key Pickup Location'] || '',
         
