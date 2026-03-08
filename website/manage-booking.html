@@ -628,6 +628,10 @@
             <span class="booking-detail-label">Media Specialist</span>
             <span class="booking-detail-value" id="detailMediaSpecialist">-</span>
           </div>
+          <div class="booking-detail hidden" id="addonsRow">
+  <span class="booking-detail-label">Add-Ons</span>
+  <span class="booking-detail-value" id="detailAddons" style="max-width: 400px; text-align: right;">-</span>
+</div>
           <div class="booking-detail">
             <span class="booking-detail-label">Total Amount</span>
             <span class="booking-detail-value" id="detailTotal">-</span>
@@ -1090,6 +1094,15 @@
       document.getElementById('detailAddress').textContent = booking.propertyAddress;
       document.getElementById('detailMediaSpecialist').textContent = booking.mediaSpecialist;
       document.getElementById('detailTotal').textContent = `£${booking.finalPrice.toFixed(2)}`;
+
+// Show add-ons if any
+const addonsDetail = document.getElementById('detailAddons');
+const addonsRow = document.getElementById('addonsRow');
+if (booking.addons && booking.addons.length > 0) {
+  const addonNames = booking.addons.map(a => `${a.name}${a.price > 0 ? ` (+£${a.price.toFixed(2)})` : ' (FREE)'}`).join(', ');
+  addonsDetail.textContent = addonNames;
+  addonsRow.classList.remove('hidden');
+}
 
       // Set status badge
       const statusBadge = document.getElementById('bookingStatus');
