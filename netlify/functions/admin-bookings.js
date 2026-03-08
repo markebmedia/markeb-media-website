@@ -1,7 +1,6 @@
 // netlify/functions/admin-bookings.js
 exports.handler = async (event, context) => {
   console.log('=== Admin Bookings Function ===');
-  
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -73,29 +72,40 @@ exports.handler = async (event, context) => {
 
     console.log('Filter formula:', filterFormula);
 
-    // Fetch from Airtable using REST API
+    // Build base Airtable URL
     let airtableUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Bookings?sort[0][field]=Date&sort[0][direction]=asc`;
-    
+
     if (filterFormula) {
       airtableUrl += `&filterByFormula=${encodeURIComponent(filterFormula)}`;
     }
 
     console.log('Fetching from Airtable...');
 
-    const response = await fetch(airtableUrl, {
-      headers: {
-        'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
+    // Paginate through all records
+    let records = [];
+    let offset = null;
+
+    do {
+      let pageUrl = airtableUrl;
+      if (offset) pageUrl += `&offset=${offset}`;
+
+      const response = await fetch(pageUrl, {
+        headers: {
+          'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Airtable error:', errorText);
+        throw new Error(`Airtable API error: ${response.status}`);
       }
-    });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Airtable error:', errorText);
-      throw new Error(`Airtable API error: ${response.status}`);
-    }
+      const data = await response.json();
+      records = records.concat(data.records || []);
+      offset = data.offset || null;
 
-    const data = await response.json();
-    const records = data.records || [];
+    } while (offset);
 
     console.log(`✓ Found ${records.length} bookings`);
 
@@ -108,7 +118,6 @@ exports.handler = async (event, context) => {
       upcoming: records.filter(r => {
         if (!r.fields['Date']) return false;
         const bookingDate = new Date(r.fields['Date']);
-        // Check for "Booked", "Confirmed", or "Reserved" status
         const validStatuses = ['Booked', 'Confirmed', 'Reserved'];
         return bookingDate >= now && validStatuses.includes(r.fields['Booking Status']);
       }).length,
