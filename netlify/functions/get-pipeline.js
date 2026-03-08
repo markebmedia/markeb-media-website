@@ -1,9 +1,8 @@
 // /.netlify/functions/get-pipeline.js
 // Fetches all records from "Sales Pipeline - BDM" in Markeb Media - Performance HQ
-
 const BASE_ID = process.env.AIRTABLE_BASE_ID_PIPELINE;
 const TABLE   = 'Sales Pipeline - BDM';
-const PAT       = process.env.AIRTABLE_PAT;
+const PAT     = process.env.AIRTABLE_PAT;
 
 exports.handler = async function (event, context) {
   const headers = {
@@ -41,6 +40,21 @@ exports.handler = async function (event, context) {
   }
 };
 
+function resolveBDM(val) {
+  if (!val) return '';
+  if (Array.isArray(val)) {
+    return val.map(x => (typeof x === 'object' ? x.name || x.email || '' : x)).join(', ');
+  }
+  if (typeof val === 'object') return val.name || val.email || '';
+  return val;
+}
+
+// Normalise dashes so "Closed - Won" and "Closed – Won" both work
+function normaliseStage(stage) {
+  if (!stage) return '';
+  return stage.replace(/\s*[\u2013\u2014-]\s*/g, ' - ').trim();
+}
+
 async function fetchAllRecords() {
   const all = [];
   let offset = null;
@@ -66,17 +80,17 @@ async function fetchAllRecords() {
       const f = r.fields;
       all.push({
         id:                   r.id,
-        leadName:             f['Lead Name']                   || '',
-        bdm:                  f['Business Development Manager'] || f['BDM'] || f['Assigned To'] || f['Team Member'] || '',
-        leadSource:           f['Lead Source']                 || '',
-        salesStage:           f['Sales Stage']                 || '',
-        dashboardSignUpDate:  f['Dashboard Sign Up Date']      || null,
-        closeDate:            f['Close Date']                  || null,
-        dealValue:            parseFloat(f['Deal Value (£)'])  || 0,
-        contractLength:       parseFloat(f['Contract Length (Months)']) || 0,
+        leadName:             f['Lead Name']                              || '',
+        bdm:                  resolveBDM(f['Business Development Manager']),
+        leadSource:           f['Lead Source']                            || '',
+        salesStage:           normaliseStage(f['Sales Stage']),
+        dashboardSignUpDate:  f['Dashboard Sign Up Date']                 || null,
+        closeDate:            f['Close Date']                             || null,
+        dealValue:            parseFloat(f['Deal Value (£)'])             || 0,
+        contractLength:       parseFloat(f['Contract Length (Months)'])   || 0,
         monthlyContractValue: parseFloat(f['Monthly Contract Value (£)']) || 0,
-        notes:                f['Notes']                       || '',
-        createdTime:          r.createdTime                    || null
+        notes:                f['Notes']                                  || '',
+        createdTime:          r.createdTime                               || null
       });
     });
 
