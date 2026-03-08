@@ -2434,7 +2434,7 @@ body {
         <div class="form-group">
           <label class="form-label">Date *</label>
           <input type="date" id="bookingDate" class="form-input" required 
-                 min="${new Date().toISOString().split('T')[0]}"
+                 min="${toLocalDateString(new Date())}"
                  onchange="checkAdminAvailability()">
         </div>
         <div class="form-group">
@@ -3560,6 +3560,11 @@ We wanted to reach out..." required></textarea>
     // ===== STRIPE INITIALIZATION =====
 const STRIPE_PUBLIC_KEY = 'pk_live_51QycLvQAVOs8qTDFVfXTNzuuhBnPjgZQSS3AH30NGMuSf3SxAWF9pLzYwL0ulj1wMMCC2jnhDyeqeop7BkWDfeZ400wT3Ko8aK';
 const stripe = Stripe(STRIPE_PUBLIC_KEY);
+
+   // ===== HELPER FUNCTIONS =====
+function toLocalDateString(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
 
     // ===== PASSWORD PROTECTION =====
 const SESSION_KEY = 'admin_authenticated';
@@ -4752,8 +4757,8 @@ async function loadCalendar() {
     if (currentView === 'month') {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
-      startDate = new Date(year, month, 1).toISOString().split('T')[0];
-      endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
+      startDate = toLocalDateString(new Date(year, month, 1));
+endDate = toLocalDateString(new Date(year, month + 1, 0));
       
       currentEl.textContent = currentDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
     } else if (currentView === 'week') {
@@ -4764,12 +4769,12 @@ async function loadCalendar() {
       const sunday = new Date(monday);
       sunday.setDate(monday.getDate() + 6);
       
-      startDate = monday.toISOString().split('T')[0];
-      endDate = sunday.toISOString().split('T')[0];
+      startDate = toLocalDateString(monday);
+endDate = toLocalDateString(sunday);
       
       currentEl.textContent = `Week of ${monday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })} - ${sunday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' })}`;
     } else {
-      startDate = currentDate.toISOString().split('T')[0];
+      startDate = toLocalDateString(currentDate);
       endDate = startDate;
       
       currentEl.textContent = currentDate.toLocaleDateString('en-GB', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
@@ -4848,7 +4853,7 @@ const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).pad
 const dayBookings = bookings.filter(b => b.fields['Date'] === dateStr);
 const dayBlocks = blockedTimes.filter(b => b.fields['Date'] === dateStr);
 const today = new Date();
-const isToday = dateStr === today.toISOString().split('T')[0];
+const isToday = dateStr === toLocalDateString(today);
 html += `<div class="calendar-day ${isToday ? 'today' : ''}" onclick="showQuickBlockModal('${dateStr}')" style="cursor: pointer;">`;
 html += `<div class="calendar-day-number">${day}</div>`;
 dayBlocks.forEach(block => {
@@ -5209,7 +5214,7 @@ function showAdminReschedule(bookingId) {
         id="rescheduleDate" 
         class="form-input" 
         required
-        min="${new Date().toISOString().split('T')[0]}"
+        min="${toLocalDateString(new Date())}"
       />
     </div>
 
@@ -7245,7 +7250,7 @@ html += `
 // Show Create Block Modal
 function showCreateBlockModal() {
   document.getElementById('blockTimeForm').reset();
-  document.getElementById('blockDate').min = new Date().toISOString().split('T')[0];
+  document.getElementById('blockDate').min = toLocalDateString(new Date());
   document.getElementById('blockTimeModal').classList.add('active');
 }
 

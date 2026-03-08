@@ -1227,6 +1227,10 @@
     const elements = stripe.elements();
     let cardElement = null;
 
+    function toLocalDateString(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
     function initializeStripeCard() {
       if (cardElement) return; // Already initialized
       
@@ -2362,7 +2366,7 @@ function handleAccessTypeChange() {
         if (isToday) classes += ' today';
         if (isSelected) classes += ' selected';
 
-        const dateString = date.toISOString().split('T')[0];
+        const dateString = toLocalDateString(date);
         html += `<div class="${classes}" onclick="${isDisabled ? '' : `selectDate('${dateString}')`}">${day}</div>`;
       }
 

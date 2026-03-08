@@ -829,6 +829,9 @@
 
   <script>
     const stripe = Stripe('pk_live_51QycLvQAVOs8qTDFVfXTNzuuhBnPjgZQSS3AH30NGMuSf3SxAWF9pLzYwL0ulj1wMMCC2jnhDyeqeop7BkWDfeZ400wT3Ko8aK');
+    function toLocalDateString(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
     let bookingData = null;
     let modifyData = {
       bedrooms: 4,
@@ -1228,14 +1231,14 @@ if (booking.addons && booking.addons.length > 0) {
         const isSaturday = date.getDay() === 6;
         const isDisabled = isPast || isTooFarAhead || isSunday || isSaturday;
         const isToday = date.getTime() === today.getTime();
-        const isSelected = rescheduleSelectedDate && date.toISOString().split('T')[0] === rescheduleSelectedDate;
+        const isSelected = rescheduleSelectedDate && toLocalDateString(date) === rescheduleSelectedDate;
 
         let classes = 'calendar-day';
         if (isDisabled) classes += ' disabled';
         if (isToday) classes += ' today';
         if (isSelected) classes += ' selected';
 
-        const dateString = date.toISOString().split('T')[0];
+        const dateString = toLocalDateString(date);
         html += `<div class="${classes}" onclick="${isDisabled ? '' : `selectRescheduleDate('${dateString}')`}">${day}</div>`;
       }
 
