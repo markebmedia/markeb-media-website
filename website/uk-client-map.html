@@ -483,6 +483,72 @@
 .rr-btn:not(.active):hover { border-color: #3b82f6; color: #3b82f6;
 }
 
+.main-tab-btn.active.pipeline {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(16,185,129,0.35);
+}
+
+.pipe-period-btn {
+  padding: 10px 18px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .2s ease;
+  font-family: 'Inter', sans-serif;
+}
+.pipe-period-btn.active {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(16,185,129,0.4);
+}
+
+.funnel-stage {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 18px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  transition: all .2s ease;
+}
+.funnel-stage:hover { border-color: #10b981; transform: translateX(3px); }
+.funnel-stage-dot  { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.funnel-stage-name { font-weight: 600; color: #0f172a; font-size: 14px; flex: 1; }
+.funnel-stage-count { font-size: 22px; font-weight: 800; min-width: 50px; text-align: right; }
+.funnel-stage-pct  { font-size: 12px; color: #64748b; min-width: 60px; text-align: right; }
+.funnel-bar-bg  { flex: 2; height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+.funnel-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+
+.bdm-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 12px;
+  transition: all .2s ease;
+}
+.bdm-card:hover { border-color: #10b981; box-shadow: 0 4px 16px rgba(16,185,129,0.12); }
+.bdm-card.rank-1 { border-top: 3px solid #f59e0b; }
+.bdm-card.rank-2 { border-top: 3px solid #94a3b8; }
+.bdm-card.rank-3 { border-top: 3px solid #cd7c2f; }
+
+.stage-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-right: 4px;
+  margin-top: 3px;
+}
+
   </style>
 </head>
 <body>
@@ -513,7 +579,10 @@
     <button class="main-tab-btn" id="tabPerformance" onclick="setMainTab('performance')">
       <i data-lucide="trending-up" style="width:16px;height:16px;"></i> Performance Analytics
     </button>
-  </div>
+  <button class="main-tab-btn" id="tabPipeline" onclick="setMainTab('pipeline')">
+  <i data-lucide="filter" style="width:16px;height:16px;"></i> Sales Pipeline
+</button>
+</div>
 
   <!-- MAP VIEW -->
   <div id="mapView">
@@ -749,6 +818,104 @@
 
   </div><!-- end #performanceSection -->
 
+  <div id="pipelineSection" style="display:none;">
+
+  <!-- Top KPI bar -->
+  <div class="stats-overview" id="pipelineKPIs" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
+    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plTotalLeads">-</div><div class="stat-label">Total Leads</div></div>
+    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plSignedUp">-</div><div class="stat-label">Dashboard Sign-Ups</div></div>
+    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plSignUpRate">-</div><div class="stat-label">Sign-Up Conversion</div></div>
+    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plClosedWon">-</div><div class="stat-label">Closed Won</div></div>
+    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plPipelineValue">-</div><div class="stat-label">Open Pipeline Value</div></div>
+    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plAvgDeal">-</div><div class="stat-label">Avg Deal Value</div></div>
+  </div>
+
+  <!-- Period toggle + activity chart -->
+  <div class="map-section" style="margin-bottom:24px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+      <div>
+        <h3 style="font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;">
+          <i data-lucide="activity" style="width:18px;height:18px;"></i> Outbound Activity — Leads Added
+        </h3>
+        <p style="font-size:13px;color:#64748b;margin-top:3px;">Tracks when leads were created in the pipeline</p>
+      </div>
+      <div style="display:flex;gap:6px;background:#f1f5f9;border-radius:10px;padding:4px;border:1px solid #e2e8f0;">
+        <button class="pipe-period-btn active" id="ppWeek"   onclick="setPipePeriod('week')">Weekly</button>
+        <button class="pipe-period-btn"        id="ppMonth"  onclick="setPipePeriod('month')">Monthly</button>
+        <button class="pipe-period-btn"        id="ppYear"   onclick="setPipePeriod('year')">Yearly</button>
+      </div>
+    </div>
+    <div id="pipelineCallout" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;"></div>
+    <canvas id="pipelineChart" style="max-height:320px;"></canvas>
+  </div>
+
+  <!-- Funnel + BDM leaderboard side by side -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
+
+    <!-- Funnel -->
+    <div class="map-section">
+      <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+        <i data-lucide="filter" style="width:18px;height:18px;"></i> Pipeline Funnel
+      </h3>
+      <p style="font-size:13px;color:#64748b;margin-bottom:20px;">All-time drop-off between each stage</p>
+      <div id="pipelineFunnel"></div>
+
+      <!-- Sign-up conversion rate bar -->
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;margin-top:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <span style="font-size:13px;font-weight:600;color:#475569;">Lead → Dashboard Sign-Up Rate</span>
+          <span style="font-size:24px;font-weight:800;color:#10b981;" id="plBigSignUpRate">-</span>
+        </div>
+        <div style="background:#dcfce7;border-radius:6px;height:12px;overflow:hidden;">
+          <div id="plSignUpBar" style="height:100%;border-radius:6px;background:linear-gradient(90deg,#10b981,#3b82f6);transition:width 1.2s ease;width:0%;"></div>
+        </div>
+        <div style="font-size:11px;color:#475569;margin-top:6px;" id="plSignUpBarSub">Loading...</div>
+      </div>
+    </div>
+
+    <!-- BDM Leaderboard -->
+    <div class="map-section" style="max-height:700px;overflow-y:auto;">
+      <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+        <i data-lucide="trophy" style="width:18px;height:18px;"></i> BDM Leaderboard
+      </h3>
+      <p style="font-size:13px;color:#64748b;margin-bottom:20px;">Ranked by Dashboard Sign-Ups generated</p>
+      <div id="bdmLeaderboard"></div>
+    </div>
+
+  </div>
+
+  <!-- Lead source breakdown -->
+  <div class="map-section" style="margin-bottom:24px;">
+    <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+      <i data-lucide="pie-chart" style="width:18px;height:18px;"></i> Lead Source Breakdown
+    </h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;" id="leadSourceGrid"></div>
+  </div>
+
+  <!-- Recent sign-ups table -->
+  <div class="map-section">
+    <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+      <i data-lucide="user-check" style="width:18px;height:18px;"></i> Recent Dashboard Sign-Ups
+    </h3>
+    <div style="overflow-x:auto;">
+      <table class="comp-table" id="signUpTable">
+        <thead>
+          <tr>
+            <th>Lead Name</th>
+            <th>BDM</th>
+            <th>Lead Source</th>
+            <th>Sign-Up Date</th>
+            <th>Deal Value</th>
+            <th>Monthly Value</th>
+          </tr>
+        </thead>
+        <tbody id="signUpTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- end #pipelineSection -->
+
 </div>
 
 <script>
@@ -803,6 +970,9 @@ let currentDataSource = 'clients';
 let currentViewMode  = 'markers';
 let currentMainTab   = 'clients';
 let currentPeriod    = 'mom';
+let pipelineData = [];
+let currentPipePeriod = 'week';
+let pipelineChartInstance = null;
 
 const REVENUE_TARGETS = { y1: 200000, y2: 500000, y3: 1000000 };
 
@@ -1320,10 +1490,11 @@ function initDateFilters() {
 
 async function loadMapData() {
   try {
-    const [usersRes, bookingsRes] = await Promise.all([
-      fetch('/.netlify/functions/admin-users'),
-      fetch('/.netlify/functions/get-all-bookings')
-    ]);
+    const [usersRes, bookingsRes, pipelineRes] = await Promise.all([
+  fetch('/.netlify/functions/admin-users'),
+  fetch('/.netlify/functions/get-all-bookings'),
+  fetch('/.netlify/functions/get-pipeline')
+]);
     if (!usersRes.ok)    throw new Error('Failed to load user data');
     if (!bookingsRes.ok) throw new Error('Failed to load booking data');
 
@@ -1334,6 +1505,8 @@ async function loadMapData() {
     filteredClientData  = [...clientData];
     bookingData         = bData.bookings   || [];
     filteredBookingData = [...bookingData];
+    const pData = await pipelineRes.json();
+pipelineData = pData.records || [];
 
     buildRegionCounts();
     updateClientStats();
@@ -1402,30 +1575,34 @@ function updateBookingFilterCounts() {
 
 function setMainTab(tab) {
   currentMainTab = tab;
-  ['clients','bookings','performance'].forEach(t => {
+  ['clients','bookings','performance','pipeline'].forEach(t => {
     const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
     btn.className = 'main-tab-btn' + (t === tab ? ' active ' + t : '');
   });
   const isPerf = tab === 'performance';
-  document.getElementById('mapView').style.display           = isPerf ? 'none' : 'block';
-  document.getElementById('performanceSection').style.display = isPerf ? 'block' : 'none';
-  if (!isPerf) {
-    const isBookings = tab === 'bookings';
-    currentDataSource = isBookings ? 'bookings' : 'clients';
-    document.getElementById('clientStats').style.display   = isBookings ? 'none' : 'grid';
-    document.getElementById('bookingStats').style.display  = isBookings ? 'grid' : 'none';
-    document.getElementById('clientFilters').style.display  = isBookings ? 'none' : 'block';
-    document.getElementById('bookingFilters').style.display = isBookings ? 'block' : 'none';
-    document.getElementById('clientLegend').style.display   = isBookings ? 'none' : 'block';
-    document.getElementById('bookingLegend').style.display  = isBookings ? 'block' : 'none';
-    document.getElementById('regionListTitle').textContent  = isBookings ? 'Bookings by Area' : 'Regions';
-    resetCluster();
-    addMarkersToMap();
-    renderRegionList();
-    renderDetailPanel();
-  } else {
-    if (clientData.length || bookingData.length) renderPerformanceSection();
-  }
+const isPipe = tab === 'pipeline';
+document.getElementById('mapView').style.display            = (!isPerf && !isPipe) ? 'block' : 'none';
+document.getElementById('performanceSection').style.display = isPerf ? 'block' : 'none';
+document.getElementById('pipelineSection').style.display    = isPipe ? 'block' : 'none';
+  if (!isPerf && !isPipe) {
+  const isBookings = tab === 'bookings';
+  currentDataSource = isBookings ? 'bookings' : 'clients';
+  document.getElementById('clientStats').style.display    = isBookings ? 'none' : 'grid';
+  document.getElementById('bookingStats').style.display   = isBookings ? 'grid' : 'none';
+  document.getElementById('clientFilters').style.display  = isBookings ? 'none' : 'block';
+  document.getElementById('bookingFilters').style.display = isBookings ? 'block' : 'none';
+  document.getElementById('clientLegend').style.display   = isBookings ? 'none' : 'block';
+  document.getElementById('bookingLegend').style.display  = isBookings ? 'block' : 'none';
+  document.getElementById('regionListTitle').textContent  = isBookings ? 'Bookings by Area' : 'Regions';
+  resetCluster();
+  addMarkersToMap();
+  renderRegionList();
+  renderDetailPanel();
+} else if (isPerf) {
+  if (clientData.length || bookingData.length) renderPerformanceSection();
+} else if (isPipe) {
+  if (pipelineData.length) renderPipelineSection();
+}
   lucide.createIcons();
 }
 
@@ -2343,6 +2520,331 @@ c.lastBooking = dates[dates.length - 1] || null;
       }
     </div>`;
 }
+
+// ── STAGE CONFIG ──
+const PIPELINE_STAGES = [
+  { name: 'Lead',               col: '#94a3b8' },
+  { name: 'Meeting Booked',     col: '#3b82f6' },
+  { name: 'Proposal Sent',      col: '#8b5cf6' },
+  { name: 'Negotiation',        col: '#f59e0b' },
+  { name: 'Dashboard Sign Up',  col: '#10b981' },
+  { name: 'Closed – Won',       col: '#059669' },
+  { name: 'Closed – Lost',      col: '#ef4444' }
+];
+
+function stagePill(stage) {
+  const s = PIPELINE_STAGES.find(x => x.name === stage) || { col: '#94a3b8' };
+  return `<span class="stage-pill" style="background:${s.col}20;color:${s.col};border:1px solid ${s.col}44;">${stage}</span>`;
+}
+
+function setPipePeriod(p) {
+  currentPipePeriod = p;
+  ['week','month','year'].forEach(x => {
+    document.getElementById('pp' + x.charAt(0).toUpperCase() + x.slice(1))
+      .classList.toggle('active', x === p);
+  });
+  renderPipelineChart();
+}
+
+function renderPipelineSection() {
+  const total      = pipelineData.length;
+  const signedUp   = pipelineData.filter(r => r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed – Won').length;
+  const closedWon  = pipelineData.filter(r => r.salesStage === 'Closed – Won').length;
+  const signUpRate = total > 0 ? ((signedUp / total) * 100).toFixed(1) : '0.0';
+
+  const openStages = ['Lead','Meeting Booked','Proposal Sent','Negotiation'];
+  const openValue  = pipelineData
+    .filter(r => openStages.includes(r.salesStage))
+    .reduce((s, r) => s + r.dealValue, 0);
+
+  const dealsWithValue = pipelineData.filter(r => r.dealValue > 0);
+  const avgDeal = dealsWithValue.length > 0
+    ? dealsWithValue.reduce((s,r) => s + r.dealValue, 0) / dealsWithValue.length : 0;
+
+  document.getElementById('plTotalLeads').textContent    = total;
+  document.getElementById('plSignedUp').textContent      = signedUp;
+  document.getElementById('plSignUpRate').textContent    = signUpRate + '%';
+  document.getElementById('plClosedWon').textContent     = closedWon;
+  document.getElementById('plPipelineValue').textContent = '£' + Math.round(openValue).toLocaleString();
+  document.getElementById('plAvgDeal').textContent       = avgDeal > 0 ? '£' + Math.round(avgDeal).toLocaleString() : '—';
+
+  document.getElementById('plBigSignUpRate').textContent = signUpRate + '%';
+  document.getElementById('plSignUpBar').style.width     = Math.min(parseFloat(signUpRate), 100) + '%';
+  document.getElementById('plSignUpBarSub').textContent  =
+    `${signedUp} of ${total} leads have reached Dashboard Sign Up or beyond`;
+
+  renderPipelineFunnel();
+  renderBDMLeaderboard();
+  renderLeadSources();
+  renderRecentSignUps();
+  renderPipelineChart();
+  lucide.createIcons();
+}
+
+function renderPipelineFunnel() {
+  const total = pipelineData.length;
+  const stageCounts = {};
+  PIPELINE_STAGES.forEach(s => stageCounts[s.name] = 0);
+  pipelineData.forEach(r => {
+    if (stageCounts.hasOwnProperty(r.salesStage)) stageCounts[r.salesStage]++;
+  });
+
+  // Ordered funnel (exclude Closed-Lost from main funnel bar)
+  const funnelOrder = ['Lead','Meeting Booked','Proposal Sent','Negotiation','Dashboard Sign Up','Closed – Won'];
+  const maxCount = Math.max(...funnelOrder.map(s => stageCounts[s]), 1);
+
+  document.getElementById('pipelineFunnel').innerHTML = [
+    ...funnelOrder.map(stageName => {
+      const s     = PIPELINE_STAGES.find(x => x.name === stageName);
+      const count = stageCounts[stageName] || 0;
+      const pct   = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
+      const barW  = ((count / maxCount) * 100).toFixed(1);
+      return `<div class="funnel-stage">
+        <div class="funnel-stage-dot" style="background:${s.col};"></div>
+        <div class="funnel-stage-name">${stageName}</div>
+        <div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width:${barW}%;background:${s.col};"></div></div>
+        <div class="funnel-stage-count" style="color:${s.col};">${count}</div>
+        <div class="funnel-stage-pct">${pct}%</div>
+      </div>`;
+    }),
+    // Closed-Lost separate
+    (() => {
+      const count = stageCounts['Closed – Lost'] || 0;
+      const pct   = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
+      const barW  = ((count / maxCount) * 100).toFixed(1);
+      return `<div class="funnel-stage" style="margin-top:12px;border-color:#ef444433;">
+        <div class="funnel-stage-dot" style="background:#ef4444;"></div>
+        <div class="funnel-stage-name" style="color:#ef4444;">Closed – Lost</div>
+        <div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width:${barW}%;background:#ef4444;"></div></div>
+        <div class="funnel-stage-count" style="color:#ef4444;">${count}</div>
+        <div class="funnel-stage-pct">${pct}%</div>
+      </div>`;
+    })()
+  ].join('');
+}
+
+function renderBDMLeaderboard() {
+  // Group by BDM
+  const bdmMap = {};
+  pipelineData.forEach(r => {
+    const name = r.bdm || 'Unassigned';
+    if (!bdmMap[name]) bdmMap[name] = { name, total:0, signedUp:0, closedWon:0, stages:{} };
+    bdmMap[name].total++;
+    if (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed – Won') bdmMap[name].signedUp++;
+    if (r.salesStage === 'Closed – Won') bdmMap[name].closedWon++;
+    bdmMap[name].stages[r.salesStage] = (bdmMap[name].stages[r.salesStage] || 0) + 1;
+  });
+
+  const sorted = Object.values(bdmMap).sort((a,b) => b.signedUp - a.signedUp);
+  const rankCls = ['rank-1','rank-2','rank-3'];
+  const rankEmoji = ['🥇','🥈','🥉'];
+
+  document.getElementById('bdmLeaderboard').innerHTML = sorted.length === 0
+    ? '<div class="empty-state"><div class="empty-state-text">No BDM data — check field name in Airtable</div></div>'
+    : sorted.map((bdm, i) => {
+        const cls  = i < 3 ? rankCls[i] : '';
+        const rank = i < 3 ? rankEmoji[i] : `#${i+1}`;
+        const rate = bdm.total > 0 ? ((bdm.signedUp / bdm.total) * 100).toFixed(1) : '0.0';
+        const stagePills = Object.entries(bdm.stages)
+          .sort((a,b) => b[1]-a[1])
+          .map(([stage, count]) => {
+            const s = PIPELINE_STAGES.find(x => x.name === stage) || { col:'#94a3b8' };
+            return `<span class="stage-pill" style="background:${s.col}20;color:${s.col};border:1px solid ${s.col}44;">${stage}: ${count}</span>`;
+          }).join('');
+
+        return `<div class="bdm-card ${cls}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+            <div>
+              <div style="font-size:15px;font-weight:800;color:#0f172a;">${rank} ${bdm.name}</div>
+              <div style="font-size:12px;color:#64748b;margin-top:2px;">${bdm.total} leads total</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:26px;font-weight:800;color:#10b981;">${bdm.signedUp}</div>
+              <div style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;">Sign-Ups</div>
+            </div>
+          </div>
+          <div style="background:#f8fafc;border-radius:6px;height:8px;overflow:hidden;margin-bottom:8px;">
+            <div style="width:${Math.min(parseFloat(rate),100)}%;height:100%;background:linear-gradient(90deg,#10b981,#3b82f6);border-radius:6px;transition:width 1s ease;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:10px;">
+            <span>Conversion rate: <strong style="color:#10b981;">${rate}%</strong></span>
+            <span>Closed Won: <strong style="color:#059669;">${bdm.closedWon}</strong></span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">${stagePills}</div>
+        </div>`;
+      }).join('');
+}
+
+function renderLeadSources() {
+  const sourceMap = {};
+  pipelineData.forEach(r => {
+    const src = r.leadSource || 'Unknown';
+    if (!sourceMap[src]) sourceMap[src] = { total:0, signedUp:0 };
+    sourceMap[src].total++;
+    if (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed – Won') sourceMap[src].signedUp++;
+  });
+
+  const sorted = Object.entries(sourceMap).sort((a,b) => b[1].total - a[1].total);
+  const colours = ['#3b82f6','#10b981','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899'];
+
+  document.getElementById('leadSourceGrid').innerHTML = sorted.map(([src, d], i) => {
+    const rate = d.total > 0 ? ((d.signedUp / d.total) * 100).toFixed(1) : '0.0';
+    const col  = colours[i % colours.length];
+    return `<div style="background:#fff;border:1px solid ${col}33;border-radius:12px;padding:16px;border-top:3px solid ${col};">
+      <div style="font-size:12px;font-weight:700;color:${col};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">${src}</div>
+      <div style="font-size:28px;font-weight:800;color:#0f172a;margin-bottom:4px;">${d.total}</div>
+      <div style="font-size:11px;color:#64748b;">leads · <strong style="color:#10b981;">${d.signedUp} signed up</strong></div>
+      <div style="background:#f1f5f9;border-radius:4px;height:6px;overflow:hidden;margin-top:10px;">
+        <div style="width:${Math.min(parseFloat(rate),100)}%;height:100%;background:${col};border-radius:4px;transition:width 1s ease;"></div>
+      </div>
+      <div style="font-size:10px;color:#64748b;margin-top:4px;">${rate}% sign-up rate</div>
+    </div>`;
+  }).join('');
+}
+
+function renderRecentSignUps() {
+  const signedUp = pipelineData
+    .filter(r => (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed – Won') && r.dashboardSignUpDate)
+    .sort((a,b) => new Date(b.dashboardSignUpDate) - new Date(a.dashboardSignUpDate))
+    .slice(0, 20);
+
+  document.getElementById('signUpTableBody').innerHTML = signedUp.length === 0
+    ? `<tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b;">No sign-up dates recorded yet</td></tr>`
+    : signedUp.map(r => `<tr>
+        <td class="metric-name">${r.leadName || '—'}</td>
+        <td>${r.bdm || '—'}</td>
+        <td>${r.leadSource || '—'}</td>
+        <td>${formatDate(r.dashboardSignUpDate)}</td>
+        <td>${r.dealValue > 0 ? '£' + Math.round(r.dealValue).toLocaleString() : '—'}</td>
+        <td>${r.monthlyContractValue > 0 ? '£' + Math.round(r.monthlyContractValue).toLocaleString() + '/mo' : '—'}</td>
+      </tr>`).join('');
+}
+
+function renderPipelineChart() {
+  const now = new Date();
+  let buckets = [];
+  let labels  = [];
+
+  if (currentPipePeriod === 'week') {
+    // Last 12 weeks
+    for (let i = 11; i >= 0; i--) {
+      const wStart = new Date(now);
+      wStart.setDate(now.getDate() - (i * 7) - now.getDay());
+      wStart.setHours(0,0,0,0);
+      const wEnd = new Date(wStart);
+      wEnd.setDate(wStart.getDate() + 6);
+      wEnd.setHours(23,59,59,999);
+      buckets.push({ start: wStart, end: wEnd });
+      labels.push(wStart.toLocaleDateString('en-GB',{day:'numeric',month:'short'}));
+    }
+  } else if (currentPipePeriod === 'month') {
+    // Last 12 months
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const e = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59);
+      buckets.push({ start: d, end: e });
+      labels.push(d.toLocaleDateString('en-GB',{month:'short',year:'numeric'}));
+    }
+  } else {
+    // Last 4 years
+    for (let i = 3; i >= 0; i--) {
+      const yr = now.getFullYear() - i;
+      buckets.push({ start: new Date(yr,0,1), end: new Date(yr,11,31,23,59,59) });
+      labels.push(yr.toString());
+    }
+  }
+
+  // Count leads added per bucket (using createdTime)
+  const leadsAdded   = buckets.map(b =>
+    pipelineData.filter(r => {
+      if (!r.createdTime) return false;
+      const d = new Date(r.createdTime);
+      return d >= b.start && d <= b.end;
+    }).length
+  );
+
+  // Count sign-ups per bucket (using dashboardSignUpDate)
+  const signUps = buckets.map(b =>
+    pipelineData.filter(r => {
+      if (!r.dashboardSignUpDate) return false;
+      const d = new Date(r.dashboardSignUpDate);
+      return (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed – Won')
+        && d >= b.start && d <= b.end;
+    }).length
+  );
+
+  // Callout boxes
+  const totalPeriod   = leadsAdded.reduce((s,v) => s+v, 0);
+  const signUpPeriod  = signUps.reduce((s,v) => s+v, 0);
+  const convRate      = totalPeriod > 0 ? ((signUpPeriod / totalPeriod) * 100).toFixed(1) : '0.0';
+  const lastBucket    = leadsAdded[leadsAdded.length-1];
+  const lastSignUp    = signUps[signUps.length-1];
+  const periodLabel   = currentPipePeriod === 'week' ? 'this week'
+                      : currentPipePeriod === 'month' ? 'this month' : 'this year';
+
+  document.getElementById('pipelineCallout').innerHTML = `
+    <div style="flex:1;min-width:140px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Leads Added ${periodLabel}</div>
+      <div style="font-size:24px;font-weight:800;color:#3b82f6;">${lastBucket}</div>
+    </div>
+    <div style="flex:1;min-width:140px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Sign-Ups ${periodLabel}</div>
+      <div style="font-size:24px;font-weight:800;color:#10b981;">${lastSignUp}</div>
+    </div>
+    <div style="flex:1;min-width:140px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Conversion Rate (shown period)</div>
+      <div style="font-size:24px;font-weight:800;color:#f59e0b;">${convRate}%</div>
+      <div style="font-size:11px;color:#64748b;margin-top:2px;">${signUpPeriod} of ${totalPeriod} leads</div>
+    </div>`;
+
+  const ctx = document.getElementById('pipelineChart').getContext('2d');
+  if (pipelineChartInstance) pipelineChartInstance.destroy();
+
+  pipelineChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Leads Added',
+          data: leadsAdded,
+          backgroundColor: '#3b82f620',
+          borderColor: '#3b82f6',
+          borderWidth: 2,
+          borderRadius: 6,
+          order: 2
+        },
+        {
+          label: 'Dashboard Sign-Ups',
+          data: signUps,
+          backgroundColor: '#10b98120',
+          borderColor: '#10b981',
+          borderWidth: 2,
+          borderRadius: 6,
+          order: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: true, position: 'top', labels: { font: { family:'Inter', size:12 }, color:'#475569', boxWidth:18, padding:16 } },
+        tooltip: {
+          backgroundColor: '#0f172a',
+          titleFont: { family:'Inter', size:12 },
+          bodyFont:  { family:'Inter', size:12 },
+          padding: 12
+        }
+      },
+      scales: {
+        x: { grid: { color:'#f1f5f9' }, ticks: { font:{ family:'Inter', size:11 }, color:'#94a3b8' } },
+        y: { grid: { color:'#f1f5f9' }, ticks: { font:{ family:'Inter', size:11 }, color:'#94a3b8', stepSize:1 }, beginAtZero:true }
+      }
+    }
+  });
+}
+
 
 let runRateChartInstance = null;
 let currentRunRateMetric = 'revenue';
