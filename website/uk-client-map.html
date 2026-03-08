@@ -2548,8 +2548,8 @@ function setPipePeriod(p) {
 
 function renderPipelineSection() {
   const total      = pipelineData.length;
-  const signedUp   = pipelineData.filter(r => r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed – Won').length;
-  const closedWon  = pipelineData.filter(r => r.salesStage === 'Closed – Won').length;
+  const signedUp   = pipelineData.filter(r => r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed Won').length;
+  const closedWon  = pipelineData.filter(r => r.salesStage === 'Closed Won').length;
   const signUpRate = total > 0 ? ((signedUp / total) * 100).toFixed(1) : '0.0';
 
   const openStages = ['Lead','Meeting Booked','Proposal Sent','Negotiation'];
@@ -2614,7 +2614,7 @@ function renderPipelineFunnel() {
       const barW  = ((count / maxCount) * 100).toFixed(1);
       return `<div class="funnel-stage" style="margin-top:12px;border-color:#ef444433;">
         <div class="funnel-stage-dot" style="background:#ef4444;"></div>
-        <div class="funnel-stage-name" style="color:#ef4444;">Closed – Lost</div>
+        <div class="funnel-stage-name" style="color:#ef4444;">Closed Lost</div>
         <div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width:${barW}%;background:#ef4444;"></div></div>
         <div class="funnel-stage-count" style="color:#ef4444;">${count}</div>
         <div class="funnel-stage-pct">${pct}%</div>
@@ -2630,8 +2630,8 @@ function renderBDMLeaderboard() {
     const name = r.bdm || 'Unassigned';
     if (!bdmMap[name]) bdmMap[name] = { name, total:0, signedUp:0, closedWon:0, stages:{} };
     bdmMap[name].total++;
-    if (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed – Won') bdmMap[name].signedUp++;
-    if (r.salesStage === 'Closed – Won') bdmMap[name].closedWon++;
+    if (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed Won') bdmMap[name].signedUp++;
+    if (r.salesStage === 'Closed Won') bdmMap[name].closedWon++;
     bdmMap[name].stages[r.salesStage] = (bdmMap[name].stages[r.salesStage] || 0) + 1;
   });
 
@@ -2681,7 +2681,7 @@ function renderLeadSources() {
     const src = r.leadSource || 'Unknown';
     if (!sourceMap[src]) sourceMap[src] = { total:0, signedUp:0 };
     sourceMap[src].total++;
-    if (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed – Won') sourceMap[src].signedUp++;
+    if (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed Won') sourceMap[src].signedUp++;
   });
 
   const sorted = Object.entries(sourceMap).sort((a,b) => b[1].total - a[1].total);
@@ -2704,7 +2704,7 @@ function renderLeadSources() {
 
 function renderRecentSignUps() {
   const signedUp = pipelineData
-    .filter(r => (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed – Won') && r.dashboardSignUpDate)
+    .filter(r => (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed Won') && r.dashboardSignUpDate)
     .sort((a,b) => new Date(b.dashboardSignUpDate) - new Date(a.dashboardSignUpDate))
     .slice(0, 20);
 
@@ -2768,7 +2768,7 @@ function renderPipelineChart() {
     pipelineData.filter(r => {
       if (!r.dashboardSignUpDate) return false;
       const d = new Date(r.dashboardSignUpDate);
-      return (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed – Won')
+      return (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed Won')
         && d >= b.start && d <= b.end;
     }).length
   );
