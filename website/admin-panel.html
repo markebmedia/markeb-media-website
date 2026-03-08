@@ -5186,7 +5186,8 @@ function viewBookingById(bookingId) {
     </div>
   `;
   
-  modal.classList.add('active');
+ modal.classList.add('active');
+  lucide.createIcons();
 }
 
 // Show Admin Reschedule Modal
@@ -5242,7 +5243,8 @@ function showAdminReschedule(bookingId) {
     </div>
   `;
   
-  modal.classList.add('active');
+ modal.classList.add('active');
+ lucide.createIcons();
 }
 
 // ===== PENDING BOOKINGS FUNCTIONS =====
@@ -5820,6 +5822,7 @@ function showAdminCancel(bookingId) {
   `;
   
   modal.classList.add('active');
+  lucide.createIcons();
 }
 
 async function confirmCancel(bookingId) {
@@ -5958,6 +5961,7 @@ function showModifyService(bookingId) {
   `;
   
   modal.classList.add('active');
+  lucide.createIcons();
 }
 
 let modifyServiceData = {
@@ -6387,7 +6391,8 @@ async function confirmModifyService(bookingId) {
 `;
 
       modal.classList.add('active');
-    }
+  lucide.createIcons();
+}
 
     async function toggleReservePrivilege(recordId, email, enabled) {
   try {
