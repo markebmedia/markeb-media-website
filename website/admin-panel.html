@@ -6811,20 +6811,19 @@ async function loadDiscountCodes() {
 
 // Render Discount Codes Table
 function renderDiscountCodesTable(codes) {
-  const container = document.getElementById('discountCodesContainer');
-  
-  if (codes.length === 0) {
-    container.innerHTML = `
+const container = document.getElementById('discountCodesContainer');
+if (codes.length === 0) {
+container.innerHTML = `
       <div style="text-align: center; padding: 60px;">
-        <div style="font-size: 48px; margin-bottom: 16px;">🎁</div>
+        <div style="font-size: 48px; margin-bottom: 16px;"><i data-lucide="gift" style="width:48px;height:48px;color:#94a3b8;"></i></div>
         <h3 style="color: #64748b; margin-bottom: 8px;">No Discount Codes Yet</h3>
         <p style="color: #94a3b8;">Create your first discount code to get started</p>
       </div>
     `;
-    return;
+lucide.createIcons();
+return;
   }
-
-  let html = `
+let html = `
     <table class="data-table">
       <thead>
         <tr>
@@ -6839,32 +6838,27 @@ function renderDiscountCodesTable(codes) {
       </thead>
       <tbody>
   `;
-
-  codes.forEach(code => {
-    const fields = code.fields;
-    const discountType = fields['Discount Type'];
-    const discountValue = fields['Discount Value'];
-    const status = fields['Status'];
-    const maxUses = fields['Max Uses'] || '∞';
-    const timesUsed = fields['Times Used'] || 0;
-    
-    const validFrom = fields['Valid From'] ? new Date(fields['Valid From']).toLocaleDateString('en-GB') : '-';
-    const validUntil = fields['Valid Until'] ? new Date(fields['Valid Until']).toLocaleDateString('en-GB') : '-';
-    
-    const discountDisplay = discountType === 'Percentage' 
+codes.forEach(code => {
+const fields = code.fields;
+const discountType = fields['Discount Type'];
+const discountValue = fields['Discount Value'];
+const status = fields['Status'];
+const maxUses = fields['Max Uses'] || '∞';
+const timesUsed = fields['Times Used'] || 0;
+const validFrom = fields['Valid From'] ? new Date(fields['Valid From']).toLocaleDateString('en-GB') : '-';
+const validUntil = fields['Valid Until'] ? new Date(fields['Valid Until']).toLocaleDateString('en-GB') : '-';
+const discountDisplay = discountType === 'Percentage' 
       ? `${discountValue}% off` 
       : `£${discountValue.toFixed(2)} off`;
-    
-    const usagePercent = maxUses !== '∞' ? Math.round((timesUsed / maxUses) * 100) : 0;
-    
-    html += `
+const usagePercent = maxUses !== '∞' ? Math.round((timesUsed / maxUses) * 100) : 0;
+html += `
       <tr>
         <td data-label="Code">
           <strong style="font-size: 16px; font-family: monospace;">${fields['Code']}</strong>
         </td>
         <td data-label="Type">
           <span class="status-badge" style="background: #dbeafe; color: #1e40af;">
-            ${discountType}
+${discountType}
           </span>
         </td>
         <td data-label="Value">
@@ -6872,15 +6866,15 @@ function renderDiscountCodesTable(codes) {
         </td>
         <td data-label="Status">
           <span class="status-badge status-${status.toLowerCase()}">
-            ${status}
+${status}
           </span>
         </td>
         <td data-label="Valid Period">
-          ${validFrom}<br>to ${validUntil}
+${validFrom}<br>to ${validUntil}
         </td>
         <td data-label="Usage">
           <div style="margin-bottom: 4px;">${timesUsed} / ${maxUses}</div>
-          ${maxUses !== '∞' ? `
+${maxUses !== '∞' ? `
             <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden;">
               <div style="background: ${usagePercent >= 90 ? '#ef4444' : usagePercent >= 70 ? '#f59e0b' : '#10b981'}; height: 100%; width: ${usagePercent}%;"></div>
             </div>
@@ -6889,19 +6883,19 @@ function renderDiscountCodesTable(codes) {
         <td data-label="Actions">
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button class="btn btn-primary btn-small" onclick="editDiscountCode('${code.id}')">
-              ✏️ Edit
+              <i data-lucide="pencil" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Edit
             </button>
             <button class="btn btn-danger btn-small" onclick="deleteDiscountCode('${code.id}', '${fields['Code']}')">
-              🗑️ Delete
+              <i data-lucide="trash-2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Delete
             </button>
           </div>
         </td>
       </tr>
     `;
   });
-
-  html += '</tbody></table>';
-  container.innerHTML = html;
+html += '</tbody></table>';
+container.innerHTML = html;
+lucide.createIcons();
 }
 
 // Show Create Discount Modal
