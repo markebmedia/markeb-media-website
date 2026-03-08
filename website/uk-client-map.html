@@ -2590,7 +2590,7 @@ function renderPipelineFunnel() {
   });
 
   // Ordered funnel (exclude Closed-Lost from main funnel bar)
-  const funnelOrder = ['Lead','Meeting Booked','Proposal Sent','Negotiation','Dashboard Sign Up','Closed – Won'];
+  const funnelOrder = ['Lead','Meeting Booked','Proposal Sent','Negotiation','Dashboard Sign Up','Closed Won'];
   const maxCount = Math.max(...funnelOrder.map(s => stageCounts[s]), 1);
 
   document.getElementById('pipelineFunnel').innerHTML = [
@@ -2609,7 +2609,7 @@ function renderPipelineFunnel() {
     }),
     // Closed-Lost separate
     (() => {
-      const count = stageCounts['Closed – Lost'] || 0;
+      const count = stageCounts['Closed Lost'] || 0;
       const pct   = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
       const barW  = ((count / maxCount) * 100).toFixed(1);
       return `<div class="funnel-stage" style="margin-top:12px;border-color:#ef444433;">
