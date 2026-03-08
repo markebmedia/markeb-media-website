@@ -52,7 +52,10 @@ function resolveBDM(val) {
 // Strip all dash variants so "Closed - Won", "Closed – Won", "Closed Won" all become "Closed Won"
 function normaliseStage(stage) {
   if (!stage) return '';
-  return stage.replace(/\s*[\u2013\u2014\-]\s*/g, ' ').trim();
+  return stage
+    .replace(/Closed\s*[\u2013\u2014\-]\s*Won/g,  'Closed Won')
+    .replace(/Closed\s*[\u2013\u2014\-]\s*Lost/g, 'Closed Lost')
+    .trim();
 }
 
 async function fetchAllRecords() {
