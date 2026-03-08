@@ -4755,10 +4755,12 @@ async function loadCalendar() {
     let startDate, endDate;
 
     if (currentView === 'month') {
-      const year = currentDate.getFullYear();
-      const month = currentDate.getMonth();
-      startDate = toLocalDateString(new Date(year, month, 1));
-endDate = toLocalDateString(new Date(year, month + 1, 0));
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  startDate = toLocalDateString(new Date(year, month, 1));
+  const lastDay = new Date(year, month + 1, 0);
+  lastDay.setDate(lastDay.getDate() + 1);
+  endDate = toLocalDateString(lastDay);
       
       currentEl.textContent = currentDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
     } else if (currentView === 'week') {
