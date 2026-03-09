@@ -1467,10 +1467,10 @@ function renderInsightCards() {
   color: '#ec4899',
   bg: '#fdf2f8',
   icon: 'repeat-2',
-  label: 'Bookings per Client / Month',
+  label: 'Avg Bookings per Active Month',
   value: calcLiveMonthlyAverages().bookingsPerBookedClientPerMonth.toFixed(2) + '×',
   valueSuffix: '',
-  sub: `Avg monthly booking frequency across clients who have booked at least once`,
+  sub: `Avg across ${Math.round(calcLiveMonthlyAverages().clientsWhoBooked)} clients who have booked · total bookings ÷ distinct months booked`,
   alert: false
 }
   ];
