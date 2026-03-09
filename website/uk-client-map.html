@@ -1102,8 +1102,21 @@ function calcLiveMonthlyAverages() {
   const monthsActive = Math.max(1, (now - earliest) / (1000 * 60 * 60 * 24 * 30));
   const totalNonCancelled = bookingData.filter(b => b.bookingStatus !== 'Cancelled').length;
   const clientsWhoBooked = everBookedPool.size;
-  const bookingsPerBookedClientPerMonth = (clientsWhoBooked > 0 && monthsActive > 0)
-    ? totalNonCancelled / monthsActive / clientsWhoBooked : 0;
+  const clientBookingMonths = {};
+bookingData.forEach(b => {
+  if (!b.date || b.bookingStatus === 'Cancelled' || !b.clientEmail) return;
+  const email = (b.clientEmail || '').toLowerCase();
+  if (!clientBookingMonths[email]) clientBookingMonths[email] = { months: new Set(), total: 0 };
+  clientBookingMonths[email].months.add(b.date.slice(0, 7));
+  clientBookingMonths[email].total++;
+});
+
+const perClientRates = Object.values(clientBookingMonths)
+  .filter(c => c.months.size > 0)
+  .map(c => c.total / c.months.size);
+
+const bookingsPerBookedClientPerMonth = perClientRates.length > 0
+  ? perClientRates.reduce((s, v) => s + v, 0) / perClientRates.length : 0;
 
   const totalEverBooked = everBookedPool.size + firstTimeBookersThisMonth.size;
   const lifetimeBookingRate = clientEmails.size > 0 ? totalEverBooked / clientEmails.size : 0;
