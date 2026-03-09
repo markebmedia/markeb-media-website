@@ -1324,11 +1324,15 @@ function calcInsightCards() {
   const milestoneStep = 10000;
   const nextMilestone = Math.ceil((totalRevenue + 1) / milestoneStep) * milestoneStep;
   const remaining     = nextMilestone - totalRevenue;
-  const runRate       = live.monthlyRevRunRate;
-  const daysToNext    = runRate > 0 ? Math.ceil((remaining / runRate) * 30) : null;
+  const now2 = new Date();
+const dayOfMonth = now2.getDate();
+const daysInMonth = new Date(now2.getFullYear(), now2.getMonth() + 1, 0).getDate();
+const thisMonthRunRate = dayOfMonth > 0 ? (totalThisMonthRev / dayOfMonth) * daysInMonth : 0;
+const runRate = thisMonthRunRate > 0 ? thisMonthRunRate : live.monthlyRevRunRate;
+const daysToNext = runRate > 0 ? Math.ceil((remaining / runRate) * 30) : null;
 
   const milestoneLabel = fmtMoney(nextMilestone);
-  const dailyRev      = runRate > 0 ? runRate / 30 : 0;
+  const dailyRev      = runRate > 0 ? runRate / daysInMonth : 0;
   const dailyBookings = live.avgMonthlyBookings > 0 ? live.avgMonthlyBookings / 30 : 0;
   const currentFreqDays = dailyBookings > 0 ? Math.round(1 / dailyBookings) : null;
 
@@ -1429,7 +1433,27 @@ function renderInsightCards() {
       valueSuffix: '',
       sub: d.regionSub,
       alert: false
-    }
+    },
+    {
+  color: '#06b6d4',
+  bg: '#ecfeff',
+  icon: 'receipt',
+  label: 'Avg Transaction Value',
+  value: '£' + Math.round(calcLiveATV()).toLocaleString(),
+  valueSuffix: '',
+  sub: `Live figure across all non-cancelled bookings · drives all milestone and target calculations`,
+  alert: false
+},
+{
+  color: '#ec4899',
+  bg: '#fdf2f8',
+  icon: 'repeat-2',
+  label: 'Bookings per Client / Month',
+  value: calcLiveMonthlyAverages().bookingsPerBookedClientPerMonth.toFixed(2) + '×',
+  valueSuffix: '',
+  sub: `Avg monthly booking frequency across clients who have booked at least once`,
+  alert: false
+}
   ];
 
   document.getElementById('insightCards').innerHTML = cards.map(c => `
