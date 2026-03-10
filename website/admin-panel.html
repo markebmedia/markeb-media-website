@@ -5121,9 +5121,9 @@ function viewBookingById(bookingId) {
     
     <div class="detail-item">
       <span class="detail-label">Property Address</span>
-      <span class="detail-value">${fields['Property Address']}</span>
+      <span class="detail-value">${fields['Property Address']}${fields['Postcode'] ? ', ' + fields['Postcode'] : ''}</span>
     </div>
-
+    
     ${hasDiscount ? `
       <div class="detail-item">
         <span class="detail-label">Discount Code</span>
