@@ -4578,14 +4578,25 @@ accessInstructions: document.getElementById('bookingAccess').value || '',
   priceBeforeDiscount: bookingFormData.priceBeforeDiscount || totalPrice,
   totalPrice: bookingFormData.totalPrice || totalPrice,  // ✅ FIXED LINE
     
-    paymentOption: 'reserve', // Admin always uses reserve, never Stripe
-    paymentStatus: paymentStatus, // Can be "Pending" or "Paid"
+   paymentOption: 'reserve',
+    paymentStatus: paymentStatus,
     status: 'Booked',
     createdBy: 'Admin'
   };
 
+  // Auto-fetch saved pm_xxx for this customer if they have one
+  const savedPM = await fetchSavedPaymentMethod(formData.clientEmail);
+  if (savedPM) {
+    formData.stripePaymentMethodId = savedPM.paymentMethodId;
+    formData.stripeCustomerId = savedPM.customerId;
+    console.log(`✅ Found saved card for ${formData.clientEmail}: ${savedPM.paymentMethodId}`);
+  }
+
+  // (remove the closing }; here — it was already added above)
+
   const statusText = paymentStatus === 'Paid' ? '✅ Already paid' : '⏳ Payment pending';
-  const confirmMsg = `Create booking for ${formData.clientName}?\n\nService: ${formData.service}\nDate: ${formData.date} at ${formData.time}\nMedia Specialist: ${formData.mediaSpecialist}\nTotal: £${totalPrice.toFixed(2)}${bookingFormData.discountCode ? `\nDiscount: ${bookingFormData.discountCode} (-£${bookingFormData.discountAmount.toFixed(2)})` : ''}\n\n${statusText}`;
+const cardText = savedPM ? `\n💳 Card on file found (${savedPM.card.brand} ****${savedPM.card.last4})` : '';
+const confirmMsg = `Create booking for ${formData.clientName}?\n\nService: ${formData.service}\nDate: ${formData.date} at ${formData.time}\nMedia Specialist: ${formData.mediaSpecialist}\nTotal: £${totalPrice.toFixed(2)}${bookingFormData.discountCode ? `\nDiscount: ${bookingFormData.discountCode} (-£${bookingFormData.discountAmount.toFixed(2)})` : ''}${cardText}\n\n${statusText}`;
   
   if (!confirm(confirmMsg)) {
     return;
@@ -8785,16 +8796,30 @@ function clearBroadcastForm() {
 const originalShowSectionBroadcast = showSection;
 showSection = function(sectionId) {
   originalShowSectionBroadcast(sectionId);
-  
   if (sectionId === 'email-broadcast') {
     loadBroadcastData();
   }
-  
   if (sectionId === 'market-updates') {
     loadMarketUpdateStats();
   }
 };
 
-  </script>
+// Auto-fetch saved Stripe payment method for admin bookings
+async function fetchSavedPaymentMethod(email) {
+  if (!email) return null;
+  try {
+    const res = await fetch('/.netlify/functions/get-stripe-payment-method', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    return data.found ? data : null;
+  } catch (e) {
+    console.warn('Could not fetch saved payment method:', e);
+    return null;
+  }
+}
+</script>
 </body>
 </html>
