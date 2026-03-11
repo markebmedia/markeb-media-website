@@ -835,9 +835,9 @@
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
       <div>
         <h3 style="font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;">
-          <i data-lucide="activity" style="width:18px;height:18px;"></i> Outbound Activity — Leads Added
-        </h3>
-        <p style="font-size:13px;color:#64748b;margin-top:3px;">Tracks when leads were created in the pipeline</p>
+  <i data-lucide="activity" style="width:18px;height:18px;"></i> Outbound Activity — Leads Added (Outreach)
+</h3>
+<p style="font-size:13px;color:#64748b;margin-top:3px;">Tracks when leads were created in the pipeline · <strong style="color:#0f172a;">Target: 70/day · 490/week · 2,100/month</strong></p>
       </div>
       <div style="display:flex;gap:6px;background:#f1f5f9;border-radius:10px;padding:4px;border:1px solid #e2e8f0;">
         <button class="pipe-period-btn active" id="ppWeek"   onclick="setPipePeriod('week')">Weekly</button>
@@ -2816,7 +2816,7 @@ function renderPipelineChart() {
     }).length
   );
 
-  // Callout boxes
+// Callout boxes
   const totalPeriod   = leadsAdded.reduce((s,v) => s+v, 0);
   const signUpPeriod  = signUps.reduce((s,v) => s+v, 0);
   const convRate      = totalPeriod > 0 ? ((signUpPeriod / totalPeriod) * 100).toFixed(1) : '0.0';
@@ -2825,19 +2825,50 @@ function renderPipelineChart() {
   const periodLabel   = currentPipePeriod === 'week' ? 'this week'
                       : currentPipePeriod === 'month' ? 'this month' : 'this year';
 
+  const outreachTargetLine = buckets.map(() =>
+    currentPipePeriod === 'week'  ? 490
+    : currentPipePeriod === 'month' ? 2100
+    : 25550
+  );
+
+  const DAILY_TARGET   = 70;
+  const WEEKLY_TARGET  = 490;
+  const MONTHLY_TARGET = 2100;
+  const outreachTarget = currentPipePeriod === 'week'  ? WEEKLY_TARGET
+                       : currentPipePeriod === 'month' ? MONTHLY_TARGET
+                       : 25550;
+  const outreachOnTrack = lastBucket >= outreachTarget;
+  const outreachPct     = outreachTarget > 0 ? ((lastBucket / outreachTarget) * 100).toFixed(1) : '0.0';
+  const outreachGap     = Math.max(0, outreachTarget - lastBucket);
+
   document.getElementById('pipelineCallout').innerHTML = `
-    <div style="flex:1;min-width:140px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
-      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Leads Added ${periodLabel}</div>
+    <div style="flex:1;min-width:160px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Outreach (Leads Added) ${periodLabel}</div>
       <div style="font-size:24px;font-weight:800;color:#3b82f6;">${lastBucket}</div>
+      <div style="font-size:11px;color:#64748b;margin-top:2px;">Target: <strong>${outreachTarget.toLocaleString()}</strong></div>
     </div>
-    <div style="flex:1;min-width:140px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+    <div style="flex:1;min-width:160px;background:${outreachOnTrack ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)'};border:1px solid ${outreachOnTrack ? '#10b981' : '#ef4444'}44;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">vs Outreach Target</div>
+      <div style="font-size:24px;font-weight:800;color:${outreachOnTrack ? '#10b981' : '#ef4444'};">${outreachPct}%</div>
+      <div style="font-size:11px;color:${outreachOnTrack ? '#10b981' : '#ef4444'};margin-top:2px;font-weight:600;">${outreachOnTrack ? '✓ Target hit' : `${outreachGap} still needed`}</div>
+    </div>
+    <div style="flex:1;min-width:160px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
       <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Sign-Ups ${periodLabel}</div>
       <div style="font-size:24px;font-weight:800;color:#10b981;">${lastSignUp}</div>
     </div>
-    <div style="flex:1;min-width:140px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+    <div style="flex:1;min-width:160px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
       <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Conversion Rate (shown period)</div>
       <div style="font-size:24px;font-weight:800;color:#f59e0b;">${convRate}%</div>
       <div style="font-size:11px;color:#64748b;margin-top:2px;">${signUpPeriod} of ${totalPeriod} leads</div>
+    </div>
+    <div style="width:100%;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-top:4px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:11px;font-weight:700;color:#475569;">Outreach Progress vs ${currentPipePeriod === 'week' ? 'Weekly (490)' : currentPipePeriod === 'month' ? 'Monthly (2,100)' : 'Yearly (25,550)'} Target</span>
+        <span style="font-size:11px;font-weight:700;color:#94a3b8;">Daily target: 70 · Weekly: 490 · Monthly: 2,100</span>
+      </div>
+      <div style="background:#e2e8f0;border-radius:6px;height:10px;overflow:hidden;">
+        <div style="width:${Math.min(parseFloat(outreachPct), 100)}%;height:100%;background:${outreachOnTrack ? 'linear-gradient(90deg,#10b981,#3b82f6)' : 'linear-gradient(90deg,#f59e0b,#ef4444)'};border-radius:6px;transition:width 1s ease;"></div>
+      </div>
     </div>`;
 
   const ctx = document.getElementById('pipelineChart').getContext('2d');
@@ -2849,7 +2880,7 @@ function renderPipelineChart() {
       labels,
       datasets: [
         {
-          label: 'Leads Added',
+          label: 'Leads Added (Outreach)',
           data: leadsAdded,
           backgroundColor: '#3b82f620',
           borderColor: '#3b82f6',
@@ -2865,6 +2896,19 @@ function renderPipelineChart() {
           borderWidth: 2,
           borderRadius: 6,
           order: 1
+        },
+        {
+          label: 'Outreach Target',
+          data: outreachTargetLine,
+          borderColor: '#ef4444',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [5, 4],
+          pointRadius: 0,
+          tension: 0,
+          fill: false,
+          type: 'line',
+          order: 0
         }
       ]
     },
