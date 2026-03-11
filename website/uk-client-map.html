@@ -841,6 +841,7 @@
       </div>
       <div style="display:flex;gap:6px;background:#f1f5f9;border-radius:10px;padding:4px;border:1px solid #e2e8f0;">
         <button class="pipe-period-btn active" id="ppWeek"   onclick="setPipePeriod('week')">Weekly</button>
+        <button class="pipe-period-btn"        id="ppDay"    onclick="setPipePeriod('day')">Daily</button>
         <button class="pipe-period-btn"        id="ppMonth"  onclick="setPipePeriod('month')">Monthly</button>
         <button class="pipe-period-btn"        id="ppYear"   onclick="setPipePeriod('year')">Yearly</button>
       </div>
@@ -2582,7 +2583,7 @@ function stagePill(stage) {
 
 function setPipePeriod(p) {
   currentPipePeriod = p;
-  ['week','month','year'].forEach(x => {
+  ['week','day','month','year'].forEach(x => {
     document.getElementById('pp' + x.charAt(0).toUpperCase() + x.slice(1))
       .classList.toggle('active', x === p);
   });
@@ -2780,6 +2781,16 @@ function renderPipelineChart() {
       buckets.push({ start: wStart, end: wEnd });
       labels.push(wStart.toLocaleDateString('en-GB',{day:'numeric',month:'short'}));
     }
+  } else if (currentPipePeriod === 'day') {
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(now.getDate() - i);
+      d.setHours(0,0,0,0);
+      const e = new Date(d);
+      e.setHours(23,59,59,999);
+      buckets.push({ start: d, end: e });
+      labels.push(d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }));
+    }
   } else if (currentPipePeriod === 'month') {
     // Last 12 months
     for (let i = 11; i >= 0; i--) {
@@ -2822,11 +2833,13 @@ function renderPipelineChart() {
   const convRate      = totalPeriod > 0 ? ((signUpPeriod / totalPeriod) * 100).toFixed(1) : '0.0';
   const lastBucket    = leadsAdded[leadsAdded.length-1];
   const lastSignUp    = signUps[signUps.length-1];
-  const periodLabel   = currentPipePeriod === 'week' ? 'this week'
+  const periodLabel   = currentPipePeriod === 'week'  ? 'this week'
+                      : currentPipePeriod === 'day'   ? 'today'
                       : currentPipePeriod === 'month' ? 'this month' : 'this year';
 
   const outreachTargetLine = buckets.map(() =>
     currentPipePeriod === 'week'  ? 490
+    : currentPipePeriod === 'day'   ? 70
     : currentPipePeriod === 'month' ? 2100
     : 25550
   );
@@ -2835,6 +2848,7 @@ function renderPipelineChart() {
   const WEEKLY_TARGET  = 490;
   const MONTHLY_TARGET = 2100;
   const outreachTarget = currentPipePeriod === 'week'  ? WEEKLY_TARGET
+                       : currentPipePeriod === 'day'   ? DAILY_TARGET
                        : currentPipePeriod === 'month' ? MONTHLY_TARGET
                        : 25550;
   const outreachOnTrack = lastBucket >= outreachTarget;
