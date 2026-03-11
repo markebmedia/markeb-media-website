@@ -196,7 +196,7 @@ exports.handler = async (event, context) => {
       {
         // ✅ FIX: Idempotency key prevents duplicate charges
         // if this function is called twice for the same booking
-        idempotencyKey: `charge-${bookingId}`
+        idempotencyKey: `charge-${bookingId}-v2`
       }
     );
 
