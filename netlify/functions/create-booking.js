@@ -265,6 +265,7 @@ exports.handler = async (event, context) => {
         'Payment Status': paymentStatus,
         
         'Stripe Payment Method ID': bookingData.stripePaymentMethodId || '',
+        'Stripe Customer ID': bookingData.stripeCustomerId || '',
         'Cardholder Name': bookingData.cardholderName || '',
         'Card Last 4': bookingData.cardLast4 || '',
         'Card Brand': bookingData.cardBrand || '',

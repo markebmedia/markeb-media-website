@@ -2700,8 +2700,7 @@ async function completeBooking() {
     return; // Exit early - skip all card/payment logic below
   }
 
-  // Create Stripe Payment Method if Reserve Without Payment
-  let paymentMethodId = null;
+  // Create Stripe SetupIntent and confirm if Reserve Without Payment
   if (bookingData.paymentOption === 'reserve') {
     const cardholderName = document.getElementById('cardholderName').value.trim();
     
@@ -2719,40 +2718,68 @@ async function completeBooking() {
       return;
     }
     
-    // Show loading state
     const submitBtn = document.getElementById('completeBookingBtn');
     submitBtn.disabled = true;
     submitBtn.classList.add('loading');
     
     try {
-      // Create payment method with Stripe
-      const { paymentMethod, error } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
-        billing_details: {
-          name: cardholderName,
-          email: email
+      // Step 1: Create SetupIntent on the server with usage: 'off_session'
+      // This tells Stripe and the bank this card will be charged later
+      // without the customer present — fixing authentication_required errors
+      const setupResponse = await fetch('/.netlify/functions/create-setup-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          name: cardholderName
+        })
+      });
+
+      if (!setupResponse.ok) {
+        throw new Error('Failed to initialise card setup');
+      }
+
+      const setupData = await setupResponse.json();
+
+      if (!setupData.success) {
+        throw new Error(setupData.error || 'Failed to initialise card setup');
+      }
+
+      // Step 2: Confirm the SetupIntent with the card element
+      // This handles 3DS/SCA authentication upfront so future off-session
+      // charges are pre-approved by the bank
+      const { setupIntent, error } = await stripe.confirmCardSetup(setupData.clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: cardholderName,
+            email: email
+          }
         }
       });
-      
+
       if (error) {
         throw new Error(error.message);
       }
-      
-      paymentMethodId = paymentMethod.id;
-      
-      // Get card details for display
+
+      // Step 3: Store the confirmed payment method ID
+      const paymentMethodId = setupIntent.payment_method;
+
       bookingData.cardholderName = cardholderName;
-      bookingData.cardLast4 = paymentMethod.card.last4;
-      bookingData.cardBrand = paymentMethod.card.brand;
-      bookingData.cardExpiry = `${paymentMethod.card.exp_month.toString().padStart(2, '0')}/${paymentMethod.card.exp_year.toString().slice(-2)}`;
       bookingData.stripePaymentMethodId = paymentMethodId;
-      
+      bookingData.stripeCustomerId = setupData.customerId;
+      bookingData.cardLast4 = '';
+      bookingData.cardBrand = '';
+      bookingData.cardExpiry = '';
+
+      console.log('✅ SetupIntent confirmed — card pre-approved for off-session charging');
+
     } catch (error) {
-      console.error('Stripe error:', error);
+      console.error('Stripe SetupIntent error:', error);
       document.getElementById('stripeCardError').textContent = error.message || 'Failed to save card details. Please try again.';
       document.getElementById('stripeCardError').classList.add('show');
       
+      const submitBtn = document.getElementById('completeBookingBtn');
       submitBtn.disabled = false;
       submitBtn.classList.remove('loading');
       return;
