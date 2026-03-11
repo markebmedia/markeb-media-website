@@ -4841,13 +4841,19 @@ const firstDay = new Date(year, month, 1);
 const lastDay = new Date(year, month + 1, 0);
 const daysInMonth = lastDay.getDate();
 const startingDayOfWeek = firstDay.getDay() || 7;
-const totalBookings = bookings.length;
+const activeBookings = bookings.filter(b => b.fields['Booking Status'] !== 'Cancelled').length;
+const cancelledBookings = bookings.filter(b => b.fields['Booking Status'] === 'Cancelled').length;
 const totalBlocks = blockedTimes.length;
 let html = `
     <div class="calendar-booking-counter">
-      <span class="calendar-booking-counter-value">${totalBookings}</span>
-      <span class="calendar-booking-counter-label">booking${totalBookings !== 1 ? 's' : ''}</span>
-${totalBlocks > 0 ? `
+      <span class="calendar-booking-counter-value">${activeBookings}</span>
+      <span class="calendar-booking-counter-label">booking${activeBookings !== 1 ? 's' : ''}</span>
+      ${cancelledBookings > 0 ? `
+        <span style="margin-left: 16px; color: #ef4444; font-size: 14px; font-weight: 600;">
+          | ${cancelledBookings} cancelled
+        </span>
+      ` : ''}
+      ${totalBlocks > 0 ? `
         <span style="margin-left: 16px; color: #ef4444; font-size: 14px;">
           | ${totalBlocks} blocked time${totalBlocks !== 1 ? 's' : ''}
         </span>
