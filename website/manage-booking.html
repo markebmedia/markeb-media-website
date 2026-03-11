@@ -1100,7 +1100,7 @@
       const dateStr = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
       document.getElementById('detailDateTime').textContent = `${dateStr} at ${booking.time}`;
       
-      document.getElementById('detailAddress').textContent = booking.propertyAddress;
+      document.getElementById('detailAddress').textContent = booking.postcode ? `${booking.propertyAddress}, ${booking.postcode}` : booking.propertyAddress;
       document.getElementById('detailMediaSpecialist').textContent = booking.mediaSpecialist;
       document.getElementById('detailTotal').textContent = `£${booking.finalPrice.toFixed(2)}`;
 
