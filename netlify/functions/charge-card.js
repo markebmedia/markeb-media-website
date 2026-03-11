@@ -168,7 +168,9 @@ exports.handler = async (event, context) => {
 
     // ✅ FIX: Create PaymentIntent with confirm: false first
     // This lets us save the intent ID to Airtable BEFORE charging,
-    // so we always have a record even if the Airtable update after charging fails
+    // so we always have a record even if the Airtable update after charging fails.
+    // off_session is NOT passed here — it is only valid when confirm: true,
+    // so it is passed at the confirm step below instead.
     console.log('Creating PaymentIntent (unconfirmed)...');
     const paymentIntent = await stripe.paymentIntents.create(
       {
@@ -176,8 +178,7 @@ exports.handler = async (event, context) => {
         currency: 'gbp',
         payment_method: paymentMethodId,
         customer: customerId,
-        confirm: false, // ← Don't charge yet
-        off_session: true,
+        confirm: false,
         description: `${fields['Service']} - ${fields['Booking Reference']}`,
         metadata: {
           bookingReference: fields['Booking Reference'],
@@ -211,9 +212,14 @@ exports.handler = async (event, context) => {
 
     console.log('✅ Intent ID saved to Airtable - now confirming payment...');
 
-    // Now confirm (charge) the payment
+    // Now confirm (charge) the payment.
+    // ✅ FIX: off_session: true is passed here at the confirm step,
+    // which is the correct place for the two-step create-then-confirm pattern.
+    // This tells Stripe the customer is not present and to attempt the charge
+    // without requiring real-time authentication.
     const confirmedIntent = await stripe.paymentIntents.confirm(paymentIntent.id, {
       payment_method: paymentMethodId,
+      off_session: true,
     });
 
     console.log('✅ Payment confirmed:', confirmedIntent.id, 'Status:', confirmedIntent.status);
