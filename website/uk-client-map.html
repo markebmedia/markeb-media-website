@@ -837,7 +837,7 @@
         <h3 style="font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;">
   <i data-lucide="activity" style="width:18px;height:18px;"></i> Outbound Activity — Leads Added (Outreach)
 </h3>
-<p style="font-size:13px;color:#64748b;margin-top:3px;">Tracks when leads were created in the pipeline · <strong style="color:#0f172a;">Target: 70/day · 490/week · 2,100/month</strong></p>
+<p style="font-size:13px;color:#64748b;margin-top:3px;">Tracks when leads were created in the pipeline · <strong style="color:#0f172a;">Target: 112/day · 784/week · 3,360/month</strong></p>
       </div>
       <div style="display:flex;gap:6px;background:#f1f5f9;border-radius:10px;padding:4px;border:1px solid #e2e8f0;">
         <button class="pipe-period-btn active" id="ppWeek"   onclick="setPipePeriod('week')">Weekly</button>
@@ -2838,15 +2838,15 @@ function renderPipelineChart() {
                       : currentPipePeriod === 'month' ? 'this month' : 'this year';
 
   const outreachTargetLine = buckets.map(() =>
-    currentPipePeriod === 'week'  ? 490
-    : currentPipePeriod === 'day'   ? 70
-    : currentPipePeriod === 'month' ? 2100
-    : 25550
+    currentPipePeriod === 'week'  ? 784
+: currentPipePeriod === 'day'   ? 112
+: currentPipePeriod === 'month' ? 3360
+: 40880
   );
 
-  const DAILY_TARGET   = 70;
-  const WEEKLY_TARGET  = 490;
-  const MONTHLY_TARGET = 2100;
+const DAILY_TARGET   = 112;
+const WEEKLY_TARGET  = 784;
+const MONTHLY_TARGET = 3360;
   const outreachTarget = currentPipePeriod === 'week'  ? WEEKLY_TARGET
                        : currentPipePeriod === 'day'   ? DAILY_TARGET
                        : currentPipePeriod === 'month' ? MONTHLY_TARGET
@@ -2878,7 +2878,7 @@ function renderPipelineChart() {
     <div style="width:100%;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-top:4px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
         <span style="font-size:11px;font-weight:700;color:#475569;">Outreach Progress vs ${currentPipePeriod === 'week' ? 'Weekly (490)' : currentPipePeriod === 'day' ? 'Daily (70)' : currentPipePeriod === 'month' ? 'Monthly (2,100)' : 'Yearly (25,550)'} Target</span>
-        <span style="font-size:11px;font-weight:700;color:#94a3b8;">Daily target: 70 · Weekly: 490 · Monthly: 2,100</span>
+        <span style="font-size:11px;font-weight:700;color:#94a3b8;">Daily target: 112 · Weekly: 784 · Monthly: 3,360</span>
       </div>
       <div style="background:#e2e8f0;border-radius:6px;height:10px;overflow:hidden;">
         <div style="width:${Math.min(parseFloat(outreachPct), 100)}%;height:100%;background:${outreachOnTrack ? 'linear-gradient(90deg,#10b981,#3b82f6)' : 'linear-gradient(90deg,#f59e0b,#ef4444)'};border-radius:6px;transition:width 1s ease;"></div>
