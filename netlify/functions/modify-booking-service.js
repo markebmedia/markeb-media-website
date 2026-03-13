@@ -43,8 +43,9 @@ exports.handler = async (event, context) => {
     } = JSON.parse(event.body);
 
     console.log('Modifying booking:', bookingRef);
-    console.log('New service:', newServiceName);
-    console.log('New total:', totalPrice);
+console.log('New service:', newServiceName);
+console.log('New total:', totalPrice);
+console.log('Add-ons received:', JSON.stringify(addons));
 
     // Get existing booking
     const booking = await base('Bookings').find(bookingId);
