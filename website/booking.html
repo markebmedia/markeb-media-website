@@ -2315,67 +2315,92 @@ function handleAccessTypeChange() {
 
       document.getElementById('priceBreakdown').style.display = 'block';
     }
-    // Change Month
-    function changeMonth(direction) {
-      currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
-      renderCalendar();
-    }
+    
+    async function changeMonth(direction) {
+  // Clear selected date when changing month
+  bookingData.selectedDate = null;
+  bookingData.selectedTime = null;
+  document.getElementById('timeSlotSection').style.display = 'none';
+  document.getElementById('continueToDetailsBtn').disabled = true;
+
+  currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+  await renderCalendar();
+}
+
+let availableDatesCache = {};
+
+async function loadAvailableDates(year, month) {
+  const cacheKey = `${bookingData.region}-${year}-${month}`;
+  if (availableDatesCache[cacheKey]) return availableDatesCache[cacheKey];
+
+  try {
+    const response = await fetch('/.netlify/functions/get-available-dates', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ region: bookingData.region, year, month })
+    });
+    const data = await response.json();
+    availableDatesCache[cacheKey] = data.availableDates || [];
+    return availableDatesCache[cacheKey];
+  } catch (error) {
+    console.error('Error loading available dates:', error);
+    return null;
+  }
+}
 
     // Render Calendar
-    function renderCalendar() {
-      const year = currentCalendarDate.getFullYear();
-      const month = currentCalendarDate.getMonth();
-      
-      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-      document.getElementById('calendarMonth').textContent = `${monthNames[month]} ${year}`;
+    async function renderCalendar() {
+  const year = currentCalendarDate.getFullYear();
+  const month = currentCalendarDate.getMonth();
 
-      const firstDay = new Date(year, month, 1);
-      const lastDay = new Date(year, month + 1, 0);
-      const daysInMonth = lastDay.getDate();
-      const startDay = firstDay.getDay();
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'];
+  document.getElementById('calendarMonth').textContent = `${monthNames[month]} ${year}`;
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+  // Show loading state
+  const grid = document.getElementById('calendarGrid');
+  grid.innerHTML = '<div style="grid-column: span 7; text-align: center; padding: 40px; color: #94a3b8;">Loading availability...</div>';
 
-      const maxDate = new Date();
-      maxDate.setDate(maxDate.getDate() + 60);
-      maxDate.setHours(23, 59, 59, 999);
+  const availableDates = await loadAvailableDates(year, month);
 
-      const grid = document.getElementById('calendarGrid');
-      let html = '';
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+  const startDay = firstDay.getDay();
 
-      const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      dayLabels.forEach(label => {
-        html += `<div class="calendar-day day-label">${label}</div>`;
-      });
+  let html = '';
 
-      for (let i = 0; i < startDay; i++) {
-        html += `<div class="calendar-day disabled other-month"></div>`;
-      }
+  const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  dayLabels.forEach(label => {
+    html += `<div class="calendar-day day-label">${label}</div>`;
+  });
 
-      for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, month, day);
-        date.setHours(0, 0, 0, 0);
-        
-        const isPast = date < today;
-        const isTooFarAhead = date > maxDate;
-        const isSunday = date.getDay() === 0;
-        const isSaturday = date.getDay() === 6;
-        const isDisabled = isPast || isTooFarAhead || isSunday || isSaturday;
-        const isToday = date.getTime() === today.getTime();
-        const isSelected = bookingData.selectedDate && date.getTime() === new Date(bookingData.selectedDate).getTime();
+  for (let i = 0; i < startDay; i++) {
+    html += `<div class="calendar-day disabled other-month"></div>`;
+  }
 
-        let classes = 'calendar-day';
-        if (isDisabled) classes += ' disabled';
-        if (isToday) classes += ' today';
-        if (isSelected) classes += ' selected';
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day);
+    date.setHours(0, 0, 0, 0);
+    const dayOfWeek = date.getDay();
+    const dateString = toLocalDateString(date);
 
-        const dateString = toLocalDateString(date);
-        html += `<div class="${classes}" onclick="${isDisabled ? '' : `selectDate('${dateString}')`}">${day}</div>`;
-      }
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+    const isAvailable = !isWeekend && availableDates && availableDates.includes(dateString);
+    const isDisabled = isWeekend || !isAvailable;
+    const isToday = dateString === toLocalDateString(new Date());
+    const isSelected = bookingData.selectedDate === dateString;
 
-      grid.innerHTML = html;
-    }
+    let classes = 'calendar-day';
+    if (isDisabled) classes += ' disabled';
+    if (isToday && !isDisabled) classes += ' today';
+    if (isSelected) classes += ' selected';
+
+    html += `<div class="${classes}" onclick="${isDisabled ? '' : `selectDate('${dateString}')`}">${day}</div>`;
+  }
+
+  grid.innerHTML = html;
+}
 
     // Select Date
     async function selectDate(dateString) {
