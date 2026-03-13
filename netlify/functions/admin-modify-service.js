@@ -253,10 +253,14 @@ exports.handler = async (event, context) => {
       if (activeBookings && activeBookings.length > 0) {
         const activeBookingId = activeBookings[0].id;
         
-        await base('tblRgcv7M9dUU3YuL').update(activeBookingId, {
-          'Service Type': newServiceName,
-          'Shoot Date': fields['Date']
-        });
+        const addonsLabel = addons && addons.length > 0
+  ? ' + ' + addons.map(a => a.name).join(' + ')
+  : '';
+
+await base('tblRgcv7M9dUU3YuL').update(activeBookingId, {
+  'Service Type': `${newServiceName}${addonsLabel}`,
+  'Shoot Date': fields['Date']
+});
         
         console.log(`✓ Active Booking synced with modified service`);
       } else {
