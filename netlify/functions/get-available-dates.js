@@ -37,7 +37,7 @@ exports.handler = async (event, context) => {
 
     const capitalizedRegion = region.charAt(0).toUpperCase() + region.slice(1).toLowerCase();
 
-    // Build list of weekdays in the month (Mon-Fri only)
+    // Build list of valid weekdays in the month (Mon-Fri only, future dates within 60 days, beyond 24hrs)
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -52,14 +52,12 @@ exports.handler = async (event, context) => {
       date.setHours(0, 0, 0, 0);
       const dayOfWeek = date.getDay();
 
-      // Skip weekends, past dates, and dates too far ahead
-      if (dayOfWeek === 0 || dayOfWeek === 6) continue;
-      if (date < today) continue;
-      if (date > maxDate) continue;
+      if (dayOfWeek === 0 || dayOfWeek === 6) continue; // skip weekends
+      if (date < today) continue;                        // skip past dates
+      if (date > maxDate) continue;                      // skip too far ahead
 
-      // Also block dates within 24 hours
       const hoursUntil = (date - new Date()) / (1000 * 60 * 60);
-      if (hoursUntil < 24) continue;
+      if (hoursUntil < 24) continue;                     // skip within 24 hours
 
       weekdays.push(toLocalDateString(date));
     }
@@ -72,19 +70,18 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Fetch all bookings for this region in this month in one query
     const monthStart = `${year}-${String(month + 1).padStart(2, '0')}-01`;
     const monthEnd = `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
 
-    console.log(`Fetching availability for ${capitalizedRegion}, ${monthStart} to ${monthEnd}`);
+    console.log(`[get-available-dates] Region: ${capitalizedRegion}, ${monthStart} to ${monthEnd}`);
 
+    // Fetch bookings and blocked times for this region/month in parallel
     const [bookingRecords, blockedRecords] = await Promise.all([
       base('Bookings')
         .select({
           filterByFormula: `AND(
             {Region} = '${capitalizedRegion}',
-            IS_SAME_OR_AFTER({Date}, '${monthStart}', 'day'),
-            IS_SAME_OR_BEFORE({Date}, '${monthEnd}', 'day'),
+            IS_SAME({Date}, '${monthStart}', 'month'),
             OR(
               {Booking Status} = 'Booked',
               {Booking Status} = 'Reserved',
@@ -99,15 +96,14 @@ exports.handler = async (event, context) => {
         .select({
           filterByFormula: `AND(
             {Region} = '${capitalizedRegion}',
-            IS_SAME_OR_AFTER({Date}, '${monthStart}', 'day'),
-            IS_SAME_OR_BEFORE({Date}, '${monthEnd}', 'day')
+            IS_SAME({Date}, '${monthStart}', 'month')
           )`,
           fields: ['Date', 'Start Time', 'End Time', 'Region']
         })
         .all()
     ]);
 
-    console.log(`Found ${bookingRecords.length} bookings, ${blockedRecords.length} blocked times`);
+    console.log(`[get-available-dates] Found ${bookingRecords.length} bookings, ${blockedRecords.length} blocked times`);
 
     // Group bookings by date
     const bookingsByDate = {};
@@ -133,7 +129,7 @@ exports.handler = async (event, context) => {
       });
     });
 
-    // For each weekday, check if at least one slot is available
+    // For each valid weekday, check if at least one slot is available
     const availableDates = [];
 
     for (const dateString of weekdays) {
@@ -141,21 +137,16 @@ exports.handler = async (event, context) => {
       const blockedTimes = blockedByDate[dateString] || [];
 
       let slots = generateAllTimeSlots();
-
-      // Apply blocked times
       slots = applyBlockedTimes(slots, blockedTimes);
-
-      // Apply booking buffers (without drive time — just time blocking)
       slots = applyBookingBuffers(slots, bookings);
 
-      // Check if any slot is available
       const hasAvailable = slots.some(s => s.available);
       if (hasAvailable) {
         availableDates.push(dateString);
       }
     }
 
-    console.log(`Returning ${availableDates.length} available dates`);
+    console.log(`[get-available-dates] Returning ${availableDates.length} available dates`);
 
     return {
       statusCode: 200,
@@ -168,7 +159,7 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Error getting available dates:', error);
+    console.error('[get-available-dates] Error:', error);
     return {
       statusCode: 500,
       headers,
@@ -177,6 +168,7 @@ exports.handler = async (event, context) => {
   }
 };
 
+// Generate all possible time slots (9:00 AM - 3:00 PM, 30-min intervals)
 function generateAllTimeSlots() {
   const slots = [];
   for (let hour = 9; hour <= 15; hour++) {
@@ -191,6 +183,7 @@ function generateAllTimeSlots() {
   return slots;
 }
 
+// Apply blocked times to slots
 function applyBlockedTimes(slots, blockedTimes) {
   blockedTimes.forEach(blocked => {
     const blockStart = timeToMinutes(blocked.startTime);
@@ -205,6 +198,7 @@ function applyBlockedTimes(slots, blockedTimes) {
   return slots;
 }
 
+// Apply booking buffers (45 min before + booking duration + 45 min after)
 function applyBookingBuffers(slots, bookings) {
   const fixedBuffer = 45;
   const endOfDay = timeToMinutes('15:30');
@@ -223,7 +217,7 @@ function applyBookingBuffers(slots, bookings) {
     });
   });
 
-  // Also block slots where a 90min booking would run past end of day
+  // Block slots where a 90min booking would run past end of day
   slots.forEach(slot => {
     if (!slot.available) return;
     const slotEnd = timeToMinutes(slot.time) + 90;
