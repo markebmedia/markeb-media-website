@@ -2315,7 +2315,7 @@ function handleAccessTypeChange() {
 
       document.getElementById('priceBreakdown').style.display = 'block';
     }
-    
+
     async function changeMonth(direction) {
   // Clear selected date when changing month
   bookingData.selectedDate = null;
@@ -2337,7 +2337,7 @@ async function loadAvailableDates(year, month) {
     const response = await fetch('/.netlify/functions/get-available-dates', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ region: bookingData.region, year, month })
+      body: JSON.stringify({ region: bookingData.region, year, month, postcode: bookingData.postcode })
     });
     const data = await response.json();
     availableDatesCache[cacheKey] = data.availableDates || [];

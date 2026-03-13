@@ -1,7 +1,9 @@
 // netlify/functions/get-available-dates.js
 // Returns list of dates that have at least one available slot for a region/month
+// Includes Google Maps distance check for days with existing bookings
 
 const Airtable = require('airtable');
+const fetch = require('node-fetch');
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
@@ -25,7 +27,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { region, year, month } = JSON.parse(event.body);
+    const { region, year, month, postcode } = JSON.parse(event.body);
 
     if (!region || year === undefined || month === undefined) {
       return {
@@ -52,12 +54,12 @@ exports.handler = async (event, context) => {
       date.setHours(0, 0, 0, 0);
       const dayOfWeek = date.getDay();
 
-      if (dayOfWeek === 0 || dayOfWeek === 6) continue; // skip weekends
-      if (date < today) continue;                        // skip past dates
-      if (date > maxDate) continue;                      // skip too far ahead
+      if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+      if (date < today) continue;
+      if (date > maxDate) continue;
 
       const hoursUntil = (date - new Date()) / (1000 * 60 * 60);
-      if (hoursUntil < 24) continue;                     // skip within 24 hours
+      if (hoursUntil < 24) continue;
 
       weekdays.push(toLocalDateString(date));
     }
@@ -73,7 +75,7 @@ exports.handler = async (event, context) => {
     const monthStart = `${year}-${String(month + 1).padStart(2, '0')}-01`;
     const monthEnd = `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
 
-    console.log(`[get-available-dates] Region: ${capitalizedRegion}, ${monthStart} to ${monthEnd}`);
+    console.log(`[get-available-dates] Region: ${capitalizedRegion}, ${monthStart} to ${monthEnd}, postcode: ${postcode || 'none'}`);
 
     // Fetch bookings and blocked times for this region/month in parallel
     const [bookingRecords, blockedRecords] = await Promise.all([
@@ -88,7 +90,7 @@ exports.handler = async (event, context) => {
               {Booking Status} = 'Confirmed'
             )
           )`,
-          fields: ['Date', 'Time', 'Duration (mins)', 'Region', 'Booking Status']
+          fields: ['Date', 'Time', 'Duration (mins)', 'Region', 'Booking Status', 'Postcode', 'Property Address']
         })
         .all(),
 
@@ -111,9 +113,11 @@ exports.handler = async (event, context) => {
       const date = record.fields['Date']?.split('T')[0];
       if (!date) return;
       if (!bookingsByDate[date]) bookingsByDate[date] = [];
+      const bookingPostcode = record.fields['Postcode'] || extractPostcode(record.fields['Property Address'] || '');
       bookingsByDate[date].push({
         startTime: record.fields['Time'],
-        duration: record.fields['Duration (mins)'] || 90
+        duration: record.fields['Duration (mins)'] || 90,
+        postcode: bookingPostcode
       });
     });
 
@@ -131,11 +135,38 @@ exports.handler = async (event, context) => {
 
     // For each valid weekday, check if at least one slot is available
     const availableDates = [];
+    const maxDriveMinutes = 45;
 
     for (const dateString of weekdays) {
       const bookings = bookingsByDate[dateString] || [];
       const blockedTimes = blockedByDate[dateString] || [];
 
+      // ✅ Distance check — if client postcode provided and day has bookings
+      if (postcode && bookings.length > 0) {
+        let tooFar = false;
+
+        for (const booking of bookings) {
+          if (!booking.postcode) continue;
+
+          try {
+            const driveTime = await getDriveTime(postcode, booking.postcode);
+            console.log(`[get-available-dates] ${dateString}: drive time ${postcode} → ${booking.postcode} = ${driveTime} mins`);
+
+            if (driveTime > maxDriveMinutes) {
+              console.log(`[get-available-dates] ${dateString}: too far (${driveTime} mins) — greying out`);
+              tooFar = true;
+              break;
+            }
+          } catch (error) {
+            // If drive time check fails, don't block the day — let check-availability handle it
+            console.error(`[get-available-dates] Drive time check failed for ${dateString}:`, error.message);
+          }
+        }
+
+        if (tooFar) continue; // Skip this day — grey it out
+      }
+
+      // Time slot check
       let slots = generateAllTimeSlots();
       slots = applyBlockedTimes(slots, blockedTimes);
       slots = applyBookingBuffers(slots, bookings);
@@ -167,6 +198,46 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+// Get drive time between two postcodes using Google Maps Distance Matrix API
+async function getDriveTime(fromPostcode, toPostcode) {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('Google Maps API key not configured');
+  }
+
+  const url = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(fromPostcode)}&destinations=${encodeURIComponent(toPostcode)}&mode=driving&departure_time=now&key=${apiKey}`;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Google Maps API request failed: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  if (data.status !== 'OK') {
+    throw new Error(`Google Maps API error: ${data.status}`);
+  }
+
+  const element = data.rows[0]?.elements[0];
+
+  if (!element || element.status !== 'OK') {
+    throw new Error(`No route found: ${element?.status || 'Unknown error'}`);
+  }
+
+  const duration = element.duration_in_traffic || element.duration;
+  return Math.ceil(duration.value / 60);
+}
+
+// Extract postcode from address string
+function extractPostcode(address) {
+  if (!address) return '';
+  const postcodeRegex = /([A-Z]{1,2}\d{1,2}[A-Z]?\s?\d[A-Z]{2})/i;
+  const match = address.match(postcodeRegex);
+  return match ? match[0].trim().toUpperCase() : '';
+}
 
 // Generate all possible time slots (9:00 AM - 3:00 PM, 30-min intervals)
 function generateAllTimeSlots() {
