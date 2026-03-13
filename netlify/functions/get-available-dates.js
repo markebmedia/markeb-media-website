@@ -76,13 +76,15 @@ exports.handler = async (event, context) => {
     const monthStart = `${year}-${String(month + 1).padStart(2, '0')}-01`;
     const monthEnd = `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
 
+    console.log(`Fetching availability for ${capitalizedRegion}, ${monthStart} to ${monthEnd}`);
+
     const [bookingRecords, blockedRecords] = await Promise.all([
       base('Bookings')
         .select({
           filterByFormula: `AND(
             {Region} = '${capitalizedRegion}',
-            IS_AFTER({Date}, '${monthStart}') = FALSE(),
-            IS_BEFORE({Date}, '${monthEnd}') = FALSE(),
+            IS_SAME_OR_AFTER({Date}, '${monthStart}', 'day'),
+            IS_SAME_OR_BEFORE({Date}, '${monthEnd}', 'day'),
             OR(
               {Booking Status} = 'Booked',
               {Booking Status} = 'Reserved',
@@ -97,13 +99,15 @@ exports.handler = async (event, context) => {
         .select({
           filterByFormula: `AND(
             {Region} = '${capitalizedRegion}',
-            IS_AFTER({Date}, DATEADD('${monthStart}', -1, 'days')),
-            IS_BEFORE({Date}, DATEADD('${monthEnd}', 1, 'days'))
+            IS_SAME_OR_AFTER({Date}, '${monthStart}', 'day'),
+            IS_SAME_OR_BEFORE({Date}, '${monthEnd}', 'day')
           )`,
           fields: ['Date', 'Start Time', 'End Time', 'Region']
         })
         .all()
     ]);
+
+    console.log(`Found ${bookingRecords.length} bookings, ${blockedRecords.length} blocked times`);
 
     // Group bookings by date
     const bookingsByDate = {};
@@ -150,6 +154,8 @@ exports.handler = async (event, context) => {
         availableDates.push(dateString);
       }
     }
+
+    console.log(`Returning ${availableDates.length} available dates`);
 
     return {
       statusCode: 200,
