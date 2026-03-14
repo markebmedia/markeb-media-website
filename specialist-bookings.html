@@ -6,6 +6,8 @@
   <title>My Bookings – Markeb Media</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -47,7 +49,7 @@
       height: 64px;
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 200;
     }
     .nav-logo {
       display: flex;
@@ -58,100 +60,41 @@
       color: var(--slate-900);
       text-decoration: none;
     }
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .nav-user {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--slate-700);
-    }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-user { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: var(--slate-700); }
     .nav-avatar {
       width: 34px; height: 34px;
       background: linear-gradient(135deg, var(--blue), var(--blue-dark));
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 13px;
-      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 13px; font-weight: 700;
     }
     .nav-logout {
-      font-size: 13px;
-      color: var(--slate-500);
-      text-decoration: none;
-      padding: 6px 12px;
-      border-radius: 6px;
-      transition: background 0.15s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-size: 13px; color: var(--slate-500); text-decoration: none;
+      padding: 6px 12px; border-radius: 6px; transition: background 0.15s;
+      display: flex; align-items: center; gap: 6px;
     }
     .nav-logout:hover { background: var(--slate-100); }
 
     /* MAIN */
-    .main {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 40px 24px;
-    }
+    .main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
 
     /* HEADER */
     .page-header { margin-bottom: 32px; }
-    .page-header h1 {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--slate-900);
-      margin-bottom: 4px;
-    }
+    .page-header h1 { font-size: 28px; font-weight: 700; color: var(--slate-900); margin-bottom: 4px; }
     .page-header p { font-size: 15px; color: var(--slate-500); }
 
     /* STATS ROW */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 32px;
-    }
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
     .stat-card {
-      background: var(--white);
-      border: 1px solid var(--slate-300);
-      border-radius: 12px;
-      padding: 20px 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      background: var(--white); border: 1px solid var(--slate-300);
+      border-radius: 12px; padding: 20px 24px;
+      display: flex; align-items: center; gap: 16px;
     }
-    .stat-icon {
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      background: var(--slate-100);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
+    .stat-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--slate-100); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .stat-icon i { width: 20px; height: 20px; color: var(--slate-500); }
-    .stat-label {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--slate-500);
-      margin-bottom: 4px;
-    }
-    .stat-value {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--slate-900);
-      font-family: 'DM Mono', monospace;
-    }
+    .stat-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--slate-500); margin-bottom: 4px; }
+    .stat-value { font-size: 28px; font-weight: 700; color: var(--slate-900); font-family: 'DM Mono', monospace; }
     .stat-card.highlight { border-color: var(--blue); background: var(--blue-light); }
     .stat-card.highlight .stat-icon { background: var(--blue-mid); }
     .stat-card.highlight .stat-icon i { color: var(--blue); }
@@ -159,430 +102,172 @@
 
     /* VIEW TOGGLE */
     .view-toggle {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      background: var(--slate-100);
-      border-radius: 10px;
-      padding: 4px;
-      margin-bottom: 20px;
-      width: fit-content;
+      display: flex; align-items: center; gap: 4px;
+      background: var(--slate-100); border-radius: 10px; padding: 4px;
+      margin-bottom: 20px; width: fit-content;
     }
     .view-btn {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 16px;
-      border-radius: 7px;
-      border: none;
-      background: transparent;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--slate-500);
-      cursor: pointer;
-      transition: all 0.15s;
+      display: flex; align-items: center; gap: 7px;
+      padding: 8px 16px; border-radius: 7px; border: none;
+      background: transparent; font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 600; color: var(--slate-500);
+      cursor: pointer; transition: all 0.15s;
     }
     .view-btn i { width: 15px; height: 15px; }
     .view-btn:hover { color: var(--slate-900); }
-    .view-btn.active {
-      background: var(--white);
-      color: var(--blue);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    }
+    .view-btn.active { background: var(--white); color: var(--blue); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
 
     /* FILTERS */
-    .filters {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
+    .filters { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
     .filter-btn {
-      padding: 7px 16px;
-      border-radius: 8px;
-      border: 1px solid var(--slate-300);
-      background: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--slate-700);
-      cursor: pointer;
-      transition: all 0.15s;
+      padding: 7px 16px; border-radius: 8px; border: 1px solid var(--slate-300);
+      background: var(--white); font-family: 'DM Sans', sans-serif;
+      font-size: 13px; font-weight: 500; color: var(--slate-700); cursor: pointer; transition: all 0.15s;
     }
     .filter-btn:hover { border-color: var(--blue); color: var(--blue); }
     .filter-btn.active { background: var(--blue); border-color: var(--blue); color: var(--white); }
-
-    .search-wrap {
-      margin-left: auto;
-      position: relative;
-    }
-    .search-wrap i {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 15px; height: 15px;
-      color: var(--slate-500);
-      pointer-events: none;
-    }
-    .filter-search {
-      padding: 7px 14px 7px 32px;
-      border-radius: 8px;
-      border: 1px solid var(--slate-300);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      color: var(--slate-900);
-      outline: none;
-      width: 220px;
-      transition: border 0.15s;
-    }
+    .search-wrap { margin-left: auto; position: relative; }
+    .search-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--slate-500); pointer-events: none; }
+    .filter-search { padding: 7px 14px 7px 32px; border-radius: 8px; border: 1px solid var(--slate-300); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--slate-900); outline: none; width: 220px; transition: border 0.15s; }
     .filter-search:focus { border-color: var(--blue); }
 
     /* BOOKING CARDS */
     .bookings-list { display: flex; flex-direction: column; gap: 12px; }
-
-    .booking-card {
-      background: var(--white);
-      border: 1px solid var(--slate-300);
-      border-radius: 12px;
-      overflow: hidden;
-      transition: box-shadow 0.15s, border-color 0.15s;
-      cursor: pointer;
-    }
+    .booking-card { background: var(--white); border: 1px solid var(--slate-300); border-radius: 12px; overflow: hidden; transition: box-shadow 0.15s, border-color 0.15s; cursor: pointer; }
     .booking-card:hover { border-color: var(--blue); box-shadow: 0 4px 16px rgba(59,130,246,0.1); }
     .booking-card.expanded { border-color: var(--blue); }
-
-    .booking-card-header {
-      padding: 18px 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
+    .booking-card-header { padding: 18px 20px; display: flex; align-items: center; gap: 16px; }
     .booking-status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
     .status-upcoming { background: var(--green); }
     .status-today { background: var(--blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
     .status-past { background: var(--slate-300); }
     .status-cancelled { background: var(--red); }
-
     .booking-main { flex: 1; min-width: 0; }
-    .booking-ref {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--slate-500);
-      margin-bottom: 2px;
-    }
-    .booking-address {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--slate-900);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .booking-ref { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; color: var(--slate-500); margin-bottom: 2px; }
+    .booking-address { font-size: 15px; font-weight: 600; color: var(--slate-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .booking-service { font-size: 13px; color: var(--slate-500); margin-top: 2px; }
-
     .booking-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
     .booking-date { font-size: 13px; font-weight: 600; color: var(--slate-700); }
     .booking-time { font-size: 13px; color: var(--slate-500); }
-
-    .booking-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
+    .booking-badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
     .badge-today { background: var(--blue-mid); color: var(--blue-dark); }
     .badge-upcoming { background: var(--green-light); color: var(--green); }
     .badge-past { background: var(--slate-100); color: var(--slate-500); }
     .badge-cancelled { background: var(--red-light); color: var(--red); }
-
     .booking-chevron { color: var(--slate-300); transition: transform 0.2s; flex-shrink: 0; }
     .booking-chevron i { width: 18px; height: 18px; }
     .booking-card.expanded .booking-chevron { transform: rotate(180deg); color: var(--blue); }
 
     /* EXPANDED DETAILS */
-    .booking-details {
-      display: none;
-      border-top: 1px solid var(--slate-100);
-      padding: 20px;
-      background: var(--slate-50);
-    }
+    .booking-details { display: none; border-top: 1px solid var(--slate-100); padding: 20px; background: var(--slate-50); }
     .booking-card.expanded .booking-details { display: block; }
-
     .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
     .detail-item.full { grid-column: 1 / -1; }
-    .detail-label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--slate-500);
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
+    .detail-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--slate-500); margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
     .detail-label i { width: 12px; height: 12px; }
     .detail-value { font-size: 14px; font-weight: 500; color: var(--slate-900); }
-
-    .access-alert {
-      background: var(--amber-light);
-      border: 1px solid var(--amber);
-      border-radius: 8px;
-      padding: 12px 16px;
-      margin-bottom: 12px;
-      font-size: 13px;
-      color: #92400e;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-    }
+    .access-alert { background: var(--amber-light); border: 1px solid var(--amber); border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; font-size: 13px; color: #92400e; display: flex; align-items: flex-start; gap: 10px; }
     .access-alert i { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
     .access-alert strong { display: block; margin-bottom: 2px; }
-
     .addons-list { display: flex; flex-wrap: wrap; gap: 6px; }
-    .addon-tag {
-      background: var(--blue-light);
-      border: 1px solid var(--blue-mid);
-      color: var(--blue-dark);
-      border-radius: 6px;
-      padding: 3px 10px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-
-    .notes-box {
-      background: var(--white);
-      border: 1px solid var(--slate-300);
-      border-radius: 8px;
-      padding: 12px 14px;
-      font-size: 13px;
-      color: var(--slate-700);
-      line-height: 1.5;
-    }
+    .addon-tag { background: var(--blue-light); border: 1px solid var(--blue-mid); color: var(--blue-dark); border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 500; }
+    .notes-box { background: var(--white); border: 1px solid var(--slate-300); border-radius: 8px; padding: 12px 14px; font-size: 13px; color: var(--slate-700); line-height: 1.5; }
 
     /* EMPTY / LOADING */
     .state-box { text-align: center; padding: 60px 20px; color: var(--slate-500); }
     .state-box i { width: 40px; height: 40px; margin-bottom: 12px; color: var(--slate-300); }
     .state-box h3 { font-size: 16px; font-weight: 600; color: var(--slate-700); margin-bottom: 6px; }
     .state-box p { font-size: 14px; }
-
-    .spinner {
-      width: 32px; height: 32px;
-      border: 3px solid var(--blue-mid);
-      border-top-color: var(--blue);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin: 0 auto 16px;
-    }
+    .spinner { width: 32px; height: 32px; border: 3px solid var(--blue-mid); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .booking-card.today-card { border-color: var(--blue); background: var(--blue-light); }
     .booking-card.today-card .booking-card-header { background: var(--blue-light); }
-
-    .section-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--slate-500);
-      margin: 24px 0 10px;
-      padding: 0 2px;
-    }
+    .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--slate-500); margin: 24px 0 10px; padding: 0 2px; }
     .section-label:first-child { margin-top: 0; }
 
     /* ===== CALENDAR VIEW ===== */
     #calendarView { display: none; }
-
-    .cal-controls {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-      gap: 12px;
-    }
+    .cal-controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 12px; }
     .cal-nav { display: flex; align-items: center; gap: 12px; }
-    .cal-nav-btn {
-      width: 34px; height: 34px;
-      border-radius: 8px;
-      border: 1px solid var(--slate-300);
-      background: var(--white);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.15s;
-      color: var(--slate-700);
-    }
+    .cal-nav-btn { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--slate-300); background: var(--white); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; color: var(--slate-700); }
     .cal-nav-btn:hover { border-color: var(--blue); color: var(--blue); }
     .cal-nav-btn i { width: 16px; height: 16px; }
-    .cal-month-label {
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--slate-900);
-      min-width: 180px;
-      text-align: center;
-    }
-    .cal-today-btn {
-      padding: 7px 14px;
-      border-radius: 8px;
-      border: 1px solid var(--slate-300);
-      background: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--slate-700);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
+    .cal-month-label { font-size: 17px; font-weight: 700; color: var(--slate-900); min-width: 180px; text-align: center; }
+    .cal-today-btn { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--slate-300); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--slate-700); cursor: pointer; transition: all 0.15s; }
     .cal-today-btn:hover { border-color: var(--blue); color: var(--blue); }
-
-    .cal-grid {
-      background: var(--white);
-      border: 1px solid var(--slate-300);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .cal-header-row {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      background: var(--slate-50);
-      border-bottom: 1px solid var(--slate-300);
-    }
-    .cal-header-cell {
-      padding: 10px 0;
-      text-align: center;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--slate-500);
-    }
+    .cal-grid { background: var(--white); border: 1px solid var(--slate-300); border-radius: 12px; overflow: hidden; }
+    .cal-header-row { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--slate-50); border-bottom: 1px solid var(--slate-300); }
+    .cal-header-cell { padding: 10px 0; text-align: center; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--slate-500); }
     .cal-body { display: grid; grid-template-columns: repeat(7, 1fr); }
-    .cal-cell {
-      min-height: 100px;
-      border-right: 1px solid var(--slate-100);
-      border-bottom: 1px solid var(--slate-100);
-      padding: 8px;
-      position: relative;
-      transition: background 0.1s;
-    }
+    .cal-cell { min-height: 100px; border-right: 1px solid var(--slate-100); border-bottom: 1px solid var(--slate-100); padding: 8px; position: relative; transition: background 0.1s; }
     .cal-cell:nth-child(7n) { border-right: none; }
     .cal-cell.other-month { background: var(--slate-50); }
     .cal-cell.other-month .cal-day-num { color: var(--slate-300); }
     .cal-cell.is-today { background: var(--blue-light); }
     .cal-cell.has-bookings { cursor: pointer; }
     .cal-cell.has-bookings:hover { background: #f0f7ff; }
-
-    .cal-day-num {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--slate-700);
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-    }
+    .cal-day-num { font-size: 13px; font-weight: 600; color: var(--slate-700); margin-bottom: 6px; display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; }
     .cal-cell.is-today .cal-day-num { background: var(--blue); color: var(--white); }
-
-    /* cal-event is now a <button> for reliable click handling everywhere */
-    .cal-event {
-      display: block;
-      width: 100%;
-      text-align: left;
-      border: none;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 6px;
-      border-radius: 4px;
-      margin-bottom: 3px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      cursor: pointer;
-      transition: opacity 0.1s;
-    }
+    .cal-event { display: block; width: 100%; text-align: left; border: none; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; padding: 3px 6px; border-radius: 4px; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; transition: opacity 0.1s; }
     .cal-event:hover { opacity: 0.8; }
     .cal-event.ev-today { background: var(--blue-mid); color: var(--blue-dark); }
     .cal-event.ev-upcoming { background: #dcfce7; color: #166534; }
     .cal-event.ev-past { background: var(--slate-100); color: var(--slate-500); }
     .cal-event.ev-cancelled { background: var(--red-light); color: var(--red); text-decoration: line-through; }
-
-    .cal-more {
-      font-size: 10px;
-      font-weight: 600;
-      color: var(--slate-500);
-      padding: 2px 4px;
-      cursor: pointer;
-    }
+    .cal-more { font-size: 10px; font-weight: 600; color: var(--slate-500); padding: 2px 4px; cursor: pointer; }
     .cal-more:hover { color: var(--blue); }
 
     /* BOOKING DETAIL PANEL */
-    .cal-detail-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(15,23,42,0.4);
-      z-index: 500;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
+    .cal-detail-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.4); z-index: 500; align-items: center; justify-content: center; padding: 20px; }
     .cal-detail-overlay.open { display: flex; }
-    .cal-detail-panel {
-      background: var(--white);
-      border-radius: 16px;
-      max-width: 480px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-      animation: panelIn 0.2s ease-out;
-    }
-    @keyframes panelIn {
-      from { opacity: 0; transform: translateY(12px) scale(0.97); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    .cal-detail-header {
-      padding: 20px 20px 16px;
-      border-bottom: 1px solid var(--slate-100);
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
+    .cal-detail-panel { background: var(--white); border-radius: 16px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: panelIn 0.2s ease-out; }
+    @keyframes panelIn { from { opacity: 0; transform: translateY(12px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .cal-detail-header { padding: 20px 20px 16px; border-bottom: 1px solid var(--slate-100); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
     .cal-detail-header h3 { font-size: 16px; font-weight: 700; color: var(--slate-900); margin-bottom: 2px; }
     .cal-detail-header p { font-size: 13px; color: var(--slate-500); }
-    .cal-detail-close {
-      width: 30px; height: 30px;
-      border-radius: 6px;
-      border: 1px solid var(--slate-300);
-      background: var(--white);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: all 0.15s;
-      color: var(--slate-500);
-    }
+    .cal-detail-close { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--slate-300); background: var(--white); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.15s; color: var(--slate-500); }
     .cal-detail-close:hover { border-color: var(--red); color: var(--red); }
     .cal-detail-close i { width: 14px; height: 14px; }
     .cal-detail-body { padding: 20px; }
     .cal-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .cal-detail-grid .detail-item.full { grid-column: 1 / -1; }
+
+    /* ===== ROUTE VIEW ===== */
+    #routeView { display: none; }
+
+    .route-date-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .route-date-label { font-size: 14px; font-weight: 600; color: var(--slate-700); white-space: nowrap; }
+    .route-date-input { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--slate-300); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--slate-900); outline: none; transition: border 0.15s; }
+    .route-date-input:focus { border-color: var(--blue); }
+    .route-shoot-count { font-size: 13px; color: var(--slate-500); font-weight: 500; }
+
+    .route-loading { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--slate-700); font-weight: 500; padding: 12px 16px; background: var(--blue-light); border: 1px solid var(--blue-mid); border-radius: 10px; margin-bottom: 16px; }
+    .route-loading-spinner { width: 18px; height: 18px; border: 2px solid var(--blue-mid); border-top-color: var(--blue); border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0; }
+
+    #routeMap { height: 380px; border-radius: 12px; border: 1px solid var(--slate-300); margin-bottom: 20px; }
+
+    .route-stops { display: flex; flex-direction: column; }
+    .route-stop { display: flex; align-items: flex-start; gap: 14px; background: var(--white); border: 1px solid var(--slate-300); border-radius: 12px; padding: 16px 18px; }
+    .route-stop-num { width: 32px; height: 32px; border-radius: 50%; color: white; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .route-stop-info { flex: 1; min-width: 0; }
+    .route-stop-time { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .route-stop-address { font-size: 14px; font-weight: 600; color: var(--slate-900); margin-bottom: 2px; word-break: break-word; }
+    .route-stop-service { font-size: 12px; color: var(--slate-500); margin-bottom: 8px; }
+    .route-stop-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 4px; }
+    .route-stop-badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 6px; }
+    .route-connector { padding: 0 0 0 15px; }
+    .route-connector-line { width: 2px; height: 24px; background: var(--slate-300); border-radius: 2px; }
+    .route-no-coords { display: flex; align-items: center; gap: 6px; background: var(--amber-light); border: 1px solid var(--amber); border-radius: 7px; padding: 7px 12px; margin-top: 8px; font-size: 12px; color: #92400e; }
+    .route-no-coords i { width: 13px; height: 13px; flex-shrink: 0; }
+    .route-empty { text-align: center; padding: 60px 20px; color: var(--slate-500); }
+    .route-empty i { width: 36px; height: 36px; color: var(--slate-300); margin: 0 auto 12px; display: block; }
+    .route-empty h3 { font-size: 15px; font-weight: 600; color: var(--slate-700); margin-bottom: 4px; }
+    .route-empty p { font-size: 13px; }
+
+    /* ===== COLOUR LEGEND — mobile only ===== */
+    .cal-legend { display: none; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+    .cal-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--slate-500); }
+    .cal-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
     /* ===== TABLET (≤768px) ===== */
     @media (max-width: 768px) {
@@ -597,15 +282,7 @@
       .stat-value { font-size: 24px; }
       .stat-label { font-size: 10px; }
       .view-toggle { margin-bottom: 16px; }
-      .filters {
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        gap: 6px;
-        padding-bottom: 4px;
-        margin-bottom: 16px;
-      }
+      .filters { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; gap: 6px; padding-bottom: 4px; margin-bottom: 16px; }
       .filters::-webkit-scrollbar { display: none; }
       .filter-btn { white-space: nowrap; flex-shrink: 0; padding: 8px 14px; min-height: 40px; }
       .search-wrap { flex-shrink: 0; min-width: 180px; margin-left: 0; }
@@ -621,17 +298,11 @@
       .cal-header-cell { font-size: 10px; padding: 8px 0; }
       .cal-event { font-size: 10px; padding: 2px 5px; margin-bottom: 2px; }
       .cal-detail-overlay { align-items: flex-end; padding: 0; }
-      .cal-detail-panel {
-        max-width: 100%;
-        border-radius: 16px 16px 0 0;
-        max-height: 85vh;
-        animation: sheetUp 0.25s ease-out;
-      }
-      @keyframes sheetUp {
-        from { transform: translateY(100%); }
-        to   { transform: translateY(0); }
-      }
+      .cal-detail-panel { max-width: 100%; border-radius: 16px 16px 0 0; max-height: 85vh; animation: sheetUp 0.25s ease-out; }
+      @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
       .cal-detail-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      #routeMap { height: 300px; }
+      .route-stop { padding: 14px; gap: 12px; }
     }
 
     /* ===== MOBILE (≤480px) ===== */
@@ -645,6 +316,8 @@
       .stat-card { padding: 12px 10px; border-radius: 10px; }
       .stat-value { font-size: 22px; }
       .stat-label { font-size: 10px; }
+      .view-toggle { width: 100%; }
+      .view-btn { flex: 1; justify-content: center; padding: 8px 6px; font-size: 12px; min-height: 40px; gap: 4px; }
       .booking-card-header { padding: 12px 12px; gap: 8px; }
       .booking-ref { font-size: 10px; }
       .booking-address { font-size: 13px; }
@@ -656,36 +329,14 @@
       .cal-cell { min-height: 52px; padding: 3px; }
       .cal-day-num { font-size: 11px; width: 20px; height: 20px; margin-bottom: 2px; }
       .cal-header-cell { font-size: 9px; padding: 6px 0; letter-spacing: 0; }
-
-      /* Phones: show coloured dot instead of text */
-      .cal-event:not(.ev-cancelled) {
-        height: 7px;
-        padding: 0;
-        border-radius: 3px;
-        font-size: 0;
-        margin-bottom: 2px;
-        min-width: 100%;
-      }
-      /* Cancelled stays visible and tappable */
-      .cal-event.ev-cancelled {
-        height: auto !important;
-        padding: 3px 5px !important;
-        font-size: 10px !important;
-        min-height: 18px !important;
-        text-decoration: line-through;
-      }
-
+      .cal-event:not(.ev-cancelled) { height: 7px; padding: 0; border-radius: 3px; font-size: 0; margin-bottom: 2px; min-width: 100%; }
+      .cal-event.ev-cancelled { height: auto !important; padding: 3px 5px !important; font-size: 10px !important; min-height: 18px !important; text-decoration: line-through; }
       .cal-more { font-size: 9px; }
       .cal-month-label { font-size: 13px; min-width: 110px; }
-      .cal-nav-btn { width: 30px; height: 30px; }
+      .cal-nav-btn { width: 30px; height: 30px; min-height: 44px; min-width: 44px; }
       .cal-today-btn { padding: 6px 10px; font-size: 12px; }
       .cal-detail-overlay { align-items: flex-end; padding: 0; }
-      .cal-detail-panel {
-        max-width: 100%;
-        border-radius: 16px 16px 0 0;
-        max-height: 90vh;
-        animation: sheetUp 0.25s ease-out;
-      }
+      .cal-detail-panel { max-width: 100%; border-radius: 16px 16px 0 0; max-height: 90vh; animation: sheetUp 0.25s ease-out; }
       .cal-detail-header { padding: 16px 16px 12px; }
       .cal-detail-header h3 { font-size: 14px; }
       .cal-detail-body { padding: 14px; }
@@ -694,31 +345,19 @@
       .filter-btn { min-height: 44px; }
       .view-btn { min-height: 40px; padding: 8px 14px; }
       .cal-nav-btn { min-height: 44px; min-width: 44px; }
+      #routeMap { height: 260px; }
+      .route-stop { padding: 12px; gap: 10px; }
+      .route-stop-num { width: 28px; height: 28px; font-size: 12px; }
+      .route-stop-address { font-size: 13px; }
+      .cal-legend { display: flex; }
     }
 
     /* Touch: ensure tap targets */
     @media (pointer: coarse) {
       .cal-event { min-height: 22px; font-size: 10px; padding: 3px 5px; }
       .cal-cell { cursor: default; }
-      .cal-event.ev-cancelled {
-        min-height: 22px !important;
-        font-size: 10px !important;
-        padding: 3px 5px !important;
-      }
+      .cal-event.ev-cancelled { min-height: 22px !important; font-size: 10px !important; padding: 3px 5px !important; }
     }
-
-    /* COLOUR LEGEND — mobile only */
-    .cal-legend { display: none; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
-    .cal-legend-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--slate-500);
-    }
-    .cal-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-    @media (max-width: 480px) { .cal-legend { display: flex; } }
   </style>
 </head>
 <body>
@@ -781,6 +420,10 @@
       <i data-lucide="calendar-days"></i>
       Calendar
     </button>
+    <button class="view-btn" id="routeViewBtn" onclick="switchView('route')">
+      <i data-lucide="map-pin"></i>
+      Route
+    </button>
   </div>
 
   <!-- LIST VIEW -->
@@ -806,14 +449,12 @@
 
   <!-- CALENDAR VIEW -->
   <div id="calendarView">
-
     <div class="cal-legend">
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#dbeafe;border:1px solid #93c5fd;"></div>Today</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#dcfce7;border:1px solid #86efac;"></div>Upcoming</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#f1f5f9;border:1px solid #cbd5e1;"></div>Past</div>
       <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#fef2f2;border:1px solid #fca5a5;"></div>Cancelled</div>
     </div>
-
     <div class="cal-controls">
       <div class="cal-nav">
         <button class="cal-nav-btn" onclick="calPrev()"><i data-lucide="chevron-left"></i></button>
@@ -822,7 +463,6 @@
       </div>
       <button class="cal-today-btn" onclick="calGoToday()">Today</button>
     </div>
-
     <div class="cal-grid">
       <div class="cal-header-row">
         <div class="cal-header-cell">Mon</div>
@@ -835,6 +475,23 @@
       </div>
       <div class="cal-body" id="calBody"></div>
     </div>
+  </div>
+
+  <!-- ROUTE VIEW -->
+  <div id="routeView">
+    <div class="route-date-bar">
+      <span class="route-date-label">Shoots on</span>
+      <input type="date" class="route-date-input" id="routeDate" onchange="renderRoute()">
+      <span class="route-shoot-count" id="routeShootCount"></span>
+    </div>
+    <div id="routeLoadingBar" style="display:none;">
+      <div class="route-loading">
+        <div class="route-loading-spinner"></div>
+        Plotting your route…
+      </div>
+    </div>
+    <div id="routeMap"></div>
+    <div id="routeStops" class="route-stops"></div>
   </div>
 
 </main>
@@ -856,19 +513,18 @@
 </div>
 
 <script>
-  let allBookings = [];
-  let currentFilter = 'all';
-  let currentView = 'list';
-  let calDate = new Date();
-
-  // ─── KEY FIX ───────────────────────────────────────────────────────────────
-  // Instead of serialising booking objects into onclick="" attributes (which
-  // breaks on special characters in addresses/names across ALL browsers),
-  // we store them in a plain JS array and reference by numeric index.
-  // The cal-event elements are rendered as <button> tags so they are
-  // natively focusable and clickable on every device without any hacks.
-  // ──────────────────────────────────────────────────────────────────────────
+  let allBookings     = [];
+  let currentFilter   = 'all';
+  let currentView     = 'list';
+  let calDate         = new Date();
   let calBookingIndex = [];
+
+  // Route state
+  let routeMap      = null;
+  let routeMarkers  = [];
+  let routePolyline = null;
+
+  const ROUTE_COLOURS = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#f97316'];
 
   // ===== HELPERS =====
 
@@ -952,8 +608,8 @@
   // ===== STATS =====
 
   function updateStats() {
-    document.getElementById('statToday').textContent    = allBookings.filter(b => getBookingStatus(b) === 'today').length;
-    document.getElementById('statUpcoming').textContent = allBookings.filter(b => getBookingStatus(b) === 'upcoming').length;
+    document.getElementById('statToday').textContent     = allBookings.filter(b => getBookingStatus(b) === 'today').length;
+    document.getElementById('statUpcoming').textContent  = allBookings.filter(b => getBookingStatus(b) === 'upcoming').length;
     document.getElementById('statCompleted').textContent = allBookings.filter(b => getBookingStatus(b) === 'past').length;
   }
 
@@ -963,9 +619,12 @@
     currentView = view;
     document.getElementById('listView').style.display     = view === 'list'     ? 'block' : 'none';
     document.getElementById('calendarView').style.display = view === 'calendar' ? 'block' : 'none';
-    document.getElementById('listViewBtn').classList.toggle('active', view === 'list');
-    document.getElementById('calViewBtn').classList.toggle('active', view === 'calendar');
+    document.getElementById('routeView').style.display    = view === 'route'    ? 'block' : 'none';
+    document.getElementById('listViewBtn').classList.toggle('active',  view === 'list');
+    document.getElementById('calViewBtn').classList.toggle('active',   view === 'calendar');
+    document.getElementById('routeViewBtn').classList.toggle('active', view === 'route');
     if (view === 'calendar') renderCalendar();
+    if (view === 'route')    initRouteView();
     lucide.createIcons();
   }
 
@@ -1139,7 +798,6 @@
   function calGoToday() { calDate = new Date(); renderCalendar(); }
 
   function renderCalendar() {
-    // Reset the booking index every time we re-render
     calBookingIndex = [];
 
     const year  = calDate.getFullYear();
@@ -1153,9 +811,8 @@
     const todayStr  = new Date().toISOString().split('T')[0];
 
     let startDow = firstDay.getDay();
-    startDow = startDow === 0 ? 6 : startDow - 1; // Mon-first grid
+    startDow = startDow === 0 ? 6 : startDow - 1;
 
-    // Build a date→bookings map
     const bookingMap = {};
     allBookings.forEach(b => {
       if (!bookingMap[b.date]) bookingMap[b.date] = [];
@@ -1164,20 +821,17 @@
 
     let cells = '';
 
-    // Leading days from previous month
     for (let i = 0; i < startDow; i++) {
       const d  = new Date(year, month, 1 - (startDow - i));
       const ds = d.toISOString().split('T')[0];
       cells += buildCalCell(ds, true, todayStr, bookingMap[ds] || []);
     }
 
-    // Current month
     for (let d = 1; d <= lastDay.getDate(); d++) {
       const ds = `${year}-${String(month + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       cells += buildCalCell(ds, false, todayStr, bookingMap[ds] || []);
     }
 
-    // Trailing days from next month
     const totalCells = startDow + lastDay.getDate();
     const remainder  = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
     for (let i = 1; i <= remainder; i++) {
@@ -1188,9 +842,6 @@
 
     document.getElementById('calBody').innerHTML = cells;
 
-    // ── Attach click listeners via JS (not inline onclick) ──────────────────
-    // This is the core fix: numeric data-idx attributes are always safe;
-    // no JSON/quote escaping needed, works on every browser and device.
     document.querySelectorAll('#calBody .cal-event').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -1203,8 +854,8 @@
   }
 
   function buildCalCell(dateStr, otherMonth, todayStr, bookings) {
-    const dayNum     = parseInt(dateStr.split('-')[2]);
-    const isToday    = dateStr === todayStr;
+    const dayNum      = parseInt(dateStr.split('-')[2]);
+    const isToday     = dateStr === todayStr;
     const hasBookings = bookings.length > 0;
 
     let classes = 'cal-cell';
@@ -1219,17 +870,12 @@
     const eventsHtml = visible.map(b => {
       const status  = getBookingStatus(b);
       const evClass = { today: 'ev-today', upcoming: 'ev-upcoming', past: 'ev-past', cancelled: 'ev-cancelled' }[status];
-
-      // Store booking by index — safe integer reference, no JSON in HTML
       const idx = calBookingIndex.length;
       calBookingIndex.push(b);
-
-      // Use <button> for native keyboard/touch/click support everywhere
       return `<button class="cal-event ${evClass}" data-idx="${idx}" type="button">${b.time} ${b.clientName || b.propertyAddress}</button>`;
     }).join('');
 
     const moreHtml = extra > 0 ? `<div class="cal-more">+${extra} more</div>` : '';
-
     return `<div class="${classes}"><div class="cal-day-num">${dayNum}</div>${eventsHtml}${moreHtml}</div>`;
   }
 
@@ -1325,6 +971,190 @@
 
   function closeCalDetailDirect() {
     document.getElementById('calDetailOverlay').classList.remove('open');
+  }
+
+  // ===== ROUTE VIEW =====
+
+  function initRouteView() {
+    const dateInput = document.getElementById('routeDate');
+    if (!dateInput.value) {
+      dateInput.value = new Date().toISOString().split('T')[0];
+    }
+    if (!routeMap) {
+      routeMap = L.map('routeMap').setView([52.8, -1.5], 7);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors', maxZoom: 18
+      }).addTo(routeMap);
+    }
+    renderRoute();
+  }
+
+  async function geocodePostcode(postcode) {
+    if (!postcode) return null;
+    const clean = postcode.trim().replace(/\s+/g, '').toUpperCase();
+    try {
+      const res  = await fetch(`https://api.postcodes.io/postcodes/${clean}`);
+      const data = await res.json();
+      if (data.status === 200) return { lat: data.result.latitude, lng: data.result.longitude };
+      return null;
+    } catch { return null; }
+  }
+
+  async function renderRoute() {
+    const dateStr = document.getElementById('routeDate').value;
+    const stopsEl = document.getElementById('routeStops');
+    const countEl = document.getElementById('routeShootCount');
+    const loadEl  = document.getElementById('routeLoadingBar');
+
+    const dayBookings = allBookings
+      .filter(b => b.date === dateStr && b.bookingStatus !== 'Cancelled')
+      .sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+
+    countEl.textContent = dayBookings.length > 0
+      ? `${dayBookings.length} shoot${dayBookings.length !== 1 ? 's' : ''}`
+      : '';
+
+    // Clear map layers including drive time labels
+    if (routeMap) {
+      routeMarkers.forEach(m => routeMap.removeLayer(m));
+      routeMarkers = [];
+      if (routePolyline) { routeMap.removeLayer(routePolyline); routePolyline = null; }
+      if (window.routeLabels) { window.routeLabels.forEach(l => routeMap.removeLayer(l)); window.routeLabels = []; }
+    }
+
+    if (dayBookings.length === 0) {
+      stopsEl.innerHTML = `
+        <div class="route-empty">
+          <i data-lucide="map-pin"></i>
+          <h3>No shoots on this day</h3>
+          <p>Pick a different date to see your route.</p>
+        </div>`;
+      if (routeMap) routeMap.setView([52.8, -1.5], 7);
+      lucide.createIcons();
+      return;
+    }
+
+    loadEl.style.display = 'block';
+    stopsEl.innerHTML = '';
+
+    const geocoded = await Promise.all(
+      dayBookings.map(async b => ({ ...b, coords: await geocodePostcode(b.postcode) }))
+    );
+
+    const withCoords = geocoded.filter(b => b.coords);
+
+    // Fetch drive times
+    let legs = [];
+    if (withCoords.length >= 2) {
+      try {
+        const res = await fetch('/.netlify/functions/get-route-times', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postcodes: withCoords.map(b => b.postcode) })
+        });
+        const data = await res.json();
+        legs = data.legs || [];
+      } catch (err) {
+        console.error('Drive time fetch failed:', err);
+      }
+    }
+
+    loadEl.style.display = 'none';
+
+    // Add numbered markers
+    withCoords.forEach((b, i) => {
+      const col  = ROUTE_COLOURS[i % ROUTE_COLOURS.length];
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="background:${col};color:#fff;border:3px solid #fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,0.25);font-family:'DM Sans',sans-serif;">${i + 1}</div>`,
+        iconSize: [32, 32], iconAnchor: [16, 16]
+      });
+      const marker = L.marker([b.coords.lat, b.coords.lng], { icon })
+        .bindPopup(`<strong style="font-size:13px;">${b.time}</strong><br><span style="font-size:12px;">${b.propertyAddress}</span><br><em style="font-size:11px;color:#64748b;">${b.service}</em>`)
+        .addTo(routeMap);
+      routeMarkers.push(marker);
+    });
+
+    // Draw route line and midpoint drive time labels
+    if (withCoords.length > 1) {
+      routePolyline = L.polyline(
+        withCoords.map(b => [b.coords.lat, b.coords.lng]),
+        { color: '#3b82f6', weight: 3, opacity: 0.6, dashArray: '8, 6' }
+      ).addTo(routeMap);
+
+      window.routeLabels = [];
+      legs.forEach((leg, i) => {
+        if (!leg || leg.error || !withCoords[i] || !withCoords[i + 1]) return;
+        const a = withCoords[i].coords;
+        const b = withCoords[i + 1].coords;
+        const labelIcon = L.divIcon({
+          className: '',
+          html: `<div style="background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:3px 8px;font-size:11px;font-weight:700;color:#334155;box-shadow:0 1px 6px rgba(0,0,0,0.15);white-space:nowrap;font-family:'DM Sans',sans-serif;">${leg.minutes} mins · ${leg.miles} mi</div>`,
+          iconSize: null, iconAnchor: [0, 0]
+        });
+        const lm = L.marker([(a.lat + b.lat) / 2, (a.lng + b.lng) / 2], { icon: labelIcon, interactive: false }).addTo(routeMap);
+        window.routeLabels.push(lm);
+      });
+    }
+
+    // Fit bounds
+    if (withCoords.length > 0) {
+      routeMap.fitBounds(
+        L.latLngBounds(withCoords.map(b => [b.coords.lat, b.coords.lng])),
+        { padding: [40, 40] }
+      );
+    }
+
+    // Build stop cards
+    let html = '';
+    geocoded.forEach((b, i) => {
+      const col      = ROUTE_COLOURS[i % ROUTE_COLOURS.length];
+      const duration = b.duration ? Math.floor(b.duration / 60) + 'h' + (b.duration % 60 ? ' ' + (b.duration % 60) + 'm' : '') : null;
+      const access   = getAccessInfo(b);
+
+      if (i > 0) {
+        const leg = legs[i - 1];
+        if (leg && !leg.error) {
+          html += `
+            <div style="display:flex;align-items:center;gap:0;padding:0 0 0 15px;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                <div style="width:2px;height:10px;background:var(--slate-300);border-radius:2px;"></div>
+                <div style="background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:8px;padding:4px 12px;font-size:12px;font-weight:700;color:#1d4ed8;white-space:nowrap;display:flex;align-items:center;gap:6px;">
+                  <i data-lucide="car" style="width:13px;height:13px;"></i>
+                  ${leg.minutes} mins · ${leg.miles} mi
+                </div>
+                <div style="width:2px;height:10px;background:var(--slate-300);border-radius:2px;"></div>
+              </div>
+            </div>`;
+        } else {
+          html += `<div class="route-connector"><div class="route-connector-line"></div></div>`;
+        }
+      }
+
+      const accessBadge   = access ? `<span class="route-stop-badge" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;">${access.label}</span>` : '';
+      const durationBadge = duration ? `<span class="route-stop-badge" style="background:var(--slate-100);color:var(--slate-500);border:1px solid var(--slate-300);">${duration}</span>` : '';
+      const phoneLine     = b.clientPhone ? `<a href="tel:${b.clientPhone}" style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:13px;color:var(--blue);text-decoration:none;font-weight:500;"><i data-lucide="phone" style="width:13px;height:13px;"></i>${b.clientPhone}</a>` : '';
+      const noCoordHtml   = !b.coords ? `<div class="route-no-coords"><i data-lucide="alert-triangle"></i> Postcode not found — not shown on map</div>` : '';
+
+      html += `
+        <div class="route-stop">
+          <div class="route-stop-num" style="background:${col};">${i + 1}</div>
+          <div class="route-stop-info">
+            <div class="route-stop-time" style="color:${col};">${b.time}</div>
+            <div class="route-stop-address">${b.propertyAddress}${b.postcode ? ', ' + b.postcode : ''}</div>
+            <div class="route-stop-service">${b.service}${b.bedrooms ? ' · ' + b.bedrooms + ' bed' : ''}</div>
+            ${(accessBadge || durationBadge) ? `<div class="route-stop-meta">${accessBadge}${durationBadge}</div>` : ''}
+            ${phoneLine}
+            ${noCoordHtml}
+          </div>
+        </div>`;
+    });
+
+    stopsEl.innerHTML = html;
+    lucide.createIcons();
+
+    // Fix Leaflet blank tile issue when rendered in a hidden tab
+    setTimeout(() => { if (routeMap) routeMap.invalidateSize(); }, 150);
   }
 
   loadBookings();
