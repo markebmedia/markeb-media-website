@@ -1330,14 +1330,10 @@ function calcInsightCards() {
     : 'No bookings this month yet';
 
   // ── 4. DAYS TO NEXT MILESTONE ──
-  const totalRevenue = bookingData
-    .filter(b => b.bookingStatus !== 'Cancelled')
-    .reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
-
-  // Find next rolling £10k milestone above current total
+  // Uses current month revenue only
   const milestoneStep = 10000;
-  const nextMilestone = Math.ceil((totalRevenue + 1) / milestoneStep) * milestoneStep;
-  const remaining     = nextMilestone - totalRevenue;
+  const nextMilestone = Math.ceil((totalThisMonthRev + 1) / milestoneStep) * milestoneStep;
+  const remaining     = nextMilestone - totalThisMonthRev;
   const now2 = new Date();
 const dayOfMonth = now2.getDate();
 const daysInMonth = new Date(now2.getFullYear(), now2.getMonth() + 1, 0).getDate();
