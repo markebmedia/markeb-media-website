@@ -837,7 +837,7 @@
         <h3 style="font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;">
   <i data-lucide="activity" style="width:18px;height:18px;"></i> Outbound Activity — Leads Added (Outreach)
 </h3>
-<p style="font-size:13px;color:#64748b;margin-top:3px;">Tracks when leads were created in the pipeline · <strong style="color:#0f172a;">Target: 112/day · 784/week · 3,360/month</strong></p>
+<p style="font-size:13px;color:#64748b;margin-top:3px;">Tracks when leads were created in the pipeline · <strong style="color:#0f172a;">Target: 200/day · 1,000/week · 4,000/month</strong> · <span style="color:#10b981;font-weight:600;">Sign-Up target: 2/day · 10/week · 40/month</span></p>
       </div>
       <div style="display:flex;gap:6px;background:#f1f5f9;border-radius:10px;padding:4px;border:1px solid #e2e8f0;">
         <button class="pipe-period-btn active" id="ppWeek"   onclick="setPipePeriod('week')">Weekly</button>
@@ -2834,19 +2834,19 @@ function renderPipelineChart() {
                       : currentPipePeriod === 'month' ? 'this month' : 'this year';
 
   const outreachTargetLine = buckets.map(() =>
-    currentPipePeriod === 'week'  ? 784
-: currentPipePeriod === 'day'   ? 112
-: currentPipePeriod === 'month' ? 3360
-: 40880
+    currentPipePeriod === 'week'  ? 1000
+: currentPipePeriod === 'day'   ? 200
+: currentPipePeriod === 'month' ? 4000
+: 52000
   );
 
-const DAILY_TARGET   = 112;
-const WEEKLY_TARGET  = 784;
-const MONTHLY_TARGET = 3360;
+const DAILY_TARGET   = 200;
+const WEEKLY_TARGET  = 1000;  // 200 × 5 days
+const MONTHLY_TARGET = 4000;  // 200 × 20 working days
   const outreachTarget = currentPipePeriod === 'week'  ? WEEKLY_TARGET
                        : currentPipePeriod === 'day'   ? DAILY_TARGET
                        : currentPipePeriod === 'month' ? MONTHLY_TARGET
-                       : 25550;
+                       : 52000;
   const outreachOnTrack = lastBucket >= outreachTarget;
   const outreachPct     = outreachTarget > 0 ? ((lastBucket / outreachTarget) * 100).toFixed(1) : '0.0';
   const outreachGap     = Math.max(0, outreachTarget - lastBucket);
@@ -2873,8 +2873,8 @@ const MONTHLY_TARGET = 3360;
     </div>
     <div style="width:100%;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-top:4px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <span style="font-size:11px;font-weight:700;color:#475569;">Outreach Progress vs ${currentPipePeriod === 'week' ? 'Weekly (490)' : currentPipePeriod === 'day' ? 'Daily (70)' : currentPipePeriod === 'month' ? 'Monthly (2,100)' : 'Yearly (25,550)'} Target</span>
-        <span style="font-size:11px;font-weight:700;color:#94a3b8;">Daily target: 112 · Weekly: 784 · Monthly: 3,360</span>
+        <span style="font-size:11px;font-weight:700;color:#94a3b8;">Outreach Progress vs ${currentPipePeriod === 'week' ? 'Weekly (1,000)' : currentPipePeriod === 'day' ? 'Daily (200)' : currentPipePeriod === 'month' ? 'Monthly (4,000)' : 'Yearly (52,000)'} Target</span>
+        <span style="font-size:11px;font-weight:700;color:#94a3b8;">Daily target: 200 · Weekly: 1,000 · Monthly: 4,000 · 5-day working week</span>
       </div>
       <div style="background:#e2e8f0;border-radius:6px;height:10px;overflow:hidden;">
         <div style="width:${Math.min(parseFloat(outreachPct), 100)}%;height:100%;background:${outreachOnTrack ? 'linear-gradient(90deg,#10b981,#3b82f6)' : 'linear-gradient(90deg,#f59e0b,#ef4444)'};border-radius:6px;transition:width 1s ease;"></div>
@@ -2914,6 +2914,24 @@ const MONTHLY_TARGET = 3360;
           backgroundColor: 'transparent',
           borderWidth: 2,
           borderDash: [5, 4],
+          pointRadius: 0,
+          tension: 0,
+          fill: false,
+          type: 'line',
+          order: 0
+        },
+        {
+          label: 'Sign-Up Target',
+          data: buckets.map(() =>
+            currentPipePeriod === 'week'  ? 10
+            : currentPipePeriod === 'day'   ? 2
+            : currentPipePeriod === 'month' ? 40
+            : 520
+          ),
+          borderColor: '#10b981',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [3, 3],
           pointRadius: 0,
           tension: 0,
           fill: false,
