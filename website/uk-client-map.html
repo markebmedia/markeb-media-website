@@ -753,6 +753,7 @@
 </div>
 
     <div class="stats-overview" id="kpiGrid"></div>
+    <div id="weekBreakdownRow" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;"></div>
 
     <!-- Run Rate Projection Chart -->
 <div class="map-section" style="margin-bottom:24px;" id="runRateSection">
@@ -2043,6 +2044,55 @@ function renderPerformanceSection() {
     kpiCards.find(c => c.key === 'totalBookings').html;
   lucide.createIcons();
   renderRunRateChart();
+
+  // ── Week-of-month breakdown for Fulfilment and Won ──
+  function weekBreakdown(bookings, label, color) {
+    const weeks = [0, 0, 0, 0];
+    bookings.filter(b => b.bookingStatus !== 'Cancelled').forEach(b => {
+      const dateStr = label === 'Fulfilment' ? b.date : (b.createdTime ? new Date(b.createdTime).toISOString().slice(0, 10) : null);
+      if (!dateStr) return;
+      const day = parseInt(dateStr.slice(8, 10), 10);
+      const w = day <= 7 ? 0 : day <= 14 ? 1 : day <= 21 ? 2 : 3;
+      weeks[w]++;
+    });
+    const total = weeks.reduce((s, v) => s + v, 0);
+    const max   = Math.max(...weeks, 1);
+    const wLabels = ['Wk 1 (1–7)', 'Wk 2 (8–14)', 'Wk 3 (15–21)', 'Wk 4 (22–end)'];
+    const peakW = weeks.indexOf(Math.max(...weeks));
+    const bars = weeks.map((c, i) => {
+      const pct  = total > 0 ? Math.round(c / total * 100) : 0;
+      const barW = Math.round(c / max * 100);
+      const isP  = i === peakW && c > 0;
+      return `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <div style="font-size:10px;color:#64748b;width:72px;flex-shrink:0;">${wLabels[i]}</div>
+          <div style="flex:1;height:20px;background:#f1f5f9;border-radius:4px;overflow:hidden;">
+            <div style="width:${barW}%;height:100%;background:${isP ? color : color + '88'};border-radius:4px;display:flex;align-items:center;padding-left:6px;transition:width 0.8s ease;">
+              ${c > 0 ? `<span style="font-size:10px;font-weight:600;color:#fff;white-space:nowrap;">${c}</span>` : ''}
+            </div>
+          </div>
+          <div style="font-size:10px;font-weight:600;color:#0f172a;width:28px;text-align:right;">${pct}%</div>
+        </div>`;
+    }).join('');
+    return `
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 18px;border-left:4px solid ${color};">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div style="font-size:12px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:0.5px;">${label} — Week of Month</div>
+          <div style="font-size:11px;color:#64748b;">${total} total · peak <strong style="color:${color};">Wk ${peakW + 1}</strong></div>
+        </div>
+        ${bars}
+        <div style="font-size:10px;color:#94a3b8;margin-top:8px;">
+          ${label === 'Fulfilment' ? 'Based on shoot date' : 'Based on when booking was placed'}
+        </div>
+      </div>`;
+  }
+
+  const weekBreakdownEl = document.getElementById('weekBreakdownRow');
+  if (weekBreakdownEl) {
+    weekBreakdownEl.innerHTML =
+      weekBreakdown(currFulfil.bookings, 'Fulfilment', '#06b6d4') +
+      weekBreakdown(curr.bookings,       'Bookings Won', '#10b981');
+  }
 
   document.getElementById('compTableTitle').textContent = windows.label1 + ' vs ' + windows.label2;
   document.getElementById('colCurrent').textContent = windows.label1;
