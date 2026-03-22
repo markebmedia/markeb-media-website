@@ -180,7 +180,7 @@ function buildReadyForReview(r) {
       </div>` : ''}
       ${r.postDate ? `
       <div class="detail-row">
-        <span class="detail-label">Go Live Date</span>
+        <span class="detail-label">Proposed Go Live Date</span>
         <span class="detail-value">${r.postDate}</span>
       </div>` : ''}
       ${r.assignee ? `
@@ -204,7 +204,7 @@ function buildReadyForReview(r) {
       All approvals and change requests must be submitted through your dashboard so our team is notified correctly.
     </div>
 
-    <p>If you have any questions, feel free to reach out at <a href="mailto:marketing@markebmedia.com">marketing@markebmedia.com</a></p>
+    <p>If you have any questions, feel free to reach out at <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a></p>
     <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
   `;
   return {
@@ -290,7 +290,7 @@ function buildScheduled(r) {
       </div>` : ''}
       ${r.postDate ? `
       <div class="detail-row">
-        <span class="detail-label">Scheduled Date</span>
+        <span class="detail-label">Proposed Go Live Date</span>
         <span class="detail-value">${r.postDate}</span>
       </div>` : ''}
       ${r.caption ? `
@@ -324,9 +324,9 @@ function buildScheduled(r) {
 
 function buildPublished(r) {
   const content = `
-    <h2>🎉 Your Content is Now Live!</h2>
+    <h2>🎉 Your Content Has Been Published!</h2>
     <p>Hi ${r.clientName},</p>
-    <p>Your latest content has been published and is now live. Here's a summary of what went out.</p>
+    <p>Great news — your content has been published and is now live on ${r.platforms}. Here's a summary of what went out.</p>
 
     <div class="booking-details">
       <div class="detail-row">
@@ -344,14 +344,14 @@ function buildPublished(r) {
       </div>` : ''}
       ${r.postDate ? `
       <div class="detail-row">
-        <span class="detail-label">Published</span>
+        <span class="detail-label">Published Date</span>
         <span class="detail-value">${r.postDate}</span>
       </div>` : ''}
     </div>
 
     <div class="alert alert-success">
-      <strong>📊 What happens next</strong><br>
-      Keep an eye on your engagement over the next 24–48 hours. We'll be monitoring performance on our end too.
+      <strong>📅 What happens next</strong><br>
+      You can view your full content history and upcoming posts in your dashboard at any time.
     </div>
 
     <center>
@@ -362,7 +362,7 @@ function buildPublished(r) {
     <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
   `;
   return {
-    subject: `Your Content is Live — ${r.idea}`,
+    subject: `Your Content Has Been Published — ${r.idea}`,
     html: getEmailLayout(content)
   };
 }
@@ -392,7 +392,7 @@ function buildDrafting(r) {
       </div>` : ''}
       ${r.postDate ? `
       <div class="detail-row">
-        <span class="detail-label">Go Live Date</span>
+        <span class="detail-label">Proposed Go Live Date</span>
         <span class="detail-value">${r.postDate}</span>
       </div>` : ''}
       ${r.assignee ? `
