@@ -191,15 +191,20 @@ function buildReadyForReview(r) {
     </div>
 
     <div class="alert alert-info">
-      <strong>✅ How to approve</strong><br>
-      Log in to your dashboard to review the full content — including captions and media files. If you have any feedback or changes, simply reply to this email.
+      <strong>✅ How to review your content</strong><br>
+      Log in to your dashboard, go to <strong>Content Calendar</strong> in the left menu, find <strong>${r.postDate || 'your scheduled date'}</strong> and click on it to view, approve or request changes.
     </div>
 
     <center>
-      <a href="${DASHBOARD_URL}" class="button">Review Content Now</a>
+      <a href="${DASHBOARD_URL}" class="button">Go to My Dashboard</a>
     </center>
 
-    <p>If you have any questions, feel free to reach out!</p>
+    <div class="alert alert-warning">
+      <strong>⚠️ Please do not reply to this email</strong><br>
+      All approvals and change requests must be submitted through your dashboard so our team is notified correctly.
+    </div>
+
+    <p>If you have any questions, feel free to reach out at <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a></p>
     <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
   `;
   return {
