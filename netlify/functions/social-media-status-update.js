@@ -204,7 +204,7 @@ function buildReadyForReview(r) {
       All approvals and change requests must be submitted through your dashboard so our team is notified correctly.
     </div>
 
-    <p>If you have any questions, feel free to reach out at <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a></p>
+    <p>If you have any questions, feel free to reach out at <a href="mailto:marketing@markebmedia.com">marketing@markebmedia.com</a></p>
     <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
   `;
   return {
@@ -314,6 +314,7 @@ function buildScheduled(r) {
       Reply to this email as soon as possible so we can adjust before the post goes live.
     </div>
 
+    <p>If you have any questions, feel free to reach out at <a href="mailto:marketing@markebmedia.com">marketing@markebmedia.com</a></p>
     <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
   `;
   return {
@@ -359,6 +360,7 @@ function buildPublished(r) {
     </center>
 
     <p>Thank you for trusting Markeb Media with your social media content!</p>
+    <p>If you have any questions, feel free to reach out at <a href="mailto:marketing@markebmedia.com">marketing@markebmedia.com</a></p>
     <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
   `;
   return {
