@@ -204,7 +204,7 @@ function buildReadyForReview(r) {
       All approvals and change requests must be submitted through your dashboard so our team is notified correctly.
     </div>
 
-    <p>If you have any questions, feel free to reach out at <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a></p>
+    <p>If you have any questions, feel free to reach out at <a href="mailto:marketing@markebmedia.com">marketing@markebmedia.com</a></p>
     <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
   `;
   return {
