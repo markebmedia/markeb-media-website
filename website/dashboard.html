@@ -2333,6 +2333,85 @@
     .gh-card-actions { flex-direction: column; }
     .gh-btn { min-width: 0; }
   }
+
+  /* ── Section headers (Review / Delivered dividers) ── */
+  .gh-section-header {
+    padding: 8px 0 4px;
+  }
+  .gh-section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 6px;
+  }
+  .gh-section-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .gh-section-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 20px;
+    margin-left: 2px;
+  }
+  .gh-section-sub {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0;
+    padding-left: 22px;
+  }
+
+  /* ── Delivered card ── */
+  .gh-card-delivered {
+    border-color: #a7f3d0;
+  }
+  .gh-card-delivered:hover {
+    border-color: #34d399;
+    box-shadow: 0 12px 40px rgba(16,185,129,.1);
+  }
+  .gh-ribbon-delivered {
+    background: linear-gradient(90deg, #10b981, #34d399) !important;
+  }
+  .gh-badge-delivered {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1.5px solid #6ee7b7;
+  }
+
+  /* ── Download button ── */
+  .gh-download-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 13px 20px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all .2s ease;
+    box-shadow: 0 4px 12px rgba(16,185,129,.25);
+  }
+  .gh-download-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(16,185,129,.35);
+    color: #fff;
+    text-decoration: none;
+  }
 </style>
 
 </head>
@@ -4444,7 +4523,8 @@ const GH_ENDPOINTS = {
   submitReview: '/.netlify/functions/submit-review',
 };
 
-let ghProjects = [];
+let ghProjects  = [];   // Client Reviews records (raw content)
+let ghDelivered = [];   // Delivered bookings (completed work)
 
 async function loadGallery() {
   const isAdmin = localStorage.getItem('admin_impersonation') === 'true';
@@ -4472,12 +4552,19 @@ async function loadGallery() {
     loading.style.display = 'none';
     grid.style.display    = 'grid';
 
-    if (!data.success || !data.projects?.length) {
+    if (!data.success) {
+      ghShowError('Unable to load your projects. Please try again.');
+      return;
+    }
+
+    ghProjects  = data.projects  || [];
+    ghDelivered = data.delivered || [];
+
+    if (!ghProjects.length && !ghDelivered.length) {
       grid.innerHTML = ghEmptyHTML();
       return;
     }
 
-    ghProjects = data.projects;
     ghRenderGrid();
     ghUpdateProgress();
 
@@ -4489,13 +4576,57 @@ async function loadGallery() {
   }
 }
 
+/* ── Render both card types ─────────────────────────────────────────── */
 function ghRenderGrid() {
-  document.getElementById('ghGrid').innerHTML = ghProjects.map(ghCardHTML).join('');
+  const grid = document.getElementById('ghGrid');
+
+  // Section header if both sets have content
+  const showReviewHeader    = ghProjects.length  > 0;
+  const showDeliveredHeader = ghDelivered.length > 0;
+
+  let html = '';
+
+  // ── Pending review cards ──
+  if (showReviewHeader) {
+    html += `
+      <div class="gh-section-header" style="grid-column:1/-1;">
+        <div class="gh-section-label">
+          <span class="gh-section-dot" style="background:#3b82f6;"></span>
+          Content Awaiting Your Review
+          <span class="gh-section-count">${ghProjects.length}</span>
+        </div>
+        <p class="gh-section-sub">Review your raw files and approve or leave feedback before we send them to editing</p>
+      </div>
+    `;
+    html += ghProjects.map(ghReviewCardHTML).join('');
+  }
+
+  // ── Delivered content cards ──
+  if (showDeliveredHeader) {
+    html += `
+      <div class="gh-section-header" style="grid-column:1/-1; ${showReviewHeader ? 'margin-top:32px;' : ''}">
+        <div class="gh-section-label">
+          <span class="gh-section-dot" style="background:#10b981;"></span>
+          Your Delivered Content
+          <span class="gh-section-count">${ghDelivered.length}</span>
+        </div>
+        <p class="gh-section-sub">All completed projects — click to download your files</p>
+      </div>
+    `;
+    html += ghDelivered.map(ghDeliveredCardHTML).join('');
+  }
+
+  grid.innerHTML = html;
 }
 
-function ghCardHTML(p) {
+/* ── Review card (raw content, needs client action) ─────────────────── */
+function ghReviewCardHTML(p) {
   const st = p.reviewStatus || 'Pending Review';
-  const cardClass = { 'Notes Added': 'card-notes', 'Approved': 'card-approved', 'Sent to Editors': 'card-sent' }[st] || '';
+  const cardClass = {
+    'Notes Added':     'card-notes',
+    'Approved':        'card-approved',
+    'Sent to Editors': 'card-sent',
+  }[st] || '';
 
   const badge = {
     'Pending Review':  `<span class="gh-badge gh-badge-pending">● Pending Review</span>`,
@@ -4508,7 +4639,7 @@ function ghCardHTML(p) {
     ? new Date(p.shootDate).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
     : null;
 
-  const locked = ['Approved','Sent to Editors'].includes(st);
+  const locked = ['Approved', 'Sent to Editors'].includes(st);
 
   /* Photos panel */
   const photosPanel = p.photosLink || p.photosNotes ? `
@@ -4572,7 +4703,6 @@ function ghCardHTML(p) {
     ? `<div class="gh-no-link" style="margin:16px 20px 0;">⏳ Your Dropbox folders will appear here once your content is ready</div>`
     : '';
 
-  /* Bottom actions */
   const actions = locked
     ? st === 'Sent to Editors'
       ? `<div class="gh-sent-banner">
@@ -4597,20 +4727,16 @@ function ghCardHTML(p) {
   return `
     <div class="gh-card ${cardClass}" id="gh-card-${p.id}">
       <div class="gh-card-ribbon"></div>
-
       <div class="gh-card-top">
         <div class="gh-card-address">${ghEsc(p.projectAddress)}</div>
         ${badge}
       </div>
-
       <div class="gh-meta">
-        ${p.serviceType       ? `<div class="gh-meta-item">📋 ${ghEsc(p.serviceType)}</div>` : ''}
-        ${shootDate           ? `<div class="gh-meta-item">📅 Shoot: ${shootDate}</div>` : ''}
-        ${p.photographerName  ? `<div class="gh-meta-item">👤 ${ghEsc(p.photographerName)}</div>` : ''}
+        ${p.serviceType      ? `<div class="gh-meta-item">📋 ${ghEsc(p.serviceType)}</div>`      : ''}
+        ${shootDate          ? `<div class="gh-meta-item">📅 Shoot: ${shootDate}</div>`           : ''}
+        ${p.photographerName ? `<div class="gh-meta-item">👤 ${ghEsc(p.photographerName)}</div>` : ''}
       </div>
-
       <div class="gh-divider"></div>
-
       ${!locked ? `
       <div class="gh-instructions">
         <strong>📋 How to review your content</strong>
@@ -4621,16 +4747,60 @@ function ghCardHTML(p) {
           <li><b>Approve &amp; Notify Team</b> when you're happy — we'll send it straight to our editors</li>
         </ol>
       </div>` : ''}
-
       <div class="gh-media-panels">
         ${photosPanel}
         ${videoPanel}
         ${noPanels}
       </div>
-
       <div style="height:16px;"></div>
       <div class="gh-feedback" id="gh-feedback-${p.id}"></div>
       ${actions}
+    </div>
+  `;
+}
+
+/* ── Delivered card (completed booking, download link) ──────────────── */
+function ghDeliveredCardHTML(b) {
+  const shootDate = b.shootDate
+    ? new Date(b.shootDate).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+    : null;
+
+  const price = b.finalPrice
+    ? `£${Number(b.finalPrice).toLocaleString('en-GB', { minimumFractionDigits: 0 })}`
+    : null;
+
+  return `
+    <div class="gh-card gh-card-delivered" id="gh-card-${b.id}">
+      <div class="gh-card-ribbon gh-ribbon-delivered"></div>
+
+      <div class="gh-card-top">
+        <div class="gh-card-address">${ghEsc(b.projectAddress)}</div>
+        <span class="gh-badge gh-badge-delivered">● Delivered</span>
+      </div>
+
+      <div class="gh-meta">
+        ${b.serviceType ? `<div class="gh-meta-item">📋 ${ghEsc(b.serviceType)}</div>`  : ''}
+        ${shootDate     ? `<div class="gh-meta-item">📅 ${shootDate}</div>`              : ''}
+        ${price         ? `<div class="gh-meta-item">💷 ${price}</div>`                  : ''}
+        ${b.photographer ? `<div class="gh-meta-item">👤 ${ghEsc(b.photographer)}</div>` : ''}
+      </div>
+
+      <div class="gh-divider"></div>
+
+      <div style="padding: 16px 20px 20px;">
+        <p style="font-size:13px;color:#64748b;margin-bottom:14px;line-height:1.6;">
+          Your edited content is ready. Click below to access your files.
+        </p>
+        <a
+          href="${ghEsc(b.deliveryLink)}"
+          target="_blank"
+          rel="noopener"
+          class="gh-download-btn"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Your Delivered Files
+        </a>
+      </div>
     </div>
   `;
 }
@@ -4657,7 +4827,7 @@ async function ghSaveNotes(recordId) {
       body: JSON.stringify({
         recordId,
         action: 'save_notes',
-        clientEmail: p.clientEmail,
+        clientEmail:    p.clientEmail,
         projectAddress: p.projectAddress,
         photosNotes,
         videoNotes,
@@ -4680,7 +4850,6 @@ async function ghSaveNotes(recordId) {
     console.error(err);
     ghFeedback(recordId, 'Network error. Please check your connection.', 'error');
   }
-
   ghSetLoading(recordId, false);
 }
 
@@ -4706,7 +4875,7 @@ async function ghApprove(recordId) {
       body: JSON.stringify({
         recordId,
         action: 'approve',
-        clientEmail: p.clientEmail,
+        clientEmail:    p.clientEmail,
         projectAddress: p.projectAddress,
         photosNotes,
         videoNotes,
@@ -4729,7 +4898,6 @@ async function ghApprove(recordId) {
     console.error(err);
     ghFeedback(recordId, 'Network error. Please check your connection.', 'error');
   }
-
   ghSetLoading(recordId, false);
 }
 
@@ -4738,9 +4906,14 @@ function ghUpdateProgress() {
   const wrap  = document.getElementById('ghProgressWrap');
   const fill  = document.getElementById('ghProgressFill');
   const count = document.getElementById('ghProgressCount');
+
   if (!ghProjects.length) { wrap.style.display = 'none'; return; }
-  const done = ghProjects.filter(p => ['Notes Added','Approved','Sent to Editors'].includes(p.reviewStatus)).length;
-  const pct  = Math.round((done / ghProjects.length) * 100);
+
+  const done = ghProjects.filter(p =>
+    ['Notes Added', 'Approved', 'Sent to Editors'].includes(p.reviewStatus)
+  ).length;
+  const pct = Math.round((done / ghProjects.length) * 100);
+
   fill.style.width   = pct + '%';
   count.textContent  = `${done} / ${ghProjects.length} reviewed`;
   wrap.style.display = 'flex';
@@ -4784,8 +4957,8 @@ function ghEmptyHTML() {
       <div class="gh-empty-icon">
         <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
       </div>
-      <h3>No Projects to Review Yet</h3>
-      <p>When your shoot is complete and your raw content is ready for review, it will appear here. You'll receive an email when it's ready.</p>
+      <h3>No Projects Yet</h3>
+      <p>Your completed and in-progress projects will appear here. You'll receive an email when your content is ready to review.</p>
     </div>`;
 }
 
