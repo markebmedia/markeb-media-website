@@ -7,6 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL     = 'Markeb Media <marketing@markebmedia.com>';
 const INTERNAL_EMAIL = 'marketing@markebmedia.com';
+const CC_EMAIL       = 'commercial@markebmedia.com';
 const SITE_URL       = 'https://markebmedia.com';
 const LOGO_URL       = 'https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png';
 const DASHBOARD_URL  = 'https://markebmedia.com/website/dashboard.html';
@@ -361,6 +362,68 @@ function buildPublished(r) {
   };
 }
 
+function buildDrafting(r) {
+  const content = `
+    <h2>✏️ Changes Requested — Content Returned to Draft</h2>
+    <p>A client has reviewed their content and requested changes. The post has been moved back to Drafting.</p>
+
+    <div class="booking-details">
+      <div class="detail-row">
+        <span class="detail-label">Client</span>
+        <span class="detail-value">${r.clientName}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Post Idea</span>
+        <span class="detail-value">${r.idea}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Platform(s)</span>
+        <span class="detail-value">${r.platforms}</span>
+      </div>
+      ${r.contentType ? `
+      <div class="detail-row">
+        <span class="detail-label">Content Type</span>
+        <span class="detail-value">${r.contentType}</span>
+      </div>` : ''}
+      ${r.postDate ? `
+      <div class="detail-row">
+        <span class="detail-label">Planned Date</span>
+        <span class="detail-value">${r.postDate}</span>
+      </div>` : ''}
+      ${r.assignee ? `
+      <div class="detail-row">
+        <span class="detail-label">Assignee</span>
+        <span class="detail-value">${r.assignee}</span>
+      </div>` : ''}
+    </div>
+
+    ${r.notesFromClient ? `
+    <div class="alert alert-warning">
+      <strong>💬 Client feedback:</strong><br>
+      ${r.notesFromClient}
+    </div>
+    ` : `
+    <div class="alert alert-warning">
+      <strong>⚠️ No feedback provided</strong><br>
+      The client did not leave specific notes. You may want to follow up directly.
+    </div>
+    `}
+
+    <div class="alert alert-info">
+      <strong>📋 Next step</strong><br>
+      Please review the client's feedback, make the necessary changes, and move the status back to Ready for Review when done.
+    </div>
+
+    <center>
+      <a href="${DASHBOARD_URL}" class="button">Open Content Calendar</a>
+    </center>
+  `;
+  return {
+    subject: `Changes Requested — ${r.clientName} | ${r.idea}`,
+    html: getEmailLayout(content)
+  };
+}
+
 // ─── Handler ───────────────────────────────────────────────────────────────────
 
 exports.handler = async (event) => {
@@ -378,18 +441,19 @@ exports.handler = async (event) => {
   const fields = payload.fields || payload;
 
   const r = {
-    clientName:    fields['Client Name']    || 'there',
-    clientEmail:   fields['Email']          || null,
-    idea:          fields['Idea']           || 'your post',
-    platforms:     Array.isArray(fields['Platform(s)'])
-                     ? fields['Platform(s)'].join(', ')
-                     : (fields['Platform(s)'] || ''),
-    postDate:      fields['Post Date']      || null,
-    status:        fields['Status']         || '',
-    assignee:      fields['Assignee']       || null,
-    contentType:   fields['Content Type']   || null,
-    contentPillar: fields['Content Pillar'] || null,
-    caption:       fields['Caption']        || null,
+    clientName:      fields['Client Name']       || 'there',
+    clientEmail:     fields['Email']             || null,
+    idea:            fields['Idea']              || 'your post',
+    platforms:       Array.isArray(fields['Platform(s)'])
+                       ? fields['Platform(s)'].join(', ')
+                       : (fields['Platform(s)'] || ''),
+    postDate:        fields['Post Date']         || null,
+    status:          fields['Status']            || '',
+    assignee:        fields['Assignee']          || null,
+    contentType:     fields['Content Type']      || null,
+    contentPillar:   fields['Content Pillar']    || null,
+    caption:         fields['Caption']           || null,
+    notesFromClient: fields['Notes from Client'] || null,
   };
 
   const status = r.status.trim().toLowerCase();
@@ -415,6 +479,10 @@ exports.handler = async (event) => {
     toEmail      = r.clientEmail;
     emailContent = buildPublished(r);
 
+  } else if (status === 'drafting') {
+    toEmail      = INTERNAL_EMAIL;
+    emailContent = buildDrafting(r);
+
   } else {
     return {
       statusCode: 200,
@@ -426,6 +494,7 @@ exports.handler = async (event) => {
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: toEmail,
+      cc: CC_EMAIL,
       subject: emailContent.subject,
       html: emailContent.html,
     });
