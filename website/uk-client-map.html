@@ -1954,11 +1954,25 @@ function getPeriodWindows() {
   return { current: [s1,e1], previous: [s2,e2], label1: now.getFullYear().toString(), label2: (now.getFullYear()-1).toString(), periodLabel: 'Year on Year — ' + now.getFullYear() + ' vs ' + (now.getFullYear()-1) };
 }
 
-function filterToWindow(window) {
+function filterToWindow(window, dateMode = 'won') {
   const [start, end] = window;
   return {
-    clients:  clientData.filter(u => { const d = new Date(u.fields['Created Date']); return d >= start && d <= end; }),
-    bookings: bookingData.filter(b => { if (!b.date) return false; const d = new Date(b.date); return d >= start && d <= end; })
+    clients: clientData.filter(u => {
+      const d = new Date(u.fields['Created Date']);
+      return d >= start && d <= end;
+    }),
+    bookings: bookingData.filter(b => {
+      if (dateMode === 'fulfilment') {
+        if (!b.date) return false;
+        const [y, m, day] = b.date.slice(0, 10).split('-').map(Number);
+        const d = new Date(y, m - 1, day);
+        return d >= start && d <= end;
+      } else {
+        if (!b.createdTime) return false;
+        const d = new Date(b.createdTime);
+        return d >= start && d <= end;
+      }
+    })
   };
 }
 
@@ -1982,8 +1996,10 @@ function renderPerformanceSection() {
   const windows = getPeriodWindows();
   document.getElementById('perfPeriodLabel').textContent = windows.periodLabel;
 
-  const curr = filterToWindow(windows.current);
-  const prev = filterToWindow(windows.previous);
+  const curr       = filterToWindow(windows.current);
+  const prev       = filterToWindow(windows.previous);
+  const currFulfil = filterToWindow(windows.current,  'fulfilment');
+  const prevFulfil = filterToWindow(windows.previous, 'fulfilment');
   const currNewVsEx = splitNewVsExisting(curr.bookings, windows.current[0]);
   const prevNewVsEx = splitNewVsExisting(prev.bookings, windows.previous[0]);
 
