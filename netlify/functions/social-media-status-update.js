@@ -140,7 +140,7 @@ function getEmailLayout(content) {
       <p>
         <strong>Markeb Media</strong><br>
         Professional Property Media, Marketing &amp; Technology Solution<br>
-        <a href="mailto:marketing@markebmedia.com">marketing@markebmedia.com</a>
+        <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
       </p>
       <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">
         Need help? <a href="${SITE_URL}/contact">Contact us</a>
