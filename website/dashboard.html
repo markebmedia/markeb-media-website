@@ -4732,10 +4732,9 @@ function ghReviewCardHTML(p) {
         ${badge}
       </div>
       <div class="gh-meta">
-        ${p.serviceType      ? `<div class="gh-meta-item">📋 ${ghEsc(p.serviceType)}</div>`      : ''}
-        ${shootDate          ? `<div class="gh-meta-item">📅 Shoot: ${shootDate}</div>`           : ''}
-        ${p.photographerName ? `<div class="gh-meta-item">👤 ${ghEsc(p.photographerName)}</div>` : ''}
-      </div>
+  ${p.serviceType ? `<div class="gh-meta-item">📋 ${ghEsc(p.serviceType)}</div>` : ''}
+  ${shootDate     ? `<div class="gh-meta-item">📅 Shoot: ${shootDate}</div>`      : ''}
+</div>
       <div class="gh-divider"></div>
       ${!locked ? `
       <div class="gh-instructions">
@@ -4765,28 +4764,18 @@ function ghDeliveredCardHTML(b) {
     ? new Date(b.shootDate).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
     : null;
 
-  const price = b.finalPrice
-    ? `£${Number(b.finalPrice).toLocaleString('en-GB', { minimumFractionDigits: 0 })}`
-    : null;
-
   return `
     <div class="gh-card gh-card-delivered" id="gh-card-${b.id}">
       <div class="gh-card-ribbon gh-ribbon-delivered"></div>
-
       <div class="gh-card-top">
         <div class="gh-card-address">${ghEsc(b.projectAddress)}</div>
         <span class="gh-badge gh-badge-delivered">● Delivered</span>
       </div>
-
       <div class="gh-meta">
-        ${b.serviceType ? `<div class="gh-meta-item">📋 ${ghEsc(b.serviceType)}</div>`  : ''}
-        ${shootDate     ? `<div class="gh-meta-item">📅 ${shootDate}</div>`              : ''}
-        ${price         ? `<div class="gh-meta-item">💷 ${price}</div>`                  : ''}
-        ${b.photographer ? `<div class="gh-meta-item">👤 ${ghEsc(b.photographer)}</div>` : ''}
+        ${b.serviceType ? `<div class="gh-meta-item">📋 ${ghEsc(b.serviceType)}</div>` : ''}
+        ${shootDate     ? `<div class="gh-meta-item">📅 ${shootDate}</div>`             : ''}
       </div>
-
       <div class="gh-divider"></div>
-
       <div style="padding: 16px 20px 20px;">
         <p style="font-size:13px;color:#64748b;margin-bottom:14px;line-height:1.6;">
           Your edited content is ready. Click below to access your files.
