@@ -180,7 +180,7 @@ function buildReadyForReview(r) {
       </div>` : ''}
       ${r.postDate ? `
       <div class="detail-row">
-        <span class="detail-label">Planned Date</span>
+        <span class="detail-label">Go Live Date</span>
         <span class="detail-value">${r.postDate}</span>
       </div>` : ''}
       ${r.assignee ? `
@@ -387,7 +387,7 @@ function buildDrafting(r) {
       </div>` : ''}
       ${r.postDate ? `
       <div class="detail-row">
-        <span class="detail-label">Planned Date</span>
+        <span class="detail-label">Go Live Date</span>
         <span class="detail-value">${r.postDate}</span>
       </div>` : ''}
       ${r.assignee ? `
