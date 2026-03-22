@@ -1971,6 +1971,368 @@
     font-size: 13px;
   }
 }
+
+/* ── Review Hub ── */
+  .gh-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .gh-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 3.5vw, 30px);
+    font-weight: 700;
+    background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 4px;
+  }
+  .gh-header p { color: #64748b; font-size: 14px; margin: 0; }
+
+  .gh-legend {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .gh-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+  }
+  .gh-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Progress bar */
+  .gh-progress-wrap {
+    display: none;
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .gh-progress-label { font-size: 13px; font-weight: 600; color: #475569; white-space: nowrap; }
+  .gh-progress-track { flex: 1; min-width: 100px; height: 8px; background: #e2e8f0; border-radius: 100px; overflow: hidden; }
+  .gh-progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); border-radius: 100px; transition: width .6s ease; }
+  .gh-progress-count { font-size: 13px; font-weight: 700; color: #1e293b; white-space: nowrap; }
+
+  /* Loading */
+  .gh-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+    gap: 16px;
+  }
+  .gh-loading p { color: #64748b; font-size: 14px; margin: 0; }
+
+  /* Grid */
+  .gh-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+  }
+
+  /* Card */
+  .gh-card {
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease;
+  }
+  .gh-card:hover { box-shadow: 0 12px 40px rgba(59,130,246,.1); transform: translateY(-3px); border-color: #bfdbfe; }
+  .gh-card.card-notes    { border-color: #fcd34d; }
+  .gh-card.card-approved { border-color: #6ee7b7; }
+  .gh-card.card-sent     { border-color: #a78bfa; }
+
+  .gh-card-ribbon { height: 6px; background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+  .gh-card.card-notes    .gh-card-ribbon { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+  .gh-card.card-approved .gh-card-ribbon { background: linear-gradient(90deg, #10b981, #34d399); }
+  .gh-card.card-sent     .gh-card-ribbon { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+
+  /* Card top */
+  .gh-card-top {
+    padding: 18px 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .gh-card-address { font-size: 15px; font-weight: 700; color: #0f172a; line-height: 1.35; flex: 1; }
+
+  /* Badges */
+  .gh-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 11px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .gh-badge-pending  { background: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; }
+  .gh-badge-notes    { background: #fffbeb; color: #92400e; border: 1.5px solid #fcd34d; }
+  .gh-badge-approved { background: #ecfdf5; color: #065f46; border: 1.5px solid #6ee7b7; }
+  .gh-badge-sent     { background: #f3e8ff; color: #5b21b6; border: 1.5px solid #c4b5fd; }
+
+  /* Meta row */
+  .gh-meta {
+    padding: 10px 20px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .gh-meta-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #64748b; }
+
+  .gh-divider { height: 1px; background: #f1f5f9; margin: 0 20px; }
+
+  /* Instructions */
+  .gh-instructions {
+    margin: 16px 20px 0;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border: 1.5px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #1e40af;
+    line-height: 1.6;
+  }
+  .gh-instructions strong { display: block; margin-bottom: 6px; font-size: 13px; }
+  .gh-instructions ol { margin: 0; padding-left: 18px; }
+  .gh-instructions li { margin-bottom: 2px; }
+
+  /* Media type panels */
+  .gh-media-panels { padding: 16px 20px 0; display: flex; flex-direction: column; gap: 14px; }
+
+  .gh-media-panel {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .gh-media-panel.photos-panel { border-color: #bfdbfe; }
+  .gh-media-panel.video-panel  { border-color: #ddd6fe; }
+
+  .gh-media-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    gap: 10px;
+  }
+  .gh-media-panel.photos-panel .gh-media-panel-header { background: linear-gradient(135deg, #eff6ff, #dbeafe); }
+  .gh-media-panel.video-panel  .gh-media-panel-header { background: linear-gradient(135deg, #faf5ff, #ede9fe); }
+
+  .gh-media-type-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .gh-media-panel.photos-panel .gh-media-type-label { color: #1e40af; }
+  .gh-media-panel.video-panel  .gh-media-type-label { color: #5b21b6; }
+
+  .gh-media-type-label .gh-type-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .photos-panel .gh-type-icon { background: #dbeafe; }
+  .video-panel  .gh-type-icon { background: #ede9fe; }
+
+  .gh-media-count {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  .photos-panel .gh-media-count { background: #dbeafe; color: #1e40af; }
+  .video-panel  .gh-media-count { background: #ede9fe; color: #5b21b6; }
+
+  /* Dropbox buttons */
+  .gh-dropbox-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    margin: 12px 16px 4px;
+    padding: 10px 16px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all .2s ease;
+  }
+  .gh-dropbox-btn:hover { transform: translateY(-1px); text-decoration: none; }
+  .gh-dropbox-btn.photos-btn {
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(29,78,216,.22);
+  }
+  .gh-dropbox-btn.photos-btn:hover { box-shadow: 0 6px 16px rgba(29,78,216,.32); color: #fff; }
+  .gh-dropbox-btn.video-btn {
+    background: linear-gradient(135deg, #6d28d9, #7c3aed);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(109,40,217,.22);
+  }
+  .gh-dropbox-btn.video-btn:hover { box-shadow: 0 6px 16px rgba(109,40,217,.32); color: #fff; }
+
+  .gh-no-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 12px 16px 4px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 9px;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+
+  /* Notes inside panel */
+  .gh-panel-notes { padding: 12px 16px 16px; }
+  .gh-notes-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 7px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .photos-panel .gh-notes-label { color: #1e40af; }
+  .video-panel  .gh-notes-label { color: #5b21b6; }
+
+  .gh-notes-textarea {
+    width: 100%;
+    min-height: 90px;
+    padding: 11px 13px;
+    border: 2px solid #e2e8f0;
+    border-radius: 9px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color .2s ease, box-shadow .2s ease;
+    background: #fafafa;
+    box-sizing: border-box;
+  }
+  .photos-panel .gh-notes-textarea:focus { outline: none; border-color: #3b82f6; background: #fff; box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+  .video-panel  .gh-notes-textarea:focus { outline: none; border-color: #8b5cf6; background: #fff; box-shadow: 0 0 0 3px rgba(139,92,246,.1); }
+  .gh-notes-textarea:disabled { background: #f8fafc; color: #64748b; cursor: not-allowed; border-color: #e2e8f0; }
+  .gh-notes-hint { font-size: 11px; color: #94a3b8; margin-top: 5px; line-height: 1.5; }
+
+  /* Card actions */
+  .gh-card-actions { display: flex; gap: 10px; padding: 16px 20px 20px; flex-wrap: wrap; }
+  .gh-btn {
+    flex: 1;
+    min-width: 120px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 11px 16px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all .2s ease;
+  }
+  .gh-btn:disabled { opacity: .55; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+  .gh-btn-save    { background: #fff; color: #0f172a; border: 2px solid #e2e8f0; }
+  .gh-btn-save:hover:not(:disabled) { border-color: #94a3b8; background: #f8fafc; }
+  .gh-btn-approve { background: linear-gradient(135deg, #10b981, #059669); color: #fff; box-shadow: 0 4px 12px rgba(16,185,129,.25); }
+  .gh-btn-approve:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16,185,129,.35); }
+
+  /* Feedback strip */
+  .gh-feedback {
+    margin: 0 20px 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+  .gh-feedback.success { display: flex; background: #ecfdf5; color: #065f46; border: 1.5px solid #6ee7b7; }
+  .gh-feedback.error   { display: flex; background: #fef2f2; color: #991b1b; border: 1.5px solid #fca5a5; }
+
+  /* Completed banners */
+  .gh-approved-banner, .gh-sent-banner {
+    margin: 0 20px 16px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .gh-approved-banner { background: linear-gradient(135deg,#ecfdf5,#d1fae5); border: 2px solid #34d399; color: #065f46; }
+  .gh-sent-banner     { background: linear-gradient(135deg,#f3e8ff,#ede9fe); border: 2px solid #a78bfa; color: #5b21b6; }
+
+  /* Empty state */
+  .gh-empty {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 40px;
+    background: linear-gradient(135deg,#fff,#f8fafc);
+    border: 2px dashed #cbd5e1;
+    border-radius: 20px;
+    text-align: center;
+  }
+  .gh-empty-icon {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg,#eff6ff,#dbeafe);
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+  }
+  .gh-empty h3 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #1e293b; margin: 0 0 10px; }
+  .gh-empty p  { color: #64748b; font-size: 14px; max-width: 380px; line-height: 1.7; margin: 0; }
+
+  @media (max-width: 600px) {
+    .gh-grid { grid-template-columns: 1fr; }
+    .gh-card-actions { flex-direction: column; }
+    .gh-btn { min-width: 0; }
+  }
 </style>
 
 </head>
@@ -2329,26 +2691,41 @@
   </div>
 </div>
 
-      <!-- GALLERY -->
+     <!-- GALLERY -->
       <div id="gallery" class="section">
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Your Photo Gallery</h2>
-            <p class="card-subtitle">View and download your completed photography projects</p>
+
+        <!-- Header -->
+        <div class="gh-header">
+          <div>
+            <h2>Content Review Hub</h2>
+            <p>Review your raw photos and video clips before we send them to the editing team</p>
           </div>
-          <div class="card-content">
-            <div class="gallery-grid" id="galleryGrid">
-              <div class="gallery-item" style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
-                <div class="gallery-image" style="width:100%;height:200px;background:linear-gradient(135deg,#667eea 0%, #764ba2 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:48px;">IMG</div>
-                <div class="gallery-info" style="padding:20px;">
-                  <div class="gallery-title" style="font-weight:600;color:#0f172a;margin-bottom:8px;">Welcome to your gallery</div>
-                  <div class="gallery-date" style="color:#64748b;font-size:14px;margin-bottom:12px;">Your completed projects will appear here</div>
-                  <span class="gallery-status status-processing" style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;background:#fef3c7;color:#d97706;">Coming Soon</span>
-                </div>
-              </div>
-            </div>
+          <div class="gh-legend">
+            <div class="gh-legend-item"><div class="gh-legend-dot" style="background:#3b82f6;"></div>Pending Review</div>
+            <div class="gh-legend-item"><div class="gh-legend-dot" style="background:#f59e0b;"></div>Notes Added</div>
+            <div class="gh-legend-item"><div class="gh-legend-dot" style="background:#10b981;"></div>Approved</div>
+            <div class="gh-legend-item"><div class="gh-legend-dot" style="background:#8b5cf6;"></div>Sent to Editors</div>
           </div>
         </div>
+
+        <!-- Progress bar -->
+        <div class="gh-progress-wrap" id="ghProgressWrap" style="display:none;flex-direction:row;">
+          <span class="gh-progress-label">Overall Review Progress</span>
+          <div class="gh-progress-track">
+            <div class="gh-progress-fill" id="ghProgressFill" style="width:0%;"></div>
+          </div>
+          <span class="gh-progress-count" id="ghProgressCount">0 / 0 reviewed</span>
+        </div>
+
+        <!-- Loading -->
+        <div class="gh-loading" id="ghLoading">
+          <div class="spinner"></div>
+          <p>Loading your content projects&hellip;</p>
+        </div>
+
+        <!-- Grid -->
+        <div class="gh-grid" id="ghGrid" style="display:none;"></div>
+
       </div>
 
       <!-- COPYRYTA -->
@@ -4057,6 +4434,379 @@ async function loadRecentBookings() {
   <script>
     // Initialize all Lucide icons
     lucide.createIcons();
+  </script>
+
+  <script>
+/* ── Gallery / Review Hub ───────────────────────────────────────────── */
+
+const GH_ENDPOINTS = {
+  getGallery:   '/.netlify/functions/get-client-gallery',
+  submitReview: '/.netlify/functions/submit-review',
+};
+
+let ghProjects = [];
+
+async function loadGallery() {
+  const isAdmin = localStorage.getItem('admin_impersonation') === 'true';
+  const user = isAdmin
+    ? { email: localStorage.getItem('user_email') }
+    : window.AirtableAPI?.getCurrentUser?.();
+
+  if (!user?.email) { ghShowError('Please log in to view your content projects.'); return; }
+
+  const loading = document.getElementById('ghLoading');
+  const grid    = document.getElementById('ghGrid');
+
+  loading.style.display = 'flex';
+  grid.style.display    = 'none';
+  document.getElementById('ghProgressWrap').style.display = 'none';
+
+  try {
+    const res  = await fetch(GH_ENDPOINTS.getGallery, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail: user.email }),
+    });
+    const data = await res.json();
+
+    loading.style.display = 'none';
+    grid.style.display    = 'grid';
+
+    if (!data.success || !data.projects?.length) {
+      grid.innerHTML = ghEmptyHTML();
+      return;
+    }
+
+    ghProjects = data.projects;
+    ghRenderGrid();
+    ghUpdateProgress();
+
+  } catch (err) {
+    console.error('Gallery load error:', err);
+    loading.style.display = 'none';
+    grid.style.display    = 'grid';
+    ghShowError('Unable to load your projects. Please try again.');
+  }
+}
+
+function ghRenderGrid() {
+  document.getElementById('ghGrid').innerHTML = ghProjects.map(ghCardHTML).join('');
+}
+
+function ghCardHTML(p) {
+  const st = p.reviewStatus || 'Pending Review';
+  const cardClass = { 'Notes Added': 'card-notes', 'Approved': 'card-approved', 'Sent to Editors': 'card-sent' }[st] || '';
+
+  const badge = {
+    'Pending Review':  `<span class="gh-badge gh-badge-pending">● Pending Review</span>`,
+    'Notes Added':     `<span class="gh-badge gh-badge-notes">● Notes Added</span>`,
+    'Approved':        `<span class="gh-badge gh-badge-approved">● Approved</span>`,
+    'Sent to Editors': `<span class="gh-badge gh-badge-sent">● Sent to Editors</span>`,
+  }[st] || '';
+
+  const shootDate = p.shootDate
+    ? new Date(p.shootDate).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+    : null;
+
+  const locked = ['Approved','Sent to Editors'].includes(st);
+
+  /* Photos panel */
+  const photosPanel = p.photosLink || p.photosNotes ? `
+    <div class="gh-media-panel photos-panel">
+      <div class="gh-media-panel-header">
+        <div class="gh-media-type-label">
+          <div class="gh-type-icon">📷</div>
+          Photos
+        </div>
+        ${p.photoCount ? `<span class="gh-media-count">${p.photoCount} files</span>` : ''}
+      </div>
+      ${p.photosLink
+        ? `<a href="${ghEsc(p.photosLink)}" target="_blank" rel="noopener" class="gh-dropbox-btn photos-btn">
+            ${ghDropboxIcon()} View Raw Photos in Dropbox
+           </a>`
+        : `<div class="gh-no-link">⏳ Photos folder not yet available</div>`
+      }
+      <div class="gh-panel-notes">
+        <div class="gh-notes-label">💬 Your Photos Feedback</div>
+        <textarea
+          class="gh-notes-textarea"
+          id="gh-photo-notes-${p.id}"
+          placeholder="e.g. Room 3 looks a bit dark, the kitchen shot is slightly blurry…"
+          ${locked ? 'disabled' : ''}
+        >${ghEsc(p.photosNotes)}</textarea>
+        ${!locked ? `<div class="gh-notes-hint">Mention specific rooms or angles so our editors know exactly what to fix.</div>` : ''}
+      </div>
+    </div>
+  ` : '';
+
+  /* Video panel */
+  const videoPanel = p.videoLink || p.videoNotes ? `
+    <div class="gh-media-panel video-panel">
+      <div class="gh-media-panel-header">
+        <div class="gh-media-type-label">
+          <div class="gh-type-icon">🎬</div>
+          Video Clips
+        </div>
+        ${p.videoCount ? `<span class="gh-media-count">${p.videoCount} clips</span>` : ''}
+      </div>
+      ${p.videoLink
+        ? `<a href="${ghEsc(p.videoLink)}" target="_blank" rel="noopener" class="gh-dropbox-btn video-btn">
+            ${ghDropboxIcon()} View Raw Video Clips in Dropbox
+           </a>`
+        : `<div class="gh-no-link">⏳ Video folder not yet available</div>`
+      }
+      <div class="gh-panel-notes">
+        <div class="gh-notes-label">💬 Your Video Feedback</div>
+        <textarea
+          class="gh-notes-textarea"
+          id="gh-video-notes-${p.id}"
+          placeholder="e.g. Clip 2 has background noise, the walkthrough feels too fast after the hallway…"
+          ${locked ? 'disabled' : ''}
+        >${ghEsc(p.videoNotes)}</textarea>
+        ${!locked ? `<div class="gh-notes-hint">Mention clip numbers or timecodes where possible.</div>` : ''}
+      </div>
+    </div>
+  ` : '';
+
+  const noPanels = !photosPanel && !videoPanel
+    ? `<div class="gh-no-link" style="margin:16px 20px 0;">⏳ Your Dropbox folders will appear here once your content is ready</div>`
+    : '';
+
+  /* Bottom actions */
+  const actions = locked
+    ? st === 'Sent to Editors'
+      ? `<div class="gh-sent-banner">
+           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+           Your content has been sent to our editing team
+         </div>`
+      : `<div class="gh-approved-banner">
+           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+           Content approved — our team has been notified
+         </div>`
+    : `<div class="gh-card-actions">
+         <button class="gh-btn gh-btn-save" onclick="ghSaveNotes('${p.id}')">
+           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+           Save Notes
+         </button>
+         <button class="gh-btn gh-btn-approve" onclick="ghApprove('${p.id}')">
+           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+           Approve &amp; Notify Team
+         </button>
+       </div>`;
+
+  return `
+    <div class="gh-card ${cardClass}" id="gh-card-${p.id}">
+      <div class="gh-card-ribbon"></div>
+
+      <div class="gh-card-top">
+        <div class="gh-card-address">${ghEsc(p.projectAddress)}</div>
+        ${badge}
+      </div>
+
+      <div class="gh-meta">
+        ${p.serviceType       ? `<div class="gh-meta-item">📋 ${ghEsc(p.serviceType)}</div>` : ''}
+        ${shootDate           ? `<div class="gh-meta-item">📅 Shoot: ${shootDate}</div>` : ''}
+        ${p.photographerName  ? `<div class="gh-meta-item">👤 ${ghEsc(p.photographerName)}</div>` : ''}
+      </div>
+
+      <div class="gh-divider"></div>
+
+      ${!locked ? `
+      <div class="gh-instructions">
+        <strong>📋 How to review your content</strong>
+        <ol>
+          <li>Click the button(s) below to open your raw files in Dropbox</li>
+          <li>Leave feedback in the relevant notes box — photos and video separately</li>
+          <li><b>Save Notes</b> to save feedback without notifying us yet</li>
+          <li><b>Approve &amp; Notify Team</b> when you're happy — we'll send it straight to our editors</li>
+        </ol>
+      </div>` : ''}
+
+      <div class="gh-media-panels">
+        ${photosPanel}
+        ${videoPanel}
+        ${noPanels}
+      </div>
+
+      <div style="height:16px;"></div>
+      <div class="gh-feedback" id="gh-feedback-${p.id}"></div>
+      ${actions}
+    </div>
+  `;
+}
+
+/* ── Save notes ─────────────────────────────────────────────────────── */
+async function ghSaveNotes(recordId) {
+  const p = ghProjects.find(x => x.id === recordId);
+  if (!p) return;
+
+  const photosNotes = document.getElementById(`gh-photo-notes-${recordId}`)?.value?.trim() || '';
+  const videoNotes  = document.getElementById(`gh-video-notes-${recordId}`)?.value?.trim()  || '';
+
+  if (!photosNotes && !videoNotes) {
+    ghFeedback(recordId, 'Please add some notes before saving.', 'error');
+    return;
+  }
+
+  ghSetLoading(recordId, true);
+
+  try {
+    const res  = await fetch(GH_ENDPOINTS.submitReview, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        recordId,
+        action: 'save_notes',
+        clientEmail: p.clientEmail,
+        projectAddress: p.projectAddress,
+        photosNotes,
+        videoNotes,
+        photosLink: p.photosLink,
+        videoLink:  p.videoLink,
+      }),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      p.photosNotes  = photosNotes;
+      p.videoNotes   = videoNotes;
+      p.reviewStatus = 'Notes Added';
+      ghFeedback(recordId, '✓ Notes saved — our team will review them before sending to editors.', 'success');
+      setTimeout(() => { ghRenderGrid(); ghUpdateProgress(); }, 2000);
+    } else {
+      ghFeedback(recordId, 'Failed to save notes. Please try again.', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    ghFeedback(recordId, 'Network error. Please check your connection.', 'error');
+  }
+
+  ghSetLoading(recordId, false);
+}
+
+/* ── Approve ────────────────────────────────────────────────────────── */
+async function ghApprove(recordId) {
+  const p = ghProjects.find(x => x.id === recordId);
+  if (!p) return;
+
+  const photosNotes = document.getElementById(`gh-photo-notes-${recordId}`)?.value?.trim() || '';
+  const videoNotes  = document.getElementById(`gh-video-notes-${recordId}`)?.value?.trim()  || '';
+
+  const confirmed = confirm(
+    `Approve and notify the Markeb Media team?\n\nProject: ${p.projectAddress}\n\nOnce approved, our team will be emailed and your content will be sent to editing.`
+  );
+  if (!confirmed) return;
+
+  ghSetLoading(recordId, true);
+
+  try {
+    const res  = await fetch(GH_ENDPOINTS.submitReview, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        recordId,
+        action: 'approve',
+        clientEmail: p.clientEmail,
+        projectAddress: p.projectAddress,
+        photosNotes,
+        videoNotes,
+        photosLink: p.photosLink,
+        videoLink:  p.videoLink,
+      }),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      p.photosNotes  = photosNotes;
+      p.videoNotes   = videoNotes;
+      p.reviewStatus = 'Approved';
+      ghFeedback(recordId, '✅ Approved! Our team has been notified and will send your content to editing.', 'success');
+      setTimeout(() => { ghRenderGrid(); ghUpdateProgress(); }, 2400);
+    } else {
+      ghFeedback(recordId, 'Failed to submit approval. Please try again.', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    ghFeedback(recordId, 'Network error. Please check your connection.', 'error');
+  }
+
+  ghSetLoading(recordId, false);
+}
+
+/* ── Helpers ────────────────────────────────────────────────────────── */
+function ghUpdateProgress() {
+  const wrap  = document.getElementById('ghProgressWrap');
+  const fill  = document.getElementById('ghProgressFill');
+  const count = document.getElementById('ghProgressCount');
+  if (!ghProjects.length) { wrap.style.display = 'none'; return; }
+  const done = ghProjects.filter(p => ['Notes Added','Approved','Sent to Editors'].includes(p.reviewStatus)).length;
+  const pct  = Math.round((done / ghProjects.length) * 100);
+  fill.style.width   = pct + '%';
+  count.textContent  = `${done} / ${ghProjects.length} reviewed`;
+  wrap.style.display = 'flex';
+}
+
+function ghSetLoading(recordId, loading) {
+  const card = document.getElementById(`gh-card-${recordId}`);
+  if (!card) return;
+  card.querySelectorAll('.gh-btn').forEach(b => b.disabled = loading);
+}
+
+function ghFeedback(recordId, msg, type) {
+  const el = document.getElementById(`gh-feedback-${recordId}`);
+  if (!el) return;
+  el.className = `gh-feedback ${type}`;
+  el.textContent = msg;
+  el.style.display = 'flex';
+  if (type === 'error') setTimeout(() => el.style.display = 'none', 5000);
+}
+
+function ghShowError(msg) {
+  const loading = document.getElementById('ghLoading');
+  const grid    = document.getElementById('ghGrid');
+  if (loading) loading.style.display = 'none';
+  if (grid) {
+    grid.style.display = 'grid';
+    grid.innerHTML = `
+      <div class="gh-empty" style="border-color:#fca5a5;background:linear-gradient(135deg,#fff5f5,#fff);">
+        <div class="gh-empty-icon" style="background:linear-gradient(135deg,#fee2e2,#fecaca);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h3 style="color:#991b1b;">Unable to Load Projects</h3>
+        <p>${msg}</p>
+      </div>`;
+  }
+}
+
+function ghEmptyHTML() {
+  return `
+    <div class="gh-empty">
+      <div class="gh-empty-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </div>
+      <h3>No Projects to Review Yet</h3>
+      <p>When your shoot is complete and your raw content is ready for review, it will appear here. You'll receive an email when it's ready.</p>
+    </div>`;
+}
+
+function ghDropboxIcon() {
+  return `<svg width="16" height="16" viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.25 2L0 7.25L8.25 12.5L16.5 7.25L8.25 2Z" fill="white"/><path d="M24.75 2L16.5 7.25L24.75 12.5L33 7.25L24.75 2Z" fill="white"/><path d="M0 17.75L8.25 23L16.5 17.75L8.25 12.5L0 17.75Z" fill="white"/><path d="M33 17.75L24.75 12.5L16.5 17.75L24.75 23L33 17.75Z" fill="white"/><path d="M8.25 24.75L16.5 30L24.75 24.75L16.5 19.5L8.25 24.75Z" fill="white"/></svg>`;
+}
+
+function ghEsc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* Patch showSection so gallery loads automatically when tab is clicked */
+(function() {
+  const _orig = window.showSection;
+  if (typeof _orig !== 'function') return;
+  window.showSection = function(id) {
+    _orig.call(this, id);
+    if (id === 'gallery') loadGallery();
+  };
+})();
   </script>
 
   <script>
