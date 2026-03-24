@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Book Your Shoot - Markeb Media</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- Stripe.js -->
   <script src="https://js.stripe.com/v3/"></script>
   
@@ -12,7 +12,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     body { 
-  font-family: 'Inter', sans-serif;
+  font-family: 'Mukta', sans-serif;
   min-height: 100vh;
   padding: 40px 20px;
   color: #1e293b;
@@ -50,7 +50,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.85) 0%, rgba(37, 99, 235, 0.85) 100%);
+  background: rgba(253,243,226,0.45);
 }
 
 .booking-container {
@@ -128,9 +128,9 @@
     }
 
     .step.active .step-number {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+      background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+color: #fff;
+box-shadow: 0 4px 12px rgba(180, 97, 0, 0.4);
     }
 
     .step.completed .step-number {
@@ -180,14 +180,14 @@
       border: 2px solid #e2e8f0;
       border-radius: 10px;
       font-size: 16px;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Mukta', sans-serif;
       transition: all 0.2s ease;
     }
 
     .form-input:focus {
       outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      border-color: #B46100;
+      box-shadow: 0 0 0 3px rgba(180,97,0,0.1);
     }
 
     .form-input.error {
@@ -206,8 +206,8 @@
     }
 
     .info-box {
-      background: #eff6ff;
-      border: 2px solid #3b82f6;
+      background: #fff8ee;
+      border: 2px solid #B46100;
       border-radius: 12px;
       padding: 20px;
       margin-bottom: 28px;
@@ -269,21 +269,21 @@
       border: none;
       cursor: pointer;
       transition: all 0.2s ease;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Mukta', sans-serif;
       display: inline-flex;
       align-items: center;
       gap: 8px;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #fff;
-      width: 100%;
+      background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+color: #fff;
+width: 100%;
     }
 
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+      box-shadow: 0 8px 24px rgba(180, 97, 0, 0.4);
     }
 
     .btn-primary:disabled {
@@ -343,15 +343,16 @@
       overflow: hidden;
     }
 
-    .service-card:hover {
-      border-color: #3b82f6;
+    .service-card.selected {
+  border-color: #B46100;
+  background: #fff8ee;
       transform: translateX(4px);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+      box-shadow: 0 4px 12px rgba(180,97,0,0.15);
     }
 
     .service-card.selected {
-      border-color: #3b82f6;
-      background: #eff6ff;
+      border-color: #B46100;
+      background: #fff8ee;
     }
 
     .service-card.popular {
@@ -382,13 +383,12 @@
     }
 
     .service-card:hover .service-radio {
-      border-color: #3b82f6;
+      border-color: #B46100;
     }
 
     .service-card.selected .service-radio {
-      border-color: #3b82f6;
-      background: #3b82f6;
-      position: relative;
+      border-color: #B46100;
+      background: #B46100;
     }
 
     .service-card.selected .service-radio::after {
@@ -416,9 +416,8 @@
     }
 
     .bedroom-btn:hover {
-      border-color: #3b82f6;
-      color: #3b82f6;
-      transform: scale(1.05);
+      border-color: #B46100;
+      color: #B46100;
     }
 
     .bedroom-btn:active {
@@ -462,14 +461,14 @@
     }
 
     .calendar-day:not(.disabled):not(.day-label):not(.other-month):hover {
-      border-color: #3b82f6;
-      background: #eff6ff;
+      border-color: #B46100;
+      background: #fff8ee;
       transform: scale(1.05);
     }
 
     .calendar-day.selected {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      border-color: #3b82f6;
+      background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+      border-color: #B46100;
       color: #fff;
     }
 
@@ -492,14 +491,13 @@
     }
 
     .time-slot:hover {
-      border-color: #3b82f6;
-      background: #eff6ff;
-      transform: translateY(-2px);
+      border-color: #B46100;
+      background: #fff8ee;
     }
 
     .time-slot.selected {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      border-color: #3b82f6;
+      background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+      border-color: #B46100;
       color: #fff;
     }
 
@@ -530,13 +528,13 @@
     }
 
     .payment-option:hover {
-      border-color: #3b82f6;
+      border-color: #B46100;
       transform: translateX(4px);
     }
 
     .payment-option.selected {
-      border-color: #3b82f6;
-      background: #eff6ff;
+      border-color: #B46100;
+      background: #fff8ee;
     }
 
     .payment-radio {
@@ -549,13 +547,12 @@
     }
 
     .payment-option:hover .payment-radio {
-      border-color: #3b82f6;
+      border-color: #B46100;
     }
 
     .payment-option.selected .payment-radio {
-      border-color: #3b82f6;
-      background: #3b82f6;
-      position: relative;
+      border-color: #B46100;
+      background: #B46100;
     }
 
     .payment-option.selected .payment-radio::after {
@@ -629,15 +626,15 @@
       gap: 8px;
       transition: all 0.2s ease;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      font-family: 'Inter', sans-serif;
+      font-family: 'Mukta', sans-serif;
     }
 
     .back-to-dashboard-btn:hover {
       background: #f8fafc;
-      border-color: #3b82f6;
-      color: #3b82f6;
+      border-color: #B46100;
+      color: #B46100;
       transform: translateX(-2px);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+      box-shadow: 0 4px 12px rgba(180,97,0,0.2);
     }
 
     @media (max-width: 768px) {
@@ -781,7 +778,7 @@
             <div style="display: flex; align-items: center; gap: 16px;">
               <button type="button" class="bedroom-btn" onclick="adjustBedrooms(-1)">-</button>
               <div style="flex: 1; text-align: center;">
-                <div id="bedroomCount" style="font-size: 48px; font-weight: 700; color: #3b82f6;">4</div>
+                <div id="bedroomCount" style="font-size: 48px; font-weight: 700; color: #B46100;">4</div>
                 <div style="font-size: 13px; color: #64748b; margin-top: 4px;">bedrooms</div>
               </div>
               <button type="button" class="bedroom-btn" onclick="adjustBedrooms(1)">+</button>
@@ -820,7 +817,7 @@
           <div style="border-top: 2px solid #e2e8f0; margin: 16px 0;"></div>
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <span style="font-size: 18px; font-weight: 700; color: #1e293b;">Total</span>
-            <span style="font-size: 24px; font-weight: 700; color: #3b82f6;" id="totalPrice">£0.00</span>
+            <span style="font-size: 24px; font-weight: 700; color: #B46100;" id="totalPrice">£0.00</span>
           </div>
           <div style="font-size: 12px; color: #94a3b8; text-align: right; margin-top: 4px;">Inc. VAT</div>
         </div>
@@ -1099,7 +1096,7 @@
           </div>
         </div>
         <!-- Booking Summary -->
-        <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 24px; margin-bottom: 28px;">
+        <div style="background: linear-gradient(135deg, #fff8ee 0%, #fff0d6 100%); border: 2px solid #B46100; border-radius: 12px; padding: 24px; margin-bottom: 28px;">
           <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 16px;">
             Booking Summary
           </h3>
@@ -1120,7 +1117,7 @@
               <span style="color: #64748b;">Media Specialist:</span>
               <span style="font-weight: 600; color: #1e293b;" id="summaryMediaSpecialist">-</span>
             </div>
-            <div style="border-top: 2px solid #3b82f6; margin: 8px 0;"></div>
+            <div style=" border-top: 2px solid #B46100; margin: 8px 0;"></div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="font-size: 16px; font-weight: 700; color: #1e293b;">Total Amount:</span>
               <span style="font-size: 24px; font-weight: 700; color: #3b82f6;" id="summaryTotal">£0.00</span>
@@ -1202,7 +1199,7 @@
               <div class="error-message" id="stripeCardError"></div>
             </div>
 
-            <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 12px; font-size: 13px; color: #1e40ab;">
+            <div style="background: #fff8ee; border: 1px solid #B46100; border-radius: 8px; padding: 12px; font-size: 13px; color: #8a4a00;">
               <strong>🔒 Stripe Secure:</strong> Your card is securely stored by Stripe and will only be charged after we complete your shoot.
             </div>
           </div>
@@ -2130,7 +2127,7 @@ function handleAccessTypeChange() {
               <span style="font-size: 13px; color: #94a3b8;">
                 ${Math.floor(service.duration / 60)}h ${service.duration % 60}m
               </span>
-              <span style="font-size: 20px; font-weight: 700; color: #3b82f6;">
+              <span style="font-size: 20px; font-weight: 700; color: #B46100;">
                 £${service.price.toFixed(2)}
               </span>
             </div>
@@ -2209,7 +2206,7 @@ function handleAccessTypeChange() {
                     +${addon.duration} min
                   </span>
                 ` : ''}
-                <span style="font-size: 18px; font-weight: 700; color: #3b82f6;">
+                <span style="font-size: 18px; font-weight: 700; color: #B46100;">
                   ${addon.price === 0 ? 'FREE' : `+£${addon.price.toFixed(2)}`}
                 </span>
               </div>
