@@ -14,16 +14,16 @@
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --ink:        #0c1e3c;
-      --ink-soft:   #64748b;
-      --blue:       #2563eb;
-      --blue-light: #3b82f6;
-      --blue-pale:  #eff6ff;
-      --blue-deep:  #1e40af;
-      --gold:       #d4a853;
-      --white:      #ffffff;
-      --off:        #f8fafc;
-      --border:     #e2e8f0;
+      --ink:        #3F4D1B;
+      --ink-soft:   #6b7c2e;
+      --blue:       #B46100;
+      --blue-light: #cc7a1a;
+      --blue-pale:  #fff8ee;
+      --blue-deep:  #8a4a00;
+      --gold:       #B46100;
+      --white:      #FDF3E2;
+      --off:        #f7ead5;
+      --border:     #e8d9be;
       --font-serif: 'Playfair Display', Georgia, serif;
       --font-sans:  'DM Sans', sans-serif;
       --ease:       cubic-bezier(0.16, 1, 0.3, 1);
@@ -191,7 +191,7 @@
     /* ── BOOKING STRIP ── */
     .book-strip {
       margin: 0 48px 72px;
-      background: linear-gradient(135deg, var(--ink) 0%, #1a3460 100%);
+      background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%);
       border-radius: 14px; padding: 36px 44px;
       display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap;
       position: relative; overflow: hidden;
@@ -321,6 +321,7 @@
           { file: 'DJI_0333.jpg',              caption: 'Aerial Approach' },
           { file: 'IMG_4710 3.JPG',            caption: 'Property' },
           { file: 'property-background.JPG',   caption: 'Property' },
+          { file: 'Photo 2.jpg',               caption: 'Property' },
         ]
       },
       {
@@ -444,8 +445,7 @@
         tagColor: '#ef4444',
         isVideo: true,
         videos: [
-          { file: 'Cheshire Mansion.mp4', caption: 'Cheshire Mansion', base: '/public/videos' },
-          { file: 'property-showcase.mp4', caption: 'Modern Living',   base: '/public/videos' },
+          { file: 'property-showcase.mp4', caption: 'Modern Living', base: '/public/videos' },
         ]
       }
     ];
@@ -523,7 +523,7 @@
         const lbIndex = lbItems.findIndex(x =>
           sec.isVideo
             ? x.src.includes(item.file)
-            : x.src.includes(`${sec.key}/${item.file}`)
+            : x.src.includes(item.file)
         );
         const sizeClass = layouts[i] || 's4';
         const delayClass = ['','d1','d2','d3'][i % 4];
