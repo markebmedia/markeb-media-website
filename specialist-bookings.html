@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Bookings – Markeb Media</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
@@ -12,27 +12,14 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --blue: #3b82f6;
-      --blue-dark: #2563eb;
-      --blue-light: #eff6ff;
-      --blue-mid: #dbeafe;
-      --slate-900: #0f172a;
-      --slate-700: #334155;
-      --slate-500: #64748b;
-      --slate-300: #cbd5e1;
-      --slate-100: #f1f5f9;
-      --slate-50: #f8fafc;
-      --white: #ffffff;
-      --green: #10b981;
-      --green-light: #f0fdf4;
-      --amber: #f59e0b;
-      --amber-light: #fef3c7;
-      --red: #ef4444;
-      --red-light: #fef2f2;
+      --blue: #B46100;
+--blue-dark: #8a4a00;
+--blue-light: #fff3e0;
+--blue-mid: #ffe0b2;
     }
 
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Mukta', sans-serif;
       background: var(--slate-50);
       color: var(--slate-900);
       min-height: 100vh;
@@ -40,7 +27,7 @@
 
     /* NAV */
     .nav {
-      background: var(--white);
+      background: #FDF3E2;
       border-bottom: 1px solid var(--slate-300);
       padding: 0 24px;
       display: flex;
@@ -64,7 +51,7 @@
     .nav-user { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: var(--slate-700); }
     .nav-avatar {
       width: 34px; height: 34px;
-      background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+      background: #B46100;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       color: white; font-size: 13px; font-weight: 700;
@@ -364,8 +351,7 @@
 
 <nav class="nav">
   <a href="/" class="nav-logo">
-    <i data-lucide="camera" style="width:22px;height:22px;color:#3b82f6;"></i>
-    Markeb Media
+    <img src="/public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" style="height:36px;width:auto;display:block;">
   </a>
   <div class="nav-right">
     <div class="nav-user">
