@@ -73,16 +73,48 @@
     .tab:hover { color: var(--ink); }
     .tab.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
 
+    /* ── SECTIONS ── */
+    .grid-section { padding: 48px 48px 72px; }
+
+    .portfolio-section { margin-bottom: 64px; }
+    .portfolio-section:last-child { margin-bottom: 0; }
+
+    /* Section header */
+    .sec-header {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 20px;
+    }
+    .sec-header-line {
+      flex: 1; height: 1px; background: var(--border);
+    }
+    .sec-header-label {
+      display: flex; align-items: center; gap: 8px;
+      flex-shrink: 0;
+    }
+    .sec-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .sec-title {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--ink-soft);
+      white-space: nowrap;
+    }
+    .sec-count {
+      font-size: 11px; color: var(--ink-soft);
+      background: var(--off); border: 1px solid var(--border);
+      border-radius: 20px; padding: 1px 8px; margin-left: 4px;
+    }
+
     /* ── GRID ── */
-    .grid-section { padding: 40px 48px 72px; }
-    .portfolio-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
+    .portfolio-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 10px; }
 
     .p-item {
       position: relative; overflow: hidden; border-radius: 10px;
-      cursor: pointer; background: var(--off); display: none;
+      cursor: pointer; background: var(--off);
     }
-    .p-item.visible { display: block; }
+    .p-item.hidden { display: none; }
 
+    /* Layout variants */
     .p-item.s8   { grid-column: span 8;  aspect-ratio: 16/9; }
     .p-item.s4t  { grid-column: span 4;  aspect-ratio: 3/4; }
     .p-item.s4   { grid-column: span 4;  aspect-ratio: 4/3; }
@@ -92,24 +124,6 @@
 
     .p-item img  { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .55s var(--ease); }
     .p-item:hover img  { transform: scale(1.04); }
-
-    /* Video items */
-    .p-item video {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-    }
-    .p-item.is-video { cursor: pointer; }
-    .play-btn {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      width: 56px; height: 56px;
-      background: rgba(255,255,255,0.92);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      transition: transform .2s, background .2s;
-      z-index: 2;
-      pointer-events: none;
-    }
-    .p-item:hover .play-btn { transform: translate(-50%,-50%) scale(1.1); background: white; }
-    .play-btn svg { margin-left: 4px; }
 
     /* Hover overlay */
     .p-ov {
@@ -127,14 +141,21 @@
       margin-bottom: 6px; width: fit-content; background: var(--gold); color: var(--ink);
     }
     .p-cap { font-family: var(--font-serif); font-size: 17px; font-weight: 600; color: var(--white); line-height: 1.25; }
-    .p-sub { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 3px; }
 
-    /* Section divider */
-    .sec-lbl {
-      grid-column: span 12; display: flex; align-items: center; gap: 12px; margin-top: 8px;
+    /* Video items */
+    .p-item video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .play-btn {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 56px; height: 56px;
+      background: rgba(255,255,255,0.92);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .2s, background .2s;
+      z-index: 2;
+      pointer-events: none;
     }
-    .sec-lbl span { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-soft); white-space: nowrap; }
-    .sec-lbl::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .p-item:hover .play-btn { transform: translate(-50%,-50%) scale(1.1); background: white; }
+    .play-btn svg { margin-left: 4px; }
 
     /* ── LIGHTBOX ── */
     .lightbox {
@@ -188,10 +209,11 @@
     /* ── ANIMATIONS ── */
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes lbIn { from { opacity: 0; transform: scale(0.95) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .reveal { opacity: 0; transform: translateY(20px); transition: opacity .55s var(--ease), transform .55s var(--ease); }
     .reveal.in { opacity: 1; transform: translateY(0); }
-    .d1 { transition-delay: .07s; } .d2 { transition-delay: .14s; } .d3 { transition-delay: .21s; } .d4 { transition-delay: .28s; }
+    .d1 { transition-delay: .07s; } .d2 { transition-delay: .14s; } .d3 { transition-delay: .21s; }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 1024px) {
@@ -228,220 +250,23 @@
 
   <!-- TABS -->
   <div class="tabs">
-    <button class="tab active" onclick="filter('all',this)">All Work</button>
-    <button class="tab" onclick="filter('photography',this)">Photography</button>
-    <button class="tab" onclick="filter('video',this)">Videography</button>
-    <button class="tab" onclick="filter('drone',this)">Drone</button>
+    <button class="tab active" data-filter="all">All Work</button>
+    <button class="tab" data-filter="external">External</button>
+    <button class="tab" data-filter="garden">Garden</button>
+    <button class="tab" data-filter="kitchen">Kitchen</button>
+    <button class="tab" data-filter="living-room">Living Room</button>
+    <button class="tab" data-filter="bedroom">Bedroom</button>
+    <button class="tab" data-filter="bathroom">Bathroom</button>
+    <button class="tab" data-filter="hallway">Hallway</button>
+    <button class="tab" data-filter="drone">Drone</button>
+    <button class="tab" data-filter="video">Video</button>
   </div>
 
   <!-- GRID -->
-  <div class="grid-section">
-    <div class="portfolio-grid" id="grid">
+  <div class="grid-section" id="gridSection">
 
-      <!-- ════════════════════════════════════════
-           PHOTOGRAPHY
-           ED1A = one property set
-           EP6A = another property set
-           ════════════════════════════════════════ -->
-      <div class="sec-lbl" data-sec="photography"><span>Photography</span></div>
+    <!-- Each section is built by JS from the SECTIONS data below -->
 
-      <div class="p-item s8 visible reveal" data-cat="photography" data-idx="0" onclick="openLb(0)">
-        <img src="/public/images/EP6A0186.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Living Area</div></div>
-      </div>
-      <div class="p-item s4t visible reveal d1" data-cat="photography" data-idx="1" onclick="openLb(1)">
-        <img src="/public/images/EP6A0673.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Interior</div></div>
-      </div>
-
-      <div class="p-item s4 visible reveal" data-cat="photography" data-idx="2" onclick="openLb(2)">
-        <img src="/public/images/EP6A0685.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Kitchen</div></div>
-      </div>
-      <div class="p-item s4 visible reveal d1" data-cat="photography" data-idx="3" onclick="openLb(3)">
-        <img src="/public/images/EP6A0778.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Bedroom</div></div>
-      </div>
-      <div class="p-item s4 visible reveal d2" data-cat="photography" data-idx="4" onclick="openLb(4)">
-        <img src="/public/images/EP6A0781.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Bathroom</div></div>
-      </div>
-
-      <div class="p-item s4 visible reveal" data-cat="photography" data-idx="5" onclick="openLb(5)">
-        <img src="/public/images/EP6A0787.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Reception Room</div></div>
-      </div>
-      <div class="p-item s4 visible reveal d1" data-cat="photography" data-idx="6" onclick="openLb(6)">
-        <img src="/public/images/EP6A0853.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Dining Area</div></div>
-      </div>
-      <div class="p-item s4 visible reveal d2" data-cat="photography" data-idx="7" onclick="openLb(7)">
-        <img src="/public/images/EP6A0868.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Master Bedroom</div></div>
-      </div>
-
-      <div class="p-item s6 visible reveal" data-cat="photography" data-idx="8" onclick="openLb(8)">
-        <img src="/public/images/EP6A2314.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Exterior</div></div>
-      </div>
-      <div class="p-item s6 visible reveal d1" data-cat="photography" data-idx="9" onclick="openLb(9)">
-        <img src="/public/images/EP6A2372.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Garden</div></div>
-      </div>
-
-      <div class="p-item s4 visible reveal" data-cat="photography" data-idx="10" onclick="openLb(10)">
-        <img src="/public/images/EP6A2396.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Lounge</div></div>
-      </div>
-      <div class="p-item s4 visible reveal d1" data-cat="photography" data-idx="11" onclick="openLb(11)">
-        <img src="/public/images/EP6A2411.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Kitchen Diner</div></div>
-      </div>
-      <div class="p-item s4 visible reveal d2" data-cat="photography" data-idx="12" onclick="openLb(12)">
-        <img src="/public/images/EP6A2417.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">En-Suite</div></div>
-      </div>
-
-      <!-- Second property set — ED1A -->
-      <div class="p-item s8 visible reveal" data-cat="photography" data-idx="13" onclick="openLb(13)">
-        <img src="/public/images/ED1A4025.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Open Plan Living</div></div>
-      </div>
-      <div class="p-item s4t visible reveal d1" data-cat="photography" data-idx="14" onclick="openLb(14)">
-        <img src="/public/images/ED1A4176.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Staircase</div></div>
-      </div>
-
-      <div class="p-item s4 visible reveal" data-cat="photography" data-idx="15" onclick="openLb(15)">
-        <img src="/public/images/ED1A4194.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Kitchen</div></div>
-      </div>
-      <div class="p-item s4 visible reveal d1" data-cat="photography" data-idx="16" onclick="openLb(16)">
-        <img src="/public/images/ED1A4209.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Bedroom</div></div>
-      </div>
-      <div class="p-item s4 visible reveal d2" data-cat="photography" data-idx="17" onclick="openLb(17)">
-        <img src="/public/images/ED1A4272.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Rear Garden</div></div>
-      </div>
-
-      <!-- Extras -->
-      <div class="p-item s6 visible reveal" data-cat="photography" data-idx="18" onclick="openLb(18)">
-        <img src="/public/images/IMG_4710 3.JPG" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Property</div></div>
-      </div>
-      <div class="p-item s6 visible reveal d1" data-cat="photography" data-idx="19" onclick="openLb(19)">
-        <img src="/public/images/Photo 2.jpg" alt="Property">
-        <div class="p-ov"><span class="p-tag">Photography</span><div class="p-cap">Property</div></div>
-      </div>
-
-      <!-- ════════════════════════════════════════
-           VIDEOGRAPHY
-           ════════════════════════════════════════ -->
-      <div class="sec-lbl" data-sec="video"><span>Videography</span></div>
-
-      <div class="p-item s12 visible reveal is-video" data-cat="video" data-idx="20" onclick="openLb(20)">
-        <video src="/public/videos/16 Sherbrook Rise, Wilm....mp4" muted playsinline preload="metadata"></video>
-        <div class="play-btn">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="#2563eb"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        </div>
-        <div class="p-ov">
-          <span class="p-tag" style="background:#ef4444;">▶ Video</span>
-          <div class="p-cap">16 Sherbrook Rise</div>
-          <div class="p-sub">Property walkthrough</div>
-        </div>
-      </div>
-
-      <div class="p-item s6 visible reveal" data-cat="video" data-idx="21" onclick="openLb(21)">
-        <video src="/public/videos/property-showcase.mp4" muted playsinline preload="metadata"></video>
-        <div class="play-btn">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="#2563eb"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        </div>
-        <div class="p-ov">
-          <span class="p-tag" style="background:#ef4444;">▶ Video</span>
-          <div class="p-cap">Property Showcase</div>
-          <div class="p-sub">Cinematic walkthrough</div>
-        </div>
-      </div>
-
-      <div class="p-item s6 visible reveal d1" data-cat="video" data-idx="22" onclick="openLb(22)">
-        <video src="/public/videos/no music.mp4" muted playsinline preload="metadata"></video>
-        <div class="play-btn">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="#2563eb"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        </div>
-        <div class="p-ov">
-          <span class="p-tag" style="background:#ef4444;">▶ Video</span>
-          <div class="p-cap">Property Film</div>
-          <div class="p-sub">Cinematic walkthrough</div>
-        </div>
-      </div>
-
-      <!-- ════════════════════════════════════════
-           DRONE
-           DJI_ files + Drone3.jpg
-           ════════════════════════════════════════ -->
-      <div class="sec-lbl" data-sec="drone"><span>Drone Aerial</span></div>
-
-      <div class="p-item s8 visible reveal" data-cat="drone" data-idx="23" onclick="openLb(23)">
-        <img src="/public/images/DJ5F62~1_Removed Cars and Bins.jpg" alt="Aerial">
-        <div class="p-ov"><span class="p-tag" style="background:#10b981;">Drone</span><div class="p-cap">Property &amp; Grounds</div><div class="p-sub">Aerial overview</div></div>
-      </div>
-      <div class="p-item s4t visible reveal d1" data-cat="drone" data-idx="24" onclick="openLb(24)">
-        <img src="/public/images/DJI_20_1.jpg" alt="Aerial">
-        <div class="p-ov"><span class="p-tag" style="background:#10b981;">Drone</span><div class="p-cap">Aerial View</div></div>
-      </div>
-
-      <div class="p-item s4 visible reveal" data-cat="drone" data-idx="25" onclick="openLb(25)">
-        <img src="/public/images/DJI_20~2.jpg" alt="Aerial">
-        <div class="p-ov"><span class="p-tag" style="background:#10b981;">Drone</span><div class="p-cap">Aerial View</div></div>
-      </div>
-      <div class="p-item s4 visible reveal d1" data-cat="drone" data-idx="26" onclick="openLb(26)">
-        <img src="/public/images/DJI_20~4.jpg" alt="Aerial">
-        <div class="p-ov"><span class="p-tag" style="background:#10b981;">Drone</span><div class="p-cap">Aerial View</div></div>
-      </div>
-      <div class="p-item s4 visible reveal d2" data-cat="drone" data-idx="27" onclick="openLb(27)">
-        <img src="/public/images/DJI_0445.jpg" alt="Aerial">
-        <div class="p-ov"><span class="p-tag" style="background:#10b981;">Drone</span><div class="p-cap">Approach Shot</div></div>
-      </div>
-
-      <div class="p-item s4 visible reveal" data-cat="drone" data-idx="28" onclick="openLb(28)">
-        <img src="/public/images/DJI_0519_Removed Bin....jpg" alt="Aerial">
-        <div class="p-ov"><span class="p-tag" style="background:#10b981;">Drone</span><div class="p-cap">Front Elevation</div></div>
-      </div>
-      <div class="p-item s4 visible reveal d1" data-cat="drone" data-idx="29" onclick="openLb(29)">
-        <img src="/public/images/DJI_0530.jpg" alt="Aerial">
-        <div class="p-ov"><span class="p-tag" style="background:#10b981;">Drone</span><div class="p-cap">Estate Overview</div></div>
-      </div>
-      <div class="p-item s4 visible reveal d2" data-cat="drone" data-idx="30" onclick="openLb(30)">
-        <img src="/public/images/Drone3.jpg" alt="Aerial">
-        <div class="p-ov"><span class="p-tag" style="background:#10b981;">Drone</span><div class="p-cap">Grounds &amp; Setting</div></div>
-      </div>
-
-      <div class="p-item s6 visible reveal" data-cat="drone" data-idx="31" onclick="openLb(31)">
-        <img src="/public/images/DJI_20260218133932_....jpg" alt="Aerial">
-        <div class="p-ov"><span class="p-tag" style="background:#10b981;">Drone</span><div class="p-cap">Aerial Overview</div></div>
-      </div>
-      <div class="p-item s6 visible reveal d1" data-cat="drone" data-idx="32" onclick="openLb(32)">
-        <img src="/public/images/DJI_20260218134052_....jpg" alt="Aerial">
-        <div class="p-ov"><span class="p-tag" style="background:#10b981;">Drone</span><div class="p-cap">Property Setting</div></div>
-      </div>
-
-      <div class="p-item s6 visible reveal" data-cat="drone" data-idx="33" onclick="openLb(33)">
-        <img src="/public/images/DJI_20260312114059_....jpg" alt="Aerial">
-        <div class="p-ov"><span class="p-tag" style="background:#10b981;">Drone</span><div class="p-cap">Aerial View</div></div>
-      </div>
-      <div class="p-item s6 visible reveal d1" data-cat="drone" data-idx="34" onclick="openLb(34)">
-        <img src="/public/images/DJI_20260312114635_....jpg" alt="Aerial">
-        <div class="p-ov"><span class="p-tag" style="background:#10b981;">Drone</span><div class="p-cap">Neighbourhood Context</div></div>
-      </div>
-
-      <!-- property-background also works as a drone/exterior shot -->
-      <div class="p-item s12 visible reveal" data-cat="drone" data-idx="35" onclick="openLb(35)">
-        <img src="/public/images/property-background.JPG" alt="Aerial">
-        <div class="p-ov"><span class="p-tag" style="background:#10b981;">Drone</span><div class="p-cap">Rural Property &amp; Grounds</div><div class="p-sub">Full aerial overview</div></div>
-      </div>
-
-    </div>
   </div>
 
   <!-- BOOKING STRIP -->
@@ -452,7 +277,7 @@
     </div>
     <div class="bs-btns">
       <a href="/website/booking.html" class="bs-primary">Book a Shoot</a>
-      <a href="mailto:commercial@markebmedia.com" class="bs-secondary">Get in Touch</a>
+      <a href="/cdn-cgi/l/email-protection#2a494547474f5849434b466a474b58414f48474f4e434b04494547" class="bs-secondary">Get in Touch</a>
     </div>
   </div>
 
@@ -474,69 +299,289 @@
     </div>
   </div>
 
-  <script>
-    // Scroll reveal
-    const ro = new IntersectionObserver(
-      e => e.forEach(x => { if (x.isIntersecting) x.target.classList.add('in'); }),
-      { threshold: 0.07 }
-    );
-    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    // ═══════════════════════════════════════════════════════════
+    // DATA — to add images, just add a filename to the array.
+    // The folder name = the category key.
+    // ═══════════════════════════════════════════════════════════
+    const BASE = '/public/images/portfolio';
 
-    // Filter
-    function filter(cat, btn) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      btn.classList.add('active');
-      document.querySelectorAll('.p-item').forEach(el =>
-        el.classList.toggle('visible', cat === 'all' || el.dataset.cat === cat)
-      );
-      document.querySelectorAll('.sec-lbl').forEach(el =>
-        el.style.display = (cat === 'all' || el.dataset.sec === cat) ? '' : 'none'
-      );
-    }
-
-    // Lightbox items — images use src, videos use type:'video'
-    const items = [
-      // Photography
-      { type:'img',   src:'/public/images/EP6A0186.jpg',                         caption:'Living Area' },           // 0
-      { type:'img',   src:'/public/images/EP6A0673.jpg',                         caption:'Interior' },              // 1
-      { type:'img',   src:'/public/images/EP6A0685.jpg',                         caption:'Kitchen' },               // 2
-      { type:'img',   src:'/public/images/EP6A0778.jpg',                         caption:'Bedroom' },               // 3
-      { type:'img',   src:'/public/images/EP6A0781.jpg',                         caption:'Bathroom' },              // 4
-      { type:'img',   src:'/public/images/EP6A0787.jpg',                         caption:'Reception Room' },        // 5
-      { type:'img',   src:'/public/images/EP6A0853.jpg',                         caption:'Dining Area' },           // 6
-      { type:'img',   src:'/public/images/EP6A0868.jpg',                         caption:'Master Bedroom' },        // 7
-      { type:'img',   src:'/public/images/EP6A2314.jpg',                         caption:'Exterior' },              // 8
-      { type:'img',   src:'/public/images/EP6A2372.jpg',                         caption:'Garden' },                // 9
-      { type:'img',   src:'/public/images/EP6A2396.jpg',                         caption:'Lounge' },                // 10
-      { type:'img',   src:'/public/images/EP6A2411.jpg',                         caption:'Kitchen Diner' },         // 11
-      { type:'img',   src:'/public/images/EP6A2417.jpg',                         caption:'En-Suite' },              // 12
-      { type:'img',   src:'/public/images/ED1A4025.jpg',                         caption:'Open Plan Living' },      // 13
-      { type:'img',   src:'/public/images/ED1A4176.jpg',                         caption:'Staircase' },             // 14
-      { type:'img',   src:'/public/images/ED1A4194.jpg',                         caption:'Kitchen' },               // 15
-      { type:'img',   src:'/public/images/ED1A4209.jpg',                         caption:'Bedroom' },               // 16
-      { type:'img',   src:'/public/images/ED1A4272.jpg',                         caption:'Rear Garden' },           // 17
-      { type:'img',   src:'/public/images/IMG_4710 3.JPG',                       caption:'Property' },              // 18
-      { type:'img',   src:'/public/images/Photo 2.jpg',                          caption:'Property' },              // 19
-      // Video
-      { type:'video', src:'/public/videos/16 Sherbrook Rise, Wilm....mp4',       caption:'16 Sherbrook Rise' },     // 20
-      { type:'video', src:'/public/videos/property-showcase.mp4',                caption:'Property Showcase' },     // 21
-      { type:'video', src:'/public/videos/no music.mp4',                         caption:'Property Film' },         // 22
-      // Drone
-      { type:'img',   src:'/public/images/DJ5F62~1_Removed Cars and Bins.jpg',   caption:'Property & Grounds' },    // 23
-      { type:'img',   src:'/public/images/DJI_20_1.jpg',                         caption:'Aerial View' },           // 24
-      { type:'img',   src:'/public/images/DJI_20~2.jpg',                         caption:'Aerial View' },           // 25
-      { type:'img',   src:'/public/images/DJI_20~4.jpg',                         caption:'Aerial View' },           // 26
-      { type:'img',   src:'/public/images/DJI_0445.jpg',                         caption:'Approach Shot' },         // 27
-      { type:'img',   src:'/public/images/DJI_0519_Removed Bin....jpg',          caption:'Front Elevation' },       // 28
-      { type:'img',   src:'/public/images/DJI_0530.jpg',                         caption:'Estate Overview' },       // 29
-      { type:'img',   src:'/public/images/Drone3.jpg',                           caption:'Grounds & Setting' },     // 30
-      { type:'img',   src:'/public/images/DJI_20260218133932_....jpg',           caption:'Aerial Overview' },       // 31
-      { type:'img',   src:'/public/images/DJI_20260218134052_....jpg',           caption:'Property Setting' },      // 32
-      { type:'img',   src:'/public/images/DJI_20260312114059_....jpg',           caption:'Aerial View' },           // 33
-      { type:'img',   src:'/public/images/DJI_20260312114635_....jpg',           caption:'Neighbourhood Context' }, // 34
-      { type:'img',   src:'/public/images/property-background.JPG',              caption:'Rural Property & Grounds' }, // 35
+    const SECTIONS = [
+      {
+        key:   'external',
+        label: 'External',
+        color: '#2563eb',
+        tag:   'External',
+        tagColor: null,
+        images: [
+          { file: 'External front 1.jpg',      caption: 'External Front' },
+          { file: 'External front 2.jpg',      caption: 'External Front' },
+          { file: 'External front.jpg',        caption: 'External Front' },
+          { file: 'DJI_0182_Removed car.jpg',  caption: 'Aerial Front' },
+          { file: 'DJI_0333.jpg',              caption: 'Aerial Approach' },
+          { file: 'IMG_4710 3.JPG',            caption: 'Property' },
+          { file: 'property-background.JPG',   caption: 'Property' },
+        ]
+      },
+      {
+        key:   'garden',
+        label: 'Garden',
+        color: '#16a34a',
+        tag:   'Garden',
+        images: [
+          { file: 'Garden .jpg',   caption: 'Garden' },
+          { file: 'Garden.jpg',    caption: 'Garden' },
+          { file: 'Garden 2.jpg',  caption: 'Garden' },
+          { file: 'Garden 3.jpg',  caption: 'Garden' },
+          { file: 'ED1A0227.jpg',  caption: 'Garden' },
+          { file: 'ED1A0233.jpg',  caption: 'Garden' },
+          { file: 'ED1A0239.jpg',  caption: 'Garden' },
+          { file: 'ED1A2341.jpg',  caption: 'Garden' },
+          { file: 'ED1A8649.jpg',  caption: 'Garden' },
+          { file: 'ED1A8682.jpg',  caption: 'Garden' },
+          { file: 'ED1A8940.jpg',  caption: 'Garden' },
+        ]
+      },
+      {
+        key:   'kitchen',
+        label: 'Kitchen',
+        color: '#d4a853',
+        tag:   'Kitchen',
+        images: [
+          { file: 'Kitchen.jpg',   caption: 'Kitchen' },
+          { file: 'Kitchen 2.jpg', caption: 'Kitchen' },
+          { file: 'Kitchen 3.jpg', caption: 'Kitchen' },
+          { file: 'Kitchen 4.jpg', caption: 'Kitchen' },
+          { file: 'Kitchen 5.jpg', caption: 'Kitchen' },
+          { file: 'Kitchen 6.jpg', caption: 'Kitchen' },
+          { file: 'ED1A7362.jpg',  caption: 'Kitchen' },
+          { file: 'ED1A7368.jpg',  caption: 'Kitchen' },
+          { file: 'ED1A7374.jpg',  caption: 'Kitchen' },
+        ]
+      },
+      {
+        key:   'living-room',
+        label: 'Living Room',
+        color: '#7c3aed',
+        tag:   'Living Room',
+        images: [
+          { file: 'Living room.jpg',   caption: 'Living Room' },
+          { file: 'Living room 2.jpg', caption: 'Living Room' },
+          { file: 'dining area.jpg',   caption: 'Dining Area' },
+          { file: 'ED1A2311.jpg',      caption: 'Living Room' },
+          { file: 'ED1A2317.jpg',      caption: 'Living Room' },
+          { file: 'ED1A7329.jpg',      caption: 'Living Room' },
+          { file: 'ED1A8826.jpg',      caption: 'Living Room' },
+        ]
+      },
+      {
+        key:   'bedroom',
+        label: 'Bedroom',
+        color: '#0891b2',
+        tag:   'Bedroom',
+        images: [
+          { file: 'Bedroom.jpg',                  caption: 'Bedroom' },
+          { file: 'Bedroom 2.jpg',                caption: 'Bedroom' },
+          { file: 'Bathroom.jpg',                 caption: 'Bathroom' },
+          { file: 'Walk-in-wardrobe.jpg',         caption: 'Walk-in Wardrobe' },
+          { file: 'ED1A6431_Removed Item.jpg',    caption: 'Bedroom' },
+          { file: 'ED1A8835.jpg',                 caption: 'Bedroom' },
+        ]
+      },
+      {
+        key:   'bathroom',
+        label: 'Bathroom',
+        color: '#6366f1',
+        tag:   'Bathroom',
+        images: [
+          { file: 'ED1A0327.jpg', caption: 'Bathroom' },
+          { file: 'ED1A2236.jpg', caption: 'Bathroom' },
+          { file: 'ED1A2257.jpg', caption: 'Bathroom' },
+          { file: 'ED1A2272.jpg', caption: 'Bathroom' },
+          { file: 'ED1A2320.jpg', caption: 'Bathroom' },
+          { file: 'ED1A8760.jpg', caption: 'Bathroom' },
+          { file: 'ED1A8790.jpg', caption: 'Bathroom' },
+        ]
+      },
+      {
+        key:   'hallway',
+        label: 'Hallway',
+        color: '#ea580c',
+        tag:   'Hallway',
+        images: [
+          { file: 'Hallway.jpg',   caption: 'Hallway' },
+          { file: 'Hallway 1.jpg', caption: 'Hallway' },
+          { file: 'Hallway 2.jpg', caption: 'Hallway' },
+          { file: 'Hallway 3.jpg', caption: 'Hallway' },
+          { file: 'ED1A2242.jpg',  caption: 'Hallway' },
+          { file: 'ED1A8919.jpg',  caption: 'Hallway' },
+          { file: 'ED1A8922.jpg',  caption: 'Hallway' },
+          { file: 'ED1A8934.jpg',  caption: 'Hallway' },
+        ]
+      },
+      {
+        key:   'drone',
+        label: 'Drone Aerial',
+        color: '#10b981',
+        tag:   'Drone',
+        tagColor: '#10b981',
+        images: [
+          { file: 'Drone 1.jpg',  caption: 'Aerial View' },
+          { file: 'Drone 2.jpg',  caption: 'Aerial View' },
+          { file: 'Drone 3.jpg',  caption: 'Aerial View' },
+          { file: 'Drone 4.jpg',  caption: 'Aerial View' },
+          { file: 'Drone 5.jpg',  caption: 'Aerial View' },
+          { file: 'Drone 6.jpg',  caption: 'Aerial View' },
+          { file: 'DJI_0546.jpg', caption: 'Aerial View' },
+          { file: 'DJI_0908.jpg', caption: 'Aerial View' },
+        ]
+      },
+      {
+        key:   'video',
+        label: 'Video',
+        color: '#ef4444',
+        tag:   'Video',
+        tagColor: '#ef4444',
+        isVideo: true,
+        videos: [
+          { file: 'Cheshire Mansion.mp4',        caption: 'Cheshire Mansion',        base: '/public/videos' },
+          { file: 'Country Home.mp4',             caption: 'Country Home',             base: '/public/videos' },
+          { file: 'Doncaster Walkthrough.mp4',    caption: 'Doncaster Walkthrough',    base: '/public/videos' },
+          { file: 'Old Coach House.mp4',          caption: 'Old Coach House',          base: '/public/videos' },
+          { file: 'Traditional English Home.mp4', caption: 'Traditional English Home', base: '/public/videos' },
+          { file: 'property-showcase.mp4',        caption: 'Modern Living',            base: '/public/videos' },
+        ]
+      }
     ];
 
+    // ═══════════════════════════════════════════════════════════
+    // Build flat lightbox items array (all images + videos)
+    // ═══════════════════════════════════════════════════════════
+    const lbItems = [];
+
+    SECTIONS.forEach(sec => {
+      if (sec.isVideo) {
+        sec.videos.forEach(v => {
+          lbItems.push({ type: 'video', src: `${v.base}/${v.file}`, caption: v.caption, cat: sec.key });
+        });
+      } else {
+        sec.images.forEach(img => {
+          lbItems.push({ type: 'img', src: `${BASE}/${sec.key}/${img.file}`, caption: img.caption, cat: sec.key });
+        });
+      }
+    });
+
+    // ═══════════════════════════════════════════════════════════
+    // Grid layout patterns per section size
+    // ═══════════════════════════════════════════════════════════
+    function getLayouts(count) {
+      // Returns array of CSS class names for each item
+      const patterns = {
+        1:  ['s12'],
+        2:  ['s6','s6'],
+        3:  ['s8','s4t','s12'],
+        4:  ['s8','s4t','s6','s6'],
+        5:  ['s8','s4t','s4','s4','s4'],
+        6:  ['s8','s4t','s4','s4','s4','s12'],
+      };
+      if (patterns[count]) return patterns[count];
+      // Fallback: fill with s4 / s6 alternating
+      const out = ['s8','s4t'];
+      for (let i = 2; i < count; i++) out.push(i % 3 === 0 ? 's6' : 's4');
+      return out;
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // Render all sections
+    // ═══════════════════════════════════════════════════════════
+    const container = document.getElementById('gridSection');
+
+    SECTIONS.forEach(sec => {
+      const items = sec.isVideo ? sec.videos : sec.images;
+      const count = items.length;
+      const layouts = getLayouts(count);
+      const tagBg = sec.tagColor || '#d4a853';
+      const tagColor = sec.tagColor ? '#fff' : '#0c1e3c';
+
+      // Section wrapper
+      const section = document.createElement('div');
+      section.className = 'portfolio-section reveal';
+      section.dataset.sec = sec.key;
+
+      // Section header
+      section.innerHTML = `
+        <div class="sec-header">
+          <div class="sec-header-label">
+            <div class="sec-dot" style="background:${sec.color};"></div>
+            <span class="sec-title">${sec.label}</span>
+            <span class="sec-count">${count}</span>
+          </div>
+          <div class="sec-header-line"></div>
+        </div>
+        <div class="portfolio-grid"></div>
+      `;
+
+      const grid = section.querySelector('.portfolio-grid');
+
+      items.forEach((item, i) => {
+        const lbIndex = lbItems.findIndex(x =>
+          sec.isVideo
+            ? x.src.includes(item.file)
+            : x.src.includes(`${sec.key}/${item.file}`)
+        );
+        const sizeClass = layouts[i] || 's4';
+        const delayClass = ['','d1','d2','d3'][i % 4];
+
+        if (sec.isVideo) {
+          const el = document.createElement('div');
+          el.className = `p-item ${sizeClass} reveal ${delayClass} is-video`;
+          el.innerHTML = `
+            <video src="${item.base}/${item.file}" muted playsinline preload="metadata"></video>
+            <div class="play-btn">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="#2563eb"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <div class="p-ov">
+              <span class="p-tag" style="background:${tagBg};color:${tagColor};">▶ Video</span>
+              <div class="p-cap">${item.caption}</div>
+            </div>
+          `;
+          el.onclick = () => openLb(lbIndex);
+          grid.appendChild(el);
+        } else {
+          const el = document.createElement('div');
+          el.className = `p-item ${sizeClass} reveal ${delayClass}`;
+          el.innerHTML = `
+            <img src="${BASE}/${sec.key}/${item.file}" alt="${item.caption}" loading="lazy">
+            <div class="p-ov">
+              <span class="p-tag" style="background:${tagBg};color:${tagColor};">${sec.tag}</span>
+              <div class="p-cap">${item.caption}</div>
+            </div>
+          `;
+          el.onclick = () => openLb(lbIndex);
+          grid.appendChild(el);
+        }
+      });
+
+      container.appendChild(section);
+    });
+
+    // ═══════════════════════════════════════════════════════════
+    // Tab filtering
+    // ═══════════════════════════════════════════════════════════
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+        document.querySelectorAll('.portfolio-section').forEach(sec => {
+          sec.style.display = (filter === 'all' || sec.dataset.sec === filter) ? '' : 'none';
+        });
+      });
+    });
+
+    // ═══════════════════════════════════════════════════════════
+    // Lightbox
+    // ═══════════════════════════════════════════════════════════
     let cur = 0;
     let lbVideoEl = null;
 
@@ -547,29 +592,26 @@
     }
 
     function renderLb() {
-      // Pause any playing video
       if (lbVideoEl) { lbVideoEl.pause(); lbVideoEl = null; }
-
-      const it = items[cur];
+      const it = lbItems[cur];
       document.getElementById('lbCap').textContent   = it.caption;
-      document.getElementById('lbCount').textContent = `${cur + 1} / ${items.length}`;
+      document.getElementById('lbCount').textContent = `${cur + 1} / ${lbItems.length}`;
       const m = document.getElementById('lbMedia');
-
       if (it.type === 'video') {
         m.innerHTML = `<video class="lb-video" src="${it.src}" controls autoplay playsinline></video>`;
         lbVideoEl = m.querySelector('video');
       } else {
+        m.innerHTML = `<div style="width:100%;height:50vh;background:#0d1117;border-radius:6px;display:flex;align-items:center;justify-content:center;"><div style="width:32px;height:32px;border:3px solid rgba(255,255,255,0.1);border-top-color:rgba(255,255,255,0.5);border-radius:50%;animation:spin 1s linear infinite;"></div></div>`;
         const img = new Image();
         img.onload  = () => { m.innerHTML = `<img class="lb-img" src="${it.src}" alt="${it.caption}">`; };
         img.onerror = () => { m.innerHTML = `<div style="width:100%;height:50vh;background:#0d1117;border-radius:6px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-size:13px;">Image not found</div>`; };
         img.src = it.src;
-        m.innerHTML = `<div style="width:100%;height:50vh;background:#0d1117;border-radius:6px;display:flex;align-items:center;justify-content:center;"><div style="width:32px;height:32px;border:3px solid rgba(255,255,255,0.1);border-top-color:rgba(255,255,255,0.5);border-radius:50%;animation:spin 1s linear infinite;"></div></div>`;
       }
     }
 
     function moveLb(d) {
       if (lbVideoEl) { lbVideoEl.pause(); lbVideoEl = null; }
-      cur = (cur + d + items.length) % items.length;
+      cur = (cur + d + lbItems.length) % lbItems.length;
       renderLb();
     }
 
@@ -588,10 +630,12 @@
       if (e.key === 'ArrowRight') moveLb(1);
     });
 
-    // Add spinner keyframes
-    const style = document.createElement('style');
-    style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
-    document.head.appendChild(style);
+    // Scroll reveal
+    const ro = new IntersectionObserver(
+      e => e.forEach(x => { if (x.isIntersecting) x.target.classList.add('in'); }),
+         { threshold: 0.07 }
+    );
+    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
 
     lucide.createIcons();
   </script>
