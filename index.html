@@ -85,11 +85,20 @@
             transition: background 0.4s, border-color 0.4s, box-shadow 0.4s, backdrop-filter 0.4s;
         }
         .site-header.scrolled #headerCta {
-            background: var(--brand);
-            border-color: transparent;
-            box-shadow: 0 0 20px var(--brand-glow);
-            backdrop-filter: none;
-        }
+    background: var(--brand);
+    border-color: transparent;
+    box-shadow: 0 0 20px var(--brand-glow);
+    backdrop-filter: none;
+}
+.site-header.scrolled #headerPortfolio {
+    background: transparent;
+    border-color: var(--brand);
+    color: var(--brand) !important;
+    backdrop-filter: none;
+}
+#headerPortfolio {
+    transition: background 0.4s, border-color 0.4s, color 0.4s;
+}
         #headerCta:hover { transform: translateY(-1px); }
         .nav-inner {
             max-width: 1200px;
@@ -1341,7 +1350,10 @@
 <header class="site-header" id="siteHeader">
     <div class="nav-inner">
         <a href="#"><img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" id="headerLogo" style="height:70px;width:auto;transition:filter 0.4s ease;"></a>
-        <a href="login.html" class="nav-cta" id="headerCta">Sign Up Free</a>
+        <div style="display:flex;align-items:center;gap:12px;">
+  <a href="/portfolio.html" id="headerPortfolio" class="nav-cta" style="background:transparent;border:2px solid rgba(255,255,255,0.7);color:#fff;backdrop-filter:blur(4px);">View Our Work</a>
+  <a href="login.html" class="nav-cta" id="headerCta">Sign Up Free</a>
+</div>
     </div>
 </header>
 
@@ -1839,7 +1851,7 @@
     <p class="final-cta-sub">Win more instructions, wow your clients, and keep buyers hooked — with high-impact marketing that puts you ahead of the competition.</p>
     <div class="cta-buttons">
         <a href="login.html" class="btn-primary" style="font-size:16px;padding:16px 36px;">Sign Up Free →</a>
-        <a href="https://www.instagram.com/markeb_mediauk/" target="_blank" class="cta-btn-sec">View Our Portfolio</a>
+        <a href="/portfolio.html" class="cta-btn-sec">View Our Work</a>
     </div>
     <div class="trust-bar">
         No contracts &nbsp;·&nbsp; 48-hour delivery &nbsp;·&nbsp; 100% satisfaction guarantee &nbsp;·&nbsp; Live progress tracking
