@@ -54,41 +54,49 @@
 
         /* ── NAV ── */
         .site-header {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 500;
-            padding: 8px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: transparent;
-            backdrop-filter: blur(0px);
-            border-bottom: 1px solid transparent;
-            box-shadow: none;
-            transition: background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-        }
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 500;
+    padding: 0 48px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+    backdrop-filter: blur(0px);
+    border-bottom: 1px solid transparent;
+    box-shadow: none;
+    transition: background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
         .site-header.scrolled {
-            background: rgba(255,255,255,0.97);
-            backdrop-filter: blur(20px);
-            border-color: var(--border);
-            box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-        }
-        /* Logo: hidden over hero, fades in only when scrolled */
-        #headerLogo { opacity: 0; transition: opacity 0.4s ease; }
-        .site-header.scrolled #headerLogo { opacity: 1; }
-        /* CTA: ghost on dark hero, solid orange on white header */
-        #headerCta {
-            background: rgba(255,255,255,0.15);
-            border: 2px solid rgba(255,255,255,0.7);
-            color: #fff !important;
-            backdrop-filter: blur(4px);
-            transition: background 0.4s, border-color 0.4s, box-shadow 0.4s, backdrop-filter 0.4s;
-        }
-        .site-header.scrolled #headerCta {
+    background: var(--bg);
+    backdrop-filter: blur(20px);
+    border-color: var(--border);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+}
+        /* Logo fades in on scroll */
+#headerLogo { opacity: 0; height: 44px; width: auto; display: block; transition: opacity 0.4s ease; }
+.site-header.scrolled #headerLogo { opacity: 1; }
+/* Buttons: ghost on hero, solid on scrolled */
+#headerCta {
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.7);
+    color: #fff !important;
+    backdrop-filter: blur(4px);
+    transition: background 0.4s, border-color 0.4s, box-shadow 0.4s, backdrop-filter 0.4s;
+}
+.site-header.scrolled #headerCta {
     background: var(--brand);
     border-color: transparent;
     box-shadow: 0 0 20px var(--brand-glow);
     backdrop-filter: none;
+}
+#headerPortfolio {
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.7);
+    color: #fff !important;
+    backdrop-filter: blur(4px);
+    transition: background 0.4s, border-color 0.4s, color 0.4s, backdrop-filter 0.4s;
 }
 .site-header.scrolled #headerPortfolio {
     background: transparent;
@@ -96,10 +104,7 @@
     color: var(--brand) !important;
     backdrop-filter: none;
 }
-#headerPortfolio {
-    transition: background 0.4s, border-color 0.4s, color 0.4s;
-}
-        #headerCta:hover { transform: translateY(-1px); }
+#headerCta:hover, #headerPortfolio:hover { transform: translateY(-1px); }
         .nav-inner {
             max-width: 1200px;
             width: 100%;
@@ -1327,7 +1332,14 @@
             .road-line { display: none; }
             .step-card { max-width: 320px; width: 90%; min-height: auto; }
         }
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
+    .site-header { padding: 0 16px; height: 60px; }
+    #headerLogo { height: 36px !important; }
+    .nav-cta { padding: 8px 14px; font-size: 13px; }
+    .nav-inner > div { gap: 8px; }
+}
+
+@media (max-width: 640px) {
     .hero-landing h1 { letter-spacing: -1.5px; }
     .hero-actions { flex-direction: column; width: 100%; }
     .btn-primary, .btn-ghost { width: 100%; text-align: center; }
@@ -1343,10 +1355,11 @@
     .cta-buttons { flex-direction: column; align-items: center; }
     .nav-cta { padding: 7px 12px; font-size: 12px; border-radius: 8px; }
     .nav-inner > div { gap: 8px; }
-    #headerLogo { height: 50px !important; }
 }
 
 @media (max-width: 480px) {
+    .site-header { padding: 0 12px; height: 56px; }
+    #headerLogo { height: 30px !important; }
     .nav-cta { padding: 6px 10px; font-size: 11px; border-radius: 7px; }
     .nav-inner > div { gap: 6px; }
 }
@@ -1357,7 +1370,7 @@
 <!-- ── HEADER ── -->
 <header class="site-header" id="siteHeader">
     <div class="nav-inner">
-        <a href="#"><img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" id="headerLogo" style="height:70px;width:auto;transition:filter 0.4s ease;"></a>
+        <a href="#"><img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" id="headerLogo"></a>
         <div style="display:flex;align-items:center;gap:12px;">
   <a href="/portfolio.html" id="headerPortfolio" class="nav-cta" style="background:transparent;border:2px solid rgba(255,255,255,0.7);color:#fff;backdrop-filter:blur(4px);">View Our Work</a>
   <a href="login.html" class="nav-cta" id="headerCta">Sign Up Free</a>
