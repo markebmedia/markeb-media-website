@@ -7,169 +7,121 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
-    body { 
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      min-height: 100vh;
-      padding: 40px 20px;
-      color: #1e293b;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body { 
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+    min-height: 100vh;
+    padding: 40px 20px;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-    .container {
-      max-width: 600px;
-      width: 100%;
-    }
+  .container { max-width: 600px; width: 100%; }
 
-    .card {
-      background: #fff;
-      border-radius: 20px;
-      padding: 48px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      text-align: center;
-    }
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 48px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    text-align: center;
+  }
 
-    .logo {
-      margin-bottom: 30px;
-    }
+  .logo { margin-bottom: 30px; }
+  .logo img { height: 60px; }
 
-    .logo img {
-      height: 60px;
-    }
+  .icon {
+    width: 80px;
+    height: 80px;
+    background: #fff3e0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 40px;
+  }
 
-    .icon {
-      width: 80px;
-      height: 80px;
-      background: #dbeafe;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 24px;
-      font-size: 40px;
-    }
+  h1 { font-size: 32px; font-weight: 700; color: #1e293b; margin-bottom: 12px; }
 
-    h1 {
-      font-size: 32px;
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 12px;
-    }
+  .booking-ref { font-size: 18px; color: #64748b; margin-bottom: 24px; }
 
-    .booking-ref {
-      font-size: 18px;
-      color: #64748b;
-      margin-bottom: 24px;
-    }
+  .message { font-size: 16px; color: #475569; line-height: 1.6; margin-bottom: 32px; }
 
-    .message {
-      font-size: 16px;
-      color: #475569;
-      line-height: 1.6;
-      margin-bottom: 32px;
-    }
+  .info-box {
+    background: #fff3e0;
+    border: 2px solid #B46100;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
 
-    .info-box {
-      background: #f0fdf4;
-      border: 2px solid #10b981;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 24px;
-      text-align: left;
-    }
+  .info-box h3 { color: #7a3e00; font-size: 16px; font-weight: 700; margin-bottom: 12px; }
 
-    .info-box h3 {
-      color: #065f46;
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #ffe0b2;
+  }
 
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      font-size: 14px;
-      border-bottom: 1px solid #d1fae5;
-    }
+  .info-row:last-child { border-bottom: none; }
+  .info-label { color: #5c2e00; font-weight: 600; }
+  .info-value { color: #7a3e00; text-align: right; }
 
-    .info-row:last-child {
-      border-bottom: none;
-    }
+  .btn {
+    display: inline-block;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    margin: 0 6px;
+  }
 
-    .info-label {
-      color: #064e3b;
-      font-weight: 600;
-    }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(180, 97, 0, 0.4);
+  }
 
-    .info-value {
-      color: #065f46;
-      text-align: right;
-    }
+  .btn-secondary { background: #f1f5f9; color: #64748b; }
+  .btn-secondary:hover { background: #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 
-    .btn {
-      display: inline-block;
-      padding: 14px 32px;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #fff;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 16px;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      margin: 0 6px;
-    }
+  .footer {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 2px solid #e2e8f0;
+    color: #64748b;
+    font-size: 14px;
+  }
 
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
-    }
+  .alert {
+    background: #fff3e0;
+    border: 2px solid #B46100;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    color: #7a3e00;
+    text-align: left;
+  }
 
-    .btn-secondary {
-      background: #f1f5f9;
-      color: #64748b;
-    }
+  .alert strong { display: block; margin-bottom: 8px; }
 
-    .btn-secondary:hover {
-      background: #e2e8f0;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+  .footer a { color: #B46100; text-decoration: none; }
 
-    .footer {
-      margin-top: 32px;
-      padding-top: 24px;
-      border-top: 2px solid #e2e8f0;
-      color: #64748b;
-      font-size: 14px;
-    }
-
-    .alert {
-      background: #eff6ff;
-      border: 2px solid #3b82f6;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 24px;
-      font-size: 14px;
-      color: #1e40af;
-      text-align: left;
-    }
-
-    .alert strong {
-      display: block;
-      margin-bottom: 8px;
-    }
-
-    @media (max-width: 600px) {
-      .btn {
-        display: block;
-        margin: 8px 0;
-      }
-    }
-  </style>
+  @media (max-width: 600px) {
+    .btn { display: block; margin: 8px 0; }
+  }
+</style>
 </head>
 <body>
   <div class="container">
@@ -215,7 +167,7 @@
       </div>
 
       <div class="footer">
-        <p>Questions? Contact us at <a href="mailto:commercial@markebmedia.com" style="color: #3b82f6; text-decoration: none;">commercial@markebmedia.com</a></p>
+        <p>Questions? Contact us at <a href="mailto:commercial@markebmedia.com" style="color: #B46100; text-decoration: none;">commercial@markebmedia.com</a></p>
       </div>
     </div>
   </div>
