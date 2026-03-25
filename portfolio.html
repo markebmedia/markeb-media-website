@@ -216,16 +216,117 @@
     .d1 { transition-delay: .07s; } .d2 { transition-delay: .14s; } .d3 { transition-delay: .21s; }
 
     /* ── RESPONSIVE ── */
-    @media (max-width: 1024px) {
-      .p-item.s8  { grid-column: span 12; }
-      .p-item.s4t { grid-column: span 6; aspect-ratio: 4/3; }
-      .p-item.s3  { grid-column: span 6; }
-    }
-    @media (max-width: 768px) {
-      header, .intro-bar, .tabs, .grid-section { padding-left: 20px; padding-right: 20px; }
-      .book-strip { margin: 0 20px 56px; padding: 24px 20px; }
-      .p-item.s8, .p-item.s4t, .p-item.s4, .p-item.s6, .p-item.s12, .p-item.s3 { grid-column: span 12; aspect-ratio: 4/3; }
-    }
+
+/* On touch devices, always show the overlay so captions are visible */
+@media (pointer: coarse) {
+  .p-ov { opacity: 1; background: linear-gradient(to top, rgba(12,30,60,0.7) 0%, transparent 60%); }
+  .p-item:hover img { transform: none; }
+}
+
+/* ── TABLET (≤1024px) ── */
+@media (max-width: 1024px) {
+  header { padding: 0 24px; }
+  .intro-bar { padding: 32px 24px 0; }
+  .tabs { padding: 0 24px; }
+  .grid-section { padding: 32px 24px 56px; }
+  .book-strip { margin: 0 24px 56px; padding: 32px 32px; }
+
+  .p-item.s8  { grid-column: span 12; }
+  .p-item.s4t { grid-column: span 6; aspect-ratio: 4/3; }
+  .p-item.s3  { grid-column: span 6; }
+  .p-item.s12 { aspect-ratio: 16/6; }
+}
+
+/* ── MOBILE (≤768px) ── */
+@media (max-width: 768px) {
+  /* Header */
+  header {
+    padding: 0 16px;
+    height: 60px;
+  }
+  .header-logo img { height: 36px; }
+  .btn-book {
+    padding: 8px 14px;
+    font-size: 13px;
+    gap: 6px;
+  }
+  .btn-book i { display: none; }
+
+  /* Intro */
+  .intro-bar {
+    padding: 24px 16px 0;
+    max-width: 100%;
+  }
+  .intro-title { font-size: clamp(22px, 6vw, 32px); }
+  .intro-desc { font-size: 14px; }
+
+  /* Tabs — scroll with fade hint */
+  .tabs {
+    padding: 0 16px;
+    margin-top: 20px;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
+  .tab { padding: 12px 14px; font-size: 13px; }
+
+  /* Grid */
+  .grid-section { padding: 20px 16px 48px; }
+  .portfolio-section { margin-bottom: 40px; }
+  .portfolio-grid { gap: 8px; }
+
+  /* All items full width on mobile */
+  .p-item.s8,
+  .p-item.s4t,
+  .p-item.s4,
+  .p-item.s6,
+  .p-item.s12,
+  .p-item.s3 {
+    grid-column: span 12;
+    aspect-ratio: 4/3;
+  }
+
+  /* Booking strip — stack vertically */
+  .book-strip {
+    margin: 0 16px 48px;
+    padding: 24px 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .bs-btns {
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .bs-primary,
+  .bs-secondary {
+    width: 100%;
+    text-align: center;
+    padding: 14px 20px;
+  }
+
+  /* Lightbox */
+  .lightbox { padding: 16px; }
+  .lb-close { top: -40px; width: 32px; height: 32px; font-size: 16px; }
+  .lb-btn { width: 44px; height: 44px; font-size: 18px; }
+  .lb-cap { font-size: 15px; }
+  .lb-foot { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+  /* Play button larger tap target */
+  .play-btn { width: 64px; height: 64px; }
+}
+
+/* ── SMALL PHONES (≤480px) ── */
+@media (max-width: 480px) {
+  .header-logo img { height: 30px; }
+  .btn-book { padding: 7px 12px; font-size: 12px; }
+  .intro-title { font-size: clamp(20px, 7vw, 28px); }
+  .tab { padding: 10px 12px; font-size: 12px; }
+  .portfolio-grid { gap: 6px; }
+  .p-item { border-radius: 8px; }
+  .p-cap { font-size: 14px; }
+  .book-strip { border-radius: 10px; }
+}
   </style>
 </head>
 <body>
