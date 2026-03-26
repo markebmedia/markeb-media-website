@@ -72,60 +72,117 @@ exports.handler = async (event, context) => {
           const resend = new Resend(process.env.RESEND_API_KEY);
 
           await resend.emails.send({
-            from: 'Markeb Media <commercial@markebmedia.com>',
-            to: fields['Client Email'],
-            bcc: 'commercial@markebmedia.com',
-            subject: `Booking Cancelled - ${bookingRef}`,
-            html: `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                <h2 style="color: #ef4444;">Booking Cancelled</h2>
-                
-                <p>Hi ${fields['Client Name']},</p>
-                
-                <p>Your booking has been cancelled and the cancellation fee has been processed.</p>
-                
-                <div style="background: #f8fafc; border-left: 4px solid #ef4444; padding: 16px; margin: 20px 0;">
-                  <h3 style="margin-top: 0;">Cancelled Booking Details</h3>
-                  <p><strong>Reference:</strong> ${bookingRef}</p>
-                  <p><strong>Service:</strong> ${fields['Service']}</p>
-                  <p><strong>Date & Time:</strong> ${new Date(fields['Date']).toLocaleDateString('en-GB')} at ${fields['Time']}</p>
-                  <p><strong>Property:</strong> ${fields['Property Address']}</p>
-                </div>
-                
-                <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 20px 0;">
-                  <h3 style="margin-top: 0; color: #92400e;">Cancellation Fee</h3>
-                  <p style="color: #92400e;"><strong>${cancellationType}:</strong> £${cancellationFeeAmount.toFixed(2)}</p>
-                  <p style="color: #92400e; font-size: 14px;">This fee has been charged to your payment method.</p>
-                </div>
-                
-                ${refundAmount > 0 ? `
-                  <div style="background: #f0fdf4; border-left: 4px solid #10b981; padding: 16px; margin: 20px 0;">
-                    <h3 style="margin-top: 0; color: #065f46;">Refund Information</h3>
-                    <p style="color: #065f46;">A refund of <strong>£${refundAmount.toFixed(2)}</strong> will be processed to your original payment method within 5-7 business days.</p>
-                  </div>
-                ` : ''}
-                
-                ${cancellationReason && cancellationReason !== 'No reason provided' ? `
-                  <p><strong>Cancellation Reason:</strong> ${cancellationReason}</p>
-                ` : ''}
-                
-                <p>If you'd like to book again in the future, we'd be happy to help you schedule a new shoot.</p>
-                
-                <p style="margin-top: 30px;">
-                  <a href="https://markebmedia.com/booking.html" style="background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Book a New Shoot</a>
-                </p>
-                
-                <p style="color: #64748b; margin-top: 30px;">
-                  If you have any questions about this cancellation, please contact us at <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
-                </p>
-                
-                <p style="color: #64748b;">
-                  Best regards,<br>
-                  The Markeb Media Team
-                </p>
+  from: 'Markeb Media <commercial@markebmedia.com>',
+  to: fields['Client Email'],
+  bcc: 'commercial@markebmedia.com',
+  subject: `Booking Cancelled - ${bookingRef}`,
+  html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f7ead5;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td style="padding: 40px 0; text-align: center; background-color: #f7ead5;">
+        <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #FDF3E2; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(63,77,27,0.12);">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 30px; text-align: center; background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%);">
+              <h1 style="margin: 0; color: #FDF3E2; font-size: 28px; font-weight: 600; letter-spacing: -0.02em;">Booking Cancelled</h1>
+              <p style="margin: 10px 0 0; color: rgba(253,243,226,0.8); font-size: 15px;">Your cancellation has been processed</p>
+              <div style="width: 40px; height: 3px; background: #B46100; margin: 16px auto 0; border-radius: 2px;"></div>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <p style="margin: 0 0 20px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">Hi ${fields['Client Name']},</p>
+              <p style="margin: 0 0 25px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">Your booking has been cancelled and the cancellation fee has been processed.</p>
+
+              <!-- Booking Details -->
+              <div style="background-color: #f7ead5; border: 2px solid #e8d9be; border-radius: 12px; padding: 24px; margin: 0 0 20px;">
+                <h3 style="margin: 0 0 16px; color: #3F4D1B; font-size: 16px; font-weight: 700;">Cancelled Booking Details</h3>
+                <table role="presentation" style="width: 100%; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #6b7c2e; font-size: 14px; font-weight: 600; width: 40%;">Reference</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">${bookingRef}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #6b7c2e; font-size: 14px; font-weight: 600;">Service</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">${fields['Service']}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #6b7c2e; font-size: 14px; font-weight: 600;">Date &amp; Time</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">${new Date(fields['Date']).toLocaleDateString('en-GB')} at ${fields['Time']}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; color: #6b7c2e; font-size: 14px; font-weight: 600;">Property</td>
+                    <td style="padding: 10px 0; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">${fields['Property Address']}</td>
+                  </tr>
+                </table>
               </div>
-            `
-          });
+
+              <!-- Cancellation Fee -->
+              <div style="padding: 16px; background-color: #fff8ee; border: 2px solid #B46100; border-radius: 8px; margin: 0 0 20px;">
+                <p style="margin: 0 0 6px; color: #8a4a00; font-size: 15px; font-weight: 700;">⚠️ Cancellation Fee</p>
+                <p style="margin: 0 0 4px; color: #8a4a00; font-size: 14px; line-height: 1.6;"><strong>${cancellationType}:</strong> £${cancellationFeeAmount.toFixed(2)}</p>
+                <p style="margin: 0; color: #8a4a00; font-size: 13px;">This fee has been charged to your payment method.</p>
+              </div>
+
+              ${refundAmount > 0 ? `
+              <!-- Refund -->
+              <div style="padding: 16px; background-color: #f3f7e8; border: 2px solid #3F4D1B; border-radius: 8px; margin: 0 0 20px;">
+                <p style="margin: 0 0 6px; color: #3F4D1B; font-size: 15px; font-weight: 700;">✅ Refund Information</p>
+                <p style="margin: 0; color: #6b7c2e; font-size: 14px; line-height: 1.6;">A refund of <strong>£${refundAmount.toFixed(2)}</strong> will be processed to your original payment method within 5–7 business days.</p>
+              </div>
+              ` : ''}
+
+              ${cancellationReason && cancellationReason !== 'No reason provided' ? `
+              <!-- Reason -->
+              <div style="padding: 16px; background-color: #f7ead5; border: 2px solid #e8d9be; border-radius: 8px; margin: 0 0 20px;">
+                <p style="margin: 0 0 4px; color: #6b7c2e; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Cancellation Reason</p>
+                <p style="margin: 0; color: #3F4D1B; font-size: 14px; line-height: 1.6;">${cancellationReason}</p>
+              </div>
+              ` : ''}
+
+              <p style="margin: 0 0 20px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">If you'd like to book again in the future, we'd be happy to help you schedule a new shoot.</p>
+
+              <!-- CTA Button -->
+              <table role="presentation" style="margin: 0 0 24px;">
+                <tr>
+                  <td>
+                    <a href="https://markebmedia.com/booking.html" style="display: inline-block; background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); color: #FDF3E2; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 15px;">Book a New Shoot</a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin: 0; color: #6b7c2e; font-size: 14px; line-height: 1.6;">Questions? Contact us at <a href="mailto:commercial@markebmedia.com" style="color: #B46100; text-decoration: none;">commercial@markebmedia.com</a></p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px 40px; background-color: #3F4D1B;">
+              <p style="margin: 0 0 4px; color: #FDF3E2; font-size: 14px; font-weight: 600;">Best regards,</p>
+              <p style="margin: 0; color: rgba(253,243,226,0.75); font-size: 14px;">The Markeb Media Team</p>
+              <div style="width: 32px; height: 2px; background: #B46100; margin: 16px 0; border-radius: 1px;"></div>
+              <p style="margin: 0; color: rgba(253,243,226,0.4); font-size: 12px; line-height: 1.5;">Professional Property Media, Marketing &amp; Technology Solution</p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `
+});
 
           console.log(`✅ Cancellation email sent to ${fields['Client Email']}`);
         } catch (emailError) {

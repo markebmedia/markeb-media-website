@@ -293,67 +293,68 @@ function generateEmailHtml(userName, milestone, currentBalance) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f8fafc;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f7ead5;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f7ead5; padding: 40px 20px;">
     <tr>
       <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden;">
-          
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #FDF3E2; border-radius: 16px; box-shadow: 0 4px 20px rgba(63,77,27,0.12); overflow: hidden;">
+
           <!-- Header -->
           <tr>
-            <td style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 40px; text-align: center;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 700;">💪 Great Progress!</h1>
+            <td style="background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%); padding: 40px; text-align: center;">
+              <h1 style="margin: 0; color: #FDF3E2; font-size: 32px; font-weight: 700; letter-spacing: -0.02em;">💪 Great Progress!</h1>
+              <div style="width: 40px; height: 3px; background: #B46100; margin: 16px auto 0; border-radius: 2px;"></div>
             </td>
           </tr>
-          
+
           <!-- Body -->
           <tr>
             <td style="padding: 40px;">
-              <p style="font-size: 18px; color: #0f172a; margin: 0 0 20px 0;">Hi ${userName},</p>
-              
-              <p style="font-size: 16px; color: #475569; line-height: 1.6; margin: 0 0 30px 0;">
-                You're building momentum! You've now earned <strong style="color: #3b82f6;">${milestone.points.toLocaleString()} points</strong> with Markeb Media.
+              <p style="font-size: 18px; color: #3F4D1B; margin: 0 0 20px 0;">Hi ${userName},</p>
+
+              <p style="font-size: 16px; color: #6b7c2e; line-height: 1.6; margin: 0 0 30px 0;">
+                You're building momentum! You've now earned <strong style="color: #B46100;">${milestone.points.toLocaleString()} points</strong> with Markeb Media.
               </p>
-              
+
               <!-- Progress Box -->
-              <table width="100%" cellpadding="20" style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; margin-bottom: 30px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
                 <tr>
-                  <td>
-                    <p style="font-size: 14px; color: #0369a1; font-weight: 600; margin: 0 0 10px 0;">🎯 YOUR NEXT MILESTONE</p>
-                    <p style="font-size: 16px; color: #0c4a6e; margin: 0;">
-                      ${milestone.points === 5000 
-                        ? 'Property Photography at 9,900 points<br><strong>You\'re 51% there!</strong>' 
-                        : 'Bronze Package at 16,900 points<br><strong>You\'re 89% there - so close!</strong>'}
+                  <td style="background-color: #fff8ee; border: 2px solid #B46100; border-radius: 12px; padding: 20px;">
+                    <p style="font-size: 13px; color: #8a4a00; font-weight: 700; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 0.5px;">🎯 Your Next Milestone</p>
+                    <p style="font-size: 16px; color: #3F4D1B; margin: 0; line-height: 1.6;">
+                      ${milestone.points === 5000
+                        ? 'Property Photography at 9,900 points<br><strong>You\'re 51% there!</strong>'
+                        : 'Bronze Package at 16,900 points<br><strong>You\'re 89% there — so close!</strong>'}
                     </p>
                   </td>
                 </tr>
               </table>
-              
-              <p style="font-size: 16px; color: #475569; line-height: 1.6; margin: 0 0 30px 0;">
+
+              <p style="font-size: 16px; color: #6b7c2e; line-height: 1.6; margin: 0 0 30px 0;">
                 Keep booking to unlock your first free service!
               </p>
-              
+
               <!-- CTA Button -->
               <table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
                 <tr>
-                  <td style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 8px; padding: 16px 32px; text-align: center;">
-                    <a href="https://markebmedia.com/login.html" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; display: block;">View Dashboard</a>
+                  <td style="background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); border-radius: 10px; padding: 16px 32px; text-align: center;">
+                    <a href="https://markebmedia.com/login.html" style="color: #FDF3E2; text-decoration: none; font-weight: 600; font-size: 16px; display: block;">View Dashboard</a>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
-          
+
           <!-- Footer -->
           <tr>
-            <td style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
-              <p style="margin: 0; font-size: 14px; color: #64748b;">
-                Thanks for your continued partnership,<br>
-                <strong style="color: #0f172a;">Mark & The Markeb Team</strong>
-              </p>
+            <td style="background-color: #3F4D1B; padding: 30px; text-align: center;">
+              <p style="margin: 0 0 4px; color: #FDF3E2; font-size: 14px; font-weight: 600;">Thanks for your continued partnership,</p>
+              <p style="margin: 0 0 0; color: rgba(253,243,226,0.75); font-size: 14px;">Mark &amp; The Markeb Team</p>
+              <div style="width: 32px; height: 2px; background: #B46100; margin: 16px auto; border-radius: 1px;"></div>
+              <p style="margin: 0; color: rgba(253,243,226,0.4); font-size: 12px;">Professional Property Media, Marketing &amp; Technology Solution</p>
             </td>
           </tr>
-          
+
         </table>
       </td>
     </tr>
@@ -362,7 +363,7 @@ function generateEmailHtml(userName, milestone, currentBalance) {
 </html>
     `;
   }
-  
+
   // Redemption email template
   return `
 <!DOCTYPE html>
@@ -371,78 +372,79 @@ function generateEmailHtml(userName, milestone, currentBalance) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f8fafc;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f7ead5;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f7ead5; padding: 40px 20px;">
     <tr>
       <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden;">
-          
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #FDF3E2; border-radius: 16px; box-shadow: 0 4px 20px rgba(63,77,27,0.12); overflow: hidden;">
+
           <!-- Header -->
           <tr>
-            <td style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px; text-align: center;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 700;">${milestone.subject.split('-')[0].trim()}</h1>
+            <td style="background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%); padding: 40px; text-align: center;">
+              <h1 style="margin: 0; color: #FDF3E2; font-size: 32px; font-weight: 700; letter-spacing: -0.02em;">${milestone.subject.split('-')[0].trim()}</h1>
+              <div style="width: 40px; height: 3px; background: #B46100; margin: 16px auto 0; border-radius: 2px;"></div>
             </td>
           </tr>
-          
+
           <!-- Body -->
           <tr>
             <td style="padding: 40px;">
-              <p style="font-size: 18px; color: #0f172a; margin: 0 0 20px 0;">Hi ${userName},</p>
-              
-              <p style="font-size: 16px; color: #475569; line-height: 1.6; margin: 0 0 30px 0;">
-                ${milestone.tier === 'Entry' 
-                  ? `Congratulations! You've reached <strong style="color: #10b981;">${milestone.points.toLocaleString()} points</strong> - your first redemption milestone!`
+              <p style="font-size: 18px; color: #3F4D1B; margin: 0 0 20px 0;">Hi ${userName},</p>
+
+              <p style="font-size: 16px; color: #6b7c2e; line-height: 1.6; margin: 0 0 30px 0;">
+                ${milestone.tier === 'Entry'
+                  ? `Congratulations! You've reached <strong style="color: #B46100;">${milestone.points.toLocaleString()} points</strong> — your first redemption milestone!`
                   : milestone.tier === 'Elite'
-                  ? `You've done it! <strong style="color: #10b981;">${milestone.points.toLocaleString()} points</strong> earned - you've reached <strong>ELITE STATUS!</strong> 🏆`
-                  : `Amazing! You've hit <strong style="color: #10b981;">${milestone.points.toLocaleString()} points</strong> and unlocked our ${milestone.tier.toUpperCase()} tier!`
+                  ? `You've done it! <strong style="color: #B46100;">${milestone.points.toLocaleString()} points</strong> earned — you've reached <strong style="color: #3F4D1B;">ELITE STATUS!</strong> 🏆`
+                  : `Amazing! You've hit <strong style="color: #B46100;">${milestone.points.toLocaleString()} points</strong> and unlocked our ${milestone.tier.toUpperCase()} tier!`
                 }
               </p>
-              
+
               <!-- Services Box -->
-              <table width="100%" cellpadding="20" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 12px; margin-bottom: 30px; border: 2px solid #10b981;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
                 <tr>
-                  <td>
-                    <p style="font-size: 14px; color: #065f46; font-weight: 600; margin: 0 0 15px 0;">🎁 ${milestone.tier === 'Entry' ? 'YOU CAN NOW REDEEM:' : 'ALL SERVICES YOU CAN NOW REDEEM:'}</p>
+                  <td style="background-color: #f3f7e8; border: 2px solid #3F4D1B; border-radius: 12px; padding: 20px;">
+                    <p style="font-size: 13px; color: #3F4D1B; font-weight: 700; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 0.5px;">🎁 ${milestone.tier === 'Entry' ? 'You Can Now Redeem:' : 'All Services You Can Now Redeem:'}</p>
                     ${getServicesHtml(milestone.tier)}
                   </td>
                 </tr>
               </table>
-              
+
               <!-- Balance Info -->
-              <table width="100%" cellpadding="15" style="background-color: #f8fafc; border-radius: 8px; margin-bottom: 30px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
                 <tr>
-                  <td>
-                    <p style="margin: 0; font-size: 14px; color: #64748b;">💰 <strong style="color: #0f172a;">Available to Spend:</strong> £${pointsValue}</p>
-                    <p style="margin: 8px 0 0 0; font-size: 14px; color: #64748b;">📊 <strong style="color: #0f172a;">Total Lifetime Points:</strong> ${currentBalance.toLocaleString()}</p>
+                  <td style="background-color: #f7ead5; border: 2px solid #e8d9be; border-radius: 12px; padding: 20px;">
+                    <p style="margin: 0 0 8px; font-size: 14px; color: #6b7c2e;">💰 <strong style="color: #3F4D1B;">Available to Spend:</strong> £${pointsValue}</p>
+                    <p style="margin: 0; font-size: 14px; color: #6b7c2e;">📊 <strong style="color: #3F4D1B;">Total Lifetime Points:</strong> ${currentBalance.toLocaleString()}</p>
                   </td>
                 </tr>
               </table>
-              
-              <p style="font-size: 16px; color: #475569; line-height: 1.6; margin: 0 0 30px 0;">
-                Your points never expire - redeem now or keep saving for a bigger service!
+
+              <p style="font-size: 16px; color: #6b7c2e; line-height: 1.6; margin: 0 0 30px 0;">
+                Your points never expire — redeem now or keep saving for a bigger service!
               </p>
-              
+
               <!-- CTA Button -->
               <table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
                 <tr>
-                  <td style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; padding: 16px 32px; text-align: center;">
-                    <a href="https://markebmedia.com/login.html" style="color: #ffffff; text-decoration: none; font-weight: 600; font-size: 16px; display: block;">Book Your Free Service</a>
+                  <td style="background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); border-radius: 10px; padding: 16px 32px; text-align: center;">
+                    <a href="https://markebmedia.com/login.html" style="color: #FDF3E2; text-decoration: none; font-weight: 600; font-size: 16px; display: block;">Book Your Free Service</a>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
-          
+
           <!-- Footer -->
           <tr>
-            <td style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
-              <p style="margin: 0; font-size: 14px; color: #64748b;">
-                Thanks for being a valued Markeb Media client,<br>
-                <strong style="color: #0f172a;">The Markeb Team</strong>
-              </p>
+            <td style="background-color: #3F4D1B; padding: 30px; text-align: center;">
+              <p style="margin: 0 0 4px; color: #FDF3E2; font-size: 14px; font-weight: 600;">Thanks for being a valued Markeb Media client,</p>
+              <p style="margin: 0; color: rgba(253,243,226,0.75); font-size: 14px;">The Markeb Team</p>
+              <div style="width: 32px; height: 2px; background: #B46100; margin: 16px auto; border-radius: 1px;"></div>
+              <p style="margin: 0; color: rgba(253,243,226,0.4); font-size: 12px;">Professional Property Media, Marketing &amp; Technology Solution</p>
             </td>
           </tr>
-          
+
         </table>
       </td>
     </tr>

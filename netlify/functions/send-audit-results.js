@@ -229,67 +229,77 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
   <title>Your Marketing Audit Results</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
-      line-height: 1.6; 
-      color: #1e293b; 
-      background-color: #f8fafc;
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #3F4D1B;
+      background-color: #f7ead5;
       -webkit-font-smoothing: antialiased;
     }
     .wrapper {
       width: 100%;
-      background-color: #f8fafc;
+      background-color: #f7ead5;
       padding: 40px 20px;
     }
-    .container { 
-      max-width: 600px; 
-      margin: 0 auto; 
-      background: #ffffff; 
-      border-radius: 16px; 
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #FDF3E2;
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 16px rgba(63,77,27,0.12);
     }
-    .header { 
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
-      color: white; 
-      padding: 40px 30px; 
+    .header {
+      background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%);
+      color: #FDF3E2;
+      padding: 40px 30px;
       text-align: center;
     }
-    .header h1 { 
-      margin: 0 0 10px 0; 
-      font-size: 28px; 
+    .header h1 {
+      margin: 0 0 10px 0;
+      font-size: 28px;
       font-weight: 700;
       line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: #FDF3E2;
     }
-    .header .company { 
-      margin: 0; 
-      opacity: 0.9; 
+    .header .company {
+      margin: 0;
+      opacity: 0.85;
       font-size: 16px;
+      color: #FDF3E2;
+    }
+    .header-accent {
+      width: 40px;
+      height: 3px;
+      background: #B46100;
+      margin: 16px auto 0;
+      border-radius: 2px;
     }
     .score-container {
       margin: 30px 0 20px;
     }
     .score-badge {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  width: 160px;
-  height: 160px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-.score-number {
-  font-size: 42px;
-  font-weight: 700;
-  line-height: 1;
-}
+      background: rgba(253,243,226,0.15);
+      border: 2px solid rgba(253,243,226,0.3);
+      border-radius: 50%;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .score-number {
+      font-size: 42px;
+      font-weight: 700;
+      line-height: 1;
+      color: #FDF3E2;
+    }
     .score-label {
       font-size: 14px;
-      opacity: 0.9;
+      color: rgba(253,243,226,0.85);
       margin-top: 8px;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -297,77 +307,65 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
     .score-rating {
       margin-top: 15px;
       padding: 8px 20px;
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(180,97,0,0.85);
       border-radius: 20px;
       font-size: 14px;
       font-weight: 600;
       display: inline-block;
+      color: #FDF3E2;
     }
-    .content { 
+    .content {
       padding: 40px 30px;
     }
     .greeting {
       font-size: 18px;
       margin-bottom: 20px;
-      color: #0f172a;
+      color: #3F4D1B;
       font-weight: 600;
     }
     .intro {
       font-size: 16px;
       margin-bottom: 30px;
-      color: #475569;
+      color: #6b7c2e;
       line-height: 1.7;
     }
-    .section { 
+    .section {
       margin-bottom: 40px;
     }
-    .section-title { 
-      font-size: 22px; 
-      font-weight: 700; 
-      color: #0f172a; 
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #3F4D1B;
       margin-bottom: 20px;
       display: flex;
       align-items: center;
       gap: 10px;
     }
     .analysis-item {
-      background: #f8fafc;
+      background: #f7ead5;
       border-radius: 12px;
       padding: 20px;
       margin-bottom: 15px;
       border-left: 4px solid;
     }
     .analysis-item.critical { border-left-color: #ef4444; }
-    .analysis-item.warning { border-left-color: #f59e0b; }
-    .analysis-item.good { border-left-color: #10b981; }
+    .analysis-item.warning  { border-left-color: #B46100; }
+    .analysis-item.good     { border-left-color: #3F4D1B; }
     .analysis-header {
       display: flex;
       align-items: center;
       gap: 10px;
       margin-bottom: 8px;
     }
-    .analysis-icon {
-      font-size: 24px;
-      line-height: 1;
-    }
-    .analysis-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #0f172a;
-    }
-    .analysis-text {
-      color: #475569;
-      font-size: 14px;
-      line-height: 1.6;
-      margin-left: 34px;
-    }
+    .analysis-icon { font-size: 24px; line-height: 1; }
+    .analysis-title { font-size: 16px; font-weight: 700; color: #3F4D1B; }
+    .analysis-text { color: #6b7c2e; font-size: 14px; line-height: 1.6; margin-left: 34px; }
     .recommendation-card {
-      background: #ffffff;
-      border: 2px solid #e2e8f0;
+      background: #FDF3E2;
+      border: 2px solid #e8d9be;
       border-radius: 12px;
       padding: 24px;
       margin-bottom: 15px;
-      transition: all 0.2s ease;
     }
     .rec-header {
       display: flex;
@@ -379,7 +377,7 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
     .rec-title {
       font-size: 18px;
       font-weight: 700;
-      color: #0f172a;
+      color: #3F4D1B;
       margin: 0;
       flex: 1;
     }
@@ -393,26 +391,12 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
       letter-spacing: 0.5px;
       white-space: nowrap;
     }
-    .priority-critical {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-    .priority-high {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    .priority-medium {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-    .rec-description {
-      color: #475569;
-      font-size: 14px;
-      line-height: 1.6;
-      margin-bottom: 10px;
-    }
+    .priority-critical { background: #fee2e2; color: #991b1b; }
+    .priority-high     { background: #fff8ee; color: #8a4a00; border: 1px solid #B46100; }
+    .priority-medium   { background: #f3f7e8; color: #3F4D1B; border: 1px solid #3F4D1B; }
+    .rec-description { color: #6b7c2e; font-size: 14px; line-height: 1.6; margin-bottom: 10px; }
     .rec-impact {
-      color: #3b82f6;
+      color: #B46100;
       font-size: 13px;
       font-weight: 600;
       display: flex;
@@ -420,89 +404,77 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
       gap: 5px;
     }
     .cta-section {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%);
       padding: 35px 30px;
       text-align: center;
       border-radius: 12px;
       margin: 40px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 100% at 80% 50%, rgba(180,97,0,0.2) 0%, transparent 65%);
     }
     .cta-section h3 {
-      color: white;
+      color: #FDF3E2;
       margin: 0 0 15px 0;
       font-size: 24px;
       font-weight: 700;
+      position: relative;
     }
     .cta-section p {
-      color: rgba(255, 255, 255, 0.95);
+      color: rgba(253,243,226,0.85);
       margin: 0 0 25px 0;
       font-size: 16px;
+      position: relative;
     }
     .cta-button {
       display: inline-block;
-      background: white;
-      color: #059669;
+      background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+      color: #FDF3E2;
       padding: 16px 32px;
       border-radius: 10px;
       text-decoration: none;
       font-weight: 700;
       font-size: 16px;
-      transition: all 0.2s ease;
+      position: relative;
     }
     .services-grid {
-      background: #f8fafc;
+      background: #f7ead5;
+      border: 2px solid #e8d9be;
       border-radius: 12px;
       padding: 25px;
       margin: 30px 0;
     }
     .service-item {
       padding: 12px 0;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e8d9be;
       display: flex;
       align-items: start;
       gap: 12px;
     }
-    .service-item:last-child {
-      border-bottom: none;
-    }
-    .service-icon {
-      font-size: 20px;
-      flex-shrink: 0;
-    }
-    .service-content {
-      flex: 1;
-    }
-    .service-title {
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 4px;
-    }
-    .service-desc {
-      color: #64748b;
-      font-size: 14px;
-    }
+    .service-item:last-child { border-bottom: none; }
+    .service-icon { font-size: 20px; flex-shrink: 0; }
+    .service-content { flex: 1; }
+    .service-title { font-weight: 700; color: #3F4D1B; margin-bottom: 4px; }
+    .service-desc { color: #6b7c2e; font-size: 14px; }
     .account-box {
-      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-      border: 2px solid #3b82f6;
+      background: #fff8ee;
+      border: 2px solid #B46100;
       border-radius: 12px;
       padding: 25px;
       text-align: center;
       margin: 30px 0;
     }
-    .account-box h3 {
-      color: #1e40af;
-      font-size: 20px;
-      margin-bottom: 12px;
-    }
-    .account-box p {
-      margin: 0 0 20px 0;
-      color: #1e40af;
-      font-size: 15px;
-      line-height: 1.6;
-    }
+    .account-box h3 { color: #8a4a00; font-size: 20px; margin-bottom: 12px; }
+    .account-box p { margin: 0 0 20px 0; color: #8a4a00; font-size: 15px; line-height: 1.6; }
     .account-button {
       display: inline-block;
-      background: #3b82f6;
-      color: white;
+      background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+      color: #FDF3E2;
       padding: 14px 28px;
       border-radius: 10px;
       text-decoration: none;
@@ -510,28 +482,27 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
       font-size: 15px;
     }
     .footer {
-      background: #f8fafc;
+      background: #3F4D1B;
       padding: 35px 30px;
       text-align: center;
-      border-top: 1px solid #e2e8f0;
     }
-    .logo {
-  margin-bottom: 20px;
-  text-align: center;
-}
-    .footer-links {
-      margin: 20px 0;
+    .logo { margin-bottom: 20px; text-align: center; }
+    .footer-divider {
+      width: 32px;
+      height: 2px;
+      background: #B46100;
+      margin: 16px auto;
+      border-radius: 1px;
     }
+    .footer-links { margin: 20px 0; }
     .footer-links a {
-      color: #3b82f6;
+      color: #B46100;
       text-decoration: none;
       margin: 0 15px;
       font-weight: 600;
       font-size: 14px;
     }
-    .social-icons {
-      margin: 25px 0;
-    }
+    .social-icons { margin: 25px 0; }
     .social-link {
       display: inline-block;
       margin: 0 8px;
@@ -539,7 +510,7 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
       text-decoration: none;
     }
     .footer-text {
-      color: #64748b;
+      color: rgba(253,243,226,0.45);
       font-size: 12px;
       margin-top: 20px;
       line-height: 1.6;
@@ -547,33 +518,18 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
     .signature {
       margin-top: 40px;
       padding-top: 25px;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid #e8d9be;
     }
-    .signature-name {
-      font-weight: 700;
-      color: #0f172a;
-      font-size: 16px;
-      margin-bottom: 5px;
-    }
-    .signature-title {
-      color: #64748b;
-      font-size: 14px;
-    }
-    .contact-link {
-      color: #3b82f6;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    
+    .signature-name { font-weight: 700; color: #3F4D1B; font-size: 16px; margin-bottom: 5px; }
+    .signature-title { color: #6b7c2e; font-size: 14px; }
+    .contact-link { color: #B46100; text-decoration: none; font-weight: 600; }
+
     @media only screen and (max-width: 600px) {
       .wrapper { padding: 20px 10px; }
       .header { padding: 30px 20px; }
       .header h1 { font-size: 24px; }
-      .score-badge {
-        width: 120px;
-        height: 120px;
-      }
-      .score-number { font-size: 48px; }
+      .score-badge { width: 120px; height: 120px; }
+      .score-number { font-size: 36px; }
       .content { padding: 30px 20px; }
       .section-title { font-size: 20px; }
       .rec-header { flex-direction: column; }
@@ -585,28 +541,27 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
 <body>
   <div class="wrapper">
     <div class="container">
+
       <!-- Header -->
       <div class="header">
         <h1>Your Marketing Audit Results</h1>
         <p class="company">${company}</p>
-        
         <div class="score-container">
           <div class="score-badge">
             <div class="score-number">${score}/25</div>
             <div class="score-label">Your Score</div>
           </div>
-          <div class="score-rating" style="background-color: ${scoreRating.color};">
-            ${scoreRating.label}
-          </div>
+          <div class="score-rating">${scoreRating.label}</div>
         </div>
+        <div class="header-accent"></div>
       </div>
 
       <!-- Main Content -->
       <div class="content">
         <div class="greeting">Hi ${firstName},</div>
-        
+
         <div class="intro">
-          Thank you for completing our Marketing Audit! Based on your responses, we've prepared a personalised analysis of your current marketing approach. 
+          Thank you for completing our Marketing Audit! Based on your responses, we've prepared a personalised analysis of your current marketing approach.
           <strong>${scoreRating.message}</strong>
         </div>
 
@@ -656,7 +611,7 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
             <div class="service-item">
               <span class="service-icon">📸</span>
               <div class="service-content">
-                <div class="service-title">Professional Property Photography & Video</div>
+                <div class="service-title">Professional Property Photography &amp; Video</div>
                 <div class="service-desc">Showcase every listing at its absolute best with stunning visuals</div>
               </div>
             </div>
@@ -684,7 +639,7 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
             <div class="service-item">
               <span class="service-icon">📊</span>
               <div class="service-content">
-                <div class="service-title">Content Strategy & Planning</div>
+                <div class="service-title">Content Strategy &amp; Planning</div>
                 <div class="service-desc">Data-driven marketing that delivers measurable results</div>
               </div>
             </div>
@@ -699,7 +654,7 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
         </div>
 
         <!-- Closing -->
-        <p style="color: #475569; margin-top: 30px;">
+        <p style="color: #6b7c2e; margin-top: 30px;">
           Questions? Simply reply to this email and we'll be happy to help you succeed in today's competitive property market.
         </p>
 
@@ -714,25 +669,24 @@ function createEmailTemplate(name, company, score, analysis, recommendations) {
       </div>
 
       <!-- Footer -->
-     <div class="footer">
-  <div class="logo">
-  <img src="https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).PNG" alt="Markeb Media" style="height: auto; width: 150px; max-width: 100%; display: block; margin: 0 auto;">
-</div>
-        
+      <div class="footer">
+        <div class="logo">
+          <img src="https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).PNG" alt="Markeb Media" style="height: auto; width: 150px; max-width: 100%; display: block; margin: 0 auto;">
+        </div>
+        <div class="footer-divider"></div>
         <div class="footer-links">
           <a href="https://markebmedia.com">Website</a>
         </div>
-
         <div class="social-icons">
           <a href="https://instagram.com/markeb_mediauk" class="social-link">📸</a>
         </div>
-
         <p class="footer-text">
           © ${new Date().getFullYear()} Markeb Media. All rights reserved.<br>
           You're receiving this email because you completed our Marketing Audit.<br>
           Property Marketing Specialists for Estate Agents
         </p>
       </div>
+
     </div>
   </div>
 </body>

@@ -104,94 +104,102 @@ async function sendWelcomeEmail(name, email, company) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f4f4;">
+<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f7ead5;">
     <table role="presentation" style="width: 100%; border-collapse: collapse;">
         <tr>
-            <td style="padding: 40px 0; text-align: center; background-color: #f4f4f4;">
-                <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <td style="padding: 40px 0; text-align: center; background-color: #f7ead5;">
+                <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #FDF3E2; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(63,77,27,0.12);">
+
                     <!-- Header -->
                     <tr>
-                        <td style="padding: 40px 40px 30px; text-align: center; background-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">Welcome to Markeb Media</h1>
-                            <p style="margin: 10px 0 0; color: #ffffff; font-size: 16px; opacity: 0.95;">Your Personalised Dashboard is Ready</p>
+                        <td style="padding: 40px 40px 30px; text-align: center; background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%);">
+                            <h1 style="margin: 0; color: #FDF3E2; font-size: 28px; font-weight: 600; letter-spacing: -0.02em;">Welcome to Markeb Media</h1>
+                            <p style="margin: 10px 0 0; color: #FDF3E2; font-size: 16px; opacity: 0.85;">Your Personalised Dashboard is Ready</p>
+                            <!-- Amber accent bar -->
+                            <div style="width: 40px; height: 3px; background: #B46100; margin: 16px auto 0; border-radius: 2px;"></div>
                         </td>
                     </tr>
-                    
+
                     <!-- Content -->
                     <tr>
                         <td style="padding: 40px;">
-                            <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">Hi ${name},</p>
-                            
-                            <p style="margin: 0 0 25px; color: #333333; font-size: 16px; line-height: 1.6;">Welcome to Markeb Media! We're delighted to have you on board.</p>
-                            
-                            <p style="margin: 0 0 25px; color: #333333; font-size: 16px; line-height: 1.6;">Your <strong>free personalised dashboard</strong> is now active, giving you access to exclusive bonus features designed to streamline your content creation and property marketing.</p>
+                            <p style="margin: 0 0 20px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">Hi ${name},</p>
+
+                            <p style="margin: 0 0 25px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">Welcome to Markeb Media! We're delighted to have you on board.</p>
+
+                            <p style="margin: 0 0 25px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">Your <strong>free personalised dashboard</strong> is now active, giving you access to exclusive bonus features designed to streamline your content creation and property marketing.</p>
 
                             <!-- Video Section -->
-                            <div style="margin: 30px 0; text-align: center; background-color: #f8f9fa; padding: 30px; border-radius: 8px;">
-                                <h2 style="margin: 0 0 15px; color: #333333; font-size: 20px; font-weight: 600;">Quick Start Guide</h2>
-                                <p style="margin: 0 0 20px; color: #666666; font-size: 14px;">Watch this 2-minute video to get the most out of your dashboard</p>
-                                <a href="https://youtu.be/5u-AC-X7juk" style="display: inline-block; background-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 15px 35px; border-radius: 6px; font-weight: 600; font-size: 16px;">▶ Watch Onboarding Video</a>
+                            <div style="margin: 30px 0; text-align: center; background-color: #f7ead5; padding: 30px; border-radius: 8px; border: 1px solid #e8d9be;">
+                                <h2 style="margin: 0 0 15px; color: #3F4D1B; font-size: 20px; font-weight: 600;">Quick Start Guide</h2>
+                                <p style="margin: 0 0 20px; color: #6b7c2e; font-size: 14px;">Watch this 2-minute video to get the most out of your dashboard</p>
+                                <a href="https://youtu.be/5u-AC-X7juk" style="display: inline-block; background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); color: #FDF3E2; text-decoration: none; padding: 15px 35px; border-radius: 6px; font-weight: 600; font-size: 16px;">▶ Watch Onboarding Video</a>
                             </div>
-                            
-                            <h3 style="margin: 30px 0 20px; color: #333333; font-size: 18px; font-weight: 600;">Your Dashboard Features:</h3>
-                            
+
+                            <h3 style="margin: 30px 0 20px; color: #3F4D1B; font-size: 18px; font-weight: 600;">Your Dashboard Features:</h3>
+
                             <table role="presentation" style="width: 100%; border-collapse: collapse;">
                                 <tr>
-                                    <td style="padding: 12px 0; vertical-align: top;">
-                                        <div style="display: inline-block; width: 30px; height: 30px; background-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
+                                    <td style="padding: 12px 0; vertical-align: top; width: 42px;">
+                                        <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #FDF3E2; font-weight: 600;">✓</div>
                                     </td>
                                     <td style="padding: 12px 0;">
-                                        <strong style="color: #333333; font-size: 15px;">Track Content Progress</strong>
-                                        <p style="margin: 5px 0 0; color: #666666; font-size: 14px; line-height: 1.5;">See real-time updates on all your property content projects from brief to delivery</p>
+                                        <strong style="color: #3F4D1B; font-size: 15px;">Track Content Progress</strong>
+                                        <p style="margin: 5px 0 0; color: #6b7c2e; font-size: 14px; line-height: 1.5;">See real-time updates on all your property content projects from brief to delivery</p>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 12px 0; vertical-align: top;">
-                                        <div style="display: inline-block; width: 30px; height: 30px; background-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
+                                    <td style="padding: 12px 0; vertical-align: top; width: 42px;">
+                                        <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #FDF3E2; font-weight: 600;">✓</div>
                                     </td>
                                     <td style="padding: 12px 0;">
-                                        <strong style="color: #333333; font-size: 15px;">Request Amendments</strong>
-                                        <p style="margin: 5px 0 0; color: #666666; font-size: 14px; line-height: 1.5;">Submit revision requests directly through your dashboard with instant notifications to our team</p>
+                                        <strong style="color: #3F4D1B; font-size: 15px;">Request Amendments</strong>
+                                        <p style="margin: 5px 0 0; color: #6b7c2e; font-size: 14px; line-height: 1.5;">Submit revision requests directly through your dashboard with instant notifications to our team</p>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 12px 0; vertical-align: top;">
-                                        <div style="display: inline-block; width: 30px; height: 30px; background-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
+                                    <td style="padding: 12px 0; vertical-align: top; width: 42px;">
+                                        <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #FDF3E2; font-weight: 600;">✓</div>
                                     </td>
                                     <td style="padding: 12px 0;">
-                                        <strong style="color: #333333; font-size: 15px;">AI Copywriting Tool</strong>
-                                        <p style="margin: 5px 0 0; color: #666666; font-size: 14px; line-height: 1.5;">Generate compelling property descriptions and video scripts in seconds with our AI assistant</p>
+                                        <strong style="color: #3F4D1B; font-size: 15px;">AI Copywriting Tool</strong>
+                                        <p style="margin: 5px 0 0; color: #6b7c2e; font-size: 14px; line-height: 1.5;">Generate compelling property descriptions and video scripts in seconds with our AI assistant</p>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 12px 0; vertical-align: top;">
-                                        <div style="display: inline-block; width: 30px; height: 30px; background-color: #667eea; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #ffffff; font-weight: 600; margin-right: 12px;">✓</div>
+                                    <td style="padding: 12px 0; vertical-align: top; width: 42px;">
+                                        <div style="width: 30px; height: 30px; background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); border-radius: 50%; text-align: center; line-height: 30px; color: #FDF3E2; font-weight: 600;">✓</div>
                                     </td>
                                     <td style="padding: 12px 0;">
-                                        <strong style="color: #333333; font-size: 15px;">Content Calendar</strong>
-                                        <p style="margin: 5px 0 0; color: #666666; font-size: 14px; line-height: 1.5;">View your complete posting schedule and upcoming content when we manage your social media</p>
+                                        <strong style="color: #3F4D1B; font-size: 15px;">Content Calendar</strong>
+                                        <p style="margin: 5px 0 0; color: #6b7c2e; font-size: 14px; line-height: 1.5;">View your complete posting schedule and upcoming content when we manage your social media</p>
                                     </td>
                                 </tr>
                             </table>
-                            
-                            <div style="margin: 35px 0 25px; padding: 20px; background-color: #f0f7ff; border-left: 4px solid #667eea; border-radius: 4px;">
-                                <p style="margin: 0; color: #333333; font-size: 15px; line-height: 1.6;"><strong>💡 Pro Tip:</strong> Bookmark your dashboard for quick access. All your content, analytics, and tools are just one click away!</p>
+
+                            <!-- Pro Tip -->
+                            <div style="margin: 35px 0 25px; padding: 20px; background-color: #fff8ee; border-left: 4px solid #B46100; border-radius: 4px;">
+                                <p style="margin: 0; color: #3F4D1B; font-size: 15px; line-height: 1.6;"><strong>💡 Pro Tip:</strong> Bookmark your dashboard for quick access. All your content, analytics, and tools are just one click away!</p>
                             </div>
-                            
-                            <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">If you have any questions or need assistance navigating your dashboard, our team is here to help.</p>
-                            
-                            <p style="margin: 0; color: #333333; font-size: 16px; line-height: 1.6;">Looking forward to creating outstanding content together!</p>
+
+                            <p style="margin: 0 0 20px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">If you have any questions or need assistance navigating your dashboard, our team is here to help.</p>
+
+                            <p style="margin: 0; color: #3F4D1B; font-size: 16px; line-height: 1.6;">Looking forward to creating outstanding content together!</p>
                         </td>
                     </tr>
-                    
+
                     <!-- Footer -->
                     <tr>
-                        <td style="padding: 30px 40px; background-color: #f8f9fa; border-top: 1px solid #e9ecef;">
-                            <p style="margin: 0 0 10px; color: #666666; font-size: 14px; font-weight: 600;">Best regards,</p>
-                            <p style="margin: 0 0 15px; color: #666666; font-size: 14px;">The Markeb Media Team</p>
-                            <p style="margin: 0; color: #999999; font-size: 12px; line-height: 1.5;">This dashboard is a complimentary feature included with your Markeb Media service package.</p>
+                        <td style="padding: 30px 40px; background-color: #3F4D1B; border-top: 1px solid #2d3813;">
+                            <p style="margin: 0 0 10px; color: #FDF3E2; font-size: 14px; font-weight: 600;">Best regards,</p>
+                            <p style="margin: 0 0 6px; color: rgba(253,243,226,0.75); font-size: 14px;">The Markeb Media Team</p>
+                            <!-- Amber divider -->
+                            <div style="width: 32px; height: 2px; background: #B46100; margin: 16px 0; border-radius: 1px;"></div>
+                            <p style="margin: 0 0 6px; color: rgba(253,243,226,0.5); font-size: 12px; line-height: 1.5;">Professional Property Media, Marketing &amp; Technology Solution</p>
+                            <p style="margin: 0; color: rgba(253,243,226,0.4); font-size: 12px; line-height: 1.5;">This dashboard is a complimentary feature included with your Markeb Media service package.</p>
                         </td>
                     </tr>
+
                 </table>
             </td>
         </tr>

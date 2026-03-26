@@ -127,19 +127,18 @@ function getEmailLayout(content) {
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       line-height: 1.6;
-      color: #1e293b;
-      background-color: #f8fafc;
+      color: #3F4D1B;
+      background-color: #f7ead5;
       margin: 0;
       padding: 0;
     }
     .container {
       max-width: 600px;
       margin: 0 auto;
-      background-color: #ffffff;
+      background-color: #FDF3E2;
     }
     .header {
-      background-color: #3b82f6;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%);
       padding: 40px 20px;
       text-align: center;
     }
@@ -150,50 +149,85 @@ function getEmailLayout(content) {
       margin-bottom: 20px;
     }
     .header h1 {
-      color: #ffffff;
+      color: #FDF3E2;
       margin: 0;
       font-size: 28px;
       font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .header-accent {
+      width: 40px;
+      height: 3px;
+      background: #B46100;
+      margin: 16px auto 0;
+      border-radius: 2px;
     }
     .content {
       padding: 40px 30px;
+    }
+    .content h2 {
+      color: #3F4D1B;
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 16px;
+    }
+    .content p {
+      color: #3F4D1B;
+      margin: 16px 0;
     }
     .alert {
       padding: 16px;
       border-radius: 8px;
       margin: 20px 0;
+      font-size: 14px;
     }
     .alert-info {
-      background-color: #eff6ff;
-      border: 2px solid #3b82f6;
-      color: #1e40af;
+      background-color: #fff8ee;
+      border: 2px solid #B46100;
+      color: #8a4a00;
+    }
+    .alert-warning {
+      background-color: #fef9ec;
+      border: 2px solid #cc7a1a;
+      color: #7a3e00;
     }
     .alert-success {
-      background-color: #f0fdf4;
-      border: 2px solid #10b981;
-      color: #065f46;
+      background-color: #f3f7e8;
+      border: 2px solid #3F4D1B;
+      color: #3F4D1B;
     }
     .button {
       display: inline-block;
-      background-color: #3b82f6;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #ffffff !important;
+      background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+      color: #FDF3E2 !important;
       padding: 14px 32px;
       border-radius: 10px;
       text-decoration: none;
       font-weight: 600;
       margin: 20px 0;
+      font-size: 15px;
+      letter-spacing: 0.01em;
     }
     .footer {
-      background-color: #f8fafc;
+      background-color: #3F4D1B;
       padding: 30px;
       text-align: center;
-      color: #64748b;
+      color: rgba(253,243,226,0.7);
       font-size: 14px;
     }
+    .footer strong {
+      color: #FDF3E2;
+    }
     .footer a {
-      color: #3b82f6;
+      color: #B46100;
       text-decoration: none;
+    }
+    .footer-divider {
+      width: 32px;
+      height: 2px;
+      background: #B46100;
+      margin: 16px auto;
+      border-radius: 1px;
     }
   </style>
 </head>
@@ -202,17 +236,17 @@ function getEmailLayout(content) {
     <div class="header">
       <img src="${LOGO_URL}" alt="Markeb Media">
       <h1>Markeb Media</h1>
+      <div class="header-accent"></div>
     </div>
     <div class="content">
-${content}
+      ${content}
     </div>
     <div class="footer">
-      <p>
-        <strong>Markeb Media</strong><br>
-        Professional Property Media, Marketing & Technology Solution<br>
-        <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
-      </p>
-      <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">
+      <strong>Markeb Media</strong>
+      <div class="footer-divider"></div>
+      <p style="margin: 0 0 6px;">Professional Property Media, Marketing &amp; Technology Solution</p>
+      <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
+      <p style="margin-top: 20px; font-size: 12px; color: rgba(253,243,226,0.4);">
         Need help? <a href="${SITE_URL}/contact">Contact us</a>
       </p>
     </div>
@@ -227,26 +261,26 @@ async function sendEditingEmail(customerName, trackingCode, projectAddress, emai
   const content = `
     <h2>📸 Your Content is Being Edited</h2>
     <p>Hi ${customerName},</p>
-    
+
     <p>We are pleased to let you know that we are currently editing the content for <strong>${projectAddress}</strong>.</p>
-    
+
     <p>Our team is meticulously enhancing your visuals to ensure they reflect the property in the best possible light — sharp, refined, and market-ready.</p>
-    
+
     <p><strong>You're one step closer to getting ${projectAddress} on the market.</strong></p>
-    
+
     <p>As an added benefit, you can track every stage of your marketing through your personalised dashboard giving you complete visibility from shoot to delivery:</p>
-    
+
     <center>
       <a href="${DASHBOARD_URL}" class="button">Track Your Project</a>
     </center>
-    
+
     <div class="alert alert-info">
       <strong>📍 Your Tracking Code:</strong><br>
-      <span style="font-size: 18px; font-weight: bold;">${trackingCode}</span>
+      <span style="font-size: 18px; font-weight: 700; color: #B46100;">${trackingCode}</span>
     </div>
-    
-    <p>Questions about your marketing? Reply anytime we're always here to help.</p>
-    
+
+    <p>Questions about your marketing? Reply anytime — we're always here to help.</p>
+
     <p>Warm regards,<br><strong>Markeb Media Team</strong></p>
   `;
 
@@ -266,26 +300,26 @@ async function sendQualityControlEmail(customerName, trackingCode, projectAddres
   const content = `
     <h2>🔍 Your Content is in Quality Control</h2>
     <p>Hi ${customerName},</p>
-    
+
     <p>We are pleased to let you know that we are currently performing the final quality control on the content for <strong>${projectAddress}</strong>.</p>
-    
+
     <p>Our team is thoroughly reviewing every detail to ensure your content is flawless, on-brand, and ready for delivery.</p>
-    
+
     <p><strong>${projectAddress} is just one step away from going live on the market!</strong></p>
-    
+
     <p>You have exclusive access to your personalised dashboard where you can track your marketing progress, request revisions, and view your content calendar:</p>
-    
+
     <center>
       <a href="${DASHBOARD_URL}" class="button">Track Your Project</a>
     </center>
-    
+
     <div class="alert alert-info">
       <strong>📍 Your Tracking Code:</strong><br>
-      <span style="font-size: 18px; font-weight: bold;">${trackingCode}</span>
+      <span style="font-size: 18px; font-weight: 700; color: #B46100;">${trackingCode}</span>
     </div>
-    
-    <p>Questions about your marketing? Reply anytime we're always here to help.</p>
-    
+
+    <p>Questions about your marketing? Reply anytime — we're always here to help.</p>
+
     <p>Warm regards,<br><strong>Markeb Media Team</strong></p>
   `;
 
@@ -305,28 +339,29 @@ async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLin
   const content = `
     <h2>🎉 Your Content is Now Ready!</h2>
     <p>Hi ${customerName},</p>
-    
-    <p>Your content for <strong>${projectAddress}</strong> is now ready 🎉</p>
-    
+
+    <p>Your content for <strong>${projectAddress}</strong> is now ready! 🎉</p>
+
     <div class="alert alert-success">
       <strong>📥 Download Link:</strong><br>
-      <a href="${deliveryLink}" style="color: #065f46; font-weight: bold; font-size: 16px;">${deliveryLink}</a>
+      <a href="${deliveryLink}" style="color: #3F4D1B; font-weight: 700; font-size: 15px; word-break: break-all;">${deliveryLink}</a>
     </div>
-    
+
     <div class="alert alert-info">
-      <strong>📍 Tracking Code:</strong> ${trackingCode}
+      <strong>📍 Tracking Code:</strong><br>
+      <span style="font-size: 18px; font-weight: 700; color: #B46100;">${trackingCode}</span>
     </div>
-    
+
     <p><strong>✏️ Need tweaks?</strong> You have exclusive access to your client dashboard where you can request revisions, track your project live, and manage your content.</p>
-    
+
     <center>
       <a href="${DASHBOARD_URL}" class="button">Access Your Dashboard</a>
     </center>
-    
+
     <p>We're happy to help.</p>
-    
+
     <p>Thanks again for choosing Markeb Media — if you need anything else, don't hesitate to get in touch.</p>
-    
+
     <p>Kind regards,<br><strong>Markeb Media Team</strong></p>
   `;
 

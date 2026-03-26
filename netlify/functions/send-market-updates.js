@@ -22,7 +22,7 @@ const headers = {
   'Access-Control-Allow-Headers': 'Content-Type'
 };
 
-// Email Layout Wrapper
+/// Email Layout Wrapper
 function getEmailLayout(content) {
   return `
 <!DOCTYPE html>
@@ -35,19 +35,18 @@ function getEmailLayout(content) {
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       line-height: 1.6;
-      color: #1e293b;
-      background-color: #f8fafc;
+      color: #3F4D1B;
+      background-color: #f7ead5;
       margin: 0;
       padding: 0;
     }
     .container {
       max-width: 600px;
       margin: 0 auto;
-      background-color: #ffffff;
+      background-color: #FDF3E2;
     }
     .header {
-      background-color: #3b82f6;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%);
       padding: 40px 20px;
       text-align: center;
     }
@@ -58,42 +57,105 @@ function getEmailLayout(content) {
       margin-bottom: 20px;
     }
     .header h1 {
-      color: #ffffff;
+      color: #FDF3E2;
       margin: 0;
       font-size: 28px;
       font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .header-accent {
+      width: 40px;
+      height: 3px;
+      background: #B46100;
+      margin: 16px auto 0;
+      border-radius: 2px;
     }
     .content {
       padding: 40px 30px;
+    }
+    .content h2 {
+      color: #3F4D1B;
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 16px;
+    }
+    .content p {
+      color: #3F4D1B;
+      margin: 16px 0;
+    }
+    .content ul,
+    .content ol {
+      margin: 16px 0;
+      padding-left: 24px;
+      color: #3F4D1B;
+    }
+    .content li {
+      margin: 8px 0;
+      color: #3F4D1B;
+    }
+    .button {
+      display: inline-block;
+      background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+      color: #FDF3E2 !important;
+      padding: 14px 32px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 20px 0;
+      font-size: 15px;
     }
     .alert {
       padding: 16px;
       border-radius: 8px;
       margin: 20px 0;
+      font-size: 14px;
     }
     .alert-info {
-      background-color: #eff6ff;
-      border: 2px solid #3b82f6;
-      color: #1e40af;
+      background-color: #fff8ee;
+      border: 2px solid #B46100;
+      color: #8a4a00;
+    }
+    .alert-warning {
+      background-color: #fef9ec;
+      border: 2px solid #cc7a1a;
+      color: #7a3e00;
+    }
+    .alert-success {
+      background-color: #f3f7e8;
+      border: 2px solid #3F4D1B;
+      color: #3F4D1B;
     }
     .footer {
-      background-color: #f8fafc;
+      background-color: #3F4D1B;
       padding: 30px;
       text-align: center;
-      color: #64748b;
+      color: rgba(253,243,226,0.7);
       font-size: 14px;
-      border-top: 2px solid #e2e8f0;
+    }
+    .footer strong {
+      color: #FDF3E2;
     }
     .footer a {
-      color: #3b82f6;
+      color: #B46100;
       text-decoration: none;
+    }
+    .footer-divider {
+      width: 32px;
+      height: 2px;
+      background: #B46100;
+      margin: 16px auto;
+      border-radius: 1px;
     }
     .unsubscribe {
       margin-top: 20px;
       padding-top: 20px;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid rgba(253,243,226,0.15);
       font-size: 12px;
-      color: #94a3b8;
+      color: rgba(253,243,226,0.35);
+    }
+    .unsubscribe a {
+      color: #B46100;
+      text-decoration: none;
     }
   </style>
 </head>
@@ -102,23 +164,23 @@ function getEmailLayout(content) {
     <div class="header">
       <img src="${LOGO_URL}" alt="Markeb Media">
       <h1>Property Market Update</h1>
+      <div class="header-accent"></div>
     </div>
     <div class="content">
       ${content}
     </div>
     <div class="footer">
-      <p>
-        <strong>Markeb Media</strong><br>
-        Professional Property Media, Marketing & Technology Solutions<br>
-        <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
-      </p>
-      <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">
+      <strong>Markeb Media</strong>
+      <div class="footer-divider"></div>
+      <p style="margin: 0 0 6px;">Professional Property Media, Marketing &amp; Technology Solutions</p>
+      <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
+      <p style="margin-top: 16px; font-size: 12px; color: rgba(253,243,226,0.4);">
         Need help? <a href="${SITE_URL}/contact">Contact us</a>
       </p>
       <div class="unsubscribe">
         <p>
           You're receiving this because you subscribed to property market updates.<br>
-          To manage your email preferences, contact us at 
+          To manage your email preferences, contact us at
           <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
         </p>
       </div>
@@ -278,7 +340,7 @@ exports.handler = async (event) => {
       insight = await generateMarketInsight(region, marketData);
     }
 
-    // TEST MODE - Send to admin only
+  // TEST MODE - Send to admin only
     if (sendPreview) {
       console.log('Sending test email to admin...');
       
@@ -292,91 +354,97 @@ exports.handler = async (event) => {
 
         <p>Hi there,</p>
 
-        <p style="font-size: 16px; line-height: 1.7; color: #475569;">
+        <p style="font-size: 16px; line-height: 1.7; color: #6b7c2e;">
           Here's your latest market intelligence for ${region} to help you win more valuations.
         </p>
 
-        <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 24px; margin: 24px 0;">
-          <h3 style="margin-top: 0; color: #1e40af;">📍 ${region} Market Snapshot (Last 3 Months)</h3>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px;">
-            <div>
-              <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Average Sold Price</div>
-              <div style="font-size: 28px; font-weight: 700; color: #1e40af;">£${marketData.snapshot.averagePrice.toLocaleString()}</div>
-            </div>
-            <div>
-              <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Change vs Last Year</div>
-              <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.yoyChange >= 0 ? '#10b981' : '#ef4444'};">
-                ${marketData.snapshot.yoyChange >= 0 ? '+' : ''}${marketData.snapshot.yoyChange}%
-              </div>
-            </div>
-            <div>
-              <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Total Sales Completed</div>
-              <div style="font-size: 28px; font-weight: 700; color: #1e40af;">${marketData.snapshot.totalTransactions}</div>
-            </div>
-            <div>
-              <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Sales Volume Change</div>
-              <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.transactionChange >= 0 ? '#10b981' : '#ef4444'};">
-                ${marketData.snapshot.transactionChange >= 0 ? '+' : ''}${marketData.snapshot.transactionChange}%
-              </div>
-            </div>
-          </div>
+        <!-- Market Snapshot -->
+        <div style="background-color: #fff8ee; border: 2px solid #B46100; border-radius: 12px; padding: 24px; margin: 24px 0;">
+          <h3 style="margin-top: 0; color: #8a4a00; font-size: 16px; font-weight: 700;">📍 ${region} Market Snapshot (Last 3 Months)</h3>
+          <table role="presentation" style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+            <tr>
+              <td style="width: 50%; padding: 8px 8px 8px 0; vertical-align: top;">
+                <div style="font-size: 12px; color: #9a7a4a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Average Sold Price</div>
+                <div style="font-size: 28px; font-weight: 700; color: #B46100;">£${marketData.snapshot.averagePrice.toLocaleString()}</div>
+              </td>
+              <td style="width: 50%; padding: 8px 0 8px 8px; vertical-align: top;">
+                <div style="font-size: 12px; color: #9a7a4a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Change vs Last Year</div>
+                <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.yoyChange >= 0 ? '#3F4D1B' : '#ef4444'};">
+                  ${marketData.snapshot.yoyChange >= 0 ? '+' : ''}${marketData.snapshot.yoyChange}%
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 50%; padding: 8px 8px 0 0; vertical-align: top;">
+                <div style="font-size: 12px; color: #9a7a4a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Total Sales Completed</div>
+                <div style="font-size: 28px; font-weight: 700; color: #B46100;">${marketData.snapshot.totalTransactions}</div>
+              </td>
+              <td style="width: 50%; padding: 8px 0 0 8px; vertical-align: top;">
+                <div style="font-size: 12px; color: #9a7a4a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Sales Volume Change</div>
+                <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.transactionChange >= 0 ? '#3F4D1B' : '#ef4444'};">
+                  ${marketData.snapshot.transactionChange >= 0 ? '+' : ''}${marketData.snapshot.transactionChange}%
+                </div>
+              </td>
+            </tr>
+          </table>
         </div>
 
-        <h3 style="color: #1e293b; margin-top: 32px;">🏘 Property Type Performance</h3>
-        <p style="color: #64748b; margin-bottom: 16px;">Average sold prices by property type:</p>
+        <h3 style="color: #3F4D1B; margin-top: 32px; font-size: 16px; font-weight: 700;">🏘 Property Type Performance</h3>
+        <p style="color: #6b7c2e; margin-bottom: 16px; font-size: 14px;">Average sold prices by property type:</p>
 
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          ${Object.keys(marketData.propertyTypes).map(type => {
-            const data = marketData.propertyTypes[type];
-            const emoji = {'Detached': '🏠', 'Semi-detached': '🏡', 'Terraced': '🏘', 'Flats': '🏢'}[type];
-            return `
-              <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                  <div style="font-size: 16px; font-weight: 600; color: #1e293b;">${emoji} ${type}</div>
-                  <div style="font-size: 12px; color: #64748b; margin-top: 4px;">${data.transactions} sales</div>
-                </div>
-                <div style="text-align: right;">
-                  <div style="font-size: 20px; font-weight: 700; color: #3b82f6;">£${data.averagePrice.toLocaleString()}</div>
-                  <div style="font-size: 13px; font-weight: 600; color: ${data.yoyChange >= 0 ? '#10b981' : '#ef4444'};">
+        ${Object.keys(marketData.propertyTypes).map(type => {
+          const data = marketData.propertyTypes[type];
+          const emoji = {'Detached': '🏠', 'Semi-detached': '🏡', 'Terraced': '🏘', 'Flats': '🏢'}[type];
+          return `
+            <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f7ead5; border: 2px solid #e8d9be; border-radius: 8px; margin-bottom: 10px;">
+              <tr>
+                <td style="padding: 16px;">
+                  <div style="font-size: 15px; font-weight: 600; color: #3F4D1B;">${emoji} ${type}</div>
+                  <div style="font-size: 12px; color: #6b7c2e; margin-top: 4px;">${data.transactions} sales</div>
+                </td>
+                <td style="padding: 16px; text-align: right;">
+                  <div style="font-size: 20px; font-weight: 700; color: #B46100;">£${data.averagePrice.toLocaleString()}</div>
+                  <div style="font-size: 13px; font-weight: 600; color: ${data.yoyChange >= 0 ? '#3F4D1B' : '#ef4444'};">
                     ${data.yoyChange >= 0 ? '+' : ''}${data.yoyChange.toFixed(1)}% YoY
                   </div>
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
+                </td>
+              </tr>
+            </table>
+          `;
+        }).join('')}
 
-        <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin: 32px 0;">
-          <h3 style="margin-top: 0; color: #92400e;">💡 What This Means for Winning Valuations</h3>
-          <p style="color: #78350f; margin: 0; line-height: 1.7; font-size: 15px;">
+        <!-- Insight Box -->
+        <div style="background-color: #fff8ee; border: 2px solid #B46100; border-left: 5px solid #B46100; border-radius: 12px; padding: 20px; margin: 32px 0;">
+          <h3 style="margin-top: 0; color: #8a4a00; font-size: 16px; font-weight: 700;">💡 What This Means for Winning Valuations</h3>
+          <p style="color: #7a3e00; margin: 0; line-height: 1.7; font-size: 15px;">
             ${insight}
           </p>
         </div>
 
-        <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 24px 0;">
-          <h3 style="margin-top: 0; color: #1e293b;">📊 How to Use This Intelligence</h3>
-          <ul style="color: #475569; margin: 0; padding-left: 20px; line-height: 1.8;">
-            <li style="margin-bottom: 8px;">Reference these <strong>actual sold prices</strong> (not asking prices) during valuations</li>
+        <!-- How to Use Box -->
+        <div style="background-color: #f3f7e8; border: 2px solid #3F4D1B; border-radius: 12px; padding: 20px; margin: 24px 0;">
+          <h3 style="margin-top: 0; color: #3F4D1B; font-size: 16px; font-weight: 700;">📊 How to Use This Intelligence</h3>
+          <ul style="color: #6b7c2e; margin: 0; padding-left: 20px; line-height: 1.8; font-size: 14px;">
+            <li style="margin-bottom: 8px;">Reference these <strong style="color: #3F4D1B;">actual sold prices</strong> (not asking prices) during valuations</li>
             <li style="margin-bottom: 8px;">Show vendors you understand current market conditions with real data</li>
             <li style="margin-bottom: 8px;">Demonstrate which property types are performing strongest in ${region}</li>
             <li style="margin-bottom: 8px;">Position yourself as the data-driven expert vendors trust</li>
           </ul>
         </div>
 
-        <p style="color: #64748b; font-size: 13px; font-style: italic; margin-top: 32px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+        <p style="color: #9a7a4a; font-size: 13px; font-style: italic; margin-top: 32px; border-top: 1px solid #e8d9be; padding-top: 16px;">
           ${marketData.compliance}
         </p>
 
-        <p style="margin-top: 32px;">Best regards,<br><strong>The Markeb Media Team</strong></p>
+        <p style="margin-top: 32px; color: #3F4D1B;">Best regards,<br><strong>The Markeb Media Team</strong></p>
 
-        <div style="background: #f8fafc; border: 2px dashed #e2e8f0; border-radius: 8px; padding: 16px; margin-top: 32px; text-align: center;">
-          <p style="margin: 0; color: #64748b; font-size: 14px;">
-            <strong>Need professional property media that wins valuations?</strong><br>
-            Markeb Media provides photography, videography, and social media content that positions you as the premium choice.
-          </p>
+        <!-- CTA Box -->
+        <div style="background-color: #f7ead5; border: 2px dashed #B46100; border-radius: 8px; padding: 20px; margin-top: 32px; text-align: center;">
+          <p style="margin: 0 0 6px; color: #3F4D1B; font-size: 14px; font-weight: 700;">Need professional property media that wins valuations?</p>
+          <p style="margin: 0; color: #6b7c2e; font-size: 14px;">Markeb Media provides photography, videography, and social media content that positions you as the premium choice.</p>
         </div>
 
-        <div class="alert alert-info">
+        <div class="alert alert-info" style="margin-top: 24px;">
           <strong>📧 Ready to send?</strong><br>
           Uncheck "Send test email" and click send to deliver to all ${recipients.length} opted-in customer${recipients.length !== 1 ? 's' : ''}.
         </div>
@@ -415,96 +483,101 @@ exports.handler = async (event) => {
         const firstName = (recipient.name || 'there').split(' ')[0];
 
         const emailContent = `
-          <p>Hi ${firstName},</p>
+          <p style="color: #3F4D1B;">Hi ${firstName},</p>
 
-          <p style="font-size: 16px; line-height: 1.7; color: #475569;">
+          <p style="font-size: 16px; line-height: 1.7; color: #6b7c2e;">
             Here's your latest market intelligence for ${region} to help you win more valuations.
           </p>
-          
-          <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 24px; margin: 24px 0;">
-            <h3 style="margin-top: 0; color: #1e40af;">📍 ${region} Market Snapshot (Last 3 Months)</h3>
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px;">
-              <div>
-                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Average Sold Price</div>
-                <div style="font-size: 28px; font-weight: 700; color: #1e40af;">£${marketData.snapshot.averagePrice.toLocaleString()}</div>
-              </div>
-              <div>
-                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Change vs Last Year</div>
-                <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.yoyChange >= 0 ? '#10b981' : '#ef4444'};">
-                  ${marketData.snapshot.yoyChange >= 0 ? '+' : ''}${marketData.snapshot.yoyChange}%
-                </div>
-              </div>
-              <div>
-                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Total Sales Completed</div>
-                <div style="font-size: 28px; font-weight: 700; color: #1e40af;">${marketData.snapshot.totalTransactions}</div>
-              </div>
-              <div>
-                <div style="font-size: 12px; color: #64748b; margin-bottom: 4px;">Sales Volume Change</div>
-                <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.transactionChange >= 0 ? '#10b981' : '#ef4444'};">
-                  ${marketData.snapshot.transactionChange >= 0 ? '+' : ''}${marketData.snapshot.transactionChange}%
-                </div>
-              </div>
-            </div>
+
+          <!-- Market Snapshot -->
+          <div style="background-color: #fff8ee; border: 2px solid #B46100; border-radius: 12px; padding: 24px; margin: 24px 0;">
+            <h3 style="margin-top: 0; color: #8a4a00; font-size: 16px; font-weight: 700;">📍 ${region} Market Snapshot (Last 3 Months)</h3>
+            <table role="presentation" style="width: 100%; border-collapse: collapse; margin-top: 16px;">
+              <tr>
+                <td style="width: 50%; padding: 8px 8px 8px 0; vertical-align: top;">
+                  <div style="font-size: 12px; color: #9a7a4a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Average Sold Price</div>
+                  <div style="font-size: 28px; font-weight: 700; color: #B46100;">£${marketData.snapshot.averagePrice.toLocaleString()}</div>
+                </td>
+                <td style="width: 50%; padding: 8px 0 8px 8px; vertical-align: top;">
+                  <div style="font-size: 12px; color: #9a7a4a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Change vs Last Year</div>
+                  <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.yoyChange >= 0 ? '#3F4D1B' : '#ef4444'};">
+                    ${marketData.snapshot.yoyChange >= 0 ? '+' : ''}${marketData.snapshot.yoyChange}%
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="width: 50%; padding: 8px 8px 0 0; vertical-align: top;">
+                  <div style="font-size: 12px; color: #9a7a4a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Total Sales Completed</div>
+                  <div style="font-size: 28px; font-weight: 700; color: #B46100;">${marketData.snapshot.totalTransactions}</div>
+                </td>
+                <td style="width: 50%; padding: 8px 0 0 8px; vertical-align: top;">
+                  <div style="font-size: 12px; color: #9a7a4a; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Sales Volume Change</div>
+                  <div style="font-size: 28px; font-weight: 700; color: ${marketData.snapshot.transactionChange >= 0 ? '#3F4D1B' : '#ef4444'};">
+                    ${marketData.snapshot.transactionChange >= 0 ? '+' : ''}${marketData.snapshot.transactionChange}%
+                  </div>
+                </td>
+              </tr>
+            </table>
           </div>
 
-          <h3 style="color: #1e293b; margin-top: 32px;">🏘 Property Type Performance</h3>
-          <p style="color: #64748b; margin-bottom: 16px;">Average sold prices by property type:</p>
+          <h3 style="color: #3F4D1B; margin-top: 32px; font-size: 16px; font-weight: 700;">🏘 Property Type Performance</h3>
+          <p style="color: #6b7c2e; margin-bottom: 16px; font-size: 14px;">Average sold prices by property type:</p>
 
-          <div style="display: flex; flex-direction: column; gap: 12px;">
-            ${Object.keys(marketData.propertyTypes).map(type => {
-              const data = marketData.propertyTypes[type];
-              const emoji = {
-                'Detached': '🏠',
-                'Semi-detached': '🏡',
-                'Terraced': '🏘',
-                'Flats': '🏢'
-              }[type];
-              
-              return `
-                <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center;">
-                  <div>
-                    <div style="font-size: 16px; font-weight: 600; color: #1e293b;">${emoji} ${type}</div>
-                    <div style="font-size: 12px; color: #64748b; margin-top: 4px;">${data.transactions} sales</div>
-                  </div>
-                  <div style="text-align: right;">
-                    <div style="font-size: 20px; font-weight: 700; color: #3b82f6;">£${data.averagePrice.toLocaleString()}</div>
-                    <div style="font-size: 13px; font-weight: 600; color: ${data.yoyChange >= 0 ? '#10b981' : '#ef4444'};">
+          ${Object.keys(marketData.propertyTypes).map(type => {
+            const data = marketData.propertyTypes[type];
+            const emoji = {
+              'Detached': '🏠',
+              'Semi-detached': '🏡',
+              'Terraced': '🏘',
+              'Flats': '🏢'
+            }[type];
+            return `
+              <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f7ead5; border: 2px solid #e8d9be; border-radius: 8px; margin-bottom: 10px;">
+                <tr>
+                  <td style="padding: 16px;">
+                    <div style="font-size: 15px; font-weight: 600; color: #3F4D1B;">${emoji} ${type}</div>
+                    <div style="font-size: 12px; color: #6b7c2e; margin-top: 4px;">${data.transactions} sales</div>
+                  </td>
+                  <td style="padding: 16px; text-align: right;">
+                    <div style="font-size: 20px; font-weight: 700; color: #B46100;">£${data.averagePrice.toLocaleString()}</div>
+                    <div style="font-size: 13px; font-weight: 600; color: ${data.yoyChange >= 0 ? '#3F4D1B' : '#ef4444'};">
                       ${data.yoyChange >= 0 ? '+' : ''}${data.yoyChange.toFixed(1)}% YoY
                     </div>
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
+                  </td>
+                </tr>
+              </table>
+            `;
+          }).join('')}
 
-          <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin: 32px 0;">
-            <h3 style="margin-top: 0; color: #92400e;">💡 What This Means for Winning Valuations</h3>
-            <p style="color: #78350f; margin: 0; line-height: 1.7; font-size: 15px;">
+          <!-- Insight Box -->
+          <div style="background-color: #fff8ee; border: 2px solid #B46100; border-left: 5px solid #B46100; border-radius: 12px; padding: 20px; margin: 32px 0;">
+            <h3 style="margin-top: 0; color: #8a4a00; font-size: 16px; font-weight: 700;">💡 What This Means for Winning Valuations</h3>
+            <p style="color: #7a3e00; margin: 0; line-height: 1.7; font-size: 15px;">
               ${insight}
             </p>
           </div>
 
-          <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 24px 0;">
-            <h3 style="margin-top: 0; color: #1e293b;">📊 How to Use This Intelligence</h3>
-            <ul style="color: #475569; margin: 0; padding-left: 20px; line-height: 1.8;">
-              <li style="margin-bottom: 8px;">Reference these <strong>actual sold prices</strong> (not asking prices) during valuations</li>
+          <!-- How to Use Box -->
+          <div style="background-color: #f3f7e8; border: 2px solid #3F4D1B; border-radius: 12px; padding: 20px; margin: 24px 0;">
+            <h3 style="margin-top: 0; color: #3F4D1B; font-size: 16px; font-weight: 700;">📊 How to Use This Intelligence</h3>
+            <ul style="color: #6b7c2e; margin: 0; padding-left: 20px; line-height: 1.8; font-size: 14px;">
+              <li style="margin-bottom: 8px;">Reference these <strong style="color: #3F4D1B;">actual sold prices</strong> (not asking prices) during valuations</li>
               <li style="margin-bottom: 8px;">Show vendors you understand current market conditions with real data</li>
               <li style="margin-bottom: 8px;">Demonstrate which property types are performing strongest in ${region}</li>
               <li style="margin-bottom: 8px;">Position yourself as the data-driven expert vendors trust</li>
             </ul>
           </div>
 
-          <p style="color: #64748b; font-size: 13px; font-style: italic; margin-top: 32px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+          <p style="color: #9a7a4a; font-size: 13px; font-style: italic; margin-top: 32px; border-top: 1px solid #e8d9be; padding-top: 16px;">
             ${marketData.compliance}
           </p>
 
-          <p style="margin-top: 32px;">Best regards,<br><strong>The Markeb Media Team</strong></p>
+          <p style="margin-top: 32px; color: #3F4D1B;">Best regards,<br><strong>The Markeb Media Team</strong></p>
 
-          <div style="background: #f8fafc; border: 2px dashed #e2e8f0; border-radius: 8px; padding: 16px; margin-top: 32px; text-align: center;">
-            <p style="margin: 0; color: #64748b; font-size: 14px;">
-              <strong>Need professional property media that wins valuations?</strong><br>
-              Markeb Media provides photography, videography, and social media content that positions you as the premium choice.
-            </p>
+          <!-- CTA Box -->
+          <div style="background-color: #f7ead5; border: 2px dashed #B46100; border-radius: 8px; padding: 20px; margin-top: 32px; text-align: center;">
+            <p style="margin: 0 0 6px; color: #3F4D1B; font-size: 14px; font-weight: 700;">Need professional property media that wins valuations?</p>
+            <p style="margin: 0; color: #6b7c2e; font-size: 14px;">Markeb Media provides photography, videography, and social media content that positions you as the premium choice.</p>
           </div>
         `;
 
@@ -520,7 +593,7 @@ exports.handler = async (event) => {
 
         sentCount++;
         console.log(`✓ Sent to ${recipient.email}`);
-        
+
         // Rate limiting: 100ms delay between sends
         await new Promise(resolve => setTimeout(resolve, 100));
 

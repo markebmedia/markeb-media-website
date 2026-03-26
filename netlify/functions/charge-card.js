@@ -235,66 +235,117 @@ exports.handler = async (event, context) => {
     console.log('✅ Booking updated - Payment Status: Paid');
 
     // Send confirmation email
-    if (process.env.RESEND_API_KEY) {
-      try {
-        const { Resend } = require('resend');
-        const resend = new Resend(process.env.RESEND_API_KEY);
+if (process.env.RESEND_API_KEY) {
+  try {
+    const { Resend } = require('resend');
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const discountCode = fields['Discount Code'] || '';
+    const discountAmount = fields['Discount Amount'] || 0;
+    const priceBeforeDiscount = fields['Price Before Discount'] || finalPrice;
 
-        const discountCode = fields['Discount Code'] || '';
-        const discountAmount = fields['Discount Amount'] || 0;
-        const priceBeforeDiscount = fields['Price Before Discount'] || finalPrice;
-        
-        let discountHTML = '';
-        if (discountCode && discountAmount > 0) {
-          discountHTML = `
-            <div style="margin-top: 16px; padding: 12px; background: #d1fae5; border-radius: 8px;">
-              <div style="font-size: 14px; color: #065f46; font-weight: 600;">🎁 Discount Applied</div>
-              <div style="font-size: 13px; color: #047857; margin-top: 4px;">
-                Code: <strong>${discountCode}</strong><br>
-                Original Price: <span style="text-decoration: line-through;">£${priceBeforeDiscount.toFixed(2)}</span><br>
-                You Saved: <strong>£${discountAmount.toFixed(2)}</strong>
-              </div>
-            </div>
-          `;
-        }
+    let discountHTML = '';
+    if (discountCode && discountAmount > 0) {
+      discountHTML = `
+        <div style="margin: 20px 0; padding: 16px; background-color: #f3f7e8; border: 2px solid #3F4D1B; border-radius: 8px;">
+          <p style="margin: 0 0 6px; color: #3F4D1B; font-size: 15px; font-weight: 700;">🎁 Discount Applied</p>
+          <p style="margin: 0; color: #6b7c2e; font-size: 14px; line-height: 1.6;">
+            Code: <strong>${discountCode}</strong><br>
+            Original Price: <span style="text-decoration: line-through;">£${priceBeforeDiscount.toFixed(2)}</span><br>
+            You Saved: <strong>£${discountAmount.toFixed(2)}</strong>
+          </p>
+        </div>
+      `;
+    }
 
-        await resend.emails.send({
-          from: 'Markeb Media <commercial@markebmedia.com>',
-          to: fields['Client Email'],
-          bcc: 'commercial@markebmedia.com',
-          subject: `Payment Confirmed - ${fields['Booking Reference']}`,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; padding: 40px 30px; text-align: center; border-radius: 8px 8px 0 0;">
-                <div style="font-size: 48px; margin-bottom: 10px;">✅</div>
-                <h1 style="margin: 0; font-size: 32px; font-weight: 700;">Payment Confirmed!</h1>
+    await resend.emails.send({
+      from: 'Markeb Media <commercial@markebmedia.com>',
+      to: fields['Client Email'],
+      bcc: 'commercial@markebmedia.com',
+      subject: `Payment Confirmed - ${fields['Booking Reference']}`,
+      html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f7ead5;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td style="padding: 40px 0; text-align: center; background-color: #f7ead5;">
+        <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #FDF3E2; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(63,77,27,0.12);">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 30px; text-align: center; background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%);">
+              <div style="font-size: 44px; margin-bottom: 12px;">✅</div>
+              <h1 style="margin: 0; color: #FDF3E2; font-size: 28px; font-weight: 600; letter-spacing: -0.02em;">Payment Confirmed!</h1>
+              <p style="margin: 10px 0 0; color: rgba(253,243,226,0.8); font-size: 15px;">Your booking is fully confirmed</p>
+              <div style="width: 40px; height: 3px; background: #B46100; margin: 16px auto 0; border-radius: 2px;"></div>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <p style="margin: 0 0 20px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">Hi <strong>${fields['Client Name']}</strong>,</p>
+              <p style="margin: 0 0 25px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">Your payment has been successfully processed!</p>
+
+              <!-- Payment Amount -->
+              <div style="background-color: #f3f7e8; border: 2px solid #3F4D1B; border-radius: 12px; padding: 24px; margin: 0 0 24px; text-align: center;">
+                <p style="margin: 0 0 6px; color: #6b7c2e; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Payment Received</p>
+                <p style="margin: 0; color: #3F4D1B; font-size: 40px; font-weight: 700; line-height: 1.1;">£${finalPrice.toFixed(2)}</p>
               </div>
-              
-              <div style="padding: 40px 30px; background: #ffffff;">
-                <p style="font-size: 16px; color: #333;">Hi <strong>${fields['Client Name']}</strong>,</p>
-                
-                <p style="font-size: 16px; color: #333;">Your payment has been successfully processed!</p>
-                
-                <div style="background: #d1fae5; border: 2px solid #10b981; border-radius: 12px; padding: 20px; margin: 25px 0; text-align: center;">
-                  <div style="font-size: 14px; color: #065f46; font-weight: 600;">PAYMENT RECEIVED</div>
-                  <div style="font-size: 36px; font-weight: 700; color: #065f46; margin-top: 8px;">£${finalPrice.toFixed(2)}</div>
-                </div>
-                
-                ${discountHTML}
-                
-                <div style="background: #f8fafc; border-left: 4px solid #10b981; padding: 25px; margin: 25px 0;">
-                  <h3 style="margin: 0 0 15px 0; font-size: 18px;">Booking Details</h3>
-                  <p><strong>Reference:</strong> ${fields['Booking Reference']}</p>
-                  <p><strong>Service:</strong> ${fields['Service']}</p>
-                  <p><strong>Date:</strong> ${fields['Date']} at ${fields['Time']}</p>
-                  <p><strong>Property:</strong> ${fields['Property Address'] || fields['Postcode']}</p>
-                </div>
-                
-                <p style="font-size: 16px; color: #333;">Thank you for choosing Markeb Media!</p>
+
+              <!-- Discount (conditional) -->
+              ${discountHTML}
+
+              <!-- Booking Details -->
+              <div style="background-color: #f7ead5; border: 2px solid #e8d9be; border-radius: 12px; padding: 24px; margin: 0 0 24px;">
+                <h3 style="margin: 0 0 16px; color: #3F4D1B; font-size: 16px; font-weight: 700;">Booking Details</h3>
+                <table role="presentation" style="width: 100%; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #6b7c2e; font-size: 14px; font-weight: 600; width: 40%;">Reference</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">${fields['Booking Reference']}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #6b7c2e; font-size: 14px; font-weight: 600;">Service</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">${fields['Service']}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #6b7c2e; font-size: 14px; font-weight: 600;">Date &amp; Time</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">${fields['Date']} at ${fields['Time']}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; color: #6b7c2e; font-size: 14px; font-weight: 600;">Property</td>
+                    <td style="padding: 10px 0; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">${fields['Property Address'] || fields['Postcode']}</td>
+                  </tr>
+                </table>
               </div>
-            </div>
-          `
-        });
+
+              <p style="margin: 0 0 6px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">Thank you for choosing Markeb Media!</p>
+              <p style="margin: 0; color: #6b7c2e; font-size: 14px; line-height: 1.6;">If you have any questions, contact us at <a href="mailto:commercial@markebmedia.com" style="color: #B46100; text-decoration: none;">commercial@markebmedia.com</a></p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px 40px; background-color: #3F4D1B;">
+              <p style="margin: 0 0 4px; color: #FDF3E2; font-size: 14px; font-weight: 600;">Best regards,</p>
+              <p style="margin: 0; color: rgba(253,243,226,0.75); font-size: 14px;">The Markeb Media Team</p>
+              <div style="width: 32px; height: 2px; background: #B46100; margin: 16px 0; border-radius: 1px;"></div>
+              <p style="margin: 0; color: rgba(253,243,226,0.4); font-size: 12px; line-height: 1.5;">Professional Property Media, Marketing &amp; Technology Solution</p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+      `
+    });
 
         console.log('✅ Confirmation email sent');
       } catch (emailError) {

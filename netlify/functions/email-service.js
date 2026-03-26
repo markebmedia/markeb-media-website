@@ -27,7 +27,7 @@ function formatServiceWithAddons(service, addons) {
   }
   
   const addonNames = addons.map(a => a.name).join(', ');
-  return `${service}<br><span style="font-size: 13px; color: #64748b;">Add-ons: ${addonNames}</span>`;
+  return `${service}<br><span style="font-size: 13px; color: #9a7a4a;">Add-ons: ${addonNames}</span>`;
 }
 
 // ✅ Format Access Type Information
@@ -81,19 +81,18 @@ function getEmailLayout(content) {
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       line-height: 1.6;
-      color: #1e293b;
-      background-color: #f8fafc;
+      color: #3F4D1B;
+      background-color: #f7ead5;
       margin: 0;
       padding: 0;
     }
     .container {
       max-width: 600px;
       margin: 0 auto;
-      background-color: #ffffff;
+      background-color: #FDF3E2;
     }
     .header {
-      background-color: #3b82f6;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%);
       padding: 40px 20px;
       text-align: center;
     }
@@ -104,17 +103,49 @@ function getEmailLayout(content) {
       margin-bottom: 20px;
     }
     .header h1 {
-      color: #ffffff;
+      color: #FDF3E2;
       margin: 0;
       font-size: 28px;
       font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .header-accent {
+      width: 40px;
+      height: 3px;
+      background: #B46100;
+      margin: 14px auto 0;
+      border-radius: 2px;
     }
     .content {
       padding: 40px 30px;
     }
+    .content h2 {
+      color: #3F4D1B;
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0 0 8px;
+    }
+    .content h3 {
+      color: #3F4D1B;
+      font-size: 16px;
+      font-weight: 700;
+      margin: 24px 0 8px;
+    }
+    .content p {
+      color: #3F4D1B;
+      margin: 0 0 14px;
+    }
+    .content ul {
+      color: #3F4D1B;
+      padding-left: 20px;
+      margin: 0 0 14px;
+    }
+    .content ul li {
+      margin-bottom: 6px;
+    }
     .booking-details {
-      background-color: #f8fafc;
-      border: 2px solid #e2e8f0;
+      background-color: #f7ead5;
+      border: 2px solid #e8d9be;
       border-radius: 12px;
       padding: 24px;
       margin: 24px 0;
@@ -123,62 +154,76 @@ function getEmailLayout(content) {
       display: flex;
       justify-content: space-between;
       padding: 12px 0;
-      border-bottom: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e8d9be;
     }
     .detail-row:last-child {
       border-bottom: none;
     }
     .detail-label {
-      color: #64748b;
+      color: #6b7c2e;
       font-weight: 600;
+      font-size: 14px;
     }
     .detail-value {
-      color: #1e293b;
+      color: #3F4D1B;
       font-weight: 600;
       text-align: right;
       max-width: 60%;
+      font-size: 14px;
     }
     .button {
       display: inline-block;
-      background-color: #3b82f6;
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      color: #ffffff !important;
+      background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+      color: #FDF3E2 !important;
       padding: 14px 32px;
       border-radius: 10px;
       text-decoration: none;
       font-weight: 600;
       margin: 20px 0;
+      font-size: 15px;
+      letter-spacing: 0.01em;
     }
     .alert {
       padding: 16px;
       border-radius: 8px;
       margin: 20px 0;
-    }
-    .alert-info {
-      background-color: #eff6ff;
-      border: 2px solid #3b82f6;
-      color: #1e40af;
-    }
-    .alert-warning {
-      background-color: #fef3c7;
-      border: 2px solid #f59e0b;
-      color: #92400e;
-    }
-    .alert-success {
-      background-color: #f0fdf4;
-      border: 2px solid #10b981;
-      color: #065f46;
-    }
-    .footer {
-      background-color: #f8fafc;
-      padding: 30px;
-      text-align: center;
-      color: #64748b;
       font-size: 14px;
     }
+    .alert-info {
+      background-color: #fff8ee;
+      border: 2px solid #B46100;
+      color: #8a4a00;
+    }
+    .alert-warning {
+      background-color: #fef9ec;
+      border: 2px solid #cc7a1a;
+      color: #7a3e00;
+    }
+    .alert-success {
+      background-color: #f3f7e8;
+      border: 2px solid #3F4D1B;
+      color: #3F4D1B;
+    }
+    .footer {
+      background-color: #3F4D1B;
+      padding: 30px;
+      text-align: center;
+      color: rgba(253,243,226,0.7);
+      font-size: 14px;
+    }
+    .footer strong {
+      color: #FDF3E2;
+    }
     .footer a {
-      color: #3b82f6;
+      color: #B46100;
       text-decoration: none;
+    }
+    .footer-divider {
+      width: 32px;
+      height: 2px;
+      background: #B46100;
+      margin: 16px auto;
+      border-radius: 1px;
     }
   </style>
 </head>
@@ -187,17 +232,17 @@ function getEmailLayout(content) {
     <div class="header">
       <img src="${LOGO_URL}" alt="Markeb Media">
       <h1>Markeb Media</h1>
+      <div class="header-accent"></div>
     </div>
     <div class="content">
       ${content}
     </div>
     <div class="footer">
-      <p>
-        <strong>Markeb Media</strong><br>
-        Professional Property Media, Marketing & Technology Solution<br>
-        <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
-      </p>
-      <p style="margin-top: 20px; font-size: 12px; color: #94a3b8;">
+      <strong>Markeb Media</strong>
+      <div class="footer-divider"></div>
+      <p style="margin:0 0 6px;">Professional Property Media, Marketing &amp; Technology Solution</p>
+      <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
+      <p style="margin-top: 20px; font-size: 12px; color: rgba(253,243,226,0.4);">
         Need help? <a href="${SITE_URL}/contact">Contact us</a>
       </p>
     </div>
@@ -235,7 +280,7 @@ async function sendBookingConfirmation(booking) {
         <span class="detail-value">${formatServiceWithAddons(booking.service, booking.addons)}</span>
       </div>
       <div class="detail-row">
-        <span class="detail-label">Date & Time</span>
+        <span class="detail-label">Date &amp; Time</span>
         <span class="detail-value">${formatDate(booking.date)} at ${booking.time}</span>
       </div>
       <div class="detail-row">
@@ -357,7 +402,7 @@ async function sendBookingConfirmation(booking) {
           <span class="detail-value">${formatServiceWithAddons(booking.service, booking.addons)}</span>
         </div>
         <div class="detail-row">
-          <span class="detail-label">Date & Time</span>
+          <span class="detail-label">Date &amp; Time</span>
           <span class="detail-value">${formatDate(booking.date)} at ${booking.time}</span>
         </div>
         <div class="detail-row">
@@ -372,7 +417,7 @@ async function sendBookingConfirmation(booking) {
         ${booking.discountCode && booking.discountAmount > 0 ? `
         <div class="detail-row">
           <span class="detail-label">Discount (${booking.discountCode})</span>
-          <span class="detail-value" style="color: #10b981;">-£${booking.discountAmount.toFixed(2)}</span>
+          <span class="detail-value" style="color: #3F4D1B;">-£${booking.discountAmount.toFixed(2)}</span>
         </div>
         ` : ''}
         <div class="detail-row">
@@ -421,7 +466,7 @@ async function sendPaymentConfirmation(booking) {
         <span class="detail-value">${formatServiceWithAddons(booking.service, booking.addons)}</span>
       </div>
       <div class="detail-row">
-        <span class="detail-label">Date & Time</span>
+        <span class="detail-label">Date &amp; Time</span>
         <span class="detail-value">${formatDate(booking.date)} at ${booking.time}</span>
       </div>
       <div class="detail-row">
@@ -509,7 +554,7 @@ async function sendRescheduleConfirmation(booking, oldDate, oldTime) {
         <span class="detail-value">${formatServiceWithAddons(booking.service, booking.addons)}</span>
       </div>
       <div class="detail-row">
-        <span class="detail-label">New Date & Time</span>
+        <span class="detail-label">New Date &amp; Time</span>
         <span class="detail-value">${formatDate(booking.date)} at ${booking.time}</span>
       </div>
       <div class="detail-row">
@@ -614,7 +659,7 @@ async function sendReminderEmail(booking) {
 
     <div class="booking-details">
       <div class="detail-row">
-        <span class="detail-label">Date & Time</span>
+        <span class="detail-label">Date &amp; Time</span>
         <span class="detail-value">${formatDate(booking.date)} at ${booking.time}</span>
       </div>
       <div class="detail-row">
@@ -722,7 +767,7 @@ async function sendServiceModificationConfirmation(booking, oldService, oldPrice
         <span class="detail-value">${booking.bookingRef}</span>
       </div>
       <div class="detail-row">
-        <span class="detail-label">Date & Time</span>
+        <span class="detail-label">Date &amp; Time</span>
         <span class="detail-value">${formatDate(booking.date)} at ${booking.time}</span>
       </div>
       <div class="detail-row">

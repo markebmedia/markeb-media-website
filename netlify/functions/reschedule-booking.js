@@ -382,10 +382,12 @@ async function sendRescheduleEmail(fields, newDate, newTime, originalDate, origi
   const formattedNewDate = new Date(newDate).toLocaleDateString('en-GB', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
+  const formattedOriginalDate = new Date(originalDate).toLocaleDateString('en-GB', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
 
   // ✅ Determine BCC recipients based on region
   const bccRecipients = ['commercial@markebmedia.com'];
-  
   if (fields['Region']) {
     if (fields['Region'].toLowerCase() === 'north') {
       bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
@@ -402,24 +404,93 @@ async function sendRescheduleEmail(fields, newDate, newTime, originalDate, origi
     bcc: bccRecipients,
     subject: `Booking Rescheduled - ${fields['Booking Reference']}`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #3b82f6;">Booking Rescheduled</h2>
-        <p>Hi ${fields['Client Name']},</p>
-        <p>Your booking has been successfully rescheduled.</p>
-        
-        <div style="background: #d1fae5; border-left: 4px solid #10b981; padding: 16px; margin: 20px 0;">
-          <h3 style="margin-top: 0; color: #065f46;">New Date & Time</h3>
-          <p style="color: #065f46; margin: 0;"><strong>${formattedNewDate} at ${newTime}</strong></p>
-        </div>
-        
-        <div style="background: #f8fafc; padding: 16px; margin: 20px 0;">
-          <p><strong>Reference:</strong> ${fields['Booking Reference']}</p>
-          <p><strong>Service:</strong> ${fields['Service']}</p>
-          <p><strong>Property:</strong> ${fields['Property Address']}</p>
-        </div>
-        
-        <p>Best regards,<br>The Markeb Media Team</p>
-      </div>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f7ead5;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td style="padding: 40px 0; text-align: center; background-color: #f7ead5;">
+        <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #FDF3E2; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(63,77,27,0.12);">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 30px; text-align: center; background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%);">
+              <div style="font-size: 40px; margin-bottom: 12px;">📅</div>
+              <h1 style="margin: 0; color: #FDF3E2; font-size: 28px; font-weight: 600; letter-spacing: -0.02em;">Booking Rescheduled</h1>
+              <p style="margin: 10px 0 0; color: rgba(253,243,226,0.8); font-size: 15px;">Your shoot has been moved to a new date</p>
+              <div style="width: 40px; height: 3px; background: #B46100; margin: 16px auto 0; border-radius: 2px;"></div>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <p style="margin: 0 0 20px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">Hi ${fields['Client Name']},</p>
+              <p style="margin: 0 0 25px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">Your booking has been successfully rescheduled.</p>
+
+              <!-- Date Change -->
+              <div style="margin: 0 0 24px;">
+
+                <!-- Old date -->
+                <div style="padding: 16px 20px; background-color: #f7ead5; border: 2px solid #e8d9be; border-radius: 10px; margin-bottom: 8px;">
+                  <div style="font-size: 11px; font-weight: 700; color: #9a7a4a; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">Previous Date</div>
+                  <div style="font-size: 15px; font-weight: 600; color: #9a7a4a; text-decoration: line-through;">${formattedOriginalDate} at ${originalTime}</div>
+                </div>
+
+                <!-- Arrow -->
+                <div style="text-align: center; font-size: 20px; color: #B46100; margin: 4px 0;">↓</div>
+
+                <!-- New date -->
+                <div style="padding: 16px 20px; background-color: #fff8ee; border: 2px solid #B46100; border-radius: 10px;">
+                  <div style="font-size: 11px; font-weight: 700; color: #8a4a00; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">New Date</div>
+                  <div style="font-size: 18px; font-weight: 700; color: #B46100;">${formattedNewDate} at ${newTime}</div>
+                </div>
+              </div>
+
+              <!-- Booking Details -->
+              <div style="background-color: #f7ead5; border: 2px solid #e8d9be; border-radius: 12px; padding: 24px; margin: 0 0 24px;">
+                <h3 style="margin: 0 0 16px; color: #3F4D1B; font-size: 16px; font-weight: 700;">Booking Details</h3>
+                <table role="presentation" style="width: 100%; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #6b7c2e; font-size: 14px; font-weight: 600; width: 40%;">Reference</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">${fields['Booking Reference']}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #6b7c2e; font-size: 14px; font-weight: 600;">Service</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">${fields['Service']}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; color: #6b7c2e; font-size: 14px; font-weight: 600;">Property</td>
+                    <td style="padding: 10px 0; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">${fields['Property Address']}</td>
+                  </tr>
+                </table>
+              </div>
+
+              <p style="margin: 0 0 6px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">See you on ${formattedNewDate}!</p>
+              <p style="margin: 0; color: #6b7c2e; font-size: 14px; line-height: 1.6;">Questions? Contact us at <a href="mailto:commercial@markebmedia.com" style="color: #B46100; text-decoration: none;">commercial@markebmedia.com</a></p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px 40px; background-color: #3F4D1B;">
+              <p style="margin: 0 0 4px; color: #FDF3E2; font-size: 14px; font-weight: 600;">Best regards,</p>
+              <p style="margin: 0; color: rgba(253,243,226,0.75); font-size: 14px;">The Markeb Media Team</p>
+              <div style="width: 32px; height: 2px; background: #B46100; margin: 16px 0; border-radius: 1px;"></div>
+              <p style="margin: 0; color: rgba(253,243,226,0.4); font-size: 12px; line-height: 1.5;">Professional Property Media, Marketing &amp; Technology Solution</p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
     `
   });
 }

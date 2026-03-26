@@ -193,64 +193,125 @@ await base('tblRgcv7M9dUU3YuL').update(activeBookingId, {
     }
 
     // Send confirmation email
-    if (process.env.RESEND_API_KEY) {
-      try {
-        const { Resend } = require('resend');
-        const resend = new Resend(process.env.RESEND_API_KEY);
+if (process.env.RESEND_API_KEY) {
+  try {
+    const { Resend } = require('resend');
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
-        let paymentNote = '';
-        if (paymentAction === 'charge' && paymentDetails) {
-          paymentNote = `<p style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 16px; margin: 16px 0;"><strong>Additional Charge:</strong> £${priceDifference.toFixed(2)} has been charged to your saved payment method.</p>`;
-        } else if (paymentAction === 'refund' && paymentDetails) {
-          paymentNote = `<p style="background: #d1fae5; border: 2px solid #10b981; border-radius: 8px; padding: 16px; margin: 16px 0;"><strong>Refund Processed:</strong> £${Math.abs(priceDifference).toFixed(2)} has been refunded to your original payment method.</p>`;
-        } else if (paymentAction === 'charge_required') {
-          paymentNote = `<p style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 16px; margin: 16px 0;"><strong>Payment Required:</strong> An additional £${priceDifference.toFixed(2)} is due. We'll contact you to collect payment.</p>`;
-        }
+    let paymentNote = '';
+    if (paymentAction === 'charge' && paymentDetails) {
+      paymentNote = `
+        <div style="margin: 20px 0; padding: 16px; background-color: #fff8ee; border: 2px solid #B46100; border-radius: 8px;">
+          <p style="margin: 0 0 4px; color: #8a4a00; font-size: 15px; font-weight: 700;">💳 Additional Charge</p>
+          <p style="margin: 0; color: #8a4a00; font-size: 14px; line-height: 1.6;">£${priceDifference.toFixed(2)} has been charged to your saved payment method.</p>
+        </div>`;
+    } else if (paymentAction === 'refund' && paymentDetails) {
+      paymentNote = `
+        <div style="margin: 20px 0; padding: 16px; background-color: #f3f7e8; border: 2px solid #3F4D1B; border-radius: 8px;">
+          <p style="margin: 0 0 4px; color: #3F4D1B; font-size: 15px; font-weight: 700;">✅ Refund Processed</p>
+          <p style="margin: 0; color: #6b7c2e; font-size: 14px; line-height: 1.6;">£${Math.abs(priceDifference).toFixed(2)} has been refunded to your original payment method within 5–7 business days.</p>
+        </div>`;
+    } else if (paymentAction === 'charge_required') {
+      paymentNote = `
+        <div style="margin: 20px 0; padding: 16px; background-color: #fff8ee; border: 2px solid #B46100; border-radius: 8px;">
+          <p style="margin: 0 0 4px; color: #8a4a00; font-size: 15px; font-weight: 700;">⚠️ Payment Required</p>
+          <p style="margin: 0; color: #8a4a00; font-size: 14px; line-height: 1.6;">An additional £${priceDifference.toFixed(2)} is due. We'll contact you to collect payment.</p>
+        </div>`;
+    }
 
-        // ✅ Determine BCC recipients based on region
-        const bccRecipients = ['commercial@markebmedia.com'];
-        
-        if (booking.fields['Region']) {
-          if (booking.fields['Region'].toLowerCase() === 'north') {
-            bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
-            console.log('✓ BCC: Adding Jodie (North region)');
-          } else if (booking.fields['Region'].toLowerCase() === 'south') {
-            bccRecipients.push('Maeve.Darley@markebmedia.com');
-            console.log('✓ BCC: Adding Maeve (South region)');
-          }
-        }
+    // ✅ Determine BCC recipients based on region
+    const bccRecipients = ['commercial@markebmedia.com'];
+    if (booking.fields['Region']) {
+      if (booking.fields['Region'].toLowerCase() === 'north') {
+        bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
+        console.log('✓ BCC: Adding Jodie (North region)');
+      } else if (booking.fields['Region'].toLowerCase() === 'south') {
+        bccRecipients.push('andrii.Hutovych@markebmedia.com');
+        console.log('✓ BCC: Adding Andrii (South region)');
+      }
+    }
 
-        await resend.emails.send({
-          from: 'Markeb Media <commercial@markebmedia.com>',
-          to: clientEmail,
-          bcc: bccRecipients, // ✅ Array of BCC recipients
-          subject: `Booking Modified - ${bookingRef}`,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: #ffffff; padding: 40px 30px; text-align: center; border-radius: 8px 8px 0 0;">
-                <h1 style="margin: 0; font-size: 32px; font-weight: 700;">Booking Modified</h1>
+    await resend.emails.send({
+      from: 'Markeb Media <commercial@markebmedia.com>',
+      to: clientEmail,
+      bcc: bccRecipients,
+      subject: `Booking Modified - ${bookingRef}`,
+      html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f7ead5;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td style="padding: 40px 0; text-align: center; background-color: #f7ead5;">
+        <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #FDF3E2; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(63,77,27,0.12);">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding: 40px 40px 30px; text-align: center; background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%);">
+              <h1 style="margin: 0; color: #FDF3E2; font-size: 28px; font-weight: 600; letter-spacing: -0.02em;">Booking Modified</h1>
+              <p style="margin: 10px 0 0; color: rgba(253,243,226,0.8); font-size: 15px;">Your booking details have been updated</p>
+              <div style="width: 40px; height: 3px; background: #B46100; margin: 16px auto 0; border-radius: 2px;"></div>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <p style="margin: 0 0 20px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">Hi ${booking.fields['Client Name']},</p>
+              <p style="margin: 0 0 25px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">Your booking has been successfully modified.</p>
+
+              ${paymentNote}
+
+              <!-- Updated Booking Details -->
+              <div style="background-color: #f7ead5; border: 2px solid #e8d9be; border-radius: 12px; padding: 24px; margin: 24px 0;">
+                <h3 style="margin: 0 0 16px; color: #3F4D1B; font-size: 16px; font-weight: 700;">Updated Booking Details</h3>
+                <table role="presentation" style="width: 100%; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #6b7c2e; font-size: 14px; font-weight: 600; width: 40%;">Reference</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">${bookingRef}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #6b7c2e; font-size: 14px; font-weight: 600;">New Service</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">${newServiceName}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #6b7c2e; font-size: 14px; font-weight: 600;">Date &amp; Time</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #e8d9be; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">${booking.fields['Date']} at ${booking.fields['Time']}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 10px 0; color: #6b7c2e; font-size: 14px; font-weight: 600;">New Total</td>
+                    <td style="padding: 10px 0; color: #3F4D1B; font-size: 14px; font-weight: 600; text-align: right;">£${newFinalPrice.toFixed(2)}</td>
+                  </tr>
+                </table>
               </div>
-              
-              <div style="padding: 40px 30px; background: #ffffff;">
-                <p style="font-size: 16px; color: #333;">Hi ${booking.fields['Client Name']},</p>
-                
-                <p style="font-size: 16px; color: #333;">Your booking has been successfully modified.</p>
-                
-                ${paymentNote}
-                
-                <div style="background: #f8fafc; border-left: 4px solid #3b82f6; padding: 25px; margin: 25px 0;">
-                  <h3 style="margin: 0 0 15px 0; font-size: 18px;">Updated Booking Details</h3>
-                  <p><strong>Reference:</strong> ${bookingRef}</p>
-                  <p><strong>New Service:</strong> ${newServiceName}</p>
-                  <p><strong>Date:</strong> ${booking.fields['Date']} at ${booking.fields['Time']}</p>
-                  <p><strong>New Total:</strong> £${newFinalPrice.toFixed(2)}</p>
-                </div>
-                
-                <p style="font-size: 16px; color: #333;">Thank you for choosing Markeb Media!</p>
-              </div>
-            </div>
-          `
-        });
+
+              <p style="margin: 0 0 6px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">Thank you for choosing Markeb Media!</p>
+              <p style="margin: 0; color: #6b7c2e; font-size: 14px; line-height: 1.6;">Questions? Contact us at <a href="mailto:commercial@markebmedia.com" style="color: #B46100; text-decoration: none;">commercial@markebmedia.com</a></p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px 40px; background-color: #3F4D1B;">
+              <p style="margin: 0 0 4px; color: #FDF3E2; font-size: 14px; font-weight: 600;">Best regards,</p>
+              <p style="margin: 0; color: rgba(253,243,226,0.75); font-size: 14px;">The Markeb Media Team</p>
+              <div style="width: 32px; height: 2px; background: #B46100; margin: 16px 0; border-radius: 1px;"></div>
+              <p style="margin: 0; color: rgba(253,243,226,0.4); font-size: 12px; line-height: 1.5;">Professional Property Media, Marketing &amp; Technology Solution</p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+      `
+    });
 
         console.log('✅ Confirmation email sent');
 
