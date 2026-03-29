@@ -1230,13 +1230,6 @@ if (booking.addons && booking.addons.length > 0) {
         );
         const totalDuration = serviceDuration + extraDuration;
         
-        console.log('Loading reschedule time slots:', {
-          postcode: bookingData.postcode,
-          region: bookingData.region,
-          selectedDate: dateString,
-          duration: totalDuration,
-          extraDuration: extraDuration
-        });
 
         const response = await fetch('/.netlify/functions/check-availability', {
           method: 'POST',
@@ -1255,7 +1248,6 @@ if (booking.addons && booking.addons.length > 0) {
         }
 
         const data = await response.json();
-        console.log('Availability response:', data);
 
         renderRescheduleTimeSlots(data.availableSlots);
 
@@ -1636,12 +1628,6 @@ if (booking.addons && booking.addons.length > 0) {
   const hoursUntil = bookingData.hoursUntilBooking;
   const totalPrice = bookingData.finalPrice;
   
-  console.log('Cancel form opened:', {
-    hoursUntil: hoursUntil,
-    totalPrice: totalPrice,
-    bookingDate: bookingData.date,
-    bookingTime: bookingData.time
-  });
   
   let cancellationFee = 0;
   let feePercentage = 0;
@@ -1660,11 +1646,6 @@ if (booking.addons && booking.addons.length > 0) {
     feeText = `You have <strong>${hoursUntil} hours</strong> until your shoot. Cancelling within 24 hours incurs a <strong>50% fee (£${cancellationFee.toFixed(2)})</strong>.`;
   }
   
-  console.log('Cancellation calculation:', {
-    fee: cancellationFee,
-    percentage: feePercentage,
-    requiresPayment: cancellationFee > 0
-  });
   
   // Show appropriate UI based on fee
   if (cancellationFee > 0) {

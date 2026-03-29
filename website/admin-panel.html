@@ -3999,7 +3999,6 @@ if (!mediaSpecialist) {
   if (savedPM) {
     formData.stripePaymentMethodId = savedPM.paymentMethodId;
     formData.stripeCustomerId = savedPM.customerId;
-    console.log(`✅ Found saved card for ${formData.clientEmail}: ${savedPM.paymentMethodId}`);
   }
 
   // (remove the closing }; here — it was already added above)
@@ -4702,7 +4701,7 @@ async function loadPendingBookings() {
     });
 
     const data = await response.json();
-    console.log('📊 All bookings fetched:', data.bookings?.length);
+    
 
     if (data.success) {
       // ✅ Filter client-side for pending payments
@@ -4710,14 +4709,6 @@ async function loadPendingBookings() {
         const paymentStatus = booking.fields['Payment Status'];
         const bookingStatus = booking.fields['Booking Status'];
         
-        // Debug each booking
-        if (paymentStatus === 'Pending') {
-          console.log('Found pending:', {
-            ref: booking.fields['Booking Reference'],
-            paymentStatus,
-            bookingStatus
-          });
-        }
         
         // Include if:
         // 1. Payment Status = "Pending"
@@ -4726,7 +4717,6 @@ async function loadPendingBookings() {
                bookingStatus !== 'Cancelled';
       });
       
-      console.log('💳 Pending bookings to display:', pendingBookings.length);
       renderPendingBookingsTable(pendingBookings);
     } else {
       console.error('❌ API returned error:', data);
@@ -5839,7 +5829,6 @@ async function confirmModifyService(bookingId) {
     const data = await response.json();
 
     if (data.success) {
-      console.log(`✓ Reserve privilege ${enabled ? 'enabled' : 'disabled'} for ${email}`);
       const customer = allCustomers.find(c => c.id === recordId);
       if (customer) {
         customer.fields['Allow Reserve Without Payment'] = enabled;
@@ -5891,7 +5880,6 @@ async function confirmModifyService(bookingId) {
         selectElement.dataset.originalValue = region;
         selectElement.disabled = false;
         
-        console.log(`✅ Region updated to "${region}" for ${email}`);
 
       } catch (error) {
         console.error('Error updating region:', error);
@@ -5935,7 +5923,6 @@ async function confirmModifyService(bookingId) {
 
         // Show success message briefly
         const statusText = enabled ? 'enabled' : 'disabled';
-        console.log(`✅ Email notifications ${statusText} for ${email}`);
         
         toggleInput.disabled = false;
 
@@ -6434,7 +6421,7 @@ async function saveDiscountCode(event) {
     if (selectedRegions.length > 0) fields['Applicable Regions'] = selectedRegions;
     if (selectedServices.length > 0) fields['Applicable Services'] = selectedServices;
     
-    console.log('Sending to Airtable:', fields);
+    
     
     const response = await fetch('/.netlify/functions/airtable-proxy', {
       method: 'POST',
@@ -6448,8 +6435,7 @@ async function saveDiscountCode(event) {
     });
 
     const data = await response.json();
-    console.log('Airtable response status:', response.status);
-    console.log('Airtable response data:', data);
+    
     
     if (!response.ok) {
       console.error('Airtable Error:', data);

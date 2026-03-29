@@ -1752,7 +1752,6 @@ function handleAddressSelection() {
     bookingData.propertyAddress = formatAddress(address);
     
     // ✅ OPTIONAL: Log to verify it's working
-    console.log('Address selected:', bookingData.propertyAddress);
   } else {
     manualEntry.style.display = 'none';
     bookingData.propertyAddress = '';
@@ -1782,13 +1781,11 @@ function handleAddressSelection() {
   checkBtn.disabled = true;
 
   try {
-    console.log('🔍 Fetching addresses for:', postcode);
+    
     
     // Fetch addresses from GetAddress.io
     const addresses = await fetchAddressesFromPostcode(postcode);
     
-    console.log('✅ Addresses received:', addresses);
-    console.log('📊 Number of addresses:', addresses ? addresses.length : 0);
     
     const result = determineRegion(postcode);
 
@@ -1796,12 +1793,6 @@ function handleAddressSelection() {
     bookingData.region = result.region;
     bookingData.mediaSpecialist = result.mediaSpecialist.name;
 
-    console.log('Region determined:', {
-      postcode: bookingData.postcode,
-      region: bookingData.region,
-      mediaSpecialist: bookingData.mediaSpecialist,
-      isServiceable: result.isServiceable
-    });
 
     if (result.isServiceable) {
       const regionBadge = document.getElementById('regionBadge');
@@ -1811,27 +1802,22 @@ function handleAddressSelection() {
       document.getElementById('mediaSpecialistName').textContent = result.mediaSpecialist.name;
       regionInfo.classList.add('show');
 
-      console.log('📝 Calling showAddressSection with addresses:', addresses);
       
       // Show address section with dropdown if addresses found
       showAddressSection(addresses);
-      
-      console.log('🔍 Checking if addressSelect exists:', !!document.getElementById('addressSelect'));
-      console.log('🔍 addressSection display:', document.getElementById('addressSection').style.display);
       
       document.getElementById('checkPostcodeBtn').style.display = 'none';
       document.getElementById('continueWithAddressBtn').style.display = 'block';
 
       setTimeout(() => {
         const addressSelect = document.getElementById('addressSelect');
-        console.log('🎯 After timeout - addressSelect exists:', !!addressSelect);
         
         if (addressSelect) {
           addressSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
           setTimeout(() => addressSelect.focus(), 300);
         } else {
           const manualInput = document.getElementById('propertyAddress');
-          console.log('🎯 Manual input exists:', !!manualInput);
+          
           if (manualInput) {
             manualInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
             setTimeout(() => manualInput.focus(), 300);
@@ -1843,7 +1829,6 @@ function handleAddressSelection() {
     }
   } catch (error) {
     console.error('❌ Error in checkPostcode:', error);
-    console.log('📍 Falling back to manual entry');
     
     const result = determineRegion(postcode);
     bookingData.postcode = postcode.toUpperCase();
@@ -2136,7 +2121,6 @@ function handleAccessTypeChange() {
       const services = SERVICES[region] || SERVICES.south;
       const container = document.getElementById('serviceCards');
 
-      console.log('Rendering services for region:', region);
 
       const servicesHTML = services.map(service => `
         <div class="service-card ${service.popular ? 'popular' : ''}" data-service-id="${service.id}" onclick="selectService('${service.id}')">
@@ -2481,12 +2465,6 @@ async function loadAvailableTimeSlots(dateString) {
     const extraDuration = bookingData.extraDuration || 0;
     const totalDuration = serviceDuration + addonsDuration + extraDuration;
 
-    console.log('Loading time slots with data:', {
-      postcode: bookingData.postcode,
-      region: bookingData.region,
-      selectedDate: dateString,
-      duration: totalDuration // ✅ ADD THIS
-    });
 
     const response = await fetch('/.netlify/functions/check-availability', {
       method: 'POST',
@@ -2506,7 +2484,7 @@ async function loadAvailableTimeSlots(dateString) {
     }
 
     const data = await response.json();
-    console.log('Availability check response:', data);
+    
 
     renderTimeSlots(data.availableSlots);
   } catch (error) {
@@ -3063,8 +3041,6 @@ async function createBooking() {
       }
     });
 
-    console.log('Booking Platform with Add-Ons Initialized');
-
     // Discount code state
 let appliedDiscount = null;
 
@@ -3111,12 +3087,6 @@ async function applyDiscountCode() {
     // ✅ FIXED: Capitalize region for Airtable lookup
     const regionCapitalized = bookingData.region.charAt(0).toUpperCase() + bookingData.region.slice(1);
     
-    console.log('Validating discount code:', {
-      code,
-      region: regionCapitalized,
-      serviceId: bookingData.service.id,
-      totalPrice: bookingData.totalPrice
-    });
     
     const response = await fetch('/.netlify/functions/validate-discount-code', {
       method: 'POST',
@@ -3130,7 +3100,6 @@ async function applyDiscountCode() {
     });
     
     const data = await response.json();
-    console.log('Discount validation response:', data);
     
     if (data.success) {
       // Store discount data

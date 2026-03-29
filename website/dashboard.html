@@ -25,7 +25,6 @@
     const cleanUrl = window.location.origin + window.location.pathname;
     window.history.replaceState({}, document.title, cleanUrl);
     
-    console.log('✅ Admin impersonation session activated for:', adminEmail);
 }
 })();
 </script>
@@ -3078,7 +3077,6 @@ Any media produced remains the property of Markeb Media until full payment has b
     function toggleSidebar(){document.querySelector('.sidebar').classList.toggle('open');document.querySelector('.mobile-overlay').classList.toggle('active');}
     function closeSidebar(){document.querySelector('.sidebar').classList.remove('open');document.querySelector('.mobile-overlay').classList.remove('active');}
     function showSection(id) {
-  console.log('showSection called with:', id);
   
   // Hide all sections
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -3087,7 +3085,6 @@ Any media produced remains the property of Markeb Media until full payment has b
   const targetSection = document.getElementById(id);
   if (targetSection) {
     targetSection.classList.add('active');
-    console.log('✅ Section activated:', id);
   } else {
     console.error('❌ Section not found:', id);
   }
@@ -3198,7 +3195,6 @@ async function lookupMarketData() {
     if (marketData.districts && marketData.districts[region]) {
       data = marketData.districts[region];
       tier = 'DISTRICT';
-      console.log(`✓ Found district data for ${region}`);
     }
     
     // TIER 2: Fallback to sub-region
@@ -3207,14 +3203,12 @@ async function lookupMarketData() {
       if (marketData.subRegions[region]) {
         data = marketData.subRegions[region];
         tier = 'SUB_REGION';
-        console.log(`✓ Found sub-region data for ${region}`);
       } else {
         // Try to find which sub-region contains this district
         for (const [subRegionName, subRegionData] of Object.entries(marketData.subRegions)) {
           if (subRegionData.districts && subRegionData.districts.includes(region)) {
             data = subRegionData;
             tier = 'SUB_REGION';
-            console.log(`✓ Found parent sub-region ${subRegionName} for ${region}`);
             break;
           }
         }
@@ -3227,14 +3221,12 @@ async function lookupMarketData() {
       if (marketData.regions[region]) {
         data = marketData.regions[region];
         tier = 'REGION';
-        console.log(`✓ Found region data for ${region}`);
       } else {
         // Try to find which region contains this district
         for (const [regionName, regionData] of Object.entries(marketData.regions)) {
           if (regionData.districts && regionData.districts.includes(region)) {
             data = regionData;
             tier = 'REGION';
-            console.log(`✓ Found parent region ${regionName} for ${region}`);
             break;
           }
         }
@@ -3249,21 +3241,18 @@ if (!data && location.admin_county) {
   if (marketData.districts && marketData.districts[county]) {
     data = marketData.districts[county];
     tier = 'DISTRICT';
-    console.log(`✓ Found county data for ${county}`);
   }
   
   // Try sub-regions
   if (!data && marketData.subRegions && marketData.subRegions[county.toUpperCase()]) {
     data = marketData.subRegions[county.toUpperCase()];
     tier = 'SUB_REGION';
-    console.log(`✓ Found sub-region data for ${county}`);
   }
   
   // Try regions
   if (!data && marketData.regions && marketData.regions[county.toUpperCase()]) {
     data = marketData.regions[county.toUpperCase()];
     tier = 'REGION';
-    console.log(`✓ Found region data for ${county}`);
   }
 }
     
@@ -4387,7 +4376,6 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     const ok = await window.AirtableAPI.requireAuthentication();
     if(!ok) return;
   } else {
-    console.log('🔓 Admin impersonation - bypassing authentication');
   }
 
   const u=window.AirtableAPI.getCurrentUser();
