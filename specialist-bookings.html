@@ -760,7 +760,7 @@
             ${booking.squareFootage ? `
             <div class="detail-item">
               <div class="detail-label"><i data-lucide="maximize-2"></i> Property Size</div>
-              <div class="detail-value">${booking.squareFootage} sq ft${booking.squareFootage > 1500 ? ' <span style="font-size:11px;color:#92400e;background:#fef3c7;border:1px solid #f59e0b;padding:1px 6px;border-radius:4px;font-weight:600;">Large</span>' : ''}</div>
+              <div class="detail-value">${booking.squareFootage} sq ft${booking.squareFootage > 3000 ? ' <span style="font-size:11px;color:#92400e;background:#fef3c7;border:1px solid #f59e0b;padding:1px 6px;border-radius:4px;font-weight:600;">Large</span>' : ''}</div>
             </div>` : ''}
             <div class="detail-item">
               <div class="detail-label"><i data-lucide="phone"></i> Client Phone</div>
@@ -946,7 +946,7 @@
         ${booking.squareFootage ? `
         <div class="detail-item">
           <div class="detail-label"><i data-lucide="maximize-2"></i> Property Size</div>
-          <div class="detail-value">${booking.squareFootage} sq ft${booking.squareFootage > 1500 ? ' <span style="font-size:11px;color:#92400e;background:#fef3c7;border:1px solid #f59e0b;padding:1px 6px;border-radius:4px;font-weight:600;">Large</span>' : ''}</div>
+          <div class="detail-value">${booking.squareFootage} sq ft${booking.squareFootage > 3000 ? ' <span style="font-size:11px;color:#92400e;background:#fef3c7;border:1px solid #f59e0b;padding:1px 6px;border-radius:4px;font-weight:600;">Large</span>' : ''}</div>
         </div>` : ''}
         <div class="detail-item full">
           <div class="detail-label"><i data-lucide="map-pin"></i> Address</div>
@@ -1138,7 +1138,7 @@
           <div class="route-stop-info">
             <div class="route-stop-time" style="color:${col};">${b.time}</div>
             <div class="route-stop-address">${b.propertyAddress}${b.postcode ? ', ' + b.postcode : ''}</div>
-            <div class="route-stop-service">${b.service}${b.bedrooms ? ' · ' + b.bedrooms + ' bed' : ''}${b.squareFootage ? ' · ' + b.squareFootage + ' sq ft' + (b.squareFootage > 1500 ? ' ⚠️' : '') : ''}</div>
+            <div class="route-stop-service">${b.service}${b.bedrooms ? ' · ' + b.bedrooms + ' bed' : ''}${b.squareFootage ? ' · ' + b.squareFootage + ' sq ft' + (b.squareFootage > 3000 ? ' ⚠️' : '') : ''}</div>
             ${(accessBadge || durationBadge) ? `<div class="route-stop-meta">${accessBadge}${durationBadge}</div>` : ''}
             ${phoneLine}
             ${noCoordHtml}

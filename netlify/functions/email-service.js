@@ -72,7 +72,7 @@ function getAccessTypeSection(booking) {
 function getSquareFootageSection(booking) {
   if (!booking.squareFootage) return '';
   
-  const isLarge = booking.squareFootage > 1500;
+  const isLarge = booking.squareFootage > 3000;
   
   return `
     <div class="detail-row">

@@ -1739,7 +1739,7 @@ body {
           <span style="font-size: 14px; color: #64748b;">sq ft</span>
         </div>
         <div id="adminSqftPriceNotice" style="display: none; margin-top: 10px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
-          <strong>+£150 large property fee</strong> — properties over 1,500 sq ft
+          <strong>+£150 large property fee</strong> — properties over 3,000 sq ft
         </div>
         <div id="adminSqftOkNotice" style="display: none; margin-top: 10px; padding: 12px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; font-size: 13px; color: #065f46;">
           ✓ Standard size — no additional fee
@@ -8228,14 +8228,14 @@ function calculateExtraDuration(serviceId, bedrooms, squareFootage) {
   extra += extraBedrooms * 5;
 
   if (squareFootage) {
-    if (squareFootage >= 2500) {
-      extra += 20;
-    } else if (squareFootage >= 2000) {
-      extra += 15;
-    } else if (squareFootage > 1500) {
-      extra += 10;
-    }
-  }
+        if (squareFootage >= 5000) {
+          extra += 20;
+        } else if (squareFootage >= 4000) {
+          extra += 15;
+        } else if (squareFootage > 3000) {
+          extra += 10;
+        }
+      }
 
   return extra;
 }
@@ -8259,7 +8259,7 @@ function handleAdminSqftInput() {
 
   bookingFormData.squareFootage = value;
 
-  if (value > 1500) {
+  if (value > 3000) {
     bookingFormData.squareFootageFee = 150;
     priceNotice.style.display = 'block';
   } else {

@@ -1195,11 +1195,11 @@ if (booking.addons && booking.addons.length > 0) {
       extra += extraBedrooms * 5;
 
       if (squareFootage) {
-        if (squareFootage >= 2500) {
+        if (squareFootage >= 5000) {
           extra += 20;
-        } else if (squareFootage >= 2000) {
+        } else if (squareFootage >= 4000) {
           extra += 15;
-        } else if (squareFootage > 1500) {
+        } else if (squareFootage > 3000) {
           extra += 10;
         }
       }
@@ -1520,7 +1520,7 @@ if (booking.addons && booking.addons.length > 0) {
         if (addon) addonsPrice += addon.price;
       });
 
-      const sqftFee = bookingData.squareFootage > 1500 ? 150 : 0;
+      const sqftFee = bookingData.squareFootage > 3000 ? 150 : 0;
       const newTotalPrice = basePrice + extraBedroomFee + addonsPrice + sqftFee;
       const currentPrice = bookingData.finalPrice;
       const priceDifference = newTotalPrice - currentPrice;
