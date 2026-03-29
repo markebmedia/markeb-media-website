@@ -2969,7 +2969,7 @@ async function createBooking() {
         time: bookingData.selectedTime,
         service: bookingData.service.name,
         serviceId: bookingData.service.id,
-        duration: bookingData.service.duration + (bookingData.addonsDuration || 0),
+        duration: bookingData.service.duration + (bookingData.addonsDuration || 0) + (bookingData.extraDuration || 0),
         bedrooms: bookingData.bedrooms,
         basePrice: bookingData.basePrice,
         extraBedroomFee: bookingData.extraBedroomFee,

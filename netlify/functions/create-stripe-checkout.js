@@ -120,7 +120,7 @@ exports.handler = async (event, context) => {
             currency: 'gbp',
             product_data: {
               name: 'Large Property Fee',
-              description: `Property over 1,500 sq ft (${bookingData.squareFootage} sq ft)`,
+              description: `Property over 3,000 sq ft (${bookingData.squareFootage} sq ft)`,
             },
             unit_amount: Math.round(bookingData.squareFootageFee * 100),
           },
