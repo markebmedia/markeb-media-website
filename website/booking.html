@@ -1134,9 +1134,13 @@ width: 100%;
               <span style="font-weight: 600; color: #1e293b;" id="summaryDateTime">-</span>
             </div>
             <div style="display: flex; justify-content: space-between;">
-              <span style="color: #64748b;">Service:</span>
-              <span style="font-weight: 600; color: #1e293b; text-align: right;" id="summaryService">-</span>
-            </div>
+  <span style="color: #64748b;">Service:</span>
+  <span style="font-weight: 600; color: #1e293b; text-align: right;" id="summaryService">-</span>
+</div>
+<div id="summaryAddonsRow" style="display: none; justify-content: space-between;">
+  <span style="color: #64748b;">Add-ons:</span>
+  <span style="font-weight: 600; color: #1e293b; text-align: right; max-width: 60%;" id="summaryAddons">-</span>
+</div>
             <div style="display: flex; justify-content: space-between;">
               <span style="color: #64748b;">Media Specialist:</span>
               <span style="font-weight: 600; color: #1e293b;" id="summaryMediaSpecialist">-</span>
@@ -1948,6 +1952,15 @@ function handleAddressSelection() {
     // Populate Booking Summary
     function populateBookingSummary() {
       document.getElementById('summaryService').textContent = bookingData.service ? bookingData.service.name : '-';
+
+const summaryAddonsRow = document.getElementById('summaryAddonsRow');
+if (bookingData.selectedAddons && bookingData.selectedAddons.length > 0) {
+  const addonNames = bookingData.selectedAddons.map(id => ADDONS[id]?.name).filter(Boolean).join(', ');
+  document.getElementById('summaryAddons').textContent = addonNames;
+  summaryAddonsRow.style.display = 'flex';
+} else {
+  summaryAddonsRow.style.display = 'none';
+}
       
       if (bookingData.selectedDate && bookingData.selectedTime) {
         const date = new Date(bookingData.selectedDate + 'T12:00:00');
