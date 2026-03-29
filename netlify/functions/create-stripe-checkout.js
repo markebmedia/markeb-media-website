@@ -113,6 +113,21 @@ exports.handler = async (event, context) => {
         });
       }
 
+      // Large property fee
+      if (bookingData.squareFootageFee && bookingData.squareFootageFee > 0) {
+        lineItems.push({
+          price_data: {
+            currency: 'gbp',
+            product_data: {
+              name: 'Large Property Fee',
+              description: `Property over 1,500 sq ft (${bookingData.squareFootage} sq ft)`,
+            },
+            unit_amount: Math.round(bookingData.squareFootageFee * 100),
+          },
+          quantity: 1,
+        });
+      }
+
       // Add-ons
       if (bookingData.addons && bookingData.addons.length > 0) {
         bookingData.addons.forEach(addon => {
@@ -170,7 +185,9 @@ exports.handler = async (event, context) => {
         
 // ✅ ADD THESE TWO LINES HERE:
   accessType: bookingData.accessType || '',
-  keyPickupLocation: bookingData.keyPickupLocation || '',
+        keyPickupLocation: bookingData.keyPickupLocation || '',
+        squareFootage: bookingData.squareFootage ? bookingData.squareFootage.toString() : '',
+        squareFootageFee: bookingData.squareFootageFee ? bookingData.squareFootageFee.toString() : '0',
 
         // Add-ons
         addons: JSON.stringify(bookingData.addons || []),

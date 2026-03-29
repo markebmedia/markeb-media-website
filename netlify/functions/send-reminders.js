@@ -65,8 +65,9 @@ exports.handler = async (event) => {
         postcode: fields['Postcode'] || '',
         mediaSpecialist: fields['Media Specialist'],
         accessType: fields['Access Type'] || '',
-        keyPickupLocation: fields['Key Pickup Location'] || '',
-        totalPrice: fields['Total Price'] || 0
+keyPickupLocation: fields['Key Pickup Location'] || '',
+squareFootage: fields['Square Footage'] || null,
+totalPrice: fields['Total Price'] || 0
       };
 
       // Guard: skip if no email

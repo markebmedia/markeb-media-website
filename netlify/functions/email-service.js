@@ -68,6 +68,23 @@ function getAccessTypeSection(booking) {
   return accessDetails;
 }
 
+// ✅ Format Square Footage Information
+function getSquareFootageSection(booking) {
+  if (!booking.squareFootage) return '';
+  
+  const isLarge = booking.squareFootage > 1500;
+  
+  return `
+    <div class="detail-row">
+      <span class="detail-label">Property Size</span>
+      <span class="detail-value">
+        ${booking.squareFootage} sq ft
+        ${isLarge ? '<br><span style="font-size:12px;color:#92400e;background:#fef3c7;border:1px solid #f59e0b;padding:2px 8px;border-radius:4px;font-weight:600;">Large Property</span>' : ''}
+      </span>
+    </div>
+  `;
+}
+
 // Email Layout Wrapper
 function getEmailLayout(content) {
   return `
@@ -292,6 +309,7 @@ async function sendBookingConfirmation(booking) {
         <span class="detail-value">${booking.mediaSpecialist}</span>
       </div>
       ${getAccessTypeSection(booking)}
+      ${getSquareFootageSection(booking)}
       <div class="detail-row">
         <span class="detail-label">Total Amount</span>
         <span class="detail-value">£${booking.totalPrice.toFixed(2)}</span>
@@ -414,6 +432,7 @@ async function sendBookingConfirmation(booking) {
           <span class="detail-value">${booking.mediaSpecialist}</span>
         </div>
         ${getAccessTypeSection(booking)}
+        ${getSquareFootageSection(booking)}
         ${booking.discountCode && booking.discountAmount > 0 ? `
         <div class="detail-row">
           <span class="detail-label">Discount (${booking.discountCode})</span>
@@ -674,6 +693,7 @@ async function sendReminderEmail(booking) {
         <span class="detail-label">Service</span>
         <span class="detail-value">${formatServiceWithAddons(booking.service, booking.addons)}</span>
       </div>
+      ${getSquareFootageSection(booking)}
       ${getAccessTypeSection(booking)}
     </div>
 

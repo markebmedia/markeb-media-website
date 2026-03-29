@@ -789,6 +789,30 @@ width: 100%;
           </div>
         </div>
 
+        <!-- Square Footage -->
+        <div class="form-group" id="squareFootageSection">
+          <label class="form-label">Property Size (sq ft) <span style="font-weight: 400; color: #94a3b8;">— optional</span></label>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <input 
+              type="number" 
+              id="squareFootageInput" 
+              class="form-input" 
+              placeholder="e.g. 1200"
+              min="100"
+              max="20000"
+              style="max-width: 200px;"
+              oninput="handleSquareFootageInput()"
+            />
+            <span style="font-size: 14px; color: #64748b;">sq ft</span>
+          </div>
+          <div id="sqftPriceNotice" style="display: none; margin-top: 10px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
+            <strong>+£150 large property fee</strong> — properties over 1,500 sq ft require additional shoot time
+          </div>
+          <div id="sqftOkNotice" style="display: none; margin-top: 10px; padding: 12px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; font-size: 13px; color: #065f46;">
+            ✓ Standard size — no additional fee
+          </div>
+        </div>
+
         <!-- Add-Ons Section -->
         <div id="addonsSection" style="display: none; margin-top: 32px;">
           <div style="border-top: 2px solid #e2e8f0; padding-top: 32px;">
@@ -1313,7 +1337,8 @@ width: 100%;
       clientPhone: '',
       clientNotes: '',
       paymentOption: null,
-      selectedAddons: []
+      selectedAddons: [],
+      squareFootage: null
     };
 
     let currentCalendarDate = new Date();
@@ -2150,6 +2175,7 @@ function handleAccessTypeChange() {
       bookingData.service = service;
       bookingData.basePrice = service.price;
       bookingData.selectedAddons = [];
+      bookingData.squareFootageFee = 0;
 
       document.querySelectorAll('.service-card').forEach(card => {
         card.classList.remove('selected');
@@ -2270,12 +2296,22 @@ function handleAccessTypeChange() {
         }
       });
 
-      const totalPrice = basePrice + extraBedroomFee + addonsPrice;
+      const sqftFee = bookingData.squareFootageFee || 0;
+      const totalPrice = basePrice + extraBedroomFee + addonsPrice + sqftFee;
 
       bookingData.extraBedroomFee = extraBedroomFee;
       bookingData.addonsPrice = addonsPrice;
       bookingData.addonsDuration = addonsDuration;
       bookingData.totalPrice = totalPrice;
+
+      // Extra duration for large properties and extra bedrooms
+      const serviceId = bookingData.service ? bookingData.service.id : '';
+      const extraDuration = calculateExtraDuration(
+        serviceId,
+        bookingData.bedrooms || 0,
+        bookingData.squareFootage || null
+      );
+      bookingData.extraDuration = extraDuration;
 
       document.getElementById('servicePrice').textContent = `£${basePrice.toFixed(2)}`;
       document.getElementById('totalPrice').textContent = `£${totalPrice.toFixed(2)}`;
@@ -2308,6 +2344,23 @@ function handleAccessTypeChange() {
         } else {
           addonsRow.style.display = 'none';
         }
+      }
+
+      // Square footage fee row
+      let sqftFeeRow = document.getElementById('sqftFeeRow');
+      if (!sqftFeeRow && sqftFee > 0) {
+        const divider = document.querySelector('#priceBreakdown [style*="border-top"]');
+        sqftFeeRow = document.createElement('div');
+        sqftFeeRow.id = 'sqftFeeRow';
+        sqftFeeRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;';
+        sqftFeeRow.innerHTML = `
+          <span style="font-size: 14px; color: #64748b;">Large property fee</span>
+          <span style="font-size: 14px; font-weight: 600; color: #1e293b;">£150.00</span>
+        `;
+        divider.parentNode.insertBefore(sqftFeeRow, divider);
+      }
+      if (sqftFeeRow) {
+        sqftFeeRow.style.display = sqftFee > 0 ? 'flex' : 'none';
       }
 
       document.getElementById('priceBreakdown').style.display = 'block';
@@ -2425,7 +2478,8 @@ async function loadAvailableTimeSlots(dateString) {
     // ✅ Calculate total duration (service + addons)
     const serviceDuration = bookingData.service ? bookingData.service.duration : 90;
     const addonsDuration = bookingData.addonsDuration || 0;
-    const totalDuration = serviceDuration + addonsDuration;
+    const extraDuration = bookingData.extraDuration || 0;
+    const totalDuration = serviceDuration + addonsDuration + extraDuration;
 
     console.log('Loading time slots with data:', {
       postcode: bookingData.postcode,
@@ -2854,7 +2908,7 @@ async function createBooking() {
     time: bookingData.selectedTime,
     service: bookingData.service.name,
     serviceId: bookingData.service.id,
-    duration: bookingData.service.duration + (bookingData.addonsDuration || 0),
+    duration: bookingData.service.duration + (bookingData.addonsDuration || 0) + (bookingData.extraDuration || 0),
     bedrooms: bookingData.bedrooms,
     basePrice: bookingData.basePrice,
     extraBedroomFee: bookingData.extraBedroomFee,
@@ -2878,6 +2932,8 @@ async function createBooking() {
     // ✅ ADD THESE TWO LINES RIGHT HERE (AFTER clientNotes):
     accessType: bookingData.accessType || '',
     keyPickupLocation: bookingData.keyPickupLocation || '',
+    squareFootage: bookingData.squareFootage || '',
+    squareFootageFee: bookingData.squareFootageFee || 0,
     
     paymentOption: bookingData.paymentOption,
     
@@ -2951,6 +3007,8 @@ async function createBooking() {
         discountCode: bookingData.discountCode || '',
         discountAmount: bookingData.discountAmount || 0,
         priceBeforeDiscount: bookingData.priceBeforeDiscount || 0,
+        squareFootage: bookingData.squareFootage || '',
+        squareFootageFee: bookingData.squareFootageFee || 0,
         
         clientName: bookingData.clientName,
         clientEmail: bookingData.clientEmail,
@@ -3146,9 +3204,63 @@ function removeDiscountCode() {
   if (discountRow) discountRow.remove();
 }
 
+// Calculate extra duration based on bedrooms and sq ft
+function calculateExtraDuration(serviceId, bedrooms, squareFootage) {
+  const droneOnlyServices = ['drone-video', 'drone-photo', 'all-in-one-drone'];
+  if (droneOnlyServices.includes(serviceId)) return 0;
+
+  let extra = 0;
+
+  // 5 mins per bedroom above 4
+  const extraBedrooms = bedrooms > 4 ? bedrooms - 4 : 0;
+  extra += extraBedrooms * 5;
+
+  // Sq ft increments
+  if (squareFootage) {
+    if (squareFootage >= 2500) {
+      extra += 20;
+    } else if (squareFootage >= 2000) {
+      extra += 15;
+    } else if (squareFootage > 1500) {
+      extra += 10;
+    }
+  }
+
+  return extra;
+}
+
+// Handle Square Footage Input
+function handleSquareFootageInput() {
+  const input = document.getElementById('squareFootageInput');
+  const value = parseInt(input.value);
+  const sqftPriceNotice = document.getElementById('sqftPriceNotice');
+  const sqftOkNotice = document.getElementById('sqftOkNotice');
+
+  sqftPriceNotice.style.display = 'none';
+  sqftOkNotice.style.display = 'none';
+
+  if (!input.value || isNaN(value)) {
+    bookingData.squareFootage = null;
+    bookingData.squareFootageFee = 0;
+    calculatePrice();
+    return;
+  }
+
+  bookingData.squareFootage = value;
+
+  if (value > 1500) {
+    bookingData.squareFootageFee = 150;
+    sqftPriceNotice.style.display = 'block';
+  } else {
+    bookingData.squareFootageFee = 0;
+    sqftOkNotice.style.display = 'block';
+  }
+
+  calculatePrice();
+}
+
 // Update Price Display with Discount
 function updatePriceWithDiscount() {
-  if (!appliedDiscount) return;
   
   // Add discount row to price breakdown
   let discountRow = document.getElementById('discountRow');

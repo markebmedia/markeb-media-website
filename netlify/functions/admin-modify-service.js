@@ -228,7 +228,9 @@ exports.handler = async (event, context) => {
       'Service Modified Date': new Date().toISOString().split('T')[0],
       'Previous Service': oldService,
       'Previous Price': oldFinalPrice,
-      'Price Adjustment': priceDifference
+      'Price Adjustment': priceDifference,
+      'Square Footage': fields['Square Footage'] || undefined,
+      'Square Footage Fee': fields['Square Footage Fee'] || 0
     };
 
     if (hasDiscount) {

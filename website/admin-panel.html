@@ -1722,6 +1722,30 @@ body {
         </div>
       </div>
 
+      <!-- Square Footage -->
+      <div class="form-group" id="adminSqftSection" style="display: none;">
+        <label class="form-label">Property Size (sq ft) <span style="font-weight: 400; color: #94a3b8;">— optional</span></label>
+        <div style="display: flex; gap: 12px; align-items: center;">
+          <input 
+            type="number" 
+            id="adminSqftInput" 
+            class="form-input" 
+            placeholder="e.g. 1200"
+            min="100"
+            max="20000"
+            style="max-width: 200px;"
+            oninput="handleAdminSqftInput()"
+          />
+          <span style="font-size: 14px; color: #64748b;">sq ft</span>
+        </div>
+        <div id="adminSqftPriceNotice" style="display: none; margin-top: 10px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
+          <strong>+£150 large property fee</strong> — properties over 1,500 sq ft
+        </div>
+        <div id="adminSqftOkNotice" style="display: none; margin-top: 10px; padding: 12px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; font-size: 13px; color: #065f46;">
+          ✓ Standard size — no additional fee
+        </div>
+      </div>
+
       <!-- Add-ons -->
       <div id="bookingAddonsSection" style="display: none; margin-top: 24px;">
         <label class="form-label">Add-Ons (Optional)</label>
@@ -3397,7 +3421,9 @@ const UK_REGIONS = [
   discountCode: '',
   discountAmount: 0,
   priceBeforeDiscount: 0,
-  totalPrice: 0
+  totalPrice: 0,
+  squareFootage: null,
+  squareFootageFee: 0
 };
 
     // Populate customer dropdown
@@ -3530,6 +3556,16 @@ function handleAdminAccessTypeChange() {
 
       // Show/hide bedrooms section
       document.getElementById('bookingBedroomsSection').style.display = isPropertyService ? 'block' : 'none';
+      
+      // Show/hide sq ft section
+      document.getElementById('adminSqftSection').style.display = isPropertyService ? 'block' : 'none';
+      if (!isPropertyService) {
+        bookingFormData.squareFootage = null;
+        bookingFormData.squareFootageFee = 0;
+        document.getElementById('adminSqftInput').value = '';
+        document.getElementById('adminSqftPriceNotice').style.display = 'none';
+        document.getElementById('adminSqftOkNotice').style.display = 'none';
+      }
 
       // Show/hide addons section
       if (availableAddons.length > 0) {
@@ -3601,7 +3637,16 @@ function handleAdminAccessTypeChange() {
     if (addon) addonsFee += addon.price;
   });
 
-  const subtotal = servicePrice + bedroomFee + addonsFee;
+  const sqftFee = bookingFormData.squareFootageFee || 0;
+  const subtotal = servicePrice + bedroomFee + addonsFee + sqftFee;
+
+  // Calculate and store extra duration
+  const extraDuration = calculateExtraDuration(
+    selectedOption.value,
+    bookingFormData.bedrooms || 0,
+    bookingFormData.squareFootage || null
+  );
+  bookingFormData.extraDuration = extraDuration;
   
   // Reset discount when price changes
   bookingFormData.discountCode = '';
@@ -3636,6 +3681,24 @@ function handleAdminAccessTypeChange() {
     document.getElementById('bookingAddonsFee').textContent = `£${addonsFee.toFixed(2)}`;
   } else {
     addonsRow.style.display = 'none';
+  }
+
+  // Sq ft fee row
+  let adminSqftFeeRow = document.getElementById('adminSqftFeeRow');
+  if (!adminSqftFeeRow && sqftFee > 0) {
+    const breakdown = document.getElementById('bookingPriceBreakdown');
+    const divider = breakdown.querySelector('[style*="border-top"]');
+    adminSqftFeeRow = document.createElement('div');
+    adminSqftFeeRow.id = 'adminSqftFeeRow';
+    adminSqftFeeRow.style.cssText = 'display: flex; justify-content: space-between; margin-bottom: 12px;';
+    adminSqftFeeRow.innerHTML = `
+      <span style="color: #64748b;">Large property fee</span>
+      <span style="font-weight: 600;">£150.00</span>
+    `;
+    divider.parentNode.insertBefore(adminSqftFeeRow, divider);
+  }
+  if (adminSqftFeeRow) {
+    adminSqftFeeRow.style.display = sqftFee > 0 ? 'flex' : 'none';
   }
 }
 
@@ -3775,6 +3838,13 @@ function resetBookingForm() {
   document.getElementById('bookingBedroomCount').textContent = '4';
   document.getElementById('bookingPriceBreakdown').style.display = 'none';
   document.getElementById('bookingBedroomsSection').style.display = 'none';
+  document.getElementById('adminSqftSection').style.display = 'none';
+  document.getElementById('adminSqftInput').value = '';
+  document.getElementById('adminSqftPriceNotice').style.display = 'none';
+  document.getElementById('adminSqftOkNotice').style.display = 'none';
+  bookingFormData.squareFootage = null;
+  bookingFormData.squareFootageFee = 0;
+  bookingFormData.extraDuration = 0;
   document.getElementById('bookingAddonsSection').style.display = 'none';
   document.getElementById('availabilityResults').style.display = 'none';
   const discountMsg = document.getElementById('discountMessage');
@@ -3794,7 +3864,7 @@ function resetBookingForm() {
   
   if (!date || !time || !region || !selectedOption?.value || !postcode) return;
   
-  const duration = parseInt(selectedOption.dataset.duration);
+  const duration = parseInt(selectedOption.dataset.duration) + (bookingFormData.extraDuration || 0);
   const resultsDiv = document.getElementById('availabilityResults');
   resultsDiv.innerHTML = '<div style="text-align: center; padding: 16px;"><div class="spinner" style="width: 30px; height: 30px;"></div></div>';
   resultsDiv.style.display = 'block';
@@ -3889,7 +3959,7 @@ if (!mediaSpecialist) {
     service: selectedOption.dataset.name,
     serviceId: selectedOption.value,
     basePrice: servicePrice,
-    duration: parseInt(selectedOption.dataset.duration),
+    duration: parseInt(selectedOption.dataset.duration) + (bookingFormData.extraDuration || 0),
     
     bedrooms: bookingFormData.bedrooms,
     extraBedroomFee: extraBedroomFee,
@@ -3904,8 +3974,10 @@ if (!mediaSpecialist) {
     propertyAddress: document.getElementById('bookingAddress').value,
     postcode: document.getElementById('bookingPostcode').value,
     accessType: document.getElementById('bookingAccessType').value || undefined,
-keyPickupLocation: document.getElementById('adminKeyPickupLocation').value || undefined,
-accessInstructions: document.getElementById('bookingAccess').value || '',
+    keyPickupLocation: document.getElementById('adminKeyPickupLocation').value || undefined,
+    accessInstructions: document.getElementById('bookingAccess').value || '',
+    squareFootage: bookingFormData.squareFootage || '',
+    squareFootageFee: bookingFormData.squareFootageFee || 0,
     
     date: document.getElementById('bookingDate').value,
     time: document.getElementById('bookingTime').value,
@@ -4438,6 +4510,17 @@ function viewBookingById(bookingId) {
     <div class="detail-item">
       <span class="detail-label">Specialist</span>
       <span class="detail-value"><strong>${fields['Media Specialist']}</strong></span>
+    </div>` : ''}
+
+    ${fields['Square Footage'] ? `
+    <div class="detail-item">
+      <span class="detail-label">Property Size</span>
+      <span class="detail-value">
+        ${fields['Square Footage']} sq ft
+        ${(fields['Square Footage Fee'] || 0) > 0 
+          ? '<span style="color: #f59e0b; font-size: 12px; margin-left: 8px;">(+£150 large property fee applied)</span>' 
+          : '<span style="color: #10b981; font-size: 12px; margin-left: 8px;">(standard size)</span>'}
+      </span>
     </div>` : ''}
 
     <div class="detail-item">
@@ -8147,6 +8230,59 @@ showSection = function(sectionId) {
     loadMarketUpdateStats();
   }
 };
+
+// Calculate extra duration based on bedrooms and sq ft
+function calculateExtraDuration(serviceId, bedrooms, squareFootage) {
+  const droneOnlyServices = ['drone-video', 'drone-photo', 'all-in-one-drone'];
+  if (droneOnlyServices.includes(serviceId)) return 0;
+
+  let extra = 0;
+
+  const extraBedrooms = bedrooms > 4 ? bedrooms - 4 : 0;
+  extra += extraBedrooms * 5;
+
+  if (squareFootage) {
+    if (squareFootage >= 2500) {
+      extra += 20;
+    } else if (squareFootage >= 2000) {
+      extra += 15;
+    } else if (squareFootage > 1500) {
+      extra += 10;
+    }
+  }
+
+  return extra;
+}
+
+// Handle Admin Square Footage Input
+function handleAdminSqftInput() {
+  const input = document.getElementById('adminSqftInput');
+  const value = parseInt(input.value);
+  const priceNotice = document.getElementById('adminSqftPriceNotice');
+  const okNotice = document.getElementById('adminSqftOkNotice');
+
+  priceNotice.style.display = 'none';
+  okNotice.style.display = 'none';
+
+  if (!input.value || isNaN(value)) {
+    bookingFormData.squareFootage = null;
+    bookingFormData.squareFootageFee = 0;
+    calculateBookingPrice();
+    return;
+  }
+
+  bookingFormData.squareFootage = value;
+
+  if (value > 1500) {
+    bookingFormData.squareFootageFee = 150;
+    priceNotice.style.display = 'block';
+  } else {
+    bookingFormData.squareFootageFee = 0;
+    okNotice.style.display = 'block';
+  }
+
+  calculateBookingPrice();
+}
 
 // Auto-fetch saved Stripe payment method for admin bookings
 async function fetchSavedPaymentMethod(email) {

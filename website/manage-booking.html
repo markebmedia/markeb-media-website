@@ -1185,6 +1185,28 @@ if (booking.addons && booking.addons.length > 0) {
       document.getElementById('rescheduleTimeSlotSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
+    function calculateExtraDuration(serviceId, bedrooms, squareFootage) {
+      const droneOnlyServices = ['drone-video', 'drone-photo', 'all-in-one-drone'];
+      if (droneOnlyServices.includes(serviceId)) return 0;
+
+      let extra = 0;
+
+      const extraBedrooms = bedrooms > 4 ? bedrooms - 4 : 0;
+      extra += extraBedrooms * 5;
+
+      if (squareFootage) {
+        if (squareFootage >= 2500) {
+          extra += 20;
+        } else if (squareFootage >= 2000) {
+          extra += 15;
+        } else if (squareFootage > 1500) {
+          extra += 10;
+        }
+      }
+
+      return extra;
+    }
+
     async function loadRescheduleTimeSlots(dateString) {
       try {
         // ✅ Calculate service duration from catalog
@@ -1192,18 +1214,28 @@ if (booking.addons && booking.addons.length > 0) {
         const region = bookingData.region.toLowerCase();
         
         let serviceDuration = 90; // default
+        let serviceId = '';
         if (SERVICES[region]) {
           const service = SERVICES[region].find(s => s.name === serviceName);
           if (service) {
             serviceDuration = service.duration;
+            serviceId = service.id;
           }
         }
+
+        const extraDuration = calculateExtraDuration(
+          serviceId,
+          bookingData.bedrooms || 0,
+          bookingData.squareFootage || null
+        );
+        const totalDuration = serviceDuration + extraDuration;
         
         console.log('Loading reschedule time slots:', {
           postcode: bookingData.postcode,
           region: bookingData.region,
           selectedDate: dateString,
-          duration: serviceDuration
+          duration: totalDuration,
+          extraDuration: extraDuration
         });
 
         const response = await fetch('/.netlify/functions/check-availability', {
@@ -1213,7 +1245,7 @@ if (booking.addons && booking.addons.length > 0) {
             postcode: bookingData.postcode,
             region: bookingData.region,
             selectedDate: dateString,
-            duration: serviceDuration, // ✅ ADD THIS
+            duration: totalDuration,
             isAdmin: false
           })
         });
@@ -1496,7 +1528,8 @@ if (booking.addons && booking.addons.length > 0) {
         if (addon) addonsPrice += addon.price;
       });
 
-      const newTotalPrice = basePrice + extraBedroomFee + addonsPrice;
+      const sqftFee = bookingData.squareFootage > 1500 ? 150 : 0;
+      const newTotalPrice = basePrice + extraBedroomFee + addonsPrice + sqftFee;
       const currentPrice = bookingData.finalPrice;
       const priceDifference = newTotalPrice - currentPrice;
 

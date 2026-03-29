@@ -73,8 +73,9 @@ exports.handler = async (event) => {
         clientPhone:       fields['Client Phone'] || '',
         clientNotes:       fields['Client Notes'] || '',
         accessType:        fields['Access Type'] || '',
-        keyPickupLocation: fields['Key Pickup Location'] || '',
-        mediaSpecialist:   fields['Media Specialist']
+keyPickupLocation: fields['Key Pickup Location'] || '',
+mediaSpecialist:   fields['Media Specialist'],
+squareFootage:     fields['Square Footage'] || null,
         // Note: price fields intentionally excluded
       };
     });

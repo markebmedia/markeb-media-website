@@ -290,6 +290,8 @@ exports.handler = async (event, context) => {
 
         'Access Type': metadata.accessType || '',
         'Key Pickup Location': metadata.keyPickupLocation || '',
+        'Square Footage': metadata.squareFootage ? parseInt(metadata.squareFootage) : undefined,
+        'Square Footage Fee': metadata.squareFootageFee ? parseFloat(metadata.squareFootageFee) : 0,
         
         'Booking Status': 'Confirmed',
         'Payment Status': 'Paid',
@@ -374,6 +376,7 @@ exports.handler = async (event, context) => {
             region: capitalizedRegion,
             accessType: metadata.accessType || '',
             keyPickupLocation: metadata.keyPickupLocation || '',
+            squareFootage: metadata.squareFootage ? parseInt(metadata.squareFootage) : null,
             addons: addons
           };
           

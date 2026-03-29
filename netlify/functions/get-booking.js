@@ -122,6 +122,10 @@ exports.handler = async (event, context) => {
         accessType: fields['Access Type'] || '',
         keyPickupLocation: fields['Key Pickup Location'] || '',
         
+        // Square footage
+        squareFootage: fields['Square Footage'] || null,
+        squareFootageFee: fields['Square Footage Fee'] || 0,
+        
         // Payment method details (for reserved bookings)
         stripePaymentMethodId: fields['Stripe Payment Method ID'] || '',
         cardholderName: fields['Cardholder Name'] || '',
