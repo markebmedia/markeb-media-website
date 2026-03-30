@@ -862,6 +862,11 @@
   let entered = '';
   let checking = false;
 
+  if (sessionStorage.getItem('mm_verified') === 'true') {
+    document.getElementById('gate').classList.add('hidden');
+    document.getElementById('app').classList.add('visible');
+  }
+
   function enter(d) {
     if (entered.length >= 4 || checking) return;
     entered += d;
@@ -897,6 +902,7 @@
 
       if (data.success) {
         errEl.textContent = '';
+        sessionStorage.setItem('mm_verified', 'true');
         document.getElementById('gate').classList.add('hidden');
         document.getElementById('app').classList.add('visible');
       } else {
