@@ -495,6 +495,11 @@
   .section.active > *:nth-child(9) { animation-delay: 0.32s; }
   .section.active > *:nth-child(10) { animation-delay: 0.36s; }
 
+  /* ── NAV CROSS-LINK ── */
+  .nav-divider { width: 1px; background: var(--border); margin: 8px 0; flex-shrink: 0; }
+  .nav-link { font-family: 'Mukta', sans-serif; font-size: 13px; font-weight: 500; color: var(--orange); background: none; border: none; border-bottom: 2px solid transparent; padding: 13px clamp(10px, 2.5vw, 16px); cursor: pointer; white-space: nowrap; text-decoration: none; display: flex; align-items: center; gap: 5px; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
+  .nav-link:hover { color: var(--pine); }
+
   code {
     font-size: 12px; background: var(--cream);
     padding: 1px 6px; border-radius: 4px;
@@ -560,7 +565,8 @@
   <button class="nav-btn" onclick="show('flow',this)">Call flow</button>
   <button class="nav-btn" onclick="show('objections',this)">Objections</button>
   <button class="nav-btn" onclick="show('principles',this)">Principles</button>
-  <button class="nav-btn" onclick="show('hosting',this)">Where to host</button>
+  <div class="nav-divider"></div>
+  <a class="nav-link" href="./Markeb-sales-system.html">Sales System →</a>
 </nav>
 
 <!-- HOW TO USE -->
@@ -750,43 +756,6 @@
   <div class="principle-card"><div class="principle-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 4.5" stroke="#FDF3E2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h3>Honesty closes faster than pressure</h3><p>If a service isn't the right fit, say so. Clients who feel advised rather than sold to are far more likely to come back — and to refer others. Short-term honesty is always the right long-term move.</p></div></div>
   <div class="principle-card"><div class="principle-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="3" width="4" height="4" rx="1" stroke="#FDF3E2" stroke-width="1.5"/><rect x="9" y="3" width="4" height="4" rx="1" stroke="#FDF3E2" stroke-width="1.5"/><rect x="3" y="9" width="4" height="4" rx="1" stroke="#FDF3E2" stroke-width="1.5"/><rect x="9" y="9" width="4" height="4" rx="1" stroke="#FDF3E2" stroke-width="1.5"/></svg></div><div><h3>The packaging logic does the selling</h3><p>The services are priced and structured to make sense on their own terms. Your job is to explain the logic clearly — not to persuade. A client who understands what they're getting and why it costs what it does will make the right decision themselves.</p></div></div>
   <div class="principle-card"><div class="principle-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v2M8 12v2M2 8h2M12 8h2M4.22 4.22l1.42 1.42M10.36 10.36l1.42 1.42M4.22 11.78l1.42-1.42M10.36 5.64l1.42-1.42" stroke="#FDF3E2" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><h3>A no now can be a yes later</h3><p>Not every call ends in a booking — and that's fine. A client who leaves feeling respected and well-informed will come back when the time is right. Focus on the relationship, not the transaction.</p></div></div>
-</section>
-
-<!-- WHERE TO HOST -->
-<section class="section" id="hosting">
-  <div class="section-intro">
-    <h2>Where to host this playbook</h2>
-    <p>This file contains internal pricing, positioning strategy, and sales methodology. Here's a clear breakdown of where it should and shouldn't live — ranked by how well each option keeps it out of the wrong hands.</p>
-  </div>
-  <div class="warning-box">
-    <strong>The PIN is now server-side via Netlify</strong>
-    The PIN is stored as a Netlify environment variable (PLAYBOOK_PIN) and verified by a Netlify Function. It never appears in the HTML source — viewing the page source reveals nothing useful. Change the PIN any time by updating the environment variable in your Netlify dashboard, no code changes required.
-  </div>
-  <div class="host-option">
-    <div class="host-rank recommended">Best — you're already set up</div>
-    <div class="host-body">
-      <h3>Your existing Netlify site — private path + env PIN</h3>
-      <p>Deploy this file to your Markeb Media Netlify project at a path like <code>/internal/playbook</code>. The PIN is verified server-side via the <code>verify-pin</code> Netlify Function using your <code>PLAYBOOK_PIN</code> environment variable.</p>
-      <p>Share the URL verbally with your BDMs — never in a group message or email. To change the PIN, update the environment variable in Netlify dashboard → Site configuration → Environment variables, then trigger a redeploy. No changes to any files needed.</p>
-      <div class="host-tags"><span class="host-tag pro">PIN never in source code</span><span class="host-tag pro">Change PIN without touching files</span><span class="host-tag pro">Works on your existing plan</span><span class="host-tag pro">Full interactive experience</span><span class="host-tag con">URL could still be shared — rely on PIN</span></div>
-    </div>
-  </div>
-  <div class="host-option">
-    <div class="host-rank">Extra layer — optional</div>
-    <div class="host-body">
-      <h3>Netlify Pro site password + env PIN</h3>
-      <p>If you upgrade to Netlify Pro, you can add a server-side site password on top of the PIN. This means even reaching the PIN screen requires a second credential. Two independent layers — neither is visible in source code.</p>
-      <div class="host-tags"><span class="host-tag pro">Two completely separate layers</span><span class="host-tag pro">Server blocks before anything loads</span><span class="host-tag con">Netlify Pro required (~£15/month)</span></div>
-    </div>
-  </div>
-  <div class="host-option">
-    <div class="host-rank avoid">Avoid</div>
-    <div class="host-body">
-      <h3>Email attachment or WhatsApp</h3>
-      <p>Sending the file directly means you lose control immediately. It can be forwarded, saved to personal devices, or shared with a client by accident. The env PIN won't work locally without the Netlify Function running.</p>
-      <div class="host-tags"><span class="host-tag con">No access control once sent</span><span class="host-tag con">PIN won't work offline</span><span class="host-tag con">Can't update or revoke</span></div>
-    </div>
-  </div>
 </section>
 
 <div class="footer">

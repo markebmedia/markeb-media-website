@@ -247,6 +247,32 @@
   .final-rule p { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; color: var(--cream); line-height: 1.4; }
   .final-rule span { color: var(--orange); }
 
+  /* ── CROSS-LINK ── */
+  .cross-link {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #fff; border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 16px 20px;
+    text-decoration: none; transition: border-color 0.15s, background 0.15s;
+    gap: 12px;
+  }
+  .cross-link:hover { border-color: var(--orange); background: var(--orange-faint); }
+  .cross-link-label { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 3px; font-family: 'Arial Unicode MS', 'Arial', sans-serif; }
+  .cross-link-title { font-size: 15px; font-weight: 600; color: var(--pine); font-family: 'Arial Unicode MS', 'Arial', sans-serif; }
+  .cross-link-arrow { font-size: 20px; color: var(--orange); flex-shrink: 0; }
+
+  /* ── NAV CROSS-LINK ── */
+  .nav-divider { width: 1px; background: var(--border); margin: 8px 0; flex-shrink: 0; }
+  .nav-link { font-family: 'Mukta', sans-serif; font-size: 13px; font-weight: 500; color: var(--orange); background: none; border: none; border-bottom: 2px solid transparent; padding: 13px clamp(10px, 2.5vw, 16px); cursor: pointer; white-space: nowrap; text-decoration: none; display: flex; align-items: center; gap: 5px; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
+  .nav-link:hover { color: var(--pine); }
+
+  /* ── DASHBOARD FEATURES ── */
+  .dashboard-feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .dashboard-feature { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; }
+  .dashboard-feature-icon { width: 36px; height: 36px; background: var(--pine); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; flex-shrink: 0; }
+  .dashboard-feature h3 { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 14px; font-weight: 700; color: var(--pine); margin-bottom: 5px; }
+  .dashboard-feature p { font-size: 13px; color: var(--ink-muted); line-height: 1.6; }
+  .dashboard-feature .pitch { font-size: 12px; color: var(--orange); font-weight: 600; margin-top: 8px; font-style: italic; }
+
   /* ── FOOTER ── */
   .footer { text-align: center; padding: 24px 16px; font-size: 12px; color: var(--ink-faint); border-top: 1px solid var(--border); margin-top: 16px; }
   .footer img { height: 28px; width: auto; display: block; margin: 0 auto 10px; opacity: 0.35; }
@@ -325,16 +351,19 @@
 <nav class="nav">
   <button class="nav-btn active" onclick="show('system',this)">The system</button>
   <button class="nav-btn" onclick="show('kpis',this)">KPIs &amp; targets</button>
+  <button class="nav-btn" onclick="show('dashboard',this)">Client dashboard</button>
   <button class="nav-btn" onclick="show('property',this)">Property services</button>
   <button class="nav-btn" onclick="show('branding',this)">Branding services</button>
   <button class="nav-btn" onclick="show('objections',this)">Objections</button>
   <button class="nav-btn" onclick="show('principles',this)">Principles</button>
+  <div class="nav-divider"></div>
+  <a class="nav-link" href="./bdm-playbook.html">BDM Playbook →</a>
 </nav>
 
 <!-- THE SYSTEM -->
 <section class="section active" id="system">
   <div class="section-intro">
-    <h2>The 5-stage sales system</h2>
+    <h2>The 6-stage sales system</h2>
     <p>Every deal follows the same path. Your job is to move prospects through each stage as fast as possible — meetings are where revenue is made, not messages.</p>
   </div>
 
@@ -436,6 +465,40 @@
     <div class="stage-header">
       <div class="stage-num">4</div>
       <div class="stage-title-wrap">
+        <div class="stage-title">Dashboard Sign-Up</div>
+        <div class="stage-objective">Objective — Bring the client into the Markeb ecosystem</div>
+      </div>
+    </div>
+    <div class="stage-cols">
+      <div class="stage-block">
+        <div class="stage-block-label">Do this during the meeting</div>
+        <ul>
+          <li>Walk the client through the dashboard live</li>
+          <li>Sign them up before they leave</li>
+          <li>Show the key features relevant to their situation</li>
+        </ul>
+      </div>
+      <div class="stage-block">
+        <div class="stage-block-label">Why it matters</div>
+        <ul>
+          <li>Free to join — no barrier to entry</li>
+          <li>They can reserve shoots without upfront payment</li>
+          <li>Bigger agencies can pay end of month</li>
+          <li>Once they're in the system, momentum builds</li>
+        </ul>
+      </div>
+    </div>
+    <div class="rule-box">
+      <div class="stage-block-label">Key rule</div>
+      <p>Sign-up happens in the meeting, not after it. A client who leaves without an account is a warm lead, not a client. See the Client Dashboard tab for the full walkthrough guide.</p>
+    </div>
+  </div>
+
+  <!-- Stage 5 -->
+  <div class="stage-card">
+    <div class="stage-header">
+      <div class="stage-num">5</div>
+      <div class="stage-title-wrap">
         <div class="stage-title">Product Brief</div>
         <div class="stage-objective">Objective — Position Markeb as the default solution</div>
       </div>
@@ -460,13 +523,13 @@
     </div>
   </div>
 
-  <!-- Stage 5 -->
+  <!-- Stage 6 -->
   <div class="stage-card">
     <div class="stage-header">
-      <div class="stage-num">5</div>
+      <div class="stage-num">6</div>
       <div class="stage-title-wrap">
         <div class="stage-title">Close — First Booking</div>
-        <div class="stage-objective">Objective — Get the client into the ecosystem</div>
+        <div class="stage-objective">Objective — Get the client's first shoot confirmed</div>
       </div>
     </div>
     <div class="stage-cols">
@@ -579,6 +642,68 @@
       <li>24-hour follow-up if no reply</li>
       <li>3–5 total touchpoints before removal</li>
     </ul>
+  </div>
+</section>
+
+<!-- CLIENT DASHBOARD -->
+<section class="section" id="dashboard">
+  <div class="section-intro">
+    <h2>Client dashboard</h2>
+    <p>The dashboard is free to join and should be set up during the meeting. Once a client is in the system, the relationship is formalised, momentum builds, and the first booking follows naturally. Walk them through each feature live.</p>
+  </div>
+
+  <div class="stage-block" style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:20px;">
+    <div class="stage-block-label">How to introduce it in the meeting</div>
+    <p style="font-size:13px;color:var(--ink-mid);line-height:1.65;margin-bottom:8px;">"Before we confirm the first shoot, let me show you the platform you'll be working from. Everything runs through here — your content, your bookings, your amendments. Takes two minutes to get set up and it's completely free."</p>
+    <p style="font-size:13px;color:var(--ink-mid);line-height:1.65;">Then walk them through the five features below. Focus on the ones most relevant to their situation.</p>
+  </div>
+
+  <div class="dashboard-feature-grid">
+    <div class="dashboard-feature">
+      <div class="dashboard-feature-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="#FDF3E2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3>Content tracking</h3>
+      <p>Clients can track their content in real time through every stage — editing, quality control, and final delivery. They always know where their content is without needing to chase.</p>
+      <div class="pitch">"You'll always know exactly where your content is — no chasing, no guessing."</div>
+    </div>
+    <div class="dashboard-feature">
+      <div class="dashboard-feature-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3v6l4 2" stroke="#FDF3E2" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="9" r="7" stroke="#FDF3E2" stroke-width="1.8"/></svg>
+      </div>
+      <h3>Amendment requests</h3>
+      <p>Clients raise amend requests directly in the dashboard — no WhatsApp, no email chains, nothing gets lost. Requests come straight into our central system and get dealt with faster.</p>
+      <div class="pitch">"Amendments come straight to us — no back and forth on WhatsApp, nothing slipping through the cracks."</div>
+    </div>
+    <div class="dashboard-feature">
+      <div class="dashboard-feature-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="12" rx="2" stroke="#FDF3E2" stroke-width="1.8"/><path d="M6 2v4M12 2v4M2 9h14" stroke="#FDF3E2" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <h3>Content calendar</h3>
+      <p>For clients on social media management services, the content calendar lives here. They can see what's planned, what's going out, and when — all in one place.</p>
+      <div class="pitch">"If you're on social with us, you can see exactly what's going out and when — full visibility."</div>
+    </div>
+    <div class="dashboard-feature">
+      <div class="dashboard-feature-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v4M9 12v4M2 9h4M12 9h4" stroke="#FDF3E2" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="9" r="3" stroke="#FDF3E2" stroke-width="1.8"/></svg>
+      </div>
+      <h3>Shoot booking</h3>
+      <p>Clients can book shoots directly from the dashboard. They can reserve shoots without upfront payment — and for bigger agencies, payment can be settled at the end of the month.</p>
+      <div class="pitch">"You can reserve shoots without paying upfront — and if you're a larger agency, we can set you up on monthly billing."</div>
+    </div>
+    <div class="dashboard-feature">
+      <div class="dashboard-feature-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 9h10M4 5h10M4 13h6" stroke="#FDF3E2" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <h3>Copyryta</h3>
+      <p>An AI copywriting assistant built for busy estate agents. Generates property descriptions, social captions, and marketing copy — saving agents hours of writing each week.</p>
+      <div class="pitch">"This alone saves most agents hours every week — property descriptions, social captions, all written in seconds."</div>
+    </div>
+  </div>
+
+  <div class="example-box" style="margin-top:4px;">
+    <div class="stage-block-label">Closing the sign-up</div>
+    <p>"Right, let's get you set up now — takes two minutes and then we can confirm the first shoot straight from here."</p>
   </div>
 </section>
 
