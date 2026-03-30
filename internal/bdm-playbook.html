@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markeb Media — Sales Playbook</title>
+<link href="https://fonts.googleapis.com/css2?family=Mukta:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pine: #3F4D1B;
+    --pine-faint: #3F4D1B12;
+    --pine-faint2: #3F4D1B26;
+    --orange: #B46100;
+    --orange-faint: #B4610012;
+    --orange-faint2: #B4610026;
+    --cream: #FDF3E2;
+    --cream-dark: #f5e8cc;
+    --ink: #1a1a14;
+    --ink-mid: #3a3a2e;
+    --ink-muted: #6b6b52;
+    --ink-faint: #9a9a7a;
+    --border: #3F4D1B20;
+    --border-mid: #3F4D1B38;
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Mukta', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Mukta', sans-serif;
+  }
+
+  /* Titles (section headings, card names, nav labels) use Arial Unicode */
+  .title-font {
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+  }
+
+  /* ── PIN GATE ── */
+  #gate {
+    position: fixed; inset: 0;
+    background: #FDF3E2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 24px;
+  }
+  #gate.hidden { display: none; }
+
+  .gate-card {
+    background: #ffffff;
+    border: 1px solid #e8d9be;
+    border-radius: 16px;
+    padding: 44px 40px 36px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 4px 24px rgba(63,77,27,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .gate-logo-wrap {
+    margin-bottom: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .gate-logo-img {
+    height: 44px;
+    width: auto;
+    display: block;
+  }
+  .gate-sub {
+    font-size: 13px;
+    color: #6b6b3a;
+    font-family: 'Mukta', sans-serif;
+    font-weight: 400;
+    text-align: center;
+  }
+  .gate-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #3d3d1a;
+    margin-bottom: 16px;
+    font-family: 'Mukta', sans-serif;
+    text-align: center;
+  }
+  .pin-dots { display: flex; gap: 14px; margin-bottom: 28px; }
+  .pin-dot {
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    border: 2px solid #c8c89a;
+    background: transparent;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .pin-dot.filled { background: var(--orange); border-color: var(--orange); }
+
+  .pin-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 72px);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .pin-key {
+    height: 72px;
+    border-radius: 10px;
+    border: 1px solid #c8c89a;
+    background: #fff;
+    color: #3F4D1B;
+    font-family: 'Mukta', sans-serif;
+    font-size: 22px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.1s, border-color 0.12s, transform 0.08s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pin-key:hover { background: #FDF3E2; border-color: #B46100; }
+  .pin-key:active { background: #f5e8cc; transform: scale(0.94); }
+  .pin-key.wide { grid-column: span 2; }
+  .pin-key.del { font-size: 17px; color: #9a9a7a; }
+  .gate-error { font-size: 13px; color: #b91c1c; height: 20px; text-align: center; font-family: 'Mukta', sans-serif; background: #fef2f2; border-radius: 6px; padding: 0 10px; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 32px; margin-top: 4px; }
+  .gate-error:empty { background: transparent; }
+  .gate-checking { font-size: 13px; color: #6b6b3a; height: 20px; text-align: center; font-family: 'Mukta', sans-serif; min-height: 32px; display: flex; align-items: center; justify-content: center; width: 100%; margin-top: 4px; }
+
+  /* ── APP ── */
+  #app { display: none; }
+  #app.visible { display: block; }
+
+  /* ── COVER ── */
+  .cover {
+    background: var(--pine);
+    color: var(--cream);
+    padding: clamp(36px, 7vw, 80px) clamp(18px, 5vw, 60px) clamp(32px, 6vw, 70px);
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 380px; height: 380px;
+    border-radius: 50%;
+    border: 55px solid #ffffff07;
+    pointer-events: none;
+  }
+  .cover-logo {
+    height: 44px;
+    width: auto;
+    display: block;
+    margin-bottom: 28px;
+    filter: brightness(0) invert(1);
+  }
+  .cover-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 14px;
+    font-family: 'Mukta', sans-serif;
+  }
+  .cover h1 {
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+    font-size: clamp(26px, 5vw, 52px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--cream);
+    margin-bottom: 14px;
+    max-width: 540px;
+  }
+  .cover-sub {
+    font-size: clamp(13px, 2vw, 15px);
+    font-weight: 300;
+    color: #FDF3E2bb;
+    max-width: 440px;
+    line-height: 1.6;
+    margin-bottom: 32px;
+    font-family: 'Mukta', sans-serif;
+  }
+  .cover-meta { display: flex; gap: clamp(14px, 4vw, 32px); flex-wrap: wrap; }
+  .cover-meta-item { display: flex; flex-direction: column; gap: 3px; }
+  .cover-meta-item span:first-child {
+    font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase;
+    color: #FDF3E266; font-weight: 500; font-family: 'Mukta', sans-serif;
+  }
+  .cover-meta-item span:last-child {
+    font-size: 13px; color: var(--cream); font-family: 'Mukta', sans-serif;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    position: sticky; top: 0; z-index: 100;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    font-family: 'Mukta', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ink-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 13px clamp(10px, 2.5vw, 20px);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
+  }
+  .nav-btn:hover { color: var(--pine); }
+  .nav-btn.active { color: var(--pine); border-bottom-color: var(--orange); font-weight: 600; }
+
+  /* ── SECTIONS ── */
+  .section { display: none; padding: clamp(20px, 5vw, 48px) clamp(14px, 4vw, 40px); max-width: 960px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  .section-intro {
+    background: var(--pine);
+    border-radius: var(--radius-lg);
+    padding: clamp(18px, 4vw, 32px) clamp(16px, 4vw, 36px);
+    margin-bottom: 24px;
+  }
+  .section-intro h2 {
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+    font-size: clamp(17px, 3vw, 22px);
+    font-weight: 700;
+    margin-bottom: 9px;
+    color: var(--cream);
+  }
+  .section-intro p {
+    font-size: 14px; line-height: 1.65;
+    color: #FDF3E2cc; font-weight: 300;
+    max-width: 640px; font-family: 'Mukta', sans-serif;
+  }
+
+  /* ── HOW TO USE ── */
+  .how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .how-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: clamp(16px, 3vw, 24px); }
+  .how-num {
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+    font-size: 28px; color: var(--pine-faint2); line-height: 1; margin-bottom: 9px; font-weight: 700;
+  }
+  .how-card h3 {
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+    font-size: 14px; font-weight: 700; color: var(--pine); margin-bottom: 6px;
+  }
+  .how-card p { font-size: 13px; color: var(--ink-muted); line-height: 1.6; font-family: 'Mukta', sans-serif; }
+
+  /* ── QUICK REF ── */
+  .ref-table-wrap { overflow-x: auto; border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: 24px; -webkit-overflow-scrolling: touch; }
+  .ref-table { width: 100%; border-collapse: collapse; background: #fff; min-width: 460px; }
+  .ref-table thead tr { background: var(--pine); }
+  .ref-table thead th {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #FDF3E2aa; padding: 12px 16px; text-align: left;
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+  }
+  .ref-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+  .ref-table tbody tr:last-child { border-bottom: none; }
+  .ref-table tbody tr:hover { background: var(--pine-faint); }
+  .ref-table td { padding: 11px 16px; font-size: 13px; vertical-align: top; font-family: 'Mukta', sans-serif; }
+  .ref-table td:first-child { color: var(--ink-muted); font-style: italic; width: 40%; }
+  .ref-table td:last-child { color: var(--pine); font-weight: 600; }
+
+  /* ── SERVICE CARDS ── */
+  .group-label {
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--ink-faint);
+    margin: 24px 0 10px; padding-bottom: 9px;
+    border-bottom: 1px solid var(--border);
+  }
+  .group-label:first-of-type { margin-top: 0; }
+
+  .service-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: clamp(16px, 3vw, 28px) clamp(14px, 3vw, 30px);
+    margin-bottom: 10px; transition: border-color 0.18s;
+  }
+  .service-card:hover { border-color: var(--border-mid); }
+  .service-card:last-child { margin-bottom: 0; }
+
+  .card-top {
+    display: flex; justify-content: space-between;
+    align-items: flex-start; gap: 10px; margin-bottom: 14px; flex-wrap: wrap;
+  }
+  .card-name {
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+    font-size: clamp(15px, 2.5vw, 18px); font-weight: 700;
+    color: var(--ink); line-height: 1.25;
+  }
+  .card-badges { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+  .badge { font-size: 12px; font-weight: 600; padding: 4px 11px; border-radius: 20px; white-space: nowrap; font-family: 'Mukta', sans-serif; }
+  .badge-price { background: var(--pine); color: var(--cream); }
+  .badge-duration { background: var(--cream-dark); color: var(--ink-muted); font-weight: 400; }
+  .badge-popular { background: var(--orange); color: #fff; }
+
+  .card-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 10px; }
+  @media (max-width: 500px) { .card-cols { grid-template-columns: 1fr; } }
+
+  .card-block { background: var(--cream); border-radius: var(--radius); padding: 12px 14px; }
+  .card-block-label {
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.13em;
+    text-transform: uppercase; color: var(--ink-faint); margin-bottom: 5px;
+  }
+  .card-block p { font-size: 13px; color: var(--ink-mid); line-height: 1.6; font-family: 'Mukta', sans-serif; }
+
+  .pill-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+  .pill {
+    font-size: 12px; padding: 3px 10px; border-radius: 20px;
+    background: var(--pine-faint); color: var(--pine);
+    border: 1px solid var(--pine-faint2); font-family: 'Mukta', sans-serif;
+  }
+
+  .consult-box {
+    background: var(--pine-faint);
+    border-left: 3px solid var(--pine);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 12px 14px; margin-bottom: 9px;
+  }
+  .consult-box .card-block-label { color: var(--pine); }
+  .consult-box p { font-size: 13px; color: var(--ink); line-height: 1.65; font-style: italic; font-family: 'Mukta', sans-serif; }
+
+  .question-box {
+    background: var(--orange-faint);
+    border-left: 3px solid var(--orange);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 12px 14px;
+  }
+  .question-box .card-block-label { color: var(--orange); }
+  .question-box p { font-size: 13px; color: var(--ink-mid); line-height: 1.65; font-family: 'Mukta', sans-serif; }
+
+  .tier-note {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 16px 20px;
+    margin-bottom: 16px; font-size: 13px;
+    color: var(--ink-muted); line-height: 1.65; font-family: 'Mukta', sans-serif;
+  }
+  .tier-note strong {
+    display: block; font-weight: 700; color: var(--pine);
+    margin-bottom: 5px; font-size: 14px;
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+  }
+
+  /* ── OBJECTIONS ── */
+  .objection-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: clamp(16px, 3vw, 24px) clamp(14px, 3vw, 28px); margin-bottom: 10px;
+  }
+  .objection-card:last-child { margin-bottom: 0; }
+  .objection-tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--pine); background: var(--pine-faint);
+    border: 1px solid var(--pine-faint2);
+    border-radius: 20px; padding: 3px 10px; margin-bottom: 9px;
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+  }
+  .objection-q {
+    font-style: italic; color: var(--ink-muted); font-size: 14px;
+    margin-bottom: 11px; padding-bottom: 11px;
+    border-bottom: 1px solid var(--border); font-family: 'Mukta', sans-serif;
+  }
+  .objection-q::before {
+    content: '"'; color: var(--orange);
+    font-size: 22px; font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+    line-height: 0; vertical-align: -5px; margin-right: 2px;
+  }
+  .objection-a { font-size: 13px; color: var(--ink-mid); line-height: 1.7; font-family: 'Mukta', sans-serif; }
+
+  /* ── CALL FLOW ── */
+  .flow-step { display: flex; gap: 14px; margin-bottom: 10px; align-items: flex-start; }
+  .flow-step:last-child { margin-bottom: 0; }
+  .flow-num {
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+    font-size: 22px; font-weight: 700; color: var(--pine);
+    min-width: 28px; line-height: 1; padding-top: 4px; flex-shrink: 0;
+  }
+  .flow-content {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: clamp(13px, 3vw, 20px) clamp(13px, 3vw, 22px); flex: 1;
+  }
+  .flow-content h3 {
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+    font-size: 14px; font-weight: 700; color: var(--pine); margin-bottom: 6px;
+  }
+  .flow-content p { font-size: 13px; color: var(--ink-muted); line-height: 1.65; font-family: 'Mukta', sans-serif; }
+  .flow-content .example {
+    margin-top: 9px; font-style: italic; color: var(--ink); font-size: 13px;
+    background: var(--cream); border-radius: 6px; padding: 9px 12px; line-height: 1.6;
+    font-family: 'Mukta', sans-serif;
+  }
+
+  /* ── PRINCIPLES ── */
+  .principle-card {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: clamp(14px, 3vw, 22px) clamp(14px, 3vw, 26px);
+    margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start;
+  }
+  .principle-icon {
+    width: 34px; height: 34px; background: var(--pine);
+    border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .principle-card h3 {
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+    font-size: 14px; font-weight: 700; color: var(--pine); margin-bottom: 4px;
+  }
+  .principle-card p { font-size: 13px; color: var(--ink-muted); line-height: 1.6; font-family: 'Mukta', sans-serif; }
+
+  /* ── HOSTING ── */
+  .host-option {
+    background: #fff; border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: clamp(16px, 3vw, 24px) clamp(14px, 3vw, 28px);
+    margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap;
+  }
+  .host-rank {
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+    background: var(--pine); color: var(--cream);
+    border-radius: 20px; padding: 4px 12px; white-space: nowrap; flex-shrink: 0; margin-top: 2px;
+  }
+  .host-rank.recommended { background: var(--orange); }
+  .host-rank.avoid { background: #c0392b; }
+  .host-body { flex: 1; min-width: 200px; }
+  .host-body h3 {
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif;
+    font-size: 14px; font-weight: 700; color: var(--pine); margin-bottom: 6px;
+  }
+  .host-body p { font-size: 13px; color: var(--ink-muted); line-height: 1.6; margin-bottom: 7px; font-family: 'Mukta', sans-serif; }
+  .host-body p:last-child { margin-bottom: 0; }
+  .host-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .host-tag { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 600; font-family: 'Mukta', sans-serif; }
+  .host-tag.pro { background: #e8f5e9; color: #2e7d32; }
+  .host-tag.con { background: #fff3e0; color: #b84c00; }
+
+  .warning-box {
+    background: var(--orange-faint); border: 1px solid var(--orange-faint2);
+    border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 18px;
+    font-size: 13px; color: var(--ink-mid); line-height: 1.65; font-family: 'Mukta', sans-serif;
+  }
+  .warning-box strong {
+    color: var(--orange); display: block; margin-bottom: 5px; font-size: 14px;
+    font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-weight: 700;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center; padding: 24px 16px;
+    font-size: 12px; color: var(--ink-faint);
+    border-top: 1px solid var(--border); margin-top: 16px;
+    font-family: 'Mukta', sans-serif;
+  }
+  .footer img {
+    height: 28px; width: auto; display: block;
+    margin: 0 auto 10px; opacity: 0.35;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .section.active > * { animation: fadeUp 0.26s ease both; }
+  .section.active > *:nth-child(2) { animation-delay: 0.04s; }
+  .section.active > *:nth-child(3) { animation-delay: 0.08s; }
+  .section.active > *:nth-child(4) { animation-delay: 0.12s; }
+  .section.active > *:nth-child(5) { animation-delay: 0.16s; }
+  .section.active > *:nth-child(6) { animation-delay: 0.20s; }
+  .section.active > *:nth-child(7) { animation-delay: 0.24s; }
+  .section.active > *:nth-child(8) { animation-delay: 0.28s; }
+  .section.active > *:nth-child(9) { animation-delay: 0.32s; }
+  .section.active > *:nth-child(10) { animation-delay: 0.36s; }
+
+  code {
+    font-size: 12px; background: var(--cream);
+    padding: 1px 6px; border-radius: 4px;
+    border: 1px solid var(--border); font-family: monospace;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── PIN GATE ── -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-logo-wrap">
+      <img class="gate-logo-img" src="/public/images/Markeb Media Logo (2).PNG" alt="Markeb Media">
+      <div class="gate-sub">Sign in to access the Sales Playbook</div>
+    </div>
+    <div class="gate-label">Enter your PIN</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="enter('1')">1</button>
+      <button class="pin-key" onclick="enter('2')">2</button>
+      <button class="pin-key" onclick="enter('3')">3</button>
+      <button class="pin-key" onclick="enter('4')">4</button>
+      <button class="pin-key" onclick="enter('5')">5</button>
+      <button class="pin-key" onclick="enter('6')">6</button>
+      <button class="pin-key" onclick="enter('7')">7</button>
+      <button class="pin-key" onclick="enter('8')">8</button>
+      <button class="pin-key" onclick="enter('9')">9</button>
+      <button class="pin-key wide" onclick="enter('0')">0</button>
+      <button class="pin-key del" onclick="del()">&#x232B;</button>
+    </div>
+    <div class="gate-error" id="gate-error"></div>
+  </div>
+</div>
+
+<!-- ── APP ── -->
+<div id="app">
+
+<!-- COVER -->
+<div class="cover">
+  <img class="cover-logo" src="/public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" onerror="this.style.display='none'">
+  <div class="cover-label">Internal Document</div>
+  <h1>Discovery Call Sales Playbook</h1>
+  <p class="cover-sub">A consultative guide for BDMs — helping clients work out what's right for them, not pushing them towards a package.</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><span>Version</span><span>1.0</span></div>
+    <div class="cover-meta-item"><span>Audience</span><span>Business Development Team</span></div>
+    <div class="cover-meta-item"><span>Use</span><span>Discovery &amp; Opening Calls</span></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="show('how',this)">How to use</button>
+  <button class="nav-btn" onclick="show('quick',this)">Quick reference</button>
+  <button class="nav-btn" onclick="show('property',this)">Property services</button>
+  <button class="nav-btn" onclick="show('branding',this)">Branding services</button>
+  <button class="nav-btn" onclick="show('flow',this)">Call flow</button>
+  <button class="nav-btn" onclick="show('objections',this)">Objections</button>
+  <button class="nav-btn" onclick="show('principles',this)">Principles</button>
+  <button class="nav-btn" onclick="show('hosting',this)">Where to host</button>
+</nav>
+
+<!-- HOW TO USE -->
+<section class="section active" id="how">
+  <div class="section-intro">
+    <h2>This playbook is a guide, not a script</h2>
+    <p>The goal on a discovery call is to understand what the client actually needs — then help them see which service fits that need. You're an adviser, not a salesperson. The best outcome is a client who feels confident they've made the right choice, not one who's been closed on a package.</p>
+  </div>
+  <div class="how-grid">
+    <div class="how-card"><div class="how-num">01</div><h3>Listen first</h3><p>Before introducing any service, understand the client's current situation — what they're doing now, what's working, and where they feel there's a gap.</p></div>
+    <div class="how-card"><div class="how-num">02</div><h3>Ask, don't assume</h3><p>Use the discovery questions in each service card to surface what they actually need. Their answers tell you where to go — not the other way around.</p></div>
+    <div class="how-card"><div class="how-num">03</div><h3>Match, don't push</h3><p>When you introduce a service, connect it directly to something they've told you. If it doesn't fit their situation, say so — that honesty builds far more trust than a close.</p></div>
+    <div class="how-card"><div class="how-num">04</div><h3>Let the logic do the work</h3><p>The pricing and packaging make sense on their own terms. Once a client understands what's included and why, they'll reach the right decision themselves.</p></div>
+  </div>
+</section>
+
+<!-- QUICK REFERENCE -->
+<section class="section" id="quick">
+  <div class="section-intro">
+    <h2>Quick reference</h2>
+    <p>Match what you hear on the call to the right starting point. These aren't definitive — they're prompts to explore further with the right discovery questions.</p>
+  </div>
+  <div class="ref-table-wrap">
+    <table class="ref-table">
+      <thead><tr><th>What the client says</th><th>Start here</th></tr></thead>
+      <tbody>
+        <tr><td>"We just need photos for listings"</td><td>Property Photography — then explore whether they want aerial</td></tr>
+        <tr><td>"We want to stand out from other agents"</td><td>Silver Package — ask what channels they're currently marketing on</td></tr>
+        <tr><td>"We've got properties with land or rural settings"</td><td>All In One Drone or Bronze — ask whether they'd use video too</td></tr>
+        <tr><td>"We want everything covered"</td><td>Silver Package — explore Gold only if prestige listings are significant</td></tr>
+        <tr><td>"I want to build my profile on social media"</td><td>Branding Videography — ask how often they're posting and what's holding them back</td></tr>
+        <tr><td>"I need a headshot and some brand imagery"</td><td>Branding Photography Session — ask whether video is on their radar too</td></tr>
+        <tr><td>"I want to invest in my personal brand properly"</td><td>Complete Branding Package — only after they've confirmed they need both photo and video</td></tr>
+        <tr><td>"What's the best value option?"</td><td>Understand what they're trying to achieve first — then the answer becomes obvious</td></tr>
+        <tr><td>"We're not sure what we need yet"</td><td>Go to the call flow section and start from the beginning</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- PROPERTY SERVICES -->
+<section class="section" id="property">
+  <div class="section-intro">
+    <h2>Property services</h2>
+    <p>Each card includes what the service delivers, how the price is justified, who it's best suited to, a consultative framing approach, and the questions to ask that'll help the client work out what's right for them.</p>
+  </div>
+
+  <div class="group-label">Standalone services</div>
+
+  <div class="service-card">
+    <div class="card-top"><div class="card-name">Property Photography</div><div class="card-badges"><span class="badge badge-price">£118.80</span><span class="badge badge-duration">45 min</span></div></div>
+    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>Up to 30 magazine-quality interior and exterior images, professionally lit and edited to make every room look its best.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Covers specialist travel, professional equipment, on-site time, and post-production editing. Every shot is composed to maximise buyer appeal — not a point-and-shoot service.</p></div></div>
+    <div class="pill-row"><span class="pill">High volume of standard listings</span><span class="pill">Price-sensitive vendors who still want quality</span><span class="pill">Quick turnaround requirements</span></div>
+    <div class="consult-box"><div class="card-block-label">Consultative framing</div><p>"How are your current listing photos performing? Are vendors happy with how their properties are coming across on Rightmove?" — let their answer reveal whether photography alone is the right starting point, or whether they need more.</p></div>
+    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>What does a typical listing look like for you at the moment? Is the photography something vendors comment on — positively or otherwise?</p></div>
+  </div>
+
+  <div class="service-card">
+    <div class="card-top"><div class="card-name">Property Videography</div><div class="card-badges"><span class="badge badge-price">£154.80</span><span class="badge badge-duration">60 min</span></div></div>
+    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>4K walkthrough video with classic editing — colour grading, smooth transitions, and a narrative flow that guides the viewer through the property.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>4K production and post-editing is significantly more time-intensive than photography. The price reflects professional-grade equipment, editing suite time, and the output's impact on enquiry rates.</p></div></div>
+    <div class="pill-row"><span class="pill">Properties that need to convey space or layout</span><span class="pill">Agents running social media or email campaigns</span><span class="pill">Vendors who want to stand out on the portals</span></div>
+    <div class="consult-box"><div class="card-block-label">Consultative framing</div><p>"Are you using video in your listings at the moment? If not — is that a budget thing, or just something you haven't got around to yet?" — understanding the barrier tells you whether video is a genuine priority for them or a nice-to-have.</p></div>
+    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>What channels are you currently marketing on beyond the portals? Are your vendors asking for video content, or is it something you're looking to introduce?</p></div>
+  </div>
+
+  <div class="group-label">Drone services</div>
+
+  <div class="service-card">
+    <div class="card-top"><div class="card-name">Property Drone Photography</div><div class="card-badges"><span class="badge badge-price">£130.80</span><span class="badge badge-duration">20 min</span></div></div>
+    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>Up to 10 stunning aerial stills showing the property, plot, surrounding area, and location context.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>CAA-certified drone pilot, specialist equipment, and location planning. The 20-minute slot reflects operational efficiency, keeping the cost accessible whilst delivering high-value content.</p></div></div>
+    <div class="pill-row"><span class="pill">Properties with land, gardens, or rural settings</span><span class="pill">New builds showing development context</span><span class="pill">Agents who want aerial without a video budget</span></div>
+    <div class="consult-box"><div class="card-block-label">Consultative framing</div><p>"What types of properties are you typically marketing — are there many with land, large gardens, or rural locations?" — if yes, aerial stills answer questions buyers can't resolve from ground-level photos alone. If the portfolio is mostly terraced houses, this may not be the priority.</p></div>
+    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>Do buyers ever ask about the surrounding area or plot size before booking a viewing? Are there properties where the setting is actually a key part of the appeal?</p></div>
+  </div>
+
+  <div class="service-card">
+    <div class="card-top"><div class="card-name">Property Drone Videography</div><div class="card-badges"><span class="badge badge-price">£130.80</span><span class="badge badge-duration">20 min</span></div></div>
+    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>Up to 30-second cinematic aerial showcase with classic editing — colour grading and smooth cuts for a polished, shareable output.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Same operational cost as drone photography but with the added editorial value of a short-form cinematic video. The value uplift comes in post-production and content versatility.</p></div></div>
+    <div class="pill-row"><span class="pill">Social media content (Reels, TikTok, email)</span><span class="pill">Prestige and rural properties</span><span class="pill">Vendors who want something to share</span></div>
+    <div class="consult-box"><div class="card-block-label">Consultative framing</div><p>"Are you posting property content on social media at the moment? If so, what's tending to get the most engagement?" — if they're active on social, a short aerial reel is a natural fit. If they're not, this may not be where to start.</p></div>
+    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>Do your vendors share their listing content with their own networks? Is social media a channel you're looking to do more with?</p></div>
+  </div>
+
+  <div class="service-card">
+    <div class="card-top"><div class="card-name">All In One Drone</div><div class="card-badges"><span class="badge badge-price">£214.80</span><span class="badge badge-duration">45 min</span></div></div>
+    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>10 aerial photos and a 30-second drone video with classic editing — the complete aerial content package in a single visit.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Bundling both outputs from a single drone session saves over £45 versus booking separately (£261.60 individually). Reflects combined on-site and post-production efficiency.</p></div></div>
+    <div class="pill-row"><span class="pill">Any property where aerial content is a priority</span><span class="pill">Agents who want both stills and video for campaigns</span></div>
+    <div class="consult-box"><div class="card-block-label">Consultative framing</div><p>"If aerial content is going to be part of the marketing for a property, it's worth knowing there are two options — stills only, or stills and a short video together. Whether that's relevant depends on how you plan to use the content — what would you typically do with aerial footage?"</p></div>
+    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>Would you use aerial stills and video for the same property, or tend to choose one or the other? Where would the video content end up — portal, social, email?</p></div>
+  </div>
+
+  <div class="group-label">Packages</div>
+
+  <div class="service-card">
+    <div class="card-top"><div class="card-name">Bronze Package</div><div class="card-badges"><span class="badge badge-price">£202.80</span><span class="badge badge-duration">90 min</span></div></div>
+    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>Up to 30 interior and exterior photographs plus drone shots — photography and aerial imagery combined in a single visit.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Combines photography (£118.80) and drone photography (£130.80) into one efficient visit. The bundled price represents a meaningful saving with a single point of contact for the whole shoot.</p></div></div>
+    <div class="pill-row"><span class="pill">Standard listings that want to stand out</span><span class="pill">Agents who include drone as standard</span><span class="pill">Volume-focused estate agency teams</span></div>
+    <div class="consult-box"><div class="card-block-label">Consultative framing</div><p>"If photography and aerial stills cover what you need, Bronze is the straightforward option — one visit, both done. If you're also thinking about video for social or the portal, it's worth looking at what Silver includes before you decide, because the jump in price is relatively small for what you get."</p></div>
+    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>Is video something you'd want for most listings, or only certain ones? That'll help us work out whether Bronze makes sense as your standard, or whether Silver is a better baseline.</p></div>
+  </div>
+
+  <div class="service-card">
+    <div class="card-top"><div class="card-name">Silver Package</div><div class="card-badges"><span class="badge badge-price">£262.80</span><span class="badge badge-duration">90 min</span><span class="badge badge-popular">Most popular</span></div></div>
+    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>Everything in Bronze — photos and drone stills — plus full property videography and drone video footage. The complete property marketing content set with classic editing throughout.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Four content outputs from a single visit. The price reflects combined on-site efficiency — individually these services would cost substantially more.</p></div></div>
+    <div class="pill-row"><span class="pill">Agents marketing across portals and social</span><span class="pill">Properties that benefit from full visual coverage</span><span class="pill">Teams wanting a consistent, premium standard</span></div>
+    <div class="consult-box"><div class="card-block-label">Consultative framing</div><p>"This tends to be where most agents land once they've thought through what they actually need across different channels — stills for the portal, video for social, aerial for both. But the right choice really depends on how you're marketing. What does a typical campaign look like for you at the moment?"</p></div>
+    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>Are you marketing on more than just Rightmove and Zoopla? Do you want the same content package across all listings, or does it vary by property type or price point?</p></div>
+  </div>
+
+  <div class="service-card">
+    <div class="card-top"><div class="card-name">Gold Package</div><div class="card-badges"><span class="badge badge-price">£600.00</span><span class="badge badge-duration">150 min</span></div></div>
+    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>Everything in Silver, plus enhanced lifestyle content — wider shots, contextual imagery, and extended production designed for high-end property marketing. Classic editing included throughout.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Extended shoot duration, more complex post-production, and creative direction that elevates content from functional to aspirational. Reflects the specialist time required for prestige-level output.</p></div></div>
+    <div class="pill-row"><span class="pill">Prestige and luxury listings</span><span class="pill">Properties being marketed internationally</span><span class="pill">Agents building a premium brand</span></div>
+    <div class="consult-box"><div class="card-block-label">Consultative framing</div><p>"Gold is really designed for a specific type of property — where the lifestyle and setting are as much a part of the appeal as the building itself. Do you have listings where that's the case? If so, it's worth talking through what enhanced lifestyle content would actually look like for those properties."</p></div>
+    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>What's the top end of your portfolio in terms of price point? For those properties, do you feel the current marketing content is doing them justice?</p></div>
+  </div>
+</section>
+
+<!-- BRANDING SERVICES -->
+<section class="section" id="branding">
+  <div class="section-intro">
+    <h2>Branding services</h2>
+    <p>The branding conversation is different in character to property work. Start by understanding where the agent wants to be in 12 months, and what's currently getting in the way — before introducing any service.</p>
+  </div>
+  <div class="tier-note"><strong>What makes branding different to property work</strong>Property services sell a building. Branding services support a person building their profile and reputation. The conversation is less about a specific listing and more about where the agent wants to be — and what's currently getting in the way. Start there before introducing any service.</div>
+
+  <div class="service-card">
+    <div class="card-top"><div class="card-name">Branding Photography — 10 Signature Shots</div><div class="card-badges"><span class="badge badge-price">£414.00</span><span class="badge badge-duration">2 hrs</span></div></div>
+    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>A directed personal branding shoot producing 10 signature images — professional headshots and brand imagery where the agent is in every shot. Ready for LinkedIn, the agency website, email signatures, and printed materials.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>A directed creative session with a professional brief, location planning, and post-production aligned to the agent's personal brand. Two hours allows for multiple looks, settings, and styles. The 10 curated outputs are campaign-ready assets — not snapshots.</p></div></div>
+    <div class="pill-row"><span class="pill">Agents building or refreshing their personal brand</span><span class="pill">New team members joining an agency</span><span class="pill">Agents who want photography but aren't yet on video</span></div>
+    <div class="consult-box"><div class="card-block-label">Consultative framing</div><p>"What does your online presence look like at the moment — LinkedIn, your agency website? When a vendor Googles you, what do they find? And does what they find reflect where you're at now, or is it a bit out of date?" — their answer tells you whether photography alone closes the gap, or whether they need more.</p></div>
+    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>Are you happy with how you come across on your current profile photos? Is imagery something vendors or colleagues have ever commented on?</p></div>
+  </div>
+
+  <div class="service-card">
+    <div class="card-top"><div class="card-name">Branding Videography Session</div><div class="card-badges"><span class="badge badge-price">£534.00</span><span class="badge badge-duration">3 hrs</span></div></div>
+    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>A full personal branding video production session — multiple sequences for social content, reels, website video, and story-led marketing. Classic editing included: colour grading and smooth transitions throughout.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Three hours of directed video production. The output isn't a single video — it's multiple sequences that become a content library the agent can draw on across platforms for months. Post-production editing included.</p></div></div>
+    <div class="pill-row"><span class="pill">Agents investing in social media as a lead channel</span><span class="pill">Those who already have photography and want video</span><span class="pill">Agents who want to feature in their agency's campaigns</span></div>
+    <div class="consult-box"><div class="card-block-label">Consultative framing</div><p>"Are you posting on social at the moment? If so, what tends to perform best — and what do you wish you had more of?" — if content consistency or running dry on material is something they mention, video is a natural solution. If they're not active on social yet, find out why before introducing this.</p></div>
+    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>How often are you posting at the moment, and what's holding you back from doing more? Is creating content something you find time-consuming or uncomfortable on camera?</p></div>
+  </div>
+
+  <div class="service-card">
+    <div class="card-top"><div class="card-name">Complete Branding Package — Photo &amp; Video</div><div class="card-badges"><span class="badge badge-price">£894.00</span><span class="badge badge-duration">5 hrs</span></div></div>
+    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>The full personal branding suite — photography and video in one comprehensive session. Signature shots for static use plus multiple video sequences for social content. Classic editing included on all video assets.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Five hours of dedicated creative production covering both disciplines. Booked separately, photography and video total £948. The package price reflects the efficiency of a combined session with a single creative direction across both outputs.</p></div></div>
+    <div class="pill-row"><span class="pill">Agents serious about their personal brand</span><span class="pill">Agency owners and directors</span><span class="pill">Agents launching or relaunching their profile</span><span class="pill">Ambitious agents who want to dominate their patch</span></div>
+    <div class="consult-box"><div class="card-block-label">Consultative framing</div><p>"It sounds like you need both — strong photography for your static presence and video content for social. If that's the case, it's worth knowing that doing both in one session is more cost-effective than booking them separately, and everything has a consistent look and feel. Does that make sense as a way to approach it, or would you rather start with one and build from there?"</p></div>
+    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>Where do you feel the biggest gap is right now — how you look online, or how much content you're putting out? And is this something you want to tackle all at once, or in stages?</p></div>
+  </div>
+</section>
+
+<!-- CALL FLOW -->
+<section class="section" id="flow">
+  <div class="section-intro">
+    <h2>Discovery call flow</h2>
+    <p>A suggested structure for opening calls. This isn't a script — adapt it to how the conversation naturally develops. The goal is to spend the first half of the call listening, and only introduce services once you understand their situation.</p>
+  </div>
+  <div class="flow-step"><div class="flow-num">1</div><div class="flow-content"><h3>Open with context, not a pitch</h3><p>Start by understanding who they are and what they do — agency size, types of properties, how they currently market listings. This isn't small talk; it tells you which services are even relevant.</p><div class="example">"Before I talk through what we offer, it'd be useful to understand a bit more about how you're currently approaching property marketing — what does a typical listing campaign look like for you at the moment?"</div></div></div>
+  <div class="flow-step"><div class="flow-num">2</div><div class="flow-content"><h3>Find the gap</h3><p>Once you understand their current setup, ask what's not working or what they wish they had more of. The gap they describe tells you exactly which service to introduce.</p><div class="example">"Is there anything about your current marketing that you feel isn't doing the properties justice — or something vendors ask for that you can't currently deliver?"</div></div></div>
+  <div class="flow-step"><div class="flow-num">3</div><div class="flow-content"><h3>Introduce the relevant service</h3><p>Connect the service directly to what they've just told you. Don't introduce everything — only what's relevant to their situation. Use the consultative framing in the service cards to frame it as a question, not a statement.</p><div class="example">"Based on what you've said about wanting to be more active on social, it might be worth looking at how video could work for you — are you open to exploring that?"</div></div></div>
+  <div class="flow-step"><div class="flow-num">4</div><div class="flow-content"><h3>Walk through the logic, not the features</h3><p>When you explain a service, lead with what it means for the client — not what it includes. Use the "why this price" copy to justify value, not defend cost.</p><div class="example">"The reason the Silver Package tends to be where most agents land is that it covers all the channels in one visit — stills for Rightmove, video for social, aerial for both. You're not going back and forth booking different services for different properties."</div></div></div>
+  <div class="flow-step"><div class="flow-num">5</div><div class="flow-content"><h3>Let them decide — don't close</h3><p>Once you've introduced the relevant service and walked through the logic, give them space. Ask whether it makes sense for their situation. If they're not ready, find out what would help them feel more confident.</p><div class="example">"Does that feel like the right fit for what you're trying to do, or is there something about it that doesn't quite sit right?"</div></div></div>
+</section>
+
+<!-- OBJECTIONS -->
+<section class="section" id="objections">
+  <div class="section-intro">
+    <h2>Handling objections</h2>
+    <p>Most objections aren't objections — they're requests for more information or reassurance. The goal is never to overcome them, but to understand what's behind them and respond honestly.</p>
+  </div>
+  <div class="objection-card"><div class="objection-tag">Price</div><div class="objection-q">It's more than we usually spend on photography.</div><div class="objection-a">That's a fair point to raise. It's worth understanding what you're currently getting for what you spend — and whether it's delivering what you need. Our pricing reflects professional-grade equipment, specialist travel, and post-production editing that makes a genuine difference to how a property presents. If budget is a constraint, it's worth starting with what would make the biggest difference to your listings and working from there. What's the one thing you feel your current photography is missing?</div></div>
+  <div class="objection-card"><div class="objection-tag">Commitment</div><div class="objection-q">We're not sure we need this for every listing.</div><div class="objection-a">That's completely reasonable — and honestly, not every property needs the same level of content. It's worth thinking about which properties in your portfolio would benefit most from professional photography or video, and starting there. We can work with you on a per-property basis rather than a blanket approach if that makes more sense for how you operate.</div></div>
+  <div class="objection-card"><div class="objection-tag">Relevance</div><div class="objection-q">Our vendors don't really ask for video.</div><div class="objection-a">That's interesting — do you think that's because they don't see it as an option, or because they genuinely don't value it? In our experience, vendors rarely ask for video specifically, but they respond very positively when they see it. It also tends to benefit the agent as much as the vendor — it's content you can use for your own marketing, not just the listing.</div></div>
+  <div class="objection-card"><div class="objection-tag">Timing</div><div class="objection-q">We'd like to think about it and come back to you.</div><div class="objection-a">Of course — it's not a decision to rush. It'd help to know what would make it easier to come to a decision. Is there something specific you'd want to think through, or something I haven't covered that would help? I'm happy to send something over in writing so you've got it to refer back to.</div></div>
+  <div class="objection-card"><div class="objection-tag">Competition</div><div class="objection-q">We've had cheaper quotes from other photographers.</div><div class="objection-a">It's worth comparing like for like — what's included, what the editing looks like, and what the turnaround is. We're not the cheapest option, and we wouldn't want to be. If price is the main factor, we might not be the right fit. But if the quality of output and reliability of the service matters — which for most agents it does — it's worth looking at what the difference actually buys you.</div></div>
+  <div class="objection-card"><div class="objection-tag">Personal branding</div><div class="objection-q">I'm not sure I'm comfortable on camera.</div><div class="objection-a">That's one of the most common things we hear — and it's exactly why the session is directed. You're not left to figure it out yourself. Our specialists guide you through the whole thing, and most people find they're far more comfortable than they expected once they're in it. Would it help to talk through what the session actually looks like in practice?</div></div>
+</section>
+
+<!-- PRINCIPLES -->
+<section class="section" id="principles">
+  <div class="section-intro">
+    <h2>Principles</h2>
+    <p>The mindset behind every successful discovery call. Come back to these when a call isn't going the way you'd hoped.</p>
+  </div>
+  <div class="principle-card"><div class="principle-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#FDF3E2" stroke-width="1.5"/><path d="M8 5v4l2.5 1.5" stroke="#FDF3E2" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><h3>Listen more than you speak</h3><p>The first half of any discovery call should be mostly the client talking. You're gathering information, not delivering a presentation. The more they say, the clearer the right service becomes.</p></div></div>
+  <div class="principle-card"><div class="principle-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 8h8M8 4l4 4-4 4" stroke="#FDF3E2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h3>Connect before you introduce</h3><p>Never introduce a service without first connecting it to something the client has told you. If you can't make that connection, it's probably not the right service for them right now.</p></div></div>
+  <div class="principle-card"><div class="principle-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 4.5" stroke="#FDF3E2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h3>Honesty closes faster than pressure</h3><p>If a service isn't the right fit, say so. Clients who feel advised rather than sold to are far more likely to come back — and to refer others. Short-term honesty is always the right long-term move.</p></div></div>
+  <div class="principle-card"><div class="principle-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="3" width="4" height="4" rx="1" stroke="#FDF3E2" stroke-width="1.5"/><rect x="9" y="3" width="4" height="4" rx="1" stroke="#FDF3E2" stroke-width="1.5"/><rect x="3" y="9" width="4" height="4" rx="1" stroke="#FDF3E2" stroke-width="1.5"/><rect x="9" y="9" width="4" height="4" rx="1" stroke="#FDF3E2" stroke-width="1.5"/></svg></div><div><h3>The packaging logic does the selling</h3><p>The services are priced and structured to make sense on their own terms. Your job is to explain the logic clearly — not to persuade. A client who understands what they're getting and why it costs what it does will make the right decision themselves.</p></div></div>
+  <div class="principle-card"><div class="principle-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v2M8 12v2M2 8h2M12 8h2M4.22 4.22l1.42 1.42M10.36 10.36l1.42 1.42M4.22 11.78l1.42-1.42M10.36 5.64l1.42-1.42" stroke="#FDF3E2" stroke-width="1.5" stroke-linecap="round"/></svg></div><div><h3>A no now can be a yes later</h3><p>Not every call ends in a booking — and that's fine. A client who leaves feeling respected and well-informed will come back when the time is right. Focus on the relationship, not the transaction.</p></div></div>
+</section>
+
+<!-- WHERE TO HOST -->
+<section class="section" id="hosting">
+  <div class="section-intro">
+    <h2>Where to host this playbook</h2>
+    <p>This file contains internal pricing, positioning strategy, and sales methodology. Here's a clear breakdown of where it should and shouldn't live — ranked by how well each option keeps it out of the wrong hands.</p>
+  </div>
+  <div class="warning-box">
+    <strong>The PIN is now server-side via Netlify</strong>
+    The PIN is stored as a Netlify environment variable (PLAYBOOK_PIN) and verified by a Netlify Function. It never appears in the HTML source — viewing the page source reveals nothing useful. Change the PIN any time by updating the environment variable in your Netlify dashboard, no code changes required.
+  </div>
+  <div class="host-option">
+    <div class="host-rank recommended">Best — you're already set up</div>
+    <div class="host-body">
+      <h3>Your existing Netlify site — private path + env PIN</h3>
+      <p>Deploy this file to your Markeb Media Netlify project at a path like <code>/internal/playbook</code>. The PIN is verified server-side via the <code>verify-pin</code> Netlify Function using your <code>PLAYBOOK_PIN</code> environment variable.</p>
+      <p>Share the URL verbally with your BDMs — never in a group message or email. To change the PIN, update the environment variable in Netlify dashboard → Site configuration → Environment variables, then trigger a redeploy. No changes to any files needed.</p>
+      <div class="host-tags"><span class="host-tag pro">PIN never in source code</span><span class="host-tag pro">Change PIN without touching files</span><span class="host-tag pro">Works on your existing plan</span><span class="host-tag pro">Full interactive experience</span><span class="host-tag con">URL could still be shared — rely on PIN</span></div>
+    </div>
+  </div>
+  <div class="host-option">
+    <div class="host-rank">Extra layer — optional</div>
+    <div class="host-body">
+      <h3>Netlify Pro site password + env PIN</h3>
+      <p>If you upgrade to Netlify Pro, you can add a server-side site password on top of the PIN. This means even reaching the PIN screen requires a second credential. Two independent layers — neither is visible in source code.</p>
+      <div class="host-tags"><span class="host-tag pro">Two completely separate layers</span><span class="host-tag pro">Server blocks before anything loads</span><span class="host-tag con">Netlify Pro required (~£15/month)</span></div>
+    </div>
+  </div>
+  <div class="host-option">
+    <div class="host-rank avoid">Avoid</div>
+    <div class="host-body">
+      <h3>Email attachment or WhatsApp</h3>
+      <p>Sending the file directly means you lose control immediately. It can be forwarded, saved to personal devices, or shared with a client by accident. The env PIN won't work locally without the Netlify Function running.</p>
+      <div class="host-tags"><span class="host-tag con">No access control once sent</span><span class="host-tag con">PIN won't work offline</span><span class="host-tag con">Can't update or revoke</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  <img src="/public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" onerror="this.style.display='none'">
+  Markeb Media Ltd &nbsp;·&nbsp; Company No. 15919272 &nbsp;·&nbsp; Sales Playbook v1.0 &nbsp;·&nbsp; Internal use only
+</div>
+
+</div><!-- /app -->
+
+<script>
+  let entered = '';
+  let checking = false;
+
+  function enter(d) {
+    if (entered.length >= 4 || checking) return;
+    entered += d;
+    updateDots();
+    if (entered.length === 4) setTimeout(check, 130);
+  }
+
+  function del() {
+    if (checking) return;
+    entered = entered.slice(0, -1);
+    updateDots();
+    document.getElementById('gate-error').textContent = '';
+  }
+
+  function updateDots() {
+    for (let i = 0; i < 4; i++)
+      document.getElementById('d' + i).classList.toggle('filled', i < entered.length);
+  }
+
+  async function check() {
+    checking = true;
+    const errEl = document.getElementById('gate-error');
+    errEl.className = 'gate-checking';
+    errEl.textContent = 'Checking…';
+
+    try {
+      const res = await fetch('/.netlify/functions/verify-pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: entered })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        errEl.textContent = '';
+        document.getElementById('gate').classList.add('hidden');
+        document.getElementById('app').classList.add('visible');
+      } else {
+        errEl.className = 'gate-error';
+        errEl.textContent = 'Incorrect PIN — please try again';
+        entered = '';
+        updateDots();
+        shake();
+      }
+    } catch (err) {
+      errEl.className = 'gate-error';
+      errEl.textContent = 'Connection error — please try again';
+      entered = '';
+      updateDots();
+    }
+
+    checking = false;
+  }
+
+  function shake() {
+    const card = document.querySelector('.gate-card');
+    card.style.transition = 'transform 0.07s';
+    ['-8px','8px','-5px','5px','-2px','0'].forEach((x, i) =>
+      setTimeout(() => card.style.transform = 'translateX(' + x + ')', i * 65)
+    );
+  }
+
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('gate').classList.contains('hidden')) return;
+    if (e.key >= '0' && e.key <= '9') enter(e.key);
+    if (e.key === 'Backspace') del();
+    if (e.key === 'Enter' && entered.length === 4) check();
+  });
+
+  function show(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
