@@ -433,8 +433,8 @@ async function sendCancellationConfirmation(metadata, session, cancellationFee, 
     
     if (region) {
       if (region.toLowerCase() === 'north') {
-        bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
-        console.log('✓ BCC: Adding Jodie (North region)');
+        bccRecipients.push('James Jago.Hamshaw@markebmedia.com');
+        console.log('✓ BCC: Adding James Jago (North region)');
       }
     }
 

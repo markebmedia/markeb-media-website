@@ -35,15 +35,19 @@ exports.handler = async (event) => {
 
   // Specialist lookup — passcodes come from environment variables
   const specialists = {
-    'jodie': {
-      displayName: 'Jodie',
-      passcode: process.env.SPECIALIST_CODE_JODIE
-    },
-    'andrii': {
-      displayName: 'Andrii',
-      passcode: process.env.SPECIALIST_CODE_ANDRII
-    }
-  };
+  'james': {
+    displayName: 'James Jago',
+    passcode: process.env.SPECIALIST_CODE_JAMES
+  },
+  'andrii': {
+    displayName: 'Andrii',
+    passcode: process.env.SPECIALIST_CODE_ANDRII
+  },
+  'jodie': {
+    displayName: 'Jodie',
+    passcode: process.env.SPECIALIST_CODE_JODIE
+  }
+};
 
   const specialist = specialists[normalisedName];
 

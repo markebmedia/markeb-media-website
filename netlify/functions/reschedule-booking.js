@@ -390,11 +390,11 @@ async function sendRescheduleEmail(fields, newDate, newTime, originalDate, origi
   const bccRecipients = ['commercial@markebmedia.com'];
   if (fields['Region']) {
     if (fields['Region'].toLowerCase() === 'north') {
-      bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
-      console.log('✓ BCC: Adding Jodie (North region)');
+      bccRecipients.push('James Jago.Hamshaw@markebmedia.com');
+      console.log('✓ BCC: Adding James Jago (North region)');
     } else if (fields['Region'].toLowerCase() === 'south') {
-      bccRecipients.push('Maeve.Darley@markebmedia.com');
-      console.log('✓ BCC: Adding Maeve (South region)');
+      bccRecipients.push('Andrii.Hutovych@markebmedia.com');
+      console.log('✓ BCC: Adding Andrii (South region)');
     }
   }
 

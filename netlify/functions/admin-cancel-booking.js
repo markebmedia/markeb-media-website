@@ -329,15 +329,15 @@ async function sendCancellationEmail(data) {
   `;
 
   // ✅ Determine BCC recipients based on region
-  const bccRecipients = ['commercial@markebmedia.com'];
+  const bccRecipients = ['commercial@markebmedia.com', 'Jodie.Hamshaw@markebmedia.com'];
   
   if (region) {
     if (region.toLowerCase() === 'north') {
-      bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
-      console.log('✓ BCC: Adding Jodie (North region)');
+      bccRecipients.push('James Jago.Hamshaw@markebmedia.com');
+      console.log('✓ BCC: Adding James Jago (North region)');
     } else if (region.toLowerCase() === 'south') {
-      bccRecipients.push('Maeve.Darley@markebmedia.com');
-      console.log('✓ BCC: Adding Maeve (South region)');
+      bccRecipients.push('Andrii.Hutovych@markebmedia.com');
+      console.log('✓ BCC: Adding Andrii (South region)');
     }
   }
 

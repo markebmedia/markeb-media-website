@@ -133,7 +133,7 @@ async function sendWelcomeEmail(name, email, company) {
                             <div style="margin: 30px 0; text-align: center; background-color: #f7ead5; padding: 30px; border-radius: 8px; border: 1px solid #e8d9be;">
                                 <h2 style="margin: 0 0 15px; color: #3F4D1B; font-size: 20px; font-weight: 600;">Quick Start Guide</h2>
                                 <p style="margin: 0 0 20px; color: #6b7c2e; font-size: 14px;">Watch this 2-minute video to get the most out of your dashboard</p>
-                                <a href="https://youtu.be/5u-AC-X7juk" style="display: inline-block; background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); color: #FDF3E2; text-decoration: none; padding: 15px 35px; border-radius: 6px; font-weight: 600; font-size: 16px;">▶ Watch Onboarding Video</a>
+                                <a href="https://youtu.be/aOWwEN_Bv6g" style="display: inline-block; background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); color: #FDF3E2; text-decoration: none; padding: 15px 35px; border-radius: 6px; font-weight: 600; font-size: 16px;">▶ Watch Onboarding Video</a>
                             </div>
 
                             <h3 style="margin: 30px 0 20px; color: #3F4D1B; font-size: 18px; font-weight: 600;">Your Dashboard Features:</h3>

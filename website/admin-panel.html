@@ -1688,7 +1688,7 @@ body {
   <div style="display: flex; gap: 12px;">
     <select id="bookingSpecialist" class="form-input" onchange="handleSpecialistChange()" style="flex: 1;">
       <option value="">-- Select Specialist --</option>
-      <option value="Jodie">Jodie (North)</option>
+      <option value="James Jago">James Jago (North)</option>
       <option value="Andrii">Andrii (South)</option>
       <option value="other">Other / Enter manually...</option>
     </select>
@@ -2824,7 +2824,7 @@ We wanted to reach out..." required></textarea>
           <label class="form-label" for="blockRegion">Region *</label>
           <select id="blockRegion" class="form-input" required>
             <option value="">-- Select Region --</option>
-            <option value="North">North (Jodie)</option>
+            <option value="North">North (James Jago)</option>
             <option value="South">South (Andrii)</option>
           </select>
         </div>
@@ -3507,7 +3507,7 @@ function handleAdminAccessTypeChange() {
   const specialistSelect = document.getElementById('bookingSpecialist');
   
   if (region === 'North') {
-    specialistSelect.value = 'Jodie';
+    specialistSelect.value = 'James Jago';
   } else if (region === 'South') {
     specialistSelect.value = 'Andrii';
   }

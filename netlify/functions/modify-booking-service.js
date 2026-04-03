@@ -223,8 +223,8 @@ if (process.env.RESEND_API_KEY) {
     const bccRecipients = ['commercial@markebmedia.com'];
     if (booking.fields['Region']) {
       if (booking.fields['Region'].toLowerCase() === 'north') {
-        bccRecipients.push('Jodie.Hamshaw@markebmedia.com');
-        console.log('✓ BCC: Adding Jodie (North region)');
+        bccRecipients.push('James Jago.Hamshaw@markebmedia.com');
+        console.log('✓ BCC: Adding James Jago (North region)');
       } else if (booking.fields['Region'].toLowerCase() === 'south') {
         bccRecipients.push('andrii.Hutovych@markebmedia.com');
         console.log('✓ BCC: Adding Andrii (South region)');
