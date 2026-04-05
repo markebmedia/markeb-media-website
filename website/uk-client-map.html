@@ -675,6 +675,9 @@ body {
             <button class="panel-tab active" id="tabData" onclick="switchTab('data')">&#128203; Data</button>
             <button class="panel-tab" id="tabIntel" onclick="switchTab('intel')">&#127942; Intelligence</button>
           </div>
+          <button id="neverBookedToggle" onclick="showNeverBooked()" style="display:none;width:100%;margin-bottom:14px;padding:10px 14px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);border-radius:10px;color:#ef4444;font-weight:700;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;align-items:center;justify-content:center;gap:8px;transition:all .2s ease;">
+            <i data-lucide="user-x" style="width:14px;height:14px;"></i> Show Clients Who Haven't Booked
+          </button>
           <div id="tabDataContent">
             <h3 id="detailTitle" style="margin-bottom:12px;">All Clients</h3>
             <div id="detailContent"><div class="empty-state"><div class="spinner"></div><p class="empty-state-text">Loading data...</p></div></div>
@@ -811,11 +814,7 @@ body {
         <div id="monthlyTargetsGrid"></div>
       </div>
 
-      <div>
-        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px;display:flex;align-items:center;gap:6px;"><i data-lucide="flask-conical" style="width:13px;height:13px;"></i>Single Lever Analysis — 2026 Target</div>
-        <div id="sensContextBar" style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#475569;line-height:1.6;"></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;" id="sensitivityGrid"></div>
-      </div>
+      <div id="ltvAnalysisSection"></div>
     </div>
 
   </div><!-- end #performanceSection -->
@@ -839,7 +838,7 @@ body {
         <h3 style="font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;">
   <i data-lucide="activity" style="width:18px;height:18px;"></i> Outbound Activity — Leads Added (Outreach)
 </h3>
-<p style="font-size:13px;color:#64748b;margin-top:3px;">Tracks when leads were created in the pipeline · <strong style="color:#0f172a;">Target: 200/day · 1,000/week · 4,000/month</strong> · <span style="color:#10b981;font-weight:600;">Sign-Up target: 2/day · 10/week · 40/month</span></p>
+<p style="font-size:13px;color:#64748b;margin-top:3px;">Tracks when leads were created in the pipeline · <strong style="color:#0f172a;">Target: 400/day · 2,000/week · 8,000/month (200/day per BDM × 2 BDMs)</strong> · <span style="color:#10b981;font-weight:600;">Sign-Up target: 30/day · 150/week · 600/month (15/day per BDM)</span></p>
       </div>
       <div style="display:flex;gap:6px;background:#f1f5f9;border-radius:10px;padding:4px;border:1px solid #e2e8f0;">
         <button class="pipe-period-btn active" id="ppWeek"   onclick="setPipePeriod('week')">Weekly</button>
@@ -890,9 +889,17 @@ body {
   <!-- Lead source breakdown -->
   <div class="map-section" style="margin-bottom:24px;">
     <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:20px;display:flex;align-items:center;gap:8px;">
-      <i data-lucide="pie-chart" style="width:18px;height:18px;"></i> Lead Source Breakdown
+      <i data-lucide="pie-chart" style="width:18px;height:18px;"></i> Outbound vs Inbound Breakdown
     </h3>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;" id="leadSourceGrid"></div>
+  </div>
+
+  <!-- Channel breakdown -->
+  <div class="map-section" style="margin-bottom:24px;">
+    <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+      <i data-lucide="radio" style="width:18px;height:18px;"></i> Communication Channel Breakdown
+    </h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" id="channelBreakdownGrid"></div>
   </div>
 
   <!-- Recent sign-ups table -->
@@ -905,11 +912,13 @@ body {
         <thead>
           <tr>
             <th>Lead Name</th>
+            <th>Agency / Company</th>
+            <th>Location</th>
             <th>BDM</th>
-            <th>Lead Source</th>
+            <th>Direction</th>
+            <th>Channel</th>
             <th>Sign-Up Date</th>
             <th>Deal Value</th>
-            <th>Monthly Value</th>
           </tr>
         </thead>
         <tbody id="signUpTableBody"></tbody>
@@ -977,7 +986,8 @@ let pipelineData = [];
 let currentPipePeriod = 'week';
 let pipelineChartInstance = null;
 
-const REVENUE_TARGETS = { y1: 200000, y2: 500000, y3: 1000000 };
+const REVENUE_TARGETS = { y1: 360000, y2: 500000, y3: 1000000 }; // y1 = £30,000/mo × 12
+const MONTHLY_TARGET = 30000;
 
 function getCurrentYear() {
   const yr = new Date().getFullYear();
@@ -1617,6 +1627,8 @@ function updateBookingFilterCounts() {
 
 function setMainTab(tab) {
   currentMainTab = tab;
+  const neverBookedBtn = document.getElementById('neverBookedToggle');
+  if (neverBookedBtn) neverBookedBtn.style.display = tab === 'bookings' ? 'flex' : 'none';
   ['clients','bookings','performance','pipeline'].forEach(t => {
     const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
     btn.className = 'main-tab-btn' + (t === tab ? ' active ' + t : '');
@@ -1822,6 +1834,34 @@ function showAllClients() {
     ? '<div class="empty-state"><div class="empty-state-text">No clients found</div></div>'
     : items.map(c => clientCard(c)).join('')
       + (filteredClientData.length > 50 ? '<div style="text-align:center;padding:16px;color:#475569;font-size:12px;">Showing 50 of ' + filteredClientData.length + '</div>' : '');
+}
+
+function showNeverBooked() {
+  const bookedEmails = new Set(
+    bookingData
+      .filter(b => b.bookingStatus !== 'Cancelled' && b.clientEmail)
+      .map(b => (b.clientEmail || '').toLowerCase())
+  );
+  const neverBooked = clientData.filter(u => {
+    const email = (u.fields['Email'] || '').toLowerCase();
+    return email && !bookedEmails.has(email);
+  });
+
+  document.getElementById('detailTitle').textContent = 'Never Booked (' + neverBooked.length + ')';
+
+  const sorted = [...neverBooked].sort((a, b) => {
+    const dA = new Date(a.fields['Created Date'] || 0);
+    const dB = new Date(b.fields['Created Date'] || 0);
+    return dB - dA;
+  });
+
+  document.getElementById('detailContent').innerHTML = `
+    <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#ef4444;font-weight:600;">
+      ⚠ ${neverBooked.length} clients on the dashboard have never made a booking
+    </div>
+    ${sorted.length === 0
+      ? '<div class="empty-state"><div class="empty-state-text">All clients have booked — great work!</div></div>'
+      : sorted.map(c => clientCard(c)).join('')}`;
 }
 
 function showAllBookings() {
@@ -2373,128 +2413,175 @@ function renderRoadmap() {
       ${retCard}
     </div>` + funnelBox;
 
-  // ── Single Lever Sensitivity Analysis ──
+  // ── LTV-based Analysis ──
   const fmtSens = v => '£' + Math.round(v).toLocaleString();
-  const fmtPct  = v => (v * 100).toFixed(1) + '%';
+  const sensTargetRev = MONTHLY_TARGET;
 
-  const sensTargetRev = REVENUE_TARGETS.y1 / 12;
+  const liveATV2   = calcLiveATV();
+  const liveBPAM   = live.bookingsPerBookedClientPerMonth; // avg bookings per active client per month
+  const liveClients = live.totalDashboardClients;
+  const liveBooked  = live.clientsWhoBooked;
 
-  const curClients     = live.totalDashboardClients;
-  const curBookingRate = live.newClientBookingRate > 0 || live.existingClientBookingRate > 0
-    ? live.clientBookingRate : 0;
-  const curATV         = liveATV;
+  // Current monthly LTV model
+  // Monthly Revenue = Clients × BPAM × ATV
+  const currentMonthlyRev = liveBooked * liveBPAM * liveATV2;
 
-  const sensNow        = new Date();
-  const thisMonthKey2  = sensNow.toISOString().slice(0, 7);
-  const thisMonthBks   = bookingData.filter(b =>
-    b.bookingStatus !== 'Cancelled' &&
-    b.date && b.date.slice(0, 7) === thisMonthKey2
-  );
-  const thisMonthCount = thisMonthBks.length;
-  const thisMonthRev   = thisMonthBks.reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
+  // What each lever needs to be to hit £30,000/mo (holding others constant)
+  const neededATV_lever      = liveBPAM > 0 && liveBooked > 0 ? sensTargetRev / (liveBooked * liveBPAM) : null;
+  const neededBPAM_lever     = liveATV2 > 0 && liveBooked > 0 ? sensTargetRev / (liveBooked * liveATV2) : null;
+  const neededClients_lever  = liveATV2 > 0 && liveBPAM > 0   ? sensTargetRev / (liveBPAM * liveATV2)   : null;
 
-  const uniqueBookersThisMonth = new Set(thisMonthBks.map(b => (b.clientEmail||'').toLowerCase()).filter(Boolean)).size;
+  // Combined lever — what ATV and BPAM each need if both move equally toward target
+  // Keep ratio same, scale both up proportionally
+  const combinedMultiplier = currentMonthlyRev > 0 ? Math.sqrt(sensTargetRev / currentMonthlyRev) : null;
+  const combinedATV  = combinedMultiplier ? liveATV2  * combinedMultiplier : null;
+  const combinedBPAM = combinedMultiplier ? liveBPAM  * combinedMultiplier : null;
 
-  const neededClients = (curBookingRate > 0 && curATV > 0)
-    ? Math.ceil(sensTargetRev / (curBookingRate * curATV)) : null;
+  const gap = sensTargetRev - currentMonthlyRev;
+  const onTrackLTV = currentMonthlyRev >= sensTargetRev;
 
-  const totalBkNeededForRate = curATV > 0 ? sensTargetRev / curATV : null;
-  const neededBookingRate = (curClients > 0 && totalBkNeededForRate !== null)
-    ? Math.min(2, totalBkNeededForRate / curClients) : null;
+  const el = document.getElementById('ltvAnalysisSection');
+  if (!el) return;
 
-  const neededATV = thisMonthCount > 0
-    ? Math.ceil(sensTargetRev / thisMonthCount)
-    : (curClients > 0 && curBookingRate > 0
-      ? Math.ceil(sensTargetRev / (curClients * curBookingRate))
-      : null);
-
-  const totalBkNeededForFreq = curATV > 0 ? Math.ceil(sensTargetRev / curATV) : null;
-  const curBkPerBooker       = uniqueBookersThisMonth > 0 ? (thisMonthCount / uniqueBookersThisMonth).toFixed(1) : '0';
-  const neededBkPerBooker    = (totalBkNeededForFreq !== null && uniqueBookersThisMonth > 0)
-    ? (totalBkNeededForFreq / uniqueBookersThisMonth).toFixed(2) : null;
-
-  const curBRDisplay = fmtPct(curBookingRate);
-
-  const levers = [
-    {
-      icon: 'users', label: 'Dashboard Clients', color: '#3b82f6',
-      current: `${curClients} clients`,
-      currentSub: `${uniqueBookersThisMonth} unique clients booked · ${thisMonthCount} total bookings · ${fmtSens(curATV)} ATV`,
-      needed: neededClients !== null ? `${neededClients.toLocaleString()} clients` : '—',
-      change: neededClients !== null
-        ? neededClients > curClients
-          ? `We need ${neededClients.toLocaleString()} clients at ${curBRDisplay}/mo booking rate & ${fmtSens(curATV)} ATV — that's +${(neededClients - curClients).toLocaleString()} more than our current ${curClients}`
-          : `At current figures we already have enough clients — focus on rate or ATV`
-        : '—',
-      feasible: neededClients !== null,
-      held: `${curBRDisplay}/mo booking rate · ${fmtSens(curATV)} ATV`
-    },
-    {
-      icon: 'trending-up', label: 'Monthly Booking Rate', color: '#10b981',
-      current: `${curBRDisplay}/mo`,
-      currentSub: `${uniqueBookersThisMonth} unique clients booked this month (${thisMonthCount} total bookings)`,
-      needed: neededBookingRate !== null
-        ? neededBookingRate > 1 ? `${(neededBookingRate * 100).toFixed(1)}% (avg ${neededBookingRate.toFixed(1)}× per client)` : `${fmtPct(neededBookingRate)}/mo`
-        : '—',
-      change: neededBookingRate !== null
-        ? `We need ${Math.ceil(neededBookingRate * curClients)} bookings from our ${curClients} clients this month at ${fmtSens(curATV)} ATV — currently at ${uniqueBookersThisMonth}`
-        : '—',
-      feasible: neededBookingRate !== null,
-      held: `${curClients} clients · ${fmtSens(curATV)} ATV`
-    },
-    {
-      icon: 'pound-sterling', label: 'Avg Transaction Value', color: '#f59e0b',
-      current: `${fmtSens(curATV)} per booking`,
-      currentSub: `${thisMonthCount} booking${thisMonthCount !== 1 ? 's' : ''} this month · ${fmtSens(thisMonthRev)} total revenue`,
-      needed: neededATV !== null ? `${fmtSens(neededATV)} per booking` : '—',
-      change: neededATV !== null
-        ? `We need ${fmtSens(neededATV)} per job across our ${thisMonthCount} booking${thisMonthCount !== 1 ? 's' : ''} this month — currently averaging ${fmtSens(curATV)}, that's +${fmtSens(Math.max(0, neededATV - curATV))} more per job`
-        : '—',
-      feasible: neededATV !== null,
-      held: `${curClients} clients · ${curBRDisplay}/mo · ${thisMonthCount} bookings this month`
-    },
-    {
-      icon: 'repeat-2', label: 'Bookings per Client this Month', color: '#a78bfa',
-      current: `${curBkPerBooker}× per booking client`,
-      currentSub: `${uniqueBookersThisMonth} booking clients · ${thisMonthCount} total bookings`,
-      needed: neededBkPerBooker !== null ? `${neededBkPerBooker}× per booking client` : '—',
-      change: totalBkNeededForFreq !== null && uniqueBookersThisMonth > 0
-        ? `We need ${totalBkNeededForFreq} total bookings at ${fmtSens(curATV)} ATV — that's ${neededBkPerBooker}× from each of our ${uniqueBookersThisMonth} active clients, currently at ${curBkPerBooker}×`
-        : uniqueBookersThisMonth === 0 ? 'No bookings this month yet — rate and ATV levers are more actionable' : '—',
-      feasible: neededBkPerBooker !== null,
-      held: `${curClients} clients · ${curBRDisplay}/mo rate · ${fmtSens(curATV)} ATV`
-    }
-  ];
-
-  document.getElementById('sensContextBar').innerHTML =
-    `<strong style="color:#1e293b;">${curClients} clients · ${curBRDisplay}/mo · ${thisMonthCount} bookings · ${fmtSens(curATV)} ATV</strong><br>
-    <span style="color:#64748b;">If these figures remain the same and we focused only on one lever, here's what each would need to be to hit <strong style="color:#1e293b;">${fmtSens(sensTargetRev)}/mo target</strong></span>`;
-
-  document.getElementById('sensitivityGrid').innerHTML = levers.map(l => `
-    <div style="background:#fff;border:1px solid ${l.color}33;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);min-width:0;word-break:break-word;overflow-wrap:anywhere;">
-      <div style="background:linear-gradient(135deg,${l.color},${l.color}cc);padding:14px 16px 12px;">
-        <div style="margin-bottom:6px;"><i data-lucide="${l.icon}" style="width:20px;height:20px;color:#fff;opacity:0.9;"></i></div>
-        <div style="font-size:12px;font-weight:700;color:#fff;letter-spacing:0.3px;">${l.label}</div>
+  el.innerHTML = `
+    <div style="margin-top:28px;">
+      <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:16px;display:flex;align-items:center;gap:6px;">
+        <i data-lucide="target" style="width:13px;height:13px;"></i>LTV Revenue Model — Road to £30,000/mo
       </div>
-      <div style="padding:14px 16px;">
-        <div style="background:${l.feasible ? l.color+'10' : 'rgba(239,68,68,0.08)'};border-left:3px solid ${l.feasible ? l.color : '#ef4444'};border-radius:0 6px 6px 0;padding:7px 10px;margin-bottom:12px;">
-          <div style="font-size:11px;font-weight:700;color:${l.feasible ? l.color : '#ef4444'};line-height:1.4;">${l.change}</div>
-        </div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:0;">
-          <div style="flex:1;min-width:80px;background:#f8fafc;border-radius:8px;padding:9px 11px;">
-            <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Now</div>
-            <div style="font-size:13px;font-weight:700;color:#475569;line-height:1.3;">${l.current}</div>
-            <div style="font-size:10px;color:#94a3b8;margin-top:3px;">${l.currentSub}</div>
+
+      <!-- Current LTV snapshot -->
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px 24px;margin-bottom:16px;">
+        <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;">Current Position</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px;">
+          <div style="background:#f8fafc;border-radius:10px;padding:14px;text-align:center;">
+            <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Avg Transaction Value</div>
+            <div style="font-size:26px;font-weight:800;color:#06b6d4;">${fmtSens(liveATV2)}</div>
           </div>
-          <div style="display:flex;align-items:center;color:#94a3b8;font-size:14px;flex-shrink:0;">→</div>
-          <div style="flex:1;min-width:80px;background:${l.color}12;border:1.5px solid ${l.color}44;border-radius:8px;padding:9px 11px;">
-            <div style="font-size:9px;font-weight:700;color:${l.color};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Needs to be</div>
-            <div style="font-size:13px;font-weight:800;color:${l.feasible ? l.color : '#ef4444'};line-height:1.3;">${l.needed}</div>
+          <div style="background:#f8fafc;border-radius:10px;padding:14px;text-align:center;">
+            <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Bookings per Active Client/mo</div>
+            <div style="font-size:26px;font-weight:800;color:#ec4899;">${liveBPAM.toFixed(2)}×</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:10px;padding:14px;text-align:center;">
+            <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Avg LTV per Active Client/mo</div>
+            <div style="font-size:26px;font-weight:800;color:#8b5cf6;">${fmtSens(liveATV2 * liveBPAM)}</div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:4px;">ATV × BPAM</div>
+          </div>
+          <div style="background:#f8fafc;border-radius:10px;padding:14px;text-align:center;">
+            <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Active Booking Clients</div>
+            <div style="font-size:26px;font-weight:800;color:#f59e0b;">${liveBooked}</div>
+          </div>
+          <div style="background:${onTrackLTV ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)'};border:1.5px solid ${onTrackLTV ? '#10b981' : '#ef4444'}44;border-radius:10px;padding:14px;text-align:center;">
+            <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Current Monthly Rev Model</div>
+            <div style="font-size:26px;font-weight:800;color:${onTrackLTV ? '#10b981' : '#ef4444'};">${fmtSens(currentMonthlyRev)}</div>
+            <div style="font-size:10px;color:${onTrackLTV ? '#10b981' : '#ef4444'};margin-top:4px;font-weight:600;">${onTrackLTV ? '✓ At target' : fmtSens(gap) + ' gap'}</div>
           </div>
         </div>
-        <div style="text-align:center;padding:6px 0 0;font-size:12px;color:#94a3b8;">= <strong style="color:#1e293b;font-size:14px;">${fmtSens(sensTargetRev)}/mo target</strong></div>
+        <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:12px;color:#475569;line-height:1.7;">
+          <strong style="color:#334155;">Formula:</strong> ${liveBooked} active clients × ${liveBPAM.toFixed(2)} bookings/mo × ${fmtSens(liveATV2)} ATV = <strong style="color:#0f172a;">${fmtSens(currentMonthlyRev)}/mo</strong>
+          &nbsp;·&nbsp; Target: <strong style="color:#0f172a;">${fmtSens(sensTargetRev)}/mo</strong>
+          &nbsp;·&nbsp; Gap: <strong style="color:${onTrackLTV ? '#10b981' : '#ef4444'};">${onTrackLTV ? '0 — at target' : fmtSens(gap)}</strong>
+        </div>
       </div>
-    </div>`).join('');
+
+      <!-- Combined lever summary -->
+      ${combinedATV && combinedBPAM ? `
+      <div style="background:linear-gradient(135deg,#3F4D1B08,#3F4D1B14);border:1.5px solid #3F4D1B33;border-radius:14px;padding:18px 22px;margin-bottom:16px;">
+        <div style="font-size:12px;font-weight:700;color:#3F4D1B;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">
+          <i data-lucide="zap" style="width:13px;height:13px;vertical-align:-2px;margin-right:4px;"></i>Balanced Approach — Increase Both Levers Together
+        </div>
+        <div style="font-size:13px;color:#334155;line-height:1.7;margin-bottom:12px;">
+          To hit <strong>${fmtSens(sensTargetRev)}/mo</strong>, increase ATV to <strong style="color:#06b6d4;">${fmtSens(combinedATV)}</strong> and bookings per active client/mo to <strong style="color:#ec4899;">${combinedBPAM.toFixed(2)}×</strong> — a <strong>${((combinedMultiplier - 1) * 100).toFixed(1)}% lift on each lever</strong>.
+          That means each active client generates <strong style="color:#8b5cf6;">${fmtSens(combinedATV * combinedBPAM)}/mo</strong> in LTV, and with <strong>${liveBooked} active clients</strong> you hit the target.
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div style="background:#fff;border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;">
+            <div><div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;">ATV</div><div style="font-size:11px;color:#64748b;margin-top:2px;">Now: ${fmtSens(liveATV2)}</div></div>
+            <div style="text-align:right;"><div style="font-size:20px;font-weight:800;color:#06b6d4;">${fmtSens(combinedATV)}</div><div style="font-size:10px;color:#06b6d4;">+${fmtSens(combinedATV - liveATV2)}</div></div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;">
+            <div><div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;">Bookings/mo per Client</div><div style="font-size:11px;color:#64748b;margin-top:2px;">Now: ${liveBPAM.toFixed(2)}×</div></div>
+            <div style="text-align:right;"><div style="font-size:20px;font-weight:800;color:#ec4899;">${combinedBPAM.toFixed(2)}×</div><div style="font-size:10px;color:#ec4899;">+${(combinedBPAM - liveBPAM).toFixed(2)}×</div></div>
+          </div>
+        </div>
+      </div>` : ''}
+
+      <!-- Single lever cards -->
+      <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:12px;">Single Lever — If You Could Only Change One Thing</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+
+        <!-- Lever 1: ATV -->
+        <div style="background:#fff;border:1.5px solid #06b6d433;border-radius:14px;overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#06b6d4,#0891b2);padding:14px 16px;">
+            <i data-lucide="pound-sterling" style="width:18px;height:18px;color:#fff;margin-bottom:4px;"></i>
+            <div style="font-size:12px;font-weight:700;color:#fff;">Increase ATV Only</div>
+            <div style="font-size:10px;color:#cffafe;margin-top:2px;">Hold clients and BPAM constant</div>
+          </div>
+          <div style="padding:14px 16px;">
+            <div style="background:#ecfeff;border-left:3px solid #06b6d4;border-radius:0 6px 6px 0;padding:8px 10px;margin-bottom:12px;font-size:11px;color:#164e63;line-height:1.5;">
+              Each booking needs to be worth <strong>${neededATV_lever ? fmtSens(neededATV_lever) : '—'}</strong> — charge more per shoot, upsell packages, or reduce discounting.
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;background:#f8fafc;border-radius:8px;padding:10px 12px;margin-bottom:8px;">
+              <div style="font-size:11px;color:#64748b;">Now</div>
+              <div style="font-size:16px;font-weight:700;color:#475569;">${fmtSens(liveATV2)}</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;background:#ecfeff;border:1.5px solid #06b6d444;border-radius:8px;padding:10px 12px;">
+              <div style="font-size:11px;color:#64748b;">Needs to be</div>
+              <div style="font-size:20px;font-weight:800;color:#06b6d4;">${neededATV_lever ? fmtSens(neededATV_lever) : '—'}</div>
+            </div>
+            <div style="text-align:center;margin-top:10px;font-size:11px;color:#94a3b8;">= <strong style="color:#0f172a;">${fmtSens(sensTargetRev)}/mo</strong> with ${liveBooked} clients at ${liveBPAM.toFixed(2)}× BPAM</div>
+          </div>
+        </div>
+
+        <!-- Lever 2: BPAM -->
+        <div style="background:#fff;border:1.5px solid #ec489933;border-radius:14px;overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#ec4899,#db2777);padding:14px 16px;">
+            <i data-lucide="repeat-2" style="width:18px;height:18px;color:#fff;margin-bottom:4px;"></i>
+            <div style="font-size:12px;font-weight:700;color:#fff;">Increase Bookings/mo per Client Only</div>
+            <div style="font-size:10px;color:#fce7f3;margin-top:2px;">Hold clients and ATV constant</div>
+          </div>
+          <div style="padding:14px 16px;">
+            <div style="background:#fdf2f8;border-left:3px solid #ec4899;border-radius:0 6px 6px 0;padding:8px 10px;margin-bottom:12px;font-size:11px;color:#831843;line-height:1.5;">
+              Each active client needs to book <strong>${neededBPAM_lever ? neededBPAM_lever.toFixed(2) + '×/mo' : '—'}</strong> — improve retention, re-engage dormant clients, and increase shoot frequency.
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;background:#f8fafc;border-radius:8px;padding:10px 12px;margin-bottom:8px;">
+              <div style="font-size:11px;color:#64748b;">Now</div>
+              <div style="font-size:16px;font-weight:700;color:#475569;">${liveBPAM.toFixed(2)}×/mo</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;background:#fdf2f8;border:1.5px solid #ec489944;border-radius:8px;padding:10px 12px;">
+              <div style="font-size:11px;color:#64748b;">Needs to be</div>
+              <div style="font-size:20px;font-weight:800;color:#ec4899;">${neededBPAM_lever ? neededBPAM_lever.toFixed(2) + '×' : '—'}</div>
+            </div>
+            <div style="text-align:center;margin-top:10px;font-size:11px;color:#94a3b8;">= <strong style="color:#0f172a;">${fmtSens(sensTargetRev)}/mo</strong> with ${liveBooked} clients at ${fmtSens(liveATV2)} ATV</div>
+          </div>
+        </div>
+
+        <!-- Lever 3: Clients -->
+        <div style="background:#fff;border:1.5px solid #f59e0b33;border-radius:14px;overflow:hidden;">
+          <div style="background:linear-gradient(135deg,#f59e0b,#d97706);padding:14px 16px;">
+            <i data-lucide="users" style="width:18px;height:18px;color:#fff;margin-bottom:4px;"></i>
+            <div style="font-size:12px;font-weight:700;color:#fff;">Increase Active Clients Only</div>
+            <div style="font-size:10px;color:#fef3c7;margin-top:2px;">Hold ATV and BPAM constant</div>
+          </div>
+          <div style="padding:14px 16px;">
+            <div style="background:#fffbeb;border-left:3px solid #f59e0b;border-radius:0 6px 6px 0;padding:8px 10px;margin-bottom:12px;font-size:11px;color:#78350f;line-height:1.5;">
+              Need <strong>${neededClients_lever ? Math.ceil(neededClients_lever) : '—'} active booking clients</strong> — that's <strong>${neededClients_lever ? Math.ceil(neededClients_lever - liveBooked) : '—'} more</strong> than today booking at the current rate and ATV.
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;background:#f8fafc;border-radius:8px;padding:10px 12px;margin-bottom:8px;">
+              <div style="font-size:11px;color:#64748b;">Now</div>
+              <div style="font-size:16px;font-weight:700;color:#475569;">${liveBooked} clients</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;background:#fffbeb;border:1.5px solid #f59e0b44;border-radius:8px;padding:10px 12px;">
+              <div style="font-size:11px;color:#64748b;">Needs to be</div>
+              <div style="font-size:20px;font-weight:800;color:#f59e0b;">${neededClients_lever ? Math.ceil(neededClients_lever) : '—'}</div>
+            </div>
+            <div style="text-align:center;margin-top:10px;font-size:11px;color:#94a3b8;">= <strong style="color:#0f172a;">${fmtSens(sensTargetRev)}/mo</strong> at ${liveBPAM.toFixed(2)}× BPAM and ${fmtSens(liveATV2)} ATV</div>
+          </div>
+        </div>
+
+      </div>
+    </div>`;
+
+  lucide.createIcons();
 }
 
 // ── Client Intelligence ──
@@ -2684,6 +2771,7 @@ function renderPipelineSection() {
   renderBDMLeaderboard();
   renderLeadSources();
   renderRecentSignUps();
+  renderChannelBreakdown();
   renderPipelineChart();
   lucide.createIcons();
 }
@@ -2785,10 +2873,11 @@ function renderBDMLeaderboard() {
 function renderLeadSources() {
   const sourceMap = {};
   pipelineData.forEach(r => {
-    const src = r.leadSource || 'Unknown';
-    if (!sourceMap[src]) sourceMap[src] = { total:0, signedUp:0 };
-    sourceMap[src].total++;
-    if (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed Won') sourceMap[src].signedUp++;
+    // Primary split: Outbound vs Inbound
+    const direction = r.outboundOrInbound || 'Unknown';
+    if (!sourceMap[direction]) sourceMap[direction] = { total:0, signedUp:0 };
+    sourceMap[direction].total++;
+    if (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed Won') sourceMap[direction].signedUp++;
   });
 
   const sorted = Object.entries(sourceMap).sort((a,b) => b[1].total - a[1].total);
@@ -2819,12 +2908,62 @@ function renderRecentSignUps() {
     ? `<tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b;">No sign-up dates recorded yet</td></tr>`
     : signedUp.map(r => `<tr>
         <td class="metric-name">${r.leadName || '—'}</td>
+        <td>${r.agencyCompany || '—'}</td>
+        <td>${r.location || '—'}</td>
         <td>${r.bdm || '—'}</td>
-        <td>${r.leadSource || '—'}</td>
+        <td>${r.outboundOrInbound || '—'}</td>
+        <td>${r.outboundOrInbound === 'Outbound' ? (r.outboundChannel || '—') : (r.inboundChannel || '—')}</td>
         <td>${formatDate(r.dashboardSignUpDate)}</td>
         <td>${r.dealValue > 0 ? '£' + Math.round(r.dealValue).toLocaleString() : '—'}</td>
-        <td>${r.monthlyContractValue > 0 ? '£' + Math.round(r.monthlyContractValue).toLocaleString() + '/mo' : '—'}</td>
       </tr>`).join('');
+}
+
+function renderChannelBreakdown() {
+  const outboundMap = {};
+  const inboundMap  = {};
+
+  pipelineData.forEach(r => {
+    const isOut = r.outboundOrInbound === 'Outbound';
+    const ch    = isOut ? (r.outboundChannel || 'Unknown') : (r.inboundChannel || 'Unknown');
+    if (!ch || ch === 'N/A') return;
+    const map   = isOut ? outboundMap : inboundMap;
+    if (!map[ch]) map[ch] = { total:0, signedUp:0 };
+    map[ch].total++;
+    if (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed Won') map[ch].signedUp++;
+  });
+
+  const colours = ['#3b82f6','#10b981','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899','#84cc16'];
+
+  function buildGrid(map, label, baseCol) {
+    const sorted = Object.entries(map).sort((a,b) => b[1].total - a[1].total);
+    if (sorted.length === 0) return `<div style="color:#64748b;font-size:13px;">No ${label} data</div>`;
+    return `
+      <div>
+        <div style="font-size:13px;font-weight:700;color:${baseCol};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">${label} Channels</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${sorted.map(([ch, d], i) => {
+            const rate = d.total > 0 ? ((d.signedUp / d.total) * 100).toFixed(1) : '0.0';
+            const col  = colours[i % colours.length];
+            const barW = Math.round((d.total / sorted[0][1].total) * 100);
+            return `<div style="background:#fff;border:1px solid ${col}33;border-radius:10px;padding:12px 14px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-size:12px;font-weight:700;color:#0f172a;">${ch}</span>
+                <span style="font-size:11px;color:#64748b;">${d.signedUp} sign-ups · <strong style="color:#10b981;">${rate}%</strong></span>
+              </div>
+              <div style="background:#f1f5f9;border-radius:4px;height:8px;overflow:hidden;">
+                <div style="width:${barW}%;height:100%;background:${col};border-radius:4px;transition:width 1s ease;"></div>
+              </div>
+              <div style="font-size:11px;color:#64748b;margin-top:4px;">${d.total} leads</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+
+  const el = document.getElementById('channelBreakdownGrid');
+  if (el) {
+    el.innerHTML = buildGrid(outboundMap, 'Outbound', '#3b82f6') + buildGrid(inboundMap, 'Inbound', '#10b981');
+  }
 }
 
 function renderPipelineChart() {
@@ -2900,20 +3039,22 @@ function renderPipelineChart() {
                       : currentPipePeriod === 'day'   ? 'today'
                       : currentPipePeriod === 'month' ? 'this month' : 'this year';
 
+  
   const outreachTargetLine = buckets.map(() =>
-    currentPipePeriod === 'week'  ? 1000
-: currentPipePeriod === 'day'   ? 200
-: currentPipePeriod === 'month' ? 4000
-: 52000
+    currentPipePeriod === 'week'  ? 1000 * BDM_COUNT
+  : currentPipePeriod === 'day'   ? 200  * BDM_COUNT
+  : currentPipePeriod === 'month' ? 4000 * BDM_COUNT
+  : 52000 * BDM_COUNT
   );
 
-const DAILY_TARGET   = 200;
-const WEEKLY_TARGET  = 1000;  // 200 × 5 days
-const MONTHLY_TARGET = 4000;  // 200 × 20 working days
-  const outreachTarget = currentPipePeriod === 'week'  ? WEEKLY_TARGET
-                       : currentPipePeriod === 'day'   ? DAILY_TARGET
+const BDM_COUNT      = 2;
+const DAILY_TARGET   = 200 * BDM_COUNT;   // 400 — 200/day per BDM
+const WEEKLY_TARGET  = 1000 * BDM_COUNT;  // 2,000 — 1,000/week per BDM
+const MONTHLY_TARGET = 4000 * BDM_COUNT;  // 8,000 — 4,000/month per BDM
+  const outreachTarget = currentPipePeriod === 'day'   ? DAILY_TARGET
+                       : currentPipePeriod === 'week'  ? WEEKLY_TARGET
                        : currentPipePeriod === 'month' ? MONTHLY_TARGET
-                       : 52000;
+                       : 52000 * BDM_COUNT;
   const outreachOnTrack = lastBucket >= outreachTarget;
   const outreachPct     = outreachTarget > 0 ? ((lastBucket / outreachTarget) * 100).toFixed(1) : '0.0';
   const outreachGap     = Math.max(0, outreachTarget - lastBucket);
@@ -2940,8 +3081,8 @@ const MONTHLY_TARGET = 4000;  // 200 × 20 working days
     </div>
     <div style="width:100%;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-top:4px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <span style="font-size:11px;font-weight:700;color:#94a3b8;">Outreach Progress vs ${currentPipePeriod === 'week' ? 'Weekly (1,000)' : currentPipePeriod === 'day' ? 'Daily (200)' : currentPipePeriod === 'month' ? 'Monthly (4,000)' : 'Yearly (52,000)'} Target</span>
-        <span style="font-size:11px;font-weight:700;color:#94a3b8;">Daily target: 200 · Weekly: 1,000 · Monthly: 4,000 · 5-day working week</span>
+        <span style="font-size:11px;font-weight:700;color:#94a3b8;">Outreach Progress vs ${currentPipePeriod === 'week' ? 'Weekly (2,000)' : currentPipePeriod === 'day' ? 'Daily (400)' : currentPipePeriod === 'month' ? 'Monthly (8,000)' : 'Yearly (104,000)'} Target</span>
+        <span style="font-size:11px;font-weight:700;color:#94a3b8;">Per BDM: 200/day · 1,000/week · 4,000/month · Team total (×2): 400/day · 2,000/week · 8,000/month</span>
       </div>
       <div style="background:#e2e8f0;border-radius:6px;height:10px;overflow:hidden;">
         <div style="width:${Math.min(parseFloat(outreachPct), 100)}%;height:100%;background:${outreachOnTrack ? 'linear-gradient(90deg,#10b981,#3b82f6)' : 'linear-gradient(90deg,#f59e0b,#ef4444)'};border-radius:6px;transition:width 1s ease;"></div>
@@ -2988,12 +3129,12 @@ const MONTHLY_TARGET = 4000;  // 200 × 20 working days
           order: 0
         },
         {
-          label: 'Sign-Up Target',
+          label: 'Sign-Up Target (15/day per BDM)',
           data: buckets.map(() =>
-            currentPipePeriod === 'week'  ? 10
-            : currentPipePeriod === 'day'   ? 2
-            : currentPipePeriod === 'month' ? 40
-            : 520
+            currentPipePeriod === 'week'  ? 75  * BDM_COUNT   // 15 sign-ups/week per BDM × 5 days
+            : currentPipePeriod === 'day'   ? 15 * BDM_COUNT   // 15/day per BDM
+            : currentPipePeriod === 'month' ? 300 * BDM_COUNT  // 15 × 20 working days per BDM
+            : 3600 * BDM_COUNT                                 // yearly
           ),
           borderColor: '#10b981',
           backgroundColor: 'transparent',

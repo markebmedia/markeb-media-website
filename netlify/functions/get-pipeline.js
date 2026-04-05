@@ -82,18 +82,29 @@ async function fetchAllRecords() {
     (data.records || []).forEach(r => {
       const f = r.fields;
       all.push({
-        id:                   r.id,
-        leadName:             f['Lead Name']                              || '',
-        bdm:                  resolveBDM(f['Business Development Manager']),
-        leadSource:           f['Lead Source']                            || '',
-        salesStage:           normaliseStage(f['Sales Stage']),
-        dashboardSignUpDate:  f['Dashboard Sign Up Date']                 || null,
-        closeDate:            f['Close Date']                             || null,
-        dealValue:            parseFloat(f['Deal Value (£)'])             || 0,
-        contractLength:       parseFloat(f['Contract Length (Months)'])   || 0,
-        monthlyContractValue: parseFloat(f['Monthly Contract Value (£)']) || 0,
-        notes:                f['Notes']                                  || '',
-        createdTime:          r.createdTime                               || null
+id:                        r.id,
+leadName:                  f['Lead Name']                       || '',
+location:                  f['Location']                        || '',
+agencyCompany:             f['Agency/Company Name']             || '',
+email:                     f['Email']                           || '',
+phone:                     f['Phone']                           || '',
+bdm:                       resolveBDM(f['Business Development Manager']),
+outboundOrInbound:         f['Outbound or Inbound']             || '',
+outboundChannel:           f['Outbound Communication Channel']  || '',
+inboundChannel:            f['Inbound Communication Channel']   || '',
+outboundPitch:             f['Outbound Communication Pitch']    || '',
+referral:                  f['Referral']                        || '',
+salesStage:                normaliseStage(f['Sales Stage']),
+salesStageNotes:           f['Sales Stage Notes']               || '',
+meetingStatus:             f['Meeting Status']                  || '',
+meetingType:               f['Meeting Type']                    || '',
+meetingDate:               f['Meeting Date']                    || null,
+dashboardSignUpDate:       f['Dashboard Sign Up Date']          || null,
+closeDate:                 f['Close Date']                      || null,
+dealValue:                 parseFloat(f['Deal Value (£)'])      || 0,
+monthlyContractValue:      parseFloat(f['Monthly Contract Value (£)']) || 0,
+notes:                     f['Sales Stage Notes']               || '',
+createdTime:               r.createdTime                        || null
       });
     });
 
