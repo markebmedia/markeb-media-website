@@ -3040,17 +3040,17 @@ function renderPipelineChart() {
                       : currentPipePeriod === 'month' ? 'this month' : 'this year';
 
   
+  const BDM_COUNT      = 2;
+const DAILY_TARGET   = 200 * BDM_COUNT;
+const WEEKLY_TARGET  = 1000 * BDM_COUNT;
+const MONTHLY_TARGET = 4000 * BDM_COUNT;
+
   const outreachTargetLine = buckets.map(() =>
-    currentPipePeriod === 'week'  ? 1000 * BDM_COUNT
-  : currentPipePeriod === 'day'   ? 200  * BDM_COUNT
+    currentPipePeriod === 'day'   ? 200  * BDM_COUNT
+  : currentPipePeriod === 'week'  ? 1000 * BDM_COUNT
   : currentPipePeriod === 'month' ? 4000 * BDM_COUNT
   : 52000 * BDM_COUNT
   );
-
-const BDM_COUNT      = 2;
-const DAILY_TARGET   = 200 * BDM_COUNT;   // 400 — 200/day per BDM
-const WEEKLY_TARGET  = 1000 * BDM_COUNT;  // 2,000 — 1,000/week per BDM
-const MONTHLY_TARGET = 4000 * BDM_COUNT;  // 8,000 — 4,000/month per BDM
   const outreachTarget = currentPipePeriod === 'day'   ? DAILY_TARGET
                        : currentPipePeriod === 'week'  ? WEEKLY_TARGET
                        : currentPipePeriod === 'month' ? MONTHLY_TARGET
