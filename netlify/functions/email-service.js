@@ -4,7 +4,7 @@ const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL = 'Markeb Media <commercial@markebmedia.com>';
-const BCC_EMAIL = 'commercial@markebmedia.com, Jodie.Hamshaw@markebmedia.com';
+const BCC_EMAIL = 'commercial@markebmedia.com';
 const SITE_URL = 'https://markebmedia.com';
 const LOGO_URL = 'https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png';
 const MANAGE_BOOKING_PATH = '/manage-booking';
