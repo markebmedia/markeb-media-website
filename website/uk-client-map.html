@@ -1120,6 +1120,7 @@ function calcLiveMonthlyAverages() {
     bookingData
       .filter(b => b.bookingStatus !== 'Cancelled' && b.clientEmail && b.date && (now90 - new Date(b.date)) <= ninetyDays)
       .map(b => (b.clientEmail || '').toLowerCase())
+      .filter(e => everBookedPool.has(e) || firstTimeBookersThisMonth.has(e))
   );
   const clientsWhoBooked = activeClients.size;
   const clientBookingMonths = {};
