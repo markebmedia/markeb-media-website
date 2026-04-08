@@ -387,13 +387,13 @@ async function sendBookingConfirmation(booking) {
 
   const emailHtml = getEmailLayout(content);
 
-  let bccRecipients = BCC_EMAIL;
+  const bccRecipients = [BCC_EMAIL];
   
   if (booking.region) {
     if (booking.region.toLowerCase() === 'north') {
-      bccRecipients += ', James.Jago@markebmedia.com';
+      bccRecipients.push('James.Jago@markebmedia.com');
     } else if (booking.region.toLowerCase() === 'south') {
-      bccRecipients += ', Andrii.Hutovych@markebmedia.com';
+      bccRecipients.push('Andrii.Hutovych@markebmedia.com');
     }
   }
 
