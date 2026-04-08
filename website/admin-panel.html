@@ -4621,6 +4621,9 @@ function viewBookingById(bookingId) {
         <button class="btn btn-danger" onclick="showAdminCancel('${booking.id}')">
           <i data-lucide="x-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Cancel
         </button>
+        <button class="btn" style="background:linear-gradient(135deg,#B46100,#8a4a00);color:#fff;grid-column:1/-1;" onclick="resendConfirmationEmail('${booking.id}', '${fields['Client Email']}', this)">
+          <i data-lucide="send" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Resend Confirmation Email
+        </button>
       </div>
     </div>
   `;
@@ -8267,6 +8270,37 @@ function handleAdminSqftInput() {
   }
 
   calculateBookingPrice();
+}
+
+async function resendConfirmationEmail(bookingId, clientEmail, btn) {
+  if (!confirm(`Resend the branded confirmation email to ${clientEmail}?\n\nThis will fire the full Markeb Media confirmation template.`)) return;
+
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i data-lucide="send" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Sending...';
+  lucide.createIcons();
+
+  try {
+    const res = await fetch('/.netlify/functions/resend-confirmation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      alert(`✅ Confirmation email resent to ${data.sentTo}`);
+    } else {
+      alert(`❌ Failed: ${data.error}`);
+    }
+  } catch (err) {
+    alert('❌ Network error: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+    lucide.createIcons();
+  }
 }
 
 // Auto-fetch saved Stripe payment method for admin bookings

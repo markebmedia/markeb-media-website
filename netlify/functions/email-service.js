@@ -4,7 +4,7 @@ const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL = 'Markeb Media <commercial@markebmedia.com>';
-const BCC_EMAIL = ['commercial@markebmedia.com', 'Jodie.Hamshaw@markebmedia.com'];
+const BCC_EMAIL = 'commercial@markebmedia.com, Jodie.Hamshaw@markebmedia.com';
 const SITE_URL = 'https://markebmedia.com';
 const LOGO_URL = 'https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png';
 const MANAGE_BOOKING_PATH = '/manage-booking';
@@ -387,13 +387,13 @@ async function sendBookingConfirmation(booking) {
 
   const emailHtml = getEmailLayout(content);
 
-  const bccRecipients = [BCC_EMAIL];
+  let bccRecipients = BCC_EMAIL;
   
   if (booking.region) {
     if (booking.region.toLowerCase() === 'north') {
-      bccRecipients.push('James.Jago@markebmedia.com');
+      bccRecipients += ', James.Jago@markebmedia.com';
     } else if (booking.region.toLowerCase() === 'south') {
-      bccRecipients.push('Andrii.Hutovych@markebmedia.com');
+      bccRecipients += ', Andrii.Hutovych@markebmedia.com';
     }
   }
 

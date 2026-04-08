@@ -606,9 +606,9 @@ body {
 
     <div class="stats-overview" id="intelStats">
       <div class="stat-card" style="border-color:#f59e0b20;"><div class="stat-value gold" id="intelBookingRate" style="color:#f59e0b;">-</div><div class="stat-label">Overall Booking Rate</div></div>
-      <div class="stat-card"><div class="stat-value green" id="intelAvgLTV" style="color:#10b981;">-</div><div class="stat-label">Avg Client LTV</div></div>
+      <div class="stat-card"><div class="stat-value green" id="intelAvgLTV" style="color:#10b981;">-</div><div class="stat-label">Avg Realised LTV</div></div>
       <div class="stat-card"><div class="stat-value purple" id="intelAvgBookings" style="color:#8b5cf6;">-</div><div class="stat-label">Avg Bookings / Client</div></div>
-      <div class="stat-card"><div class="stat-value gold" id="intelTotalLTV" style="color:#f59e0b;">-</div><div class="stat-label">Total Client LTV</div></div>
+      <div class="stat-card"><div class="stat-value gold" id="intelTotalLTV" style="color:#f59e0b;">-</div><div class="stat-label">Total Realised LTV</div></div>
       <div class="stat-card"><div class="stat-value" id="intelNeverBooked">-</div><div class="stat-label">Never Booked</div></div>
       <div class="stat-card"><div class="stat-value" id="intelATV" style="color:#06b6d4;">-</div><div class="stat-label">Avg Transaction Value</div></div>
     </div>
@@ -1264,6 +1264,38 @@ function getYearTarget(metric) {
 //  NEW INSIGHT CARDS
 // ══════════════════════════════════════════════════════════════
 
+function calcLiveLifespan() {
+  // Returns avg client lifespan in months (first booking → last booking, or → now if active in last 90 days)
+  const now = new Date();
+  const ninetyDays = 90 * 24 * 60 * 60 * 1000;
+  const clientBookingDates = {};
+  bookingData
+    .filter(b => b.date && b.bookingStatus !== 'Cancelled' && b.clientEmail)
+    .forEach(b => {
+      const email = (b.clientEmail || '').toLowerCase();
+      const d = new Date(b.date);
+      if (!clientBookingDates[email]) clientBookingDates[email] = { first: d, last: d };
+      if (d < clientBookingDates[email].first) clientBookingDates[email].first = d;
+      if (d > clientBookingDates[email].last)  clientBookingDates[email].last  = d;
+    });
+  const lifespans = [];
+  Object.values(clientBookingDates).forEach(({ first, last }) => {
+    // If last booking is within 90 days, treat as still active → lifespan to now
+    const effectiveLast = (now - last) < ninetyDays ? now : last;
+    const months = (effectiveLast - first) / (1000 * 60 * 60 * 24 * 30.44);
+    lifespans.push(Math.max(1, months)); // minimum 1 month
+  });
+  if (lifespans.length === 0) return 1;
+  return lifespans.reduce((s, v) => s + v, 0) / lifespans.length;
+}
+
+function calcClientLTV(email, avgLifespanMonths) {
+  // True LTV = ATV × BPAM × lifespan for a specific client
+  // For individual clients in leaderboard: use their actual spend (already real LTV)
+  // This helper is for the aggregate model
+  return calcLiveATV() * calcLiveMonthlyAverages().bookingsPerBookedClientPerMonth * avgLifespanMonths;
+}
+
 function calcInsightCards() {
   const now = new Date();
   const thisMonthKey = now.toISOString().slice(0, 7);
@@ -1473,15 +1505,25 @@ function renderInsightCards() {
   alert: false
 },
 {
-  color: '#ec4899',
-  bg: '#fdf2f8',
-  icon: 'repeat-2',
-  label: 'Avg Bookings per Active Month',
-  value: calcLiveMonthlyAverages().bookingsPerBookedClientPerMonth.toFixed(2) + '×',
-  valueSuffix: '',
-  sub: `Avg across ${Math.round(calcLiveMonthlyAverages().clientsWhoBooked)} clients who have booked · total bookings ÷ distinct months booked`,
-  alert: false
-}
+      color: '#ec4899',
+      bg: '#fdf2f8',
+      icon: 'repeat-2',
+      label: 'Avg Bookings per Active Month (BPAM)',
+      value: calcLiveMonthlyAverages().bookingsPerBookedClientPerMonth.toFixed(2) + '×',
+      valueSuffix: '',
+      sub: `Avg across ${Math.round(calcLiveMonthlyAverages().clientsWhoBooked)} clients who have booked · total bookings ÷ distinct months booked · used in MRR formula`,
+      alert: false
+    },
+    {
+      color: '#10b981',
+      bg: '#f0fdf4',
+      icon: 'trending-up',
+      label: 'Avg Client LTV',
+      value: '£' + Math.round(calcLiveATV() * calcLiveMonthlyAverages().bookingsPerBookedClientPerMonth * calcLiveLifespan()).toLocaleString(),
+      valueSuffix: '',
+      sub: `ATV × BPAM × ${calcLiveLifespan().toFixed(1)} month avg lifespan · true lifetime value per client`,
+      alert: false
+    }
   ];
 
   document.getElementById('insightCards').innerHTML = cards.map(c => `
@@ -2446,7 +2488,7 @@ function renderRoadmap() {
   el.innerHTML = `
     <div style="margin-top:28px;">
       <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:16px;display:flex;align-items:center;gap:6px;">
-        <i data-lucide="target" style="width:13px;height:13px;"></i>LTV Revenue Model — Road to £30,000/mo
+        <i data-lucide="target" style="width:13px;height:13px;"></i>MRR Model — Road to £30,000/mo &nbsp;<span style="font-size:10px;font-weight:500;color:#94a3b8;text-transform:none;">MRR = Active Clients × BPAM × ATV &nbsp;|&nbsp; LTV = ATV × BPAM × Avg Lifespan</span>
       </div>
 
       <!-- Current LTV snapshot -->
@@ -2477,9 +2519,13 @@ function renderRoadmap() {
           </div>
         </div>
         <div style="background:#f1f5f9;border-radius:8px;padding:10px 14px;font-size:12px;color:#475569;line-height:1.7;">
-          <strong style="color:#334155;">Formula:</strong> ${liveBooked} active clients × ${liveBPAM.toFixed(2)} bookings/mo × ${fmtSens(liveATV2)} ATV = <strong style="color:#0f172a;">${fmtSens(currentMonthlyRev)}/mo</strong>
+          <strong style="color:#334155;">MRR Formula:</strong> ${liveBooked} active clients × ${liveBPAM.toFixed(2)} bookings/mo × ${fmtSens(liveATV2)} ATV = <strong style="color:#0f172a;">${fmtSens(currentMonthlyRev)}/mo MRR</strong>
           &nbsp;·&nbsp; Target: <strong style="color:#0f172a;">${fmtSens(sensTargetRev)}/mo</strong>
           &nbsp;·&nbsp; Gap: <strong style="color:${onTrackLTV ? '#10b981' : '#ef4444'};">${onTrackLTV ? '0 — at target' : fmtSens(gap)}</strong>
+        </div>
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;font-size:12px;color:#475569;line-height:1.7;margin-top:8px;">
+          <strong style="color:#059669;">LTV Formula:</strong> ${fmtSens(liveATV2)} ATV × ${liveBPAM.toFixed(2)} BPAM × <strong style="color:#059669;">${calcLiveLifespan().toFixed(1)} month avg lifespan</strong> = <strong style="color:#059669;">${fmtSens(liveATV2 * liveBPAM * calcLiveLifespan())} avg LTV per client</strong>
+          &nbsp;·&nbsp; <span style="color:#94a3b8;">Lifespan = time from first → last booking per client (capped at today if active within 90 days)</span>
         </div>
       </div>
 
@@ -2487,11 +2533,11 @@ function renderRoadmap() {
       ${combinedATV && combinedBPAM ? `
       <div style="background:linear-gradient(135deg,#3F4D1B08,#3F4D1B14);border:1.5px solid #3F4D1B33;border-radius:14px;padding:18px 22px;margin-bottom:16px;">
         <div style="font-size:12px;font-weight:700;color:#3F4D1B;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">
-          <i data-lucide="zap" style="width:13px;height:13px;vertical-align:-2px;margin-right:4px;"></i>Balanced Approach — Increase Both Levers Together
+          <i data-lucide="zap" style="width:13px;height:13px;vertical-align:-2px;margin-right:4px;"></i>Balanced Approach — Increase Both Levers to Hit MRR Target
         </div>
         <div style="font-size:13px;color:#334155;line-height:1.7;margin-bottom:12px;">
-          To hit <strong>${fmtSens(sensTargetRev)}/mo</strong>, increase ATV to <strong style="color:#06b6d4;">${fmtSens(combinedATV)}</strong> and bookings per active client/mo to <strong style="color:#ec4899;">${combinedBPAM.toFixed(2)}×</strong> — a <strong>${((combinedMultiplier - 1) * 100).toFixed(1)}% lift on each lever</strong>.
-          That means each active client generates <strong style="color:#8b5cf6;">${fmtSens(combinedATV * combinedBPAM)}/mo</strong> in LTV, and with <strong>${liveBooked} active clients</strong> you hit the target.
+          To hit <strong>${fmtSens(sensTargetRev)}/mo MRR</strong>, increase ATV to <strong style="color:#06b6d4;">${fmtSens(combinedATV)}</strong> and bookings per active client/mo (BPAM) to <strong style="color:#ec4899;">${combinedBPAM.toFixed(2)}×</strong> — a <strong>${((combinedMultiplier - 1) * 100).toFixed(1)}% lift on each lever</strong>.
+          Each active client then contributes <strong style="color:#8b5cf6;">${fmtSens(combinedATV * combinedBPAM)}/mo to MRR</strong>, and their LTV grows to <strong style="color:#10b981;">${fmtSens(combinedATV * combinedBPAM * calcLiveLifespan())}</strong> over the ${calcLiveLifespan().toFixed(1)}-month avg lifespan.
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <div style="background:#fff;border-radius:8px;padding:12px;display:flex;justify-content:space-between;align-items:center;">
@@ -2627,9 +2673,13 @@ c.lastBooking = dates[dates.length - 1] || null;
   const rankClass    = ['rank-1','rank-2','rank-3'];
 
   document.getElementById('intelBookingRate').textContent = rate + '%';
+  // avgLTV here = avg actual spend per booking client = true realised LTV
   document.getElementById('intelAvgLTV').textContent      = '£' + parseFloat(avgLTV).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
   document.getElementById('intelAvgBookings').textContent = avgBPC;
   document.getElementById('intelTotalLTV').textContent    = '£' + parseFloat(totalLTV).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
+  // Also update the MRR-based projected LTV using lifespan model
+  const mrrLTV = calcLiveATV() * calcLiveMonthlyAverages().bookingsPerBookedClientPerMonth * calcLiveLifespan();
+  document.getElementById('intelATV').textContent = '£' + parseFloat(calcLiveATV()).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
   document.getElementById('intelNeverBooked').textContent = totalClients - cwb;
   document.getElementById('intelATV').textContent         = '£' + parseFloat(atv).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
 
