@@ -1945,14 +1945,18 @@
                 }).catch(() => {});
             }
         };
-        if (heroVideo) {
-            heroVideo.play().then(() => {
-                heroVideo.classList.add('playing');
-                heroSection.classList.add('video-playing');
-            }).catch(() => {
-                ['scroll','click','mousemove','touchstart'].forEach(e => document.addEventListener(e, tryPlay, { once: true }));
-            });
-        }
+       if (heroVideo) {
+    heroVideo.play().then(() => {
+        heroVideo.classList.add('playing');
+        heroSection.classList.add('video-playing');
+    }).catch(() => {});
+    heroVideo.addEventListener('canplay', () => {
+        heroVideo.play().then(() => {
+            heroVideo.classList.add('playing');
+            heroSection.classList.add('video-playing');
+        }).catch(() => {});
+    });
+}
 
         // Header: transparent over hero, white once past it
         const header = document.getElementById('siteHeader');
