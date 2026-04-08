@@ -1114,7 +1114,14 @@ function calcLiveMonthlyAverages() {
   const earliest = allDates.length ? new Date(Math.min(...allDates)) : now;
   const monthsActive = Math.max(1, (now - earliest) / (1000 * 60 * 60 * 24 * 30));
   const totalNonCancelled = bookingData.filter(b => b.bookingStatus !== 'Cancelled').length;
-  const clientsWhoBooked = everBookedPool.size;
+  const ninetyDays = 90 * 24 * 60 * 60 * 1000;
+  const now90 = new Date();
+  const activeClients = new Set(
+    bookingData
+      .filter(b => b.bookingStatus !== 'Cancelled' && b.clientEmail && b.date && (now90 - new Date(b.date)) <= ninetyDays)
+      .map(b => (b.clientEmail || '').toLowerCase())
+  );
+  const clientsWhoBooked = activeClients.size;
   const clientBookingMonths = {};
 bookingData.forEach(b => {
   if (!b.date || b.bookingStatus === 'Cancelled' || !b.clientEmail) return;
@@ -2504,9 +2511,9 @@ function renderRoadmap() {
             <div style="font-size:26px;font-weight:800;color:#ec4899;">${liveBPAM.toFixed(2)}×</div>
           </div>
           <div style="background:#f8fafc;border-radius:10px;padding:14px;text-align:center;">
-            <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Avg LTV per Active Client/mo</div>
+            <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Avg MRR per Active Client/mo</div>
             <div style="font-size:26px;font-weight:800;color:#8b5cf6;">${fmtSens(liveATV2 * liveBPAM)}</div>
-            <div style="font-size:10px;color:#94a3b8;margin-top:4px;">ATV × BPAM</div>
+            <div style="font-size:10px;color:#94a3b8;margin-top:4px;">ATV × BPAM = monthly contribution per client</div>
           </div>
           <div style="background:#f8fafc;border-radius:10px;padding:14px;text-align:center;">
             <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Active Booking Clients</div>
