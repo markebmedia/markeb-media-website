@@ -2784,6 +2784,45 @@ We wanted to reach out..." required></textarea>
   </div> <!-- ✅ Close discount modal-dialog -->
 </div> <!-- ✅ Close discountModal -->
 
+<!-- Suspend Account Modal -->
+<div class="modal" id="suspendModal" onclick="closeModal('suspendModal')">
+  <div class="modal-dialog" style="max-width: 480px;" onclick="event.stopPropagation()">
+    <div class="modal-header" id="suspendModalHeader">
+      <h3 id="suspendModalTitle">Suspend Account</h3>
+      <button class="modal-close" onclick="closeModal('suspendModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="suspendModalInfo" style="padding: 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 20px; font-size: 14px;"></div>
+      <div class="form-group" id="suspendReasonGroup">
+        <label class="form-label">Reason for Suspension *</label>
+        <select id="suspendReasonSelect" class="form-input" onchange="handleSuspendReasonChange()">
+          <option value="">-- Select reason --</option>
+          <option value="Non-payment of invoice">Non-payment of invoice</option>
+          <option value="Breach of terms and conditions">Breach of terms and conditions</option>
+          <option value="Late payment — account frozen">Late payment — account frozen</option>
+          <option value="Fraudulent activity">Fraudulent activity</option>
+          <option value="Account under review">Account under review</option>
+          <option value="Other">Other (specify below)</option>
+        </select>
+      </div>
+      <div class="form-group" id="suspendNotesGroup">
+        <label class="form-label">Additional Notes <span style="color:#94a3b8;font-weight:400;">(optional)</span></label>
+        <textarea id="suspendNotes" class="form-input" rows="3" placeholder="Internal notes — not visible to customer"></textarea>
+      </div>
+      <div class="form-group">
+        <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+          <input type="checkbox" id="suspendNotifyCustomer" style="width: 20px; height: 20px;">
+          <span style="font-size: 14px; font-weight: 600;">Send notification email to customer</span>
+        </label>
+      </div>
+      <div class="button-group" style="margin-top: 24px;">
+        <button class="btn btn-secondary" onclick="closeModal('suspendModal')" style="flex: 1;">Cancel</button>
+        <button class="btn btn-danger" id="suspendConfirmBtn" onclick="confirmSuspend()" style="flex: 2;">Suspend Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Edit Price Modal -->
 <div class="modal" id="editPriceModal" onclick="closeModal('editPriceModal')">
   <div class="modal-dialog" style="max-width: 480px;" onclick="event.stopPropagation()">
@@ -5791,6 +5830,9 @@ async function confirmModifyService(bookingId) {
       <button class="btn btn-primary" style="flex: 1;" onclick='impersonateUser("${customer.fields['Email']}")'>
         <i data-lucide="key" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Login as ${customer.fields['Name']}
       </button>
+      <button class="btn ${customer.fields['Account Status'] === 'Suspended' ? 'btn-success' : 'btn-danger'}" style="flex: 1;" onclick='showSuspendModal("${customer.id}", "${customer.fields['Name']}", "${customer.fields['Email']}", "${customer.fields['Account Status']}")'>
+        <i data-lucide="${customer.fields['Account Status'] === 'Suspended' ? 'user-check' : 'user-x'}" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> ${customer.fields['Account Status'] === 'Suspended' ? 'Reinstate Account' : 'Suspend Account'}
+      </button>
       <button class="btn btn-secondary" style="flex: 1;" onclick='checkMilestone("${customer.fields['Email']}", "${customer.fields['Name']}")'>
         <i data-lucide="mail" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Check Milestone
       </button>
@@ -8270,6 +8312,134 @@ function handleAdminSqftInput() {
   }
 
   calculateBookingPrice();
+}
+
+// ===== ACCOUNT SUSPENSION =====
+
+let suspendTargetId = null;
+let suspendTargetEmail = null;
+let suspendCurrentStatus = null;
+
+function showSuspendModal(recordId, name, email, currentStatus) {
+  suspendTargetId = recordId;
+  suspendTargetEmail = email;
+  suspendCurrentStatus = currentStatus;
+
+  const isSuspended = currentStatus === 'Suspended';
+  const header = document.getElementById('suspendModalHeader');
+  const title = document.getElementById('suspendModalTitle');
+  const confirmBtn = document.getElementById('suspendConfirmBtn');
+  const reasonGroup = document.getElementById('suspendReasonGroup');
+
+  document.getElementById('suspendModalInfo').innerHTML = `
+    <div style="margin-bottom: 6px;"><strong>Name:</strong> ${name}</div>
+    <div style="margin-bottom: 6px;"><strong>Email:</strong> ${email}</div>
+    <div><strong>Current Status:</strong> <span class="status-badge status-${currentStatus.toLowerCase()}">${currentStatus}</span></div>
+  `;
+
+  document.getElementById('suspendNotes').value = '';
+  document.getElementById('suspendReasonSelect').value = '';
+  document.getElementById('suspendNotifyCustomer').checked = false;
+
+  if (isSuspended) {
+    header.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+    title.textContent = 'Reinstate Account';
+    confirmBtn.textContent = 'Reinstate Account';
+    confirmBtn.className = 'btn btn-success';
+    confirmBtn.style.flex = '2';
+    reasonGroup.style.display = 'none';
+  } else {
+    header.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+    title.textContent = 'Suspend Account';
+    confirmBtn.textContent = 'Suspend Account';
+    confirmBtn.className = 'btn btn-danger';
+    confirmBtn.style.flex = '2';
+    reasonGroup.style.display = 'block';
+  }
+
+  closeModal('customerModal');
+  document.getElementById('suspendModal').classList.add('active');
+  lucide.createIcons();
+}
+
+function handleSuspendReasonChange() {
+  document.getElementById('suspendNotesGroup').style.display = 'block';
+}
+
+async function confirmSuspend() {
+  const isSuspended = suspendCurrentStatus === 'Suspended';
+  const newStatus = isSuspended ? 'Active' : 'Suspended';
+  const reason = document.getElementById('suspendReasonSelect').value;
+  const notes = document.getElementById('suspendNotes').value.trim();
+  const notify = document.getElementById('suspendNotifyCustomer').checked;
+
+  if (!isSuspended && !reason) {
+    alert('Please select a reason for suspension');
+    return;
+  }
+
+  const finalReason = reason === 'Other' && notes ? notes : reason;
+  const btn = document.getElementById('suspendConfirmBtn');
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+
+  try {
+    const updateFields = { 'Account Status': newStatus };
+    if (!isSuspended) {
+      updateFields['Suspension Reason'] = finalReason;
+      if (notes) updateFields['Suspension Notes'] = notes;
+      updateFields['Suspended At'] = new Date().toISOString().split('T')[0];
+      updateFields['Suspended By'] = 'Admin';
+    } else {
+      updateFields['Suspension Reason'] = '';
+      updateFields['Suspension Notes'] = '';
+      updateFields['Suspended At'] = '';
+      updateFields['Suspended By'] = '';
+    }
+
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'PATCH',
+        table: 'Markeb Media Users',
+        recordId: suspendTargetId,
+        body: { fields: updateFields }
+      })
+    });
+
+    if (!response.ok) throw new Error('Failed to update account status');
+
+    const idx = allCustomers.findIndex(c => c.id === suspendTargetId);
+    if (idx !== -1) {
+      allCustomers[idx].fields['Account Status'] = newStatus;
+      allCustomers[idx].fields['Suspension Reason'] = updateFields['Suspension Reason'];
+    }
+
+    if (notify) {
+      await fetch('/.netlify/functions/send-suspension-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: suspendTargetEmail,
+          status: newStatus,
+          reason: finalReason
+        })
+      });
+    }
+
+    alert(`✅ Account ${newStatus === 'Suspended' ? 'suspended' : 'reinstated'} successfully!${notify ? '\n\n✉️ Notification email sent.' : ''}`);
+    closeModal('suspendModal');
+    loadCustomers();
+    loadDashboardStats();
+
+  } catch (error) {
+    console.error('Suspension error:', error);
+    alert('❌ Failed to update account: ' + error.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = isSuspended ? 'Reinstate Account' : 'Suspend Account';
+  }
 }
 
 async function resendConfirmationEmail(bookingId, clientEmail, btn) {
