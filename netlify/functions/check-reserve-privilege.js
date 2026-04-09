@@ -45,9 +45,10 @@ exports.handler = async (event, context) => {
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          success: true,
-          skipPayment: false,
-          isNewCustomer: true
+success: true,
+skipPayment: false,
+isNewCustomer: true,
+accountStatus: 'Active'
         })
       };
     }
@@ -59,9 +60,10 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        success: true,
-        skipPayment: skipPayment,
-        isNewCustomer: false
+success: true,
+skipPayment: skipPayment,
+isNewCustomer: false,
+accountStatus: user.fields['Account Status'] || 'Active'
       })
     };
 
