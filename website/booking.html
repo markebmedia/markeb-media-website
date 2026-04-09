@@ -2631,13 +2631,19 @@ document.addEventListener('DOMContentLoaded', function() {
               </div>
             `;
             document.getElementById('clientEmail').classList.add('error');
+            document.getElementById('paymentOptionsSection').style.display = 'none';
+            document.getElementById('skipPaymentMessage').style.display = 'none';
+            document.getElementById('stripeCardSection').style.display = 'none';
+            document.getElementById('completeBookingBtn').style.display = 'none';
             return;
           }
 
-          // Clear any previous suspended message
+          // Clear any previous suspended message and restore UI
           const existingSuspendedMsg = document.getElementById('suspendedAccountMsg');
           if (existingSuspendedMsg) existingSuspendedMsg.remove();
           document.getElementById('clientEmail').classList.remove('error');
+          document.getElementById('completeBookingBtn').style.display = 'flex';
+          document.getElementById('paymentOptionsSection').style.display = 'block';
 
           const paymentSection = document.getElementById('paymentOptionsSection');
           const skipMessage = document.getElementById('skipPaymentMessage');
