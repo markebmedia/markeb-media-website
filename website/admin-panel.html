@@ -8390,11 +8390,6 @@ async function confirmSuspend() {
       if (notes) updateFields['Suspension Notes'] = notes;
       updateFields['Suspended At'] = new Date().toISOString().split('T')[0];
       updateFields['Suspended By'] = 'Admin';
-    } else {
-      updateFields['Suspension Reason'] = '';
-      updateFields['Suspension Notes'] = '';
-      updateFields['Suspended At'] = '';
-      updateFields['Suspended By'] = '';
     }
 
     const response = await fetch('/.netlify/functions/airtable-proxy', {
