@@ -4377,52 +4377,58 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   } else {
   }
 
-  const u=window.AirtableAPI.getCurrentUser();
-  if(u){ localStorage.setItem('user_email',u.email||''); if(u.name) localStorage.setItem('user_name',u.name); }
+  const u = window.AirtableAPI.getCurrentUser();
+if (u) { 
+  localStorage.setItem('user_email', u.email || ''); 
+  if (u.name) localStorage.setItem('user_name', u.name); 
+}
 
-  populateHeaderUser();
-  setDashboardGreeting();
-  loadDashboardData();
+populateHeaderUser();
+setDashboardGreeting();
 
-// ===== SUSPENSION CHECK =====
-  async function checkAccountSuspension() {
-    const isAdminSession = localStorage.getItem('admin_impersonation') === 'true';
-    if (isAdminSession) return;
-
-    // Try AirtableAPI first, fall back to localStorage
-    const user = window.AirtableAPI?.getCurrentUser?.();
-    const email = user?.email || localStorage.getItem('user_email');
-
-    console.log('Suspension check email:', email);
-    if (!email) return;
-
-    try {
-      const response = await fetch('/.netlify/functions/check-account-status', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email })
-      });
-
-      const data = await response.json();
-      console.log('Suspension data:', data);
-
-      if (data.success && data.suspended === true) {
-        console.log('Account suspended — logging out');
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.href = '../login.html?suspended=true';
-      }
-    } catch (error) {
-      console.warn('Suspension check error:', error);
+// ✅ Run suspension check BEFORE loading dashboard data
+const emailToCheck = u?.email || localStorage.getItem('user_email');
+if (emailToCheck) {
+  try {
+    const response = await fetch('/.netlify/functions/check-account-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: emailToCheck })
+    });
+    const data = await response.json();
+    if (data.success && data.suspended === true) {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '../login.html?suspended=true';
+      return; // ✅ Stop everything
     }
+  } catch (err) {
+    console.warn('Initial suspension check failed:', err);
   }
+}
 
-  // Check immediately on load
-  await checkAccountSuspension();
+loadDashboardData();
 
-  // Check every 1 minute while dashboard is open
-  setInterval(checkAccountSuspension, 60 * 1000);
-  // ===== END SUSPENSION CHECK =====
+// Re-check every 60 seconds
+setInterval(async () => {
+  const isAdmin = localStorage.getItem('admin_impersonation') === 'true';
+  if (isAdmin) return;
+  const email = window.AirtableAPI?.getCurrentUser?.()?.email || localStorage.getItem('user_email');
+  if (!email) return;
+  try {
+    const res = await fetch('/.netlify/functions/check-account-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    if (data.success && data.suspended === true) {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '../login.html?suspended=true';
+    }
+  } catch (e) { console.warn('Periodic suspension check failed:', e); }
+}, 60000);
 
   // Handle payment return from Stripe
 const urlParams = new URLSearchParams(window.location.search);
