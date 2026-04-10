@@ -371,12 +371,37 @@ box-shadow: 0 0 0 3px rgba(180,97,0,0.15);
             }
         });
 
-        // If already logged in, bounce to dashboard
+        // If already logged in, bounce to dashboard (only if not suspended)
         window.addEventListener('load', async function() {
             if (typeof AirtableAPI !== 'undefined') {
                 try {
                     const isLoggedIn = await AirtableAPI.isUserLoggedIn();
-                    if (isLoggedIn) window.location.href = 'website/dashboard.html';
+                    if (isLoggedIn) {
+                        const email = localStorage.getItem('user_email');
+                        if (email) {
+                            const suspensionCheck = await fetch('/.netlify/functions/check-reserve-privilege', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ email: email })
+                            });
+                            const suspensionData = await suspensionCheck.json();
+
+                            if (suspensionData.success && suspensionData.accountStatus === 'Suspended') {
+                                // Clear session so they can't bypass login
+                                localStorage.clear();
+                                sessionStorage.clear();
+                                const errorDiv = document.getElementById('errorMessage');
+                                errorDiv.innerHTML = '⛔ Your account has been suspended. Please contact <a href="mailto:commercial@markebmedia.com" style="color:#991b1b;font-weight:700;">commercial@markebmedia.com</a> to resolve this.';
+                                errorDiv.style.display = 'block';
+                                errorDiv.style.background = '#fef2f2';
+                                errorDiv.style.border = '2px solid #ef4444';
+                                errorDiv.style.borderRadius = '10px';
+                                errorDiv.style.padding = '16px';
+                                return;
+                            }
+                        }
+                        window.location.href = 'website/dashboard.html';
+                    }
                 } catch (error) {
                     console.log('Authentication check failed:', error);
                 }
@@ -436,6 +461,28 @@ box-shadow: 0 0 0 3px rgba(180,97,0,0.15);
             try {
                 const response = await AirtableAPI.authenticateUser(email, password);
                 if (response.success) {
+
+                    // ✅ SUSPENSION CHECK BEFORE ALLOWING ACCESS
+                    const suspensionCheck = await fetch('/.netlify/functions/check-reserve-privilege', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: email })
+                    });
+                    const suspensionData = await suspensionCheck.json();
+
+                    if (suspensionData.success && suspensionData.accountStatus === 'Suspended') {
+                        // Do NOT store session — block access entirely
+                        const errorDiv = document.getElementById('errorMessage');
+                        errorDiv.innerHTML = '⛔ Your account has been suspended. Please contact <a href="mailto:commercial@markebmedia.com" style="color:#991b1b;font-weight:700;">commercial@markebmedia.com</a> to resolve this.';
+                        errorDiv.style.display = 'block';
+                        errorDiv.style.background = '#fef2f2';
+                        errorDiv.style.border = '2px solid #ef4444';
+                        errorDiv.style.borderRadius = '10px';
+                        errorDiv.style.padding = '16px';
+                        hideLoading();
+                        return;
+                    }
+
                     // mark action for dashboard greeting
                     localStorage.setItem('auth_action','login');
                     AirtableAPI.storeUserSession(response.token, email);
