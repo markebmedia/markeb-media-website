@@ -379,14 +379,14 @@ box-shadow: 0 0 0 3px rgba(180,97,0,0.15);
                     if (isLoggedIn) {
                         const email = localStorage.getItem('user_email');
                         if (email) {
-                            const suspensionCheck = await fetch('/.netlify/functions/check-reserve-privilege', {
+                            const suspensionCheck = await fetch('/.netlify/functions/check-account-status', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ email: email })
                             });
                             const suspensionData = await suspensionCheck.json();
 
-                            if (suspensionData.success && suspensionData.accountStatus === 'Suspended') {
+                            if (suspensionData.success && suspensionData.suspended === true) {
                                 // Clear session so they can't bypass login
                                 localStorage.clear();
                                 sessionStorage.clear();
@@ -463,14 +463,14 @@ box-shadow: 0 0 0 3px rgba(180,97,0,0.15);
                 if (response.success) {
 
                     // ✅ SUSPENSION CHECK BEFORE ALLOWING ACCESS
-                    const suspensionCheck = await fetch('/.netlify/functions/check-reserve-privilege', {
+                    const suspensionCheck = await fetch('/.netlify/functions/check-account-status', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ email: email })
                     });
                     const suspensionData = await suspensionCheck.json();
 
-                    if (suspensionData.success && suspensionData.accountStatus === 'Suspended') {
+                    if (suspensionData.success && suspensionData.suspended === true) {
                         // Do NOT store session — block access entirely
                         const errorDiv = document.getElementById('errorMessage');
                         errorDiv.innerHTML = '⛔ Your account has been suspended. Please contact <a href="mailto:commercial@markebmedia.com" style="color:#991b1b;font-weight:700;">commercial@markebmedia.com</a> to resolve this.';

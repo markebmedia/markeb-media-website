@@ -4383,7 +4383,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   populateHeaderUser();
   setDashboardGreeting();
   loadDashboardData();
-  
+
 // ===== SUSPENSION CHECK =====
   async function checkAccountSuspension() {
     const isAdminSession = localStorage.getItem('admin_impersonation') === 'true';
@@ -4397,7 +4397,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     if (!email) return;
 
     try {
-      const response = await fetch('/.netlify/functions/check-reserve-privilege', {
+      const response = await fetch('/.netlify/functions/check-account-status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email })
@@ -4406,7 +4406,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
       const data = await response.json();
       console.log('Suspension data:', data);
 
-      if (data.success && data.accountStatus === 'Suspended') {
+      if (data.success && data.suspended === true) {
         console.log('Account suspended — logging out');
         localStorage.clear();
         sessionStorage.clear();
