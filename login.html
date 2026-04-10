@@ -356,6 +356,21 @@ box-shadow: 0 0 0 3px rgba(180,97,0,0.15);
             lucide.createIcons();
         }
 
+        // Show suspended account message if redirected from dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('suspended') === 'true') {
+                const errorDiv = document.getElementById('errorMessage');
+                errorDiv.innerHTML = '⛔ Your account has been suspended. Please contact <a href="mailto:commercial@markebmedia.com" style="color:#991b1b;font-weight:700;">commercial@markebmedia.com</a> to resolve this.';
+                errorDiv.style.display = 'block';
+                errorDiv.style.background = '#fef2f2';
+                errorDiv.style.border = '2px solid #ef4444';
+                errorDiv.style.borderRadius = '10px';
+                errorDiv.style.padding = '16px';
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+        });
+
         // If already logged in, bounce to dashboard
         window.addEventListener('load', async function() {
             if (typeof AirtableAPI !== 'undefined') {

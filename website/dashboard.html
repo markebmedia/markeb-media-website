@@ -4384,6 +4384,41 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   setDashboardGreeting();
   loadDashboardData();
 
+  // ===== SUSPENSION CHECK =====
+  async function checkAccountSuspension() {
+    const isAdminSession = localStorage.getItem('admin_impersonation') === 'true';
+    if (isAdminSession) return; // Never kick out admin impersonation
+
+    const user = window.AirtableAPI?.getCurrentUser?.();
+    if (!user?.email) return;
+
+    try {
+      const response = await fetch('/.netlify/functions/check-reserve-privilege', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email })
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.accountStatus === 'Suspended') {
+        // Clear session and redirect to login with suspended message
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = '../login.html?suspended=true';
+      }
+    } catch (error) {
+      console.warn('Suspension check error:', error);
+    }
+  }
+
+  // Check immediately on load
+  await checkAccountSuspension();
+
+  // Check every 3 minutes while dashboard is open
+  setInterval(checkAccountSuspension, 3 * 60 * 1000);
+  // ===== END SUSPENSION CHECK =====
+
   // Handle payment return from Stripe
 const urlParams = new URLSearchParams(window.location.search);
 const paymentStatus = urlParams.get('payment');
