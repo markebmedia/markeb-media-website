@@ -4387,22 +4387,32 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   // ===== SUSPENSION CHECK =====
   async function checkAccountSuspension() {
     const isAdminSession = localStorage.getItem('admin_impersonation') === 'true';
-    if (isAdminSession) return; // Never kick out admin impersonation
+    if (isAdminSession) return;
 
     const user = window.AirtableAPI?.getCurrentUser?.();
-    if (!user?.email) return;
+    console.log('Suspension check - user:', user);
+    if (!user?.email) {
+      console.warn('Suspension check - no email found, trying localStorage');
+      const email = localStorage.getItem('user_email');
+      console.log('Suspension check - localStorage email:', email);
+      if (!email) return;
+    }
+
+    const email = user?.email || localStorage.getItem('user_email');
+    console.log('Suspension check - using email:', email);
 
     try {
       const response = await fetch('/.netlify/functions/check-reserve-privilege', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: user.email })
+        body: JSON.stringify({ email: email })
       });
 
       const data = await response.json();
+      console.log('Suspension check - response:', data);
 
       if (data.success && data.accountStatus === 'Suspended') {
-        // Clear session and redirect to login with suspended message
+        console.log('Account suspended - logging out');
         localStorage.clear();
         sessionStorage.clear();
         window.location.href = '../login.html?suspended=true';
@@ -4411,7 +4421,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
       console.warn('Suspension check error:', error);
     }
   }
-
+  
   // Check immediately on load
   console.log('Running suspension check...');
   await checkAccountSuspension();
