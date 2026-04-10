@@ -4383,23 +4383,18 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   populateHeaderUser();
   setDashboardGreeting();
   loadDashboardData();
-
-  // ===== SUSPENSION CHECK =====
+  
+// ===== SUSPENSION CHECK =====
   async function checkAccountSuspension() {
     const isAdminSession = localStorage.getItem('admin_impersonation') === 'true';
     if (isAdminSession) return;
 
+    // Try AirtableAPI first, fall back to localStorage
     const user = window.AirtableAPI?.getCurrentUser?.();
-    console.log('Suspension check - user:', user);
-    if (!user?.email) {
-      console.warn('Suspension check - no email found, trying localStorage');
-      const email = localStorage.getItem('user_email');
-      console.log('Suspension check - localStorage email:', email);
-      if (!email) return;
-    }
-
     const email = user?.email || localStorage.getItem('user_email');
-    console.log('Suspension check - using email:', email);
+
+    console.log('Suspension check email:', email);
+    if (!email) return;
 
     try {
       const response = await fetch('/.netlify/functions/check-reserve-privilege', {
@@ -4409,10 +4404,10 @@ document.addEventListener('DOMContentLoaded', async ()=>{
       });
 
       const data = await response.json();
-      console.log('Suspension check - response:', data);
+      console.log('Suspension data:', data);
 
       if (data.success && data.accountStatus === 'Suspended') {
-        console.log('Account suspended - logging out');
+        console.log('Account suspended — logging out');
         localStorage.clear();
         sessionStorage.clear();
         window.location.href = '../login.html?suspended=true';
@@ -4421,11 +4416,9 @@ document.addEventListener('DOMContentLoaded', async ()=>{
       console.warn('Suspension check error:', error);
     }
   }
-  
+
   // Check immediately on load
-  console.log('Running suspension check...');
   await checkAccountSuspension();
-  console.log('Suspension check complete');
 
   // Check every 1 minute while dashboard is open
   setInterval(checkAccountSuspension, 60 * 1000);
