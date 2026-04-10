@@ -4413,7 +4413,9 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }
 
   // Check immediately on load
+  console.log('Running suspension check...');
   await checkAccountSuspension();
+  console.log('Suspension check complete');
 
   // Check every 1 minute while dashboard is open
   setInterval(checkAccountSuspension, 60 * 1000);
