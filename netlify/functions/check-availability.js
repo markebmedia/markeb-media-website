@@ -160,7 +160,7 @@ async function fetchBlockedTimes(region, selectedDate) {
     console.log(`  - Region: ${region} → Specialist: ${specialistNameBT}`);
 
     const filterFormula = `AND(
-      {Media Specialist} = '${specialistNameBT}',
+      FIND('${specialistNameBT}', {Media Specialist}),
       IS_SAME({Date}, '${selectedDate}', 'day')
     )`;
     
@@ -276,7 +276,7 @@ async function fetchBookingsForRegion(region, selectedDate) {
     console.log(`  - Region: ${region} → Specialist: ${specialistName}`);
 
     const filterFormula = `AND(
-  {Media Specialist} = '${specialistName}',
+  FIND('${specialistName}', {Media Specialist}),
   IS_SAME({Date}, '${selectedDate}', 'day'),
   OR(
     {Booking Status} = 'Booked',

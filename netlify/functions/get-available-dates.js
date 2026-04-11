@@ -105,7 +105,7 @@ exports.handler = async (event, context) => {
       base('Bookings')
         .select({
           filterByFormula: `AND(
-            {Media Specialist} = '${specialistName}',
+            FIND('${specialistName}', {Media Specialist}),
             IS_SAME({Date}, '${monthStart}', 'month'),
             OR(
               {Booking Status} = 'Booked',
@@ -120,7 +120,7 @@ exports.handler = async (event, context) => {
       base('Blocked Times')
         .select({
           filterByFormula: `AND(
-            {Media Specialist} = '${specialistName}',
+            FIND('${specialistName}', {Media Specialist}),
             IS_SAME({Date}, '${monthStart}', 'month')
           )`,
           fields: ['Date', 'Start Time', 'End Time', 'Media Specialist']
