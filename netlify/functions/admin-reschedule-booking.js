@@ -4,6 +4,13 @@ const Airtable = require('airtable');
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
+// ── SPECIALIST EMAIL ROUTING ─────────────────────────────────────────────────
+// Add a new entry here when hiring a new specialist.
+const SPECIALIST_EMAILS = {
+  'James Jago': 'James.Jago@markebmedia.com',
+  'Andrii':     'Andrii.Hutovych@markebmedia.com'
+};
+
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -167,15 +174,16 @@ async function sendRescheduleEmail(data) {
     clientName,
     clientEmail,
     bookingRef,
-    originalDate,
-    originalTime,
-    newDate,
-    newTime,
+    date,
+    time,
     service,
     propertyAddress,
-    mediaSpecialist,
+    cancellationReason,
+    cancellationCharge,
+    refundAmount,
+    refundProcessed,
     totalPrice,
-    region
+    mediaSpecialist
   } = data;
 
   const formattedOriginalDate = new Date(originalDate).toLocaleDateString('en-GB', {
@@ -247,14 +255,9 @@ async function sendRescheduleEmail(data) {
   // ✅ Determine BCC recipients based on region
   const bccRecipients = ['commercial@markebmedia.com', 'Jodie.Hamshaw@markebmedia.com'];
   
-  if (region) {
-    if (region.toLowerCase() === 'north') {
-      bccRecipients.push('James Jago.Hamshaw@markebmedia.com');
-      console.log('✓ BCC: Adding James Jago (North region)');
-    } else if (region.toLowerCase() === 'south') {
-      bccRecipients.push('Andrii.Hutovych@markebmedia.com');
-      console.log('✓ BCC: Adding Andrii (South region)');
-    }
+  if (data.mediaSpecialist && SPECIALIST_EMAILS[data.mediaSpecialist]) {
+    bccRecipients.push(SPECIALIST_EMAILS[data.mediaSpecialist]);
+    console.log(`✓ BCC: Adding ${data.mediaSpecialist}`);
   }
 
   await resend.emails.send({

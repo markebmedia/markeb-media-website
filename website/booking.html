@@ -251,12 +251,18 @@ box-shadow: 0 4px 12px rgba(180, 97, 0, 0.4);
       letter-spacing: 0.5px;
     }
 
-    .region-badge.north {
+     .region-badge.north,
+    .region-badge.north-west,
+    .region-badge.north-east,
+    .region-badge.west {
       background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       color: #fff;
     }
 
-    .region-badge.south {
+    .region-badge.east,
+    .region-badge.south,
+    .region-badge.south-east,
+    .region-badge.south-west {
       background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
       color: #fff;
     }
@@ -726,7 +732,7 @@ width: 100%;
             Sorry, we don't cover this area yet
           </div>
           <div class="info-box-text">
-            We're currently available in the Midlands & North (James Jago) and London & South (Andrii). Please contact us if you'd like to discuss options.
+            We're currently available across North, North West, North East and West (James Jago) and East, South, South East and South West (Andrii). Please contact us if you'd like to discuss options.
           </div>
         </div>
 
@@ -1295,36 +1301,108 @@ width: 100%;
     }
 
     // ===== REGION CONFIGURATION =====
-    const NORTH_POSTCODES = [
-  'B', 'CV', 'LE', 'DE', 'NG', 'S', 'DN', 'HU', 'YO', 'LS', 'BD', 'HX', 
-  'WF', 'HD', 'M', 'OL', 'BL', 'WN', 'SK', 'L', 'WA', 'CH', 'CW', 'ST', 
-  'TF', 'SY', 'WV', 'WS', 'DY',
-  // Lincolnshire & East
-  'LN', 'PE', 'NN', 'MK'
-];
-
-    const SOUTH_POSTCODES = [
-  // Greater London
-  'E', 'EC', 'N', 'NW', 'SE', 'SW', 'W', 'WC',
-  // Surrounding areas
-  'AL', 'BR', 'CM', 'CR', 'DA', 'EN', 'HA', 'IG', 'KT', 'RM', 'SL', 'SM', 
-  'TW', 'UB', 'WD',
-  // Home Counties
-  'GU', 'HP', 'LU', 'MK', 'OX', 'RG', 'SG', 'SS', 'TN',
-  // South Coast
-  'BN', 'PO', 'SO', 'SP', 'BH', 'DT', 'CT', 'ME', 'RH', 'EX', 'TQ', 'PL'
-];
-
-    const MEDIA_SPECIALISTS = {
-      north: {
-        name: 'James Jago',
-        region: 'North'
-      },
-      south: {
-        name: 'Andrii',
-        region: 'South'
-      }
+    // ── SPECIALIST CONFIG ────────────────────────────────────────────────────
+    // This is the ONLY thing you edit when hiring or reshuffling regions.
+    // Add a new person: add their name and regions here.
+    // Move a region: cut from one name, paste to another. Nothing else changes.
+    const SPECIALIST_CONFIG = {
+      'James Jago': ['north', 'north-west', 'north-east', 'west'],
+      'Andrii':     ['east', 'south', 'south-east', 'south-west']
     };
+
+    const SPECIALIST_CATALOG_KEY = {
+      'James Jago': 'north',
+      'Andrii':     'south'
+    };
+
+    const REGION_DISPLAY = {
+      'north':      'North',
+      'north-west': 'North West',
+      'north-east': 'North East',
+      'west':       'West',
+      'east':       'East',
+      'south':      'South',
+      'south-east': 'South East',
+      'south-west': 'South West'
+    };
+
+    // ── REGION MAP: postcodes → region keys (pure geography, no names) ──────
+    const REGION_MAP = {
+      // North
+      'YO': 'north', 'LS': 'north', 'BD': 'north', 'HX': 'north',
+      'WF': 'north', 'HD': 'north', 'S':  'north', 'DN': 'north',
+      'HU': 'north',
+      // Scotland → North
+      'G':  'north', 'PA': 'north', 'KA': 'north', 'ML': 'north',
+      'EH': 'north', 'FK': 'north', 'KY': 'north', 'DG': 'north',
+      'TD': 'north', 'CA': 'north', 'AB': 'north', 'DD': 'north',
+      'PH': 'north', 'IV': 'north', 'KW': 'north', 'HS': 'north',
+      'ZE': 'north',
+      // North West
+      'M':  'north-west', 'OL': 'north-west', 'BL': 'north-west',
+      'WN': 'north-west', 'SK': 'north-west', 'L':  'north-west',
+      'WA': 'north-west', 'CH': 'north-west', 'CW': 'north-west',
+      'PR': 'north-west', 'BB': 'north-west', 'FY': 'north-west',
+      'LA': 'north-west',
+      // North East
+      'NE': 'north-east', 'SR': 'north-east', 'DH': 'north-east',
+      'TS': 'north-east', 'DL': 'north-east',
+      // West / Midlands
+      'B':  'west', 'CV': 'west', 'LE': 'west', 'DE': 'west',
+      'NG': 'west', 'ST': 'west', 'TF': 'west', 'SY': 'west',
+      'WV': 'west', 'WS': 'west', 'DY': 'west', 'WR': 'west',
+      'HR': 'west',
+      // East
+      'CB': 'east', 'CO': 'east', 'IP': 'east', 'NR': 'east',
+      'PE': 'east', 'NN': 'east', 'MK': 'east', 'LN': 'east',
+      'LU': 'east', 'SG': 'east', 'AL': 'east', 'CM': 'east',
+      'SS': 'east', 'IG': 'east', 'RM': 'east', 'EN': 'east',
+      // South (Greater London)
+      'E':  'south', 'EC': 'south', 'N':  'south', 'NW': 'south',
+      'SE': 'south', 'SW': 'south', 'W':  'south', 'WC': 'south',
+      'BR': 'south', 'CR': 'south', 'DA': 'south', 'HA': 'south',
+      'KT': 'south', 'SL': 'south', 'SM': 'south', 'TW': 'south',
+      'UB': 'south', 'WD': 'south',
+      // South East
+      'GU': 'south-east', 'HP': 'south-east', 'OX': 'south-east',
+      'RG': 'south-east', 'TN': 'south-east', 'RH': 'south-east',
+      'BN': 'south-east', 'CT': 'south-east', 'ME': 'south-east',
+      'PO': 'south-east',
+      // South West
+      'SO': 'south-west', 'SP': 'south-west', 'BH': 'south-west',
+      'DT': 'south-west', 'EX': 'south-west', 'TQ': 'south-west',
+      'PL': 'south-west', 'TR': 'south-west', 'BA': 'south-west',
+      'BS': 'south-west', 'GL': 'south-west', 'SN': 'south-west'
+    };
+
+    // ── DERIVED HELPERS: never edit these ────────────────────────────────────
+    function getSpecialistForRegion(regionKey) {
+      const key = (regionKey || '').toLowerCase();
+      const name = Object.keys(SPECIALIST_CONFIG).find(n =>
+        SPECIALIST_CONFIG[n].includes(key)
+      ) || null;
+      if (!name) return null;
+      return { name, region: REGION_DISPLAY[key] || key };
+    }
+
+    function getCatalogKeyForRegion(regionKey) {
+      const specialist = getSpecialistForRegion(regionKey);
+      return (specialist && SPECIALIST_CATALOG_KEY[specialist.name]) || 'south';
+    }
+
+    function generateRegionOptions(includeAll = true) {
+      let html = includeAll
+        ? '<option value="">All Regions</option>'
+        : '<option value="">-- Select Region --</option>';
+      Object.entries(SPECIALIST_CONFIG).forEach(([name, regions]) => {
+        html += `<optgroup label="${name}">`;
+        regions.forEach(r => {
+          html += `<option value="${r}">${REGION_DISPLAY[r]}</option>`;
+        });
+        html += '</optgroup>';
+      });
+      return html;
+    }
 
     let currentStep = 1;
     let bookingData = {
@@ -1612,18 +1690,18 @@ width: 100%;
       return postcodeRegex.test(postcode.trim());
     }
 
-    // Determine Region from Postcode
+     // Determine Region from Postcode
     function determineRegion(postcode) {
       const cleanPostcode = postcode.trim().toUpperCase().replace(/\s/g, '');
       const outcodeArea = cleanPostcode.match(/^[A-Z]+/)[0];
-      
-      const isNorth = NORTH_POSTCODES.includes(outcodeArea);
-      const isSouth = SOUTH_POSTCODES.includes(outcodeArea);
-      
+
+      const regionKey = REGION_MAP[outcodeArea] || null;
+      const specialist = regionKey ? getSpecialistForRegion(regionKey) : null;
+
       return {
-        region: isNorth ? 'north' : (isSouth ? 'south' : 'unknown'),
-        mediaSpecialist: isNorth ? MEDIA_SPECIALISTS.north : (isSouth ? MEDIA_SPECIALISTS.south : null),
-        isServiceable: isNorth || isSouth
+        region: regionKey || 'unknown',
+        mediaSpecialist: specialist,
+        isServiceable: !!regionKey
       };
     }
     // New function to fetch addresses from GetAddress.io
@@ -1804,7 +1882,7 @@ function handleAddressSelection() {
     if (result.isServiceable) {
       const regionBadge = document.getElementById('regionBadge');
       regionBadge.className = `region-badge ${result.region}`;
-      regionBadge.textContent = result.region.toUpperCase();
+      regionBadge.textContent = REGION_DISPLAY[result.region] || result.region.toUpperCase();
       
       document.getElementById('mediaSpecialistName').textContent = result.mediaSpecialist.name;
       regionInfo.classList.add('show');
@@ -1845,7 +1923,7 @@ function handleAddressSelection() {
     if (result.isServiceable) {
       const regionBadge = document.getElementById('regionBadge');
       regionBadge.className = `region-badge ${result.region}`;
-      regionBadge.textContent = result.region.toUpperCase();
+      regionBadge.textContent = REGION_DISPLAY[result.region] || result.region.toUpperCase();
       
       document.getElementById('mediaSpecialistName').textContent = result.mediaSpecialist.name;
       regionInfo.classList.add('show');
@@ -2133,8 +2211,7 @@ function handleAccessTypeChange() {
 
     // Render Services
     function renderServices() {
-      const region = bookingData.region; // ✅ FIXED: lowercase
-      const services = SERVICES[region] || SERVICES.south;
+      const services = SERVICES[getCatalogKeyForRegion(bookingData.region)] || SERVICES.south;
       const container = document.getElementById('serviceCards');
 
 
@@ -2166,8 +2243,7 @@ function handleAccessTypeChange() {
 
     // Select Service
     function selectService(serviceId) {
-      const region = bookingData.region; // ✅ FIXED: lowercase
-      const services = SERVICES[region] || SERVICES.south;
+      const services = SERVICES[getCatalogKeyForRegion(bookingData.region)] || SERVICES.south;
       const service = services.find(s => s.id === serviceId);
 
       if (!service) return;
@@ -3143,17 +3219,13 @@ async function applyDiscountCode() {
   applyBtn.innerHTML = '<div class="loading-spinner"></div>';
   
   try {
-    // ✅ FIXED: Capitalize region for Airtable lookup
-    const regionCapitalized = bookingData.region.charAt(0).toUpperCase() + bookingData.region.slice(1);
-    
-    
     const response = await fetch('/.netlify/functions/validate-discount-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         code: code,
         totalPrice: bookingData.totalPrice,
-        region: regionCapitalized, // ✅ 'North' or 'South'
+        region: bookingData.region,
         serviceId: bookingData.service.id
       })
     });

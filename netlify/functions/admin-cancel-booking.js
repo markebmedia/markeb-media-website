@@ -5,6 +5,13 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
+// ── SPECIALIST EMAIL ROUTING ─────────────────────────────────────────────────
+// Add a new entry here when hiring a new specialist.
+const SPECIALIST_EMAILS = {
+  'James Jago': 'James.Jago@markebmedia.com',
+  'Andrii':     'Andrii.Hutovych@markebmedia.com'
+};
+
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -178,7 +185,7 @@ exports.handler = async (event, context) => {
           refundAmount: refundAmount,
           refundProcessed: refundProcessed,
           totalPrice: fields['Total Price'],
-          region: fields['Region'] // ✅ Pass region
+          mediaSpecialist: fields['Media Specialist']
         });
         console.log(`Cancellation email sent to ${fields['Client Email']}`);
         emailSent = true;
@@ -241,7 +248,7 @@ async function sendCancellationEmail(data) {
     refundAmount,
     refundProcessed,
     totalPrice,
-    region
+    mediaSpecialist
   } = data;
 
   const formattedDate = new Date(date).toLocaleDateString('en-GB', {
@@ -331,14 +338,9 @@ async function sendCancellationEmail(data) {
   // ✅ Determine BCC recipients based on region
   const bccRecipients = ['commercial@markebmedia.com', 'Jodie.Hamshaw@markebmedia.com'];
   
-  if (region) {
-    if (region.toLowerCase() === 'north') {
-      bccRecipients.push('James Jago.Hamshaw@markebmedia.com');
-      console.log('✓ BCC: Adding James Jago (North region)');
-    } else if (region.toLowerCase() === 'south') {
-      bccRecipients.push('Andrii.Hutovych@markebmedia.com');
-      console.log('✓ BCC: Adding Andrii (South region)');
-    }
+  if (data.mediaSpecialist && SPECIALIST_EMAILS[data.mediaSpecialist]) {
+    bccRecipients.push(SPECIALIST_EMAILS[data.mediaSpecialist]);
+    console.log(`✓ BCC: Adding ${data.mediaSpecialist}`);
   }
 
   await resend.emails.send({

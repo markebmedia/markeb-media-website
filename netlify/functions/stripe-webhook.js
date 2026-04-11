@@ -123,7 +123,7 @@ exports.handler = async (event, context) => {
           console.error('Error moving Active Booking:', activeBookingError);
         }
         
-        await sendCancellationConfirmation(metadata, session, cancellationFee, region);
+        await sendCancellationConfirmation(metadata, session, cancellationFee);
         
         return {
           statusCode: 200,
@@ -218,7 +218,7 @@ exports.handler = async (event, context) => {
             body: JSON.stringify({
               fields: {
                 'Last Booking Date': new Date().toISOString().split('T')[0],
-                'Region': metadata.region ? metadata.region.charAt(0).toUpperCase() + metadata.region.slice(1).toLowerCase() : ''
+                'Region': metadata.region || ''
               }
             })
           });
@@ -254,9 +254,7 @@ exports.handler = async (event, context) => {
         basePrice = totalPrice - extraBedroomFee - addonsPrice;
       }
 
-      const capitalizedRegion = metadata.region 
-        ? metadata.region.charAt(0).toUpperCase() + metadata.region.slice(1).toLowerCase()
-        : 'Unknown';
+      const capitalizedRegion = metadata.region || 'Unknown';
 
       const bookingFields = {
         'Booking Reference': bookingRef,
@@ -429,13 +427,16 @@ async function sendCancellationConfirmation(metadata, session, cancellationFee, 
 
     const refundAmount = parseFloat(metadata.originalTotalPrice) - cancellationFee;
 
+    const SPECIALIST_EMAILS = {
+      'James Jago': 'James.Jago@markebmedia.com',
+      'Andrii':     'Andrii.Hutovych@markebmedia.com'
+    };
+
     const bccRecipients = ['commercial@markebmedia.com'];
-    
-    if (region) {
-      if (region.toLowerCase() === 'north') {
-        bccRecipients.push('James Jago.Hamshaw@markebmedia.com');
-        console.log('✓ BCC: Adding James Jago (North region)');
-      }
+    const mediaSpecialist = metadata.mediaSpecialist || '';
+    if (mediaSpecialist && SPECIALIST_EMAILS[mediaSpecialist]) {
+      bccRecipients.push(SPECIALIST_EMAILS[mediaSpecialist]);
+      console.log(`✓ BCC: Adding ${mediaSpecialist}`);
     }
 
     await resend.emails.send({

@@ -389,12 +389,15 @@ async function sendBookingConfirmation(booking) {
 
   const bccRecipients = [BCC_EMAIL];
   
-  if (booking.region) {
-    if (booking.region.toLowerCase() === 'north') {
-      bccRecipients.push('James.Jago@markebmedia.com');
-    } else if (booking.region.toLowerCase() === 'south') {
-      bccRecipients.push('Andrii.Hutovych@markebmedia.com');
-    }
+  // ── SPECIALIST EMAIL ROUTING ─────────────────────────────────────────────
+  // Add a new entry here when hiring a new specialist.
+  const SPECIALIST_EMAILS = {
+    'James Jago': 'James.Jago@markebmedia.com',
+    'Andrii':     'Andrii.Hutovych@markebmedia.com'
+  };
+
+  if (booking.mediaSpecialist && SPECIALIST_EMAILS[booking.mediaSpecialist]) {
+    bccRecipients.push(SPECIALIST_EMAILS[booking.mediaSpecialist]);
   }
 
   await resend.emails.send({

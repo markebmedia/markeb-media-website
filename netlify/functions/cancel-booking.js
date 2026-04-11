@@ -155,14 +155,14 @@ exports.handler = async (event, context) => {
         // ✅ Determine BCC recipients based on region
         const bccRecipients = ['commercial@markebmedia.com'];
         
-        if (fields['Region']) {
-          if (fields['Region'].toLowerCase() === 'north') {
-            bccRecipients.push('James Jago.Hamshaw@markebmedia.com');
-            console.log('✓ BCC: Adding James Jago (North region)');
-          } else if (fields['Region'].toLowerCase() === 'south') {
-            bccRecipients.push('Andrii.Hutovych@markebmedia.com');
-            console.log('✓ BCC: Adding Andrii (South region)');
-          }
+        const SPECIALIST_EMAILS = {
+          'James Jago': 'James.Jago@markebmedia.com',
+          'Andrii':     'Andrii.Hutovych@markebmedia.com'
+        };
+
+        if (fields['Media Specialist'] && SPECIALIST_EMAILS[fields['Media Specialist']]) {
+          bccRecipients.push(SPECIALIST_EMAILS[fields['Media Specialist']]);
+          console.log(`✓ BCC: Adding ${fields['Media Specialist']}`);
         }
 
         await resend.emails.send({

@@ -219,16 +219,17 @@ if (process.env.RESEND_API_KEY) {
         </div>`;
     }
 
-    // ✅ Determine BCC recipients based on region
+    // ── SPECIALIST EMAIL ROUTING ─────────────────────────────────────────────
+    const SPECIALIST_EMAILS = {
+      'James Jago': 'James.Jago@markebmedia.com',
+      'Andrii':     'Andrii.Hutovych@markebmedia.com'
+    };
+
     const bccRecipients = ['commercial@markebmedia.com'];
-    if (booking.fields['Region']) {
-      if (booking.fields['Region'].toLowerCase() === 'north') {
-        bccRecipients.push('James Jago.Hamshaw@markebmedia.com');
-        console.log('✓ BCC: Adding James Jago (North region)');
-      } else if (booking.fields['Region'].toLowerCase() === 'south') {
-        bccRecipients.push('andrii.Hutovych@markebmedia.com');
-        console.log('✓ BCC: Adding Andrii (South region)');
-      }
+    const specialist = booking.fields['Media Specialist'];
+    if (specialist && SPECIALIST_EMAILS[specialist]) {
+      bccRecipients.push(SPECIALIST_EMAILS[specialist]);
+      console.log(`✓ BCC: Adding ${specialist}`);
     }
 
     await resend.emails.send({

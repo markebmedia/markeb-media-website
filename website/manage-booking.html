@@ -742,6 +742,26 @@ body {
 
   <script>
     const stripe = Stripe('pk_live_51QycLvQAVOs8qTDFVfXTNzuuhBnPjgZQSS3AH30NGMuSf3SxAWF9pLzYwL0ulj1wMMCC2jnhDyeqeop7BkWDfeZ400wT3Ko8aK');
+
+    // ── SPECIALIST CONFIG ─────────────────────────────────────────────────────
+    const SPECIALIST_CONFIG = {
+      'James Jago': ['north', 'north-west', 'north-east', 'west'],
+      'Andrii':     ['east', 'south', 'south-east', 'south-west']
+    };
+
+    const SPECIALIST_CATALOG_KEY = {
+      'James Jago': 'north',
+      'Andrii':     'south'
+    };
+
+    function getCatalogKeyForRegion(regionKey) {
+      const key = (regionKey || '').toLowerCase();
+      const specialist = Object.keys(SPECIALIST_CONFIG).find(n =>
+        SPECIALIST_CONFIG[n].includes(key)
+      );
+      return (specialist && SPECIALIST_CATALOG_KEY[specialist]) || 'south';
+    }
+
     function toLocalDateString(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
@@ -1211,12 +1231,12 @@ if (booking.addons && booking.addons.length > 0) {
       try {
         // ✅ Calculate service duration from catalog
         const serviceName = bookingData.service;
-        const region = bookingData.region.toLowerCase();
-        
+        const catalogKey = getCatalogKeyForRegion(bookingData.region);
+
         let serviceDuration = 90; // default
         let serviceId = '';
-        if (SERVICES[region]) {
-          const service = SERVICES[region].find(s => s.name === serviceName);
+        if (SERVICES[catalogKey]) {
+          const service = SERVICES[catalogKey].find(s => s.name === serviceName);
           if (service) {
             serviceDuration = service.duration;
             serviceId = service.id;
@@ -1377,8 +1397,7 @@ if (booking.addons && booking.addons.length > 0) {
     }
 
     function renderModifyServices() {
-      const region = bookingData.region.toLowerCase();
-      const services = SERVICES[region] || SERVICES.south;
+      const services = SERVICES[getCatalogKeyForRegion(bookingData.region)] || SERVICES.south;
       const container = document.getElementById('modifyServiceCards');
 
       const servicesHTML = services.map(service => `
@@ -1407,8 +1426,7 @@ if (booking.addons && booking.addons.length > 0) {
     }
 
     function selectModifyService(serviceId) {
-      const region = bookingData.region.toLowerCase();
-      const services = SERVICES[region] || SERVICES.south;
+      const services = SERVICES[getCatalogKeyForRegion(bookingData.region)] || SERVICES.south;
       const service = services.find(s => s.id === serviceId);
 
       if (!service) return;

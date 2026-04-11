@@ -7,6 +7,22 @@ const fetch = require('node-fetch');
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
+// ── SPECIALIST ROSTER ────────────────────────────────────────────────────────
+const SPECIALIST_REGIONS = {
+  'north':      'James Jago',
+  'north-west': 'James Jago',
+  'north-east': 'James Jago',
+  'west':       'James Jago',
+  'east':       'Andrii',
+  'south':      'Andrii',
+  'south-east': 'Andrii',
+  'south-west': 'Andrii'
+};
+
+function getSpecialistName(regionKey) {
+  return SPECIALIST_REGIONS[(regionKey || '').toLowerCase()] || null;
+}
+
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -37,7 +53,14 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const capitalizedRegion = region.charAt(0).toUpperCase() + region.slice(1).toLowerCase();
+    const specialistName = getSpecialistName(region);
+    if (!specialistName) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: `No specialist found for region: ${region}` })
+      };
+    }
 
     // Build list of valid weekdays in the month (Mon-Fri only, future dates within 60 days, beyond 24hrs)
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -75,14 +98,14 @@ exports.handler = async (event, context) => {
     const monthStart = `${year}-${String(month + 1).padStart(2, '0')}-01`;
     const monthEnd = `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
 
-    console.log(`[get-available-dates] Region: ${capitalizedRegion}, ${monthStart} to ${monthEnd}, postcode: ${postcode || 'none'}`);
+    console.log(`[get-available-dates] Region: ${region} → ${specialistName}, ${monthStart} to ${monthEnd}, postcode: ${postcode || 'none'}`);
 
     // Fetch bookings and blocked times for this region/month in parallel
     const [bookingRecords, blockedRecords] = await Promise.all([
       base('Bookings')
         .select({
           filterByFormula: `AND(
-            {Region} = '${capitalizedRegion}',
+            {Media Specialist} = '${specialistName}',
             IS_SAME({Date}, '${monthStart}', 'month'),
             OR(
               {Booking Status} = 'Booked',
@@ -90,17 +113,17 @@ exports.handler = async (event, context) => {
               {Booking Status} = 'Confirmed'
             )
           )`,
-          fields: ['Date', 'Time', 'Duration (mins)', 'Region', 'Booking Status', 'Postcode', 'Property Address']
+          fields: ['Date', 'Time', 'Duration (mins)', 'Media Specialist', 'Booking Status', 'Postcode', 'Property Address']
         })
         .all(),
 
       base('Blocked Times')
         .select({
           filterByFormula: `AND(
-            {Region} = '${capitalizedRegion}',
+            {Media Specialist} = '${specialistName}',
             IS_SAME({Date}, '${monthStart}', 'month')
           )`,
-          fields: ['Date', 'Start Time', 'End Time', 'Region']
+          fields: ['Date', 'Start Time', 'End Time', 'Media Specialist']
         })
         .all()
     ]);
@@ -184,7 +207,7 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({
         availableDates,
-        region: capitalizedRegion,
+        region: region,
         month: `${year}-${String(month + 1).padStart(2, '0')}`
       })
     };

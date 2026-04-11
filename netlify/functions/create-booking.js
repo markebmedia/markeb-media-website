@@ -69,7 +69,7 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({
           fields: {
             'Last Booking Date': new Date().toISOString().split('T')[0],
-            'Region': bookingData.region ? bookingData.region.charAt(0).toUpperCase() + bookingData.region.slice(1).toLowerCase() : ''
+            'Region': bookingData.region || ''
           }
         })
       });
@@ -80,9 +80,7 @@ exports.handler = async (event, context) => {
     }
 
     // ✅ Capitalize region to match Airtable Single Select options (North/South)
-    if (bookingData.region) {
-      bookingData.region = bookingData.region.charAt(0).toUpperCase() + bookingData.region.slice(1).toLowerCase();
-    }
+    // Region is stored as-is (e.g. 'north-west') - routing is by mediaSpecialist name
     
     console.log('Received booking data:', {
       postcode: bookingData.postcode,

@@ -270,10 +270,23 @@ async function checkAvailabilityForReschedule(postcode, region, selectedDate, re
 
 // ✅ FIXED: Fetch bookings (excluding current booking being rescheduled)
 async function fetchBookingsForRegion(region, selectedDate, excludeBookingId) {
+  const SPECIALIST_REGIONS = {
+    'north':      'James Jago',
+    'north-west': 'James Jago',
+    'north-east': 'James Jago',
+    'west':       'James Jago',
+    'east':       'Andrii',
+    'south':      'Andrii',
+    'south-east': 'Andrii',
+    'south-west': 'Andrii'
+  };
+
+  const specialistName = SPECIALIST_REGIONS[(region || '').toLowerCase()] || region;
+
   const filterFormula = excludeBookingId
     ? `AND(
-        {Region} = '${region}', 
-        IS_SAME({Date}, '${selectedDate}', 'day'), 
+        {Media Specialist} = '${specialistName}',
+        IS_SAME({Date}, '${selectedDate}', 'day'),
         OR(
           {Booking Status} = 'Booked',
           {Booking Status} = 'Reserved',
@@ -282,8 +295,8 @@ async function fetchBookingsForRegion(region, selectedDate, excludeBookingId) {
         RECORD_ID() != '${excludeBookingId}'
       )`
     : `AND(
-        {Region} = '${region}', 
-        IS_SAME({Date}, '${selectedDate}', 'day'), 
+        {Media Specialist} = '${specialistName}',
+        IS_SAME({Date}, '${selectedDate}', 'day'),
         OR(
           {Booking Status} = 'Booked',
           {Booking Status} = 'Reserved',
@@ -386,16 +399,15 @@ async function sendRescheduleEmail(fields, newDate, newTime, originalDate, origi
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
 
-  // ✅ Determine BCC recipients based on region
+  const SPECIALIST_EMAILS = {
+    'James Jago': 'James.Jago@markebmedia.com',
+    'Andrii':     'Andrii.Hutovych@markebmedia.com'
+  };
+
   const bccRecipients = ['commercial@markebmedia.com'];
-  if (fields['Region']) {
-    if (fields['Region'].toLowerCase() === 'north') {
-      bccRecipients.push('James Jago.Hamshaw@markebmedia.com');
-      console.log('✓ BCC: Adding James Jago (North region)');
-    } else if (fields['Region'].toLowerCase() === 'south') {
-      bccRecipients.push('Andrii.Hutovych@markebmedia.com');
-      console.log('✓ BCC: Adding Andrii (South region)');
-    }
+  if (fields['Media Specialist'] && SPECIALIST_EMAILS[fields['Media Specialist']]) {
+    bccRecipients.push(SPECIALIST_EMAILS[fields['Media Specialist']]);
+    console.log(`✓ BCC: Adding ${fields['Media Specialist']}`);
   }
 
   await resend.emails.send({

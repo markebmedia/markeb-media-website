@@ -1,5 +1,25 @@
 const fetch = require('node-fetch');
 
+// ── SPECIALIST ROSTER ────────────────────────────────────────────────────────
+// Availability is checked per specialist not per region, so a booking in
+// 'north' and a booking in 'north-west' both block James Jago's diary.
+// To reassign a region: change the name value on that line only.
+// To add a new person: add their region keys here with their name.
+const SPECIALIST_REGIONS = {
+  'north':      'James Jago',
+  'north-west': 'James Jago',
+  'north-east': 'James Jago',
+  'west':       'James Jago',
+  'east':       'Andrii',
+  'south':      'Andrii',
+  'south-east': 'Andrii',
+  'south-west': 'Andrii'
+};
+
+function getSpecialistName(regionKey) {
+  return SPECIALIST_REGIONS[regionKey.toLowerCase()] || null;
+}
+
 exports.handler = async (event, context) => {
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
@@ -133,15 +153,14 @@ async function fetchBlockedTimes(region, selectedDate) {
     const Airtable = require('airtable');
     const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-    // Capitalize region for Airtable (it stores "North" or "South")
-    const capitalizedRegion = region.charAt(0).toUpperCase() + region.slice(1).toLowerCase();
-    
+    const specialistNameBT = getSpecialistName(region);
+
     console.log(`Querying Blocked Times with:`);
     console.log(`  - Date: ${selectedDate}`);
-    console.log(`  - Region: ${capitalizedRegion}`);
-    
+    console.log(`  - Region: ${region} → Specialist: ${specialistNameBT}`);
+
     const filterFormula = `AND(
-      {Region} = '${capitalizedRegion}',
+      {Media Specialist} = '${specialistNameBT}',
       IS_SAME({Date}, '${selectedDate}', 'day')
     )`;
     
@@ -250,17 +269,15 @@ async function fetchBookingsForRegion(region, selectedDate) {
     const Airtable = require('airtable');
     const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-    // Capitalise region for Airtable (it stores "North" or "South")
-    const capitalisedRegion = region.charAt(0).toUpperCase() + region.slice(1).toLowerCase();
-    
+    const specialistName = getSpecialistName(region);
+
     console.log(`Querying Airtable with:`);
     console.log(`  - Date: ${selectedDate}`);
-    console.log(`  - Region: ${capitalisedRegion} (original: ${region})`);
-    
-    // Use Airtable's IS_SAME() function for date comparison
+    console.log(`  - Region: ${region} → Specialist: ${specialistName}`);
+
     const filterFormula = `AND(
-  {Region} = '${capitalisedRegion}', 
-  IS_SAME({Date}, '${selectedDate}', 'day'), 
+  {Media Specialist} = '${specialistName}',
+  IS_SAME({Date}, '${selectedDate}', 'day'),
   OR(
     {Booking Status} = 'Booked',
     {Booking Status} = 'Reserved',

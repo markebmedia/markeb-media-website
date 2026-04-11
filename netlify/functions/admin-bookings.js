@@ -1,4 +1,21 @@
 // netlify/functions/admin-bookings.js
+// ── SPECIALIST ROSTER ────────────────────────────────────────────────────────
+// To reassign a region: change the name value on that line only.
+const SPECIALIST_REGIONS = {
+  'north':      'James Jago',
+  'north-west': 'James Jago',
+  'north-east': 'James Jago',
+  'west':       'James Jago',
+  'east':       'Andrii',
+  'south':      'Andrii',
+  'south-east': 'Andrii',
+  'south-west': 'Andrii'
+};
+
+function getSpecialistName(regionKey) {
+  return SPECIALIST_REGIONS[(regionKey || '').toLowerCase()] || null;
+}
+
 exports.handler = async (event, context) => {
   console.log('=== Admin Bookings Function ===');
   const headers = {
@@ -40,9 +57,15 @@ exports.handler = async (event, context) => {
       filters.push(`AND({Date} >= "${startDate}", {Date} <= "${endDate}")`);
     }
 
-    // Region filter
+    // Region filter — look up by specialist name so all their regions are included
     if (region) {
-      filters.push(`{Region} = "${region}"`);
+      const specialistName = getSpecialistName(region);
+      if (specialistName) {
+        filters.push(`{Media Specialist} = "${specialistName}"`);
+      } else {
+        // Fallback: direct region match for legacy data
+        filters.push(`{Region} = "${region}"`);
+      }
     }
 
     // Booking Status filter

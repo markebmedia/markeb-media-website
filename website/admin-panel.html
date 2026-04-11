@@ -1673,24 +1673,17 @@ body {
   </div>
 </div>
 
-      <!-- Region Selection -->
+   <!-- Region Selection -->
       <div class="form-group">
         <label class="form-label">Region *</label>
         <select id="bookingRegion" class="form-input" required onchange="loadServicesForRegion()">
-          <option value="">-- Select Region --</option>
-          <option value="North">North</option>
-          <option value="South">South</option>
         </select>
       </div>
 
       <div class="form-group">
   <label class="form-label">Media Specialist *</label>
   <div style="display: flex; gap: 12px;">
-    <select id="bookingSpecialist" class="form-input" onchange="handleSpecialistChange()" style="flex: 1;">
-      <option value="">-- Select Specialist --</option>
-      <option value="James Jago">James Jago (North)</option>
-      <option value="Andrii">Andrii (South)</option>
-      <option value="other">Other / Enter manually...</option>
+ <select id="bookingSpecialist" class="form-input" onchange="handleSpecialistChange()" style="flex: 1;">
     </select>
     <input 
       type="text" 
@@ -1923,9 +1916,6 @@ body {
 
         <div class="filters-bar">
           <select class="filter-select" id="calendarRegion" onchange="loadCalendar()">
-            <option value="">All Regions</option>
-            <option value="North">North</option>
-            <option value="South">South</option>
           </select>
           <button class="btn btn-primary" onclick="loadCalendar()">
             <i data-lucide="refresh-cw" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Refresh
@@ -1945,9 +1935,7 @@ body {
       <div class="filters-bar">
         <input type="text" class="filter-input" id="bookingSearch" placeholder="Search by name, email, address, reference...">
         <select class="filter-select" id="bookingRegion">
-          <option value="">All Regions</option>
-          <option value="North">North</option>
-          <option value="South">South</option>
+         <select class="filter-select" id="bookingRegion">
         </select>
         <select class="filter-select" id="bookingStatus">
           <option value="">All Status</option>
@@ -2009,11 +1997,12 @@ body {
   </div>
 
   <div class="filters-bar">
-    <select class="filter-select" id="blockRegionFilter" onchange="loadBlockedTimes()">
-      <option value="">All Regions</option>
-      <option value="North">North</option>
-      <option value="South">South</option>
+    <select class="filter-select" id="blockSpecialistFilter" onchange="loadBlockedTimes()">
+      <option value="">All Specialists</option>
+      <option value="James Jago">James Jago</option>
+      <option value="Andrii">Andrii</option>
     </select>
+
     <button class="btn btn-primary" onclick="loadBlockedTimes()">
       <i data-lucide="refresh-cw" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Refresh
     </button>
@@ -2731,14 +2720,38 @@ We wanted to reach out..." required></textarea>
         <!-- Applicable Regions -->
         <div class="form-group">
           <label class="form-label">Applicable Regions</label>
-          <div style="display: flex; gap: 16px;">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-              <input type="checkbox" value="North" class="region-checkbox" style="width: 18px; height: 18px;">
+              <input type="checkbox" value="north" class="region-checkbox" style="width: 18px; height: 18px;">
               <span>North</span>
             </label>
             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-              <input type="checkbox" value="South" class="region-checkbox" style="width: 18px; height: 18px;">
+              <input type="checkbox" value="north-west" class="region-checkbox" style="width: 18px; height: 18px;">
+              <span>North West</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" value="north-east" class="region-checkbox" style="width: 18px; height: 18px;">
+              <span>North East</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" value="west" class="region-checkbox" style="width: 18px; height: 18px;">
+              <span>West</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" value="east" class="region-checkbox" style="width: 18px; height: 18px;">
+              <span>East</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" value="south" class="region-checkbox" style="width: 18px; height: 18px;">
               <span>South</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" value="south-east" class="region-checkbox" style="width: 18px; height: 18px;">
+              <span>South East</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" value="south-west" class="region-checkbox" style="width: 18px; height: 18px;">
+              <span>South West</span>
             </label>
           </div>
           <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
@@ -2860,11 +2873,11 @@ We wanted to reach out..." required></textarea>
       <form id="blockTimeForm" onsubmit="saveBlockedTime(event)">
         
         <div class="form-group">
-          <label class="form-label" for="blockRegion">Region *</label>
-          <select id="blockRegion" class="form-input" required>
-            <option value="">-- Select Region --</option>
-            <option value="North">North (James Jago)</option>
-            <option value="South">South (Andrii)</option>
+          <label class="form-label" for="blockSpecialist">Media Specialist *</label>
+          <select id="blockSpecialist" class="form-input" required>
+            <option value="">-- Select Specialist --</option>
+            <option value="James Jago">James Jago</option>
+            <option value="Andrii">Andrii</option>
           </select>
         </div>
 
@@ -2962,9 +2975,68 @@ We wanted to reach out..." required></textarea>
 const STRIPE_PUBLIC_KEY = 'pk_live_51QycLvQAVOs8qTDFVfXTNzuuhBnPjgZQSS3AH30NGMuSf3SxAWF9pLzYwL0ulj1wMMCC2jnhDyeqeop7BkWDfeZ400wT3Ko8aK';
 const stripe = Stripe(STRIPE_PUBLIC_KEY);
 
-   // ===== HELPER FUNCTIONS =====
+// ===== HELPER FUNCTIONS =====
 function toLocalDateString(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+// ── SPECIALIST CONFIG ─────────────────────────────────────────────────────────
+// Edit ONLY this when hiring or reshuffling regions.
+const SPECIALIST_CONFIG = {
+  'James Jago': ['north', 'north-west', 'north-east', 'west'],
+  'Andrii':     ['east', 'south', 'south-east', 'south-west']
+};
+
+const SPECIALIST_CATALOG_KEY = {
+  'James Jago': 'north',
+  'Andrii':     'south'
+};
+
+const REGION_DISPLAY = {
+  'north':      'North',
+  'north-west': 'North West',
+  'north-east': 'North East',
+  'west':       'West',
+  'east':       'East',
+  'south':      'South',
+  'south-east': 'South East',
+  'south-west': 'South West'
+};
+
+function getSpecialistForRegion(regionKey) {
+  const key = (regionKey || '').toLowerCase();
+  return Object.keys(SPECIALIST_CONFIG).find(n =>
+    SPECIALIST_CONFIG[n].includes(key)
+  ) || null;
+}
+
+function getCatalogKeyForRegion(regionKey) {
+  const specialist = getSpecialistForRegion(regionKey);
+  return (specialist && SPECIALIST_CATALOG_KEY[specialist]) || 'south';
+}
+
+function generateRegionOptions(includeAll = true) {
+  let html = includeAll
+    ? '<option value="">All Regions</option>'
+    : '<option value="">-- Select Region --</option>';
+  Object.entries(SPECIALIST_CONFIG).forEach(([name, regions]) => {
+    html += `<optgroup label="${name}">`;
+    regions.forEach(r => {
+      html += `<option value="${r}">${REGION_DISPLAY[r]}</option>`;
+    });
+    html += '</optgroup>';
+  });
+  return html;
+}
+
+function generateSpecialistOptions() {
+  let html = '<option value="">-- Select Specialist --</option>';
+  Object.keys(SPECIALIST_CONFIG).forEach(name => {
+    const regions = SPECIALIST_CONFIG[name].map(r => REGION_DISPLAY[r]).join(', ');
+    html += `<option value="${name}">${name} (${regions})</option>`;
+  });
+  html += '<option value="other">Other / Enter manually...</option>';
+  return html;
 }
 
     // ===== PASSWORD PROTECTION =====
@@ -3431,6 +3503,14 @@ const UK_REGIONS = [
 
     // Initialize
     document.addEventListener('DOMContentLoaded', () => {
+
+      // Populate all region/specialist dropdowns from SPECIALIST_CONFIG
+      document.getElementById('bookingRegion').innerHTML = generateRegionOptions(false);
+      document.getElementById('bookingSpecialist').innerHTML = generateSpecialistOptions();
+      document.getElementById('calendarRegion').innerHTML = generateRegionOptions(true);
+      // blockSpecialistFilter and blockSpecialist are now static HTML — no population needed
+      // Quick block modal is dynamically created so populated in showQuickBlockModal
+
       loadDashboardStats();
       loadCalendar();
       loadBookings();
@@ -3545,20 +3625,17 @@ function handleAdminAccessTypeChange() {
   const serviceSelect = document.getElementById('bookingService');
   const specialistSelect = document.getElementById('bookingSpecialist');
   
-  if (region === 'North') {
-    specialistSelect.value = 'James Jago';
-  } else if (region === 'South') {
-    specialistSelect.value = 'Andrii';
-  }
+  const specialist = getSpecialistForRegion(region);
+  if (specialist) specialistSelect.value = specialist;
   handleSpecialistChange();
 
   if (!region) {
     serviceSelect.innerHTML = '<option value="">-- Select Service --</option>';
     return;
   }
-  
-  const regionKey = region.toLowerCase();
-  const services = SERVICES_CATALOG[regionKey] || [];
+
+  const catalogKey = getCatalogKeyForRegion(region);
+  const services = SERVICES_CATALOG[catalogKey] || [];
   
   serviceSelect.innerHTML = '<option value="">-- Select Service --</option>';
   services.forEach(service => {
@@ -4965,11 +5042,11 @@ ${date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'lo
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label" for="quickBlockRegion">Region *</label>
-            <select id="quickBlockRegion" class="form-input" required>
-              <option value="">-- Select Region --</option>
-              <option value="North">North</option>
-              <option value="South">South</option>
+            <label class="form-label" for="quickBlockSpecialist">Media Specialist *</label>
+            <select id="quickBlockSpecialist" class="form-input" required>
+              <option value="">-- Select Specialist --</option>
+              <option value="James Jago">James Jago</option>
+              <option value="Andrii">Andrii</option>
             </select>
           </div>
           <div class="form-row">
@@ -5022,10 +5099,15 @@ function closeQuickBlockModal() {
 async function saveQuickBlock(event, dateStr) {
   event.preventDefault();
   
-  const region = document.getElementById('quickBlockRegion').value;
+  const specialist = document.getElementById('quickBlockSpecialist').value;
   const startTime = document.getElementById('quickBlockStartTime').value;
   const endTime = document.getElementById('quickBlockEndTime').value;
   const reason = document.getElementById('quickBlockReason').value.trim();
+  
+  if (!specialist) {
+    alert('❌ Please select a media specialist');
+    return;
+  }
   
   if (startTime >= endTime) {
     alert('❌ End time must be after start time');
@@ -5041,7 +5123,7 @@ async function saveQuickBlock(event, dateStr) {
         table: 'Blocked Times',
         body: {
           fields: {
-            'Region': region,
+            'Media Specialist': specialist,
             'Date': dateStr,
             'Start Time': startTime,
             'End Time': endTime,
@@ -5056,7 +5138,7 @@ async function saveQuickBlock(event, dateStr) {
       throw new Error('Failed to create blocked time');
     }
     
-    alert(`✅ Time blocked!\n\n${region} - ${dateStr}\n${startTime} to ${endTime}`);
+    alert(`✅ Time blocked!\n\n${specialist} - ${dateStr}\n${startTime} to ${endTime}`);
     closeQuickBlockModal();
     loadCalendar(); // Refresh calendar
     
@@ -5341,8 +5423,7 @@ function showModifyService(bookingId) {
   const modal = document.getElementById('modifyServiceModal');
   const modalBody = document.getElementById('modifyServiceModalBody');
   
-  const region = booking.fields['Region'] === 'North' ? 'north' : 'south';
-  const services = SERVICES_CATALOG[region] || SERVICES_CATALOG.south;
+  const services = SERVICES_CATALOG[getCatalogKeyForRegion(booking.fields['Region'])] || SERVICES_CATALOG.south;
   
   const currentPrice = booking.fields['Final Price'] || 0;
   
@@ -5446,8 +5527,7 @@ function updateServicePrice() {
 
   const serviceId = selectedOption.value;
   const booking = currentBooking || allBookings.find(b => b.id);
-  const region = booking?.fields['Region'] === 'North' ? 'north' : 'south';
-  const services = SERVICES_CATALOG[region] || SERVICES_CATALOG.south;
+  const services = SERVICES_CATALOG[getCatalogKeyForRegion(booking?.fields['Region'])] || SERVICES_CATALOG.south;
   const service = services.find(s => s.id === serviceId);
 
   // Show add-ons if available
@@ -6585,7 +6665,7 @@ async function loadBlockedTimes() {
   container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
 
   try {
-    const regionFilter = document.getElementById('blockRegionFilter')?.value || '';
+    const specialistFilter = document.getElementById('blockSpecialistFilter')?.value || '';
     
     const response = await fetch('/.netlify/functions/airtable-proxy', {
       method: 'POST',
@@ -6593,7 +6673,7 @@ async function loadBlockedTimes() {
       body: JSON.stringify({
         method: 'GET',
         table: 'Blocked Times',
-        filterFormula: regionFilter ? `{Region} = "${regionFilter}"` : null,
+        filterFormula: specialistFilter ? `{Media Specialist} = "${specialistFilter}"` : null,
         sort: [{ field: 'Date', direction: 'asc' }]
       })
     });
@@ -6729,7 +6809,7 @@ function showCreateBlockModal() {
 async function saveBlockedTime(event) {
   event.preventDefault();
   
-  const region = document.getElementById('blockRegion').value;
+  const specialist = document.getElementById('blockSpecialist').value;
   const date = document.getElementById('blockDate').value;
   const startTime = document.getElementById('blockStartTime').value;
   const endTime = document.getElementById('blockEndTime').value;
@@ -6740,7 +6820,7 @@ async function saveBlockedTime(event) {
     return;
   }
   
-  if (!confirm(`Block ${region} region on ${date} from ${startTime} to ${endTime}?`)) {
+  if (!confirm(`Block ${specialist}'s diary on ${date} from ${startTime} to ${endTime}?`)) {
     return;
   }
   
@@ -6753,7 +6833,7 @@ async function saveBlockedTime(event) {
         table: 'Blocked Times',
         body: {
           fields: {
-            'Region': region,
+            'Media Specialist': specialist,
             'Date': date,
             'Start Time': startTime,
             'End Time': endTime,
@@ -6768,7 +6848,7 @@ async function saveBlockedTime(event) {
       throw new Error('Failed to create blocked time');
     }
     
-    alert(`✅ Time blocked successfully!\n\n${region} - ${date}\n${startTime} to ${endTime}`);
+    alert(`✅ Time blocked successfully!\n\n${specialist} - ${date}\n${startTime} to ${endTime}`);
     closeModal('blockTimeModal');
     loadBlockedTimes();
     

@@ -71,10 +71,20 @@ exports.handler = async (event, context) => {
           const { Resend } = require('resend');
           const resend = new Resend(process.env.RESEND_API_KEY);
 
+          const SPECIALIST_EMAILS = {
+            'James Jago': 'James.Jago@markebmedia.com',
+            'Andrii':     'Andrii.Hutovych@markebmedia.com'
+          };
+
+          const cancellationBcc = ['commercial@markebmedia.com'];
+          if (fields['Media Specialist'] && SPECIALIST_EMAILS[fields['Media Specialist']]) {
+            cancellationBcc.push(SPECIALIST_EMAILS[fields['Media Specialist']]);
+          }
+
           await resend.emails.send({
   from: 'Markeb Media <commercial@markebmedia.com>',
   to: fields['Client Email'],
-  bcc: 'commercial@markebmedia.com',
+  bcc: cancellationBcc,
   subject: `Booking Cancelled - ${bookingRef}`,
   html: `
 <!DOCTYPE html>
