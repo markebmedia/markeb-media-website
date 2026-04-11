@@ -5180,7 +5180,7 @@ function viewBlockedTime(blockId) {
           <div class="detail-item">
             <span class="detail-label">Region</span>
             <span class="detail-value">
-              <span class="region-badge ${fields['Region'].toLowerCase()}">${fields['Region']}</span>
+             <span class="region-badge">${fields['Media Specialist'] || fields['Region'] || '-'}</span>
             </span>
           </div>
           <div class="detail-item">
@@ -6734,8 +6734,8 @@ const date = new Date(fields['Date']);
 const formattedDate = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
 html += `
         <tr>
-          <td data-label="Region">
-            <span class="region-badge ${fields['Region'].toLowerCase()}">${fields['Region']}</span>
+          <td data-label="Specialist">
+            <span class="region-badge">${fields['Media Specialist'] || fields['Region'] || '-'}</span>
           </td>
           <td data-label="Date">${formattedDate}</td>
           <td data-label="Time Blocked">
@@ -6762,7 +6762,7 @@ html += `
         <table class="data-table" style="margin-top: 16px;">
           <thead>
             <tr>
-              <th>Region</th>
+              <th>Specialist</th>
               <th>Date</th>
               <th>Time Blocked</th>
               <th>Reason</th>
@@ -6778,8 +6778,8 @@ html += `
       
       html += `
         <tr style="opacity: 0.6;">
-          <td data-label="Region">
-            <span class="region-badge ${fields['Region'].toLowerCase()}">${fields['Region']}</span>
+          <td data-label="Specialist">
+            <span class="region-badge">${fields['Media Specialist'] || fields['Region'] || '-'}</span>
           </td>
           <td data-label="Date">${formattedDate}</td>
           <td data-label="Time Blocked">${fields['Start Time']} - ${fields['End Time']}</td>
