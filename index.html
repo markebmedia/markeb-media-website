@@ -1371,9 +1371,7 @@
 
 <!-- ── HERO ── -->
 <section class="hero-landing" id="hero">
-    <video class="hero-video" id="heroVideo" autoplay muted loop playsinline>
-        <source src="/public/videos/Showreel Final.mp4" type="video/mp4">
-    </video>
+    <video class="hero-video" id="heroVideo" autoplay muted loop playsinline preload="auto" src="/public/videos/Showreel Final.mp4"></video>
     <div class="hero-overlay"></div>
     <div class="hero-grid"></div>
     <div class="hero-glow"></div>
@@ -1936,26 +1934,10 @@
         // Hero video
         const heroVideo = document.getElementById('heroVideo');
         const heroSection = document.getElementById('hero');
-        const tryPlay = () => {
-            if (heroVideo && heroVideo.paused) {
-                heroVideo.play().then(() => {
-                    heroVideo.classList.add('playing');
-                    heroSection.classList.add('video-playing');
-                }).catch(() => {});
-            }
-        };
-       if (heroVideo) {
-    heroVideo.play().then(() => {
-        heroVideo.classList.add('playing');
-        heroSection.classList.add('video-playing');
-    }).catch(() => {});
-    heroVideo.addEventListener('canplay', () => {
-        heroVideo.play().then(() => {
+        if (heroVideo) {
             heroVideo.classList.add('playing');
             heroSection.classList.add('video-playing');
-        }).catch(() => {});
-    });
-}
+        }
 
         // Header: transparent over hero, white once past it
         const header = document.getElementById('siteHeader');
