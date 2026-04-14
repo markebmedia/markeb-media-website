@@ -54,7 +54,7 @@ exports.handler = async (event, context) => {
     // ✅ CHANGE 2: Pass ref + email directly in success URL (no race condition)
     const successUrl = isDashboard
       ? `${process.env.URL}/website/dashboard.html?view=bookings&payment=success&session_id={CHECKOUT_SESSION_ID}`
-      : `${process.env.URL}/booking-success.html?ref=${newBookingRef}&email=${encodeURIComponent(bookingData.clientEmail)}`;
+      : `${process.env.URL}/website/booking-success.html?ref=${newBookingRef}&email=${encodeURIComponent(bookingData.clientEmail)}`;
     
     const cancelUrl = isDashboard
       ? `${process.env.URL}/website/dashboard.html?view=bookings&payment=cancelled`
