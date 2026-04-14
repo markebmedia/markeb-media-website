@@ -327,8 +327,8 @@ async function sendBookingConfirmation(booking) {
         ${isAdminBooking 
           ? 'Payment will be collected as arranged.' 
           : booking.cardLast4 
-            ? `We'll charge your card ending in ${booking.cardLast4} automatically once your content enters the editing stage.`
-            : 'We\'ll charge your card automatically once your content enters the editing stage.'}
+  ? `We'll charge your card ending in ${booking.cardLast4} automatically once your content is delivered.`
+  : 'We\'ll charge your card automatically once your content is delivered.'}
       </div>
     `}
 
