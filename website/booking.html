@@ -3127,7 +3127,9 @@ async function createBooking() {
         clientEmail: bookingData.clientEmail,
         clientPhone: bookingData.clientPhone,
         clientNotes: bookingData.clientNotes,
-        source: new URLSearchParams(window.location.search).get('source') || 'booking_page' // ✅ ADD THIS LINE
+        accessType: bookingData.accessType || '',
+        keyPickupLocation: bookingData.keyPickupLocation || '',
+        source: new URLSearchParams(window.location.search).get('source') || 'booking_page'
       })
     });
 

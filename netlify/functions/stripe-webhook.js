@@ -286,8 +286,8 @@ exports.handler = async (event, context) => {
         'Client Phone': metadata.clientPhone || '',
         'Client Notes': metadata.clientNotes || '',
 
-        'Access Type': metadata.accessType || '',
-        'Key Pickup Location': metadata.keyPickupLocation || '',
+        ...(metadata.accessType && { 'Access Type': metadata.accessType }),
+        ...(metadata.keyPickupLocation && { 'Key Pickup Location': metadata.keyPickupLocation }),
         'Square Footage': metadata.squareFootage ? parseInt(metadata.squareFootage) : undefined,
         'Square Footage Fee': metadata.squareFootageFee ? parseFloat(metadata.squareFootageFee) : 0,
         

@@ -32,7 +32,7 @@ exports.handler = async (event, context) => {
       totalPrice: bookingData.totalPrice,
       discountCode: bookingData.discountCode || 'none',
       discountAmount: bookingData.discountAmount || 0,
-      source: bookingData.source || 'booking_page' // ✅ NEW: Track source
+      source: bookingData.source || 'booking_page'
     });
 
     // Validate required fields
@@ -44,12 +44,17 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // ✅ NEW: Determine redirect URLs based on source
+    // ✅ CHANGE 1: Pre-generate booking ref once so success URL and metadata match
+    const isExistingBooking = !!bookingData.bookingId;
+    const newBookingRef = `BK-${Date.now()}`;
+
+    // Determine redirect URLs based on source
     const isDashboard = bookingData.source === 'dashboard';
     
+    // ✅ CHANGE 2: Pass ref + email directly in success URL (no race condition)
     const successUrl = isDashboard
       ? `${process.env.URL}/website/dashboard.html?view=bookings&payment=success&session_id={CHECKOUT_SESSION_ID}`
-      : `${process.env.URL}/booking-success.html?session_id={CHECKOUT_SESSION_ID}`;
+      : `${process.env.URL}/booking-success.html?ref=${newBookingRef}&email=${encodeURIComponent(bookingData.clientEmail)}`;
     
     const cancelUrl = isDashboard
       ? `${process.env.URL}/website/dashboard.html?view=bookings&payment=cancelled`
@@ -60,14 +65,12 @@ exports.handler = async (event, context) => {
       cancel: cancelUrl
     });
 
-    // ✅ UPDATED: Build line items for Stripe with discount support
+    // Build line items for Stripe with discount support
     const lineItems = [];
 
-    // Check if discount is applied
     const hasDiscount = bookingData.discountCode && bookingData.discountAmount > 0;
 
     if (hasDiscount) {
-      // ✅ If discount applied, create a single line item with the final discounted price
       const priceBeforeDiscount = bookingData.priceBeforeDiscount || (bookingData.totalPrice + bookingData.discountAmount);
       
       lineItems.push({
@@ -77,14 +80,11 @@ exports.handler = async (event, context) => {
             name: bookingData.service,
             description: `${bookingData.date} at ${bookingData.time} - ${bookingData.propertyAddress}\n\nOriginal Price: £${priceBeforeDiscount.toFixed(2)}\nDiscount (${bookingData.discountCode}): -£${bookingData.discountAmount.toFixed(2)}\nFinal Price: £${bookingData.totalPrice.toFixed(2)}`,
           },
-          unit_amount: Math.round(bookingData.totalPrice * 100), // ✅ Use discounted total in pence
+          unit_amount: Math.round(bookingData.totalPrice * 100),
         },
         quantity: 1,
       });
     } else {
-      // ✅ No discount - itemize everything as before
-      
-      // Main service
       lineItems.push({
         price_data: {
           currency: 'gbp',
@@ -92,12 +92,11 @@ exports.handler = async (event, context) => {
             name: bookingData.service,
             description: `${bookingData.date} at ${bookingData.time} - ${bookingData.propertyAddress}`,
           },
-          unit_amount: Math.round(bookingData.basePrice * 100), // Convert to pence
+          unit_amount: Math.round(bookingData.basePrice * 100),
         },
         quantity: 1,
       });
 
-      // Extra bedrooms fee
       if (bookingData.extraBedroomFee && bookingData.extraBedroomFee > 0) {
         const extraBedrooms = bookingData.bedrooms - 4;
         lineItems.push({
@@ -113,7 +112,6 @@ exports.handler = async (event, context) => {
         });
       }
 
-      // Large property fee
       if (bookingData.squareFootageFee && bookingData.squareFootageFee > 0) {
         lineItems.push({
           price_data: {
@@ -128,7 +126,6 @@ exports.handler = async (event, context) => {
         });
       }
 
-      // Add-ons
       if (bookingData.addons && bookingData.addons.length > 0) {
         bookingData.addons.forEach(addon => {
           if (addon.price > 0) {
@@ -148,22 +145,22 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // ✅ Determine if this is a new booking or existing booking payment
-    const isExistingBooking = !!bookingData.bookingId;
-    
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: successUrl, // ✅ Dynamic based on source
-      cancel_url: cancelUrl,   // ✅ Dynamic based on source
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       metadata: {
-        // ✅ If existing booking (admin payment link), include bookingId
+        // If existing booking (admin payment link), include bookingId
         ...(isExistingBooking && { 
           bookingId: bookingData.bookingId,
           bookingRef: bookingData.bookingRef 
         }),
+
+        // ✅ CHANGE 3: Always include bookingRef in metadata so webhook uses the same ref
+        bookingRef: isExistingBooking ? bookingData.bookingRef : newBookingRef,
         
         // Booking details
         postcode: bookingData.postcode,
@@ -183,8 +180,7 @@ exports.handler = async (event, context) => {
         clientPhone: bookingData.clientPhone,
         clientNotes: bookingData.clientNotes || '',
         
-// ✅ ADD THESE TWO LINES HERE:
-  accessType: bookingData.accessType || '',
+        accessType: bookingData.accessType || '',
         keyPickupLocation: bookingData.keyPickupLocation || '',
         squareFootage: bookingData.squareFootage ? bookingData.squareFootage.toString() : '',
         squareFootageFee: bookingData.squareFootageFee ? bookingData.squareFootageFee.toString() : '0',
@@ -192,7 +188,7 @@ exports.handler = async (event, context) => {
         // Add-ons
         addons: JSON.stringify(bookingData.addons || []),
         
-        // ✅ NEW: Discount information
+        // Discount information
         discountCode: bookingData.discountCode || '',
         discountAmount: bookingData.discountAmount ? bookingData.discountAmount.toString() : '0',
         priceBeforeDiscount: bookingData.priceBeforeDiscount ? bookingData.priceBeforeDiscount.toString() : '0',
@@ -200,7 +196,7 @@ exports.handler = async (event, context) => {
         // Payment type flag
         paymentType: isExistingBooking ? 'existing_booking' : 'new_booking',
         
-        // ✅ NEW: Source tracking
+        // Source tracking
         source: bookingData.source || 'booking_page'
       },
       customer_email: bookingData.clientEmail,
