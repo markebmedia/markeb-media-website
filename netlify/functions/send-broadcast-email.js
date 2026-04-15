@@ -231,6 +231,9 @@ function getSpecialistForKey(regionKey) {
 }
 
 async function fetchAvailableDatesForUser(user) {
+  if (!user.ukRegion && !user.regionKey && !user.region) {
+    return null;
+  }
   const regionKey = getRegionKey(user);
   const now = new Date();
   const year = now.getFullYear();
@@ -260,6 +263,7 @@ async function fetchAvailableDatesForUser(user) {
 
 async function generateAvailabilityContent(user) {
   const availableDates = await fetchAvailableDatesForUser(user);
+  if (availableDates === null) return null;
   const firstName = (user.name || 'there').split(' ')[0];
 
   let datesHTML = '';
@@ -448,62 +452,6 @@ async function getAvailableDates(region, mediaSpecialist) {
     console.error('Error getting available dates:', error);
     return [];
   }
-}
-
-// Generate availability reminder content
-async function generateAvailabilityContent(user) {
-  const region = user.region || 'North';
-  const mediaSpecialist = region === 'South' ? 'Andrii' : 'James Jago Hamshaw';
-  
-  const availableDates = await getAvailableDates(region, mediaSpecialist);
-  
-  let datesHTML = '';
-  if (availableDates.length > 0) {
-    datesHTML = `
-      <div class="date-list">
-        ${availableDates.map(d => `
-          <div class="date-item">
-            <span class="date-label">${d.formatted}</span>
-            <span class="date-badge">AVAILABLE</span>
-          </div>
-        `).join('')}
-      </div>
-    `;
-  } else {
-    datesHTML = `
-      <div class="alert alert-info">
-        <strong>📅 High Demand Period</strong><br>
-        We're experiencing high demand! Please contact us directly to find your ideal slot.
-      </div>
-    `;
-  }
-  
-  return `
-    <h2>📸 Available Shoot Dates</h2>
-    
-    <p>Hi ${user.name},</p>
-    
-    <p>We wanted to let you know about upcoming availability with <strong>${mediaSpecialist}</strong> in your region (${region}).</p>
-    
-    <p>Here are our next available dates:</p>
-    ${datesHTML}
-    
-    <center>
-      <a href="https://markebmedia.com/login" class="button">Book Your Shoot Now</a>
-    </center>
-    
-    <div class="alert alert-info">
-      <strong>💡 Why book now?</strong><br>
-      • Guaranteed priority slot<br>
-      • Flexible rescheduling (24hr notice)<br>
-      • Professional content within 48 hours<br>
-      • Dashboard clients get exclusive perks
-    </div>
-    
-    <p>Questions? Just reply to this email or call us directly.</p>
-    
-    <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
-  `;
 }
 
 exports.handler = async (event, context) => {

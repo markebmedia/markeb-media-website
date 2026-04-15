@@ -8020,124 +8020,11 @@ function loadBroadcastTemplate(templateId) {
   
   switch(templateId) {
    case 'availability':
-  subject = 'Available Shoot Dates - Book Your Slot';
-  
-  composer.style.display = 'block';
-  contentInput.value = 'Loading availability data...';
-  
-  if (selectedRecipients.length > 0) {
-    const firstRecipient = allBroadcastUsers.find(u => u.fields['Email'] === selectedRecipients[0]);
-    
-    if (firstRecipient) {
-      const userUKRegion = firstRecipient.fields['Region'];
-      const userRegion = mapRegionToBookingRegion(userUKRegion);
-      
-      if (!userRegion) {
-        content = `Hi [Name],
-
-We'd love to show you our availability, but we need your region set up first.
-
-Please update your profile with your region, then check back!
-
-<strong><a href="https://markebmedia.com/website/dashboard.html">Update Your Profile</a></strong>
-
-Best regards,
-Markeb Media Team`;
-        
-        contentInput.value = content;
-        updateBroadcastPreview();
-        break;
-      }
-      
-      const userPostcode = firstRecipient.fields['Postcode'] || 'M1 1AA';
-      
-      // ✅ FIXED: Generate next 7 WEEKDAYS (skip weekends)
-      const availabilityPromises = [];
-      let daysChecked = 0;
-      let dayOffset = 1;
-      
-      while (daysChecked < 7 && dayOffset <= 14) {  // Check up to 14 days to find 7 weekdays
-        const checkDate = new Date();
-        checkDate.setDate(checkDate.getDate() + dayOffset);
-        
-        // ✅ Skip weekends (Sunday=0, Saturday=6)
-        const dayOfWeek = checkDate.getDay();
-        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-          const dateStr = checkDate.toISOString().split('T')[0];
-          
-          availabilityPromises.push(
-            fetch('/.netlify/functions/check-availability', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                postcode: userPostcode,
-                region: userRegion,
-                selectedDate: dateStr,
-                duration: 90
-              })
-            })
-            .then(res => res.json())
-            .then(data => ({
-              date: dateStr,
-              slots: data.availableSlots ? data.availableSlots.filter(s => s.available) : []
-            }))
-          );
-          
-          daysChecked++;
-        }
-        
-        dayOffset++;
-      }
-      
-      Promise.all(availabilityPromises).then(results => {
-        const daysWithAvailability = results.filter(r => r.slots.length > 0);
-        
-        if (daysWithAvailability.length === 0) {
-          content = `Hi [Name],
-
-Unfortunately, we're fully booked in your region (${userUKRegion}) for the next week.
-
-However, availability changes frequently as clients reschedule, so please check back or contact us directly:
-
-<strong><a href="https://markebmedia.com/website/dashboard.html">Check Live Availability</a></strong>
-
-Best regards,
-Markeb Media Team`;
-        } else {
-          let availabilityHTML = '';
-          daysWithAvailability.slice(0, 5).forEach(day => {
-            const date = new Date(day.date);
-            const dayName = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' });
-            const times = day.slots.map(s => s.time).join(', ');
-            
-            availabilityHTML += `<strong>${dayName}:</strong> ${times}<br>\n`;
-          });
-          
-          content = `Hi [Name],
-
-Great news! Our in-house media specialist is available in your area.
-
-✅ <strong>AVAILABLE TIME SLOTS:</strong>
-${availabilityHTML}
-These slots are filling up as clients book throughout the week. You can reserve your preferred time through your dashboard.
-
-<strong><a href="https://markebmedia.com/login">View Full Calendar & Book</a></strong>
-
-Best regards,
-Markeb Media Team`;
-        }
-        
-        contentInput.value = content;
-        updateBroadcastPreview();
-      }).catch(error => {
-        console.error('Error fetching availability:', error);
-        content = fallbackAvailabilityContent;
-        contentInput.value = content;
-        updateBroadcastPreview();
-      });
-    }
-  }
-  break;
+      subject = 'Available Shoot Dates - Book Your Slot';
+      contentInput.value = '✅ Availability data will be fetched live for each recipient when sent.\n\nEach person will receive dates specific to their region — you don\'t need to edit this.';
+      composer.style.display = 'block';
+      updateBroadcastPreview();
+      break;
   }
   
   subjectInput.value = subject;
@@ -8219,18 +8106,19 @@ async function sendTestBroadcast() {
   }
   
   try {
+    const isAvailabilityTemplateTest = document.getElementById('broadcastContent').value.includes('Availability data will be fetched live');
+    const testRecipient = selectedRecipients.length > 0
+      ? (() => { const u = allBroadcastUsers.find(u => u.fields['Email'] === selectedRecipients[0]); return { email: 'commercial@markebmedia.com', name: u?.fields['Name'] || 'Test User', company: u?.fields['Company'] || '', region: mapRegionToBookingRegion(u?.fields['Region']) || 'North', regionKey: (u?.fields['Region'] || '').toLowerCase().replace(/ /g, '-'), ukRegion: u?.fields['Region'] || '', postcode: u?.fields['Postcode'] || '' }; })()
+      : { email: 'commercial@markebmedia.com', name: 'Test User', company: 'Test Company', region: 'North', regionKey: 'north', ukRegion: '', postcode: '' };
+
     const response = await fetch('/.netlify/functions/send-broadcast-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        recipients: [{
-          email: 'commercial@markebmedia.com',
-          name: 'Test User',
-          company: 'Test Company'
-        }],
+        recipients: [testRecipient],
         subject: '[TEST] ' + subject,
         content: content,
-        templateType: 'custom',
+        templateType: isAvailabilityTemplateTest ? 'availability' : 'custom',
         testMode: true
       })
     });
@@ -8287,6 +8175,8 @@ async function sendBroadcastEmail() {
       };
     });
     
+    const isAvailabilityTemplate = document.getElementById('broadcastContent').value.includes('Availability data will be fetched live');
+
     const response = await fetch('/.netlify/functions/send-broadcast-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -8294,7 +8184,7 @@ async function sendBroadcastEmail() {
         recipients: recipients,
         subject: subject,
         content: content,
-        templateType: 'custom',
+        templateType: isAvailabilityTemplate ? 'availability' : 'custom',
         testMode: false
       })
     });
