@@ -3241,12 +3241,14 @@ async function applyDiscountCode() {
   
   try {
     const clientEmail = document.getElementById('clientEmail').value.trim();
+    // Discount applies to service/bedroom/sqft only — addons always full price
+    const discountablePrice = bookingData.basePrice + (bookingData.extraBedroomFee || 0) + (bookingData.squareFootageFee || 0);
     const response = await fetch('/.netlify/functions/validate-discount-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         code: code,
-        totalPrice: bookingData.totalPrice,
+        totalPrice: discountablePrice,
         region: bookingData.region,
         serviceId: bookingData.service.id,
         clientEmail: clientEmail
@@ -3270,8 +3272,8 @@ async function applyDiscountCode() {
       // Update booking data
       bookingData.discountCode = data.code;
       bookingData.discountAmount = data.discountAmount;
-      bookingData.priceBeforeDiscount = data.originalPrice;
-      bookingData.totalPrice = data.finalPrice;
+      bookingData.priceBeforeDiscount = bookingData.totalPrice; // full price before discount
+      bookingData.totalPrice = bookingData.totalPrice - data.discountAmount; // addons stay full price
       
       // Show success message
       const discountText = data.discountType === 'Percentage' 
