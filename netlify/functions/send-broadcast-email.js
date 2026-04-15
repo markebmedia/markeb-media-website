@@ -504,9 +504,9 @@ async function generateAvailabilityContent(user) {
           });
           const timesDisplay = times.slice(0, 6).join(', ');
           return `
-            <div class="date-item">
-              <span class="date-label"><strong>${formatted}</strong><br><span style="font-size:13px;color:#64748b;">${timesDisplay}</span></span>
-              <span class="date-badge">AVAILABLE</span>
+            <div class="date-item" style="flex-wrap: wrap; gap: 8px;">
+              <span class="date-label" style="flex: 1; min-width: 0;"><strong>${formatted}</strong><br><span style="font-size:12px;color:#64748b;word-break:break-word;">${timesDisplay}</span></span>
+              <span class="date-badge" style="font-size:9px; padding: 3px 8px; white-space: nowrap; align-self: flex-start;">✓</span>
             </div>
           `;
         }).join('')}

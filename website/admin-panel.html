@@ -8195,7 +8195,11 @@ async function sendBroadcastEmail() {
       alert(`✅ Broadcast sent successfully!\n\nSent: ${data.successCount}\nFailed: ${data.failureCount}`);
       
       // Save to history
-      saveBroadcastHistory(subject, selectedRecipients.length);
+      const recipientNames = selectedRecipients.map(email => {
+        const u = allBroadcastUsers.find(u => u.fields['Email'] === email);
+        return u ? `${u.fields['Name']} (${email})` : email;
+      });
+      saveBroadcastHistory(subject, selectedRecipients.length, recipientNames);
       
       // Clear form
       clearBroadcastForm();
@@ -8213,7 +8217,7 @@ async function sendBroadcastEmail() {
 }
 
 // Save broadcast to history
-function saveBroadcastHistory(subject, recipientCount) {
+function saveBroadcastHistory(subject, recipientCount, recipientNames) {
   const history = JSON.parse(localStorage.getItem('broadcastHistory') || '[]');
   
   const templateType = document.getElementById('broadcastContent').value.includes('Availability data will be fetched live') ? 'Availability Reminder' : 'Custom';
@@ -8221,7 +8225,7 @@ function saveBroadcastHistory(subject, recipientCount) {
   history.unshift({
     subject: subject,
     recipientCount: recipientCount,
-    recipients: recipientNames,
+    recipients: recipientNames || [],
     templateType: templateType,
     content: document.getElementById('broadcastContent').value,
     timestamp: new Date().toISOString()
