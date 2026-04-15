@@ -10,7 +10,7 @@ const BCC_EMAIL = 'commercial@markebmedia.com';
 const LOGO_URL = 'https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png';
 
 // Email Layout Wrapper (matching email-service.js)
-function getEmailLayout(content) {
+function getEmailLayout(content, userEmail = '') {
   return `
 <!DOCTYPE html>
 <html>
@@ -182,7 +182,7 @@ function getEmailLayout(content) {
       <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
       <p style="margin-top: 20px; font-size: 12px; color: rgba(253,243,226,0.4);">
         You received this email because you're a valued Markeb Media client.<br>
-        <a href="https://markebmedia.com/login">Manage your preferences</a>
+        <a href="https://markebmedia.com/website/unsubscribe.html?email=${encodeURIComponent(userEmail)}" style="color: rgba(253,243,226,0.4);">Unsubscribe</a>
       </p>
     </div>
   </div>
@@ -536,7 +536,7 @@ exports.handler = async (event, context) => {
         return;
       }
       try {
-        const emailHtml = getEmailLayout(emailContent);
+        const emailHtml = getEmailLayout(emailContent, user.email);
         const recipientEmail = isTest ? testEmail : user.email;
         await resend.emails.send({
           from: FROM_EMAIL,

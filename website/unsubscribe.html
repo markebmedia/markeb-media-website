@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Unsubscribe - Markeb Media</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f7ead5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: #FDF3E2;
+      border-radius: 16px;
+      padding: 48px 40px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(63,77,27,0.1);
+    }
+    .logo { width: 120px; height: auto; margin-bottom: 24px; }
+    h1 { font-size: 24px; font-weight: 700; color: #3F4D1B; margin-bottom: 12px; }
+    p { font-size: 15px; color: #64748b; line-height: 1.6; margin-bottom: 24px; }
+    .email-display {
+      background: #f0f4e8;
+      border: 2px solid #3F4D1B;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-weight: 600;
+      color: #3F4D1B;
+      margin-bottom: 24px;
+      font-size: 15px;
+    }
+    .btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+      color: #FDF3E2;
+      padding: 14px 32px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 15px;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .success {
+      display: none;
+      background: #f0fdf4;
+      border: 2px solid #10b981;
+      border-radius: 12px;
+      padding: 24px;
+      color: #065f46;
+      font-weight: 600;
+      margin-top: 24px;
+    }
+    .error-msg {
+      display: none;
+      background: #fee2e2;
+      border: 2px solid #ef4444;
+      border-radius: 12px;
+      padding: 16px;
+      color: #991b1b;
+      font-size: 14px;
+      margin-top: 16px;
+    }
+    .no-email {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 24px;
+      color: #92400e;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="/public/images/Markeb Media Logo (2).png" alt="Markeb Media" class="logo">
+
+    <div id="mainContent">
+      <h1>Unsubscribe</h1>
+      <p>You'll no longer receive broadcast emails from Markeb Media. We'll be notified of your request.</p>
+
+      <div id="emailDisplay" class="email-display"></div>
+
+      <button class="btn" id="confirmBtn" onclick="confirmUnsubscribe()">
+        Confirm Unsubscribe
+      </button>
+
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+
+    <div id="noEmail" class="no-email" style="display:none;">
+      <strong>⚠️ Invalid unsubscribe link</strong><br><br>
+      Please contact us directly at <a href="mailto:commercial@markebmedia.com" style="color:#92400e;">commercial@markebmedia.com</a> to unsubscribe.
+    </div>
+
+    <div class="success" id="successMsg">
+      ✅ You've been unsubscribed.<br><br>
+      You won't receive any further broadcast emails from us. If this was a mistake, please email <a href="mailto:commercial@markebmedia.com" style="color:#065f46;">commercial@markebmedia.com</a>.
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get('email');
+
+    if (!email) {
+      document.getElementById('mainContent').style.display = 'none';
+      document.getElementById('noEmail').style.display = 'block';
+    } else {
+      document.getElementById('emailDisplay').textContent = email;
+    }
+
+    async function confirmUnsubscribe() {
+      const btn = document.getElementById('confirmBtn');
+      const errorMsg = document.getElementById('errorMsg');
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
+      errorMsg.style.display = 'none';
+
+      try {
+        const response = await fetch('/.netlify/functions/unsubscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          document.getElementById('mainContent').style.display = 'none';
+          document.getElementById('successMsg').style.display = 'block';
+        } else {
+          throw new Error(data.error || 'Failed to unsubscribe');
+        }
+      } catch (error) {
+        errorMsg.textContent = '❌ ' + error.message;
+        errorMsg.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Confirm Unsubscribe';
+      }
+    }
+  </script>
+</body>
+</html>
