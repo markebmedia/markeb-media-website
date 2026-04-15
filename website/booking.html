@@ -2373,12 +2373,19 @@ function handleAccessTypeChange() {
       });
 
       const sqftFee = bookingData.squareFootageFee || 0;
-      const totalPrice = basePrice + extraBedroomFee + addonsPrice + sqftFee;
+      const subtotal = basePrice + extraBedroomFee + addonsPrice + sqftFee;
 
       bookingData.extraBedroomFee = extraBedroomFee;
       bookingData.addonsPrice = addonsPrice;
       bookingData.addonsDuration = addonsDuration;
-      bookingData.totalPrice = totalPrice;
+
+      // Keep discount locked to original service/bedroom/sqft — addons never discounted
+      if (appliedDiscount) {
+        bookingData.priceBeforeDiscount = subtotal;
+        bookingData.totalPrice = subtotal - appliedDiscount.discountAmount;
+      } else {
+        bookingData.totalPrice = subtotal;
+      }
 
       // Extra duration for large properties and extra bedrooms
       const serviceId = bookingData.service ? bookingData.service.id : '';
@@ -2390,7 +2397,10 @@ function handleAccessTypeChange() {
       bookingData.extraDuration = extraDuration;
 
       document.getElementById('servicePrice').textContent = `£${basePrice.toFixed(2)}`;
-      document.getElementById('totalPrice').textContent = `£${totalPrice.toFixed(2)}`;
+      const displayTotal = appliedDiscount
+        ? subtotal - appliedDiscount.discountAmount
+        : subtotal;
+      document.getElementById('totalPrice').textContent = `£${displayTotal.toFixed(2)}`;
 
       const bedroomFeeRow = document.getElementById('bedroomFeeRow');
       if (extraBedroomFee > 0) {
@@ -2440,6 +2450,17 @@ function handleAccessTypeChange() {
       }
 
       document.getElementById('priceBreakdown').style.display = 'block';
+
+      // Refresh discount row if a code is already applied
+      if (appliedDiscount) {
+        let discountRow = document.getElementById('discountRow');
+        if (discountRow) {
+          discountRow.querySelector('span:first-child').textContent =
+            `Discount (${appliedDiscount.code})`;
+          discountRow.querySelector('span:last-child').textContent =
+            `-£${appliedDiscount.discountAmount.toFixed(2)}`;
+        }
+      }
     }
 
     async function changeMonth(direction) {
