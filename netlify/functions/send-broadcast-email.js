@@ -395,7 +395,7 @@ async function fetchAvailableDatesForUser(user) {
   // Find next 7 weekdays
   const weekdays = [];
   let offset = 1;
-  while (weekdays.length < 7 && offset <= 14) {
+  while (weekdays.length < 5 && offset <= 10) {
     const d = new Date();
     d.setDate(d.getDate() + offset);
     if (d.getDay() !== 0 && d.getDay() !== 6) {
@@ -730,20 +730,27 @@ exports.handler = async (event, context) => {
     const emailsSent = [];
     const errors = [];
 
-    // Generate all email content in parallel, then send in parallel
-    const emailJobs = await Promise.all(recipients.map(async (user) => {
-      try {
-        let emailContent = content;
-        if (templateType === 'availability') {
-          emailContent = await generateAvailabilityContent(user);
-        } else {
-          emailContent = replaceMergeTags(content, user);
+    // Generate email content in batches to avoid timeout
+    const BATCH_SIZE = 5;
+    const emailJobs = [];
+
+    for (let i = 0; i < recipients.length; i += BATCH_SIZE) {
+      const batch = recipients.slice(i, i + BATCH_SIZE);
+      const batchResults = await Promise.all(batch.map(async (user) => {
+        try {
+          let emailContent = content;
+          if (templateType === 'availability') {
+            emailContent = await generateAvailabilityContent(user);
+          } else {
+            emailContent = replaceMergeTags(content, user);
+          }
+          return { user, emailContent, error: null };
+        } catch (error) {
+          return { user, emailContent: null, error };
         }
-        return { user, emailContent, error: null };
-      } catch (error) {
-        return { user, emailContent: null, error };
-      }
-    }));
+      }));
+      emailJobs.push(...batchResults);
+    }
 
     await Promise.all(emailJobs.map(async ({ user, emailContent, error: contentError }) => {
       if (contentError || !emailContent) {
