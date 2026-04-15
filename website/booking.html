@@ -3408,9 +3408,10 @@ function updatePriceWithDiscount() {
     priceBreakdown.insertBefore(discountRow, divider);
   }
   
-  // Update total price
-  document.getElementById('totalPrice').textContent = `£${appliedDiscount.finalPrice.toFixed(2)}`;
-  document.getElementById('summaryTotal').textContent = `£${appliedDiscount.finalPrice.toFixed(2)}`;
+  // Update total price — discount on service only, addons always full price
+  const displayTotal = bookingData.totalPrice;
+  document.getElementById('totalPrice').textContent = `£${displayTotal.toFixed(2)}`;
+  document.getElementById('summaryTotal').textContent = `£${displayTotal.toFixed(2)}`;
 }
 </script>
 </body>
