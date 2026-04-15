@@ -2253,6 +2253,9 @@ function handleAccessTypeChange() {
       bookingData.selectedAddons = [];
       bookingData.squareFootageFee = 0;
 
+      // Clear any applied discount — codes are validated per service
+      removeDiscountCode();
+
       document.querySelectorAll('.service-card').forEach(card => {
         card.classList.remove('selected');
       });
