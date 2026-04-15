@@ -221,6 +221,43 @@ exports.handler = async (event, context) => {
       priceBeforeDiscount = finalPrice;
     }
 
+    // ✅ Hard server-side discount code validation (per-customer and applicable customers)
+    if (bookingData.discountCode && bookingData.discountAmount > 0) {
+      try {
+        const validateUrl = `${process.env.URL || 'https://markebmedia.com'}/.netlify/functions/validate-discount-code`;
+        const validateResponse = await fetch(validateUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code: bookingData.discountCode,
+            totalPrice: bookingData.priceBeforeDiscount || bookingData.totalPrice,
+            region: bookingData.region,
+            serviceId: bookingData.serviceId,
+            clientEmail: bookingData.clientEmail
+          })
+        });
+
+        const validateResult = await validateResponse.json();
+
+        if (!validateResult.success) {
+          console.log('❌ Server-side discount validation failed:', validateResult.error);
+          return {
+            statusCode: 400,
+            headers,
+            body: JSON.stringify({
+              success: false,
+              error: `Discount code rejected: ${validateResult.error}`
+            })
+          };
+        }
+
+        console.log('✅ Server-side discount validation passed');
+      } catch (validateError) {
+        console.error('Error during server-side discount validation:', validateError);
+        // Don't block booking on validation error — log and continue
+      }
+    }
+
     // Prepare Airtable record
     const airtableRecord = {
       fields: {

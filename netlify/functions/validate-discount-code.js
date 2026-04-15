@@ -20,9 +20,9 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { code, totalPrice, region, serviceId } = JSON.parse(event.body);
+    const { code, totalPrice, region, serviceId, clientEmail } = JSON.parse(event.body);
 
-    console.log('📥 Validating discount code:', { code, totalPrice, region, serviceId });
+    console.log('📥 Validating discount code:', { code, totalPrice, region, serviceId, clientEmail });
 
     if (!code || !totalPrice) {
       return {
@@ -172,6 +172,59 @@ exports.handler = async (event, context) => {
             error: 'This code is not valid for the selected service' 
           })
         };
+      }
+    }
+
+    // Check applicable customers
+    const applicableCustomerEmails = discount['Email (from Applicable Customers)'];
+    if (applicableCustomerEmails && applicableCustomerEmails.length > 0 && clientEmail) {
+      const emailList = Array.isArray(applicableCustomerEmails)
+        ? applicableCustomerEmails.map(e => e.toLowerCase())
+        : [applicableCustomerEmails.toLowerCase()];
+      if (!emailList.includes(clientEmail.toLowerCase())) {
+        console.log('❌ Customer not in applicable customers list');
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            success: false,
+            error: 'This code is not valid for your account'
+          })
+        };
+      }
+    }
+
+    // Check per-customer usage limit
+    const perCustomerLimit = discount['Per Customer Limit'];
+    if (perCustomerLimit && clientEmail) {
+      try {
+        const bookingsTableId = process.env.AIRTABLE_BOOKINGS_TABLE || 'Bookings';
+        const usageFormula = `AND(UPPER({Discount Code}) = "${code.toUpperCase()}", LOWER({Client Email}) = "${clientEmail.toLowerCase()}", {Booking Status} != "Cancelled")`;
+        const usageUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${bookingsTableId}?filterByFormula=${encodeURIComponent(usageFormula)}&fields[]=Booking Reference`;
+
+        const usageResponse = await fetch(usageUrl, {
+          headers: { 'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}` }
+        });
+
+        const usageData = await usageResponse.json();
+        const customerUsageCount = usageData.records ? usageData.records.length : 0;
+
+        console.log(`Customer usage count for ${clientEmail}: ${customerUsageCount} / ${perCustomerLimit}`);
+
+        if (customerUsageCount >= perCustomerLimit) {
+          console.log('❌ Per-customer usage limit reached');
+          return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({
+              success: false,
+              error: 'You have already used this code the maximum number of times'
+            })
+          };
+        }
+      } catch (usageError) {
+        console.error('Error checking per-customer usage:', usageError);
+        // Don't block on error — allow booking to proceed
       }
     }
 

@@ -2770,6 +2770,40 @@ We wanted to reach out..." required></textarea>
           </div>
         </div>
 
+        <!-- Per Customer Limit -->
+        <div class="form-group">
+          <label class="form-label" for="perCustomerLimit">Max Uses Per Customer</label>
+          <input
+            type="number"
+            id="perCustomerLimit"
+            class="form-input"
+            placeholder="Leave blank for unlimited"
+            min="1"
+          />
+          <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+            Maximum times a single customer can use this code
+          </div>
+        </div>
+
+        <!-- Applicable Customers -->
+        <div class="form-group">
+          <label class="form-label">Applicable Customers</label>
+          <div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">
+            Leave blank to allow all customers. Select specific customers to restrict access.
+          </div>
+          <input
+            type="text"
+            id="customerSearchInput"
+            class="form-input"
+            placeholder="Search customers..."
+            oninput="filterDiscountCustomers()"
+            style="margin-bottom: 8px;"
+          />
+          <div id="applicableCustomersList" style="max-height: 200px; overflow-y: auto; border: 2px solid #e2e8f0; border-radius: 8px; padding: 8px; background: #fff;">
+            <div style="text-align: center; color: #94a3b8; font-size: 13px; padding: 16px;">Loading customers...</div>
+          </div>
+        </div>
+
         <!-- Notes -->
         <div class="form-group">
           <label class="form-label" for="discountNotes">Internal Notes</label>
@@ -6457,6 +6491,9 @@ function showCreateDiscountModal() {
   
   // Populate service checkboxes
   populateServiceCheckboxes();
+
+  // Populate applicable customers
+  populateDiscountCustomers([]);
   
   // Show modal
   document.getElementById('discountModal').classList.add('active');
@@ -6487,6 +6524,38 @@ function populateServiceCheckboxes() {
       <span style="font-size: 13px;">${serviceNames[serviceId] || serviceId}</span>
     </label>
   `).join('');
+}
+
+// Populate Applicable Customers checkboxes
+function populateDiscountCustomers(selectedRecordIds = []) {
+  const container = document.getElementById('applicableCustomersList');
+  if (!container) return;
+
+  if (!allCustomers || allCustomers.length === 0) {
+    container.innerHTML = '<div style="text-align: center; color: #94a3b8; font-size: 13px; padding: 16px;">No customers loaded</div>';
+    return;
+  }
+
+  container.innerHTML = allCustomers.map(customer => {
+    const isChecked = selectedRecordIds.includes(customer.id);
+    return `
+      <label style="display: flex; align-items: center; gap: 8px; padding: 8px; cursor: pointer; border-bottom: 1px solid #f1f5f9;" class="discount-customer-row">
+        <input type="checkbox" value="${customer.id}" class="customer-checkbox" ${isChecked ? 'checked' : ''} style="width: 16px; height: 16px;">
+        <div>
+          <div style="font-size: 13px; font-weight: 600;">${customer.fields['Name']}</div>
+          <div style="font-size: 11px; color: #64748b;">${customer.fields['Email']} ${customer.fields['Company'] ? '· ' + customer.fields['Company'] : ''}</div>
+        </div>
+      </label>
+    `;
+  }).join('');
+}
+
+function filterDiscountCustomers() {
+  const search = document.getElementById('customerSearchInput').value.toLowerCase();
+  document.querySelectorAll('.discount-customer-row').forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(search) ? 'flex' : 'none';
+  });
 }
 
 // Update Discount Value Label
@@ -6545,6 +6614,14 @@ async function saveDiscountCode(event) {
     if (notes) fields['Notes'] = notes;
     if (selectedRegions.length > 0) fields['Applicable Regions'] = selectedRegions;
     if (selectedServices.length > 0) fields['Applicable Services'] = selectedServices;
+
+    const perCustomerLimit = document.getElementById('perCustomerLimit').value
+      ? parseInt(document.getElementById('perCustomerLimit').value)
+      : null;
+    if (perCustomerLimit) fields['Per Customer Limit'] = perCustomerLimit;
+
+    const selectedCustomers = Array.from(document.querySelectorAll('.customer-checkbox:checked')).map(cb => cb.value);
+    if (selectedCustomers.length > 0) fields['Applicable Customers'] = selectedCustomers;
     
     
     
@@ -6619,6 +6696,13 @@ function editDiscountCode(codeId) {
   document.querySelectorAll('.service-checkbox').forEach(cb => {
     cb.checked = applicableServices.includes(cb.value);
   });
+
+  // Per customer limit
+  document.getElementById('perCustomerLimit').value = fields['Per Customer Limit'] || '';
+
+  // Applicable customers — use linked record IDs
+  const applicableCustomers = fields['Applicable Customers'] || [];
+  populateDiscountCustomers(applicableCustomers);
   
   document.getElementById('discountModal').classList.add('active');
 }
