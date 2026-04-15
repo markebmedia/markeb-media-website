@@ -235,30 +235,43 @@ async function fetchAvailableDatesForUser(user) {
     return null;
   }
   const regionKey = getRegionKey(user);
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
+  const baseUrl = process.env.URL || 'https://markebmedia.com';
 
-  try {
-    const baseUrl = process.env.URL || 'https://markebmedia.com';
-    const response = await fetch(`${baseUrl}/.netlify/functions/get-available-dates`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        region: regionKey,
-        year,
-        month,
-        postcode: user.postcode || ''
-      })
-    });
-
-    if (!response.ok) throw new Error('Failed to fetch available dates');
-    const data = await response.json();
-    return data.availableDates || [];
-  } catch (error) {
-    console.error(`Error fetching dates for ${user.email}:`, error.message);
-    return [];
+  // Find next 7 weekdays
+  const weekdays = [];
+  let offset = 1;
+  while (weekdays.length < 7 && offset <= 14) {
+    const d = new Date();
+    d.setDate(d.getDate() + offset);
+    if (d.getDay() !== 0 && d.getDay() !== 6) {
+      weekdays.push(d.toISOString().split('T')[0]);
+    }
+    offset++;
   }
+
+  // Check availability for each weekday
+  const results = await Promise.all(weekdays.map(async (dateStr) => {
+    try {
+      const response = await fetch(`${baseUrl}/.netlify/functions/check-availability`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          postcode: user.postcode || '',
+          region: regionKey,
+          selectedDate: dateStr,
+          duration: 90
+        })
+      });
+      if (!response.ok) return null;
+      const data = await response.json();
+      const available = (data.availableSlots || []).filter(s => s.available).map(s => s.time);
+      return available.length > 0 ? { date: dateStr, times: available } : null;
+    } catch {
+      return null;
+    }
+  }));
+
+  return results.filter(Boolean);
 }
 
 async function generateAvailabilityContent(user) {
@@ -270,14 +283,15 @@ async function generateAvailabilityContent(user) {
   if (availableDates.length > 0) {
     datesHTML = `
       <div class="date-list">
-        ${availableDates.slice(0, 7).map(dateStr => {
+        ${availableDates.slice(0, 5).map(({ date: dateStr, times }) => {
           const date = new Date(dateStr + 'T12:00:00');
           const formatted = date.toLocaleDateString('en-GB', {
             weekday: 'long', day: 'numeric', month: 'long'
           });
+          const timesDisplay = times.slice(0, 6).join(', ');
           return `
             <div class="date-item">
-              <span class="date-label">${formatted}</span>
+              <span class="date-label"><strong>${formatted}</strong><br><span style="font-size:13px;color:#64748b;">${timesDisplay}</span></span>
               <span class="date-badge">AVAILABLE</span>
             </div>
           `;
