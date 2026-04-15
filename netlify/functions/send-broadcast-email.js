@@ -467,7 +467,8 @@ async function fetchAvailableDatesForUser(user) {
           const start = timeToMins(b.fields['Time']);
           const dur = b.fields['Duration (mins)'] || 90;
           const end = start + dur;
-          if (slotMins >= start - buffer && slotMins < end + buffer) return false;
+          const twoHourBuffer = 120;
+          if (slotMins >= start - twoHourBuffer && slotMins < end + twoHourBuffer) return false;
         }
 
         for (const bt of blockedTimes) {
