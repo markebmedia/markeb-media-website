@@ -852,47 +852,6 @@ width: 100%;
           <div style="font-size: 12px; color: #94a3b8; text-align: right; margin-top: 4px;">Inc. VAT</div>
         </div>
 
-        <!-- Discount Code Section -->
-<div id="discountSection" style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px; padding: 20px; margin-bottom: 28px; display: none;">
-  <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 12px;">
-    🎁 Have a Discount Code?
-  </h3>
-  
-  <div style="display: flex; gap: 12px; align-items: start;">
-    <div style="flex: 1;">
-      <input 
-        type="text" 
-        id="discountCodeInput" 
-        class="form-input" 
-        placeholder="Enter code"
-        style="text-transform: uppercase; margin-bottom: 0;"
-      />
-      <div class="error-message" id="discountCodeError"></div>
-      <div id="discountSuccess" style="display: none; margin-top: 8px; color: #065f46; font-size: 13px; font-weight: 600;">
-        ✓ <span id="discountSuccessText"></span>
-      </div>
-    </div>
-    <button 
-      type="button" 
-      class="btn btn-primary" 
-      id="applyDiscountBtn"
-      onclick="applyDiscountCode()"
-      style="width: auto; padding: 14px 24px;"
-    >
-      Apply
-    </button>
-    <button 
-      type="button" 
-      class="btn btn-secondary" 
-      id="removeDiscountBtn"
-      onclick="removeDiscountCode()"
-      style="width: auto; padding: 14px 24px; display: none;"
-    >
-      Remove
-    </button>
-  </div>
-</div>
-
         <div class="button-group">
           <button type="button" class="btn btn-secondary" onclick="goToStep(1)" style="flex: 1;">
             Back
@@ -1159,6 +1118,46 @@ width: 100%;
               <span style="font-size: 16px; font-weight: 700; color: #1e293b;">Total Amount:</span>
               <span style="font-size: 24px; font-weight: 700; color: #3b82f6;" id="summaryTotal">£0.00</span>
             </div>
+          </div>
+        </div>
+
+       <!-- Discount Code Section -->
+        <div id="discountSection" style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px; padding: 20px; margin-bottom: 28px;">
+          <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 12px;">
+            🎁 Have a Discount Code?
+          </h3>
+          <div style="display: flex; gap: 12px; align-items: start;">
+            <div style="flex: 1;">
+              <input
+                type="text"
+                id="discountCodeInput"
+                class="form-input"
+                placeholder="Enter code"
+                style="text-transform: uppercase; margin-bottom: 0;"
+              />
+              <div class="error-message" id="discountCodeError"></div>
+              <div id="discountSuccess" style="display: none; margin-top: 8px; color: #065f46; font-size: 13px; font-weight: 600;">
+                ✓ <span id="discountSuccessText"></span>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="applyDiscountBtn"
+              onclick="applyDiscountCode()"
+              style="width: auto; padding: 14px 24px;"
+            >
+              Apply
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              id="removeDiscountBtn"
+              onclick="removeDiscountCode()"
+              style="width: auto; padding: 14px 24px; display: none;"
+            >
+              Remove
+            </button>
           </div>
         </div>
 
@@ -3205,12 +3204,8 @@ async function createBooking() {
     // Discount code state
 let appliedDiscount = null;
 
-// Show discount section when service is selected
-function showDiscountSection() {
-  if (bookingData.service) {
-    document.getElementById('discountSection').style.display = 'block';
-  }
-}
+// No-op: discount section now lives on step 4 and is always visible
+function showDiscountSection() {}
 
 // Apply Discount Code
 async function applyDiscountCode() {
@@ -3245,6 +3240,7 @@ async function applyDiscountCode() {
   applyBtn.innerHTML = '<div class="loading-spinner"></div>';
   
   try {
+    const clientEmail = document.getElementById('clientEmail').value.trim();
     const response = await fetch('/.netlify/functions/validate-discount-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -3252,7 +3248,8 @@ async function applyDiscountCode() {
         code: code,
         totalPrice: bookingData.totalPrice,
         region: bookingData.region,
-        serviceId: bookingData.service.id
+        serviceId: bookingData.service.id,
+        clientEmail: clientEmail
       })
     });
     
