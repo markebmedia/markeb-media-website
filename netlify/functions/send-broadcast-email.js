@@ -193,23 +193,131 @@ function getEmailLayout(content) {
 
 // Replace merge tags AND convert line breaks to <br>
 function replaceMergeTags(content, user) {
-  const firstName = (user.name || 'there').split(' ')[0];  // ✅ Extract first name only
-  
+  const firstName = (user.name || 'there').split(' ')[0];
+  const specialist = (user.region || '').toLowerCase() === 'south' ? 'Andrii' : 'James Jago';
+
   return content
     .replace(/\[Name\]/g, firstName)
     .replace(/\[Company\]/g, user.company || 'your company')
     .replace(/\[Email\]/g, user.email || '')
+    .replace(/\[Region\]/g, user.ukRegion || user.region || 'your area')
+    .replace(/\[Specialist\]/g, specialist)
     .replace(/\n/g, '<br>');
 }
 
-// Helper: Convert time string (HH:MM) to minutes since midnight
-function timeToMinutes(timeString) {
-  if (!timeString) return 0;
-  const [hours, minutes] = timeString.split(':').map(Number);
-  return hours * 60 + minutes;
+const REGION_TO_KEY = {
+  'North': 'north',
+  'South': 'south'
+};
+
+function getRegionKey(user) {
+  if (user.regionKey) return user.regionKey;
+  return REGION_TO_KEY[user.region] || 'south';
 }
 
-// Helper: Check if a specific date has ANY available time slots
+const SPECIALIST_REGIONS = {
+  'north':      'James Jago',
+  'north-west': 'James Jago',
+  'north-east': 'James Jago',
+  'west':       'James Jago',
+  'east':       'Andrii',
+  'south':      'Andrii',
+  'south-east': 'Andrii',
+  'south-west': 'Andrii'
+};
+
+function getSpecialistForKey(regionKey) {
+  return SPECIALIST_REGIONS[(regionKey || '').toLowerCase()] || 'James Jago';
+}
+
+async function fetchAvailableDatesForUser(user) {
+  const regionKey = getRegionKey(user);
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+
+  try {
+    const baseUrl = process.env.URL || 'https://markebmedia.com';
+    const response = await fetch(`${baseUrl}/.netlify/functions/get-available-dates`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        region: regionKey,
+        year,
+        month,
+        postcode: user.postcode || ''
+      })
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch available dates');
+    const data = await response.json();
+    return data.availableDates || [];
+  } catch (error) {
+    console.error(`Error fetching dates for ${user.email}:`, error.message);
+    return [];
+  }
+}
+
+async function generateAvailabilityContent(user) {
+  const availableDates = await fetchAvailableDatesForUser(user);
+  const firstName = (user.name || 'there').split(' ')[0];
+
+  let datesHTML = '';
+  if (availableDates.length > 0) {
+    datesHTML = `
+      <div class="date-list">
+        ${availableDates.slice(0, 7).map(dateStr => {
+          const date = new Date(dateStr + 'T12:00:00');
+          const formatted = date.toLocaleDateString('en-GB', {
+            weekday: 'long', day: 'numeric', month: 'long'
+          });
+          return `
+            <div class="date-item">
+              <span class="date-label">${formatted}</span>
+              <span class="date-badge">AVAILABLE</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  } else {
+    datesHTML = `
+      <div class="alert alert-warning">
+        <strong>📅 High demand this week</strong><br>
+        Availability opens up regularly — log in to check the latest or reply and we'll find something that works.
+      </div>
+    `;
+  }
+
+  return `
+    <h2>📅 Availability Update</h2>
+
+    <p>Hi ${firstName},</p>
+
+    <p>
+      We have availability on the dates below. If you're sitting with a seller and want to give them a concrete timeline, these are slots you can offer right now:
+    </p>
+
+    ${datesHTML}
+
+    <div class="alert alert-success">
+      <strong>💡 How to use this</strong><br>
+      Drop these dates into your valuation conversation. Telling a vendor <em>"we can have the photographer there by Thursday"</em> is a simple but effective way to move the instruction forward.
+    </div>
+
+    <center>
+      <a href="https://markebmedia.com/login" class="button">Book a Slot Now</a>
+    </center>
+
+    <p style="font-size: 14px; color: #64748b; margin-top: 20px;">
+      Slots fill up quickly — if none of these work, log in to see the full calendar or reply to this email and we'll sort something.
+    </p>
+
+    <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+  `;
+}
+
+// Helper: Check if a specific date has ANY available time slots — KEEP FOR REFERENCE BUT NO LONGER CALLED
 async function checkDateAvailability(region, dateString) {
   try {
     // Capitalize region for Airtable lookup
@@ -445,49 +553,43 @@ exports.handler = async (event, context) => {
     const emailsSent = [];
     const errors = [];
 
-    // Send individual emails to each recipient
-    for (const user of recipients) {
+    // Generate all email content in parallel, then send in parallel
+    const emailJobs = await Promise.all(recipients.map(async (user) => {
       try {
         let emailContent = content;
-        
-        // Generate special content for availability template
         if (templateType === 'availability') {
           emailContent = await generateAvailabilityContent(user);
         } else {
-          // Replace merge tags for custom templates
           emailContent = replaceMergeTags(content, user);
         }
-        
+        return { user, emailContent, error: null };
+      } catch (error) {
+        return { user, emailContent: null, error };
+      }
+    }));
+
+    await Promise.all(emailJobs.map(async ({ user, emailContent, error: contentError }) => {
+      if (contentError || !emailContent) {
+        errors.push({ email: user.email, name: user.name, error: contentError?.message || 'Content generation failed' });
+        return;
+      }
+      try {
         const emailHtml = getEmailLayout(emailContent);
-        
-        // Determine recipient email (test or real)
         const recipientEmail = isTest ? testEmail : user.email;
-        
         await resend.emails.send({
           from: FROM_EMAIL,
           to: recipientEmail,
-          bcc: isTest ? [] : [BCC_EMAIL], // Only BCC on real sends
+          bcc: isTest ? [] : [BCC_EMAIL],
           subject: isTest ? `[TEST] ${subject}` : subject,
           html: emailHtml
         });
-
-        emailsSent.push({
-          email: recipientEmail,
-          name: user.name,
-          status: 'sent'
-        });
-
+        emailsSent.push({ email: recipientEmail, name: user.name, status: 'sent' });
         console.log(`✓ Sent to: ${user.name} (${recipientEmail})`);
-
       } catch (error) {
         console.error(`✗ Failed to send to ${user.email}:`, error);
-        errors.push({
-          email: user.email,
-          name: user.name,
-          error: error.message
-        });
+        errors.push({ email: user.email, name: user.name, error: error.message });
       }
-    }
+    }));
 
     return {
       statusCode: 200,

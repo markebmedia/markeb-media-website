@@ -2387,8 +2387,8 @@ body {
     </h3>
     
     <div class="info-box" style="margin-bottom: 24px;">
-      <strong>Merge tags available:</strong> <code>[Name]</code>, <code>[Company]</code>, <code>[Email]</code><br>
-      Each recipient receives an individual email (not CC'd or BCC'd together).
+      <strong>Merge tags available:</strong> <code>[Name]</code>, <code>[Company]</code>, <code>[Email]</code>, <code>[Region]</code>, <code>[Specialist]</code><br>
+      Each recipient gets a personalised individual email. Use the checkboxes above to select exactly who receives it — tick all and untick anyone you want to exclude.
     </div>
 
     <!-- Template Buttons -->
@@ -8279,7 +8279,11 @@ async function sendBroadcastEmail() {
       return {
         email: email,
         name: user?.fields['Name'] || 'Client',
-        company: user?.fields['Company'] || ''
+        company: user?.fields['Company'] || '',
+        region: mapRegionToBookingRegion(user?.fields['Region']) || 'North',
+        regionKey: (user?.fields['Region'] || '').toLowerCase().replace(/ /g, '-'),
+        ukRegion: user?.fields['Region'] || '',
+        postcode: user?.fields['Postcode'] || ''
       };
     });
     
