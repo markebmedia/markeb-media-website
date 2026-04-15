@@ -399,29 +399,88 @@ async function fetchAvailableDatesForUser(user) {
     const d = new Date();
     d.setDate(d.getDate() + offset);
     if (d.getDay() !== 0 && d.getDay() !== 6) {
-      weekdays.push(d.toISOString().split('T')[0]);
+      weekdays.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
     }
     offset++;
   }
 
-  // Check availability for each weekday
+  const SPECIALIST_FOR_REGION = {
+    'north': 'James Jago', 'north-west': 'James Jago',
+    'north-east': 'James Jago', 'west': 'James Jago',
+    'east': 'Andrii', 'south': 'Andrii',
+    'south-east': 'Andrii', 'south-west': 'Andrii'
+  };
+  const specialistName = SPECIALIST_FOR_REGION[regionKey] || 'James Jago';
+
+  const timeToMins = (t) => {
+    if (!t) return 0;
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  };
+
   const results = await Promise.all(weekdays.map(async (dateStr) => {
     try {
-      const response = await fetch(`${baseUrl}/.netlify/functions/check-availability`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          postcode: user.postcode || '',
-          region: regionKey,
-          selectedDate: dateStr,
-          duration: 90
-        })
+      const [bookings, blockedTimes] = await Promise.all([
+        base('Bookings')
+          .select({
+            filterByFormula: `AND(
+              FIND('${specialistName}', {Media Specialist}),
+              IS_SAME({Date}, '${dateStr}', 'day'),
+              OR(
+                {Booking Status} = 'Booked',
+                {Booking Status} = 'Reserved',
+                {Booking Status} = 'Confirmed'
+              )
+            )`,
+            fields: ['Time', 'Duration (mins)']
+          })
+          .firstPage(),
+
+        base('Blocked Times')
+          .select({
+            filterByFormula: `AND(
+              FIND('${specialistName}', {Media Specialist}),
+              IS_SAME({Date}, '${dateStr}', 'day')
+            )`,
+            fields: ['Start Time', 'End Time']
+          })
+          .firstPage()
+      ]);
+
+      // Generate slots 09:00 - 15:00
+      const allSlots = [];
+      for (let hour = 9; hour <= 15; hour++) {
+        for (const minute of [0, 30]) {
+          if (hour === 15 && minute === 30) break;
+          allSlots.push(`${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`);
+        }
+      }
+
+      const available = allSlots.filter(slot => {
+        const slotMins = timeToMins(slot);
+        const buffer = 45;
+        const duration = 90;
+
+        if (slotMins + duration > timeToMins('15:30')) return false;
+
+        for (const b of bookings) {
+          const start = timeToMins(b.fields['Time']);
+          const dur = b.fields['Duration (mins)'] || 90;
+          const end = start + dur;
+          if (slotMins >= start - buffer && slotMins < end + buffer) return false;
+        }
+
+        for (const bt of blockedTimes) {
+          const start = timeToMins(bt.fields['Start Time']);
+          const end = timeToMins(bt.fields['End Time']);
+          if (slotMins >= start && slotMins < end) return false;
+        }
+
+        return true;
       });
-      if (!response.ok) return null;
-      const data = await response.json();
-      const available = (data.availableSlots || []).filter(s => s.available).map(s => s.time);
+
       return available.length > 0 ? { date: dateStr, times: available } : null;
-    } catch {
+    } catch (err) {
       return null;
     }
   }));
