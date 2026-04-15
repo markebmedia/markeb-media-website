@@ -8020,11 +8020,11 @@ function loadBroadcastTemplate(templateId) {
   
   switch(templateId) {
    case 'availability':
-      subject = 'Available Shoot Dates - Book Your Slot';
+      subjectInput.value = 'Available Shoot Dates - Book Your Slot';
       contentInput.value = '✅ Availability data will be fetched live for each recipient when sent.\n\nEach person will receive dates specific to their region — you don\'t need to edit this.';
       composer.style.display = 'block';
       updateBroadcastPreview();
-      break;
+      return;
   }
   
   subjectInput.value = subject;
