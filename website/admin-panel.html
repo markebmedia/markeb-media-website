@@ -4963,9 +4963,26 @@ ${hasPaymentMethod ? `
       </tr>
     `;
   });
-html += '</tbody></table>';
-container.innerHTML = html;
-lucide.createIcons();
+const grandTotal = bookings.reduce((sum, b) => sum + (b.fields['Final Price'] || 0), 0);
+
+  html += `
+    <tr style="background: #fff3e0; border: 2px solid #B46100 !important; border-radius: 12px !important;">
+      <td data-label="Reference" colspan="3" style="font-weight: 700; font-size: 15px; color: #7a3e00; padding-top: 16px; padding-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <i data-lucide="calculator" style="width:16px;height:16px;color:#B46100;display:inline-block;vertical-align:middle;"></i>
+          Total Outstanding (${bookings.length} booking${bookings.length !== 1 ? 's' : ''})
+        </div>
+      </td>
+      <td data-label="Total" style="font-weight: 700; font-size: 20px; color: #B46100; padding-top: 16px; padding-bottom: 16px;">
+        £${grandTotal.toFixed(2)}
+      </td>
+      <td data-label="Payment Method" colspan="2"></td>
+    </tr>
+  `;
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+  lucide.createIcons();
 }
 
 // ===== MARK AS PAID FUNCTION - CORRECTED =====
