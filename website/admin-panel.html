@@ -4967,13 +4967,15 @@ const grandTotal = bookings.reduce((sum, b) => sum + (b.fields['Final Price'] ||
 
   html += `
     <tr style="background: #fff3e0; border: 2px solid #B46100 !important; border-radius: 12px !important;">
-      <td data-label="Reference" colspan="3" style="font-weight: 700; font-size: 15px; color: #7a3e00; padding-top: 16px; padding-bottom: 16px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <i data-lucide="calculator" style="width:16px;height:16px;color:#B46100;display:inline-block;vertical-align:middle;"></i>
-          Total Outstanding (${bookings.length} booking${bookings.length !== 1 ? 's' : ''})
-        </div>
-      </td>
+      <td data-label="Reference"></td>
+      <td data-label="Client"></td>
+      <td data-label="Service"></td>
+      <td data-label="Date & Time"></td>
       <td data-label="Total" style="font-weight: 700; font-size: 20px; color: #B46100; padding-top: 16px; padding-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+          <i data-lucide="calculator" style="width:14px;height:14px;color:#B46100;display:inline-block;vertical-align:middle;"></i>
+          <span style="font-size: 12px; font-weight: 700; color: #7a3e00; text-transform: uppercase; letter-spacing: 0.5px;">Outstanding</span>
+        </div>
         £${grandTotal.toFixed(2)}
       </td>
       <td data-label="Payment Method" colspan="2"></td>
