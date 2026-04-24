@@ -311,8 +311,16 @@ async function sendBookingConfirmation(booking) {
       ${getAccessTypeSection(booking)}
       ${getSquareFootageSection(booking)}
       <div class="detail-row">
-        <span class="detail-label">Total Amount</span>
-        <span class="detail-value">£${booking.totalPrice.toFixed(2)}</span>
+        <span class="detail-label">Subtotal (ex. VAT)</span>
+        <span class="detail-value">£${(booking.totalPrice / 1.2).toFixed(2)}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">VAT (20%)</span>
+        <span class="detail-value">£${(booking.totalPrice - booking.totalPrice / 1.2).toFixed(2)}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Total inc. VAT</span>
+        <span class="detail-value"><strong>£${booking.totalPrice.toFixed(2)}</strong></span>
       </div>
     </div>
 
@@ -501,8 +509,16 @@ async function sendPaymentConfirmation(booking) {
       </div>
       ${getAccessTypeSection(booking)}
       <div class="detail-row">
-        <span class="detail-label">Amount Paid</span>
-        <span class="detail-value">£${booking.amountPaid.toFixed(2)}</span>
+        <span class="detail-label">Subtotal (ex. VAT)</span>
+        <span class="detail-value">£${(booking.amountPaid / 1.2).toFixed(2)}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">VAT (20%)</span>
+        <span class="detail-value">£${(booking.amountPaid - booking.amountPaid / 1.2).toFixed(2)}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Amount Paid (inc. VAT)</span>
+        <span class="detail-value"><strong>£${booking.amountPaid.toFixed(2)}</strong></span>
       </div>
     </div>
 

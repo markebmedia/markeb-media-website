@@ -49,8 +49,8 @@ console.log('Add-ons received:', JSON.stringify(addons));
 
     // Get existing booking
     const booking = await base('Bookings').find(bookingId);
-    const oldTotalPrice = booking.fields['Total Price'];
-    const oldFinalPrice = booking.fields['Final Price'] || oldTotalPrice;
+    const oldFinalPrice = booking.fields['Final Price'] || 0;
+    const oldTotalPrice = oldFinalPrice;
     const discountCode = booking.fields['Discount Code'];
     const discountAmount = booking.fields['Discount Amount'] || 0;
 
@@ -99,6 +99,8 @@ console.log('Add-ons received:', JSON.stringify(addons));
       'Total Price': totalPrice,
       'Price Before Discount': priceBeforeDiscount,
       'Discount Amount': newDiscountAmount,
+      'Price Ex VAT': parseFloat((newFinalPrice / 1.2).toFixed(2)),
+      'VAT Amount': parseFloat((newFinalPrice - newFinalPrice / 1.2).toFixed(2)),
       'Final Price': newFinalPrice,
       'Service Modified': true,
       'Service Modified Date': new Date().toISOString()

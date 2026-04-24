@@ -229,7 +229,9 @@ exports.handler = async (event, context) => {
       'Payment Status': 'Paid',
       'Booking Status': 'Confirmed',
       'Payment Date': new Date().toISOString(),
-      'Amount Paid': finalPrice
+      'Amount Paid': finalPrice,
+      'Price Ex VAT': parseFloat((finalPrice / 1.2).toFixed(2)),
+      'VAT Amount': parseFloat((finalPrice - finalPrice / 1.2).toFixed(2))
     });
 
     console.log('✅ Booking updated - Payment Status: Paid');

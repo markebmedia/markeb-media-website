@@ -77,6 +77,8 @@ exports.handler = async (event, context) => {
           'Cancellation Reason': metadata.cancellationReason || 'Customer requested',
           'Cancellation Charge %': metadata.cancellationType === '50% Late Cancellation Fee' ? 50 : 100,
           'Cancellation Fee': cancellationFee,
+          'Cancellation Fee Ex VAT': parseFloat((cancellationFee / 1.2).toFixed(2)),
+          'Cancellation VAT Amount': parseFloat((cancellationFee - cancellationFee / 1.2).toFixed(2)),
           'Refund Amount': parseFloat(metadata.originalTotalPrice) - cancellationFee,
           'Cancelled By': 'Client',
           'Cancellation Pending': false,
@@ -245,7 +247,7 @@ exports.handler = async (event, context) => {
       const totalPrice = session.amount_total / 100;
       const bedrooms = parseInt(metadata.bedrooms) || 0;
       const extraBedrooms = Math.max(0, bedrooms - 4);
-      const extraBedroomFee = extraBedrooms * 30;
+      const extraBedroomFee = extraBedrooms * 25;
       
       let basePrice;
       if (discountAmount > 0 && priceBeforeDiscount > 0) {
@@ -279,6 +281,8 @@ exports.handler = async (event, context) => {
         'Discount Code': discountCode,
         'Discount Amount': discountAmount,
         'Price Before Discount': priceBeforeDiscount > 0 ? priceBeforeDiscount : totalPrice,
+        'Price Ex VAT': parseFloat((totalPrice / 1.2).toFixed(2)),
+        'VAT Amount': parseFloat((totalPrice - totalPrice / 1.2).toFixed(2)),
         'Final Price': totalPrice,
         
         'Client Name': metadata.clientName,

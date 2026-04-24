@@ -285,6 +285,8 @@ exports.handler = async (event, context) => {
         'Discount Code': discountAmount > 0 ? bookingData.discountCode : '',
         'Discount Amount': discountAmount,
         'Price Before Discount': priceBeforeDiscount,
+        'Price Ex VAT': parseFloat((finalPrice / 1.2).toFixed(2)),
+        'VAT Amount': parseFloat((finalPrice - finalPrice / 1.2).toFixed(2)),
         'Final Price': finalPrice,
         
         'Client Name': bookingData.clientName,

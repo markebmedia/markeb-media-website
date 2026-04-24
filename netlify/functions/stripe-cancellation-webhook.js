@@ -42,9 +42,9 @@ exports.handler = async (event, context) => {
 
       console.log(`Processing cancellation payment for booking ${bookingRef}`);
 
-      const cancellationFeeAmount = parseFloat(cancellationFee);
-      const totalPrice = parseFloat(originalTotalPrice);
-      const refundAmount = totalPrice - cancellationFeeAmount;
+      const cancellationFeeAmount = parseFloat(cancellationFee) || 0;
+      const totalPrice = parseFloat(originalTotalPrice) || 0;
+      const refundAmount = Math.max(0, totalPrice - cancellationFeeAmount);
       const cancellationChargePercentage = (cancellationFeeAmount / totalPrice) * 100;
 
       // Update booking status to Cancelled in Airtable
@@ -56,6 +56,8 @@ exports.handler = async (event, context) => {
         'Cancellation Pending': false,
         'Cancellation Charge %': Math.round(cancellationChargePercentage),
         'Cancellation Charge': cancellationFeeAmount,
+        'Cancellation Fee Ex VAT': parseFloat((cancellationFeeAmount / 1.2).toFixed(2)),
+        'Cancellation VAT Amount': parseFloat((cancellationFeeAmount - cancellationFeeAmount / 1.2).toFixed(2)),
         'Refund Amount': refundAmount
       });
 

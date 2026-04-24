@@ -61,7 +61,7 @@ exports.handler = async (event, context) => {
               name: fields['Service'] || 'Property Photography', // ✅ FIXED: Was 'Service Name'
               description: `Booking ${fields['Booking Reference']} - ${fields['Date']} at ${fields['Time']}`
             },
-            unit_amount: Math.round(fields['Total Price'] * 100) // Convert to pence
+            unit_amount: Math.round((fields['Final Price'] || 0) * 100) // Convert to pence
           },
           quantity: 1
         }
@@ -151,7 +151,7 @@ exports.handler = async (event, context) => {
               <!-- Amount Due -->
               <div style="background-color: #fff8ee; border: 2px solid #B46100; border-radius: 12px; padding: 24px; text-align: center; margin: 0 0 24px;">
                 <div style="font-size: 12px; color: #8a4a00; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Total Amount Due</div>
-                <div style="font-size: 48px; font-weight: 700; color: #B46100; line-height: 1; margin: 0;">£${fields['Total Price'].toFixed(2)}</div>
+                <div style="font-size: 48px; font-weight: 700; color: #B46100; line-height: 1; margin: 0;">£${(fields['Final Price'] || 0).toFixed(2)}</div>
               </div>
 
               <!-- CTA Button -->
@@ -159,7 +159,7 @@ exports.handler = async (event, context) => {
                 <tr>
                   <td style="text-align: center;">
                     <a href="${paymentLink.url}" style="display: inline-block; background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); color: #FDF3E2; text-decoration: none; padding: 18px 40px; border-radius: 10px; font-weight: 600; font-size: 18px;">
-                      💳 Pay Now — £${fields['Total Price'].toFixed(2)}
+                      💳 Pay Now — £${(fields['Final Price'] || 0).toFixed(2)}
                     </a>
                   </td>
                 </tr>

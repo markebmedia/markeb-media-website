@@ -119,7 +119,7 @@ exports.handler = async (event, context) => {
           service: fields['Service'],
           propertyAddress: fields['Property Address'],
           mediaSpecialist: fields['Media Specialist'],
-          totalPrice: fields['Total Price'],
+          totalPrice: fields['Final Price'] || 0,
           region: fields['Region'] // ✅ Pass region
         });
         console.log(`Reschedule email sent to ${fields['Client Email']}`);
@@ -174,14 +174,12 @@ async function sendRescheduleEmail(data) {
     clientName,
     clientEmail,
     bookingRef,
-    date,
-    time,
+    originalDate,
+    originalTime,
+    newDate,
+    newTime,
     service,
     propertyAddress,
-    cancellationReason,
-    cancellationCharge,
-    refundAmount,
-    refundProcessed,
     totalPrice,
     mediaSpecialist
   } = data;

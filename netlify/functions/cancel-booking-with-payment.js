@@ -69,7 +69,7 @@ exports.handler = async (event) => {
     const bookingDateTime = new Date(`${fields['Date']}T${fields['Time']}:00`);
     const now = new Date();
     const hoursUntil = (bookingDateTime - now) / (1000 * 60 * 60);
-    const totalPrice = fields['Total Price'];
+    const totalPrice = fields['Final Price'] || 0;
 
     let expectedFee = 0;
     let feeType = '';
@@ -138,6 +138,8 @@ exports.handler = async (event) => {
     await base('Bookings').update(booking.id, {
       'Cancellation Pending': true,
       'Cancellation Fee': cancellationFee,
+      'Cancellation Fee Ex VAT': parseFloat((cancellationFee / 1.2).toFixed(2)),
+      'Cancellation VAT Amount': parseFloat((cancellationFee - cancellationFee / 1.2).toFixed(2)),
       'Cancellation Type': feeType,
       'Cancellation Reason': reason || 'No reason provided',
       'Cancellation Session ID': session.id

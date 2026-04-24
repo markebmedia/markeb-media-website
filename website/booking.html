@@ -790,7 +790,7 @@ width: 100%;
               <button type="button" class="bedroom-btn" onclick="adjustBedrooms(1)">+</button>
             </div>
             <div id="bedroomFeeNotice" style="display: none; margin-top: 12px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
-              <strong>£30 per additional bedroom</strong> after the first 4 bedrooms
+              <strong>£25 + VAT per additional bedroom</strong> after the first 4 bedrooms
             </div>
           </div>
         </div>
@@ -812,7 +812,7 @@ width: 100%;
             <span style="font-size: 14px; color: #64748b;">sq ft</span>
           </div>
           <div id="sqftPriceNotice" style="display: none; margin-top: 10px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
-            <strong>+£150 large property fee</strong> — properties over 3,000 sq ft require additional shoot time
+            <strong>+£125 + VAT large property fee</strong> — properties over 3,000 sq ft require additional shoot time
           </div>
           <div id="sqftOkNotice" style="display: none; margin-top: 10px; padding: 12px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; font-size: 13px; color: #065f46;">
             ✓ Standard size — no additional fee
@@ -845,11 +845,14 @@ width: 100%;
             <span style="font-size: 14px; font-weight: 600; color: #1e293b;" class="detail-value">£0.00</span>
           </div>
           <div style="border-top: 2px solid #e2e8f0; margin: 16px 0;"></div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-size: 14px; color: #64748b;">VAT (20%)</span>
+            <span style="font-size: 14px; font-weight: 600; color: #64748b;" id="vatAmount">£0.00</span>
+          </div>
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 18px; font-weight: 700; color: #1e293b;">Total</span>
+            <span style="font-size: 18px; font-weight: 700; color: #1e293b;">Total inc. VAT</span>
             <span style="font-size: 24px; font-weight: 700; color: #B46100;" id="totalPrice">£0.00</span>
           </div>
-          <div style="font-size: 12px; color: #94a3b8; text-align: right; margin-top: 4px;">Inc. VAT</div>
         </div>
 
         <div class="button-group">
@@ -1432,7 +1435,7 @@ width: 100%;
   'standard-floor-plan': {
     id: 'standard-floor-plan',
     name: 'Standard Floor Plan',
-    price: 24.00,
+    price: 20.00,
     duration: 0,
     description: '2D floor plan to help buyers visualise the property layout',
     appliesToVideo: false
@@ -1440,7 +1443,7 @@ width: 100%;
   'plus-floor-plan': {
     id: 'plus-floor-plan',
     name: 'Plus Floor Plan',
-    price: 36.00,
+    price: 30.00,
     duration: 0,
     description: 'Enhanced 2D floor plan with measurements and room labels',
     appliesToVideo: false
@@ -1448,7 +1451,7 @@ width: 100%;
   'elevate-edit': {  // ✅ CHANGED from 'cinematic-edit'
     id: 'elevate-edit',
     name: 'Elevate Your Edit',  // ✅ NEW NAME
-    price: 75.00,  // ✅ CHANGED from 50.00
+    price: 62.50,  // ✅ CHANGED from 50.00
     duration: 0,
     description: 'Transform your video with premium editing including dynamic transitions, bold captions, spotlight features on key property details, advanced color grading, and creative effects that make your listing unforgettable',  // ✅ NEW DESCRIPTION
     appliesToVideo: true
@@ -1456,7 +1459,7 @@ width: 100%;
   'property-drone-photo': {
     id: 'property-drone-photo',
     name: 'Property Drone Photography',
-    price: 130.80,
+    price: 109.00,
     duration: 15,
     description: 'Up to 10 stunning aerial photographs',
     appliesToVideo: false
@@ -1464,7 +1467,7 @@ width: 100%;
   'property-drone-video': {
     id: 'property-drone-video',
     name: 'Property Drone Videography',
-    price: 130.80,
+    price: 109.00,
     duration: 15,
     description: 'Up to 30-second cinematic aerial showcase',
     appliesToVideo: true
@@ -1472,7 +1475,7 @@ width: 100%;
   'property-video': {
     id: 'property-video',
     name: 'Property Videography',
-    price: 154.80,
+    price: 129.00,
     duration: 60,
     description: 'Shot in 4K to captivate viewers and drive enquiries',
     appliesToVideo: true
@@ -1480,7 +1483,7 @@ width: 100%;
   'property-speed-tours': {
     id: 'property-speed-tours',
     name: 'Property Speed Tours',
-    price: 60.00,
+    price: 50.00,
     duration: 0,
     description: 'Quick walkthrough video tour of the property',
     appliesToVideo: true
@@ -1496,7 +1499,7 @@ width: 100%;
  'floor-plan-3d': {
   id: 'floor-plan-3d',
   name: 'Floor Plan Bundle',
-  price: 100.00,
+  price: 83.33,
   duration: 0,
   description: 'Immersive 3D floor plan giving buyers a realistic sense of space and layout — includes a 2D & 3D floor plan at no extra cost.',
   appliesToVideo: false
@@ -1508,7 +1511,7 @@ width: 100%;
     {
       id: 'complete-branding',
       name: 'Complete Branding Package - Photo & Video',
-      price: 894.00,
+      price: 745.00,
       duration: 300,
       description: 'Full personal branding suite for estate agents. Photography and video content with classic editing included.',
       isPropertyService: false,
@@ -1517,7 +1520,7 @@ width: 100%;
     {
       id: 'branding-video',
       name: 'Branding Videography Session',
-      price: 534.00,
+      price: 445.00,
       duration: 180,
       description: 'Personal branding video for estate agents. Multiple sequences for social content with classic editing included.',
       isPropertyService: false,
@@ -1526,7 +1529,7 @@ width: 100%;
     {
       id: 'branding-photo',
       name: 'Branding Photography Session - 10 Signature Shots',
-      price: 414.00,
+      price: 345.00,
       duration: 120,
       description: 'Personal branding for estate agents. You\'re in every shot.',
       isPropertyService: false,
@@ -1535,7 +1538,7 @@ width: 100%;
     {
       id: 'gold-package',
       name: 'Gold Package',
-      price: 600.00,
+      price: 500.00,
       duration: 150,
       description: 'Everything in our Silver Package, plus enhanced lifestyle content with classic editing included.',
       isPropertyService: true,
@@ -1544,7 +1547,7 @@ width: 100%;
     {
       id: 'silver-package',
       name: 'Silver Package',
-      price: 262.80,
+      price: 219.00,
       duration: 90,
       description: 'Everything in our Bronze Package, plus full videography and drone shots with classic editing included for complete property marketing.',
       popular: true,
@@ -1554,7 +1557,7 @@ width: 100%;
     {
       id: 'bronze-package',
       name: 'Bronze Package',
-      price: 202.80,
+      price: 169.00,
       duration: 90,
       description: 'Up to 30 interior and exterior photos, plus drone shots included. Professional photography.',
       isPropertyService: true,
@@ -1563,7 +1566,7 @@ width: 100%;
     {
       id: 'all-in-one-drone',
       name: 'All In One Drone',
-      price: 214.80,
+      price: 179.00,
       duration: 45,
       description: '10 aerial photos and a 30-second drone video with classic editing included for your property marketing.',
       isPropertyService: true,
@@ -1572,7 +1575,7 @@ width: 100%;
     {
       id: 'property-video',
       name: 'Property Videography',
-      price: 154.80,
+      price: 129.00,
       duration: 60,
       description: 'Shot in 4K with classic editing included (color grading & smooth transitions) to captivate viewers and drive enquiries.',
       isPropertyService: true,
@@ -1581,7 +1584,7 @@ width: 100%;
     {
       id: 'property-photo',
       name: 'Property Photography',
-      price: 118.80,
+      price: 99.00,
       duration: 45,
       description: 'Up to 30 magazine-quality images that make your property irresistible to potential buyers.',
       isPropertyService: true,
@@ -1590,7 +1593,7 @@ width: 100%;
     {
       id: 'drone-video',
       name: 'Property Drone Videography',
-      price: 130.80,
+      price: 109.00,
       duration: 20,
       description: 'Up to 30-second cinematic aerial showcase with classic editing included.',
       isPropertyService: true,
@@ -1599,7 +1602,7 @@ width: 100%;
     {
       id: 'drone-photo',
       name: 'Property Drone Photography',
-      price: 130.80,
+      price: 109.00,
       duration: 20,
       description: 'Up to 10 stunning aerial photographs.',
       isPropertyService: true,
@@ -1610,7 +1613,7 @@ width: 100%;
     {
       id: 'gold-package',
       name: 'Gold Package',
-      price: 600.00,
+      price: 500.00,
       duration: 150,
       description: 'Everything in our Silver Package, plus enhanced lifestyle content with classic editing included.',
       isPropertyService: true,
@@ -1619,7 +1622,7 @@ width: 100%;
     {
       id: 'silver-package',
       name: 'Silver Package',
-      price: 262.80,
+      price: 219.00,
       duration: 90,
       description: 'Everything in our Bronze Package, plus full videography and drone shots with classic editing included for complete property marketing.',
       popular: true,
@@ -1629,7 +1632,7 @@ width: 100%;
     {
       id: 'bronze-package',
       name: 'Bronze Package',
-      price: 202.80,
+      price: 169.00,
       duration: 90,
       description: 'Up to 30 interior and exterior photos, plus drone shots included. Professional photography.',
       isPropertyService: true,
@@ -1638,7 +1641,7 @@ width: 100%;
     {
       id: 'all-in-one-drone',
       name: 'All In One Drone',
-      price: 214.80,
+      price: 179.00,
       duration: 45,
       description: '10 aerial photos and a 30-second drone video with classic editing included for your property marketing.',
       isPropertyService: true,
@@ -1647,7 +1650,7 @@ width: 100%;
     {
       id: 'property-video',
       name: 'Property Videography',
-      price: 154.80,
+      price: 129.00,
       duration: 60,
       description: 'Shot in 4K with classic editing included (color grading & smooth transitions) to captivate viewers and drive enquiries.',
       isPropertyService: true,
@@ -1656,7 +1659,7 @@ width: 100%;
     {
       id: 'property-photo',
       name: 'Property Photography',
-      price: 118.80,
+      price: 99.00,
       duration: 45,
       description: 'Up to 30 magazine-quality images that make your property irresistible to potential buyers.',
       isPropertyService: true,
@@ -1665,7 +1668,7 @@ width: 100%;
     {
       id: 'drone-video',
       name: 'Property Drone Videography',
-      price: 130.80,
+      price: 109.00,
       duration: 20,
       description: 'Up to 30-second cinematic aerial showcase with classic editing included.',
       isPropertyService: true,
@@ -1674,7 +1677,7 @@ width: 100%;
     {
       id: 'drone-photo',
       name: 'Property Drone Photography',
-      price: 130.80,
+      price: 109.00,
       duration: 20,
       description: 'Up to 10 stunning aerial photographs.',
       isPropertyService: true,
@@ -2229,7 +2232,7 @@ function handleAccessTypeChange() {
                 ${Math.floor(service.duration / 60)}h ${service.duration % 60}m
               </span>
               <span style="font-size: 20px; font-weight: 700; color: #B46100;">
-                £${service.price.toFixed(2)}
+                £${service.price.toFixed(2)} <span style="font-size: 13px; font-weight: 500; color: #94a3b8;">+ VAT</span>
               </span>
             </div>
           </div>
@@ -2311,7 +2314,7 @@ function handleAccessTypeChange() {
                   </span>
                 ` : ''}
                 <span style="font-size: 18px; font-weight: 700; color: #B46100;">
-                  ${addon.price === 0 ? 'FREE' : `+£${addon.price.toFixed(2)}`}
+                  ${addon.price === 0 ? 'FREE' : `+£${addon.price.toFixed(2)} <span style="font-size: 12px; font-weight: 500; color: #94a3b8;">+ VAT</span>`}
                 </span>
               </div>
             </div>
@@ -2362,7 +2365,7 @@ function handleAccessTypeChange() {
 
       const basePrice = bookingData.basePrice;
       const extraRooms = bookingData.bedrooms > 4 ? bookingData.bedrooms - 4 : 0;
-      const extraBedroomFee = extraRooms * 30;
+      const extraBedroomFee = extraRooms * 25;
       
       let addonsPrice = 0;
       let addonsDuration = 0;
@@ -2383,10 +2386,10 @@ function handleAccessTypeChange() {
 
       // Keep discount locked to original service/bedroom/sqft — addons never discounted
       if (appliedDiscount) {
-        bookingData.priceBeforeDiscount = subtotal;
-        bookingData.totalPrice = subtotal - appliedDiscount.discountAmount;
+        bookingData.priceBeforeDiscount = subtotal * 1.2;
+        bookingData.totalPrice = (subtotal - appliedDiscount.discountAmount) * 1.2;
       } else {
-        bookingData.totalPrice = subtotal;
+        bookingData.totalPrice = subtotal * 1.2;
       }
 
       // Extra duration for large properties and extra bedrooms
@@ -2399,10 +2402,12 @@ function handleAccessTypeChange() {
       bookingData.extraDuration = extraDuration;
 
       document.getElementById('servicePrice').textContent = `£${basePrice.toFixed(2)}`;
-      const displayTotal = appliedDiscount
+      const displaySubtotal = appliedDiscount
         ? subtotal - appliedDiscount.discountAmount
         : subtotal;
-      document.getElementById('totalPrice').textContent = `£${displayTotal.toFixed(2)}`;
+      const displayVat = displaySubtotal * 0.2;
+      document.getElementById('vatAmount').textContent = `£${displayVat.toFixed(2)}`;
+      document.getElementById('totalPrice').textContent = `£${(displaySubtotal * 1.2).toFixed(2)}`;
 
       const bedroomFeeRow = document.getElementById('bedroomFeeRow');
       if (extraBedroomFee > 0) {
@@ -3058,6 +3063,8 @@ async function createBooking() {
     discountCode: bookingData.discountCode || '',
     discountAmount: bookingData.discountAmount || 0,
     priceBeforeDiscount: bookingData.priceBeforeDiscount || 0,
+    priceExVat: parseFloat((bookingData.totalPrice / 1.2).toFixed(2)),
+    vatAmount: parseFloat((bookingData.totalPrice - (bookingData.totalPrice / 1.2)).toFixed(2)),
     totalPrice: bookingData.totalPrice,
     
     clientName: bookingData.clientName,
@@ -3143,6 +3150,8 @@ async function createBooking() {
         discountCode: bookingData.discountCode || '',
         discountAmount: bookingData.discountAmount || 0,
         priceBeforeDiscount: bookingData.priceBeforeDiscount || 0,
+        priceExVat: parseFloat((bookingData.totalPrice / 1.2).toFixed(2)),
+        vatAmount: parseFloat((bookingData.totalPrice - (bookingData.totalPrice / 1.2)).toFixed(2)),
         squareFootage: bookingData.squareFootage || '',
         squareFootageFee: bookingData.squareFootageFee || 0,
         
@@ -3374,7 +3383,7 @@ function handleSquareFootageInput() {
   bookingData.squareFootage = value;
 
   if (value > 3000) {
-    bookingData.squareFootageFee = 150;
+    bookingData.squareFootageFee = 125;
     sqftPriceNotice.style.display = 'block';
   } else {
     bookingData.squareFootageFee = 0;
@@ -3409,9 +3418,10 @@ function updatePriceWithDiscount() {
   }
   
   // Update total price — discount on service only, addons always full price
-  const displayTotal = bookingData.totalPrice;
-  document.getElementById('totalPrice').textContent = `£${displayTotal.toFixed(2)}`;
-  document.getElementById('summaryTotal').textContent = `£${displayTotal.toFixed(2)}`;
+  const discountedExVat = bookingData.totalPrice / 1.2;
+  document.getElementById('vatAmount').textContent = `£${(discountedExVat * 0.2).toFixed(2)}`;
+  document.getElementById('totalPrice').textContent = `£${bookingData.totalPrice.toFixed(2)}`;
+  document.getElementById('summaryTotal').textContent = `£${bookingData.totalPrice.toFixed(2)}`;
 }
 </script>
 </body>

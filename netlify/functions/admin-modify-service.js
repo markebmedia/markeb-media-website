@@ -70,7 +70,7 @@ exports.handler = async (event, context) => {
 
     // Store old values
     const oldService = fields['Service'];
-    const oldFinalPrice = fields['Final Price'] || fields['Total Price'];
+    const oldFinalPrice = fields['Final Price'] || 0;
 
     // Get discount info if it exists
     const discountCode = fields['Discount Code'] || '';
@@ -80,7 +80,7 @@ exports.handler = async (event, context) => {
     const baseBedrooms = 4;
     const actualBedrooms = bedrooms || fields['Bedrooms'] || 0;
     const extraBedrooms = Math.max(0, actualBedrooms - baseBedrooms);
-    const extraBedroomFee = extraBedrooms * 30;
+    const extraBedroomFee = extraBedrooms * 25;
     const newAddonsPrice = addonsPrice || 0;
 
     const priceBeforeDiscount = newServicePrice + extraBedroomFee + newAddonsPrice;
@@ -230,6 +230,8 @@ exports.handler = async (event, context) => {
       'Add-Ons': addonsString,
       'Add-Ons Price': newAddonsPrice,
       'Price Before Discount': priceBeforeDiscount,
+      'Price Ex VAT': parseFloat((finalPrice / 1.2).toFixed(2)),
+      'VAT Amount': parseFloat((finalPrice - finalPrice / 1.2).toFixed(2)),
       'Final Price': finalPrice,
       'Service Modified': true,
       'Service Modified Date': new Date().toISOString().split('T')[0],

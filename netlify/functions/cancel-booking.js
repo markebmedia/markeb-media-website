@@ -74,7 +74,7 @@ exports.handler = async (event, context) => {
     }
 
     // Calculate refund details
-    const totalPrice = fields['Total Price'];
+    const totalPrice = fields['Final Price'] || 0;
     const cancellationCharge = 0; // Free cancellation
     const cancellationChargePercentage = 0;
     const refundAmount = totalPrice;
@@ -86,6 +86,8 @@ exports.handler = async (event, context) => {
       'Cancellation Reason': reason || 'Customer requested',
       'Cancellation Charge %': cancellationChargePercentage,
       'Cancellation Fee': cancellationCharge,
+      'Cancellation Fee Ex VAT': 0,
+      'Cancellation VAT Amount': 0,
       'Refund Amount': refundAmount,
       'Cancelled By': 'Client'
     });

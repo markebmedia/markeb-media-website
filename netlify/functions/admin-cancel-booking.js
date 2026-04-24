@@ -69,7 +69,7 @@ exports.handler = async (event, context) => {
     const isPaidBooking = fields['Payment Status'] === 'Paid';
     
     if (isPaidBooking) {
-      const totalPrice = fields['Total Price'] || 0;
+      const totalPrice = fields['Final Price'] || 0;
 
       if (hoursUntilBooking < 24) {
         // Less than 24 hours: 100% charge
@@ -116,6 +116,8 @@ exports.handler = async (event, context) => {
       'Cancellation Reason': reason,
       'Cancelled By': 'Admin',
       'Cancellation Fee': cancellationCharge,
+      'Cancellation Fee Ex VAT': parseFloat((cancellationCharge / 1.2).toFixed(2)),
+      'Cancellation VAT Amount': parseFloat((cancellationCharge - cancellationCharge / 1.2).toFixed(2)),
       'Refund Amount': refundAmount,
       'Refund Processed': refundProcessed
     });

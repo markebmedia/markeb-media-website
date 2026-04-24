@@ -104,7 +104,7 @@ exports.handler = async (event, context) => {
             currency: 'gbp',
             product_data: {
               name: 'Extra Bedrooms',
-              description: `${extraBedrooms} additional bedroom(s) @ £30 each`,
+              description: `${extraBedrooms} additional bedroom(s) @ £25 + VAT each`,
             },
             unit_amount: Math.round(bookingData.extraBedroomFee * 100),
           },
@@ -192,6 +192,8 @@ exports.handler = async (event, context) => {
         discountCode: bookingData.discountCode || '',
         discountAmount: bookingData.discountAmount ? bookingData.discountAmount.toString() : '0',
         priceBeforeDiscount: bookingData.priceBeforeDiscount ? bookingData.priceBeforeDiscount.toString() : '0',
+        priceExVat: bookingData.priceExVat ? bookingData.priceExVat.toString() : (bookingData.totalPrice / 1.2).toFixed(2),
+        vatAmount: bookingData.vatAmount ? bookingData.vatAmount.toString() : (bookingData.totalPrice - bookingData.totalPrice / 1.2).toFixed(2),
         
         // Payment type flag
         paymentType: isExistingBooking ? 'existing_booking' : 'new_booking',
