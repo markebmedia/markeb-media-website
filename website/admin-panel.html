@@ -3804,9 +3804,9 @@ function handleAdminAccessTypeChange() {
   
   // Reset discount when price changes
   bookingFormData.discountCode = '';
-  bookingFormData.discountAmount = 0;
-  bookingFormData.priceBeforeDiscount = 0;
-  bookingFormData.totalPrice = subtotal;
+bookingFormData.discountAmount = 0;
+bookingFormData.priceBeforeDiscount = 0;
+bookingFormData.totalPrice = incVat;
   
   // Clear discount UI
   const codeInput = document.getElementById('bookingDiscountCode');
