@@ -1117,8 +1117,16 @@ width: 100%;
               <span style="font-weight: 600; color: #1e293b;" id="summaryMediaSpecialist">-</span>
             </div>
             <div style=" border-top: 2px solid #B46100; margin: 8px 0;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 14px; color: #64748b;">Subtotal (ex. VAT):</span>
+              <span style="font-size: 14px; font-weight: 600; color: #64748b;" id="summaryExVat">£0.00</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <span style="font-size: 14px; color: #64748b;">VAT (20%):</span>
+              <span style="font-size: 14px; font-weight: 600; color: #64748b;" id="summaryVat">£0.00</span>
+            </div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 16px; font-weight: 700; color: #1e293b;">Total Amount:</span>
+              <span style="font-size: 16px; font-weight: 700; color: #1e293b;">Total inc. VAT:</span>
               <span style="font-size: 24px; font-weight: 700; color: #3b82f6;" id="summaryTotal">£0.00</span>
             </div>
           </div>
@@ -2056,6 +2064,10 @@ if (bookingData.selectedAddons && bookingData.selectedAddons.length > 0) {
       
       document.getElementById('summaryAddress').textContent = bookingData.propertyAddress || bookingData.postcode || '-';
       document.getElementById('summaryMediaSpecialist').textContent = bookingData.mediaSpecialist || '-';
+      const exVat = bookingData.totalPrice / 1.2;
+      const vat = bookingData.totalPrice - exVat;
+      document.getElementById('summaryExVat').textContent = `£${exVat.toFixed(2)}`;
+      document.getElementById('summaryVat').textContent = `£${vat.toFixed(2)}`;
       document.getElementById('summaryTotal').textContent = `£${bookingData.totalPrice.toFixed(2)}`;
 
       updateTermsVisibility();
@@ -3421,6 +3433,8 @@ function updatePriceWithDiscount() {
   const discountedExVat = bookingData.totalPrice / 1.2;
   document.getElementById('vatAmount').textContent = `£${(discountedExVat * 0.2).toFixed(2)}`;
   document.getElementById('totalPrice').textContent = `£${bookingData.totalPrice.toFixed(2)}`;
+  document.getElementById('summaryExVat').textContent = `£${discountedExVat.toFixed(2)}`;
+  document.getElementById('summaryVat').textContent = `£${(discountedExVat * 0.2).toFixed(2)}`;
   document.getElementById('summaryTotal').textContent = `£${bookingData.totalPrice.toFixed(2)}`;
 }
 </script>
