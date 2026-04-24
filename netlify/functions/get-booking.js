@@ -72,7 +72,8 @@ exports.handler = async (event, context) => {
     const canCancel = !isCancelled && hoursUntilBooking > 24;
     const canReschedule = !isCancelled && hoursUntilBooking > 24;
 
-    // Parse add-ons — safely handles JSON arrays, comma-separated strings, or plain strings
+    // Parse add-ons — handles JSON arrays or Airtable multiline text format
+    // e.g. "Standard Floor Plan (+£20.00)\nAdd Branded Outro To Video (+£0.00)"
     let addonsArray = [];
     const rawAddons = fields['Add-Ons'];
     if (rawAddons) {
@@ -80,8 +81,22 @@ exports.handler = async (event, context) => {
         const parsed = JSON.parse(rawAddons);
         addonsArray = Array.isArray(parsed) ? parsed : [parsed];
       } catch {
-        // Not valid JSON — treat as plain string or comma-separated list
-        addonsArray = rawAddons.split(',').map(s => s.trim()).filter(Boolean);
+        // Airtable stores addons as multiline text: "Name (+£price)" per line
+        addonsArray = rawAddons
+          .split('\n')
+          .map(s => s.trim())
+          .filter(Boolean)
+          .map(line => {
+            // Parse "Standard Floor Plan (+£20.00)" → { name, price }
+            const match = line.match(/^(.+?)\s*\(\+£([\d.]+)\)$/);
+            if (match) {
+              return { name: match[1].trim(), price: parseFloat(match[2]) };
+            }
+            // Handle FREE items: "Add Branded Outro To Video (+£0.00)"
+            // or plain name with no price
+            return { name: line.replace(/\s*\(\+£[\d.]+\)$/, '').trim(), price: 0 };
+          })
+          .filter(a => a.name);
       }
     }
 

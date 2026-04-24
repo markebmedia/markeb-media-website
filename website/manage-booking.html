@@ -674,9 +674,17 @@ body {
             <span style="font-size: 14px; color: #10b981;">Discount Applied</span>
             <span style="font-size: 14px; font-weight: 600; color: #10b981;" id="modifyDiscountAmount">-£0.00</span>
           </div>
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+            <span style="font-size: 14px; color: #64748b;">New Price (ex. VAT)</span>
+            <span style="font-size: 14px; font-weight: 600; color: #1e293b;" id="modifyNewExVat">£0.00</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+            <span style="font-size: 14px; color: #64748b;">VAT (20%)</span>
+            <span style="font-size: 14px; font-weight: 600; color: #64748b;" id="modifyNewVat">£0.00</span>
+          </div>
           <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
-            <span style="font-size: 14px; color: #64748b;">New Price</span>
-            <span style="font-size: 14px; font-weight: 600; color: #1e293b;" id="modifyNewPrice">£0.00</span>
+            <span style="font-size: 14px; color: #64748b; font-weight: 700;">New Price (inc. VAT)</span>
+            <span style="font-size: 14px; font-weight: 700; color: #1e293b;" id="modifyNewPrice">£0.00</span>
           </div>
           <div style="border-top: 2px solid #e2e8f0; padding-top: 16px; display: flex; justify-content: space-between; align-items: center;">
             <span style="font-size: 18px; font-weight: 700; color: #1e293b;">Price Difference</span>
@@ -1041,9 +1049,19 @@ body {
 const addonsDetail = document.getElementById('detailAddons');
 const addonsRow = document.getElementById('addonsRow');
 if (booking.addons && booking.addons.length > 0) {
-  const addonNames = booking.addons.map(a => `${a.name}${a.price > 0 ? ` (+£${a.price.toFixed(2)})` : ' (FREE)'}`).join(', ');
-  addonsDetail.textContent = addonNames;
-  addonsRow.classList.remove('hidden');
+  let addonNames = '';
+  if (Array.isArray(booking.addons)) {
+    addonNames = booking.addons
+      .filter(a => a && a.name)
+      .map(a => `${a.name}${a.price > 0 ? ` (+£${parseFloat(a.price).toFixed(2)})` : ' (FREE)'}`)
+      .join(', ');
+  } else if (typeof booking.addons === 'string') {
+    addonNames = booking.addons;
+  }
+  if (addonNames) {
+    addonsDetail.textContent = addonNames;
+    addonsRow.classList.remove('hidden');
+  }
 }
 
       // Set status badge
@@ -1097,7 +1115,7 @@ if (booking.addons && booking.addons.length > 0) {
 
     // ===== RESCHEDULE WITH CALENDAR =====
     
-    function showRescheduleForm() {
+    async function showRescheduleForm() {
       // Check if within 24 hours
       if (bookingData.hoursUntilBooking < 24) {
         document.getElementById('reschedule24HourWarning').classList.remove('hidden');
@@ -1113,7 +1131,7 @@ if (booking.addons && booking.addons.length > 0) {
       rescheduleCalendarDate = new Date();
       rescheduleSelectedDate = null;
       rescheduleSelectedTime = null;
-      renderRescheduleCalendar();
+      await renderRescheduleCalendar();
     }
 
     function hideRescheduleForm() {
@@ -1124,31 +1142,48 @@ if (booking.addons && booking.addons.length > 0) {
       rescheduleSelectedTime = null;
     }
 
-    function changeRescheduleMonth(direction) {
+    async function changeRescheduleMonth(direction) {
       rescheduleCalendarDate.setMonth(rescheduleCalendarDate.getMonth() + direction);
-      renderRescheduleCalendar();
+      await renderRescheduleCalendar();
     }
 
-    function renderRescheduleCalendar() {
+    let rescheduleAvailableDatesCache = {};
+
+    async function loadRescheduleAvailableDates(year, month) {
+      const cacheKey = `${bookingData.region}-${year}-${month}`;
+      if (rescheduleAvailableDatesCache[cacheKey]) return rescheduleAvailableDatesCache[cacheKey];
+      try {
+        const response = await fetch('/.netlify/functions/get-available-dates', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ region: bookingData.region, year, month, postcode: bookingData.postcode })
+        });
+        const data = await response.json();
+        rescheduleAvailableDatesCache[cacheKey] = data.availableDates || [];
+        return rescheduleAvailableDatesCache[cacheKey];
+      } catch (error) {
+        console.error('Error loading available dates:', error);
+        return null;
+      }
+    }
+
+    async function renderRescheduleCalendar() {
       const year = rescheduleCalendarDate.getFullYear();
       const month = rescheduleCalendarDate.getMonth();
       
       const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
       document.getElementById('rescheduleCalendarMonth').textContent = `${monthNames[month]} ${year}`;
 
+      const grid = document.getElementById('rescheduleCalendarGrid');
+      grid.innerHTML = '<div style="grid-column: span 7; text-align: center; padding: 20px; color: #94a3b8; font-size: 13px;">Loading availability...</div>';
+
+      const availableDates = await loadRescheduleAvailableDates(year, month);
+
       const firstDay = new Date(year, month, 1);
       const lastDay = new Date(year, month + 1, 0);
       const daysInMonth = lastDay.getDate();
       const startDay = firstDay.getDay();
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const maxDate = new Date();
-      maxDate.setDate(maxDate.getDate() + 60);
-      maxDate.setHours(23, 59, 59, 999);
-
-      const grid = document.getElementById('rescheduleCalendarGrid');
       let html = '';
 
       const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -1163,21 +1198,20 @@ if (booking.addons && booking.addons.length > 0) {
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(year, month, day);
         date.setHours(0, 0, 0, 0);
-        
-        const isPast = date < today;
-        const isTooFarAhead = date > maxDate;
-        const isSunday = date.getDay() === 0;
-        const isSaturday = date.getDay() === 6;
-        const isDisabled = isPast || isTooFarAhead || isSunday || isSaturday;
-        const isToday = date.getTime() === today.getTime();
-        const isSelected = rescheduleSelectedDate && toLocalDateString(date) === rescheduleSelectedDate;
+        const dayOfWeek = date.getDay();
+        const dateString = toLocalDateString(date);
+
+        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+        const isAvailable = !isWeekend && availableDates && availableDates.includes(dateString);
+        const isDisabled = isWeekend || !isAvailable;
+        const isToday = dateString === toLocalDateString(new Date());
+        const isSelected = rescheduleSelectedDate && dateString === rescheduleSelectedDate;
 
         let classes = 'calendar-day';
         if (isDisabled) classes += ' disabled';
-        if (isToday) classes += ' today';
+        if (isToday && !isDisabled) classes += ' today';
         if (isSelected) classes += ' selected';
 
-        const dateString = toLocalDateString(date);
         html += `<div class="${classes}" onclick="${isDisabled ? '' : `selectRescheduleDate('${dateString}')`}">${day}</div>`;
       }
 
@@ -1188,7 +1222,7 @@ if (booking.addons && booking.addons.length > 0) {
       rescheduleSelectedDate = dateString;
       rescheduleSelectedTime = null;
 
-      renderRescheduleCalendar();
+      await renderRescheduleCalendar();
 
       document.getElementById('rescheduleTimeSlotSection').classList.remove('hidden');
       document.getElementById('rescheduleLoadingTimeSlots').classList.remove('hidden');
@@ -1539,11 +1573,14 @@ if (booking.addons && booking.addons.length > 0) {
       });
 
       const sqftFee = bookingData.squareFootage > 3000 ? 125 : 0;
-      const newTotalPrice = basePrice + extraBedroomFee + addonsPrice + sqftFee;
+      const newExVat = basePrice + extraBedroomFee + addonsPrice + sqftFee;
+      const newTotalPrice = newExVat * 1.2;
       const currentPrice = bookingData.finalPrice;
       const priceDifference = newTotalPrice - currentPrice;
 
       // Update UI
+      document.getElementById('modifyNewExVat').textContent = `£${newExVat.toFixed(2)}`;
+      document.getElementById('modifyNewVat').textContent = `£${(newExVat * 0.2).toFixed(2)}`;
       document.getElementById('modifyNewPrice').textContent = `£${newTotalPrice.toFixed(2)}`;
       
       const diffEl = document.getElementById('modifyPriceDifference');
@@ -1592,7 +1629,7 @@ if (booking.addons && booking.addons.length > 0) {
         };
       });
 
-      const newTotalPrice = service.price + extraBedroomFee + addonsPrice;
+      const newTotalPrice = (service.price + extraBedroomFee + addonsPrice) * 1.2;
       const priceDifference = newTotalPrice - bookingData.totalPrice;
 
       if (!confirm(`Modify service to ${service.name}?\n\nPrice difference: ${priceDifference >= 0 ? '+' : ''}£${priceDifference.toFixed(2)}`)) {
