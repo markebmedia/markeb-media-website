@@ -234,6 +234,12 @@ body {
   color: #B46100;
 }
 
+.service-price .vat-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
 .branding-banner {
   background: linear-gradient(135deg, #3F4D1B 0%, #2e3812 100%);
   border-radius: 20px;
@@ -841,12 +847,12 @@ body {
   </div>
 
   <script>
-    // Services data matching your booking system
+    // Services data — prices ex-VAT, matching booking.html
     const SERVICES = [
       // Branding Services
       {
         name: 'Complete Branding Package - Photo & Video',
-        price: 894.00,
+        price: 745.00,
         duration: 300,
         description: 'Full personal branding suite for estate agents. Photography and video content with classic editing included.',
         icon: 'star',
@@ -855,7 +861,7 @@ body {
       },
       {
         name: 'Branding Videography Session',
-        price: 534.00,
+        price: 445.00,
         duration: 180,
         description: 'Personal branding video for estate agents. Multiple sequences for social content with classic editing included.',
         icon: 'video',
@@ -864,7 +870,7 @@ body {
       },
       {
         name: 'Branding Photography Session - 10 Signature Shots',
-        price: 414.00,
+        price: 345.00,
         duration: 120,
         description: 'Personal branding for estate agents. You\'re in every shot.',
         icon: 'camera',
@@ -874,7 +880,7 @@ body {
       // Property Packages
       {
         name: 'Gold Package',
-        price: 600.00,
+        price: 500.00,
         duration: 150,
         description: 'Everything in our Silver Package, plus enhanced lifestyle content with classic editing included.',
         icon: 'award',
@@ -883,7 +889,7 @@ body {
       },
       {
         name: 'Silver Package',
-        price: 262.80,
+        price: 219.00,
         duration: 90,
         description: 'Everything in our Bronze Package, plus full videography and drone shots with classic editing included for complete property marketing.',
         icon: 'package',
@@ -892,7 +898,7 @@ body {
       },
       {
         name: 'Bronze Package',
-        price: 202.80,
+        price: 169.00,
         duration: 90,
         description: 'Up to 30 interior and exterior photos, plus drone shots included. Professional photography.',
         icon: 'image',
@@ -901,7 +907,7 @@ body {
       },
       {
         name: 'All In One Drone',
-        price: 214.80,
+        price: 179.00,
         duration: 45,
         description: '10 aerial photos and a 30-second drone video with classic editing included for your property marketing.',
         icon: 'plane',
@@ -910,7 +916,7 @@ body {
       },
       {
         name: 'Property Videography',
-        price: 154.80,
+        price: 129.00,
         duration: 60,
         description: 'Shot in 4K with classic editing included to captivate viewers and drive enquiries.',
         icon: 'film',
@@ -919,7 +925,7 @@ body {
       },
       {
         name: 'Property Photography',
-        price: 118.80,
+        price: 99.00,
         duration: 45,
         description: 'Up to 30 magazine-quality images that make your property irresistible to potential buyers.',
         icon: 'camera',
@@ -928,7 +934,7 @@ body {
       },
       {
         name: 'Property Drone Videography',
-        price: 130.80,
+        price: 109.00,
         duration: 20,
         description: 'Up to 30-second cinematic aerial showcase with classic editing included.',
         icon: 'video',
@@ -937,7 +943,7 @@ body {
       },
       {
         name: 'Property Drone Photography',
-        price: 130.80,
+        price: 109.00,
         duration: 20,
         description: 'Up to 10 stunning aerial photographs.',
         icon: 'camera',
@@ -964,7 +970,9 @@ body {
               <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
               ${Math.floor(service.duration / 60)}h ${service.duration % 60}m
             </span>
-            <span class="service-price">£${service.price.toFixed(2)}</span>
+            <span class="service-price">
+              £${service.price.toFixed(2)} <span class="vat-label">+ VAT</span>
+            </span>
           </div>
         </div>
       `).join('');
@@ -979,7 +987,9 @@ body {
               <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
               ${Math.floor(service.duration / 60)}h ${service.duration % 60}m
             </span>
-            <span class="service-price">£${service.price.toFixed(2)}</span>
+            <span class="service-price">
+              £${service.price.toFixed(2)} <span class="vat-label">+ VAT</span>
+            </span>
           </div>
         </div>
       `).join('');
