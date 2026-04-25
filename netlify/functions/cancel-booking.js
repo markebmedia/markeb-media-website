@@ -1,5 +1,6 @@
 // netlify/functions/cancel-booking.js
 const Airtable = require('airtable');
+const Stripe = require('stripe');
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
@@ -78,6 +79,23 @@ exports.handler = async (event, context) => {
     const cancellationCharge = 0; // Free cancellation
     const cancellationChargePercentage = 0;
     const refundAmount = totalPrice;
+
+    // Process Stripe refund if booking was paid
+    if (fields['Payment Status'] === 'Paid' && fields['Stripe Payment Intent ID']) {
+      try {
+        const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+        const refund = await stripe.refunds.create({
+          payment_intent: fields['Stripe Payment Intent ID'],
+          reason: 'requested_by_customer'
+        });
+        console.log(`✅ Stripe refund created: ${refund.id} for £${totalPrice}`);
+      } catch (stripeError) {
+        console.error('Stripe refund failed:', stripeError);
+        throw new Error(`Refund failed: ${stripeError.message}`);
+      }
+    } else if (fields['Payment Status'] === 'Paid') {
+      console.warn('⚠️ Booking is Paid but no Stripe Payment Intent ID found — manual refund required');
+    }
 
     // Update booking status in Airtable
     await base('Bookings').update(bookingId, {
