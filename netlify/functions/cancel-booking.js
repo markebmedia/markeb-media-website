@@ -264,10 +264,10 @@ exports.handler = async (event, context) => {
               <p style="margin: 0 0 25px; color: #3F4D1B; font-size: 16px; line-height: 1.6;">If you'd like to reschedule, you can book a new shoot online at any time.</p>
 
               <!-- CTA Button -->
-              <table role="presentation" style="margin: 0 0 30px;">
+              <table role="presentation" style="width: 100%; margin: 0 0 30px;">
                 <tr>
-                  <td>
-                    <a href="https://markebmedia.com/booking.html" style="display: inline-block; background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); color: #FDF3E2; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 15px;">Book a New Shoot</a>
+                  <td style="text-align: center;">
+                    <a href="https://markebmedia.com/website/booking.html" style="display: inline-block; background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); color: #FDF3E2; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-weight: 600; font-size: 15px;">Book a New Shoot</a>
                   </td>
                 </tr>
               </table>
