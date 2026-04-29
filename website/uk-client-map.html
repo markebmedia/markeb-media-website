@@ -997,9 +997,9 @@ function getCurrentYear() {
 }
 
 function calcLiveATV() {
-  const paid = bookingData.filter(b => b.bookingStatus !== 'Cancelled' && parseFloat(b.finalPrice) > 0);
+  const paid = bookingData.filter(b => b.bookingStatus !== 'Cancelled' && parseFloat(b.priceExVAT) > 0);
   if (paid.length === 0) return 350;
-  return paid.reduce((s, b) => s + parseFloat(b.finalPrice), 0) / paid.length;
+  return paid.reduce((s, b) => s + parseFloat(b.priceExVAT), 0) / paid.length;
 }
 
 function calcLiveMonthlyAverages() {
@@ -1654,7 +1654,7 @@ function updateBookingStats() {
   const active   = bookingData.filter(b => b.bookingStatus !== 'Cancelled');
   const ago30    = new Date(); ago30.setDate(ago30.getDate() - 30);
   const recent30 = active.filter(b => b.date && new Date(b.date) >= ago30).length;
-  const revenue  = active.reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
+  const revenue  = active.reduce((s, b) => s + (parseFloat(b.priceExVAT) || 0), 0);
   document.getElementById('totalBookings').textContent     = active.length;
   document.getElementById('confirmedBookings').textContent = active.filter(b => b.bookingStatus === 'Confirmed').length;
   document.getElementById('reservedBookings').textContent  = active.filter(b => b.bookingStatus === 'Reserved').length;
@@ -1778,7 +1778,7 @@ function renderBookingLayer() {
         <div class="popup-footer">
           <span class="badge badge-${(booking.bookingStatus||'').toLowerCase()}">${booking.bookingStatus||'Unknown'}</span>
           ${isUpcoming ? '<span class="badge" style="background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid #3b82f6;">Upcoming</span>' : ''}
-          ${booking.finalPrice ? '<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid #10b981;">£' + parseFloat(booking.finalPrice).toFixed(2) + '</span>' : ''}
+          ${booking.priceExVAT ? '<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid #10b981;">£' + parseFloat(booking.priceExVAT).toFixed(2) + '</span>' : ''}
         </div>
       `);
       markerCluster.addLayer(m);
@@ -1967,7 +1967,7 @@ function bookingCard(b) {
     + (b.mediaSpecialist ? '<div class="card-info">📸 ' + b.mediaSpecialist + '</div>' : '')
     + '<span class="badge badge-' + status.toLowerCase() + '">' + status + '</span>'
     + (isUpcoming ? '<span class="badge" style="background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid #3b82f6;">Upcoming</span>' : '')
-    + (b.finalPrice ? '<span class="revenue-tag">£' + parseFloat(b.finalPrice).toFixed(2) + '</span>' : '')
+    + (b.priceExVAT ? '<span class="revenue-tag">£' + parseFloat(b.priceExVAT).toFixed(2) + '</span>' : '')
     + (!b.lat ? '<div style="font-size:10px;color:#f59e0b;margin-top:4px;">⚠ Postcode not geocoded</div>' : '')
     + '</div>';
 }
@@ -2240,7 +2240,7 @@ function renderRoadmap() {
   function revenueForYear(yr) {
     return bookingData
       .filter(b => b.bookingStatus !== 'Cancelled' && b.date && new Date(b.date).getFullYear() === yr)
-      .reduce((s, b) => s + (parseFloat(b.finalPrice) || 0), 0);
+      .reduce((s, b) => s + (parseFloat(b.priceExVAT) || 0), 0);
   }
 
   const rev2026 = revenueForYear(2026);
@@ -2652,7 +2652,7 @@ function renderIntelligence() {
     if (!email) return;
     if (!clientMap[email]) clientMap[email] = { name:b.clientName||'Guest', company:'', email, region:'', status:'Guest', bookings:[], ltv:0, bookingCount:0, avgSpend:0, lastBooking:null };
     clientMap[email].bookings.push(b);
-    if (b.bookingStatus !== 'Cancelled') clientMap[email].ltv += parseFloat(b.finalPrice)||0;
+    if (b.bookingStatus !== 'Cancelled') clientMap[email].ltv += parseFloat(b.priceExVAT)||0;
   });
   Object.values(clientMap).forEach(c => {
     c.bookingCount = c.bookings.length;

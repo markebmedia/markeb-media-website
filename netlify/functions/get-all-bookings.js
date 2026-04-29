@@ -60,7 +60,8 @@ exports.handler = async (event, context) => {
         'Client Email',
         'Media Specialist',
         'Bedrooms',
-        'Add-Ons'
+        'Add-Ons',
+        'Price Ex VAT'
       ],
       sort: [{ field: 'Date', direction: 'desc' }]
     };
@@ -86,6 +87,7 @@ exports.handler = async (event, context) => {
             time: record.fields['Time'] || null,
             totalPrice: record.fields['Total Price'] || 0,
             finalPrice: record.fields['Final Price'] || record.fields['Total Price'] || 0,
+            priceExVAT: record.fields['Price Ex VAT'] || record.fields['Final Price'] || record.fields['Total Price'] || 0,
             clientName: record.fields['Client Name'] || null,
             clientEmail: record.fields['Client Email'] || null,
             mediaSpecialist: record.fields['Media Specialist'] || null,
@@ -173,7 +175,7 @@ exports.handler = async (event, context) => {
     const cancelled = allRecords.filter(b => b.bookingStatus === 'Cancelled').length;
     const totalRevenue = allRecords
       .filter(b => b.bookingStatus !== 'Cancelled')
-      .reduce((sum, b) => sum + (parseFloat(b.finalPrice) || 0), 0);
+      .reduce((sum, b) => sum + (parseFloat(b.priceExVAT) || 0), 0);
 
     return {
       statusCode: 200,
