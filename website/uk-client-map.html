@@ -1103,7 +1103,7 @@ function calcLiveMonthlyAverages() {
   const revByMonth = {};
   bookingData.filter(b => b.date && b.bookingStatus !== 'Cancelled').forEach(b => {
     const k = b.date.slice(0, 7);
-    if (k < thisMonthKey) revByMonth[k] = (revByMonth[k] || 0) + (parseFloat(b.finalPrice) || 0);
+    if (k < thisMonthKey) revByMonth[k] = (revByMonth[k] || 0) + (parseFloat(b.priceExVAT) || 0);
   });
   const sortedRevMonths = Object.keys(revByMonth).sort().reverse();
   const last3Months = sortedRevMonths.slice(0, 3);
@@ -1370,7 +1370,7 @@ function calcInsightCards() {
   let newRev = 0, repeatRev = 0;
   thisMonthPaid.forEach(b => {
     const email = (b.clientEmail || '').toLowerCase();
-    const val = parseFloat(b.finalPrice) || 0;
+    const val = parseFloat(b.priceExVAT) || 0;
     if (priorEmailsSeen.has(email)) repeatRev += val;
     else newRev += val;
   });
@@ -1435,7 +1435,7 @@ const milestoneSub = `<strong>${fmtMoney(Math.round(remaining))}</strong> to nex
     const email = (b.clientEmail || '').toLowerCase();
     const region = clientRegionMap[email];
     if (!region) return;
-    regionLTV[region] = (regionLTV[region] || 0) + (parseFloat(b.finalPrice) || 0);
+    regionLTV[region] = (regionLTV[region] || 0) + (parseFloat(b.priceExVAT) || 0);
   });
 
   const sortedRegions = Object.entries(regionLTV).sort((a, b) => b[1] - a[1]);
@@ -1844,7 +1844,7 @@ function renderRegionList() {
       if (!b.postcode) return;
       const area = b.postcode.split(' ')[0].toUpperCase();
       areaCounts[area]  = (areaCounts[area]  || 0) + 1;
-      areaRevenue[area] = (areaRevenue[area] || 0) + (parseFloat(b.finalPrice) || 0);
+      areaRevenue[area] = (areaRevenue[area] || 0) + (parseFloat(b.priceExVAT) || 0);
     });
     const sorted = Object.entries(areaCounts).sort((a,b) => b[1]-a[1]);
     regionTotal.textContent = sorted.length + ' areas';
@@ -1917,7 +1917,7 @@ function showNeverBooked() {
 function showAllBookings() {
   const geocoded     = filteredBookingData.filter(b => b.lat).length;
   const total        = filteredBookingData.length;
-  const totalRevenue = filteredBookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice)||0), 0);
+  const totalRevenue = filteredBookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.priceExVAT)||0), 0);
   document.getElementById('detailTitle').textContent = 'Bookings (' + total + ')';
   const revenueHtml  = totalRevenue > 0 ? '<div class="revenue-total">Total Revenue: £' + totalRevenue.toFixed(2) + '</div>' : '';
   const geocodeNote  = '<div style="font-size:11px;color:#475569;margin-bottom:12px;"><i data-lucide="map-pin" style="width:11px;height:11px;vertical-align:-2px;margin-right:3px;"></i>' + geocoded + ' of ' + total + ' plotted on map</div>';
@@ -1937,7 +1937,7 @@ function showClientsInRegion(region) {
 
 function showBookingsInArea(area) {
   const bookings     = filteredBookingData.filter(b => b.postcode && b.postcode.toUpperCase().startsWith(area));
-  const totalRevenue = bookings.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice)||0), 0);
+  const totalRevenue = bookings.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.priceExVAT)||0), 0);
   document.getElementById('detailTitle').textContent = area + ' — ' + bookings.length + ' bookings';
   const revenueHtml  = totalRevenue > 0 ? '<div class="revenue-total">Revenue: £' + totalRevenue.toFixed(2) + '</div>' : '';
   document.getElementById('detailContent').innerHTML = revenueHtml + (bookings.length === 0
@@ -2080,7 +2080,7 @@ function splitNewVsExisting(windowBookings, windowStart) {
 }
 
 function calcRevenue(bookings) {
-  return bookings.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice)||0), 0);
+  return bookings.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.priceExVAT)||0), 0);
 }
 
 function renderPerformanceSection() {
@@ -2235,7 +2235,7 @@ function renderRoadmap() {
   renderInsightCards();
 
   const now2    = new Date();
-  const totalRevenue = bookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.finalPrice) || 0), 0);
+  const totalRevenue = bookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.priceExVAT) || 0), 0);
 
   function revenueForYear(yr) {
     return bookingData
@@ -3276,7 +3276,7 @@ function renderRunRateChart() {
       if (ctIndex < 0 || ctIndex >= totalDays) return;
 
       const email = (b.clientEmail || '').toLowerCase();
-      const val = metric === 'revenue'  ? (parseFloat(b.finalPrice) || 0)
+      const val = metric === 'revenue'  ? (parseFloat(b.priceExVAT) || 0)
                 : metric === 'new'      ? (!priorEmails.has(email) ? 1 : 0)
                 : metric === 'existing' ? (priorEmails.has(email)  ? 1 : 0)
                 : 1;
