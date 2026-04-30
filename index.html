@@ -128,8 +128,18 @@
         .mq-item:hover { opacity:.72; }
 
         /* Why */
-        .why { padding:120px 56px; background:var(--cream); }
-        .why-in { max-width:1160px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:96px; align-items:center; }
+        .why { padding:120px 56px; background:var(--cream); position:relative; overflow:hidden; }
+        .why-logo-bg {
+            position:absolute;
+            right:-60px; top:50%;
+            transform:translateY(-50%);
+            width:600px; height:auto;
+            opacity:0.045;
+            pointer-events:none;
+            user-select:none;
+            filter:saturate(0) brightness(0);
+        }
+        .why-in { max-width:1160px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:96px; align-items:center; position:relative; z-index:1; }
         .pg { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--rule); border:1px solid var(--rule); }
         .pl { background:var(--white); padding:34px 26px; transition:background .2s; position:relative; overflow:hidden; }
         .pl::after { content:''; position:absolute; bottom:0;left:0;right:0; height:2px; background:linear-gradient(90deg,var(--brand),var(--brand-light)); opacity:0; transition:opacity .3s; }
@@ -455,7 +465,7 @@
         <div class="hero-badge"><div class="hero-badge-line"></div><span class="hero-badge-txt">Premium Property Media &amp; Marketing · United Kingdom</span></div>
         <h1>Make your<br>properties<em>impossible<br>to ignore.</em></h1>
         <div class="hero-rule"></div>
-        <p class="hero-sub">One dedicated team. Every platform. Content that stops buyers mid-scroll — delivered within 48 hours.</p>
+        <p class="hero-sub">One dedicated team serving estate agents and property developers across the UK. Content that stops buyers mid-scroll — delivered within 48 hours.</p>
         <div class="hero-acts">
             <a href="#audit" class="btn-p">Get Your Free Audit</a>
             <a href="#services" class="btn-g">See what we do</a>
@@ -495,11 +505,12 @@
 
 <!-- WHY -->
 <section class="why" id="why">
+    <img src="/public/images/markeb-media-logo.png" alt="" class="why-logo-bg" aria-hidden="true">
     <div class="why-in">
         <div class="reveal-l">
             <div class="s-lbl">Why Markeb Media</div>
             <h2 class="dh">One team.<br>Every platform.<br><em>Zero gaps.</em></h2>
-            <p class="bl" style="margin-top:18px;">No more juggling agencies, freelancers, or disconnected campaigns. We act as your permanent in-house marketing team — from the first shoot to the final sale.</p>
+            <p class="bl" style="margin-top:18px;">Whether you are an estate agent or a property developer, stop juggling agencies, freelancers, and disconnected campaigns. We act as your permanent in-house marketing team — from the first shoot to the final sale or plot completion.</p>
             <div style="margin-top:36px;"><a href="#audit" class="btn-p">Get Your Free Audit</a></div>
         </div>
         <div class="reveal-r">
@@ -562,10 +573,12 @@
 </section>
 
 
+<!-- PROCESS -->
+<section class="proc reveal" id="process">
     <div class="proc-in">
         <div class="orn"><div class="orn-line rev short"></div><div class="orn-dia"></div><div class="orn-txt">How it works</div></div>
         <h2 class="dh dh-w" style="margin-bottom:14px;">From brief to brilliant<br><em>in three steps.</em></h2>
-        <p class="bl" style="color:rgba(255,255,255,.42);">Our proven process transforms your property into premium content — in under 48 hours.</p>
+        <p class="bl" style="color:rgba(255,255,255,.42);">Whether you are an estate agent listing a new property or a developer launching a scheme — our proven process gets you premium content in under 48 hours.</p>
         <div class="proc-grid">
             <div class="ps"><div class="ps-ghost">01</div><div class="ps-ic"><i data-lucide="calendar" style="width:19px;height:19px;"></i></div><div class="ps-t">Book Your Shoot</div><div class="ps-d">Choose your date and we handle everything from planning to equipment. No stress, no friction — just results from the moment you confirm.</div></div>
             <div class="ps"><div class="ps-ghost">02</div><div class="ps-ic"><i data-lucide="camera" style="width:19px;height:19px;"></i></div><div class="ps-t">We Create the Magic</div><div class="ps-d">Professional photography, video, and drone that captures every detail and makes your property irresistible to buyers browsing online.</div></div>
@@ -727,9 +740,9 @@
 <section class="fcta reveal">
     <div class="orn" style="justify-content:center;margin-bottom:22px;"><div class="orn-line rev"></div><div class="orn-dia"></div><div class="orn-txt">Ready to dominate your market?</div><div class="orn-dia"></div><div class="orn-line"></div></div>
     <h2 class="dh">Be the agent<br><em>everyone talks about.</em></h2>
-    <p class="bl">Win more instructions, wow your clients, and keep buyers hooked with marketing that puts you ahead of the competition.</p>
+    <p class="bl">Whether you are an estate agent winning more instructions or a developer launching a new scheme — premium marketing is what separates you from the competition.</p>
     <div class="cta-row"><a href="/login" class="btn-p" style="font-size:13px;padding:16px 44px;">Sign Up Free</a><a href="/portfolio.html" class="btn-o">View Our Work</a></div>
-    <div class="tr-row"><span>No contracts</span><div class="tr-sep"></div><span>48-hour delivery</span><div class="tr-sep"></div><span>100% satisfaction guarantee</span><div class="tr-sep"></div><span>Live progress tracking</span></div>
+    <div class="tr-row"><span>Estate agents &amp; developers</span><div class="tr-sep"></div><span>48-hour delivery</span><div class="tr-sep"></div><span>100% satisfaction guarantee</span><div class="tr-sep"></div><span>Live progress tracking</span></div>
 </section>
 
 <!-- CONTACT -->
@@ -768,7 +781,7 @@
 <!-- FOOTER -->
 <footer class="site-footer">
     <div class="sf-logo">Markeb<em>Media</em></div>
-    <div class="sf-copy">© 2025 Markeb Media Ltd &nbsp;·&nbsp; Co. No. 15919272 &nbsp;·&nbsp; VAT No. 498444731</div>
+    <div class="sf-copy">© 2026 Markeb Media Ltd. All rights reserved.</div>
 </footer>
 
 <script>
