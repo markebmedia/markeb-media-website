@@ -1,93 +1,228 @@
-const { Resend } = require('resend');
+// netlify/functions/submit-contact.js
 
+const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const FROM_EMAIL = 'Markeb Media <commercial@markebmedia.com>';
+const SITE_URL   = 'https://markebmedia.com';
+const LOGO_URL   = 'https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png';
+
+function getEmailLayout(content) {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markeb Media</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #3F4D1B;
+      background-color: #f7ead5;
+      margin: 0;
+      padding: 0;
+    }
+    .container { max-width: 600px; margin: 0 auto; background-color: #FDF3E2; }
+    .header {
+      background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%);
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .header img { max-width: 200px; width: 100%; height: auto; margin-bottom: 20px; }
+    .header h1 { color: #FDF3E2; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+    .header-accent { width: 40px; height: 3px; background: #B46100; margin: 14px auto 0; border-radius: 2px; }
+    .content { padding: 40px 30px; }
+    .content h2 { color: #3F4D1B; font-size: 22px; font-weight: 700; margin: 0 0 8px; }
+    .content h3 { color: #3F4D1B; font-size: 16px; font-weight: 700; margin: 24px 0 8px; }
+    .content p { color: #3F4D1B; margin: 0 0 14px; }
+    .content ul { color: #3F4D1B; padding-left: 20px; margin: 0 0 14px; }
+    .content ul li { margin-bottom: 6px; }
+    .booking-details {
+      background-color: #f7ead5;
+      border: 2px solid #e8d9be;
+      border-radius: 12px;
+      padding: 24px;
+      margin: 24px 0;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #e8d9be;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { color: #6b7c2e; font-weight: 600; font-size: 14px; }
+    .detail-value { color: #3F4D1B; font-weight: 600; text-align: right; max-width: 60%; font-size: 14px; }
+    .message-box {
+      background: #ffffff;
+      border: 1px solid #e8d9be;
+      border-left: 3px solid #B46100;
+      border-radius: 0 8px 8px 0;
+      padding: 20px 24px;
+      margin: 16px 0 24px;
+      font-size: 15px;
+      color: #3F4D1B;
+      line-height: 1.7;
+    }
+    .button {
+      display: inline-block;
+      background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+      color: #FDF3E2 !important;
+      padding: 14px 32px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 20px 0;
+      font-size: 15px;
+      letter-spacing: 0.01em;
+    }
+    .alert { padding: 16px; border-radius: 8px; margin: 20px 0; font-size: 14px; }
+    .alert-info { background-color: #fff8ee; border: 2px solid #B46100; color: #8a4a00; }
+    .alert-success { background-color: #f3f7e8; border: 2px solid #3F4D1B; color: #3F4D1B; }
+    .footer {
+      background-color: #3F4D1B;
+      padding: 30px;
+      text-align: center;
+      color: rgba(253,243,226,0.7);
+      font-size: 14px;
+    }
+    .footer strong { color: #FDF3E2; }
+    .footer a { color: #B46100; text-decoration: none; }
+    .footer-divider { width: 32px; height: 2px; background: #B46100; margin: 16px auto; border-radius: 1px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="${LOGO_URL}" alt="Markeb Media">
+      <h1>Markeb Media</h1>
+      <div class="header-accent"></div>
+    </div>
+    <div class="content">
+      ${content}
+    </div>
+    <div class="footer">
+      <strong>Markeb Media</strong>
+      <div class="footer-divider"></div>
+      <p style="margin:0 0 6px;">Professional Property Media, Marketing &amp; Technology Solutions</p>
+      <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
+      <p style="margin-top:20px;font-size:12px;color:rgba(253,243,226,0.4);">
+        <a href="${SITE_URL}">markebmedia.com</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
 exports.handler = async (event) => {
-    if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
+  }
+
+  try {
+    const { name, email, agency, phone, message } = JSON.parse(event.body);
+
+    if (!name || !email || !message) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Name, email and message are required.' })
+      };
     }
 
-    try {
-        const { name, email, agency, phone, message } = JSON.parse(event.body);
+    // ── Internal notification to the Markeb Media team ──
+    const internalContent = `
+      <h2>📩 New Website Enquiry</h2>
+      <p>A new message has been submitted via the Markeb Media website contact form.</p>
 
-        if (!name || !email || !message) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ error: 'Name, email and message are required.' })
-            };
-        }
+      <div class="booking-details">
+        <div class="detail-row">
+          <span class="detail-label">Name</span>
+          <span class="detail-value">${name}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Email</span>
+          <span class="detail-value"><a href="mailto:${email}" style="color:#B46100;">${email}</a></span>
+        </div>
+        ${agency ? `
+        <div class="detail-row">
+          <span class="detail-label">Agency / Company</span>
+          <span class="detail-value">${agency}</span>
+        </div>` : ''}
+        ${phone ? `
+        <div class="detail-row">
+          <span class="detail-label">Phone</span>
+          <span class="detail-value">${phone}</span>
+        </div>` : ''}
+      </div>
 
-        // Notify the Markeb Media team
-        await resend.emails.send({
-            from: 'Markeb Media Website <noreply@markebmedia.com>',
-            to: ['Jodie.Hamshaw@markebmedia.com', 'commercial@markebmedia.com'],
-            replyTo: email,
-            subject: `New Website Enquiry from ${name}${agency ? ` — ${agency}` : ''}`,
-            html: `
-                <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#FDF3E2;border:1px solid #e8d9be;border-radius:8px;overflow:hidden;">
-                    <div style="background:#3F4D1B;padding:28px 32px;">
-                        <p style="margin:0;color:rgba(253,243,226,0.6);font-size:12px;letter-spacing:2px;text-transform:uppercase;">New Enquiry</p>
-                        <h1 style="margin:8px 0 0;color:#FDF3E2;font-size:22px;font-weight:700;">Markeb Media Website</h1>
-                    </div>
-                    <div style="padding:32px;">
-                        <table style="width:100%;border-collapse:collapse;">
-                            <tr><td style="padding:10px 0;border-bottom:1px solid #e8d9be;font-size:13px;color:#8A7050;width:120px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Name</td><td style="padding:10px 0;border-bottom:1px solid #e8d9be;font-size:15px;color:#1C140A;">${name}</td></tr>
-                            <tr><td style="padding:10px 0;border-bottom:1px solid #e8d9be;font-size:13px;color:#8A7050;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Email</td><td style="padding:10px 0;border-bottom:1px solid #e8d9be;font-size:15px;"><a href="mailto:${email}" style="color:#B46100;">${email}</a></td></tr>
-                            ${agency ? `<tr><td style="padding:10px 0;border-bottom:1px solid #e8d9be;font-size:13px;color:#8A7050;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Agency</td><td style="padding:10px 0;border-bottom:1px solid #e8d9be;font-size:15px;color:#1C140A;">${agency}</td></tr>` : ''}
-                            ${phone ? `<tr><td style="padding:10px 0;border-bottom:1px solid #e8d9be;font-size:13px;color:#8A7050;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Phone</td><td style="padding:10px 0;border-bottom:1px solid #e8d9be;font-size:15px;color:#1C140A;">${phone}</td></tr>` : ''}
-                        </table>
-                        <div style="margin-top:24px;">
-                            <p style="font-size:13px;color:#8A7050;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Message</p>
-                            <div style="background:#fff;border:1px solid #e8d9be;border-radius:6px;padding:20px;font-size:15px;color:#1C140A;line-height:1.7;">${message.replace(/\n/g, '<br>')}</div>
-                        </div>
-                        <div style="margin-top:28px;">
-                            <a href="mailto:${email}" style="display:inline-block;background:#B46100;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-size:14px;font-weight:600;">Reply to ${name}</a>
-                        </div>
-                    </div>
-                    <div style="background:#3F4D1B;padding:16px 32px;text-align:center;">
-                        <p style="margin:0;color:rgba(253,243,226,0.4);font-size:11px;">Markeb Media Ltd &nbsp;·&nbsp; markebmedia.com</p>
-                    </div>
-                </div>
-            `
-        });
+      <h3>Message</h3>
+      <div class="message-box">${message.replace(/\n/g, '<br>')}</div>
 
-        // Auto-reply to the sender
-        await resend.emails.send({
-            from: 'Markeb Media <noreply@markebmedia.com>',
-            to: [email],
-            subject: 'Thanks for getting in touch with Markeb Media',
-            html: `
-                <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#FDF3E2;border:1px solid #e8d9be;border-radius:8px;overflow:hidden;">
-                    <div style="background:#3F4D1B;padding:28px 32px;">
-                        <p style="margin:0;color:rgba(253,243,226,0.6);font-size:12px;letter-spacing:2px;text-transform:uppercase;">Message Received</p>
-                        <h1 style="margin:8px 0 0;color:#FDF3E2;font-size:22px;font-weight:700;">Thanks, ${name.split(' ')[0]}.</h1>
-                    </div>
-                    <div style="padding:32px;">
-                        <p style="font-size:16px;color:#1C140A;line-height:1.7;margin:0 0 16px;">We have received your message and a member of our team will be in touch within 24 hours.</p>
-                        <p style="font-size:15px;color:#5C4A2A;line-height:1.7;margin:0 0 28px;">In the meantime, feel free to browse our portfolio at <a href="https://markebmedia.com/portfolio" style="color:#B46100;">markebmedia.com/portfolio</a> or reach us directly at <a href="mailto:commercial@markebmedia.com" style="color:#B46100;">commercial@markebmedia.com</a>.</p>
-                        <div style="background:#fff;border-left:3px solid #B46100;padding:16px 20px;font-size:14px;color:#5C4A2A;line-height:1.6;font-style:italic;">
-                            Your message: "${message.length > 200 ? message.substring(0, 200) + '...' : message}"
-                        </div>
-                    </div>
-                    <div style="background:#3F4D1B;padding:16px 32px;text-align:center;">
-                        <p style="margin:0;color:rgba(253,243,226,0.4);font-size:11px;">Markeb Media Ltd &nbsp;·&nbsp; markebmedia.com</p>
-                    </div>
-                </div>
-            `
-        });
+      <center>
+        <a href="mailto:${email}" class="button">Reply to ${name}</a>
+      </center>
 
-        return {
-            statusCode: 200,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ success: true })
-        };
+      <div class="alert alert-info">
+        <strong>⏱ Response Target</strong><br>
+        Please aim to respond to this enquiry within 24 hours.
+      </div>
+    `;
 
-    } catch (error) {
-        console.error('Contact form error:', error);
-        return {
-            statusCode: 500,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: 'Failed to send message.' })
-        };
-    }
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: ['Jodie.Hamshaw@markebmedia.com', 'commercial@markebmedia.com'],
+      replyTo: email,
+      subject: `New Enquiry: ${name}${agency ? ` — ${agency}` : ''}`,
+      html: getEmailLayout(internalContent)
+    });
+
+    // ── Auto-reply to the person who submitted ──
+    const autoReplyContent = `
+      <h2>Thanks for reaching out, ${name.split(' ')[0]}.</h2>
+      <p>We have received your message and a member of our team will be in touch within 24 hours.</p>
+
+      <div class="alert alert-success">
+        <strong>✅ Message Received</strong><br>
+        We will review your enquiry and get back to you as soon as possible.
+      </div>
+
+      <h3>What Happens Next?</h3>
+      <p>One of our team will review your message and reach out directly. In the meantime, feel free to explore what we do:</p>
+      <ul>
+        <li>Browse our <a href="${SITE_URL}/portfolio" style="color:#B46100;">portfolio</a></li>
+        <li>Learn more about our <a href="${SITE_URL}#services" style="color:#B46100;">services</a></li>
+        <li>Email us directly at <a href="mailto:commercial@markebmedia.com" style="color:#B46100;">commercial@markebmedia.com</a></li>
+      </ul>
+
+      <h3>Your Message</h3>
+      <div class="message-box">${message.length > 300 ? message.substring(0, 300) + '...' : message}</div>
+
+      <p style="margin-top:24px;">Best regards,<br><strong>The Markeb Media Team</strong></p>
+    `;
+
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      subject: 'We have received your message — Markeb Media',
+      html: getEmailLayout(autoReplyContent)
+    });
+
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ success: true })
+    };
+
+  } catch (error) {
+    console.error('Contact form error:', error);
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: 'Failed to send message.' })
+    };
+  }
 };
