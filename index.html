@@ -128,16 +128,17 @@
         .mq-item:hover { opacity:.72; }
 
         /* Why */
-        .why { padding:120px 56px; background:var(--cream); position:relative; overflow:hidden; }
+        .why { padding:120px 56px; background:var(--cream); position:relative; overflow:hidden; isolation:isolate; }
         .why-logo-bg {
             position:absolute;
-            right:-60px; top:50%;
+            right:-80px; top:50%;
             transform:translateY(-50%);
-            width:600px; height:auto;
-            opacity:0.045;
+            width:560px; height:auto;
+            opacity:0.07;
             pointer-events:none;
             user-select:none;
             filter:saturate(0) brightness(0);
+            z-index:0;
         }
         .why-in { max-width:1160px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:96px; align-items:center; position:relative; z-index:1; }
         .pg { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--rule); border:1px solid var(--rule); }
@@ -150,10 +151,10 @@
         .pl-s { font-size:13px; color:var(--ink-mid); line-height:1.6; font-weight:300; }
 
         /* Proof */
-        .proof { background:var(--pine); padding:72px 56px; position:relative; overflow:hidden; }
+        .proof { background:var(--pine); padding:72px 56px; position:relative; overflow:hidden; isolation:isolate; }
         .proof::before { content:''; position:absolute; top:0;left:0;right:0; height:1px; background:linear-gradient(to right,transparent,var(--gold-line),transparent); }
         .proof::after { content:''; position:absolute; bottom:0;left:0;right:0; height:1px; background:linear-gradient(to right,transparent,var(--gold-line),transparent); }
-        .proof-bg { position:absolute; top:50%;left:50%; transform:translate(-50%,-50%); font-family:'Cormorant Garamond',serif; font-size:180px; font-weight:700; color:rgba(255,255,255,.022); white-space:nowrap; pointer-events:none; letter-spacing:-4px; }
+        .proof-bg { position:absolute; top:50%;left:50%; transform:translate(-50%,-50%); pointer-events:none; z-index:0; }
         .proof-in { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); position:relative; z-index:1; }
         .pc { padding:16px 28px; text-align:center; border-right:1px solid rgba(255,255,255,.06); transition:background .2s; }
         .pc:last-child { border-right:none; }
@@ -526,7 +527,7 @@
 
 <!-- PROOF -->
 <div class="proof reveal">
-    <div class="proof-bg">MARKEB MEDIA</div>
+    <img src="/public/images/markeb-media-logo.png" alt="" class="proof-bg" style="font-size:unset;letter-spacing:unset;color:unset;white-space:unset;width:900px;height:auto;filter:brightness(10);opacity:0.03;object-fit:contain;">
     <div class="proof-in">
         <div class="pc"><div class="pn">48<sup>hr</sup></div><div class="pd">Guaranteed<br>Delivery</div></div>
         <div class="pc"><div class="pn">8<sup>+</sup></div><div class="pd">UK Regions<br>Covered</div></div>
