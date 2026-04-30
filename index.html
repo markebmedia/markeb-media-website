@@ -77,7 +77,8 @@
         /* Header */
         .site-header { position:fixed; top:0;left:0;right:0; z-index:500; height:74px; padding:0 52px; display:flex; align-items:center; justify-content:space-between; transition:all .5s cubic-bezier(.16,1,.3,1); }
         .site-header.sc { background:rgba(253,243,226,.96); backdrop-filter:blur(20px); border-bottom:1px solid var(--rule); box-shadow:0 4px 40px rgba(63,77,27,.08); height:66px; }
-        #headerLogo { opacity:0; height:40px; width:auto; transition:opacity .4s; }
+        #headerLogo { opacity:1; height:40px; width:auto; transition:opacity .4s,filter .4s; filter:brightness(0) invert(1); }
+        .site-header.sc #headerLogo { filter:none; }
         .site-header.sc #headerLogo { opacity:1; }
         .hn { display:flex; align-items:center; gap:12px; }
         .hn-a { font-family:'Mukta',sans-serif; font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; text-decoration:none; padding:10px 20px; border-radius:3px; border:1px solid rgba(255,255,255,.5); color:#fff; background:rgba(255,255,255,.08); backdrop-filter:blur(4px); transition:all .4s; }
@@ -401,48 +402,136 @@
         .sf-logo { font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:600; color:rgba(255,255,255,.3); }
         .sf-logo em { color:var(--brand); font-style:normal; }
         .sf-copy { font-size:11px; color:rgba(255,255,255,.4); letter-spacing:.08em; }
-        @media(max-width:768px) {
-            .contact-in { grid-template-columns:1fr; gap:44px; }
-            .contact { padding-left:22px; padding-right:22px; }
-            .site-footer { flex-direction:column; gap:10px; padding:24px 22px; text-align:center; }
-        }
 
-        /* Responsive */
+        /* ── RESPONSIVE ── */
+
+        /* Tablet */
         @media(max-width:1024px) {
             .why-in,.aud-lay { grid-template-columns:1fr; gap:48px; }
             .aud-sticky { position:static; }
             .hero { grid-template-columns:1fr; }
             .hero-sp { display:none; }
             .fd { grid-template-columns:1fr; }
-            .fd-img { min-height:200px; }
+            .fd-img { min-height:220px; }
             .tg { grid-template-columns:repeat(3,1fr); }
-            .team-hdr { grid-template-columns:1fr; }
-        }
-        @media(max-width:768px) {
-            .site-header { padding:0 20px; }
-            .hero-c { padding:140px 26px 80px; }
-            .hero-lrule { left:20px; }
-            .why,.proof,.aud,.proc,.svcs,.stk,.vis,.team,.shw,.faq,.fcta { padding-left:22px; padding-right:22px; }
-            .proof-in { grid-template-columns:repeat(2,1fr); }
-            .proc-grid { grid-template-columns:1fr; }
-            .sg { grid-template-columns:1fr 1fr; }
-            .sc.wide { grid-column:span 1; }
+            .team-hdr { grid-template-columns:1fr; gap:24px; }
             .stk-grid { grid-template-columns:1fr; }
-            .vis-grid { grid-template-columns:1fr; }
+            .vis-grid { grid-template-columns:1fr 1fr; }
+            .contact-in { grid-template-columns:1fr; gap:44px; }
             .shw-photos { grid-template-columns:1fr; }
-            .tg { grid-template-columns:repeat(2,1fr); }
-            .pg { grid-template-columns:1fr; }
         }
-        @media(max-width:480px) {
-            .hero h1 { letter-spacing:-.5px; }
-            .hero-acts { flex-direction:column; align-items:flex-start; }
-            .proof-in { grid-template-columns:1fr; }
+
+        /* Mobile */
+        @media(max-width:768px) {
+            /* Header */
+            .site-header { padding:0 16px; height:60px; }
+            #headerLogo { height:32px; }
+            .hn { gap:8px; }
+            .hn-a { padding:8px 12px; font-size:10px; letter-spacing:.1em; }
+
+            /* Hero */
+            .hero { min-height:100svh; }
+            .hero-c { padding:120px 20px 80px; }
+            .hero-lrule { display:none; }
+            .hero h1 { font-size:clamp(42px,11vw,64px); letter-spacing:-.5px; }
+            .hero-sub { font-size:14px; max-width:100%; }
+            .hero-acts { flex-direction:column; align-items:flex-start; gap:14px; }
+            .hero-acts .btn-p,.hero-acts .btn-g { width:100%; justify-content:center; text-align:center; }
+            .hero-rule { margin:20px 0; }
+            .hero-badge { margin-bottom:20px; }
+            .hero-badge-txt { font-size:11px; }
+
+            /* Sections — unified padding */
+            .why,.proof,.aud,.proc,.svcs,.stk,.vis,.team,.shw,.faq,.fcta { padding:72px 20px; }
+            .contact { padding:72px 20px; }
+
+            /* Section headings */
+            .dh { font-size:clamp(32px,8vw,48px); }
+
+            /* Marquee */
+            .mq { padding:36px 0; }
+            .mq-item { padding:0 32px; }
+
+            /* Why */
+            .pg { grid-template-columns:1fr 1fr; }
+
+            /* Proof strip */
+            .proof-in { grid-template-columns:repeat(2,1fr); }
+            .pn { font-size:48px; }
+
+            /* Audit */
+            .aud-card { padding:28px 20px; }
+            .aud-card::after { display:none; }
+            .qt { font-size:20px; }
+            .fbr { flex-direction:column; gap:8px; }
+            .fbp,.fbs { width:100%; }
+
+            /* Process */
+            .proc-grid { grid-template-columns:1fr; }
+            .ps { padding:36px 24px; }
+
+            /* Services */
             .sg { grid-template-columns:1fr; }
-            .cta-row { flex-direction:column;align-items:center; }
-            .cs-form { flex-direction:column; }
-            .cs-email { border-right:1px solid rgba(255,255,255,.09); border-bottom:none; }
-            .tr-row { gap:10px; }
+            .sc.wide { grid-column:span 1; }
+
+            /* Stake */
+            .stk-grid { grid-template-columns:1fr; }
+
+            /* Vision */
+            .vis-grid { grid-template-columns:1fr; }
+
+            /* Team */
+            .team-hdr { grid-template-columns:1fr; gap:16px; }
+            .fd { grid-template-columns:1fr; }
+            .fd-img { min-height:180px; }
+            .fd-body { padding:32px 24px; }
+            .fd-name { font-size:36px; }
+            .tg { grid-template-columns:repeat(2,1fr); }
+
+            /* Showcase */
+            .shw-photos { grid-template-columns:1fr; }
+
+            /* FAQ */
+            .fi-q h3 { font-size:16px; }
+
+            /* Final CTA */
+            .cta-row { flex-direction:column; align-items:center; gap:12px; }
+            .cta-row .btn-p,.cta-row .btn-o { width:100%; text-align:center; }
+            .tr-row { gap:10px; flex-wrap:wrap; justify-content:center; }
+            .tr-sep { display:none; }
+            .tr-row span { font-size:10px; }
+
+            /* Contact */
+            .contact-in { grid-template-columns:1fr; gap:36px; }
+            .contact-form-wrap { padding:28px 20px; }
+            .cf-input,.cf-textarea { font-size:16px; } /* prevent iOS zoom */
+
+            /* Footer */
+            .site-footer { flex-direction:column; gap:10px; padding:24px 20px; text-align:center; }
         }
+
+        /* Small mobile */
+        @media(max-width:480px) {
+            /* Header */
+            .hn-a#headerPortfolio { display:none; } /* hide View Our Work, keep Sign Up */
+
+            /* Hero */
+            .hero h1 { font-size:clamp(38px,12vw,56px); }
+
+            /* Proof */
+            .proof-in { grid-template-columns:repeat(2,1fr); }
+            .pn { font-size:40px; }
+
+            /* Why pillars */
+            .pg { grid-template-columns:1fr; }
+
+            /* Team */
+            .tg { grid-template-columns:repeat(2,1fr); }
+
+            /* Audit form */
+            .aud-lay { gap:32px; }
+        }
+
     </style>
 </head>
 <body>
@@ -506,7 +595,6 @@
 
 <!-- WHY -->
 <section class="why" id="why">
-    <img src="/public/images/markeb-media-logo.png" alt="" class="why-logo-bg" aria-hidden="true">
     <div class="why-in">
         <div class="reveal-l">
             <div class="s-lbl">Why Markeb Media</div>
@@ -696,11 +784,11 @@
         <div class="tg reveal">
             <div class="tc"><div class="tm">J</div><div class="tn">Jodie</div><div class="tr">Head of Operations</div><span class="td">Operations</span></div>
             <div class="tc"><div class="tm">K</div><div class="tn">Katy</div><div class="tr">Head of Marketing &amp; Sales</div><span class="td">Marketing</span></div>
-            <div class="tc"><div class="tm">I</div><div class="tn">Izzy</div><div class="tr">Social Media Manager &amp; Content Creator</div><span class="td">Content</span></div>
+            <div class="tc"><div class="tm">I</div><div class="tn">Izzy</div><div class="tr">Social Media Manager &amp; Content Creator</div><span class="td">Marketing</span></div>
             <div class="tc"><div class="tm">C</div><div class="tn">Christian</div><div class="tr">Business Development Manager</div><span class="td">Sales</span></div>
-            <div class="tc"><div class="tm">C</div><div class="tn">Charlotte</div><div class="tr">Executive Assistant to CEO</div><span class="td">Leadership</span></div>
-            <div class="tc"><div class="tm">J</div><div class="tn">James J</div><div class="tr">Media Specialist</div><span class="td">Media</span></div>
-            <div class="tc"><div class="tm">A</div><div class="tn">Andrii</div><div class="tr">Media Specialist</div><span class="td">Media</span></div>
+            <div class="tc"><div class="tm">C</div><div class="tn">Charlotte</div><div class="tr">Executive Assistant to CEO</div><span class="td">Leadership Support</span></div>
+            <div class="tc"><div class="tm">J</div><div class="tn">James J</div><div class="tr">Media Specialist</div><span class="td">Operations</span></div>
+            <div class="tc"><div class="tm">A</div><div class="tn">Andrii</div><div class="tr">Media Specialist</div><span class="td">Operations</span></div>
         </div>
     </div>
 </section>
