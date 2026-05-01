@@ -4409,23 +4409,51 @@ const startingDayOfWeek = firstDay.getDay() || 7;
 const activeBookings = bookings.filter(b => b.fields['Booking Status'] !== 'Cancelled').length;
 const cancelledBookings = bookings.filter(b => b.fields['Booking Status'] === 'Cancelled').length;
 const totalBlocks = blockedTimes.length;
+const weeksInMonth = 4.33;
+const monthlyTarget = Math.round(30 * weeksInMonth);
+const monthProgress = Math.min(100, Math.round((activeBookings / monthlyTarget) * 100));
+const monthProgressColor = monthProgress >= 100 ? '#10b981' : monthProgress >= 66 ? '#f59e0b' : '#ef4444';
+
 let html = `
-    <div class="calendar-booking-counter">
-      <span class="calendar-booking-counter-value">${activeBookings}</span>
-      <span class="calendar-booking-counter-label">booking${activeBookings !== 1 ? 's' : ''}</span>
-      ${cancelledBookings > 0 ? `
-        <span style="margin-left: 16px; color: #ef4444; font-size: 14px; font-weight: 600;">
-          | ${cancelledBookings} cancelled
-        </span>
-      ` : ''}
-      ${totalBlocks > 0 ? `
-        <span style="margin-left: 16px; color: #ef4444; font-size: 14px;">
-          | ${totalBlocks} blocked time${totalBlocks !== 1 ? 's' : ''}
-        </span>
-      ` : ''}
+    <div class="calendar-booking-counter" style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <span class="calendar-booking-counter-value">${activeBookings}</span>
+          <span class="calendar-booking-counter-label">booking${activeBookings !== 1 ? 's' : ''} this month</span>
+          ${cancelledBookings > 0 ? `
+            <span style="margin-left: 16px; color: #ef4444; font-size: 14px; font-weight: 600;">
+              | ${cancelledBookings} cancelled
+            </span>
+          ` : ''}
+          ${totalBlocks > 0 ? `
+            <span style="margin-left: 16px; color: #ef4444; font-size: 14px;">
+              | ${totalBlocks} blocked time${totalBlocks !== 1 ? 's' : ''}
+            </span>
+          ` : ''}
+        </div>
+        <div style="text-align: right; font-size: 13px; font-weight: 700; color: ${monthProgressColor};">
+          ${monthProgress}% of monthly target
+        </div>
+      </div>
+      <div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b; margin-bottom: 6px;">
+          <span>🎯 Monthly target: <strong>${monthlyTarget} shoots</strong> (30/wk × 4.33 wks)</span>
+          <span style="color: ${monthProgressColor}; font-weight: 700;">${activeBookings} / ${monthlyTarget}</span>
+        </div>
+        <div style="background: #e2e8f0; height: 10px; border-radius: 5px; overflow: hidden;">
+          <div style="background: ${monthProgressColor}; height: 100%; width: ${monthProgress}%; transition: width 0.4s ease; border-radius: 5px;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 6px;">
+          <span>James Jago: 15/wk &nbsp;|&nbsp; Andrii: 15/wk</span>
+          <span>${monthlyTarget - activeBookings > 0 ? `${monthlyTarget - activeBookings} to go` : '🎉 Target hit!'}</span>
+        </div>
+      </div>
     </div>
+`;
+
+html += `
     <div class="calendar-grid month">
-  `;
+`;
   ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(day => {
 html += `<div class="calendar-day-header">${day}</div>`;
   });
@@ -4474,7 +4502,71 @@ html += `
 
 function renderWeekView(bookings, blockedTimes) {
   const grid = document.getElementById('calendarGrid');
-  grid.innerHTML = '<div style="padding: 40px; text-align: center;">Week view coming soon...</div>';
+
+  const activeBookings = bookings.filter(b => b.fields['Booking Status'] !== 'Cancelled').length;
+  const cancelledBookings = bookings.filter(b => b.fields['Booking Status'] === 'Cancelled').length;
+  const weeklyTarget = 30;
+  const weekProgress = Math.min(100, Math.round((activeBookings / weeklyTarget) * 100));
+  const weekProgressColor = weekProgress >= 100 ? '#10b981' : weekProgress >= 66 ? '#f59e0b' : '#ef4444';
+
+  const jamesBookings = bookings.filter(b => (b.fields['Media Specialist'] || '').includes('James') && b.fields['Booking Status'] !== 'Cancelled').length;
+  const andriiBookings = bookings.filter(b => (b.fields['Media Specialist'] || '').includes('Andrii') && b.fields['Booking Status'] !== 'Cancelled').length;
+  const jamesProgress = Math.min(100, Math.round((jamesBookings / 15) * 100));
+  const andriiProgress = Math.min(100, Math.round((andriiBookings / 15) * 100));
+  const jamesColor = jamesProgress >= 100 ? '#10b981' : jamesProgress >= 66 ? '#f59e0b' : '#ef4444';
+  const andriiColor = andriiProgress >= 100 ? '#10b981' : andriiProgress >= 66 ? '#f59e0b' : '#ef4444';
+
+  grid.innerHTML = `
+    <div class="calendar-booking-counter" style="display: flex; flex-direction: column; gap: 14px;">
+
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <span class="calendar-booking-counter-value">${activeBookings}</span>
+          <span class="calendar-booking-counter-label">shoot${activeBookings !== 1 ? 's' : ''} this week</span>
+          ${cancelledBookings > 0 ? `<span style="margin-left: 16px; color: #ef4444; font-size: 14px; font-weight: 600;">| ${cancelledBookings} cancelled</span>` : ''}
+        </div>
+        <div style="font-size: 13px; font-weight: 700; color: ${weekProgressColor};">${weekProgress}% of weekly target</div>
+      </div>
+
+      <div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b; margin-bottom: 6px;">
+          <span>🎯 Weekly target: <strong>30 shoots</strong></span>
+          <span style="color: ${weekProgressColor}; font-weight: 700;">${activeBookings} / 30</span>
+        </div>
+        <div style="background: #e2e8f0; height: 10px; border-radius: 5px; overflow: hidden;">
+          <div style="background: ${weekProgressColor}; height: 100%; width: ${weekProgress}%; transition: width 0.4s ease; border-radius: 5px;"></div>
+        </div>
+        <div style="text-align: right; font-size: 11px; color: #94a3b8; margin-top: 5px;">
+          ${30 - activeBookings > 0 ? `${30 - activeBookings} shoots to go` : '🎉 Weekly target hit!'}
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 4px; border-top: 1px solid #e2e8f0;">
+        <div>
+          <div style="font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">James Jago</div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+            <span style="color: #64748b;">Target: 15/wk</span>
+            <span style="color: ${jamesColor}; font-weight: 700;">${jamesBookings} / 15</span>
+          </div>
+          <div style="background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden;">
+            <div style="background: ${jamesColor}; height: 100%; width: ${jamesProgress}%; border-radius: 4px;"></div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">Andrii</div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+            <span style="color: #64748b;">Target: 15/wk</span>
+            <span style="color: ${andriiColor}; font-weight: 700;">${andriiBookings} / 15</span>
+          </div>
+          <div style="background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden;">
+            <div style="background: ${andriiColor}; height: 100%; width: ${andriiProgress}%; border-radius: 4px;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div style="padding: 40px; text-align: center; color: #94a3b8; font-size: 14px;">Week grid view coming soon</div>
+  `;
 }
 
 function renderDayView(bookings, blockedTimes) {
