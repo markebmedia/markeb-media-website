@@ -1732,7 +1732,7 @@ body {
           <span style="font-size: 14px; color: #64748b;">sq ft</span>
         </div>
         <div id="adminSqftPriceNotice" style="display: none; margin-top: 10px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
-          <strong>+£150 large property fee</strong> — properties over 3,000 sq ft
+          <strong>+£125 large property fee</strong> — properties over 3,000 sq ft
         </div>
         <div id="adminSqftOkNotice" style="display: none; margin-top: 10px; padding: 12px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; font-size: 13px; color: #065f46;">
           ✓ Standard size — no additional fee
@@ -3847,7 +3847,7 @@ bookingFormData.totalPrice = incVat;
     adminSqftFeeRow.style.cssText = 'display: flex; justify-content: space-between; margin-bottom: 12px;';
     adminSqftFeeRow.innerHTML = `
       <span style="color: #64748b;">Large property fee</span>
-      <span style="font-weight: 600;">£150.00</span>
+      <span style="font-weight: 600;">£125.00</span>
     `;
     divider.parentNode.insertBefore(adminSqftFeeRow, divider);
   }
@@ -8523,7 +8523,7 @@ function handleAdminSqftInput() {
   bookingFormData.squareFootage = value;
 
   if (value > 3000) {
-    bookingFormData.squareFootageFee = 150;
+    bookingFormData.squareFootageFee = 125;
     priceNotice.style.display = 'block';
   } else {
     bookingFormData.squareFootageFee = 0;

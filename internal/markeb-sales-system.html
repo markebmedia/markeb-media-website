@@ -3,1073 +3,1181 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Markeb Media — Sales System</title>
-<link href="https://fonts.googleapis.com/css2?family=Mukta:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Markeb Media — Outreach Flows & Prices</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
 <style>
-  :root {
-    --pine: #3F4D1B;
-    --pine-faint: #3F4D1B12;
-    --pine-faint2: #3F4D1B26;
-    --orange: #B46100;
-    --orange-faint: #B4610012;
-    --orange-faint2: #B4610026;
-    --cream: #FDF3E2;
-    --cream-dark: #f5e8cc;
-    --ink: #1a1a14;
-    --ink-mid: #3a3a2e;
-    --ink-muted: #6b6b52;
-    --ink-faint: #9a9a7a;
-    --border: #3F4D1B20;
-    --border-mid: #3F4D1B38;
-    --radius: 10px;
-    --radius-lg: 16px;
-  }
+:root {
+  --pine:    #3F4D1B;
+  --pine2:   #2d3812;
+  --orange:  #B46100;
+  --orange2: #8a4a00;
+  --cream:   #FDF3E2;
+  --cream2:  #F5E8CC;
+  --ink:     #1e293b;
+  --mid:     #475569;
+  --muted:   #64748b;
+  --faint:   #94a3b8;
+  --border:  #e2e8f0;
+  --border2: rgba(63,77,27,0.3);
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  --c-ig:    #E1306C;
+  --c-email: #1a73e8;
+  --c-call:  #2e7d32;
+  --c-walk:  #7b3f00;
+  --c-li:    #0077B5;
+  --c-meet:  #B46100;
+  --c-win:   #1b5e20;
+  --c-dec:   #455a64;
+  --c-hoo:   #4a148c;
+  --c-ea:    #0077B5;
+  --c-spec:  #e65100;
+  --c-ceo:   #1b5e20;
+}
 
-  body {
-    font-family: 'Mukta', sans-serif;
-    background: var(--cream);
-    color: var(--ink);
-    font-size: 15px;
-    line-height: 1.65;
-    min-height: 100vh;
-  }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-size:14px;line-height:1.6;min-height:100vh}
 
-  /* ── PIN GATE ── */
-  #gate {
-    position: fixed; inset: 0;
-    background: #FDF3E2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    padding: 24px;
-  }
-  #gate.hidden { display: none; }
+/* ── HEADER ── */
+.hdr{background:var(--pine);padding:24px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.hdr-logo{height:48px;width:auto;filter:brightness(0) invert(1)}
+.hdr-title{font-size:clamp(16px,3vw,22px);font-weight:800;color:var(--cream);margin-bottom:3px}
+.hdr-sub{font-size:12px;color:rgba(253,243,226,.55)}
 
-  .gate-card {
-    background: #ffffff;
-    border: 1px solid #e8d9be;
-    border-radius: 16px;
-    padding: 44px 40px 36px;
-    width: 100%;
-    max-width: 380px;
-    box-shadow: 0 4px 24px rgba(63,77,27,0.08);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .gate-logo-wrap { margin-bottom: 28px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-  .gate-logo-img { height: 44px; width: auto; display: block; }
-  .gate-sub { font-size: 13px; color: #6b6b3a; font-family: 'Mukta', sans-serif; font-weight: 400; text-align: center; }
-  .gate-label { font-size: 13px; font-weight: 600; color: #3d3d1a; margin-bottom: 16px; font-family: 'Mukta', sans-serif; text-align: center; }
-  .pin-dots { display: flex; gap: 14px; margin-bottom: 28px; }
-  .pin-dot { width: 13px; height: 13px; border-radius: 50%; border: 2px solid #c8c89a; background: transparent; transition: background 0.15s, border-color 0.15s; }
-  .pin-dot.filled { background: var(--orange); border-color: var(--orange); }
-  .pin-pad { display: grid; grid-template-columns: repeat(3, 72px); gap: 10px; margin-bottom: 16px; }
-  .pin-key { height: 72px; border-radius: 10px; border: 1px solid #c8c89a; background: #fff; color: #3F4D1B; font-family: 'Mukta', sans-serif; font-size: 22px; font-weight: 500; cursor: pointer; transition: background 0.1s, border-color 0.12s, transform 0.08s; user-select: none; -webkit-tap-highlight-color: transparent; }
-  .pin-key:hover { background: #FDF3E2; border-color: #B46100; }
-  .pin-key:active { background: #f5e8cc; transform: scale(0.94); }
-  .pin-key.wide { grid-column: span 2; }
-  .pin-key.del { font-size: 17px; color: #9a9a7a; }
-  .gate-error { font-size: 13px; color: #b91c1c; text-align: center; font-family: 'Mukta', sans-serif; background: #fef2f2; border-radius: 6px; padding: 0 10px; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 32px; margin-top: 4px; }
-  .gate-error:empty { background: transparent; }
-  .gate-checking { font-size: 13px; color: #6b6b3a; text-align: center; font-family: 'Mukta', sans-serif; min-height: 32px; display: flex; align-items: center; justify-content: center; width: 100%; margin-top: 4px; }
+/* ── TOP TABS ── */
+.top-tabs{background:#fff;border-bottom:2px solid var(--border);display:flex;overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:50}
+.top-tabs::-webkit-scrollbar{display:none}
+.top-tab{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:2.5px solid transparent;padding:14px 22px;cursor:pointer;white-space:nowrap;transition:all .15s;-webkit-tap-highlight-color:transparent;flex-shrink:0;display:flex;align-items:center;gap:7px}
+.top-tab svg{width:15px;height:15px;flex-shrink:0}
+.top-tab:hover{color:var(--pine)}
+.top-tab.on{color:var(--pine);border-bottom-color:var(--orange);font-weight:700}
 
-  /* ── APP ── */
-  #app { display: none; }
-  #app.visible { display: block; }
+/* ── PANELS ── */
+.top-panel{display:none;padding:28px 32px}
+.top-panel.on{display:block}
+@media(max-width:640px){.top-panel{padding:18px 16px}}
 
-  /* ── COVER ── */
-  .cover {
-    background: var(--pine);
-    color: var(--cream);
-    padding: clamp(36px, 7vw, 80px) clamp(18px, 5vw, 60px) clamp(32px, 6vw, 70px);
-    position: relative;
-    overflow: hidden;
-  }
-  .cover::before { content: ''; position: absolute; top: -80px; right: -80px; width: 380px; height: 380px; border-radius: 50%; border: 55px solid #ffffff07; pointer-events: none; }
-  .cover-logo { height: 44px; width: auto; display: block; margin-bottom: 28px; filter: brightness(0) invert(1); }
-  .cover-label { font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--orange); margin-bottom: 14px; }
-  .cover h1 { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: clamp(26px, 5vw, 52px); font-weight: 700; line-height: 1.1; color: var(--cream); margin-bottom: 14px; max-width: 540px; }
-  .cover-sub { font-size: clamp(13px, 2vw, 15px); font-weight: 300; color: #FDF3E2bb; max-width: 480px; line-height: 1.6; margin-bottom: 32px; }
+/* ── FLOW SELECTOR GRID ── */
+.flow-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+@media(max-width:700px){.flow-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:380px){.flow-grid{grid-template-columns:1fr}}
 
-  .core-principle {
-    background: #ffffff0f;
-    border: 1px solid #ffffff18;
-    border-radius: var(--radius-lg);
-    padding: 20px 24px;
-    max-width: 540px;
-  }
-  .core-principle-label { font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--orange); margin-bottom: 10px; }
-  .core-principle p { font-size: 14px; color: #FDF3E2dd; line-height: 1.65; margin-bottom: 8px; }
-  .core-principle p:last-child { margin-bottom: 0; }
-  .core-principle strong { color: var(--cream); font-weight: 600; }
+.flow-btn{background:#fff;border:2px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;text-align:left;transition:all .2s;font-family:'Inter',sans-serif}
+.flow-btn:hover{border-color:var(--orange);background:#fffbf5}
+.flow-btn.on{border-color:var(--pine);background:rgba(63,77,27,.06)}
+.flow-btn-num{font-size:22px;font-weight:800;color:#cbd5e1;line-height:1;margin-bottom:6px}
+.flow-btn.on .flow-btn-num{color:var(--pine)}
+.flow-btn-title{font-size:12.5px;font-weight:700;color:var(--pine);margin-bottom:2px;display:flex;align-items:center;gap:5px}
+.flow-btn-title svg{width:13px;height:13px;flex-shrink:0}
+.flow-btn-desc{font-size:11px;color:var(--muted);line-height:1.4}
 
-  .cover-meta { display: flex; gap: clamp(14px, 4vw, 32px); flex-wrap: wrap; margin-top: 28px; }
-  .cover-meta-item { display: flex; flex-direction: column; gap: 3px; }
-  .cover-meta-item span:first-child { font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; color: #FDF3E266; font-weight: 500; }
-  .cover-meta-item span:last-child { font-size: 13px; color: var(--cream); }
+/* ── FLOW PANELS ── */
+.flow-panel{display:none}
+.flow-panel.on{display:block}
 
-  /* ── NAV ── */
-  .nav { background: #fff; border-bottom: 1px solid var(--border); display: flex; position: sticky; top: 0; z-index: 100; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-  .nav::-webkit-scrollbar { display: none; }
-  .nav-btn { font-family: 'Mukta', sans-serif; font-size: 14px; font-weight: 500; color: var(--ink-muted); background: none; border: none; border-bottom: 2px solid transparent; padding: 13px clamp(10px, 2.5vw, 20px); cursor: pointer; white-space: nowrap; transition: color 0.15s, border-color 0.15s; -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
-  .nav-btn:hover { color: var(--pine); }
-  .nav-btn.active { color: var(--pine); border-bottom-color: var(--orange); font-weight: 600; }
+/* ── LEGEND ── */
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;padding:12px 16px;background:#fff;border:1px solid var(--border);border-radius:10px}
+.leg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);font-weight:500}
+.leg-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
 
-  /* ── SECTIONS ── */
-  .section { display: none; padding: clamp(20px, 5vw, 48px) clamp(14px, 4vw, 40px); max-width: 960px; margin: 0 auto; }
-  .section.active { display: block; }
+/* ── SECTION CARD ── */
+.section-card{background:#fff;border:2px solid var(--border);border-radius:14px;padding:22px 24px;margin-bottom:14px}
+.section-card:last-child{margin-bottom:0}
 
-  .section-intro { background: var(--pine); border-radius: var(--radius-lg); padding: clamp(18px, 4vw, 32px) clamp(16px, 4vw, 36px); margin-bottom: 24px; }
-  .section-intro h2 { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: clamp(17px, 3vw, 22px); font-weight: 700; margin-bottom: 9px; color: var(--cream); }
-  .section-intro p { font-size: 14px; line-height: 1.65; color: #FDF3E2cc; font-weight: 300; max-width: 640px; }
+.sc-title{font-size:15px;font-weight:700;color:var(--pine);margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.sc-title svg{width:17px;height:17px;flex-shrink:0;color:var(--pine)}
+.sc-sub{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.55}
 
-  /* ── STAGE CARDS ── */
-  .stage-card {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: clamp(18px, 3vw, 28px) clamp(16px, 3vw, 30px);
-    margin-bottom: 12px;
-  }
-  .stage-card:last-child { margin-bottom: 0; }
-  .stage-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
-  .stage-num { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 32px; font-weight: 700; color: var(--pine-faint2); line-height: 1; flex-shrink: 0; width: 44px; }
-  .stage-title-wrap { flex: 1; }
-  .stage-title { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: clamp(16px, 2.5vw, 19px); font-weight: 700; color: var(--pine); margin-bottom: 3px; }
-  .stage-objective { font-size: 12px; font-weight: 600; color: var(--orange); letter-spacing: 0.08em; text-transform: uppercase; }
+/* ── ROLE BADGES ── */
+.roles{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.role{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:20px;padding:3px 10px}
+.role svg{width:11px;height:11px}
+.role-bdm{background:rgba(180,97,0,.12);color:var(--orange2)}
+.role-hoo{background:rgba(74,20,140,.12);color:#4a148c}
+.role-ea{background:rgba(0,119,181,.12);color:#005a87}
+.role-ceo{background:rgba(27,94,32,.12);color:#1b5e20}
+.role-spec{background:rgba(230,81,0,.12);color:#bf360c}
 
-  .stage-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-  @media (max-width: 520px) { .stage-cols { grid-template-columns: 1fr; } }
+/* ── STEP FLOW ── */
+.step-flow{display:flex;flex-direction:column}
+.sf-step{display:flex;gap:14px;position:relative}
+.sf-step:not(:last-child)::after{content:'';position:absolute;left:19px;top:44px;width:2px;bottom:-4px;background:var(--border);z-index:0}
+.sf-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1;margin-top:2px}
+.sf-icon svg{width:17px;height:17px;color:#fff}
+.sf-body{background:#f8fafc;border-radius:10px;padding:12px 15px;flex:1;margin-bottom:10px}
+.sf-title{font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.sf-text{font-size:12.5px;color:var(--muted);line-height:1.6}
+.sf-note{font-size:12px;font-weight:600;margin-top:6px;display:flex;align-items:flex-start;gap:5px}
+.sf-note svg{width:12px;height:12px;flex-shrink:0;margin-top:2px}
+.sf-note.orange{color:var(--orange2)}
+.sf-note.green{color:#2e7d32}
+.sf-note.red{color:#b91c1c}
+.sf-example{margin-top:10px;background:#fff;border-radius:8px;padding:11px 14px;font-size:12.5px;line-height:1.65;color:var(--ink);font-style:italic;border-left:3px solid var(--orange)}
 
-  .stage-block { background: var(--cream); border-radius: var(--radius); padding: 13px 15px; }
-  .stage-block-label { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; }
-  .stage-block ul { list-style: none; padding: 0; }
-  .stage-block ul li { font-size: 13px; color: var(--ink-mid); line-height: 1.6; padding-left: 14px; position: relative; margin-bottom: 3px; }
-  .stage-block ul li:last-child { margin-bottom: 0; }
-  .stage-block ul li::before { content: '–'; position: absolute; left: 0; color: var(--orange); font-weight: 600; }
-  .stage-block p { font-size: 13px; color: var(--ink-mid); line-height: 1.6; }
+/* ── MINI GRID ── */
+.sf-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+@media(max-width:480px){.sf-grid{grid-template-columns:1fr}}
+.sf-mini{background:#fff;border-radius:8px;padding:10px 12px;border:1px solid var(--border)}
+.sf-mini-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:5px;display:flex;align-items:center;gap:4px}
+.sf-mini-label svg{width:11px;height:11px}
+.sf-mini ul{list-style:none;padding:0}
+.sf-mini ul li{font-size:12.5px;color:var(--mid);line-height:1.55;padding-left:12px;position:relative;margin-bottom:2px}
+.sf-mini ul li::before{content:'–';position:absolute;left:0;color:var(--orange);font-weight:600}
 
-  .example-box { background: var(--pine-faint); border-left: 3px solid var(--pine); border-radius: 0 var(--radius) var(--radius) 0; padding: 12px 15px; margin-bottom: 10px; }
-  .example-box .stage-block-label { color: var(--pine); }
-  .example-box p { font-size: 13px; color: var(--ink); line-height: 1.65; font-style: italic; }
+/* ── DECISION BLOCK ── */
+.decision-block{background:#fff;border:2px solid var(--c-dec);border-radius:10px;padding:12px 15px;margin:4px 0 10px 54px}
+.decision-block-title{font-size:11px;font-weight:700;color:var(--c-dec);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:5px}
+.decision-block-title svg{width:13px;height:13px}
+.decision-branches{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:400px){.decision-branches{grid-template-columns:1fr}}
+.dec-yes{background:#f0fdf4;border-radius:8px;padding:8px 10px}
+.dec-no{background:#fef2f2;border-radius:8px;padding:8px 10px}
+.dec-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.dec-label svg{width:11px;height:11px}
+.dec-yes .dec-label{color:#2e7d32}
+.dec-no .dec-label{color:#b91c1c}
+.dec-text{font-size:12px;color:var(--mid);line-height:1.45}
 
-  .rule-box { background: var(--orange-faint); border-left: 3px solid var(--orange); border-radius: 0 var(--radius) var(--radius) 0; padding: 12px 15px; }
-  .rule-box .stage-block-label { color: var(--orange); }
-  .rule-box ul { list-style: none; padding: 0; }
-  .rule-box ul li { font-size: 13px; color: var(--ink-mid); line-height: 1.6; padding-left: 14px; position: relative; margin-bottom: 3px; }
-  .rule-box ul li::before { content: '–'; position: absolute; left: 0; color: var(--orange); font-weight: 600; }
-  .rule-box p { font-size: 13px; color: var(--ink-mid); line-height: 1.6; }
+/* ── INFO / ALERT BOXES ── */
+.info-box{background:rgba(63,77,27,.07);border-left:3px solid var(--pine);border-radius:0 10px 10px 0;padding:12px 15px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
+.info-box svg{width:16px;height:16px;color:var(--pine);flex-shrink:0;margin-top:1px}
+.info-box p{font-size:13px;color:var(--mid);line-height:1.6}
 
-  /* ── KPI SECTION ── */
-  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
-  .kpi-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 22px; }
-  .kpi-card.highlight { border-color: var(--orange); background: var(--orange-faint); }
-  .kpi-card-label { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; }
-  .kpi-card.highlight .kpi-card-label { color: var(--orange); }
-  .kpi-item { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--border); }
-  .kpi-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .kpi-item-label { font-size: 13px; color: var(--ink-muted); }
-  .kpi-item-value { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 15px; font-weight: 700; color: var(--pine); }
-  .kpi-card.highlight .kpi-item-value { color: var(--orange); }
+.orange-box{background:rgba(180,97,0,.07);border-left:3px solid var(--orange);border-radius:0 10px 10px 0;padding:12px 15px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
+.orange-box svg{width:16px;height:16px;color:var(--orange);flex-shrink:0;margin-top:1px}
+.orange-box p{font-size:13px;color:var(--mid);line-height:1.6}
 
-  .schedule-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
-  .schedule-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; }
-  .schedule-time { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 13px; font-weight: 700; color: var(--orange); margin-bottom: 4px; }
-  .schedule-name { font-size: 14px; font-weight: 600; color: var(--pine); margin-bottom: 8px; }
-  .schedule-tasks { list-style: none; padding: 0; }
-  .schedule-tasks li { font-size: 13px; color: var(--ink-muted); padding-left: 14px; position: relative; margin-bottom: 3px; line-height: 1.5; }
-  .schedule-tasks li::before { content: '–'; position: absolute; left: 0; color: var(--pine-faint2); font-weight: 600; }
+/* ── STRATEGY GRID ── */
+.strat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+@media(max-width:520px){.strat-grid{grid-template-columns:1fr}}
+.strat-card{background:#fff;border-radius:12px;padding:15px 17px}
+.strat-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:5px}
+.strat-label svg{width:12px;height:12px}
+.strat-title{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:4px}
+.strat-desc{font-size:12px;color:var(--muted);line-height:1.5}
 
-  .pipeline-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px 24px; margin-bottom: 12px; }
-  .pipeline-card:last-child { margin-bottom: 0; }
-  .pipeline-card h3 { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 14px; font-weight: 700; color: var(--pine); margin-bottom: 8px; }
-  .pipeline-card p { font-size: 13px; color: var(--ink-muted); line-height: 1.65; }
-  .pipeline-card ul { list-style: none; padding: 0; margin-top: 6px; }
-  .pipeline-card ul li { font-size: 13px; color: var(--ink-muted); padding-left: 14px; position: relative; margin-bottom: 3px; line-height: 1.6; }
-  .pipeline-card ul li::before { content: '–'; position: absolute; left: 0; color: var(--orange); font-weight: 600; }
+/* ── NORTHSTONE BANNER ── */
+.proof-banner{background:var(--pine);border-radius:14px;padding:16px 20px;margin-bottom:18px;display:flex;gap:14px;align-items:flex-start}
+.proof-banner svg{width:26px;height:26px;color:#c8d96b;flex-shrink:0;margin-top:2px}
+.proof-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(253,243,226,.5);margin-bottom:4px}
+.proof-title{font-size:14px;font-weight:700;color:var(--cream);margin-bottom:4px}
+.proof-text{font-size:12.5px;color:rgba(253,243,226,.75);line-height:1.6}
 
-  .group-label { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); margin: 24px 0 10px; padding-bottom: 9px; border-bottom: 1px solid var(--border); }
-  .group-label:first-of-type { margin-top: 0; }
+/* ── SECTION DIVIDER LABEL ── */
+.sec-label{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:22px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.sec-label svg{width:13px;height:13px}
 
-  /* ── SERVICE CARDS ── */
-  .service-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: clamp(16px, 3vw, 28px) clamp(14px, 3vw, 30px); margin-bottom: 10px; transition: border-color 0.18s; }
-  .service-card:hover { border-color: var(--border-mid); }
-  .service-card:last-child { margin-bottom: 0; }
-  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
-  .card-name { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: clamp(15px, 2.5vw, 18px); font-weight: 700; color: var(--ink); line-height: 1.25; }
-  .card-badges { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
-  .badge { font-size: 12px; font-weight: 600; padding: 4px 11px; border-radius: 20px; white-space: nowrap; }
-  .badge-price { background: var(--pine); color: var(--cream); }
-  .badge-duration { background: var(--cream-dark); color: var(--ink-muted); font-weight: 400; }
-  .badge-popular { background: var(--orange); color: #fff; }
-  .card-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 10px; }
-  @media (max-width: 500px) { .card-cols { grid-template-columns: 1fr; } }
-  .card-block { background: var(--cream); border-radius: var(--radius); padding: 12px 14px; }
-  .card-block-label { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 5px; }
-  .card-block p { font-size: 13px; color: var(--ink-mid); line-height: 1.6; }
-  .pill-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
-  .pill { font-size: 12px; padding: 3px 10px; border-radius: 20px; background: var(--pine-faint); color: var(--pine); border: 1px solid var(--pine-faint2); }
-  .consult-box { background: var(--pine-faint); border-left: 3px solid var(--pine); border-radius: 0 var(--radius) var(--radius) 0; padding: 12px 14px; margin-bottom: 9px; }
-  .consult-box .card-block-label { color: var(--pine); }
-  .consult-box p { font-size: 13px; color: var(--ink); line-height: 1.65; font-style: italic; }
-  .question-box { background: var(--orange-faint); border-left: 3px solid var(--orange); border-radius: 0 var(--radius) var(--radius) 0; padding: 12px 14px; }
-  .question-box .card-block-label { color: var(--orange); }
-  .question-box p { font-size: 13px; color: var(--ink-mid); line-height: 1.65; }
-  .tier-note { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 16px; font-size: 13px; color: var(--ink-muted); line-height: 1.65; }
-  .tier-note strong { display: block; font-weight: 700; color: var(--pine); margin-bottom: 5px; font-size: 14px; font-family: 'Arial Unicode MS', 'Arial', sans-serif; }
+/* ── WIN BOX ── */
+.win-box{background:linear-gradient(135deg,var(--pine),var(--pine2));border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:10px;margin-top:6px}
+.win-box svg{width:20px;height:20px;color:#c8d96b;flex-shrink:0}
+.win-box-text{color:var(--cream);font-weight:700;font-size:14px}
+.win-box-sub{display:block;font-size:11.5px;font-weight:400;color:rgba(253,243,226,.6);margin-top:2px}
 
-  /* ── OBJECTIONS ── */
-  .objection-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: clamp(16px, 3vw, 24px) clamp(14px, 3vw, 28px); margin-bottom: 10px; }
-  .objection-card:last-child { margin-bottom: 0; }
-  .objection-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pine); background: var(--pine-faint); border: 1px solid var(--pine-faint2); border-radius: 20px; padding: 3px 10px; margin-bottom: 9px; font-family: 'Arial Unicode MS', 'Arial', sans-serif; }
-  .objection-q { font-style: italic; color: var(--ink-muted); font-size: 14px; margin-bottom: 11px; padding-bottom: 11px; border-bottom: 1px solid var(--border); }
-  .objection-q::before { content: '"'; color: var(--orange); font-size: 22px; font-family: 'Arial Unicode MS', 'Arial', sans-serif; line-height: 0; vertical-align: -5px; margin-right: 2px; }
-  .objection-a { font-size: 13px; color: var(--ink-mid); line-height: 1.7; }
+/* ── PRICES ── */
+.prices-header{background:var(--pine);border-radius:14px;padding:18px 22px;margin-bottom:22px}
+.prices-header h2{font-size:18px;font-weight:800;color:var(--cream);margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.prices-header h2 svg{width:20px;height:20px}
+.prices-header p{font-size:13px;color:rgba(253,243,226,.75);line-height:1.55}
 
-  /* ── PRINCIPLES ── */
-  .principle-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: clamp(14px, 3vw, 22px) clamp(14px, 3vw, 26px); margin-bottom: 10px; display: flex; gap: 14px; align-items: flex-start; }
-  .principle-icon { width: 34px; height: 34px; background: var(--pine); border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-  .principle-card h3 { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 14px; font-weight: 700; color: var(--pine); margin-bottom: 4px; }
-  .principle-card p { font-size: 13px; color: var(--ink-muted); line-height: 1.6; }
+.price-group{margin-bottom:24px}
+.price-group-label{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
+.price-group-label svg{width:13px;height:13px}
 
-  .final-rule {
-    background: var(--pine);
-    border-radius: var(--radius-lg);
-    padding: 28px 32px;
-    margin-top: 20px;
-    text-align: center;
-  }
-  .final-rule p { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: clamp(16px, 2.5vw, 20px); font-weight: 700; color: var(--cream); line-height: 1.4; }
-  .final-rule span { color: var(--orange); }
+.price-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.price-card{background:#fff;border:2px solid var(--border);border-radius:14px;padding:16px 18px;transition:border-color .15s}
+.price-card:hover{border-color:rgba(63,77,27,.3)}
+.price-card.popular{border-color:var(--orange)}
+.pc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+.pc-name{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.3;display:flex;align-items:flex-start;gap:7px}
+.pc-name svg{width:16px;height:16px;flex-shrink:0;margin-top:2px;color:var(--orange)}
+.pc-badges{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.pc-price{background:var(--pine);color:var(--cream);font-size:13px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.pc-popular{background:var(--orange);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em}
+.pc-vat{font-size:11px;color:var(--muted);font-weight:400;margin-top:2px;text-align:right}
+.pc-dur{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:4px;margin-bottom:6px}
+.pc-dur svg{width:13px;height:13px}
+.pc-desc{font-size:12.5px;color:var(--mid);line-height:1.55}
 
-  /* ── CROSS-LINK ── */
-  .cross-link {
-    display: flex; align-items: center; justify-content: space-between;
-    background: #fff; border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: 16px 20px;
-    text-decoration: none; transition: border-color 0.15s, background 0.15s;
-    gap: 12px;
-  }
-  .cross-link:hover { border-color: var(--orange); background: var(--orange-faint); }
-  .cross-link-label { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 3px; font-family: 'Arial Unicode MS', 'Arial', sans-serif; }
-  .cross-link-title { font-size: 15px; font-weight: 600; color: var(--pine); font-family: 'Arial Unicode MS', 'Arial', sans-serif; }
-  .cross-link-arrow { font-size: 20px; color: var(--orange); flex-shrink: 0; }
+.addon-table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden;border:2px solid var(--border)}
+.addon-table thead tr{background:var(--pine)}
+.addon-table thead th{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(253,243,226,.75);padding:11px 15px;text-align:left}
+.addon-table tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+.addon-table tbody tr:last-child{border-bottom:none}
+.addon-table tbody tr:hover{background:#fff3e0}
+.addon-table td{padding:11px 15px;font-size:13px;vertical-align:middle}
+.addon-table td:first-child{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--ink)}
+.addon-table td:first-child svg{width:14px;height:14px;color:var(--orange);flex-shrink:0}
+.addon-table td:nth-child(2){color:var(--pine);font-weight:700;white-space:nowrap}
+.addon-table td:nth-child(3){color:var(--muted);font-size:12px}
+.vat-note{font-size:11px;color:var(--faint);font-weight:400;display:block;margin-top:2px}
 
-  /* ── NAV CROSS-LINK ── */
-  .nav-divider { width: 1px; background: var(--border); margin: 8px 0; flex-shrink: 0; }
-  .nav-link { font-family: 'Mukta', sans-serif; font-size: 13px; font-weight: 500; color: var(--orange); background: none; border: none; border-bottom: 2px solid transparent; padding: 13px clamp(10px, 2.5vw, 16px); cursor: pointer; white-space: nowrap; text-decoration: none; display: flex; align-items: center; gap: 5px; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
-  .nav-link:hover { color: var(--pine); }
+.footer{text-align:center;padding:20px;font-size:12px;color:var(--faint);border-top:1px solid var(--border);margin-top:12px}
 
-  /* ── DASHBOARD FEATURES ── */
-  .dashboard-feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 12px; }
-  .dashboard-feature { background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; }
-  .dashboard-feature-icon { width: 36px; height: 36px; background: var(--pine); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; flex-shrink: 0; }
-  .dashboard-feature h3 { font-family: 'Arial Unicode MS', 'Arial', sans-serif; font-size: 14px; font-weight: 700; color: var(--pine); margin-bottom: 5px; }
-  .dashboard-feature p { font-size: 13px; color: var(--ink-muted); line-height: 1.6; }
-  .dashboard-feature .pitch { font-size: 12px; color: var(--orange); font-weight: 600; margin-top: 8px; font-style: italic; }
-
-  /* ── FOOTER ── */
-  .footer { text-align: center; padding: 24px 16px; font-size: 12px; color: var(--ink-faint); border-top: 1px solid var(--border); margin-top: 16px; }
-  .footer img { height: 28px; width: auto; display: block; margin: 0 auto 10px; opacity: 0.35; }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  .section.active > * { animation: fadeUp 0.26s ease both; }
-  .section.active > *:nth-child(2) { animation-delay: 0.04s; }
-  .section.active > *:nth-child(3) { animation-delay: 0.08s; }
-  .section.active > *:nth-child(4) { animation-delay: 0.12s; }
-  .section.active > *:nth-child(5) { animation-delay: 0.16s; }
-  .section.active > *:nth-child(6) { animation-delay: 0.20s; }
-  .section.active > *:nth-child(7) { animation-delay: 0.24s; }
-  .section.active > *:nth-child(8) { animation-delay: 0.28s; }
-  .section.active > *:nth-child(9) { animation-delay: 0.32s; }
-  .section.active > *:nth-child(10) { animation-delay: 0.36s; }
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.flow-panel.on .section-card{animation:fadeUp .2s ease both}
+.flow-panel.on .section-card:nth-child(2){animation-delay:.05s}
+.flow-panel.on .section-card:nth-child(3){animation-delay:.1s}
+.flow-panel.on .section-card:nth-child(4){animation-delay:.15s}
+.flow-panel.on .section-card:nth-child(5){animation-delay:.2s}
 </style>
 </head>
 <body>
 
-<!-- PIN GATE -->
-<div id="gate">
-  <div class="gate-card">
-    <div class="gate-logo-wrap">
-      <img class="gate-logo-img" src="/public/images/Markeb Media Logo (2).PNG" alt="Markeb Media">
-      <div class="gate-sub">Sign in to access the Sales System</div>
-    </div>
-    <div class="gate-label">Enter your PIN</div>
-    <div class="pin-dots">
-      <div class="pin-dot" id="d0"></div>
-      <div class="pin-dot" id="d1"></div>
-      <div class="pin-dot" id="d2"></div>
-      <div class="pin-dot" id="d3"></div>
-    </div>
-    <div class="pin-pad">
-      <button class="pin-key" onclick="enter('1')">1</button>
-      <button class="pin-key" onclick="enter('2')">2</button>
-      <button class="pin-key" onclick="enter('3')">3</button>
-      <button class="pin-key" onclick="enter('4')">4</button>
-      <button class="pin-key" onclick="enter('5')">5</button>
-      <button class="pin-key" onclick="enter('6')">6</button>
-      <button class="pin-key" onclick="enter('7')">7</button>
-      <button class="pin-key" onclick="enter('8')">8</button>
-      <button class="pin-key" onclick="enter('9')">9</button>
-      <button class="pin-key wide" onclick="enter('0')">0</button>
-      <button class="pin-key del" onclick="del()">&#x232B;</button>
-    </div>
-    <div class="gate-error" id="gate-error"></div>
+<div class="hdr">
+  <div>
+    <div class="hdr-title">Outreach Flows & Service Prices</div>
+    <div class="hdr-sub">4 flows · Personal Agents · High-Street · Developers · Brokerage Directors</div>
   </div>
+  <img class="hdr-logo" src="/public/images/Markeb Media Logo (2).png" alt="Markeb Media" onerror="this.style.display='none'">
 </div>
 
-<!-- APP -->
-<div id="app">
-
-<!-- COVER -->
-<div class="cover">
-  <img class="cover-logo" src="/public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" onerror="this.style.display='none'">
-  <div class="cover-label">Internal — Business Development</div>
-  <h1>The Markeb Media Sales System</h1>
-
-  <div class="core-principle">
-    <div class="core-principle-label">Core Principle</div>
-    <p>We do not sell through messages. <strong>We convert in meetings.</strong></p>
-    <p>Everything in this system is designed to achieve one outcome:</p>
-    <p><strong>Book the meeting → Control the outcome → Secure the first shoot</strong></p>
-  </div>
-
-  <div class="cover-meta">
-    <div class="cover-meta-item"><span>Version</span><span>1.0</span></div>
-    <div class="cover-meta-item"><span>Audience</span><span>Business Development Team</span></div>
-    <div class="cover-meta-item"><span>Classification</span><span>Internal Use Only</span></div>
-  </div>
+<div class="top-tabs">
+  <button class="top-tab on" onclick="showTop('flows',this)">
+    <i data-lucide="git-branch"></i> Outreach Flows
+  </button>
+  <button class="top-tab" onclick="showTop('prices',this)">
+    <i data-lucide="pound-sterling"></i> Service Prices
+  </button>
 </div>
 
-<!-- NAV -->
-<nav class="nav">
-  <button class="nav-btn active" onclick="show('system',this)">The system</button>
-  <button class="nav-btn" onclick="show('kpis',this)">KPIs &amp; targets</button>
-  <button class="nav-btn" onclick="show('dashboard',this)">Client dashboard</button>
-  <button class="nav-btn" onclick="show('property',this)">Property services</button>
-  <button class="nav-btn" onclick="show('branding',this)">Branding services</button>
-  <button class="nav-btn" onclick="show('objections',this)">Objections</button>
-  <button class="nav-btn" onclick="show('principles',this)">Principles</button>
-  <div class="nav-divider"></div>
-  <a class="nav-link" href="./bdm-playbook.html">BDM Playbook →</a>
-</nav>
 
-<!-- THE SYSTEM -->
-<section class="section active" id="system">
-  <div class="section-intro">
-    <h2>The 6-stage sales system</h2>
-    <p>Every deal follows the same path. Your job is to move prospects through each stage as fast as possible — meetings are where revenue is made, not messages.</p>
+<!-- ═══════════════════════════════════════
+     OUTREACH FLOWS
+═══════════════════════════════════════ -->
+<div class="top-panel on" id="flows">
+
+  <div class="flow-grid">
+    <button class="flow-btn on" onclick="switchFlow('f-personal',this)">
+      <div class="flow-btn-num">01</div>
+      <div class="flow-btn-title"><i data-lucide="smartphone"></i> Personal Agents</div>
+      <div class="flow-btn-desc">eXp · KW · The Agency UK</div>
+    </button>
+    <button class="flow-btn" onclick="switchFlow('f-highstreet',this)">
+      <div class="flow-btn-num">02</div>
+      <div class="flow-btn-title"><i data-lucide="store"></i> High-Street</div>
+      <div class="flow-btn-desc">Physical branches · Walk-ins</div>
+    </button>
+    <button class="flow-btn" onclick="switchFlow('f-developer',this)">
+      <div class="flow-btn-num">03</div>
+      <div class="flow-btn-title"><i data-lucide="building-2"></i> Developers</div>
+      <div class="flow-btn-desc">LinkedIn · Networking events</div>
+    </button>
+    <button class="flow-btn" onclick="switchFlow('f-director',this)">
+      <div class="flow-btn-num">04</div>
+      <div class="flow-btn-title"><i data-lucide="users"></i> Brokerage Directors</div>
+      <div class="flow-btn-desc">Warm intro via existing clients</div>
+    </button>
   </div>
 
-  <!-- Stage 1 -->
-  <div class="stage-card">
-    <div class="stage-header">
-      <div class="stage-num">1</div>
-      <div class="stage-title-wrap">
-        <div class="stage-title">Lead Generation</div>
-        <div class="stage-objective">Objective — Start a conversation with a decision-maker</div>
+
+  <!-- ─────────────────────────────────────
+       FLOW 1: PERSONAL AGENTS
+  ───────────────────────────────────── -->
+  <div class="flow-panel on" id="f-personal">
+
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--c-ig)"></div>Instagram DM</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-email)"></div>Email</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-call)"></div>Phone call</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-meet)"></div>Meeting</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-win)"></div>Signed up</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-dec)"></div>Decision</div>
+    </div>
+
+    <!-- Stage 1 -->
+    <div class="section-card">
+      <div class="roles"><span class="role role-bdm"><i data-lucide="user"></i> BDM</span></div>
+      <div class="sc-title"><i data-lucide="search"></i> Stage 1 — Find agents inside existing brokerage networks</div>
+      <div class="sc-sub">Mine your existing client list first. Find the brokerage's website on Google — it gives you names, photos, and often emails in one place. Then find them on Instagram to send the DM.</div>
+
+      <div class="step-flow">
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--pine)"><i data-lucide="globe"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Google the brokerage — find their agent team page</div>
+            <div class="sf-text">Search "[Brokerage name] agents [region]" or go directly to their official site. eXp: exprealty.uk agent directory. KW: kw.com/find-an-agent. Build a list of names, photos, and email addresses.</div>
+            <div class="sf-grid">
+              <div class="sf-mini">
+                <div class="sf-mini-label"><i data-lucide="map-pin"></i> Where to look</div>
+                <ul>
+                  <li>Google: "[Brokerage] agents [region]"</li>
+                  <li>eXp: exprealty.uk agent directory</li>
+                  <li>KW: kw.com/find-an-agent</li>
+                  <li>Instagram — brokerage hashtag + region</li>
+                  <li>Existing client's follower list</li>
+                </ul>
+              </div>
+              <div class="sf-mini">
+                <div class="sf-mini-label"><i data-lucide="list-ordered"></i> Priority order</div>
+                <ul>
+                  <li>Same brokerage, same region</li>
+                  <li>Same brokerage, adjacent region</li>
+                  <li>Different brokerage, same region</li>
+                  <li>Cold — no existing connection</li>
+                </ul>
+              </div>
+            </div>
+            <div class="sf-note orange"><i data-lucide="lightbulb"></i> Ask existing clients to introduce you to 2–3 agents in their brokerage. One warm intro = 50 cold messages.</div>
+          </div>
+        </div>
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-ig)"><i data-lucide="heart"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Find them on Instagram — engage for 2–3 days before messaging</div>
+            <div class="sf-text">Like posts, leave a specific comment on a listing or reel. When your DM arrives your name is already familiar — not cold.</div>
+            <div class="sf-note red"><i data-lucide="x-circle"></i> Don't: "Great post!" &nbsp;·&nbsp; Do: Something specific about their listing or content.</div>
+          </div>
+        </div>
+
       </div>
     </div>
-    <div class="stage-cols">
-      <div class="stage-block">
-        <div class="stage-block-label">Lead sources</div>
-        <ul>
-          <li>Cold calls</li>
-          <li>LinkedIn / Instagram outreach</li>
-          <li>Email outreach</li>
-          <li>In-person walk-ins</li>
-          <li>Referrals</li>
-        </ul>
-      </div>
-      <div class="stage-block">
-        <div class="stage-block-label">Target contacts</div>
-        <ul>
-          <li>Valuers</li>
-          <li>Branch Managers</li>
-          <li>Agency Owners</li>
-        </ul>
-      </div>
-    </div>
-  </div>
 
-  <!-- Stage 2 -->
-  <div class="stage-card">
-    <div class="stage-header">
-      <div class="stage-num">2</div>
-      <div class="stage-title-wrap">
-        <div class="stage-title">Proposal Message</div>
-        <div class="stage-objective">Objective — Book a meeting</div>
-      </div>
-    </div>
-    <div class="stage-cols">
-      <div class="stage-block">
-        <div class="stage-block-label">Key principles</div>
-        <ul>
-          <li>Position Markeb as a marketing solution</li>
-          <li>Introduce the free shoot offer</li>
-          <li>Create curiosity — do not oversell</li>
-          <li>Never send booking links immediately</li>
-        </ul>
-      </div>
-      <div class="stage-block">
-        <div class="stage-block-label">What you're selling at this stage</div>
-        <p style="font-size:13px;color:var(--ink-mid);line-height:1.6;">Not a service. Not a package. Just 10 minutes of their time. Everything else comes in the meeting.</p>
-      </div>
-    </div>
-    <div class="example-box">
-      <div class="stage-block-label">Example message</div>
-      <p>"We help estate agents attract more listings and generate stronger buyer interest through high-quality marketing. We're currently offering a free shoot when agents join our system — worth showing you how it works properly. Are you free today or tomorrow for a quick 10 minutes?"</p>
-    </div>
-  </div>
+    <!-- Stage 2: Outreach sequence -->
+    <div class="section-card">
+      <div class="roles"><span class="role role-bdm"><i data-lucide="user"></i> BDM</span></div>
+      <div class="sc-title"><i data-lucide="send"></i> Stage 2 — Three-touch outreach sequence</div>
+      <div class="sc-sub">Three channels across seven days. Move channel if no reply — never send multiple messages on the same platform.</div>
 
-  <!-- Stage 3 -->
-  <div class="stage-card">
-    <div class="stage-header">
-      <div class="stage-num">3</div>
-      <div class="stage-title-wrap">
-        <div class="stage-title">The Meeting</div>
-        <div class="stage-objective">Objective — Build trust and guide the client into our system</div>
-      </div>
-    </div>
-    <div class="stage-cols">
-      <div class="stage-block">
-        <div class="stage-block-label">Meeting types</div>
-        <ul>
-          <li>In-person (always preferred)</li>
-          <li>Online via Teams</li>
-        </ul>
-      </div>
-      <div class="stage-block">
-        <div class="stage-block-label">Rules</div>
-        <ul>
-          <li>Book same-day or next-day where possible</li>
-          <li>Always speak to a decision-maker</li>
-          <li>Be confident and structured</li>
-        </ul>
+      <div class="step-flow">
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-ig)"><i data-lucide="message-circle"></i></div>
+          <div class="sf-body" style="border-left:3px solid var(--c-ig)">
+            <div class="sf-title" style="color:var(--c-ig)">Day 1 — Instagram DM</div>
+            <div class="sf-example">"Hi [Name], we've been working with [Existing Client] at [Brokerage] on their property photography and marketing — they've been brilliant to work with. Noticed you're also part of [Brokerage] and wanted to reach out personally. We help agents across the network with photography, video, and personal branding. Free for a quick 10 minutes this week?"</div>
+          </div>
+        </div>
+
+        <div class="decision-block">
+          <div class="decision-block-title"><i data-lucide="help-circle"></i> Reply received?</div>
+          <div class="decision-branches">
+            <div class="dec-yes"><div class="dec-label"><i data-lucide="check"></i> Yes</div><div class="dec-text">Book the meeting. Go to Stage 3.</div></div>
+            <div class="dec-no"><div class="dec-label"><i data-lucide="x"></i> No reply</div><div class="dec-text">Wait until Day 3. Move to email.</div></div>
+          </div>
+        </div>
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-email)"><i data-lucide="mail"></i></div>
+          <div class="sf-body" style="border-left:3px solid var(--c-email)">
+            <div class="sf-title" style="color:var(--c-email)">Day 3 — Email (if no reply to DM)</div>
+            <div class="sf-text">Find their business email from the brokerage profile or Instagram bio. Subject: <em>Markeb Media — [Brokerage Name] agents</em></div>
+            <div class="sf-example">"Hi [Name], I dropped you a message on Instagram earlier this week — wanted to follow up by email in case it got missed. We work with [Existing Client] at [Brokerage] and help agents across the network with property photography, video, and personal branding. Would love to show you what we do — free for a quick 10-minute call this week?"</div>
+          </div>
+        </div>
+
+        <div class="decision-block">
+          <div class="decision-block-title"><i data-lucide="help-circle"></i> Reply received?</div>
+          <div class="decision-branches">
+            <div class="dec-yes"><div class="dec-label"><i data-lucide="check"></i> Yes</div><div class="dec-text">Book the meeting. Go to Stage 3.</div></div>
+            <div class="dec-no"><div class="dec-label"><i data-lucide="x"></i> No reply</div><div class="dec-text">Wait until Day 7. Move to phone call.</div></div>
+          </div>
+        </div>
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-call)"><i data-lucide="phone"></i></div>
+          <div class="sf-body" style="border-left:3px solid var(--c-call)">
+            <div class="sf-title" style="color:var(--c-call)">Day 7 — Phone call (if no reply to DM or email)</div>
+            <div class="sf-text">Find their number from the brokerage profile or Instagram bio. Call directly — keep it short and warm.</div>
+            <div class="sf-example">"Hi [Name], it's [BDM Name] from Markeb Media — I dropped you a message on Instagram and sent an email earlier this week. Just wanted to give you a quick call. We work with [Existing Client] at [Brokerage] and I wanted to show you how we help agents across the network. Is now a good time for two minutes?"</div>
+          </div>
+        </div>
+
+        <div class="decision-block">
+          <div class="decision-block-title"><i data-lucide="help-circle"></i> Connected?</div>
+          <div class="decision-branches">
+            <div class="dec-yes"><div class="dec-label"><i data-lucide="check"></i> Yes</div><div class="dec-text">Book the meeting. Go to Stage 3.</div></div>
+            <div class="dec-no"><div class="dec-label"><i data-lucide="x"></i> No answer</div><div class="dec-text">Pause 30 days. Re-engage with fresh content — listing example, testimonial, market update.</div></div>
+          </div>
+        </div>
+
       </div>
     </div>
-    <div class="rule-box">
-      <div class="stage-block-label">This is the most important stage</div>
-      <p>The meeting is where the relationship is built and the decision is made. Everything before it is just getting through the door. Everything after it is follow-through.</p>
-    </div>
-  </div>
 
-  <!-- Stage 4 -->
-  <div class="stage-card">
-    <div class="stage-header">
-      <div class="stage-num">4</div>
-      <div class="stage-title-wrap">
-        <div class="stage-title">Dashboard Sign-Up</div>
-        <div class="stage-objective">Objective — Bring the client into the Markeb ecosystem</div>
+    <!-- Stage 3: Meeting -->
+    <div class="section-card">
+      <div class="roles"><span class="role role-bdm"><i data-lucide="user"></i> BDM</span></div>
+      <div class="sc-title"><i data-lucide="calendar"></i> Stage 3 — The meeting</div>
+      <div class="sc-sub">Every meeting follows the same structure. This is where revenue is made.</div>
+
+      <div class="step-flow">
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-meet)"><i data-lucide="message-square"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Open with questions — listen first</div>
+            <div class="sf-text">"What does your current marketing look like?" &nbsp;·&nbsp; "Are you happy with how your listings perform?" &nbsp;·&nbsp; "What's your biggest challenge with content right now?" &nbsp;·&nbsp; "Are you building your personal brand alongside listings?"</div>
+          </div>
+        </div>
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-meet)"><i data-lucide="target"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Recommend the right service — don't present everything</div>
+            <div class="sf-text">Match the service to what they told you. Lead the decision confidently. Refer to the Service Prices tab for reference.</div>
+          </div>
+        </div>
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-win)"><i data-lucide="laptop"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Sign them up to the dashboard — in the meeting</div>
+            <div class="sf-text">Walk through the platform live. Sign up before they leave. A client who leaves without an account is a warm lead, not a client.</div>
+          </div>
+        </div>
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-win)"><i data-lucide="camera"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Confirm the first shoot</div>
+            <div class="sf-text">Every meeting ends with either a confirmed booking or a scheduled follow-up with a clear next step. Never leave without one.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="win-box" style="margin-top:14px">
+        <i data-lucide="check-circle"></i>
+        <div class="win-box-text">Client signed up + first shoot confirmed <span class="win-box-sub">Revenue pipeline active</span></div>
       </div>
     </div>
-    <div class="stage-cols">
-      <div class="stage-block">
-        <div class="stage-block-label">Do this during the meeting</div>
-        <ul>
-          <li>Walk the client through the dashboard live</li>
-          <li>Sign them up before they leave</li>
-          <li>Show the key features relevant to their situation</li>
-        </ul>
-      </div>
-      <div class="stage-block">
-        <div class="stage-block-label">Why it matters</div>
-        <ul>
-          <li>Free to join — no barrier to entry</li>
-          <li>They can reserve shoots without upfront payment</li>
-          <li>Bigger agencies can pay end of month</li>
-          <li>Once they're in the system, momentum builds</li>
-        </ul>
-      </div>
-    </div>
-    <div class="rule-box">
-      <div class="stage-block-label">Key rule</div>
-      <p>Sign-up happens in the meeting, not after it. A client who leaves without an account is a warm lead, not a client. See the Client Dashboard tab for the full walkthrough guide.</p>
-    </div>
-  </div>
 
-  <!-- Stage 5 -->
-  <div class="stage-card">
-    <div class="stage-header">
-      <div class="stage-num">5</div>
-      <div class="stage-title-wrap">
-        <div class="stage-title">Product Brief</div>
-        <div class="stage-objective">Objective — Position Markeb as the default solution</div>
-      </div>
+  </div><!-- /f-personal -->
+
+
+  <!-- ─────────────────────────────────────
+       FLOW 2: HIGH-STREET AGENTS
+  ───────────────────────────────────── -->
+  <div class="flow-panel" id="f-highstreet">
+
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--c-spec)"></div>Media Specialist (walk-in)</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-hoo)"></div>Head of Operations</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-meet)"></div>Meeting</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-win)"></div>Signed / Booked</div>
     </div>
-    <div class="stage-cols">
-      <div class="stage-block">
-        <div class="stage-block-label">During the meeting you must</div>
-        <ul>
-          <li>Understand their business</li>
-          <li>Identify their marketing gaps</li>
-          <li>Recommend the correct services</li>
-        </ul>
-      </div>
-      <div class="stage-block">
-        <div class="stage-block-label">Important</div>
-        <p style="font-size:13px;color:var(--ink-mid);line-height:1.6;">Do not let the client choose randomly. Lead the decision confidently. Use the service cards in this system to guide the conversation.</p>
+
+    <div class="orange-box">
+      <i data-lucide="camera"></i>
+      <p><strong>Walk-ins are done by Media Specialists</strong> when they are not doing shoots. This keeps the BDM focused on digital outreach and meetings while ensuring local branches get a face-to-face Markeb Media touchpoint from someone already in the field. The Head of Operations follows up within 24 hours of every walk-in.</p>
+    </div>
+
+    <!-- Stage 1: Research -->
+    <div class="section-card">
+      <div class="roles"><span class="role role-spec"><i data-lucide="camera"></i> Media Specialist</span></div>
+      <div class="sc-title"><i data-lucide="map"></i> Stage 1 — Map and research target branches</div>
+      <div class="sc-sub">Identify every independent and high-street agency in your region before visiting a single one. Prioritise 2–5 branch agencies — large enough to have real marketing budget, small enough that the director is accessible.</div>
+
+      <div class="step-flow">
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--pine)"><i data-lucide="search"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Google Maps + Rightmove agent directory</div>
+            <div class="sf-text">Search "estate agents [town name]" on Google Maps. Cross-reference with Rightmove and Zoopla agent search by postcode. Record agency name, address, branch count, director name.</div>
+          </div>
+        </div>
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--pine)"><i data-lucide="eye"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Check current listing quality on Rightmove</div>
+            <div class="sf-text">Poor photography = warm prospect. Note which agencies have the biggest gap between their property quality and their media output — those are your best targets.</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="example-box">
-      <div class="stage-block-label">Positioning line</div>
-      <p>"For properties like yours, this is what we recommend to get the best result."</p>
-    </div>
-  </div>
 
-  <!-- Stage 6 -->
-  <div class="stage-card">
-    <div class="stage-header">
-      <div class="stage-num">6</div>
-      <div class="stage-title-wrap">
-        <div class="stage-title">Close — First Booking</div>
-        <div class="stage-objective">Objective — Get the client's first shoot confirmed</div>
+    <!-- Stage 2: Walk-in -->
+    <div class="section-card">
+      <div class="roles"><span class="role role-spec"><i data-lucide="camera"></i> Media Specialist</span></div>
+      <div class="sc-title"><i data-lucide="door-open"></i> Stage 2 — The walk-in (between shoots)</div>
+      <div class="sc-sub">8–12 branch walk-ins per day when not shooting. Avoid Monday mornings and Friday afternoons. Dress professionally.</div>
+
+      <div class="step-flow">
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-spec)"><i data-lucide="door-open"></i></div>
+          <div class="sf-body" style="border-left:3px solid var(--c-spec)">
+            <div class="sf-title">Walk in — ask for the branch manager or director</div>
+            <div class="sf-example">"Hi, I'm [Name] from Markeb Media — we work with estate agents across the region on professional property photography, video and drone. I noticed your listings and wanted to show you what we do. Is [Director/Manager] available for five minutes?"</div>
+            <div class="sf-grid">
+              <div class="sf-mini">
+                <div class="sf-mini-label"><i data-lucide="briefcase"></i> Bring with you</div>
+                <ul>
+                  <li>Printed one-pager with best work</li>
+                  <li>Business card</li>
+                  <li>Relevant example for their property type</li>
+                </ul>
+              </div>
+              <div class="sf-mini">
+                <div class="sf-mini-label"><i data-lucide="x-circle"></i> If unavailable</div>
+                <ul>
+                  <li>Leave materials with reception</li>
+                  <li>Get the director's name</li>
+                  <li>Ask best time to return</li>
+                  <li>Report back to HoO same day</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="decision-block">
+          <div class="decision-block-title"><i data-lucide="help-circle"></i> Decision-maker available?</div>
+          <div class="decision-branches">
+            <div class="dec-yes"><div class="dec-label"><i data-lucide="check"></i> Yes</div><div class="dec-text">Brief conversation — qualify and close for a meeting.</div></div>
+            <div class="dec-no"><div class="dec-label"><i data-lucide="x"></i> Not available</div><div class="dec-text">Leave materials. Get name. Report to HoO for follow-up.</div></div>
+          </div>
+        </div>
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-spec)"><i data-lucide="message-square"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">If you get time — close for a meeting</div>
+            <div class="sf-example">"We help agencies like yours with consistent, high-quality photography and video for every listing — fast turnaround, reliable, makes your listings stand out on Rightmove. Would it be worth 15 minutes with you and [Director Name] to show you some examples from similar agencies nearby?"</div>
+            <div class="sf-note orange"><i data-lucide="users"></i> Always reference agencies "nearby" — local social proof is the strongest tool at this stage.</div>
+          </div>
+        </div>
+
       </div>
     </div>
-    <div class="stage-cols">
-      <div class="stage-block">
-        <div class="stage-block-label">Every meeting must end with</div>
-        <ul>
-          <li>A confirmed booking, or</li>
-          <li>A scheduled follow-up with a clear next step</li>
-        </ul>
-      </div>
-      <div class="stage-block">
-        <div class="stage-block-label">Follow-up message</div>
-        <p style="font-size:13px;color:var(--ink-mid);line-height:1.6;font-style:italic;">"We still have your free shoot available — do you have a property coming up we can get booked in?"</p>
-      </div>
-    </div>
-    <div class="rule-box">
-      <div class="stage-block-label">Key rule</div>
-      <p>Do not leave a meeting without a next step. Momentum is everything — a warm lead that goes cold is a wasted meeting.</p>
-    </div>
-  </div>
-</section>
 
-<!-- KPIs & TARGETS -->
-<section class="section" id="kpis">
-  <div class="section-intro">
-    <h2>KPIs &amp; targets</h2>
-    <p>These are non-negotiable. Activity is tracked daily, output is visible, and results are expected. If targets are met, performance is rewarded. If they are not met, it is immediately clear.</p>
-  </div>
+    <!-- Stage 3: HoO follows up -->
+    <div class="section-card">
+      <div class="roles"><span class="role role-hoo"><i data-lucide="briefcase"></i> Head of Operations</span></div>
+      <div class="sc-title"><i data-lucide="phone-call"></i> Stage 3 — HoO follows up within 24 hours of walk-in</div>
+      <div class="sc-sub">HoO contacts the agency within 24 hours of the Specialist's visit. This elevates the conversation to director level and signals Markeb is a serious, structured business.</div>
 
-  <div class="group-label">Daily targets</div>
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-card-label">Outreach</div>
-      <div class="kpi-item"><span class="kpi-item-label">Messages / calls</span><span class="kpi-item-value">150–250</span></div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-card-label">Meetings</div>
-      <div class="kpi-item"><span class="kpi-item-label">Booked</span><span class="kpi-item-value">3–5</span></div>
-      <div class="kpi-item"><span class="kpi-item-label">Completed</span><span class="kpi-item-value">3–4</span></div>
-    </div>
-  </div>
+      <div class="step-flow">
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-hoo)"><i data-lucide="phone"></i></div>
+          <div class="sf-body" style="border-left:3px solid var(--c-hoo)">
+            <div class="sf-title" style="color:var(--c-hoo)">HoO: Call or email within 24 hours</div>
+            <div class="sf-example">"Hi [Name], my colleague [Specialist Name] visited your branch yesterday — I'm the Head of Operations at Markeb Media and wanted to reach out personally. We work with a number of agencies across [region] and I'd love to find 20 minutes to show you exactly how we approach things. Are you free [day] or [day] this week?"</div>
+          </div>
+        </div>
 
-  <div class="group-label">Weekly targets</div>
-  <div class="kpi-grid">
-    <div class="kpi-card highlight">
-      <div class="kpi-card-label">Primary KPI — Meetings per week</div>
-      <div class="kpi-item"><span class="kpi-item-label">In-person / online</span><span class="kpi-item-value">15–20</span></div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-card-label">Results</div>
-      <div class="kpi-item"><span class="kpi-item-label">Sign-ups</span><span class="kpi-item-value">15–20</span></div>
-      <div class="kpi-item"><span class="kpi-item-label">Bookings</span><span class="kpi-item-value">6–10</span></div>
-    </div>
-  </div>
-
-  <div class="group-label">Daily structure</div>
-  <div class="schedule-grid">
-    <div class="schedule-card">
-      <div class="schedule-time">9:00 – 11:30</div>
-      <div class="schedule-name">Morning</div>
-      <ul class="schedule-tasks">
-        <li>Outbound calls and messages</li>
-        <li>Book meetings</li>
-      </ul>
-    </div>
-    <div class="schedule-card">
-      <div class="schedule-time">11:30 – 14:00</div>
-      <div class="schedule-name">Midday</div>
-      <ul class="schedule-tasks">
-        <li>Online meetings</li>
-        <li>Follow-ups</li>
-      </ul>
-    </div>
-    <div class="schedule-card">
-      <div class="schedule-time">14:00 – 16:30</div>
-      <div class="schedule-name">Afternoon</div>
-      <ul class="schedule-tasks">
-        <li>In-person meetings</li>
-        <li>Walk-ins</li>
-      </ul>
-    </div>
-    <div class="schedule-card">
-      <div class="schedule-time">16:30 – 17:00</div>
-      <div class="schedule-name">End of day</div>
-      <ul class="schedule-tasks">
-        <li>Summarise pipeline activity</li>
-        <li>Confirm next day's meetings</li>
-        <li>Send end of day report to line manager</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="group-label">Pipeline rules</div>
-
-  <div class="rule-box" style="margin-bottom: 12px;">
-    <div class="stage-block-label">Update as you go — not at the end of the day</div>
-    <p>Every call, meeting, and outcome gets logged in the Airtable sales pipeline immediately — not at 4:30pm. If it's not in the system, it didn't happen. Real-time data is what makes the pipeline useful.</p>
-  </div>
-  <div class="pipeline-card">
-    <h3>No lead sits without action</h3>
-    <p>Every lead must be either booked for a meeting or actively followed up. Nothing stays static.</p>
-  </div>
-  <div class="pipeline-card">
-    <h3>14-day rule</h3>
-    <p>If no meeting has been secured within 14 days of first contact:</p>
-    <ul>
-      <li>Push hard for a meeting</li>
-      <li>Or remove from the pipeline entirely</li>
-    </ul>
-  </div>
-  <div class="pipeline-card">
-    <h3>Follow-up sequence</h3>
-    <p>Every lead requires:</p>
-    <ul>
-      <li>Immediate response on first contact</li>
-      <li>24-hour follow-up if no reply</li>
-      <li>3–5 total touchpoints before removal</li>
-    </ul>
-  </div>
-<div class="group-label">Sales script</div>
-
-  <div class="stage-card">
-    <div class="stage-header">
-      <div class="stage-num">1</div>
-      <div class="stage-title-wrap">
-        <div class="stage-title">Opening outreach</div>
-        <div class="stage-objective">Choose the approach that fits the context</div>
+        <div class="decision-block">
+          <div class="decision-block-title"><i data-lucide="help-circle"></i> Meeting booked?</div>
+          <div class="decision-branches">
+            <div class="dec-yes"><div class="dec-label"><i data-lucide="check"></i> Yes</div><div class="dec-text">Specialist + HoO attend together. Go to Stage 4.</div></div>
+            <div class="dec-no"><div class="dec-label"><i data-lucide="x"></i> Not yet</div><div class="dec-text">Follow up once more in 5 days. After 2 attempts — pause 30 days, then re-visit the branch.</div></div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="stage-cols">
-      <div class="stage-block">
-        <div class="stage-block-label">Outreach 1 — Best overall</div>
-        <p style="font-size:13px;color:var(--ink-mid);line-height:1.6;font-style:italic;">"Hi [Name], quick one — what's been the biggest challenge with your property marketing recently?"</p>
-      </div>
-      <div class="stage-block">
-        <div class="stage-block-label">Outreach 2 — Safe</div>
-        <p style="font-size:13px;color:var(--ink-mid);line-height:1.6;font-style:italic;">"Hi [Name], how are you currently handling your property marketing at the moment?"</p>
-      </div>
-    </div>
-    <div class="stage-block" style="margin-top:10px;">
-      <div class="stage-block-label">Outreach 3 — Results-focused</div>
-      <p style="font-size:13px;color:var(--ink-mid);line-height:1.6;font-style:italic;">"Hi, are you happy with the level of interest your properties are getting at the moment?"</p>
-    </div>
-  </div>
 
-  <div class="stage-card">
-    <div class="stage-header">
-      <div class="stage-num">2</div>
-      <div class="stage-title-wrap">
-        <div class="stage-title">If they talk about leads or sales</div>
-        <div class="stage-objective">Reframe the problem — then offer to show them the solution</div>
+    <!-- Stage 4: Meeting -->
+    <div class="section-card">
+      <div class="roles">
+        <span class="role role-hoo"><i data-lucide="briefcase"></i> Head of Operations</span>
+        <span class="role role-spec"><i data-lucide="camera"></i> Media Specialist</span>
       </div>
-    </div>
-    <div class="example-box">
-      <div class="stage-block-label">Client says</div>
-      <p>"We need more leads / more interest / more sales"</p>
-    </div>
-    <div class="stage-block" style="margin-top:10px;">
-      <div class="stage-block-label">Your response</div>
-      <p style="font-size:13px;color:var(--ink-mid);line-height:1.6;">"Yeah that's exactly where we tend to help. In most cases it's not a lack of properties — it's how they're being presented and how consistently they're marketed. What we do is make sure every listing is pushed properly with the right level of quality and speed so it builds momentum and generates consistent interest rather than just going live and sitting there. That's usually where the increase in enquiries comes from. If you want I can show you what we would do differently for one of your current listings."</p>
-    </div>
-  </div>
+      <div class="sc-title"><i data-lucide="users"></i> Stage 4 — The meeting</div>
+      <div class="sc-sub">Specialist and HoO attend together. HoO leads commercially. Specialist walks through the dashboard and services.</div>
 
-  <div class="stage-card">
-    <div class="stage-header">
-      <div class="stage-num">3</div>
-      <div class="stage-title-wrap">
-        <div class="stage-title">If they talk about consistency</div>
-        <div class="stage-objective">Validate the problem — then offer structure</div>
+      <div class="step-flow">
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-hoo)"><i data-lucide="pound-sterling"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">HoO: Open on commercial terms</div>
+            <div class="sf-text">Consistent service across all branches · Monthly billing and invoicing · Volume agreements · Dedicated account management</div>
+          </div>
+        </div>
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-spec)"><i data-lucide="laptop"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Specialist: Walk through the dashboard live — sign them up</div>
+            <div class="sf-text">Show content tracking, amendment requests, booking system. Sign up before they leave.</div>
+          </div>
+        </div>
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-win)"><i data-lucide="camera"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Close: pilot shoot on one current listing</div>
+            <div class="sf-example">"The easiest way to see whether it works for you is one shoot on one of your current listings. No commitment beyond that — just see the quality and turnaround for yourself."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="win-box" style="margin-top:14px">
+        <i data-lucide="check-circle"></i>
+        <div class="win-box-text">Pilot shoot confirmed → relationship established <span class="win-box-sub">Preferred supplier conversation follows</span></div>
       </div>
     </div>
-    <div class="example-box">
-      <div class="stage-block-label">Client says</div>
-      <p>"We're not very consistent / it's a bit all over the place"</p>
-    </div>
-    <div class="stage-block" style="margin-top:10px;">
-      <div class="stage-block-label">Your response</div>
-      <p style="font-size:13px;color:var(--ink-mid);line-height:1.6;">"Yeah that's probably the most common issue we see. Most agents are doing marketing but it's not consistent enough to actually build traction. What we do is bring structure to it — consistent quality, consistent turnaround, and consistent output so your brand and listings stay in front of people. That's when things start compounding rather than feeling random. Happy to run through how we would set that up for you if you're open to it."</p>
-    </div>
-  </div>
 
-  <div class="stage-card">
-    <div class="stage-header">
-      <div class="stage-num">4</div>
-      <div class="stage-title-wrap">
-        <div class="stage-title">If they ask about price</div>
-        <div class="stage-objective">Never just drop a number — control the conversation</div>
+  </div><!-- /f-highstreet -->
+
+
+  <!-- ─────────────────────────────────────
+       FLOW 3: PROPERTY DEVELOPERS
+  ───────────────────────────────────── -->
+  <div class="flow-panel" id="f-developer">
+
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--c-li)"></div>LinkedIn (EA)</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-ceo)"></div>CEO</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-meet)"></div>Call / Meeting</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-win)"></div>Pilot / Contract</div>
+    </div>
+
+    <div class="proof-banner">
+      <i data-lucide="building-2"></i>
+      <div>
+        <div class="proof-label">Lead proof point — reference in every developer conversation</div>
+        <div class="proof-title">Northstone — Show Home Marketing</div>
+        <div class="proof-text">We created the full marketing content for Northstone's main show home — photography, video, and drone for their launch campaign. Reference this by name in every LinkedIn message, at every networking event, and on every opening call. We also manage the entire marketing process start to finish for developers — introduce this once the pilot shoot relationship is established.</div>
       </div>
     </div>
-    <div class="example-box">
-      <div class="stage-block-label">Client says</div>
-      <p>"What are your prices?"</p>
-    </div>
-    <div class="stage-block" style="margin-top:10px;">
-      <div class="stage-block-label">Your response</div>
-      <p style="font-size:13px;color:var(--ink-mid);line-height:1.6;">"Our pricing depends on the level of marketing and the type of property but most of our clients sit between £100 and £300 depending on what they need. That said we don't really position it as just a cost — it's more about what level of exposure and results you want from your listings. If you tell me a bit about the type of properties you're working with I can give you a clear idea of what would make the most sense for you."</p>
-    </div>
-    <div class="rule-box" style="margin-top:10px;">
-      <div class="stage-block-label">Key rule</div>
-      <p>Price is always answered with a range and immediately followed by a question back to them. You are not a price list — you are a marketing adviser.</p>
-    </div>
-  </div>
 
-  <div class="stage-card">
-    <div class="stage-header">
-      <div class="stage-num">5</div>
-      <div class="stage-title-wrap">
-        <div class="stage-title">If they push for package details</div>
-        <div class="stage-objective">Lead with outcomes, not a list of services</div>
+    <div class="strat-grid">
+      <div class="strat-card" style="border:2px solid var(--c-li)">
+        <div class="strat-label" style="color:var(--c-li)"><i data-lucide="linkedin"></i> Strategy A</div>
+        <div class="strat-title">LinkedIn Outreach</div>
+        <div class="strat-desc">EA sends 20 targeted messages every Monday. Regions mapped with CEO every Friday. EA researches, connects, books calls.</div>
+      </div>
+      <div class="strat-card" style="border:2px solid var(--orange)">
+        <div class="strat-label" style="color:var(--orange)"><i data-lucide="calendar"></i> Strategy B</div>
+        <div class="strat-title">Networking Events</div>
+        <div class="strat-desc">CEO attends 1–3 events per week (minimum 1). In-person, relationship-led, fastest route to developer trust.</div>
       </div>
     </div>
-    <div class="example-box">
-      <div class="stage-block-label">Client says</div>
-      <p>"What do you actually include?"</p>
-    </div>
-    <div class="stage-block" style="margin-top:10px;">
-      <div class="stage-block-label">Your response</div>
-      <p style="font-size:13px;color:var(--ink-mid);line-height:1.6;">"It's usually a combination of photography, videography, and drone depending on the property. The key difference is not just what's included but how it's delivered — consistent quality, fast turnaround, and a clear structure behind how your listings are marketed. That's what actually drives the results rather than just ticking boxes on services. If you want I can break down the best setup based on one of your properties."</p>
-    </div>
-  </div>
 
-  <div class="stage-card">
-    <div class="stage-header">
-      <div class="stage-num">6</div>
-      <div class="stage-title-wrap">
-        <div class="stage-title">If they're warm — close for the meeting</div>
-        <div class="stage-objective">Move from interest to a confirmed next step</div>
+    <div class="sec-label"><i data-lucide="linkedin"></i> Strategy A — LinkedIn (Executive Assistant to CEO)</div>
+
+    <div class="section-card">
+      <div class="roles">
+        <span class="role role-ea"><i data-lucide="user-check"></i> Executive Assistant</span>
+        <span class="role role-ceo"><i data-lucide="briefcase"></i> CEO</span>
+      </div>
+      <div class="sc-title"><i data-lucide="calendar-check"></i> Friday — CEO + EA map regions. Monday — EA sends 20 messages.</div>
+      <div class="sc-sub">Every Friday the CEO and EA agree target regions. EA prepares 20 qualified LinkedIn targets and sends on Monday morning without delay.</div>
+
+      <div class="step-flow">
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-li)"><i data-lucide="search"></i></div>
+          <div class="sf-body" style="border-left:3px solid var(--c-li)">
+            <div class="sf-title">EA: Research 20 targets — focus on active pipeline signals</div>
+            <div class="sf-grid">
+              <div class="sf-mini">
+                <div class="sf-mini-label"><i data-lucide="zap"></i> Search terms</div>
+                <ul>
+                  <li>"Property developer [region]"</li>
+                  <li>"Development director [region]"</li>
+                  <li>"New build [region]"</li>
+                  <li>Companies posting planning approvals</li>
+                </ul>
+              </div>
+              <div class="sf-mini">
+                <div class="sf-mini-label"><i data-lucide="activity"></i> Active pipeline signals</div>
+                <ul>
+                  <li>Posting about a live development</li>
+                  <li>Hiring a sales or marketing team</li>
+                  <li>Announcing planning permission</li>
+                  <li>Sharing site progress or renders</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-li)"><i data-lucide="user-plus"></i></div>
+          <div class="sf-body" style="border-left:3px solid var(--c-li)">
+            <div class="sf-title">EA: Send connection request — on behalf of CEO</div>
+            <div class="sf-example">"Hi [Name], I work with property developers across [region] on marketing content — photography, video, and drone for new builds and launches. We recently created all the marketing for Northstone's main show home. Your [project name] looks like an interesting development — would love to connect."</div>
+            <div class="sf-note orange"><i data-lucide="lightbulb"></i> Always reference the specific development or post seen. Northstone named when the developer is of similar scale.</div>
+          </div>
+        </div>
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-li)"><i data-lucide="thumbs-up"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">EA: Engage with their content for 1–2 weeks after connecting</div>
+            <div class="sf-example">"Really interesting site — how are you approaching the marketing launch for this one?"</div>
+            <div class="sf-note red"><i data-lucide="x-circle"></i> Avoid: "Great post!" · Generic emoji-only comments</div>
+          </div>
+        </div>
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-li)"><i data-lucide="send"></i></div>
+          <div class="sf-body" style="border-left:3px solid var(--c-li)">
+            <div class="sf-title">EA: Send the case study message — lead with Northstone</div>
+            <div class="sf-example">"Hi [Name], I noticed [development name] is coming along — we recently created all the marketing content for Northstone's main show home: drone, lifestyle photography, video, and launch campaign assets. We also manage the full marketing process for developers from start to finish if that's something you'd want to explore. Happy to share the full case study. Would a quick call with [CEO name] make sense?"</div>
+          </div>
+        </div>
+
+        <div class="decision-block">
+          <div class="decision-block-title"><i data-lucide="help-circle"></i> Interested in a call?</div>
+          <div class="decision-branches">
+            <div class="dec-yes"><div class="dec-label"><i data-lucide="check"></i> Yes</div><div class="dec-text">EA books the call for the CEO.</div></div>
+            <div class="dec-no"><div class="dec-label"><i data-lucide="x"></i> No reply</div><div class="dec-text">Keep engaging. Follow up in 2 weeks with a new angle. Max 3 follow-ups before pausing.</div></div>
+          </div>
+        </div>
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-ceo)"><i data-lucide="phone-call"></i></div>
+          <div class="sf-body" style="border-left:3px solid var(--c-ceo)">
+            <div class="sf-title" style="color:var(--c-ceo)">CEO: Takes the call — builds the commercial relationship</div>
+            <div class="sf-text">Understand their development pipeline. Propose a pilot shoot on one active development. Discuss full marketing management as the larger opportunity once trust is established.</div>
+            <div class="sf-note green"><i data-lucide="target"></i> Close line: "The easiest way to see whether it works for you is one shoot on a current development. No commitment beyond that."</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="win-box" style="margin-top:14px">
+        <i data-lucide="check-circle"></i>
+        <div class="win-box-text">Pilot shoot confirmed <span class="win-box-sub">Full marketing management conversation follows</span></div>
       </div>
     </div>
-    <div class="stage-block">
-      <div class="stage-block-label">Your response</div>
-      <p style="font-size:13px;color:var(--ink-mid);line-height:1.6;">"From what you've said it sounds like there's definitely an opportunity to improve how your listings are performing. Easiest thing is probably a quick call — I can show you exactly how we approach it and you can decide if it makes sense for you. What does your availability look like this week?"</p>
+
+    <div class="sec-label"><i data-lucide="users"></i> Strategy B — Networking Events (CEO)</div>
+
+    <div class="info-box" style="margin-bottom:14px">
+      <i data-lucide="calendar"></i>
+      <p><strong>Target: 1–3 events per week. Minimum 1.</strong> EA researches and calendars events in advance. CEO attends consistently — developer relationships are built through repeated exposure at the same events, not one-off appearances.</p>
     </div>
-    <div class="rule-box" style="margin-top:10px;">
-      <div class="stage-block-label">Key rule</div>
-      <p>Any sign of genuine interest gets closed for a meeting immediately. Do not send more information. Do not keep talking. Ask for the time.</p>
-    </div>
-  </div>
 
-</section>
-
-<!-- CLIENT DASHBOARD -->
-<section class="section" id="dashboard">
-  <div class="section-intro">
-    <h2>Client dashboard</h2>
-    <p>The dashboard is free to join and should be set up during the meeting. Once a client is in the system, the relationship is formalised, momentum builds, and the first booking follows naturally. Walk them through each feature live.</p>
-  </div>
-
-  <div class="stage-block" style="background:#fff;border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:20px;">
-    <div class="stage-block-label">How to introduce it in the meeting</div>
-    <p style="font-size:13px;color:var(--ink-mid);line-height:1.65;margin-bottom:8px;">"Before we confirm the first shoot, let me show you the platform you'll be working from. Everything runs through here — your content, your bookings, your amendments. Takes two minutes to get set up and it's completely free."</p>
-    <p style="font-size:13px;color:var(--ink-mid);line-height:1.65;">Then walk them through the five features below. Focus on the ones most relevant to their situation.</p>
-  </div>
-
-  <div class="dashboard-feature-grid">
-    <div class="dashboard-feature">
-      <div class="dashboard-feature-icon">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9l4 4 8-8" stroke="#FDF3E2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="section-card">
+      <div class="roles">
+        <span class="role role-ea"><i data-lucide="user-check"></i> EA (calendaring)</span>
+        <span class="role role-ceo"><i data-lucide="briefcase"></i> CEO (attends)</span>
       </div>
-      <h3>Content tracking</h3>
-      <p>Clients can track their content in real time through every stage — editing, quality control, and final delivery. They always know where their content is without needing to chase.</p>
-      <div class="pitch">"You'll always know exactly where your content is — no chasing, no guessing."</div>
-    </div>
-    <div class="dashboard-feature">
-      <div class="dashboard-feature-icon">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3v6l4 2" stroke="#FDF3E2" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="9" r="7" stroke="#FDF3E2" stroke-width="1.8"/></svg>
+      <div class="sc-title"><i data-lucide="map-pin"></i> Events strategy — CEO attends, EA calendars and follows up</div>
+      <div class="sc-sub">EA books and calendars events every week. CEO attends with curiosity-first approach — the pitch happens in the follow-up, not at the event itself.</div>
+
+      <div class="step-flow">
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-ea)"><i data-lucide="calendar"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">EA: Find and calendar events each week</div>
+            <div class="sf-grid">
+              <div class="sf-mini">
+                <div class="sf-mini-label"><i data-lucide="map-pin"></i> Events to target</div>
+                <ul>
+                  <li>Property Investors Network (PIN)</li>
+                  <li>New build show home launches</li>
+                  <li>Property investment meetups (Eventbrite)</li>
+                  <li>Local chamber of commerce</li>
+                  <li>RICS and RIBA regional events</li>
+                  <li>Property auction networking evenings</li>
+                </ul>
+              </div>
+              <div class="sf-mini">
+                <div class="sf-mini-label"><i data-lucide="target"></i> Weekly target</div>
+                <ul>
+                  <li><strong>Minimum:</strong> 1 event/week</li>
+                  <li><strong>Target:</strong> 2–3 events/week</li>
+                  <li>EA books and calendars in advance</li>
+                  <li>CEO prepares 3 talking points per event</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-ceo)"><i data-lucide="handshake"></i></div>
+          <div class="sf-body" style="border-left:3px solid var(--c-ceo)">
+            <div class="sf-title" style="color:var(--c-ceo)">CEO: At the event — lead with curiosity, not a pitch</div>
+            <div class="sf-example">"What are you working on at the moment?" — let them talk. When they ask: "We handle all the marketing content for new builds and developments — photography, drone, video for launches and sales suites. We recently did all the marketing for Northstone's main show home."</div>
+            <div class="sf-note green"><i data-lucide="target"></i> Goal: 3–5 genuine conversations. Exchange details. The close happens in the follow-up, not on the night.</div>
+          </div>
+        </div>
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-li)"><i data-lucide="linkedin"></i></div>
+          <div class="sf-body" style="border-left:3px solid var(--c-li)">
+            <div class="sf-title">Same evening — CEO connects on LinkedIn. EA follows up next morning.</div>
+            <div class="sf-example">"Hi [Name], great to meet you tonight at [event]. I'll send over the Northstone case study I mentioned — would love to find 20 minutes for a proper conversation this week."</div>
+            <div class="sf-note orange"><i data-lucide="clock"></i> Do this the same evening. Relevance drops fast. EA picks up the thread next morning to book the call for CEO.</div>
+          </div>
+        </div>
       </div>
-      <h3>Amendment requests</h3>
-      <p>Clients raise amend requests directly in the dashboard — no WhatsApp, no email chains, nothing gets lost. Requests come straight into our central system and get dealt with faster.</p>
-      <div class="pitch">"Amendments come straight to us — no back and forth on WhatsApp, nothing slipping through the cracks."</div>
-    </div>
-    <div class="dashboard-feature">
-      <div class="dashboard-feature-icon">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="12" rx="2" stroke="#FDF3E2" stroke-width="1.8"/><path d="M6 2v4M12 2v4M2 9h14" stroke="#FDF3E2" stroke-width="1.8" stroke-linecap="round"/></svg>
+
+      <div class="win-box" style="margin-top:14px">
+        <i data-lucide="check-circle"></i>
+        <div class="win-box-text">Pilot shoot → full marketing management <span class="win-box-sub">Preferred supplier agreement — long-term relationship</span></div>
       </div>
-      <h3>Content calendar</h3>
-      <p>For clients on social media management services, the content calendar lives here. They can see what's planned, what's going out, and when — all in one place.</p>
-      <div class="pitch">"If you're on social with us, you can see exactly what's going out and when — full visibility."</div>
     </div>
-    <div class="dashboard-feature">
-      <div class="dashboard-feature-icon">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v4M9 12v4M2 9h4M12 9h4" stroke="#FDF3E2" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="9" r="3" stroke="#FDF3E2" stroke-width="1.8"/></svg>
+
+  </div><!-- /f-developer -->
+
+
+  <!-- ─────────────────────────────────────
+       FLOW 4: BROKERAGE DIRECTORS
+  ───────────────────────────────────── -->
+  <div class="flow-panel" id="f-director">
+
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--c-hoo)"></div>Head of Operations</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-ea)"></div>Executive Assistant</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-ig)"></div>Instagram / WhatsApp</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-email)"></div>Email / LinkedIn</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c-win)"></div>Endorsement</div>
+    </div>
+
+    <div class="info-box">
+      <i data-lucide="info"></i>
+      <p><strong>The goal:</strong> Secure a relationship with a regional director of a brokerage network (eXp, KW, The Agency UK, Moveli, etc.) so they endorse Markeb Media to all agents under their umbrella. One director relationship can unlock 20–200 agents in a single conversation. The route in is always a <strong>warm introduction from one of our existing personal agent clients inside that brokerage.</strong></p>
+    </div>
+
+    <div class="orange-box">
+      <i data-lucide="gift"></i>
+      <p><strong>What we offer the director:</strong> A discounted personal branding session (photography and/or video) as a goodwill gesture. This makes the introduction feel reciprocal and gives them a personal reason to promote us. The message is: we want to help their agents improve output, quality, and consistency — and help the director improve their own professional image and self-image at the same time.</p>
+    </div>
+
+    <!-- Stage 1: Ask for warm intro -->
+    <div class="section-card">
+      <div class="roles">
+        <span class="role role-hoo"><i data-lucide="briefcase"></i> Head of Operations</span>
+        <span class="role role-ea"><i data-lucide="user-check"></i> Executive Assistant</span>
       </div>
-      <h3>Shoot booking</h3>
-      <p>Clients can book shoots directly from the dashboard. They can reserve shoots without upfront payment — and for bigger agencies, payment can be settled at the end of the month.</p>
-      <div class="pitch">"You can reserve shoots without paying upfront — and if you're a larger agency, we can set you up on monthly billing."</div>
-    </div>
-    <div class="dashboard-feature">
-      <div class="dashboard-feature-icon">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 9h10M4 5h10M4 13h6" stroke="#FDF3E2" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <div class="sc-title"><i data-lucide="users"></i> Stage 1 — Ask an existing client for a warm introduction</div>
+      <div class="sc-sub">The warm intro is everything. Identify which of your existing personal agent clients is closest to their regional director or market centre leader. HoO or EA makes the ask personally — not by bulk message.</div>
+
+      <div class="step-flow">
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--pine)"><i data-lucide="search"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Identify which existing client is closest to their director</div>
+            <div class="sf-text">Look at your existing 17 clients. Which brokerage are they in? Who in that brokerage are they likely to know well? Check their Instagram — do they follow or engage with the regional director? Ask casually: "Do you know [Director Name] at all?"</div>
+          </div>
+        </div>
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-hoo)"><i data-lucide="message-circle"></i></div>
+          <div class="sf-body" style="border-left:3px solid var(--c-hoo)">
+            <div class="sf-title">HoO or EA: Ask the client for the introduction</div>
+            <div class="sf-example">"You've been a brilliant client and we're looking to grow our presence across [Brokerage]. Would you be happy to introduce us to [Director Name]? We'd love to show them how we can help the agents in your network — and we'd take care of a personal branding session for them as a thank you for their time."</div>
+            <div class="sf-note orange"><i data-lucide="lightbulb"></i> Make the ask low-friction. A simple mention on WhatsApp, Instagram DM, or in their next conversation is enough. Don't ask for a formal email.</div>
+          </div>
+        </div>
+
       </div>
-      <h3>Copyryta</h3>
-      <p>An AI copywriting assistant built for busy estate agents. Generates property descriptions, social captions, and marketing copy — saving agents hours of writing each week.</p>
-      <div class="pitch">"This alone saves most agents hours every week — property descriptions, social captions, all written in seconds."</div>
+    </div>
+
+    <!-- Stage 2: Opening message to director -->
+    <div class="section-card">
+      <div class="roles">
+        <span class="role role-hoo"><i data-lucide="briefcase"></i> Head of Operations</span>
+        <span class="role role-ea"><i data-lucide="user-check"></i> Executive Assistant</span>
+      </div>
+      <div class="sc-title"><i data-lucide="send"></i> Stage 2 — The opening message to the director</div>
+      <div class="sc-sub">Once the client has made the introduction, HoO or EA reaches out directly. The message is warm, specific, and leads with value — not a sales pitch. The aim is to open the director's network up and improve their agents' output and self-image.</div>
+
+      <div class="step-flow">
+
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-hoo)"><i data-lucide="linkedin"></i></div>
+          <div class="sf-body" style="border-left:3px solid var(--c-hoo)">
+            <div class="sf-title">HoO or EA: Send the opening message (LinkedIn, email, or Instagram)</div>
+            <div class="sf-example">"Hi [Director Name], [Client Name] from your network mentioned you — I'm [Name], Head of Operations at Markeb Media. We already work with a number of personal agents in [Brokerage] and we're looking to support more of your team. We help agents improve the quality, consistency, and speed of their property marketing — and help them build a stronger personal brand alongside it. Both things reflect well on your network as a whole. I'd love to show you what we're doing for agents like [Client Name] and how we could open that up to more of your team. Would you be open to a quick 20-minute conversation? As a thank you for your time, we'd also love to offer you a complimentary personal branding session — photography and video — which we provide for all our director partners."</div>
+          </div>
+        </div>
+
+        <div class="decision-block">
+          <div class="decision-block-title"><i data-lucide="help-circle"></i> Reply received?</div>
+          <div class="decision-branches">
+            <div class="dec-yes"><div class="dec-label"><i data-lucide="check"></i> Yes — interested</div><div class="dec-text">Book the meeting. Go to Stage 3.</div></div>
+            <div class="dec-no"><div class="dec-label"><i data-lucide="x"></i> No reply in 5 days</div><div class="dec-text">One follow-up referencing the client intro. After 2 attempts — ask the original client if they can nudge the director directly.</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Stage 3: The meeting -->
+    <div class="section-card">
+      <div class="roles"><span class="role role-hoo"><i data-lucide="briefcase"></i> Head of Operations</span></div>
+      <div class="sc-title"><i data-lucide="calendar"></i> Stage 3 — The meeting with the director</div>
+      <div class="sc-sub">This is a business partnership conversation, not a sales call. Frame everything from the director's perspective: what does this do for their agents, their network, and their own image?</div>
+
+      <div class="step-flow">
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-hoo)"><i data-lucide="message-square"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Open with what we've already done for their agents</div>
+            <div class="sf-text">Name the existing clients in their network. Show specific examples — before/after output, quality improvement, consistency. Lead with quality and consistency, not price.</div>
+          </div>
+        </div>
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-hoo)"><i data-lucide="trending-up"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Position Markeb as the network's preferred media partner</div>
+            <div class="sf-text">The director endorsing us makes them look good — they're adding real value to their agent base and helping their agents grow. Their agents' output improves. Their network looks more professional. And their own personal image benefits from a complimentary branding session.</div>
+            <div class="sf-grid">
+              <div class="sf-mini">
+                <div class="sf-mini-label"><i data-lucide="gift"></i> What we offer the director</div>
+                <ul>
+                  <li>Discounted personal branding shoot</li>
+                  <li>Preferred partner status for their network</li>
+                  <li>Group rate or volume arrangement</li>
+                  <li>Markeb as their endorsed supplier</li>
+                </ul>
+              </div>
+              <div class="sf-mini">
+                <div class="sf-mini-label"><i data-lucide="users"></i> What we need from them</div>
+                <ul>
+                  <li>Endorsement to their agent base</li>
+                  <li>Mention in next team call or event</li>
+                  <li>Post in their agent WhatsApp / community</li>
+                  <li>Introduction to their regional agents</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-win)"><i data-lucide="handshake"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Book the director's personal branding session as the close</div>
+            <div class="sf-text">Confirming their own complimentary session cements the relationship and makes the partnership feel real and reciprocal. Book it before the meeting ends.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="win-box" style="margin-top:14px">
+        <i data-lucide="check-circle"></i>
+        <div class="win-box-text">Director endorsement secured <span class="win-box-sub">Network opens up — BDM activates individual agents using the director's name as the warm-in</span></div>
+      </div>
+    </div>
+
+    <!-- Stage 4: BDM activates -->
+    <div class="section-card">
+      <div class="roles"><span class="role role-bdm"><i data-lucide="user"></i> BDM</span></div>
+      <div class="sc-title"><i data-lucide="zap"></i> Stage 4 — BDM activates the network using the director's endorsement</div>
+      <div class="sc-sub">Once the director has endorsed Markeb (via group message, WhatsApp, team call), the BDM follows up individually with every agent in that network using the director's name as the warm-in.</div>
+
+      <div class="step-flow">
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--c-ig)"><i data-lucide="message-circle"></i></div>
+          <div class="sf-body" style="border-left:3px solid var(--c-ig)">
+            <div class="sf-title">BDM: Instagram DM or email to every agent in the network</div>
+            <div class="sf-example">"Hi [Name], [Director Name] at [Brokerage] mentioned we've been working with agents across your network — I'm [Name] from Markeb Media. We help personal agents with property photography, video, and personal branding. [Director Name] has introduced us as their preferred media partner and I'd love to show you what we can do for your listings. Free for a quick 10 minutes this week?"</div>
+            <div class="sf-note green"><i data-lucide="zap"></i> This converts at a significantly higher rate than cold outreach — the director's name transforms it into a warm referral.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /f-director -->
+
+</div><!-- /top-panel flows -->
+
+
+<!-- ═══════════════════════════════════════
+     SERVICE PRICES
+═══════════════════════════════════════ -->
+<div class="top-panel" id="prices">
+
+  <div class="prices-header">
+    <h2><i data-lucide="pound-sterling"></i> Service Prices</h2>
+    <p>All prices shown <strong>ex-VAT</strong>. VAT at 20% applies to all services and add-ons. Use this as your quick reference during calls and meetings.</p>
+  </div>
+
+  <!-- PROPERTY STANDALONE -->
+  <div class="price-group">
+    <div class="price-group-label"><i data-lucide="home"></i> Property Services — Standalone</div>
+    <div class="price-cards">
+      <div class="price-card">
+        <div class="pc-top">
+          <div class="pc-name"><i data-lucide="camera"></i> Property Photography</div>
+          <div class="pc-badges"><div class="pc-price">£99.00</div><div class="pc-vat">+ VAT = £118.80</div></div>
+        </div>
+        <div class="pc-dur"><i data-lucide="clock"></i> 45 min</div>
+        <div class="pc-desc">Up to 30 magazine-quality interior and exterior images, professionally lit and edited.</div>
+      </div>
+      <div class="price-card">
+        <div class="pc-top">
+          <div class="pc-name"><i data-lucide="video"></i> Property Videography</div>
+          <div class="pc-badges"><div class="pc-price">£129.00</div><div class="pc-vat">+ VAT = £154.80</div></div>
+        </div>
+        <div class="pc-dur"><i data-lucide="clock"></i> 60 min</div>
+        <div class="pc-desc">4K walkthrough video with classic editing — colour grading and smooth transitions.</div>
+      </div>
+      <div class="price-card">
+        <div class="pc-top">
+          <div class="pc-name"><i data-lucide="plane"></i> Drone Photography</div>
+          <div class="pc-badges"><div class="pc-price">£109.00</div><div class="pc-vat">+ VAT = £130.80</div></div>
+        </div>
+        <div class="pc-dur"><i data-lucide="clock"></i> 20 min</div>
+        <div class="pc-desc">Up to 10 stunning aerial stills showing the property, plot, and location context.</div>
+      </div>
+      <div class="price-card">
+        <div class="pc-top">
+          <div class="pc-name"><i data-lucide="plane"></i> Drone Videography</div>
+          <div class="pc-badges"><div class="pc-price">£109.00</div><div class="pc-vat">+ VAT = £130.80</div></div>
+        </div>
+        <div class="pc-dur"><i data-lucide="clock"></i> 20 min</div>
+        <div class="pc-desc">Up to 30-second cinematic aerial showcase with classic editing.</div>
+      </div>
+      <div class="price-card">
+        <div class="pc-top">
+          <div class="pc-name"><i data-lucide="layers"></i> All In One Drone</div>
+          <div class="pc-badges"><div class="pc-price">£179.00</div><div class="pc-vat">+ VAT = £214.80</div></div>
+        </div>
+        <div class="pc-dur"><i data-lucide="clock"></i> 45 min</div>
+        <div class="pc-desc">10 aerial photos + 30-second drone video in a single visit. Saves £39 vs booking separately.</div>
+      </div>
     </div>
   </div>
 
-  <div class="example-box" style="margin-top:4px;">
-    <div class="stage-block-label">Closing the sign-up</div>
-    <p>"Right, let's get you set up now — takes two minutes and then we can confirm the first shoot straight from here."</p>
-  </div>
-</section>
-
-<!-- PROPERTY SERVICES -->
-<section class="section" id="property">
-  <div class="section-intro">
-    <h2>Property services</h2>
-    <p>Use these during the product brief stage. Understand the client's situation first — then recommend. Do not present everything. Present what fits.</p>
-  </div>
-
-  <div class="group-label">Standalone services</div>
-
-  <div class="service-card">
-    <div class="card-top"><div class="card-name">Property Photography</div><div class="card-badges"><span class="badge badge-price">£118.80</span><span class="badge badge-duration">45 min</span></div></div>
-    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>Up to 30 magazine-quality interior and exterior images, professionally lit and edited to make every room look its best.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Covers specialist travel, professional equipment, on-site time, and post-production editing. Every shot is composed to maximise buyer appeal — not a point-and-shoot service.</p></div></div>
-    <div class="pill-row"><span class="pill">High volume of standard listings</span><span class="pill">Price-sensitive vendors who still want quality</span><span class="pill">Quick turnaround requirements</span></div>
-    <div class="consult-box"><div class="card-block-label">How to position it</div><p>"How are your current listing photos performing? Are vendors happy with how their properties are coming across on Rightmove?" — let their answer tell you whether photography alone is the right starting point.</p></div>
-    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>What does a typical listing look like for you at the moment? Is the photography something vendors comment on — positively or otherwise?</p></div>
-  </div>
-
-  <div class="service-card">
-    <div class="card-top"><div class="card-name">Property Videography</div><div class="card-badges"><span class="badge badge-price">£154.80</span><span class="badge badge-duration">60 min</span></div></div>
-    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>4K walkthrough video with classic editing — colour grading, smooth transitions, and a narrative flow that guides the viewer through the property.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>4K production and post-editing is significantly more time-intensive than photography. The price reflects professional-grade equipment, editing suite time, and the output's impact on enquiry rates.</p></div></div>
-    <div class="pill-row"><span class="pill">Properties that need to convey space or layout</span><span class="pill">Agents running social media or email campaigns</span><span class="pill">Vendors who want to stand out on the portals</span></div>
-    <div class="consult-box"><div class="card-block-label">How to position it</div><p>"Are you using video in your listings at the moment? If not — is that a budget thing, or just something you haven't got around to yet?" — understanding the barrier tells you whether video is a genuine priority or a nice-to-have.</p></div>
-    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>What channels are you currently marketing on beyond the portals? Are your vendors asking for video content, or is it something you're looking to introduce?</p></div>
-  </div>
-
-  <div class="group-label">Drone services</div>
-
-  <div class="service-card">
-    <div class="card-top"><div class="card-name">Property Drone Photography</div><div class="card-badges"><span class="badge badge-price">£130.80</span><span class="badge badge-duration">20 min</span></div></div>
-    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>Up to 10 stunning aerial stills showing the property, plot, surrounding area, and location context.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>CAA-certified drone pilot, specialist equipment, and location planning. Keeps the cost accessible whilst delivering high-value content.</p></div></div>
-    <div class="pill-row"><span class="pill">Properties with land, gardens, or rural settings</span><span class="pill">New builds showing development context</span><span class="pill">Agents who want aerial without a video budget</span></div>
-    <div class="consult-box"><div class="card-block-label">How to position it</div><p>"What types of properties are you typically marketing — are there many with land, large gardens, or rural locations?" — if yes, aerial stills answer questions buyers can't resolve from ground-level photos alone.</p></div>
-    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>Do buyers ever ask about the surrounding area or plot size before booking a viewing? Are there properties where the setting is actually a key part of the appeal?</p></div>
+  <!-- PACKAGES -->
+  <div class="price-group">
+    <div class="price-group-label"><i data-lucide="package"></i> Property Packages</div>
+    <div class="price-cards">
+      <div class="price-card">
+        <div class="pc-top">
+          <div class="pc-name"><i data-lucide="layers"></i> Bronze Package</div>
+          <div class="pc-badges"><div class="pc-price">£169.00</div><div class="pc-vat">+ VAT = £202.80</div></div>
+        </div>
+        <div class="pc-dur"><i data-lucide="clock"></i> 90 min</div>
+        <div class="pc-desc">Up to 30 photos + drone photography in a single visit. One visit, two outputs.</div>
+      </div>
+      <div class="price-card popular">
+        <div class="pc-top">
+          <div class="pc-name"><i data-lucide="star"></i> Silver Package</div>
+          <div class="pc-badges"><div class="pc-price">£219.00</div><div class="pc-popular">Most popular</div><div class="pc-vat">+ VAT = £262.80</div></div>
+        </div>
+        <div class="pc-dur"><i data-lucide="clock"></i> 90 min</div>
+        <div class="pc-desc">Photos + drone stills + property video + drone video. Four outputs from a single visit. Stills for the portal, video for social, aerial for both.</div>
+      </div>
+      <div class="price-card">
+        <div class="pc-top">
+          <div class="pc-name"><i data-lucide="award"></i> Gold Package</div>
+          <div class="pc-badges"><div class="pc-price">£500.00</div><div class="pc-vat">+ VAT = £600.00</div></div>
+        </div>
+        <div class="pc-dur"><i data-lucide="clock"></i> 150 min</div>
+        <div class="pc-desc">Everything in Silver plus enhanced lifestyle content — wider shots, contextual imagery, and extended production for high-end listings.</div>
+      </div>
+    </div>
   </div>
 
-  <div class="service-card">
-    <div class="card-top"><div class="card-name">Property Drone Videography</div><div class="card-badges"><span class="badge badge-price">£130.80</span><span class="badge badge-duration">20 min</span></div></div>
-    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>Up to 30-second cinematic aerial showcase with classic editing — colour grading and smooth cuts for a polished, shareable output.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Same operational cost as drone photography but with the added editorial value of a short-form cinematic video. Value uplift comes in post-production and content versatility.</p></div></div>
-    <div class="pill-row"><span class="pill">Social media content (Reels, TikTok, email)</span><span class="pill">Prestige and rural properties</span><span class="pill">Vendors who want something to share</span></div>
-    <div class="consult-box"><div class="card-block-label">How to position it</div><p>"Are you posting property content on social media at the moment? If so, what's tending to get the most engagement?" — if they're active on social, a short aerial reel is a natural fit.</p></div>
-    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>Do your vendors share their listing content with their own networks? Is social media a channel you're looking to do more with?</p></div>
+  <!-- BRANDING -->
+  <div class="price-group">
+    <div class="price-group-label"><i data-lucide="user-circle"></i> Personal Branding Services</div>
+    <div class="price-cards">
+      <div class="price-card">
+        <div class="pc-top">
+          <div class="pc-name"><i data-lucide="camera"></i> Branding Photography — 10 Signature Shots</div>
+          <div class="pc-badges"><div class="pc-price">£345.00</div><div class="pc-vat">+ VAT = £414.00</div></div>
+        </div>
+        <div class="pc-dur"><i data-lucide="clock"></i> 2 hrs</div>
+        <div class="pc-desc">10 directed signature images — professional headshots and brand imagery for LinkedIn, website, email signatures, and print.</div>
+      </div>
+      <div class="price-card">
+        <div class="pc-top">
+          <div class="pc-name"><i data-lucide="video"></i> Branding Videography Session</div>
+          <div class="pc-badges"><div class="pc-price">£445.00</div><div class="pc-vat">+ VAT = £534.00</div></div>
+        </div>
+        <div class="pc-dur"><i data-lucide="clock"></i> 3 hrs</div>
+        <div class="pc-desc">Multiple video sequences for social content, reels, website video, and story-led marketing. Classic editing included.</div>
+      </div>
+      <div class="price-card">
+        <div class="pc-top">
+          <div class="pc-name"><i data-lucide="sparkles"></i> Complete Branding Package</div>
+          <div class="pc-badges"><div class="pc-price">£745.00</div><div class="pc-vat">+ VAT = £894.00</div></div>
+        </div>
+        <div class="pc-dur"><i data-lucide="clock"></i> 5 hrs</div>
+        <div class="pc-desc">Photo + video in one comprehensive session. Saves £45 vs booking separately. One creative direction across both outputs — consistent look and feel.</div>
+      </div>
+    </div>
   </div>
 
-  <div class="service-card">
-    <div class="card-top"><div class="card-name">All In One Drone</div><div class="card-badges"><span class="badge badge-price">£214.80</span><span class="badge badge-duration">45 min</span></div></div>
-    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>10 aerial photos and a 30-second drone video with classic editing — the complete aerial content package in a single visit.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Bundling both outputs from a single drone session saves over £45 versus booking separately (£261.60 individually).</p></div></div>
-    <div class="pill-row"><span class="pill">Any property where aerial content is a priority</span><span class="pill">Agents who want both stills and video for campaigns</span></div>
-    <div class="consult-box"><div class="card-block-label">How to position it</div><p>"If aerial is going to be part of the marketing at all, it's worth knowing there are two options — stills only, or stills and a short video together. The combined option saves over £45. What would you typically do with aerial footage?"</p></div>
-    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>Would you use aerial stills and video for the same property, or tend to choose one or the other?</p></div>
+  <!-- ADD-ONS -->
+  <div class="price-group">
+    <div class="price-group-label"><i data-lucide="plus-circle"></i> Add-Ons</div>
+    <table class="addon-table">
+      <thead>
+        <tr>
+          <th>Add-on</th>
+          <th>Price (ex-VAT)</th>
+          <th>Best used when…</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><i data-lucide="layout"></i> Standard Floor Plan (2D)</td>
+          <td>£20.00 <span class="vat-note">+ VAT = £24.00</span></td>
+          <td>Agent or vendor wants layout clarity on the listing</td>
+        </tr>
+        <tr>
+          <td><i data-lucide="layout"></i> Plus Floor Plan (2D with measurements)</td>
+          <td>£30.00 <span class="vat-note">+ VAT = £36.00</span></td>
+          <td>Larger or unusual layouts where dimensions matter</td>
+        </tr>
+        <tr>
+          <td><i data-lucide="box"></i> Floor Plan Bundle (2D + 3D)</td>
+          <td>£83.33 <span class="vat-note">+ VAT = £100.00</span></td>
+          <td>Prestige listings where full layout experience is needed</td>
+        </tr>
+        <tr>
+          <td><i data-lucide="zap"></i> Elevate Your Edit (premium video)</td>
+          <td>£62.50 <span class="vat-note">+ VAT = £75.00</span></td>
+          <td>Agent wants social-ready, cinematic video output</td>
+        </tr>
+        <tr>
+          <td><i data-lucide="play"></i> Property Speed Tours</td>
+          <td>£50.00 <span class="vat-note">+ VAT = £60.00</span></td>
+          <td>Quick walkthrough for social content</td>
+        </tr>
+        <tr>
+          <td><i data-lucide="tag"></i> Add Branded Outro to Video</td>
+          <td><strong>FREE</strong></td>
+          <td>Any video service — always offer this</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
-  <div class="group-label">Packages</div>
-
-  <div class="service-card">
-    <div class="card-top"><div class="card-name">Bronze Package</div><div class="card-badges"><span class="badge badge-price">£202.80</span><span class="badge badge-duration">90 min</span></div></div>
-    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>Up to 30 interior and exterior photographs plus drone shots — photography and aerial imagery combined in a single visit.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Combines photography (£118.80) and drone photography (£130.80) into one efficient visit. A meaningful saving with a single point of contact for the whole shoot.</p></div></div>
-    <div class="pill-row"><span class="pill">Standard listings that want to stand out</span><span class="pill">Agents who include drone as standard</span><span class="pill">Volume-focused estate agency teams</span></div>
-    <div class="consult-box"><div class="card-block-label">How to position it</div><p>"If photography and aerial stills cover what you need, Bronze is the straightforward option — one visit, both done. If you're also thinking about video, it's worth looking at Silver before you decide."</p></div>
-    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>Is video something you'd want for most listings, or only certain ones? That'll help determine whether Bronze or Silver is the right baseline.</p></div>
+  <!-- ADDITIONAL FEES -->
+  <div class="price-group">
+    <div class="price-group-label"><i data-lucide="ruler"></i> Additional Property Fees</div>
+    <table class="addon-table">
+      <thead>
+        <tr>
+          <th>Fee</th>
+          <th>Price (ex-VAT)</th>
+          <th>When it applies</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><i data-lucide="bed"></i> Extra bedrooms (above 4)</td>
+          <td>£25.00/bedroom <span class="vat-note">+ VAT per bedroom</span></td>
+          <td>Property services only. 5-bed = +£25, 6-bed = +£50, etc.</td>
+        </tr>
+        <tr>
+          <td><i data-lucide="maximize-2"></i> Large property fee (over 3,000 sq ft)</td>
+          <td>£125.00 <span class="vat-note">+ VAT = £150.00</span></td>
+          <td>Properties over 3,000 sq ft — requires additional shoot time</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
-  <div class="service-card">
-    <div class="card-top"><div class="card-name">Silver Package</div><div class="card-badges"><span class="badge badge-price">£262.80</span><span class="badge badge-duration">90 min</span><span class="badge badge-popular">Most popular</span></div></div>
-    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>Everything in Bronze — photos and drone stills — plus full property videography and drone video footage. The complete property marketing content set with classic editing throughout.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Four content outputs from a single visit. Individually these services would cost substantially more. The price reflects combined on-site efficiency.</p></div></div>
-    <div class="pill-row"><span class="pill">Agents marketing across portals and social</span><span class="pill">Properties that benefit from full visual coverage</span><span class="pill">Teams wanting a consistent, premium standard</span></div>
-    <div class="consult-box"><div class="card-block-label">How to position it</div><p>"This tends to be where most agents land — stills for the portal, video for social, aerial for both. One visit, four outputs. Whatever channel you're marketing on, you've got the right asset for it."</p></div>
-    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>Are you marketing on more than just Rightmove and Zoopla? Do you want the same content package across all listings, or does it vary by property type?</p></div>
-  </div>
+</div><!-- /top-panel prices -->
 
-  <div class="service-card">
-    <div class="card-top"><div class="card-name">Gold Package</div><div class="card-badges"><span class="badge badge-price">£600.00</span><span class="badge badge-duration">150 min</span></div></div>
-    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>Everything in Silver, plus enhanced lifestyle content — wider shots, contextual imagery, and extended production designed for high-end property marketing. Classic editing included throughout.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Extended shoot duration, more complex post-production, and creative direction that elevates content from functional to aspirational. For prestige-level output.</p></div></div>
-    <div class="pill-row"><span class="pill">Prestige and luxury listings</span><span class="pill">Properties being marketed internationally</span><span class="pill">Agents building a premium brand</span></div>
-    <div class="consult-box"><div class="card-block-label">How to position it</div><p>"Gold is for a specific type of property — where the lifestyle and setting are as much a part of the appeal as the building itself. Do you have listings where that's the case?"</p></div>
-    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>What's the top end of your portfolio in terms of price point? For those properties, does the current marketing content do them justice?</p></div>
-  </div>
-</section>
-
-<!-- BRANDING SERVICES -->
-<section class="section" id="branding">
-  <div class="section-intro">
-    <h2>Branding services</h2>
-    <p>The branding conversation is different to property work. Start by understanding where the agent wants to be in 12 months and what's currently getting in the way — before introducing any service.</p>
-  </div>
-
-  <div class="tier-note"><strong>What makes branding different to property work</strong>Property services sell a building. Branding services support a person building their profile and reputation. The conversation is less about a specific listing and more about where the agent wants to be. Start there before introducing any service.</div>
-
-  <div class="service-card">
-    <div class="card-top"><div class="card-name">Branding Photography — 10 Signature Shots</div><div class="card-badges"><span class="badge badge-price">£414.00</span><span class="badge badge-duration">2 hrs</span></div></div>
-    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>A directed personal branding shoot producing 10 signature images — professional headshots and brand imagery where the agent is in every shot. Ready for LinkedIn, the agency website, email signatures, and printed materials.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>A directed creative session with a professional brief, location planning, and post-production aligned to the agent's personal brand. The 10 curated outputs are campaign-ready assets — not snapshots.</p></div></div>
-    <div class="pill-row"><span class="pill">Agents building or refreshing their personal brand</span><span class="pill">New team members joining an agency</span><span class="pill">Agents who want photography but aren't yet on video</span></div>
-    <div class="consult-box"><div class="card-block-label">How to position it</div><p>"What does your online presence look like at the moment — LinkedIn, your agency website? When a vendor Googles you, what do they find? And does what they find reflect where you're at now?"</p></div>
-    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>Are you happy with how you come across on your current profile photos? Is imagery something vendors or colleagues have ever commented on?</p></div>
-  </div>
-
-  <div class="service-card">
-    <div class="card-top"><div class="card-name">Branding Videography Session</div><div class="card-badges"><span class="badge badge-price">£534.00</span><span class="badge badge-duration">3 hrs</span></div></div>
-    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>A full personal branding video production session — multiple sequences for social content, reels, website video, and story-led marketing. Classic editing included: colour grading and smooth transitions throughout.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Three hours of directed video production. The output isn't a single video — it's multiple sequences that become a content library the agent can draw on across platforms for months.</p></div></div>
-    <div class="pill-row"><span class="pill">Agents investing in social media as a lead channel</span><span class="pill">Those who already have photography and want video</span><span class="pill">Agents who want to feature in their agency's campaigns</span></div>
-    <div class="consult-box"><div class="card-block-label">How to position it</div><p>"Are you posting on social at the moment? If so, what tends to perform best — and what do you wish you had more of?" — if running dry on content is something they mention, video is the natural solution.</p></div>
-    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>How often are you posting at the moment, and what's holding you back from doing more? Is creating content something you find time-consuming or uncomfortable on camera?</p></div>
-  </div>
-
-  <div class="service-card">
-    <div class="card-top"><div class="card-name">Complete Branding Package — Photo &amp; Video</div><div class="card-badges"><span class="badge badge-price">£894.00</span><span class="badge badge-duration">5 hrs</span></div></div>
-    <div class="card-cols"><div class="card-block"><div class="card-block-label">What's included</div><p>The full personal branding suite — photography and video in one comprehensive session. Signature shots for static use plus multiple video sequences for social content. Classic editing included on all video assets.</p></div><div class="card-block"><div class="card-block-label">Why this price</div><p>Five hours of dedicated creative production covering both disciplines. Booked separately, photography and video total £948. The package reflects the efficiency of a combined session with a single creative direction.</p></div></div>
-    <div class="pill-row"><span class="pill">Agents serious about their personal brand</span><span class="pill">Agency owners and directors</span><span class="pill">Agents launching or relaunching their profile</span><span class="pill">Ambitious agents who want to dominate their patch</span></div>
-    <div class="consult-box"><div class="card-block-label">How to position it</div><p>"It sounds like you need both — strong photography for your static presence and video content for social. Doing both in one session is more cost-effective and everything has a consistent look and feel. Does that make sense as a way to approach it?"</p></div>
-    <div class="question-box" style="margin-top:9px;"><div class="card-block-label">Questions to ask</div><p>Where do you feel the biggest gap is right now — how you look online, or how much content you're putting out? And is this something you want to tackle all at once, or in stages?</p></div>
-  </div>
-</section>
-
-<!-- OBJECTIONS -->
-<section class="section" id="objections">
-  <div class="section-intro">
-    <h2>Handling objections</h2>
-    <p>Most objections aren't objections — they're requests for more information or reassurance. Understand what's behind them and respond honestly. Never try to overcome them — try to understand them.</p>
-  </div>
-  <div class="objection-card"><div class="objection-tag">Price</div><div class="objection-q">It's more than we usually spend on photography.</div><div class="objection-a">That's a fair point to raise. It's worth understanding what you're currently getting for what you spend — and whether it's delivering what you need. Our pricing reflects professional-grade equipment, specialist travel, and post-production editing that makes a genuine difference to how a property presents. If budget is a constraint, it's worth starting with what would make the biggest difference to your listings and working from there. What's the one thing you feel your current photography is missing?</div></div>
-  <div class="objection-card"><div class="objection-tag">Commitment</div><div class="objection-q">We're not sure we need this for every listing.</div><div class="objection-a">That's completely reasonable — and honestly, not every property needs the same level of content. It's worth thinking about which properties in your portfolio would benefit most from professional photography or video, and starting there. We can work with you on a per-property basis rather than a blanket approach if that makes more sense for how you operate.</div></div>
-  <div class="objection-card"><div class="objection-tag">Relevance</div><div class="objection-q">Our vendors don't really ask for video.</div><div class="objection-a">That's interesting — do you think that's because they don't see it as an option, or because they genuinely don't value it? In our experience, vendors rarely ask for video specifically, but they respond very positively when they see it. It also tends to benefit the agent as much as the vendor — it's content you can use for your own marketing, not just the listing.</div></div>
-  <div class="objection-card"><div class="objection-tag">Timing</div><div class="objection-q">We'd like to think about it and come back to you.</div><div class="objection-a">Of course — it's not a decision to rush. It'd help to know what would make it easier to come to a decision. Is there something specific you'd want to think through, or something I haven't covered that would help? I'm happy to send something over in writing so you've got it to refer back to.</div></div>
-  <div class="objection-card"><div class="objection-tag">Competition</div><div class="objection-q">We've had cheaper quotes from other photographers.</div><div class="objection-a">It's worth comparing like for like — what's included, what the editing looks like, and what the turnaround is. We're not the cheapest option, and we wouldn't want to be. If price is the main factor, we might not be the right fit. But if the quality of output and reliability of the service matters — which for most agents it does — it's worth looking at what the difference actually buys you.</div></div>
-  <div class="objection-card"><div class="objection-tag">Personal branding</div><div class="objection-q">I'm not sure I'm comfortable on camera.</div><div class="objection-a">That's one of the most common things we hear — and it's exactly why the session is directed. You're not left to figure it out yourself. Our specialists guide you through the whole thing, and most people find they're far more comfortable than they expected once they're in it. Would it help to talk through what the session actually looks like in practice?</div></div>
-</section>
-
-<!-- PRINCIPLES -->
-<section class="section" id="principles">
-  <div class="section-intro">
-    <h2>Principles</h2>
-    <p>The mindset behind every successful interaction. Come back to these when things aren't going to plan.</p>
-  </div>
-
-  <div class="principle-card"><div class="principle-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v4l3 3" stroke="#FDF3E2" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="8" r="6" stroke="#FDF3E2" stroke-width="1.5"/></svg></div><div><h3>Meetings over messages</h3><p>A message can be ignored. A meeting cannot. Every action you take should be designed to get you in front of a decision-maker, not to close them through a screen.</p></div></div>
-  <div class="principle-card"><div class="principle-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 4.5" stroke="#FDF3E2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h3>Speed over perfection</h3><p>A meeting booked today is worth more than a perfectly crafted message sent next week. Move fast, follow up faster.</p></div></div>
-  <div class="principle-card"><div class="principle-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v2M8 12v2M2 8h2M12 8h2" stroke="#FDF3E2" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="8" r="3" stroke="#FDF3E2" stroke-width="1.5"/></svg></div><div><h3>Confidence over complexity</h3><p>You don't need a perfect answer for everything. You need the confidence to hold the room, recommend with conviction, and guide the client to a decision.</p></div></div>
-  <div class="principle-card"><div class="principle-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="3" width="4" height="4" rx="1" stroke="#FDF3E2" stroke-width="1.5"/><rect x="9" y="3" width="4" height="4" rx="1" stroke="#FDF3E2" stroke-width="1.5"/><rect x="3" y="9" width="4" height="4" rx="1" stroke="#FDF3E2" stroke-width="1.5"/><rect x="9" y="9" width="4" height="4" rx="1" stroke="#FDF3E2" stroke-width="1.5"/></svg></div><div><h3>Consistency over intensity</h3><p>150 outreaches every day beats 500 in one day and nothing the next. The system works when you work it consistently.</p></div></div>
-  <div class="principle-card"><div class="principle-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 8h8M8 4l4 4-4 4" stroke="#FDF3E2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><h3>You are not selling photos</h3><p>You are selling a marketing system that helps agents win more listings, attract more buyers, and operate more consistently. Lead every conversation from that position.</p></div></div>
-
-  <div class="final-rule">
-    <p>"If you control the number of meetings,<br><span>you control the revenue."</span></p>
-  </div>
-</section>
-
-<div class="footer">
-  <img src="/public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" onerror="this.style.display='none'">
-  Markeb Media Ltd &nbsp;·&nbsp; Company No. 15919272 &nbsp;·&nbsp; Sales System v1.0 &nbsp;·&nbsp; Internal use only
-</div>
-
-</div><!-- /app -->
+<div class="footer">Markeb Media Ltd &nbsp;·&nbsp; Co. No. 15919272 &nbsp;·&nbsp; VAT No. 498444731 &nbsp;·&nbsp; All prices ex-VAT · VAT at 20% applies to all services</div>
 
 <script>
-  let entered = '';
-  let checking = false;
+document.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });
 
-  if (sessionStorage.getItem('mm_verified') === 'true') {
-    document.getElementById('gate').classList.add('hidden');
-    document.getElementById('app').classList.add('visible');
-  }
+function showTop(id, btn) {
+  document.querySelectorAll('.top-panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.top-tab').forEach(b => b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+  lucide.createIcons();
+}
 
-  function enter(d) {
-    if (entered.length >= 4 || checking) return;
-    entered += d;
-    updateDots();
-    if (entered.length === 4) setTimeout(check, 130);
-  }
-
-  function del() {
-    if (checking) return;
-    entered = entered.slice(0, -1);
-    updateDots();
-    document.getElementById('gate-error').textContent = '';
-  }
-
-  function updateDots() {
-    for (let i = 0; i < 4; i++)
-      document.getElementById('d' + i).classList.toggle('filled', i < entered.length);
-  }
-
-  async function check() {
-    checking = true;
-    const errEl = document.getElementById('gate-error');
-    errEl.className = 'gate-checking';
-    errEl.textContent = 'Checking…';
-
-    try {
-      const res = await fetch('/.netlify/functions/verify-pin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin: entered })
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        errEl.textContent = '';
-        sessionStorage.setItem('mm_verified', 'true');
-        document.getElementById('gate').classList.add('hidden');
-        document.getElementById('app').classList.add('visible');
-      } else {
-        errEl.className = 'gate-error';
-        errEl.textContent = 'Incorrect PIN — please try again';
-        entered = '';
-        updateDots();
-        shake();
-      }
-    } catch (err) {
-      errEl.className = 'gate-error';
-      errEl.textContent = 'Connection error — please try again';
-      entered = '';
-      updateDots();
-    }
-    checking = false;
-  }
-
-  function shake() {
-    const card = document.querySelector('.gate-card');
-    card.style.transition = 'transform 0.07s';
-    ['-8px','8px','-5px','5px','-2px','0'].forEach((x, i) =>
-      setTimeout(() => card.style.transform = 'translateX(' + x + ')', i * 65)
-    );
-  }
-
-  document.addEventListener('keydown', e => {
-    if (document.getElementById('gate').classList.contains('hidden')) return;
-    if (e.key >= '0' && e.key <= '9') enter(e.key);
-    if (e.key === 'Backspace') del();
-    if (e.key === 'Enter' && entered.length === 4) check();
-  });
-
-  function show(id, btn) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    btn.classList.add('active');
-    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
+function switchFlow(id, btn) {
+  document.querySelectorAll('.flow-panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.flow-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+  window.scrollTo({top:100,behavior:'smooth'});
+  lucide.createIcons();
+}
 </script>
 </body>
 </html>
