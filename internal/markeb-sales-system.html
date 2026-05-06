@@ -33,6 +33,7 @@
   --c-ea:    #0077B5;
   --c-spec:  #e65100;
   --c-ceo:   #1b5e20;
+  --c-process:#3F4D1B;
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -173,6 +174,39 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
 .win-box-text{color:var(--cream);font-weight:700;font-size:14px}
 .win-box-sub{display:block;font-size:11.5px;font-weight:400;color:rgba(253,243,226,.6);margin-top:2px}
 
+/* ── PROCESS SHOWCASE ── */
+.process-showcase{background:linear-gradient(135deg,rgba(63,77,27,.04),rgba(180,97,0,.04));border:2px solid rgba(63,77,27,.2);border-radius:16px;padding:20px 22px;margin:14px 0}
+.process-showcase-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid rgba(63,77,27,.1)}
+.process-showcase-header svg{width:20px;height:20px;color:var(--pine)}
+.process-showcase-title{font-size:14px;font-weight:800;color:var(--pine)}
+.process-showcase-sub{font-size:12px;color:var(--muted);margin-top:1px}
+
+.process-steps{display:flex;flex-direction:column;gap:0}
+.process-step{display:flex;gap:14px;position:relative}
+.process-step:not(:last-child)::after{content:'';position:absolute;left:16px;top:36px;width:2px;bottom:-2px;background:linear-gradient(to bottom,rgba(63,77,27,.25),rgba(180,97,0,.15));z-index:0}
+
+.ps-num{width:34px;height:34px;border-radius:50%;background:var(--pine);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--cream);flex-shrink:0;position:relative;z-index:1;margin-top:2px;border:2px solid rgba(255,255,255,.8);box-shadow:0 2px 8px rgba(63,77,27,.25)}
+.ps-body{flex:1;margin-bottom:12px}
+.ps-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.ps-title svg{width:13px;height:13px;color:var(--orange)}
+.ps-desc{font-size:12px;color:var(--muted);line-height:1.6}
+
+.ps-substeps{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;margin-top:8px}
+.ps-sub{background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 10px;display:flex;align-items:flex-start;gap:7px}
+.ps-sub-num{width:20px;height:20px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px}
+.ps-sub-name{font-size:11.5px;font-weight:700;color:var(--ink);margin-bottom:1px}
+.ps-sub-detail{font-size:11px;color:var(--muted);line-height:1.45}
+
+.ps-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(63,77,27,.1);border-radius:20px;padding:2px 8px;font-size:10px;font-weight:700;color:var(--pine);margin-top:6px}
+.ps-badge svg{width:10px;height:10px}
+
+.ps-highlight{background:rgba(180,97,0,.07);border-left:2px solid var(--orange);border-radius:0 6px 6px 0;padding:7px 10px;margin-top:6px;font-size:11.5px;color:var(--mid);line-height:1.5}
+.ps-highlight strong{color:var(--orange2)}
+
+.process-close-line{background:var(--pine);border-radius:10px;padding:11px 16px;display:flex;align-items:center;gap:9px;margin-top:14px}
+.process-close-line svg{width:16px;height:16px;color:#c8d96b;flex-shrink:0}
+.process-close-line span{font-size:12.5px;font-weight:700;color:var(--cream)}
+
 /* ── PRICES ── */
 .prices-header{background:var(--pine);border-radius:14px;padding:18px 22px;margin-bottom:22px}
 .prices-header h2{font-size:18px;font-weight:800;color:var(--cream);margin-bottom:5px;display:flex;align-items:center;gap:8px}
@@ -219,6 +253,7 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
 .flow-panel.on .section-card:nth-child(3){animation-delay:.1s}
 .flow-panel.on .section-card:nth-child(4){animation-delay:.15s}
 .flow-panel.on .section-card:nth-child(5){animation-delay:.2s}
+.flow-panel.on .section-card:nth-child(6){animation-delay:.25s}
 </style>
 </head>
 <body>
@@ -410,11 +445,11 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
       </div>
     </div>
 
-    <!-- Stage 3: Meeting -->
+    <!-- Stage 3: Meeting — UPDATED WITH PROCESS -->
     <div class="section-card">
       <div class="roles"><span class="role role-bdm"><i data-lucide="user"></i> BDM</span></div>
       <div class="sc-title"><i data-lucide="calendar"></i> Stage 3 — The meeting</div>
-      <div class="sc-sub">Every meeting follows the same structure. This is where revenue is made.</div>
+      <div class="sc-sub">Every meeting follows the same structure. Open with questions, recommend the right service, then walk them through our process — this is what you're selling. Close with a sign-up and confirmed first shoot.</div>
 
       <div class="step-flow">
         <div class="sf-step">
@@ -428,9 +463,141 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
           <div class="sf-icon" style="background:var(--c-meet)"><i data-lucide="target"></i></div>
           <div class="sf-body">
             <div class="sf-title">Recommend the right service — don't present everything</div>
-            <div class="sf-text">Match the service to what they told you. Lead the decision confidently. Refer to the Service Prices tab for reference.</div>
+            <div class="sf-text">Match the service to what they told you. Lead the decision confidently. Refer to the Service Prices tab for reference. Use the Silver Package as your default anchor — it's the most popular and covers the full output.</div>
           </div>
         </div>
+
+        <!-- ★ NEW: THE 5-STEP PROCESS ★ -->
+        <div class="sf-step">
+          <div class="sf-icon" style="background:var(--pine)"><i data-lucide="layers"></i></div>
+          <div class="sf-body">
+            <div class="sf-title">Walk them through exactly what happens when they book</div>
+            <div class="sf-text">This is what separates Markeb from every competitor. Take them through the process step by step — use the Silver Package as the example. This is what they're buying.</div>
+
+            <div class="process-showcase">
+              <div class="process-showcase-header">
+                <i data-lucide="layers"></i>
+                <div>
+                  <div class="process-showcase-title">Our 5-Step Process — Use the Silver Package as your example</div>
+                  <div class="process-showcase-sub">Walk through this live in the meeting. This is how you close.</div>
+                </div>
+              </div>
+
+              <div class="process-steps">
+
+                <!-- Step 1: Sign up -->
+                <div class="process-step">
+                  <div class="ps-num">1</div>
+                  <div class="ps-body">
+                    <div class="ps-title"><i data-lucide="user-plus"></i> Sign Up — Access the Dashboard</div>
+                    <div class="ps-desc">The moment they sign up they get access to our client dashboard — a professional platform to track every booking, view content, manage amendments, and more. No other property media company gives their clients this level of visibility and control.</div>
+                    <div class="ps-badge"><i data-lucide="star"></i> Industry-leading client portal</div>
+                  </div>
+                </div>
+
+                <!-- Step 2: Booking -->
+                <div class="process-step">
+                  <div class="ps-num">2</div>
+                  <div class="ps-body">
+                    <div class="ps-title"><i data-lucide="calendar-check"></i> Book a Shoot — Smart Booking System</div>
+                    <div class="ps-desc">They choose their service, property address, preferred date and time — all through our smart booking system. Pay upfront or reserve now and pay later — whatever suits their cashflow. No back-and-forth emails, no waiting.</div>
+                  </div>
+                </div>
+
+                <!-- Step 3: Shoot day -->
+                <div class="process-step">
+                  <div class="ps-num">3</div>
+                  <div class="ps-body">
+                    <div class="ps-title"><i data-lucide="camera"></i> Shoot Day — Our Proven On-Site System</div>
+                    <div class="ps-desc">They receive an automatic reminder 24 hours before. Our Media Specialist arrives and works through a proven four-stage shoot sequence — every time, without variation:</div>
+
+                    <div class="ps-substeps">
+                      <div class="ps-sub">
+                        <div class="ps-sub-num">A</div>
+                        <div class="ps-sub-content">
+                          <div class="ps-sub-name">Floor Plan First</div>
+                          <div class="ps-sub-detail">AI-powered scan of the property — takes minutes, not hours. Most companies still draw these by hand.</div>
+                        </div>
+                      </div>
+                      <div class="ps-sub">
+                        <div class="ps-sub-num">B</div>
+                        <div class="ps-sub-content">
+                          <div class="ps-sub-name">Drone Second</div>
+                          <div class="ps-sub-detail">Low and high aerial shots, bird's-eye view, and a spotlight effect centred on the property.</div>
+                        </div>
+                      </div>
+                      <div class="ps-sub">
+                        <div class="ps-sub-num">C</div>
+                        <div class="ps-sub-content">
+                          <div class="ps-sub-name">Photography Third</div>
+                          <div class="ps-sub-detail">Interior and exterior shots — magazine-quality, professionally lit. Every key room, every angle.</div>
+                        </div>
+                      </div>
+                      <div class="ps-sub">
+                        <div class="ps-sub-num">D</div>
+                        <div class="ps-sub-content">
+                          <div class="ps-sub-name">Video Last</div>
+                          <div class="ps-sub-detail">Full walkthrough capturing the space, key selling points, and the lifestyle. Agent can record a talking intro and outro — we film it on the day.</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="ps-highlight">We sell the <strong>lifestyle</strong>, not just the walls. Every video is built to do that.</div>
+                  </div>
+                </div>
+
+                <!-- Step 4: Edit & QC -->
+                <div class="process-step">
+                  <div class="ps-num">4</div>
+                  <div class="ps-body">
+                    <div class="ps-title"><i data-lucide="sliders"></i> Editing & Prestige Quality Control</div>
+                    <div class="ps-desc">Their client portal shows live progress updates throughout editing — they always know where their content is. Before anything is sent, a dedicated member of our team reviews every single piece:</div>
+                    <div class="sf-grid" style="margin-top:8px">
+                      <div class="sf-mini">
+                        <div class="sf-mini-label"><i data-lucide="film"></i> Video checks</div>
+                        <ul>
+                          <li>Music selection and pacing</li>
+                          <li>Colour grading consistency</li>
+                          <li>Best angles featured prominently</li>
+                          <li>Optimised for social + portals</li>
+                        </ul>
+                      </div>
+                      <div class="sf-mini">
+                        <div class="sf-mini-label"><i data-lucide="image"></i> Photo checks</div>
+                        <ul>
+                          <li>Exposure and white balance</li>
+                          <li>Composition and framing</li>
+                          <li>Consistent edit across all images</li>
+                          <li>No missed angles</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="ps-highlight">Nothing leaves Markeb without a human signing it off. <strong>This is our Prestige Quality Control standard.</strong></div>
+                    <div class="ps-desc" style="margin-top:8px">Once approved, the content is delivered as a clean download link — they access and download everything instantly, no login required.</div>
+                  </div>
+                </div>
+
+                <!-- Step 5: Amendments -->
+                <div class="process-step">
+                  <div class="ps-num">5</div>
+                  <div class="ps-body">
+                    <div class="ps-title"><i data-lucide="refresh-cw"></i> Amendments — Sorted Within 24 Hours</div>
+                    <div class="ps-desc">If they want anything changed, they submit an amendment request directly through their dashboard. Our team gets it back to them — usually within 24 hours. They receive progress updates throughout. No chasing, no emails lost in inboxes.</div>
+                    <div class="ps-badge"><i data-lucide="clock"></i> Typical turnaround: under 24 hours</div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="process-close-line">
+                <i data-lucide="zap"></i>
+                <span>Close line: "This is the process every single client goes through — from first booking to final delivery. No other company in the region offers this."</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ★ END PROCESS ★ -->
+
         <div class="sf-step">
           <div class="sf-icon" style="background:var(--c-win)"><i data-lucide="laptop"></i></div>
           <div class="sf-body">
@@ -577,14 +744,14 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
       </div>
     </div>
 
-    <!-- Stage 4: Meeting -->
+    <!-- Stage 4: Meeting — UPDATED WITH PROCESS -->
     <div class="section-card">
       <div class="roles">
         <span class="role role-hoo"><i data-lucide="briefcase"></i> Head of Operations</span>
         <span class="role role-spec"><i data-lucide="camera"></i> Media Specialist</span>
       </div>
       <div class="sc-title"><i data-lucide="users"></i> Stage 4 — The meeting</div>
-      <div class="sc-sub">Specialist and HoO attend together. HoO leads commercially. Specialist walks through the dashboard and services.</div>
+      <div class="sc-sub">Specialist and HoO attend together. HoO leads commercially. Specialist walks through the dashboard and our full 5-step process — this is what closes the room.</div>
 
       <div class="step-flow">
         <div class="sf-step">
@@ -594,13 +761,111 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
             <div class="sf-text">Consistent service across all branches · Monthly billing and invoicing · Volume agreements · Dedicated account management</div>
           </div>
         </div>
+
         <div class="sf-step">
           <div class="sf-icon" style="background:var(--c-spec)"><i data-lucide="laptop"></i></div>
           <div class="sf-body">
-            <div class="sf-title">Specialist: Walk through the dashboard live — sign them up</div>
-            <div class="sf-text">Show content tracking, amendment requests, booking system. Sign up before they leave.</div>
+            <div class="sf-title">Specialist: Walk through the dashboard live — then the process</div>
+            <div class="sf-text">Show the client portal, content tracking, booking system, and amendment requests. Then take the room through exactly what happens once they place their first booking. Use the Silver Package as the example.</div>
+
+            <!-- ★ NEW: THE 5-STEP PROCESS ★ -->
+            <div class="process-showcase">
+              <div class="process-showcase-header">
+                <i data-lucide="layers"></i>
+                <div>
+                  <div class="process-showcase-title">Walk them through the 5-step process — Silver Package as the example</div>
+                  <div class="process-showcase-sub">This is where the room tilts. No competitor can match what they're about to see.</div>
+                </div>
+              </div>
+
+              <div class="process-steps">
+
+                <div class="process-step">
+                  <div class="ps-num">1</div>
+                  <div class="ps-body">
+                    <div class="ps-title"><i data-lucide="user-plus"></i> Sign Up — Dashboard Access from Day One</div>
+                    <div class="ps-desc">Every agent across their branches signs up to the client dashboard — a professional platform to manage bookings, track content delivery, and handle amendments. Full visibility, zero admin overhead for the director.</div>
+                    <div class="ps-badge"><i data-lucide="star"></i> No other property media company offers this</div>
+                  </div>
+                </div>
+
+                <div class="process-step">
+                  <div class="ps-num">2</div>
+                  <div class="ps-body">
+                    <div class="ps-title"><i data-lucide="calendar-check"></i> Booking — Agents Book Their Own Shoots</div>
+                    <div class="ps-desc">Each agent books directly through the system — service, property, date, time. Pay upfront or reserve now. No phone calls, no email chains, no director involvement needed per booking.</div>
+                  </div>
+                </div>
+
+                <div class="process-step">
+                  <div class="ps-num">3</div>
+                  <div class="ps-body">
+                    <div class="ps-title"><i data-lucide="camera"></i> Shoot Day — Proven Four-Stage System, Every Time</div>
+                    <div class="ps-desc">24-hour automatic shoot reminder. Our Specialist arrives and delivers the same four-stage sequence on every property — no variation, no missed steps:</div>
+                    <div class="ps-substeps">
+                      <div class="ps-sub">
+                        <div class="ps-sub-num">A</div>
+                        <div class="ps-sub-content">
+                          <div class="ps-sub-name">Floor Plan</div>
+                          <div class="ps-sub-detail">AI-powered scan — minutes to complete, not hours. Most competitors still draw these manually.</div>
+                        </div>
+                      </div>
+                      <div class="ps-sub">
+                        <div class="ps-sub-num">B</div>
+                        <div class="ps-sub-content">
+                          <div class="ps-sub-name">Drone</div>
+                          <div class="ps-sub-detail">Low and high aerials, bird's-eye view, spotlight effect focused on the property.</div>
+                        </div>
+                      </div>
+                      <div class="ps-sub">
+                        <div class="ps-sub-num">C</div>
+                        <div class="ps-sub-content">
+                          <div class="ps-sub-name">Photography</div>
+                          <div class="ps-sub-detail">Interior and exterior — magazine-quality, professionally lit. Every key room covered.</div>
+                        </div>
+                      </div>
+                      <div class="ps-sub">
+                        <div class="ps-sub-num">D</div>
+                        <div class="ps-sub-content">
+                          <div class="ps-sub-name">Video</div>
+                          <div class="ps-sub-detail">Full walkthrough capturing space, selling points, and lifestyle. Agent talking intro and outro available on request.</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="ps-highlight">Every piece of content is built to sell the <strong>lifestyle</strong> — not just the property. This is what gets listings noticed on Rightmove.</div>
+                  </div>
+                </div>
+
+                <div class="process-step">
+                  <div class="ps-num">4</div>
+                  <div class="ps-body">
+                    <div class="ps-title"><i data-lucide="sliders"></i> Editing & Prestige Quality Control</div>
+                    <div class="ps-desc">Live progress updates in the dashboard throughout editing. Before delivery, every piece goes through our Prestige Quality Control — a dedicated team member reviews music, colour grading, angles, and photo editing to our standard before anything is sent. Content arrives as a clean download link — instant access, no login needed.</div>
+                    <div class="ps-highlight"><strong>Prestige Quality Control:</strong> Human eyes on every piece of content, every time. This is the standard we hold every job to.</div>
+                  </div>
+                </div>
+
+                <div class="process-step">
+                  <div class="ps-num">5</div>
+                  <div class="ps-body">
+                    <div class="ps-title"><i data-lucide="refresh-cw"></i> Amendments — Back Within 24 Hours</div>
+                    <div class="ps-desc">Amendment requests go through the dashboard — no email chains, no chasing. Our team turns them around within 24 hours with progress updates throughout. For a branch network, this means consistent quality and zero operational friction for the director.</div>
+                    <div class="ps-badge"><i data-lucide="clock"></i> Typical amendment turnaround: under 24 hours</div>
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="process-close-line">
+                <i data-lucide="zap"></i>
+                <span>Close line: "This is how every single job runs — from the first booking to the last amendment. It's the same process, every time, for every branch."</span>
+              </div>
+            </div>
+            <!-- ★ END PROCESS ★ -->
+
           </div>
         </div>
+
         <div class="sf-step">
           <div class="sf-icon" style="background:var(--c-win)"><i data-lucide="camera"></i></div>
           <div class="sf-body">
