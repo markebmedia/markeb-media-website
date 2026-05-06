@@ -490,6 +490,7 @@
 
             /* Showcase */
             .shw-photos { grid-template-columns:1fr; }
+            .shw-photos .phc[style*="grid-column"] { grid-column:span 1 !important; }
 
             /* FAQ */
             .fi-q h3 { font-size:16px; }
@@ -835,7 +836,7 @@
                 <video autoplay muted loop playsinline preload="auto" src="/public/videos/Traditional English Home.mp4" style="width:100%;height:100%;object-fit:cover;display:block;"></video>
                 <div class="ph-lbl"><div class="ph-t">Traditional English Home</div><div class="ph-s">Yorkshire · Property Tour</div></div>
             </div>
-            <div class="phc" style="aspect-ratio:16/9;">
+            <div class="phc" style="aspect-ratio:16/9;grid-column:span 2;">
                 <video autoplay muted loop playsinline preload="auto" src="/public/videos/Rural Home.mp4" style="width:100%;height:100%;object-fit:cover;display:block;"></video>
                 <div class="ph-lbl"><div class="ph-t">Rural Home</div><div class="ph-s">Countryside · Property Tour</div></div>
             </div>
