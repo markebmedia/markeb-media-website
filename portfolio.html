@@ -1,687 +1,671 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Our Work — Markeb Media</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Markeb Media</title>
+    <meta name="description" content="Our portfolio of premium property photography, videography and drone work across the UK. See what Markeb Media delivers for estate agents and developers.">
+    <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@300;400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../public/images/Markeb Media Logo (2).PNG">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --brand:       #B46100;
+            --brand-light: #CC7A1A;
+            --brand-gold:  #D4940A;
+            --brand-pale:  rgba(180,97,0,0.07);
+            --brand-glow:  rgba(180,97,0,0.28);
+            --pine:        #3F4D1B;
+            --pine-mid:    #4a5920;
+            --pine-light:  rgba(63,77,27,0.08);
+            --cream:       #FDF3E2;
+            --cream-dark:  #F7E8CC;
+            --white:       #FFFFFF;
+            --ink:         #1C140A;
+            --ink-mid:     #5C4A2A;
+            --ink-soft:    #8A7050;
+            --ink-dim:     #B8A080;
+            --rule:        rgba(180,97,0,0.14);
+            --rule-strong: rgba(180,97,0,0.28);
+            --gold-line:   rgba(212,148,10,0.32);
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family:'Mukta',sans-serif; background:var(--cream); color:var(--ink); line-height:1.6; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+        body::before { content:''; position:fixed; inset:0; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E"); pointer-events:none; z-index:9000; }
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/lucide@latest"></script>
+        /* Reveal */
+        .reveal { opacity:0; transform:translateY(36px); transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1); }
+        .reveal.visible { opacity:1; transform:none; }
+        .reveal-l { opacity:0; transform:translateX(-36px); transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1); }
+        .reveal-l.visible { opacity:1; transform:none; }
+        .reveal-r { opacity:0; transform:translateX(36px); transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1); }
+        .reveal-r.visible { opacity:1; transform:none; }
 
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        /* Ornamental rule */
+        .orn { display:flex; align-items:center; gap:14px; margin-bottom:24px; }
+        .orn-line { flex:1; height:1px; background:linear-gradient(to right,transparent,var(--gold-line)); }
+        .orn-line.rev { background:linear-gradient(to left,transparent,var(--gold-line)); }
+        .orn-line.short { max-width:40px; flex:none; }
+        .orn-dia { width:6px; height:6px; background:var(--brand-gold); transform:rotate(45deg); flex-shrink:0; opacity:.65; }
+        .orn-txt { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:12px; color:var(--brand-gold); letter-spacing:.18em; text-transform:uppercase; white-space:nowrap; }
 
-    :root {
-      --ink:        #3F4D1B;
-      --ink-soft:   #6b7c2e;
-      --blue:       #B46100;
-      --blue-light: #cc7a1a;
-      --blue-pale:  #fff8ee;
-      --blue-deep:  #8a4a00;
-      --gold:       #B46100;
-      --white:      #FDF3E2;
-      --off:        #f7ead5;
-      --border:     #e8d9be;
-      --font-serif: 'Playfair Display', Georgia, serif;
-      --font-sans:  'DM Sans', sans-serif;
-      --ease:       cubic-bezier(0.16, 1, 0.3, 1);
-    }
+        /* Section label */
+        .s-lbl { font-family:'Mukta',sans-serif; font-size:11px; font-weight:600; color:var(--brand); text-transform:uppercase; letter-spacing:.22em; display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+        .s-lbl::before { content:''; width:22px; height:1px; background:var(--brand); flex-shrink:0; }
 
-    html { scroll-behavior: smooth; }
-    body { font-family: var(--font-sans); background: var(--white); color: var(--ink); line-height: 1.6; overflow-x: hidden; }
+        /* Headings */
+        .dh { font-family:'Cormorant Garamond',serif; font-size:clamp(36px,5.5vw,70px); font-weight:600; line-height:1.0; letter-spacing:-.5px; color:var(--ink); }
+        .dh em { font-style:italic; color:var(--brand); }
+        .dh-w { color:#fff; }
+        .dh-w em { color:var(--brand-light); }
 
-    /* ── SPLASH ── */
-    #mm-splash {
-      position: fixed; inset: 0; z-index: 99999;
-      background: #3F4D1B;
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column; overflow: hidden;
-    }
-    #mm-splash.hiding { animation: splashOut 0.9s cubic-bezier(0.76,0,0.24,1) forwards; }
-    @keyframes splashOut { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:scale(1.06); } }
-    .mm-orb { position:absolute; border-radius:50%; background:radial-gradient(circle,rgba(180,97,0,0.22) 0%,transparent 70%); pointer-events:none; }
-    .mm-inner { position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; }
-    .mm-pre { font-family:var(--font-sans); font-size:11px; font-weight:600; letter-spacing:4px; text-transform:uppercase; color:#B46100; margin-bottom:18px; opacity:0; animation:fadeUp 0.7s 0.3s ease forwards; }
-    .mm-logo-wrap { opacity:0; animation:fadeUp 0.7s 0.55s ease forwards; margin-bottom:28px; }
-    .mm-wordmark { font-family:var(--font-serif); font-size:clamp(32px,5vw,58px); font-weight:700; letter-spacing:-0.02em; color:#FDF3E2; line-height:1; }
-    .mm-wordmark span { color:#B46100; font-style:italic; }
-    .mm-sub { font-family:var(--font-sans); font-size:13px; font-weight:400; letter-spacing:2.5px; text-transform:uppercase; color:rgba(253,243,226,0.45); margin-top:10px; text-align:center; opacity:0; animation:fadeUp 0.7s 0.75s ease forwards; }
-    .mm-divider { width:48px; height:1px; background:#B46100; margin:28px auto; opacity:0; animation:expandLine 0.6s 0.9s ease forwards; transform-origin:center; }
-    @keyframes expandLine { from { opacity:0; transform:scaleX(0); } to { opacity:1; transform:scaleX(1); } }
-    .mm-tagline { font-family:var(--font-serif); font-size:clamp(14px,2vw,18px); font-style:italic; color:rgba(253,243,226,0.6); text-align:center; opacity:0; animation:fadeUp 0.7s 1.05s ease forwards; }
-    .mm-enter { margin-top:44px; display:inline-flex; align-items:center; gap:10px; padding:14px 32px; background:transparent; border:1px solid rgba(180,97,0,0.6); border-radius:4px; font-family:var(--font-sans); font-size:12px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:#FDF3E2; cursor:pointer; opacity:0; animation:fadeUp 0.7s 1.3s ease forwards; transition:background .25s,border-color .25s; }
-    .mm-enter:hover { background:rgba(180,97,0,0.15); border-color:#B46100; }
-    .mm-enter-arrow { width:16px; height:1px; background:#B46100; position:relative; display:inline-block; transition:width .25s; }
-    .mm-enter:hover .mm-enter-arrow { width:22px; }
-    .mm-enter-arrow::after { content:''; position:absolute; right:0; top:-3px; width:6px; height:6px; border-right:1px solid #B46100; border-bottom:1px solid #B46100; transform:rotate(-45deg); }
-    .mm-corner { position:absolute; width:28px; height:28px; border-color:rgba(180,97,0,0.4); border-style:solid; opacity:0; animation:fadeIn 0.6s 1.1s ease forwards; }
-    .mm-corner.tl { top:32px; left:32px; border-width:1px 0 0 1px; }
-    .mm-corner.tr { top:32px; right:32px; border-width:1px 1px 0 0; }
-    .mm-corner.bl { bottom:32px; left:32px; border-width:0 0 1px 1px; }
-    .mm-corner.br { bottom:32px; right:32px; border-width:0 1px 1px 0; }
+        /* Body */
+        .bl { font-size:16px; font-weight:300; color:var(--ink-mid); line-height:1.75; max-width:520px; }
 
-    /* ── HEADER ── */
-    header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 48px; height: 68px;
-      border-bottom: 1px solid var(--border);
-      background: var(--white);
-      position: sticky; top: 0; z-index: 100;
-    }
-    .header-logo img { height: 44px; width: auto; display: block; }
-    .btn-book {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 10px 20px; background: var(--blue); color: var(--white);
-      border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none;
-      transition: background .2s, transform .15s;
-    }
-    .btn-book:hover { background: var(--blue-deep); transform: translateY(-1px); }
+        /* Buttons */
+        .btn-p { display:inline-block; background:var(--brand); color:#fff; padding:14px 36px; border-radius:3px; font-family:'Mukta',sans-serif; font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; text-decoration:none; transition:all .3s; box-shadow:0 8px 32px var(--brand-glow); position:relative; overflow:hidden; }
+        .btn-p::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,.12) 0%,transparent 60%); }
+        .btn-p:hover { background:var(--brand-light); transform:translateY(-2px); box-shadow:0 12px 40px var(--brand-glow); color:#fff; }
+        .btn-g { display:inline-flex; align-items:center; gap:10px; color:rgba(255,255,255,.7); font-family:'Mukta',sans-serif; font-size:12px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; text-decoration:none; transition:all .2s; }
+        .btn-g::after { content:''; width:28px; height:1px; background:rgba(255,255,255,.4); transition:width .3s; }
+        .btn-g:hover { color:#fff; }
+        .btn-g:hover::after { width:44px; background:var(--brand-light); }
+        .btn-o { display:inline-block; color:var(--ink-mid); padding:14px 36px; border-radius:3px; font-family:'Mukta',sans-serif; font-size:12px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; text-decoration:none; border:1px solid var(--rule-strong); transition:all .3s; }
+        .btn-o:hover { border-color:var(--brand); color:var(--brand); }
 
-    /* ── INTRO ── */
-    .intro-bar { padding: 40px 48px 0; max-width: 620px; }
-    .intro-label { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
-    .intro-title { font-family: var(--font-serif); font-size: clamp(26px, 3.2vw, 40px); font-weight: 700; color: var(--ink); line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 12px; }
-    .intro-title em { font-style: italic; color: var(--blue); }
-    .intro-desc { font-size: 15px; color: var(--ink-soft); line-height: 1.7; }
+        /* Header */
+        .site-header { position:fixed; top:0;left:0;right:0; z-index:500; height:74px; padding:0 52px; display:flex; align-items:center; justify-content:space-between; transition:all .5s cubic-bezier(.16,1,.3,1); background:rgba(253,243,226,.96); backdrop-filter:blur(20px); border-bottom:1px solid var(--rule); box-shadow:0 4px 40px rgba(63,77,27,.08); height:66px; }
+        #headerLogo { opacity:1; height:40px; width:auto; }
+        .hn { display:flex; align-items:center; gap:12px; }
+        .hn-a { font-family:'Mukta',sans-serif; font-size:11px; font-weight:600; letter-spacing:.15em; text-transform:uppercase; text-decoration:none; padding:10px 20px; border-radius:3px; border:1px solid var(--rule-strong); color:var(--ink-mid); background:transparent; transition:all .4s; }
+        .hn-a.pp { background:var(--brand); border-color:transparent; color:#fff; box-shadow:0 4px 20px var(--brand-glow); }
+        .hn-a:hover { transform:translateY(-1px); }
+        .hn-a.pp:hover { background:var(--brand-light); }
+        .hn-a.active { color:var(--brand); border-color:var(--rule-strong); }
 
-    /* ── TABS ── */
-    .tabs {
-      display: flex; align-items: center; padding: 0 48px;
-      margin-top: 32px; border-bottom: 1px solid var(--border);
-      overflow-x: auto; scrollbar-width: none;
-    }
-    .tabs::-webkit-scrollbar { display: none; }
-    .tab {
-      flex-shrink: 0; padding: 14px 20px;
-      font-family: var(--font-sans); font-size: 14px; font-weight: 500;
-      color: var(--ink-soft); background: none; border: none;
-      border-bottom: 2px solid transparent; cursor: pointer;
-      transition: color .2s, border-color .2s; white-space: nowrap; margin-bottom: -1px;
-    }
-    .tab:hover { color: var(--ink); }
-    .tab.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
+        /* Hero — portfolio variant */
+        .port-hero { position:relative; height:72vh; min-height:520px; background:var(--pine); overflow:hidden; display:flex; align-items:flex-end; }
+        .port-hero-bg { position:absolute; inset:0; background:linear-gradient(145deg,var(--pine) 0%,rgba(63,77,27,.82) 40%,rgba(180,97,0,.22) 100%); z-index:0; }
+        .port-hero-grid { position:absolute; inset:0; background-image:linear-gradient(rgba(212,148,10,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(212,148,10,.04) 1px,transparent 1px); background-size:80px 80px; z-index:1; }
+        .port-hero-glow { position:absolute; top:0;right:0; width:600px;height:600px; background:radial-gradient(ellipse,rgba(180,97,0,.14) 0%,transparent 65%); z-index:1; pointer-events:none; }
+        .port-hero-lrule { position:absolute; left:52px; top:15%;bottom:80px; width:1px; background:linear-gradient(to bottom,transparent,var(--gold-line) 30%,var(--gold-line) 70%,transparent); z-index:3; }
+        .port-hero-c { position:relative; z-index:2; padding:0 76px 80px; }
+        .port-hero-badge { display:inline-flex; align-items:center; gap:12px; margin-bottom:28px; animation:fu .7s ease both; }
+        .port-hero-badge-line { width:32px; height:1px; background:var(--brand-light); }
+        .port-hero-badge-txt { font-family:'Cormorant Garamond',serif; font-size:14px; font-style:italic; color:rgba(255,255,255,.55); letter-spacing:.1em; }
+        .port-hero h1 { font-family:'Cormorant Garamond',serif; font-size:clamp(48px,7vw,88px); font-weight:600; line-height:.95; color:#fff; letter-spacing:-1px; animation:fu .7s .1s ease both; }
+        .port-hero h1 em { font-style:italic; display:block; background:linear-gradient(120deg,#FF8A33,#FFB97A,#D4940A); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .port-hero-rule { width:72px;height:1px; background:linear-gradient(to right,var(--brand),transparent); margin:22px 0; animation:fu .7s .15s ease both; }
+        .port-hero-sub { font-size:15px; font-weight:300; color:rgba(255,255,255,.52); max-width:440px; line-height:1.78; animation:fu .7s .2s ease both; }
+        @keyframes fu { from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)} }
 
-    /* ── SECTIONS ── */
-    .grid-section { padding: 48px 48px 72px; }
+        /* Filter bar */
+        .filter-bar { background:var(--white); border-bottom:1px solid var(--rule); position:sticky; top:66px; z-index:100; }
+        .filter-bar-in { max-width:1100px; margin:0 auto; padding:0 56px; display:flex; align-items:center; gap:0; overflow-x:auto; scrollbar-width:none; }
+        .filter-bar-in::-webkit-scrollbar { display:none; }
+        .fb-btn { font-family:'Mukta',sans-serif; font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-dim); padding:18px 22px; border:none; background:none; cursor:pointer; white-space:nowrap; transition:all .2s; border-bottom:2px solid transparent; position:relative; }
+        .fb-btn:hover { color:var(--ink-mid); }
+        .fb-btn.active { color:var(--brand); border-bottom-color:var(--brand); }
 
-    .portfolio-section { margin-bottom: 64px; }
-    .portfolio-section:last-child { margin-bottom: 0; }
+        /* Stats strip */
+        .stats-strip { background:var(--pine); padding:48px 56px; position:relative; overflow:hidden; }
+        .stats-strip::before { content:''; position:absolute; top:0;left:0;right:0; height:1px; background:linear-gradient(to right,transparent,var(--gold-line),transparent); }
+        .stats-strip::after { content:''; position:absolute; bottom:0;left:0;right:0; height:1px; background:linear-gradient(to right,transparent,var(--gold-line),transparent); }
+        .stats-in { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); }
+        .stat-c { padding:12px 28px; text-align:center; border-right:1px solid rgba(255,255,255,.06); }
+        .stat-c:last-child { border-right:none; }
+        .stat-n { font-family:'Cormorant Garamond',serif; font-size:52px; font-weight:600; color:#fff; line-height:1; }
+        .stat-n sup { font-size:20px; color:var(--brand-light); vertical-align:super; }
+        .stat-d { font-size:11px; color:rgba(255,255,255,.42); text-transform:uppercase; letter-spacing:.14em; margin-top:8px; line-height:1.6; }
 
-    /* Section header */
-    .sec-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
-    .sec-header-line { flex: 1; height: 1px; background: var(--border); }
-    .sec-header-label { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-    .sec-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .sec-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-soft); white-space: nowrap; }
-    .sec-count { font-size: 11px; color: var(--ink-soft); background: var(--off); border: 1px solid var(--border); border-radius: 20px; padding: 1px 8px; margin-left: 4px; }
+        /* Grid section */
+        .grid-section { padding:96px 56px; }
+        .grid-section.alt { background:var(--white); }
+        .grid-section-in { max-width:1100px; margin:0 auto; }
+        .section-head { display:grid; grid-template-columns:1fr auto; align-items:end; gap:48px; margin-bottom:52px; }
+        .section-head-r { text-align:right; }
 
-    /* ── GRID ── */
-    .portfolio-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 10px; }
+        /* Masonry-style photo grid */
+        .photo-grid { display:grid; gap:14px; }
+        .photo-grid.cols-2 { grid-template-columns:1fr 1fr; }
+        .photo-grid.cols-3 { grid-template-columns:1fr 1fr 1fr; }
+        .photo-grid.mixed { grid-template-columns:1.6fr 1fr; }
+        .photo-grid.mixed-r { grid-template-columns:1fr 1.6fr; }
 
-    .p-item { position: relative; overflow: hidden; border-radius: 10px; cursor: pointer; background: var(--off); }
-    .p-item.hidden { display: none; }
+        .pgc { position:relative; overflow:hidden; border:1px solid rgba(180,97,0,.1); background:var(--pine); }
+        .pgc.tall { aspect-ratio:3/4; }
+        .pgc.wide { aspect-ratio:16/9; }
+        .pgc.sq { aspect-ratio:1/1; }
+        .pgc.std { aspect-ratio:4/3; }
+        .pgc img { width:100%;height:100%; object-fit:cover; display:block; transition:transform .8s cubic-bezier(.16,1,.3,1),opacity .4s; opacity:.92; }
+        .pgc:hover img { transform:scale(1.06); opacity:1; }
+        .pgc-lbl { position:absolute; bottom:0;left:0;right:0; padding:32px 24px 22px; background:linear-gradient(to top,rgba(8,6,3,.9) 0%,rgba(8,6,3,.5) 50%,transparent 100%); transform:translateY(8px); transition:transform .4s cubic-bezier(.16,1,.3,1); }
+        .pgc:hover .pgc-lbl { transform:translateY(0); }
+        .pgc-tag { font-size:9px; font-weight:700; color:var(--brand-light); text-transform:uppercase; letter-spacing:.2em; border:1px solid rgba(180,97,0,.4); padding:3px 8px; display:inline-block; margin-bottom:8px; }
+        .pgc-t { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; color:#fff; margin-bottom:3px; line-height:1.2; }
+        .pgc-s { font-size:10px; color:rgba(255,255,255,.44); letter-spacing:.12em; text-transform:uppercase; }
+        .pgc-ov { position:absolute; top:16px;right:16px; width:34px;height:34px; background:rgba(180,97,0,.8); display:flex;align-items:center;justify-content:center; opacity:0; transition:opacity .3s; border:1px solid rgba(255,255,255,.2); }
+        .pgc:hover .pgc-ov { opacity:1; }
 
-    .p-item.s8   { grid-column: span 8;  aspect-ratio: 16/9; }
-    .p-item.s4t  { grid-column: span 4;  aspect-ratio: 3/4; }
-    .p-item.s4   { grid-column: span 4;  aspect-ratio: 4/3; }
-    .p-item.s6   { grid-column: span 6;  aspect-ratio: 4/3; }
-    .p-item.s12  { grid-column: span 12; aspect-ratio: 21/7; }
-    .p-item.s3   { grid-column: span 3;  aspect-ratio: 4/3; }
+        /* Video grid */
+        .video-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+        .vc-wrap { position:relative; overflow:hidden; border:1px solid rgba(180,97,0,.1); background:#080603; }
+        .vc-wrap.featured { grid-column:span 2; }
+        .vc-wrap video { width:100%;height:100%; object-fit:cover; display:block; }
+        .vc-wrap.featured video { aspect-ratio:16/9; }
+        .vc-wrap:not(.featured) { aspect-ratio:16/9; }
+        .vc-lbl { position:absolute; bottom:0;left:0;right:0; padding:32px 24px 22px; background:linear-gradient(to top,rgba(8,6,3,.92),transparent); }
+        .vc-tag { font-size:9px; font-weight:700; color:var(--brand-light); text-transform:uppercase; letter-spacing:.2em; border:1px solid rgba(180,97,0,.4); padding:3px 8px; display:inline-block; margin-bottom:8px; }
+        .vc-t { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:#fff; margin-bottom:3px; }
+        .vc-s { font-size:10px; color:rgba(255,255,255,.44); letter-spacing:.12em; text-transform:uppercase; }
+        .play-btn { position:absolute; top:50%;left:50%; transform:translate(-50%,-50%); width:56px;height:56px; background:rgba(180,97,0,.85); border:1px solid rgba(255,255,255,.3); display:flex;align-items:center;justify-content:center; transition:all .3s; cursor:pointer; }
+        .play-btn:hover { background:var(--brand); transform:translate(-50%,-50%) scale(1.1); }
+        .vc-wrap:hover .play-btn { opacity:1; }
 
-    .p-item img  { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .55s var(--ease); }
-    .p-item:hover img  { transform: scale(1.04); }
+        /* Drone section dark */
+        .drone-sec { background:var(--pine); padding:96px 56px; position:relative; overflow:hidden; }
+        .drone-sec::before { content:''; position:absolute; top:0;left:0;right:0; height:1px; background:linear-gradient(to right,transparent,var(--gold-line),transparent); }
+        .drone-in { max-width:1100px; margin:0 auto; }
+        .drone-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-top:52px; }
+        .drone-grid .pgc.wide { aspect-ratio:3/2; }
 
-    .p-ov {
-      position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(12,30,60,0.82) 0%, rgba(12,30,60,0.12) 55%, transparent 100%);
-      opacity: 0; transition: opacity .3s ease;
-      display: flex; flex-direction: column; justify-content: flex-end; padding: 20px;
-      z-index: 3;
-    }
-    .p-item:hover .p-ov { opacity: 1; }
+        /* Testimonial band */
+        .tband { background:var(--cream-dark); padding:72px 56px; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); position:relative; }
+        .tband::before { content:''; position:absolute; top:0;left:0;right:0; height:1px; background:linear-gradient(to right,transparent,var(--gold-line),transparent); }
+        .tband-in { max-width:900px; margin:0 auto; text-align:center; }
+        .tband-quote { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(20px,2.5vw,28px); color:var(--pine); line-height:1.65; margin-bottom:28px; }
+        .tband-mark { font-size:72px; color:var(--brand); line-height:.6; margin-bottom:20px; font-family:'Cormorant Garamond',serif; font-style:normal; opacity:.5; }
+        .tband-attr { display:inline-flex; align-items:center; gap:14px; }
+        .tband-line { width:28px;height:1px; background:var(--brand); }
+        .tband-name { font-family:'Mukta',sans-serif; font-size:11px; font-weight:700; color:var(--brand); text-transform:uppercase; letter-spacing:.18em; }
 
-    .p-tag { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; width: fit-content; background: var(--gold); color: var(--ink); }
-    .p-cap { font-family: var(--font-serif); font-size: 17px; font-weight: 600; color: var(--white); line-height: 1.25; }
+        /* CTA strip */
+        .port-cta { padding:120px 56px; background:var(--cream); text-align:center; position:relative; overflow:hidden; }
+        .port-cta::before { content:''; position:absolute; top:50%;left:50%; transform:translate(-50%,-50%); width:680px;height:680px; background:radial-gradient(ellipse,rgba(180,97,0,.08) 0%,transparent 70%); }
+        .cta-row { display:flex;justify-content:center;gap:14px;flex-wrap:wrap;position:relative; margin-top:36px; }
+        .tr-row { margin-top:36px;position:relative; display:inline-flex;align-items:center;gap:18px; flex-wrap:wrap;justify-content:center; }
+        .tr-row span { font-size:10px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.14em; }
+        .tr-sep { width:1px;height:12px; background:var(--rule-strong); }
 
-    .p-item video { width: 100%; height: 100%; object-fit: cover; display: block; background: var(--off); }
-    .play-btn {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      width: 56px; height: 56px;
-      background: rgba(255,255,255,0.92);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      transition: transform .2s, background .2s;
-      z-index: 2; pointer-events: none;
-    }
-    .p-item:hover .play-btn { transform: translate(-50%,-50%) scale(1.1); background: white; }
-    .play-btn svg { margin-left: 4px; }
+        /* Contact footer */
+        .contact { background:var(--pine); padding:100px 56px; position:relative; overflow:hidden; }
+        .contact::before { content:''; position:absolute; top:0;left:0;right:0; height:1px; background:linear-gradient(to right,transparent,var(--gold-line),transparent); }
+        .contact-in { max-width:1100px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; }
+        .contact-left h2 { font-family:'Cormorant Garamond',serif; font-size:clamp(36px,4.5vw,58px); font-weight:600; color:#fff; line-height:1.05; letter-spacing:-.5px; margin-bottom:18px; }
+        .contact-left h2 em { font-style:italic; color:var(--brand-light); }
+        .contact-left p { font-size:15px; color:rgba(255,255,255,.48); line-height:1.78; font-weight:300; max-width:380px; margin-bottom:36px; }
+        .contact-details { display:flex; flex-direction:column; gap:18px; }
+        .cd { display:flex; align-items:center; gap:14px; }
+        .cd-ic { width:36px; height:36px; border:1px solid rgba(180,97,0,.3); display:flex; align-items:center; justify-content:center; color:var(--brand-light); flex-shrink:0; }
+        .cd-txt a,.cd-txt span { font-size:14px; color:rgba(255,255,255,.65); text-decoration:none; transition:color .2s; font-weight:300; }
+        .cd-txt a:hover { color:#fff; }
+        .cd-lbl { font-size:10px; color:rgba(255,255,255,.3); text-transform:uppercase; letter-spacing:.14em; margin-bottom:2px; }
+        .contact-form-wrap { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07); padding:44px; position:relative; }
+        .contact-form-wrap::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:linear-gradient(90deg,var(--brand),var(--brand-light)); }
+        .contact-form-wrap::after { content:''; position:absolute; bottom:0;right:0; width:48px;height:48px; border-bottom:1px solid var(--gold-line); border-right:1px solid var(--gold-line); }
+        .cf-title { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:#fff; margin-bottom:6px; }
+        .cf-sub { font-size:13px; color:rgba(255,255,255,.38); margin-bottom:28px; font-weight:300; }
+        .cf-input { width:100%; padding:13px 16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); font-size:14px; font-family:'Mukta',sans-serif; color:#fff; margin-bottom:10px; transition:border-color .2s,box-shadow .2s; }
+        .cf-input:focus { outline:none; border-color:rgba(180,97,0,.5); box-shadow:inset 2px 0 0 var(--brand); }
+        .cf-input::placeholder { color:rgba(255,255,255,.22); }
+        .cf-textarea { width:100%; padding:13px 16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); font-size:14px; font-family:'Mukta',sans-serif; color:#fff; margin-bottom:10px; resize:vertical; min-height:110px; transition:border-color .2s,box-shadow .2s; }
+        .cf-textarea:focus { outline:none; border-color:rgba(180,97,0,.5); box-shadow:inset 2px 0 0 var(--brand); }
+        .cf-textarea::placeholder { color:rgba(255,255,255,.22); }
+        .cf-btn { width:100%; padding:14px; background:var(--brand); color:#fff; border:none; font-family:'Mukta',sans-serif; font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; cursor:pointer; transition:all .2s; box-shadow:0 6px 24px rgba(180,97,0,.3); margin-top:6px; }
+        .cf-btn:hover { background:var(--brand-light); transform:translateY(-2px); }
+        .cf-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+        .cf-success { display:none; text-align:center; padding:32px; }
+        .cf-success.on { display:block; }
+        .cf-success-icon { font-family:'Cormorant Garamond',serif; font-size:48px; color:var(--brand-light); margin-bottom:12px; }
+        .cf-success p { font-size:14px; color:rgba(255,255,255,.55); font-weight:300; line-height:1.7; }
 
-    /* ── LIGHTBOX ── */
-    .lightbox { display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(5,10,20,0.97); align-items: center; justify-content: center; padding: 24px; }
-    .lightbox.active { display: flex; animation: fadeIn .18s ease; }
-    .lb-inner { position: relative; max-width: 1200px; width: 100%; animation: lbIn .28s var(--ease); }
-    .lb-img { width: 100%; max-height: 82vh; object-fit: contain; border-radius: 6px; display: block; }
-    .lb-video { width: 100%; max-height: 82vh; border-radius: 6px; display: block; background: #000; }
-    .lb-close { position: absolute; top: -46px; right: 0; width: 36px; height: 36px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 50%; color: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; }
-    .lb-close:hover { background: rgba(255,255,255,0.18); }
-    .lb-foot { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-    .lb-cap { font-family: var(--font-serif); font-size: 18px; color: white; }
-    .lb-count { font-size: 12px; color: rgba(255,255,255,0.38); }
-    .lb-nav { display: flex; gap: 8px; }
-    .lb-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; font-size: 16px; }
-    .lb-btn:hover { background: var(--blue); border-color: var(--blue); }
+        /* Footer */
+        .site-footer { background:var(--ink); padding:28px 56px; display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(255,255,255,.05); }
+        .sf-copy { font-size:11px; color:rgba(255,255,255,.4); letter-spacing:.08em; }
 
-    /* ── BOOKING STRIP ── */
-    .book-strip {
-      margin: 0 48px 72px;
-      background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%);
-      border-radius: 14px; padding: 36px 44px;
-      display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap;
-      position: relative; overflow: hidden;
-    }
-    .book-strip::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 50% 100% at 80% 50%, rgba(37,99,235,0.22) 0%, transparent 65%); }
-    .book-strip > * { position: relative; z-index: 1; }
-    .bs-text h3 { font-family: var(--font-serif); font-size: clamp(20px, 2.5vw, 28px); font-weight: 700; color: var(--white); margin-bottom: 4px; }
-    .bs-text p { font-size: 14px; color: rgba(255,255,255,0.55); }
-    .bs-btns { display: flex; gap: 12px; flex-wrap: wrap; flex-shrink: 0; }
-    .bs-primary { padding: 13px 26px; background: var(--blue); color: white; border-radius: 8px; font-size: 15px; font-weight: 600; text-decoration: none; transition: background .2s, transform .15s; white-space: nowrap; display: inline-block; }
-    .bs-primary:hover { background: var(--blue-light); transform: translateY(-1px); }
-    .bs-secondary { padding: 13px 26px; background: transparent; color: white; border-radius: 8px; font-size: 15px; font-weight: 500; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.2); transition: border-color .2s; white-space: nowrap; display: inline-block; }
-    .bs-secondary:hover { border-color: rgba(255,255,255,0.5); }
+        /* Lightbox */
+        .lb { position:fixed; inset:0; background:rgba(8,6,3,.97); z-index:9999; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity .3s; }
+        .lb.on { opacity:1; pointer-events:all; }
+        .lb-img { max-width:90vw; max-height:88vh; object-fit:contain; border:1px solid rgba(255,255,255,.08); }
+        .lb-close { position:absolute; top:24px;right:32px; color:rgba(255,255,255,.5); cursor:pointer; transition:color .2s; font-size:28px; font-family:'Cormorant Garamond',serif; line-height:1; }
+        .lb-close:hover { color:#fff; }
+        .lb-caption { position:absolute; bottom:32px;left:50%; transform:translateX(-50%); text-align:center; }
+        .lb-caption-t { font-family:'Cormorant Garamond',serif; font-size:18px; color:#fff; }
+        .lb-caption-s { font-size:11px; color:rgba(255,255,255,.38); letter-spacing:.14em; text-transform:uppercase; margin-top:4px; }
+        .lb-prev,.lb-next { position:absolute; top:50%;transform:translateY(-50%); color:rgba(255,255,255,.4); cursor:pointer; padding:20px; transition:color .2s; }
+        .lb-prev { left:16px; }
+        .lb-next { right:16px; }
+        .lb-prev:hover,.lb-next:hover { color:#fff; }
 
-    /* ── ANIMATIONS ── */
-    @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes lbIn    { from { opacity: 0; transform: scale(0.95) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-    @keyframes spin    { to { transform: rotate(360deg); } }
-    @keyframes fadeUp  { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        /* Services preview */
+        .svc-preview { padding:96px 56px; background:var(--white); }
+        .svc-preview-in { max-width:1100px; margin:0 auto; }
+        .svc-row { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:52px; }
+        .svc-c { border:1px solid var(--rule); padding:34px 28px; position:relative; overflow:hidden; transition:all .35s cubic-bezier(.16,1,.3,1); background:var(--cream); }
+        .svc-c::before { content:''; position:absolute; top:0;left:0;bottom:0; width:2px; background:linear-gradient(to bottom,var(--brand),var(--brand-light)); opacity:0; transition:opacity .3s; }
+        .svc-c:hover { transform:translateY(-5px); border-color:var(--rule-strong); box-shadow:0 20px 56px rgba(180,97,0,.1); }
+        .svc-c:hover::before { opacity:1; }
+        .svc-ic { width:40px;height:40px; border:1px solid var(--rule-strong); display:flex;align-items:center;justify-content:center; color:var(--brand); margin-bottom:16px; }
+        .svc-c h3 { font-family:'Cormorant Garamond',serif; font-size:21px; font-weight:600; color:var(--ink); margin-bottom:8px; }
+        .svc-c p { font-size:13px; color:var(--ink-mid); line-height:1.65; font-weight:300; }
 
-    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .55s var(--ease), transform .55s var(--ease); }
-    .reveal.in { opacity: 1; transform: translateY(0); }
-    .d1 { transition-delay: .07s; } .d2 { transition-delay: .14s; } .d3 { transition-delay: .21s; }
-
-    /* ── RESPONSIVE ── */
-    @media (pointer: coarse) {
-      .p-ov { opacity: 1; background: linear-gradient(to top, rgba(12,30,60,0.7) 0%, transparent 60%); }
-      .p-item:hover img { transform: none; }
-    }
-
-    @media (max-width: 1024px) {
-      header { padding: 0 24px; }
-      .intro-bar { padding: 32px 24px 0; }
-      .tabs { padding: 0 24px; }
-      .grid-section { padding: 32px 24px 56px; }
-      .book-strip { margin: 0 24px 56px; padding: 32px 32px; }
-      .p-item.s8  { grid-column: span 12; }
-      .p-item.s4t { grid-column: span 6; aspect-ratio: 4/3; }
-      .p-item.s3  { grid-column: span 6; }
-      .p-item.s12 { aspect-ratio: 16/6; }
-    }
-
-    @media (max-width: 768px) {
-      header { padding: 0 16px; height: 60px; }
-      .header-logo img { height: 36px; }
-      .btn-book { padding: 8px 14px; font-size: 13px; gap: 6px; }
-      .btn-book i { display: none; }
-      .intro-bar { padding: 24px 16px 0; max-width: 100%; }
-      .intro-title { font-size: clamp(22px, 6vw, 32px); }
-      .intro-desc { font-size: 14px; }
-      .tabs { padding: 0 16px; margin-top: 20px; -webkit-overflow-scrolling: touch; }
-      .tab { padding: 12px 14px; font-size: 13px; }
-      .grid-section { padding: 20px 16px 48px; }
-      .portfolio-section { margin-bottom: 40px; }
-      .portfolio-grid { gap: 8px; }
-      .p-item.s8, .p-item.s4t, .p-item.s4, .p-item.s6, .p-item.s12, .p-item.s3 { grid-column: span 12; aspect-ratio: 4/3; }
-      .book-strip { margin: 0 16px 48px; padding: 24px 20px; flex-direction: column; align-items: flex-start; gap: 20px; }
-      .bs-btns { width: 100%; flex-direction: column; gap: 10px; }
-      .bs-primary, .bs-secondary { width: 100%; text-align: center; padding: 14px 20px; }
-      .lightbox { padding: 16px; }
-      .lb-close { top: -40px; width: 32px; height: 32px; font-size: 16px; }
-      .lb-btn { width: 44px; height: 44px; font-size: 18px; }
-      .lb-cap { font-size: 15px; }
-      .lb-foot { flex-direction: column; align-items: flex-start; gap: 8px; }
-      .play-btn { width: 64px; height: 64px; }
-      .mm-corner { display: none; }
-    }
-
-    @media (max-width: 480px) {
-      .header-logo img { height: 30px; }
-      .btn-book { padding: 7px 12px; font-size: 12px; }
-      .intro-title { font-size: clamp(20px, 7vw, 28px); }
-      .tab { padding: 10px 12px; font-size: 12px; }
-      .portfolio-grid { gap: 6px; }
-      .p-item { border-radius: 8px; }
-      .p-cap { font-size: 14px; }
-      .book-strip { border-radius: 10px; }
-    }
-  </style>
+        /* ── RESPONSIVE ── */
+        @media(max-width:1024px) {
+            .contact-in { grid-template-columns:1fr; gap:44px; }
+            .drone-grid { grid-template-columns:1fr 1fr; }
+            .svc-row { grid-template-columns:1fr 1fr; }
+            .stats-in { grid-template-columns:repeat(2,1fr); }
+        }
+        @media(max-width:768px) {
+            .site-header { padding:0 16px; height:60px; }
+            #headerLogo { height:32px; }
+            .hn { gap:8px; }
+            .hn-a { padding:8px 12px; font-size:10px; }
+            .port-hero { height:auto; min-height:420px; }
+            .port-hero-c { padding:100px 20px 60px; }
+            .port-hero-lrule { display:none; }
+            .port-hero h1 { font-size:clamp(40px,10vw,60px); }
+            .filter-bar-in { padding:0 20px; }
+            .stats-strip,.grid-section,.drone-sec,.tband,.port-cta,.svc-preview { padding:72px 20px; }
+            .contact { padding:72px 20px; }
+            .stats-in { grid-template-columns:repeat(2,1fr); gap:0; }
+            .photo-grid.cols-2,.photo-grid.cols-3,.photo-grid.mixed,.photo-grid.mixed-r { grid-template-columns:1fr; }
+            .video-grid { grid-template-columns:1fr; }
+            .vc-wrap.featured { grid-column:span 1; }
+            .drone-grid { grid-template-columns:1fr; }
+            .svc-row { grid-template-columns:1fr; }
+            .section-head { grid-template-columns:1fr; gap:18px; }
+            .section-head-r { text-align:left; }
+            .contact-in { grid-template-columns:1fr; gap:36px; }
+            .contact-form-wrap { padding:28px 20px; }
+            .cf-input,.cf-textarea { font-size:16px; }
+            .site-footer { flex-direction:column; gap:10px; padding:24px 20px; text-align:center; }
+            .cta-row { flex-direction:column; align-items:center; }
+            .cta-row .btn-p,.cta-row .btn-o { width:100%; text-align:center; }
+            .tr-sep { display:none; }
+        }
+        @media(max-width:480px) {
+            .hn-a#headerHome { display:none; }
+            .stats-in { grid-template-columns:1fr 1fr; }
+            .stat-n { font-size:40px; }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- WELCOME SPLASH -->
-  <div id="mm-splash">
-    <div class="mm-corner tl"></div>
-    <div class="mm-corner tr"></div>
-    <div class="mm-corner bl"></div>
-    <div class="mm-corner br"></div>
-    <div class="mm-orb" style="width:500px;height:500px;top:-100px;right:-100px;"></div>
-    <div class="mm-orb" style="width:400px;height:400px;bottom:-80px;left:-80px;"></div>
-    <div class="mm-inner">
-      <div class="mm-pre">Welcome to</div>
-      <div class="mm-logo-wrap">
-        <img src="/public/images/Markeb Media.PNG" alt="Markeb Media" style="height:72px;width:auto;display:block;" />
-      </div>
-      <div class="mm-sub">Property Marketing &mdash; Est. 2024</div>
-      <div class="mm-divider"></div>
-      <div class="mm-tagline">Photography &middot; Videography &middot; Drone</div>
-      <button class="mm-enter" id="mm-enter-btn">
-        View Our Work
-        <span class="mm-enter-arrow"></span>
-      </button>
+<!-- HEADER -->
+<header class="site-header" id="siteHeader">
+    <a href="/"><img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" id="headerLogo"></a>
+    <div class="hn">
+        <a href="/" class="hn-a" id="headerHome">Back to Home</a>
+        <a href="/login" class="hn-a pp">Sign Up Free</a>
     </div>
-  </div>
+</header>
 
-  <!-- HEADER -->
-  <header>
-    <a href="/" class="header-logo">
-      <img src="/public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" />
-    </a>
-    <a href="/login" class="btn-book">
-      <i data-lucide="user-plus" style="width:15px;height:15px;"></i>
-      Sign Up Free
-    </a>
-  </header>
-
-  <!-- INTRO -->
-  <div class="intro-bar reveal">
-    <div class="intro-label">Portfolio</div>
-    <h1 class="intro-title">Property marketing<br>that <em>sells</em></h1>
-    <p class="intro-desc">Photography, videography and drone — all produced in-house for estate agents across the UK.</p>
-  </div>
-
-  <!-- TABS -->
-  <div class="tabs">
-    <button class="tab active" data-filter="all">All Work</button>
-    <button class="tab" data-filter="external">External</button>
-    <button class="tab" data-filter="garden">Garden</button>
-    <button class="tab" data-filter="kitchen">Kitchen</button>
-    <button class="tab" data-filter="living-room">Living Room</button>
-    <button class="tab" data-filter="bedroom">Bedroom</button>
-    <button class="tab" data-filter="bathroom">Bathroom</button>
-    <button class="tab" data-filter="hallway">Hallway</button>
-    <button class="tab" data-filter="drone">Drone</button>
-    <button class="tab" data-filter="video">Video</button>
-  </div>
-
-  <!-- GRID -->
-  <div class="grid-section" id="gridSection"></div>
-
-  <!-- BOOKING STRIP -->
-  <div class="book-strip reveal">
-    <div class="bs-text">
-      <h3>Ready to get started?</h3>
-      <p>Book online in under 3 minutes — 48hr turnaround as standard.</p>
+<!-- HERO -->
+<section class="port-hero">
+    <div class="port-hero-bg"></div>
+    <div class="port-hero-grid"></div>
+    <div class="port-hero-glow"></div>
+    <div class="port-hero-lrule"></div>
+    <div class="port-hero-c">
+        <div class="port-hero-badge"><div class="port-hero-badge-line"></div><span class="port-hero-badge-txt">Premium Property Media · United Kingdom</span></div>
+        <h1>Work that<em>speaks for itself.</em></h1>
+        <div class="port-hero-rule"></div>
+        <p class="port-hero-sub">Photography, videography, drone, and social media that makes properties impossible to scroll past. Every image. Every frame. Every time.</p>
     </div>
-    <div class="bs-btns">
-      <a href="/login" class="bs-primary">Sign Up Free →</a>
-      <a href="mailto:commercial@markebmedia.com" class="bs-secondary">Get in Touch</a>
-    </div>
-  </div>
+</section>
 
-  <!-- LIGHTBOX -->
-  <div class="lightbox" id="lightbox" onclick="closeLb(event)">
-    <div class="lb-inner">
-      <button class="lb-close" onclick="closeLb()">✕</button>
-      <div id="lbMedia"></div>
-      <div class="lb-foot">
-        <div class="lb-cap" id="lbCap"></div>
-        <div style="display:flex;align-items:center;gap:14px;">
-          <span class="lb-count" id="lbCount"></span>
-          <div class="lb-nav">
-            <button class="lb-btn" onclick="moveLb(-1)">←</button>
-            <button class="lb-btn" onclick="moveLb(1)">→</button>
-          </div>
+<!-- FILTER BAR -->
+<div class="filter-bar">
+    <div class="filter-bar-in">
+        <button class="fb-btn active" data-filter="all" onclick="filterWork(this,'all')">All Work</button>
+        <button class="fb-btn" data-filter="photo" onclick="filterWork(this,'photo')">Photography</button>
+        <button class="fb-btn" data-filter="video" onclick="filterWork(this,'video')">Videography</button>
+        <button class="fb-btn" data-filter="drone" onclick="filterWork(this,'drone')">Drone &amp; Aerial</button>
+        <button class="fb-btn" data-filter="dev" onclick="filterWork(this,'dev')">Developments</button>
+    </div>
+</div>
+
+<!-- STATS STRIP -->
+<div class="stats-strip reveal">
+    <div class="stats-in">
+        <div class="stat-c"><div class="stat-n">500<sup>+</sup></div><div class="stat-d">Properties<br>Captured</div></div>
+        <div class="stat-c"><div class="stat-n">8<sup>+</sup></div><div class="stat-d">UK Regions<br>Covered</div></div>
+        <div class="stat-c"><div class="stat-n">48<sup>hr</sup></div><div class="stat-d">Guaranteed<br>Delivery</div></div>
+        <div class="stat-c"><div class="stat-n">100<sup>%</sup></div><div class="stat-d">Satisfaction<br>Guarantee</div></div>
+    </div>
+</div>
+
+<!-- PHOTOGRAPHY -->
+<section class="grid-section" id="photography" data-cat="photo">
+    <div class="grid-section-in">
+        <div class="section-head reveal">
+            <div>
+                <div class="orn"><div class="orn-line rev short"></div><div class="orn-dia"></div><div class="orn-txt">Photography</div></div>
+                <h2 class="dh">Every detail,<br><em>beautifully lit.</em></h2>
+            </div>
+            <div class="section-head-r">
+                <p class="bl" style="max-width:340px;font-size:14px;">HDR-edited property photography that makes every room, facade and feature compelling from the first glance.</p>
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-  <script>
-
-    // ── SPLASH ──
-    document.getElementById('mm-enter-btn').addEventListener('click', function() {
-      const s = document.getElementById('mm-splash');
-      s.classList.add('hiding');
-      setTimeout(() => { s.style.display = 'none'; }, 900);
-    });
-    setTimeout(() => {
-      const s = document.getElementById('mm-splash');
-      if (s && !s.classList.contains('hiding')) {
-        s.classList.add('hiding');
-        setTimeout(() => { s.style.display = 'none'; }, 900);
-      }
-    }, 5000);
-
-    // ═══════════════════════════════════════════════════════════
-    // DATA
-    // ═══════════════════════════════════════════════════════════
-    const BASE = '/public/images/portfolio';
-
-    const SECTIONS = [
-      {
-        key:   'external',
-        label: 'External',
-        color: '#2563eb',
-        tag:   'External',
-        tagColor: null,
-        images: [
-          { file: 'External front 1.jpg',               caption: 'External Front' },
-          { file: 'External front 2.jpg',               caption: 'External Front' },
-          { file: 'External front.jpg',                 caption: 'External Front' },
-          { file: 'DJI_0182_Removed car.jpg',           caption: 'Aerial Front' },
-          { file: 'DJI_0333.jpg',                       caption: 'Aerial Approach' },
-          { file: 'IMG_4710 3.JPG',                     caption: 'Property' },
-          { file: 'property-background.JPG',            caption: 'Property' },
-          { file: 'DJI_20260327152837_0086_D.jpg',      caption: 'Property' },
-        ]
-      },
-      {
-        key:   'garden',
-        label: 'Garden',
-        color: '#16a34a',
-        tag:   'Garden',
-        images: [
-          { file: 'Garden .jpg',   caption: 'Garden' },
-          { file: 'Garden.jpg',    caption: 'Garden' },
-          { file: 'Garden 2.jpg',  caption: 'Garden' },
-          { file: 'Garden 3.jpg',  caption: 'Garden' },
-          { file: 'ED1A0227.jpg',  caption: 'Garden' },
-          { file: 'ED1A0233.jpg',  caption: 'Garden' },
-          { file: 'ED1A0239.jpg',  caption: 'Garden' },
-          { file: 'ED1A2341.jpg',  caption: 'Garden' },
-          { file: 'ED1A8649.jpg',  caption: 'Garden' },
-          { file: 'ED1A8682.jpg',  caption: 'Garden' },
-          { file: 'ED1A8940.jpg',  caption: 'Garden' },
-        ]
-      },
-      {
-        key:   'kitchen',
-        label: 'Kitchen',
-        color: '#d4a853',
-        tag:   'Kitchen',
-        images: [
-          { file: 'Kitchen.jpg',   caption: 'Kitchen' },
-          { file: 'Kitchen 2.jpg', caption: 'Kitchen' },
-          { file: 'Kitchen 3.jpg', caption: 'Kitchen' },
-          { file: 'Kitchen 4.jpg', caption: 'Kitchen' },
-          { file: 'Kitchen 5.jpg', caption: 'Kitchen' },
-          { file: 'Kitchen 6.jpg', caption: 'Kitchen' },
-          { file: 'ED1A7362.jpg',  caption: 'Kitchen' },
-          { file: 'ED1A7368.jpg',  caption: 'Kitchen' },
-          { file: 'ED1A7374.jpg',  caption: 'Kitchen' },
-        ]
-      },
-      {
-        key:   'living-room',
-        label: 'Living Room',
-        color: '#7c3aed',
-        tag:   'Living Room',
-        images: [
-          { file: 'Living room.jpg',   caption: 'Living Room' },
-          { file: 'Living room 2.jpg', caption: 'Living Room' },
-          { file: 'dining area.jpg',   caption: 'Dining Area' },
-          { file: 'ED1A2311.jpg',      caption: 'Living Room' },
-          { file: 'ED1A2317.jpg',      caption: 'Living Room' },
-          { file: 'ED1A7329.jpg',      caption: 'Living Room' },
-          { file: 'ED1A8826.jpg',      caption: 'Living Room' },
-        ]
-      },
-      {
-        key:   'bedroom',
-        label: 'Bedroom',
-        color: '#0891b2',
-        tag:   'Bedroom',
-        images: [
-          { file: 'Bedroom.jpg',                caption: 'Bedroom' },
-          { file: 'Bedroom 2.jpg',              caption: 'Bedroom' },
-          { file: 'Bathroom.jpg',               caption: 'Bathroom' },
-          { file: 'Walk-in-wardrobe.jpg',       caption: 'Walk-in Wardrobe' },
-          { file: 'ED1A6431_Removed Item.jpg',  caption: 'Bedroom' },
-          { file: 'ED1A8835.jpg',               caption: 'Bedroom' },
-        ]
-      },
-      {
-        key:   'bathroom',
-        label: 'Bathroom',
-        color: '#6366f1',
-        tag:   'Bathroom',
-        images: [
-          { file: 'ED1A0327.jpg', caption: 'Bathroom' },
-          { file: 'ED1A2236.jpg', caption: 'Bathroom' },
-          { file: 'ED1A2257.jpg', caption: 'Bathroom' },
-          { file: 'ED1A2272.jpg', caption: 'Bathroom' },
-          { file: 'ED1A2320.jpg', caption: 'Bathroom' },
-          { file: 'ED1A8760.jpg', caption: 'Bathroom' },
-          { file: 'ED1A8790.jpg', caption: 'Bathroom' },
-        ]
-      },
-      {
-        key:   'hallway',
-        label: 'Hallway',
-        color: '#ea580c',
-        tag:   'Hallway',
-        images: [
-          { file: 'Hallway.jpg',   caption: 'Hallway' },
-          { file: 'Hallway 1.jpg', caption: 'Hallway' },
-          { file: 'Hallway 2.jpg', caption: 'Hallway' },
-          { file: 'Hallway 3.jpg', caption: 'Hallway' },
-          { file: 'ED1A2242.jpg',  caption: 'Hallway' },
-          { file: 'ED1A8919.jpg',  caption: 'Hallway' },
-          { file: 'ED1A8922.jpg',  caption: 'Hallway' },
-          { file: 'ED1A8934.jpg',  caption: 'Hallway' },
-        ]
-      },
-      {
-        key:   'drone',
-        label: 'Drone Aerial',
-        color: '#10b981',
-        tag:   'Drone',
-        tagColor: '#10b981',
-        images: [
-          { file: 'Drone 1.jpg',  caption: 'Aerial View' },
-          { file: 'Drone 2.jpg',  caption: 'Aerial View' },
-          { file: 'Drone 3.jpg',  caption: 'Aerial View' },
-          { file: 'Drone 4.jpg',  caption: 'Aerial View' },
-          { file: 'Drone 5.jpg',  caption: 'Aerial View' },
-          { file: 'Drone 6.jpg',  caption: 'Aerial View' },
-          { file: 'DJI_0546.jpg', caption: 'Aerial View' },
-          { file: 'DJI_0908.jpg', caption: 'Aerial View' },
-        ]
-      },
-      {
-        key:      'video',
-        label:    'Video',
-        color:    '#ef4444',
-        tag:      'Video',
-        tagColor: '#ef4444',
-        isVideo:  true,
-        videos: [
-  { file: 'Showreel Final.mp4',           caption: 'Our Showreel',           base: '/public/videos', autoplay: true },
-  { file: 'Cheshire Mansion.mp4',         caption: 'Cheshire Mansion',         base: '/public/videos', autoplay: true },
-  { file: 'Doncaster Walkthrough.mp4',    caption: 'Doncaster Walkthrough',    base: '/public/videos', autoplay: true },
-  { file: 'Traditional English Home.mp4', caption: 'Traditional English Home', base: '/public/videos', autoplay: true },
-  { file: 'Rural Home.mp4',               caption: 'Rural Home',               base: '/public/videos', autoplay: true },
-]
-      }
-    ];
-
-    // ── Flat lightbox items array ──
-    const lbItems = [];
-    SECTIONS.forEach(sec => {
-      if (sec.isVideo) {
-        sec.videos.forEach(v => {
-          lbItems.push({ type: 'video', src: `${v.base}/${v.file}`, caption: v.caption, cat: sec.key });
-        });
-      } else {
-        sec.images.forEach(img => {
-          lbItems.push({ type: 'img', src: `${BASE}/${sec.key}/${img.file}`, caption: img.caption, cat: sec.key });
-        });
-      }
-    });
-
-    // ── Layout patterns ──
-    function getLayouts(count) {
-      const patterns = {
-        1: ['s12'],
-        2: ['s6','s6'],
-        3: ['s8','s4t','s12'],
-        4: ['s8','s4t','s6','s6'],
-        5: ['s8','s4t','s4','s4','s4'],
-        6: ['s8','s4t','s4','s4','s4','s12'],
-      };
-      if (patterns[count]) return patterns[count];
-      const out = ['s8','s4t'];
-      for (let i = 2; i < count; i++) out.push(i % 3 === 0 ? 's6' : 's4');
-      return out;
-    }
-
-    // ── Render sections ──
-    const container = document.getElementById('gridSection');
-
-    SECTIONS.forEach(sec => {
-      const items   = sec.isVideo ? sec.videos : sec.images;
-      const count   = items.length;
-      const layouts = getLayouts(count);
-      const tagBg   = sec.tagColor || '#d4a853';
-      const tagColor = sec.tagColor ? '#fff' : '#0c1e3c';
-
-      const section = document.createElement('div');
-      section.className = 'portfolio-section reveal';
-      section.dataset.sec = sec.key;
-
-      section.innerHTML = `
-        <div class="sec-header">
-          <div class="sec-header-label">
-            <div class="sec-dot" style="background:${sec.color};"></div>
-            <span class="sec-title">${sec.label}</span>
-            <span class="sec-count">${count}</span>
-          </div>
-          <div class="sec-header-line"></div>
+        <div class="photo-grid mixed reveal" style="margin-bottom:14px;">
+            <div class="pgc tall" onclick="openLb(this)" data-title="Period Mansion" data-sub="Cheshire · HDR Photography">
+                <img src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/61b92060-d48f-4db8-b8cf-1657ec9a697c/DJI_0165_Removed+cars.jpg?format=800w" alt="Period Mansion">
+                <div class="pgc-lbl"><span class="pgc-tag">Photography</span><div class="pgc-t">Period Mansion</div><div class="pgc-s">Cheshire · HDR Photography</div></div>
+                <div class="pgc-ov"><i data-lucide="zoom-in" style="width:16px;height:16px;color:#fff;"></i></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+                <div class="pgc std" onclick="openLb(this)" data-title="Lakeside Estate" data-sub="Cheshire · Exterior Photography">
+                    <img src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/71cd6387-8d6d-44e1-ac4b-4e40cb183b90/DJI_0169_Removed+cars-2.jpg?format=800w" alt="Lakeside Estate">
+                    <div class="pgc-lbl"><span class="pgc-tag">Photography</span><div class="pgc-t">Lakeside Estate</div><div class="pgc-s">Cheshire · Exterior Photography</div></div>
+                    <div class="pgc-ov"><i data-lucide="zoom-in" style="width:16px;height:16px;color:#fff;"></i></div>
+                </div>
+                <div class="pgc std" onclick="openLb(this)" data-title="Cheshire Mansion" data-sub="North West · Interior Photography">
+                    <img src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/61b92060-d48f-4db8-b8cf-1657ec9a697c/DJI_0165_Removed+cars.jpg?format=400w" alt="Interior Shot" style="filter:hue-rotate(10deg) brightness(1.05);">
+                    <div class="pgc-lbl"><span class="pgc-tag">Photography</span><div class="pgc-t">Cheshire Mansion</div><div class="pgc-s">North West · Interior Photography</div></div>
+                    <div class="pgc-ov"><i data-lucide="zoom-in" style="width:16px;height:16px;color:#fff;"></i></div>
+                </div>
+            </div>
         </div>
-        <div class="portfolio-grid"></div>
-      `;
 
-      const grid = section.querySelector('.portfolio-grid');
-
-      items.forEach((item, i) => {
-        const lbIndex = lbItems.findIndex(x => x.src.includes(item.file));
-        const sizeClass  = layouts[i] || 's4';
-        const delayClass = ['','d1','d2','d3'][i % 4];
-
-        if (sec.isVideo) {
-          const el = document.createElement('div');
-          el.className = `p-item ${sizeClass} reveal ${delayClass} is-video`;
-          el.innerHTML = `
-            <video src="${item.base}/${item.file}" muted playsinline preload="auto" ${item.autoplay ? 'autoplay loop' : ''} style="display:block;width:100%;height:100%;object-fit:cover;"></video>
-            <div class="play-btn">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="#B46100"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <div class="photo-grid cols-3 reveal">
+            <div class="pgc std" onclick="openLb(this)" data-title="Traditional English Home" data-sub="Doncaster · Property Photography">
+                <img src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/71cd6387-8d6d-44e1-ac4b-4e40cb183b90/DJI_0169_Removed+cars-2.jpg?format=500w" alt="Traditional Home" style="filter:brightness(1.08) saturate(1.1);">
+                <div class="pgc-lbl"><span class="pgc-tag">Photography</span><div class="pgc-t">Traditional English Home</div><div class="pgc-s">Doncaster · Property Photography</div></div>
+                <div class="pgc-ov"><i data-lucide="zoom-in" style="width:16px;height:16px;color:#fff;"></i></div>
             </div>
-            <div class="p-ov">
-              <span class="p-tag" style="background:${tagBg};color:${tagColor};">▶ Video</span>
-              <div class="p-cap">${item.caption}</div>
+            <div class="pgc std" onclick="openLb(this)" data-title="Rural Property Showcase" data-sub="Yorkshire · Exterior Photography">
+                <img src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/61b92060-d48f-4db8-b8cf-1657ec9a697c/DJI_0165_Removed+cars.jpg?format=500w" alt="Rural Property" style="filter:brightness(.95) saturate(1.2);">
+                <div class="pgc-lbl"><span class="pgc-tag">Photography</span><div class="pgc-t">Rural Property Showcase</div><div class="pgc-s">Yorkshire · Exterior Photography</div></div>
+                <div class="pgc-ov"><i data-lucide="zoom-in" style="width:16px;height:16px;color:#fff;"></i></div>
             </div>
-          `;
-          el.onclick = () => openLb(lbIndex);
-          grid.appendChild(el);
-        } else {
-          const el = document.createElement('div');
-          el.className = `p-item ${sizeClass} reveal ${delayClass}`;
-          el.innerHTML = `
-            <img src="${BASE}/${sec.key}/${item.file}" alt="${item.caption}" loading="lazy">
-            <div class="p-ov">
-              <span class="p-tag" style="background:${tagBg};color:${tagColor};">${sec.tag}</span>
-              <div class="p-cap">${item.caption}</div>
+            <div class="pgc std" onclick="openLb(this)" data-title="Modern New Build" data-sub="Manchester · Architectural Photography">
+                <img src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/71cd6387-8d6d-44e1-ac4b-4e40cb183b90/DJI_0169_Removed+cars-2.jpg?format=500w" alt="New Build" style="filter:brightness(1.12) contrast(1.05);">
+                <div class="pgc-lbl"><span class="pgc-tag">Photography</span><div class="pgc-t">Modern New Build</div><div class="pgc-s">Manchester · Architectural Photography</div></div>
+                <div class="pgc-ov"><i data-lucide="zoom-in" style="width:16px;height:16px;color:#fff;"></i></div>
             </div>
-          `;
-          el.onclick = () => openLb(lbIndex);
-          grid.appendChild(el);
-        }
-      });
+        </div>
+    </div>
+</section>
 
-      container.appendChild(section);
+<!-- VIDEOGRAPHY -->
+<section class="grid-section alt" id="videography" data-cat="video">
+    <div class="grid-section-in">
+        <div class="section-head reveal">
+            <div>
+                <div class="orn"><div class="orn-line rev short"></div><div class="orn-dia"></div><div class="orn-txt">Videography</div></div>
+                <h2 class="dh">Cinematic tours<br><em>buyers remember.</em></h2>
+            </div>
+            <div class="section-head-r">
+                <p class="bl" style="max-width:340px;font-size:14px;">Walkthrough videos that let buyers fall in love with a property before they set foot inside.</p>
+            </div>
+        </div>
+
+        <div class="video-grid reveal">
+            <div class="vc-wrap featured">
+                <video autoplay muted loop playsinline src="/public/videos/Showreel Final.mp4"></video>
+                <div class="vc-lbl"><span class="vc-tag">Showreel</span><div class="vc-t">Our 2024/25 Showreel</div><div class="vc-s">Markeb Media · Portfolio Highlight</div></div>
+            </div>
+            <div class="vc-wrap">
+                <video autoplay muted loop playsinline src="/public/videos/Cheshire Mansion.mp4"></video>
+                <div class="vc-lbl"><span class="vc-tag">Videography</span><div class="vc-t">Cheshire Mansion</div><div class="vc-s">North West · Property Video</div></div>
+            </div>
+            <div class="vc-wrap">
+                <video autoplay muted loop playsinline src="/public/videos/Doncaster Walkthrough.mp4"></video>
+                <div class="vc-lbl"><span class="vc-tag">Videography</span><div class="vc-t">Doncaster Walkthrough</div><div class="vc-s">Yorkshire · Property Video</div></div>
+            </div>
+            <div class="vc-wrap">
+                <video autoplay muted loop playsinline src="/public/videos/Traditional English Home.mp4"></video>
+                <div class="vc-lbl"><span class="vc-tag">Videography</span><div class="vc-t">Traditional English Home</div><div class="vc-s">Yorkshire · Property Tour</div></div>
+            </div>
+            <div class="vc-wrap">
+                <video autoplay muted loop playsinline src="/public/videos/Rural Home.mp4"></video>
+                <div class="vc-lbl"><span class="vc-tag">Videography</span><div class="vc-t">Rural Home</div><div class="vc-s">Countryside · Property Tour</div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- DRONE -->
+<section class="drone-sec" id="drone" data-cat="drone">
+    <div class="drone-in">
+        <div class="section-head reveal">
+            <div>
+                <div class="orn"><div class="orn-line rev short"></div><div class="orn-dia"></div><div class="orn-txt" style="color:rgba(212,148,10,.8);">Drone &amp; Aerial</div></div>
+                <h2 class="dh dh-w">The view that<br><em>closes deals.</em></h2>
+            </div>
+            <div class="section-head-r">
+                <p class="bl" style="max-width:340px;font-size:14px;color:rgba(255,255,255,.45);">CAA-licensed aerial photography and videography that gives every property a luxury edge competitors simply cannot match.</p>
+            </div>
+        </div>
+
+        <div class="drone-grid reveal">
+            <div class="pgc wide" onclick="openLb(this)" data-title="Period Mansion — Aerial" data-sub="Cheshire · CAA-Licensed Drone">
+                <img src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/61b92060-d48f-4db8-b8cf-1657ec9a697c/DJI_0165_Removed+cars.jpg?format=800w" alt="Aerial Period Mansion">
+                <div class="pgc-lbl"><span class="pgc-tag">Drone</span><div class="pgc-t">Period Mansion — Aerial</div><div class="pgc-s">Cheshire · CAA-Licensed Drone</div></div>
+                <div class="pgc-ov"><i data-lucide="zoom-in" style="width:16px;height:16px;color:#fff;"></i></div>
+            </div>
+            <div class="pgc wide" onclick="openLb(this)" data-title="Lakeside Estate — Aerial" data-sub="Cheshire · Aerial Photography">
+                <img src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/71cd6387-8d6d-44e1-ac4b-4e40cb183b90/DJI_0169_Removed+cars-2.jpg?format=800w" alt="Lakeside Estate Aerial">
+                <div class="pgc-lbl"><span class="pgc-tag">Drone</span><div class="pgc-t">Lakeside Estate — Aerial</div><div class="pgc-s">Cheshire · Aerial Photography</div></div>
+                <div class="pgc-ov"><i data-lucide="zoom-in" style="width:16px;height:16px;color:#fff;"></i></div>
+            </div>
+            <div class="pgc wide" onclick="openLb(this)" data-title="Rural Estate Overview" data-sub="Yorkshire · Aerial Photography">
+                <img src="https://images.squarespace-cdn.com/content/v1/669fdffdaec2a830b19bbca8/61b92060-d48f-4db8-b8cf-1657ec9a697c/DJI_0165_Removed+cars.jpg?format=500w" alt="Rural Estate Aerial" style="filter:saturate(1.15) brightness(.92);">
+                <div class="pgc-lbl"><span class="pgc-tag">Drone</span><div class="pgc-t">Rural Estate Overview</div><div class="pgc-s">Yorkshire · Aerial Photography</div></div>
+                <div class="pgc-ov"><i data-lucide="zoom-in" style="width:16px;height:16px;color:#fff;"></i></div>
+            </div>
+        </div>
+
+        <div style="margin-top:44px;" class="reveal">
+            <div class="orn" style="justify-content:center;margin-bottom:22px;"><div class="orn-line rev" style="background:linear-gradient(to left,rgba(212,148,10,.18),transparent);"></div><div class="orn-dia"></div><div class="orn-txt" style="color:rgba(212,148,10,.6);">CAA Licensed &amp; Fully Insured · All UK Regions</div><div class="orn-dia"></div><div class="orn-line" style="background:linear-gradient(to right,rgba(212,148,10,.18),transparent);"></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- VIDEO PROPERTY-SHOWCASE.MP4 -->
+<section class="grid-section" id="developments" data-cat="dev">
+    <div class="grid-section-in">
+        <div class="section-head reveal">
+            <div>
+                <div class="orn"><div class="orn-line rev short"></div><div class="orn-dia"></div><div class="orn-txt">Property Showcase</div></div>
+                <h2 class="dh">Developments that<br><em>sell before completion.</em></h2>
+            </div>
+            <div class="section-head-r">
+                <p class="bl" style="max-width:340px;font-size:14px;">Launch campaigns and phased content that builds momentum from the moment you break ground.</p>
+            </div>
+        </div>
+        <div class="video-grid reveal">
+            <div class="vc-wrap featured">
+                <video autoplay muted loop playsinline src="/public/videos/property-showcase.mp4"></video>
+                <div class="vc-lbl"><span class="vc-tag">Development</span><div class="vc-t">Property Showcase Reel</div><div class="vc-s">UK Developments · Launch Campaign</div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<div class="tband reveal">
+    <div class="tband-in">
+        <div class="tband-mark">"</div>
+        <p class="tband-quote">From scheduling appointments to working with ourselves and vendors on shoots, the quality of their service, attitude and aftercare is second to none. We look forward to continuing our relationship.</p>
+        <div class="tband-attr">
+            <div class="tband-line"></div>
+            <span class="tband-name">Verified Client · Estate Agent</span>
+        </div>
+    </div>
+</div>
+
+<!-- SERVICES PREVIEW -->
+<section class="svc-preview reveal">
+    <div class="svc-preview-in">
+        <div style="text-align:center;margin-bottom:0;">
+            <div class="orn" style="justify-content:center;"><div class="orn-line rev"></div><div class="orn-dia"></div><div class="orn-txt">What we offer</div><div class="orn-dia"></div><div class="orn-line"></div></div>
+            <h2 class="dh" style="margin-bottom:14px;">Everything you need,<br><em>under one roof.</em></h2>
+        </div>
+        <div class="svc-row">
+            <div class="svc-c">
+                <div class="svc-ic"><i data-lucide="camera" style="width:18px;height:18px;"></i></div>
+                <h3>Photography</h3>
+                <p>HDR-edited interior and exterior shoots that make every listing look its absolute best across every portal.</p>
+            </div>
+            <div class="svc-c">
+                <div class="svc-ic"><i data-lucide="video" style="width:18px;height:18px;"></i></div>
+                <h3>Videography</h3>
+                <p>Cinematic property tours that let buyers feel the space and fall in love before they book a viewing.</p>
+            </div>
+            <div class="svc-c">
+                <div class="svc-ic"><i data-lucide="navigation" style="width:18px;height:18px;"></i></div>
+                <h3>Drone &amp; Aerial</h3>
+                <p>CAA-licensed aerial footage giving your listings a luxury edge no competitor can easily replicate.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="port-cta reveal">
+    <div class="orn" style="justify-content:center;margin-bottom:22px;"><div class="orn-line rev"></div><div class="orn-dia"></div><div class="orn-txt">Ready to get started?</div><div class="orn-dia"></div><div class="orn-line"></div></div>
+    <h2 class="dh" style="position:relative;">Your properties<br><em>deserve this.</em></h2>
+    <p class="bl" style="margin:18px auto 0;text-align:center;position:relative;">Join the estate agents and developers who've made premium marketing their biggest competitive advantage.</p>
+    <div class="cta-row">
+        <a href="/login" class="btn-p" style="font-size:13px;padding:16px 44px;">Book Your Shoot</a>
+        <a href="/#audit" class="btn-o">Get a Free Audit</a>
+    </div>
+    <div class="tr-row">
+        <span>48-hour delivery</span><div class="tr-sep"></div><span>UK-wide coverage</span><div class="tr-sep"></div><span>100% satisfaction guarantee</span>
+    </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact reveal" id="contact">
+    <div class="contact-in">
+        <div class="contact-left">
+            <div class="orn"><div class="orn-line rev short" style="background:linear-gradient(to left,rgba(212,148,10,.25),transparent);"></div><div class="orn-dia"></div><div class="orn-txt" style="color:rgba(212,148,10,.7);">Get in touch</div></div>
+            <h2>Seen enough?<br><em>Let's talk.</em></h2>
+            <p>Tell us about your properties and we'll put together the right package to help you win more instructions and sell faster.</p>
+            <div class="contact-details">
+                <div class="cd"><div class="cd-ic"><i data-lucide="mail" style="width:16px;height:16px;"></i></div><div class="cd-txt"><div class="cd-lbl">Email</div><a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a></div></div>
+                <div class="cd"><div class="cd-ic"><i data-lucide="map-pin" style="width:16px;height:16px;"></i></div><div class="cd-txt"><div class="cd-lbl">Coverage</div><span>UK-wide across 8 regions</span></div></div>
+                <div class="cd"><div class="cd-ic"><i data-lucide="clock" style="width:16px;height:16px;"></i></div><div class="cd-txt"><div class="cd-lbl">Response time</div><span>We aim to respond within 24 hours</span></div></div>
+            </div>
+        </div>
+        <div class="contact-form-wrap">
+            <div id="contactForm">
+                <div class="cf-title">Start the conversation</div>
+                <div class="cf-sub">Fill in your details and we'll be in touch shortly.</div>
+                <input type="text" class="cf-input" id="cf-name" placeholder="Your Name *">
+                <input type="text" class="cf-input" id="cf-agency" placeholder="Agency / Company Name">
+                <input type="email" class="cf-input" id="cf-email" placeholder="Email Address *">
+                <input type="tel" class="cf-input" id="cf-phone" placeholder="Phone Number">
+                <textarea class="cf-textarea" id="cf-message" placeholder="Tell us about your properties and what you need *"></textarea>
+                <div class="emsg" id="cf-error" style="display:none;border:1px solid rgba(220,38,38,.25);background:rgba(220,38,38,.06);color:#FCA5A5;padding:11px 14px;font-size:13px;margin-bottom:14px;"></div>
+                <button class="cf-btn" onclick="submitContact(this)">Send Message</button>
+            </div>
+            <div class="cf-success" id="cf-success">
+                <div class="cf-success-icon">✓</div>
+                <p>Thank you, your message has been sent.<br>We will be in touch within 24 hours.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+    <img src="/public/images/markeb-media-logo.png" alt="Markeb Media" style="height:36px;width:auto;filter:brightness(0) invert(1);opacity:0.6;">
+    <div class="sf-copy">© 2026 Markeb Media Ltd. All rights reserved.</div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lightbox" onclick="closeLb(event)">
+    <span class="lb-close" onclick="closeLb()">×</span>
+    <span class="lb-prev" onclick="lbNav(-1,event)"><i data-lucide="chevron-left" style="width:28px;height:28px;"></i></span>
+    <img class="lb-img" id="lbImg" src="" alt="">
+    <span class="lb-next" onclick="lbNav(1,event)"><i data-lucide="chevron-right" style="width:28px;height:28px;"></i></span>
+    <div class="lb-caption"><div class="lb-caption-t" id="lbTitle"></div><div class="lb-caption-s" id="lbSub"></div></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        const obs = new IntersectionObserver(e => e.forEach(x => { if(x.isIntersecting) x.target.classList.add('visible'); }), { threshold:.07, rootMargin:'0px 0px -40px 0px' });
+        document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(el => obs.observe(el));
     });
 
-    // ── Tab filtering ──
-    document.querySelectorAll('.tab').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    // Filter
+    function filterWork(btn, cat) {
+        document.querySelectorAll('.fb-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        const filter = btn.dataset.filter;
-        document.querySelectorAll('.portfolio-section').forEach(sec => {
-          sec.style.display = (filter === 'all' || sec.dataset.sec === filter) ? '' : 'none';
+        document.querySelectorAll('[data-cat]').forEach(sec => {
+            if (cat === 'all' || sec.dataset.cat === cat) {
+                sec.style.display = '';
+            } else {
+                sec.style.display = 'none';
+            }
         });
-      });
-    });
-
-    // ── Lightbox ──
-    let cur = 0;
-    let lbVideoEl = null;
-
-    function openLb(i) {
-      cur = i; renderLb();
-      document.getElementById('lightbox').classList.add('active');
-      document.body.style.overflow = 'hidden';
     }
 
-    function renderLb() {
-      if (lbVideoEl) { lbVideoEl.pause(); lbVideoEl = null; }
-      const it = lbItems[cur];
-      document.getElementById('lbCap').textContent   = it.caption;
-      document.getElementById('lbCount').textContent = `${cur + 1} / ${lbItems.length}`;
-      const m = document.getElementById('lbMedia');
-      if (it.type === 'video') {
-        m.innerHTML = `<video class="lb-video" src="${it.src}" controls autoplay playsinline></video>`;
-        lbVideoEl = m.querySelector('video');
-      } else {
-        m.innerHTML = `<div style="width:100%;height:50vh;background:#0d1117;border-radius:6px;display:flex;align-items:center;justify-content:center;"><div style="width:32px;height:32px;border:3px solid rgba(255,255,255,0.1);border-top-color:rgba(255,255,255,0.5);border-radius:50%;animation:spin 1s linear infinite;"></div></div>`;
-        const img = new Image();
-        img.onload  = () => { m.innerHTML = `<img class="lb-img" src="${it.src}" alt="${it.caption}">`; };
-        img.onerror = () => { m.innerHTML = `<div style="width:100%;height:50vh;background:#0d1117;border-radius:6px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-size:13px;">Image not found</div>`; };
-        img.src = it.src;
-      }
+    // Lightbox
+    let lbItems = [], lbIdx = 0;
+    function openLb(el) {
+        const allItems = Array.from(document.querySelectorAll('.pgc[data-title]'));
+        lbItems = allItems;
+        lbIdx = allItems.indexOf(el);
+        showLb();
+        document.getElementById('lightbox').classList.add('on');
+        document.body.style.overflow = 'hidden';
     }
-
-    function moveLb(d) {
-      if (lbVideoEl) { lbVideoEl.pause(); lbVideoEl = null; }
-      cur = (cur + d + lbItems.length) % lbItems.length;
-      renderLb();
+    function showLb() {
+        const el = lbItems[lbIdx];
+        const img = el.querySelector('img');
+        document.getElementById('lbImg').src = img.src;
+        document.getElementById('lbTitle').textContent = el.dataset.title || '';
+        document.getElementById('lbSub').textContent = el.dataset.sub || '';
+        lucide.createIcons();
     }
-
     function closeLb(e) {
-      if (!e || e.target === document.getElementById('lightbox')) {
-        if (lbVideoEl) { lbVideoEl.pause(); lbVideoEl = null; }
-        document.getElementById('lightbox').classList.remove('active');
+        if (e && e.target !== document.getElementById('lightbox') && !e.target.classList.contains('lb-close')) return;
+        if (!e) {}
+        document.getElementById('lightbox').classList.remove('on');
         document.body.style.overflow = '';
-      }
     }
-
+    function lbNav(dir, e) {
+        if(e) e.stopPropagation();
+        lbIdx = (lbIdx + dir + lbItems.length) % lbItems.length;
+        showLb();
+    }
     document.addEventListener('keydown', e => {
-      if (!document.getElementById('lightbox').classList.contains('active')) return;
-      if (e.key === 'Escape')     closeLb();
-      if (e.key === 'ArrowLeft')  moveLb(-1);
-      if (e.key === 'ArrowRight') moveLb(1);
+        if (!document.getElementById('lightbox').classList.contains('on')) return;
+        if (e.key === 'Escape') { document.getElementById('lightbox').classList.remove('on'); document.body.style.overflow=''; }
+        if (e.key === 'ArrowRight') lbNav(1);
+        if (e.key === 'ArrowLeft') lbNav(-1);
     });
 
-    // ── Scroll reveal ──
-    const ro = new IntersectionObserver(
-      e => e.forEach(x => { if (x.isIntersecting) x.target.classList.add('in'); }),
-      { threshold: 0.07 }
-    );
-    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
-
-    lucide.createIcons();
-  </script>
+    // Contact
+    async function submitContact(btn) {
+        const name = document.getElementById('cf-name').value.trim();
+        const email = document.getElementById('cf-email').value.trim();
+        const message = document.getElementById('cf-message').value.trim();
+        const agency = document.getElementById('cf-agency').value.trim();
+        const phone = document.getElementById('cf-phone').value.trim();
+        const err = document.getElementById('cf-error');
+        err.style.display = 'none';
+        if (!name || !email || !message) { err.textContent='Please fill in your name, email, and message.'; err.style.display='block'; return; }
+        btn.textContent = 'Sending...'; btn.disabled = true;
+        try {
+            const res = await fetch('/.netlify/functions/submit-contact', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name,email,agency,phone,message}) });
+            if (!res.ok) throw new Error('Send failed');
+            document.getElementById('contactForm').style.display = 'none';
+            document.getElementById('cf-success').classList.add('on');
+        } catch(e) {
+            err.textContent = 'Sorry, something went wrong. Please email us at commercial@markebmedia.com';
+            err.style.display = 'block';
+            btn.textContent = 'Send Message'; btn.disabled = false;
+        }
+    }
+</script>
 </body>
 </html>
