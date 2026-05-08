@@ -4484,7 +4484,7 @@ html += '<div class="calendar-day other-month"></div>';
   }
 for (let day = 1; day <= daysInMonth; day++) {
 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-const dayBookings = bookings.filter(b => b.fields['Date'] === dateStr);
+const dayBookings = bookings.filter(b => (b.fields['Date'] || '').startsWith(dateStr));
 const dayBlocks = blockedTimes.filter(b => b.fields['Date'] === dateStr);
 const today = new Date();
 const isToday = dateStr === toLocalDateString(today);
@@ -4702,8 +4702,8 @@ function closeSheet() {
 function renderDayView(bookings, blockedTimes) {
   const grid = document.getElementById('calendarGrid');
   const dateStr = toLocalDateString(currentDate);
-  const dayBookings = bookings.filter(b => b.fields['Date'] === dateStr);
-  const dayBlocks = blockedTimes.filter(b => b.fields['Date'] === dateStr);
+  const dayBookings = bookings.filter(b => (b.fields['Date'] || '').startsWith(dateStr));
+  const dayBlocks = blockedTimes.filter(b => (b.fields['Date'] || '').startsWith(dateStr));
   const activeCount = dayBookings.filter(b => b.fields['Booking Status'] !== 'Cancelled').length;
 
   let html = `
