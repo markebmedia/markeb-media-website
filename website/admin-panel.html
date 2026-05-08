@@ -2537,12 +2537,12 @@ We wanted to reach out..." required></textarea>
 
   <!-- Find Booking Modal -->
 <div class="modal" id="findBookingModal" onclick="closeModal('findBookingModal')">
-  <div class="modal-dialog" style="max-width: 700px;" onclick="event.stopPropagation()">
+  <div class="modal-dialog" style="max-width: 700px; display:flex; flex-direction:column; max-height:90vh;" onclick="event.stopPropagation()">
     <div class="modal-header">
       <h3>Find Booking</h3>
       <button class="modal-close" onclick="closeModal('findBookingModal')">&times;</button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style="overflow-y:auto; flex:1; -webkit-overflow-scrolling:touch;">
       <div style="display:flex;gap:12px;margin-bottom:20px;">
         <input 
           type="text" 
