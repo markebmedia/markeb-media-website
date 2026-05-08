@@ -4375,7 +4375,9 @@ endDate = toLocalDateString(sunday);
       currentEl.textContent = `Week of ${monday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })} - ${sunday.toLocaleDateString('en-GB', { month: 'short', day: 'numeric', year: 'numeric' })}`;
     } else {
       startDate = toLocalDateString(currentDate);
-      endDate = startDate;
+      const nextDay = new Date(currentDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      endDate = toLocalDateString(nextDay);
       
       currentEl.textContent = currentDate.toLocaleDateString('en-GB', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
     }
