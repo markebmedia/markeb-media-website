@@ -1153,10 +1153,32 @@ body {
   .spinner { width: 35px; height: 35px; border-width: 3px; }
   .admin-sidebar { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
   .admin-main { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+}
+
+@media (max-width: 600px) {
+  .calendar-day { min-height: 52px !important; max-height: 52px !important; padding: 4px 3px !important; overflow: hidden !important; cursor: pointer !important; }
+  .calendar-booking { display: none !important; }
+  .cal-dot-row { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 3px; }
+  .cal-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .cal-dot.paid { background: #B46100; }
+  .cal-dot.pending { background: #f59e0b; }
+  .cal-dot.blocked { background: #ef4444; }
+  .calendar-day.today .calendar-day-number { color: #B46100; font-weight: 800; }
+}
+.day-sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 20000; display: flex; align-items: flex-end; }
+.day-sheet { background: #fff; border-radius: 16px 16px 0 0; width: 100%; max-height: 80vh; overflow-y: auto; padding: 0 0 40px; animation: slideUpSheet .25s ease; }
+@keyframes slideUpSheet { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.day-sheet-handle { width: 40px; height: 4px; background: #e2e8f0; border-radius: 2px; margin: 12px auto 0; }
+.day-sheet-header { padding: 16px 20px; border-bottom: 1px solid #e2e8f0; font-weight: 700; font-size: 17px; display: flex; justify-content: space-between; align-items: center; }
+.day-sheet-item { padding: 14px 20px; border-bottom: 1px solid #f1f5f9; cursor: pointer; }
+.day-sheet-time { font-size: 12px; color: #64748b; font-weight: 600; margin-bottom: 4px; }
+.day-sheet-name { font-size: 15px; font-weight: 600; color: #0f172a; }
+.day-sheet-sub { font-size: 13px; color: #64748b; margin-top: 2px; }
+.day-sheet-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-top: 6px; }
+.day-sheet-empty { padding: 40px 20px; text-align: center; color: #94a3b8; font-size: 15px; }
   .calendar-legend { display: flex; gap: 12px; padding: 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 12px; flex-wrap: wrap; justify-content: center; }
   .calendar-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #64748b; }
   .calendar-legend-dot { width: 12px; height: 12px; border-radius: 3px; }
-}
 
 @media (pointer: coarse) {
   .calendar-booking, .calendar-day, .btn, .nav-item { min-height: 44px; }
@@ -4466,9 +4488,26 @@ const dayBookings = bookings.filter(b => b.fields['Date'] === dateStr);
 const dayBlocks = blockedTimes.filter(b => b.fields['Date'] === dateStr);
 const today = new Date();
 const isToday = dateStr === toLocalDateString(today);
-html += `<div class="calendar-day ${isToday ? 'today' : ''}" onclick="showQuickBlockModal('${dateStr}')" style="cursor: pointer;">`;
-html += `<div class="calendar-day-number">${day}</div>`;
-dayBlocks.forEach(block => {
+const isMobile = window.innerWidth <= 600;
+    if (isMobile) {
+      const paidCount = dayBookings.filter(b => b.fields['Payment Status'] === 'Paid' && b.fields['Booking Status'] !== 'Cancelled').length;
+      const pendingCount = dayBookings.filter(b => b.fields['Payment Status'] === 'Pending' && b.fields['Booking Status'] !== 'Cancelled').length;
+      const blockedCount = dayBlocks.length;
+      const hasAnything = paidCount + pendingCount + blockedCount > 0;
+      html += `<div class="calendar-day ${isToday ? 'today' : ''}" onclick="showDaySheet('${dateStr}', ${JSON.stringify(dayBookings).replace(/"/g,'&quot;')}, ${JSON.stringify(dayBlocks).replace(/"/g,'&quot;')})">`;
+      html += `<div class="calendar-day-number">${day}</div>`;
+      if (hasAnything) {
+        html += '<div class="cal-dot-row">';
+        html += '<span class="cal-dot paid"></span>'.repeat(Math.min(paidCount, 4));
+        html += '<span class="cal-dot pending"></span>'.repeat(Math.min(pendingCount, 4));
+        html += '<span class="cal-dot blocked"></span>'.repeat(Math.min(blockedCount, 2));
+        html += '</div>';
+      }
+      html += '</div>';
+    } else {
+      html += `<div class="calendar-day ${isToday ? 'today' : ''}" onclick="showQuickBlockModal('${dateStr}')" style="cursor: pointer;">`;
+      html += `<div class="calendar-day-number">${day}</div>`;
+      dayBlocks.forEach(block => {
 const fields = block.fields;
 html += `
         <div class="calendar-booking blocked" 
@@ -4494,6 +4533,7 @@ html += `
     });
     
     html += '</div>';
+    }
   }
 
   html += '</div>';
@@ -4508,70 +4548,211 @@ function renderWeekView(bookings, blockedTimes) {
   const weeklyTarget = 30;
   const weekProgress = Math.min(100, Math.round((activeBookings / weeklyTarget) * 100));
   const weekProgressColor = weekProgress >= 100 ? '#10b981' : weekProgress >= 66 ? '#f59e0b' : '#ef4444';
+  const jamesB = bookings.filter(b => (b.fields['Media Specialist']||'').includes('James') && b.fields['Booking Status'] !== 'Cancelled').length;
+  const andriiB = bookings.filter(b => (b.fields['Media Specialist']||'').includes('Andrii') && b.fields['Booking Status'] !== 'Cancelled').length;
 
-  const jamesBookings = bookings.filter(b => (b.fields['Media Specialist'] || '').includes('James') && b.fields['Booking Status'] !== 'Cancelled').length;
-  const andriiBookings = bookings.filter(b => (b.fields['Media Specialist'] || '').includes('Andrii') && b.fields['Booking Status'] !== 'Cancelled').length;
-  const jamesProgress = Math.min(100, Math.round((jamesBookings / 15) * 100));
-  const andriiProgress = Math.min(100, Math.round((andriiBookings / 15) * 100));
-  const jamesColor = jamesProgress >= 100 ? '#10b981' : jamesProgress >= 66 ? '#f59e0b' : '#ef4444';
-  const andriiColor = andriiProgress >= 100 ? '#10b981' : andriiProgress >= 66 ? '#f59e0b' : '#ef4444';
+  const tempDate = new Date(currentDate);
+  const day = tempDate.getDay();
+  const diff = tempDate.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(tempDate.setDate(diff));
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    days.push(d);
+  }
+  const todayStr = toLocalDateString(new Date());
 
-  grid.innerHTML = `
-    <div class="calendar-booking-counter" style="display: flex; flex-direction: column; gap: 14px;">
+  const hours = [];
+  for (let h = 8; h <= 18; h++) hours.push(h);
 
-      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+  let html = `
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
         <div>
           <span class="calendar-booking-counter-value">${activeBookings}</span>
-          <span class="calendar-booking-counter-label">shoot${activeBookings !== 1 ? 's' : ''} this week</span>
-          ${cancelledBookings > 0 ? `<span style="margin-left: 16px; color: #ef4444; font-size: 14px; font-weight: 600;">| ${cancelledBookings} cancelled</span>` : ''}
+          <span class="calendar-booking-counter-label"> shoots this week</span>
+          ${cancelledBookings > 0 ? `<span style="margin-left:16px;color:#ef4444;font-size:14px;">| ${cancelledBookings} cancelled</span>` : ''}
         </div>
-        <div style="font-size: 13px; font-weight: 700; color: ${weekProgressColor};">${weekProgress}% of weekly target</div>
+        <div style="font-size:13px;font-weight:700;color:${weekProgressColor};">${weekProgress}% of 30</div>
       </div>
-
-      <div>
-        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b; margin-bottom: 6px;">
-          <span>🎯 Weekly target: <strong>30 shoots</strong></span>
-          <span style="color: ${weekProgressColor}; font-weight: 700;">${activeBookings} / 30</span>
-        </div>
-        <div style="background: #e2e8f0; height: 10px; border-radius: 5px; overflow: hidden;">
-          <div style="background: ${weekProgressColor}; height: 100%; width: ${weekProgress}%; transition: width 0.4s ease; border-radius: 5px;"></div>
-        </div>
-        <div style="text-align: right; font-size: 11px; color: #94a3b8; margin-top: 5px;">
-          ${30 - activeBookings > 0 ? `${30 - activeBookings} shoots to go` : '🎉 Weekly target hit!'}
-        </div>
+      <div style="background:#e2e8f0;height:10px;border-radius:5px;overflow:hidden;">
+        <div style="background:${weekProgressColor};height:100%;width:${weekProgress}%;border-radius:5px;"></div>
       </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 4px; border-top: 1px solid #e2e8f0;">
-        <div>
-          <div style="font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">James Jago</div>
-          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-            <span style="color: #64748b;">Target: 15/wk</span>
-            <span style="color: ${jamesColor}; font-weight: 700;">${jamesBookings} / 15</span>
-          </div>
-          <div style="background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden;">
-            <div style="background: ${jamesColor}; height: 100%; width: ${jamesProgress}%; border-radius: 4px;"></div>
-          </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="padding:10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;">
+          <div style="font-size:12px;color:#64748b;margin-bottom:4px;">James Jago</div>
+          <div style="font-size:20px;font-weight:700;color:#B46100;">${jamesB} <span style="font-size:12px;font-weight:400;color:#94a3b8;">/ 15</span></div>
+          <div style="background:#e2e8f0;height:6px;border-radius:3px;margin-top:6px;overflow:hidden;"><div style="background:${jamesB>=15?'#10b981':jamesB>=10?'#f59e0b':'#ef4444'};height:100%;width:${Math.min(100,jamesB/15*100)}%;"></div></div>
         </div>
-        <div>
-          <div style="font-size: 12px; font-weight: 700; color: #64748b; margin-bottom: 6px;">Andrii</div>
-          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-            <span style="color: #64748b;">Target: 15/wk</span>
-            <span style="color: ${andriiColor}; font-weight: 700;">${andriiBookings} / 15</span>
-          </div>
-          <div style="background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden;">
-            <div style="background: ${andriiColor}; height: 100%; width: ${andriiProgress}%; border-radius: 4px;"></div>
-          </div>
+        <div style="padding:10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;">
+          <div style="font-size:12px;color:#64748b;margin-bottom:4px;">Andrii</div>
+          <div style="font-size:20px;font-weight:700;color:#B46100;">${andriiB} <span style="font-size:12px;font-weight:400;color:#94a3b8;">/ 15</span></div>
+          <div style="background:#e2e8f0;height:6px;border-radius:3px;margin-top:6px;overflow:hidden;"><div style="background:${andriiB>=15?'#10b981':andriiB>=10?'#f59e0b':'#ef4444'};height:100%;width:${Math.min(100,andriiB/15*100)}%;"></div></div>
         </div>
       </div>
-
     </div>
-    <div style="padding: 40px; text-align: center; color: #94a3b8; font-size: 14px;">Week grid view coming soon</div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <div style="display:grid;grid-template-columns:56px repeat(7,1fr);gap:0;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;min-width:560px;">
+        <div style="background:#f8fafc;padding:8px 4px;text-align:center;font-size:11px;font-weight:700;color:#64748b;border-bottom:2px solid #e2e8f0;border-right:1px solid #e2e8f0;"></div>
   `;
+
+  days.forEach(d => {
+    const ds = toLocalDateString(d);
+    const isToday = ds === todayStr;
+    const dayLabel = d.toLocaleDateString('en-GB', { weekday: 'short' });
+    const dayNum = d.getDate();
+    html += `<div style="background:#f8fafc;padding:8px 4px;text-align:center;font-size:11px;font-weight:700;border-bottom:2px solid #e2e8f0;border-right:1px solid #e2e8f0;${isToday ? 'background:#fff8f0;color:#B46100;' : 'color:#64748b;'}">${dayLabel}<br>${dayNum}</div>`;
+  });
+
+  hours.forEach(h => {
+    const timeStr = `${String(h).padStart(2,'0')}:00`;
+    html += `<div style="background:#f8fafc;padding:4px 6px;font-size:10px;color:#94a3b8;text-align:right;border-bottom:1px solid #f1f5f9;border-right:2px solid #e2e8f0;line-height:1;">${timeStr}</div>`;
+    days.forEach(d => {
+      const ds = toLocalDateString(d);
+      const isToday = ds === todayStr;
+      const slotBookings = bookings.filter(b => {
+        const bt = (b.fields['Time']||'').substring(0,5);
+        return b.fields['Date'] === ds && bt >= timeStr && bt < `${String(h+1).padStart(2,'0')}:00`;
+      });
+      const slotBlocks = blockedTimes.filter(b => {
+        const st = (b.fields['Start Time']||'').substring(0,5);
+        const et = (b.fields['End Time']||'').substring(0,5);
+        return b.fields['Date'] === ds && st <= timeStr && timeStr < et;
+      });
+      html += `<div style="border-bottom:1px solid #f1f5f9;border-right:1px solid #f1f5f9;min-height:36px;padding:2px;${isToday ? 'background:#fff8f0;' : ''}">`;
+      slotBlocks.forEach(bl => {
+        html += `<div onclick="viewBlockedTime('${bl.id}')" style="border-radius:4px;padding:2px 4px;font-size:10px;font-weight:600;color:#fff;background:#ef4444;margin-bottom:1px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">🚫 Blocked</div>`;
+      });
+      slotBookings.forEach(bk => {
+        const ps = bk.fields['Payment Status']||'Pending';
+        const bg = bk.fields['Booking Status']==='Cancelled' ? '#94a3b8' : ps==='Pending' ? '#f59e0b' : '#B46100';
+        html += `<div onclick="viewBookingById('${bk.id}')" style="border-radius:4px;padding:2px 4px;font-size:10px;font-weight:600;color:#fff;background:${bg};margin-bottom:1px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${bk.fields['Time']} ${bk.fields['Client Name']}</div>`;
+      });
+      html += '</div>';
+    });
+  });
+
+  html += '</div></div>';
+  grid.innerHTML = html;
+}
+
+function showDaySheet(dateStr, dayBookings, dayBlocks) {
+  const existing = document.getElementById('daySheetOverlay');
+  if (existing) existing.remove();
+
+  const date = new Date(dateStr + 'T12:00:00');
+  const label = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  const allItems = [
+    ...dayBlocks.map(b => ({ type: 'block', time: b.fields['Start Time'], data: b })),
+    ...dayBookings.map(b => ({ type: 'booking', time: b.fields['Time'], data: b }))
+  ].sort((a, b) => (a.time||'').localeCompare(b.time||''));
+
+  let itemsHtml = '';
+  if (allItems.length === 0) {
+    itemsHtml = '<div class="day-sheet-empty">No bookings or blocks for this day</div>';
+  } else {
+    allItems.forEach(item => {
+      if (item.type === 'block') {
+        const f = item.data.fields;
+        itemsHtml += `<div class="day-sheet-item">
+          <div class="day-sheet-time">${f['Start Time']} – ${f['End Time']}</div>
+          <div class="day-sheet-name" style="color:#ef4444;">Blocked — ${f['Media Specialist']||''}</div>
+          ${f['Reason'] ? `<div class="day-sheet-sub">${f['Reason']}</div>` : ''}
+          <span class="day-sheet-badge" style="background:#fee2e2;color:#991b1b;">Blocked</span>
+        </div>`;
+      } else {
+        const f = item.data.fields;
+        const ps = f['Payment Status']||'Pending';
+        const badgeStyle = ps==='Paid' ? 'background:#d1fae5;color:#065f46;' : 'background:#fef3c7;color:#92400e;';
+        itemsHtml += `<div class="day-sheet-item" onclick="closeSheet();viewBookingById('${item.data.id}')">
+          <div class="day-sheet-time">${f['Time']}</div>
+          <div class="day-sheet-name">${f['Client Name']}</div>
+          <div class="day-sheet-sub">${f['Service']}</div>
+          <div class="day-sheet-sub">${f['Property Address']||''}</div>
+          <span class="day-sheet-badge" style="${badgeStyle}">${ps}</span>
+        </div>`;
+      }
+    });
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'day-sheet-overlay';
+  overlay.id = 'daySheetOverlay';
+  overlay.onclick = e => { if (e.target === overlay) closeSheet(); };
+  overlay.innerHTML = `
+    <div class="day-sheet">
+      <div class="day-sheet-handle"></div>
+      <div class="day-sheet-header">
+        <span>${label}</span>
+        <button onclick="closeSheet()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#64748b;line-height:1;">&times;</button>
+      </div>
+      ${itemsHtml}
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function closeSheet() {
+  const el = document.getElementById('daySheetOverlay');
+  if (el) el.remove();
 }
 
 function renderDayView(bookings, blockedTimes) {
   const grid = document.getElementById('calendarGrid');
-  grid.innerHTML = '<div style="padding: 40px; text-align: center;">Day view coming soon...</div>';
+  const dateStr = toLocalDateString(currentDate);
+  const dayBookings = bookings.filter(b => b.fields['Date'] === dateStr);
+  const dayBlocks = blockedTimes.filter(b => b.fields['Date'] === dateStr);
+  const activeCount = dayBookings.filter(b => b.fields['Booking Status'] !== 'Cancelled').length;
+
+  let html = `
+    <div style="margin-bottom:16px;">
+      <div class="calendar-booking-counter">
+        <span class="calendar-booking-counter-value">${activeCount}</span>
+        <span class="calendar-booking-counter-label"> booking${activeCount !== 1 ? 's' : ''} today</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
+  `;
+
+  for (let h = 8; h <= 18; h++) {
+    for (const [slot, isHalf] of [[`${String(h).padStart(2,'0')}:00`, false],[`${String(h).padStart(2,'0')}:30`, true]]) {
+      if (h === 18 && isHalf) continue;
+      const slotBookings = dayBookings.filter(b => (b.fields['Time']||'').startsWith(slot));
+      const slotBlocks = dayBlocks.filter(b => {
+        const st = (b.fields['Start Time']||'').substring(0,5);
+        const et = (b.fields['End Time']||'').substring(0,5);
+        return st <= slot && slot < et;
+      });
+      const hasContent = slotBookings.length > 0 || slotBlocks.length > 0;
+      html += `<div style="display:flex;border-bottom:1px solid #f1f5f9;${hasContent ? 'background:#fffbf5;' : ''}">`;
+      html += `<div style="width:60px;padding:8px 10px;font-size:${isHalf ? '10px' : '11px'};color:${isHalf ? '#d1d5db' : '#94a3b8'};text-align:right;flex-shrink:0;border-right:2px solid #e2e8f0;background:#f8fafc;">${slot}</div>`;
+      html += '<div style="flex:1;padding:4px 8px;min-height:36px;">';
+      slotBlocks.forEach(bl => {
+        const f = bl.fields;
+        html += `<div onclick="viewBlockedTime('${bl.id}')" style="border-radius:6px;padding:6px 10px;background:#fee2e2;border-left:3px solid #ef4444;margin-bottom:4px;cursor:pointer;">
+          <div style="font-size:13px;font-weight:700;color:#ef4444;">Blocked — ${f['Media Specialist']||''}</div>
+          <div style="font-size:11px;color:#64748b;margin-top:2px;">${f['Start Time']||''} – ${f['End Time']||''} ${f['Reason'] ? '· ' + f['Reason'] : ''}</div>
+        </div>`;
+      });
+      slotBookings.forEach(bk => {
+        const f = bk.fields;
+        const ps = f['Payment Status']||'Pending';
+        const border = f['Booking Status']==='Cancelled' ? '#94a3b8' : ps==='Pending' ? '#f59e0b' : '#B46100';
+        const bg = f['Booking Status']==='Cancelled' ? '#f1f5f9' : ps==='Pending' ? '#fef3c7' : '#fff3e0';
+        html += `<div onclick="viewBookingById('${bk.id}')" style="border-radius:6px;padding:6px 10px;background:${bg};border-left:3px solid ${border};margin-bottom:4px;cursor:pointer;">
+          <div style="font-size:13px;font-weight:700;color:#0f172a;">${f['Client Name']}</div>
+          <div style="font-size:11px;color:#64748b;margin-top:2px;">${f['Service']} · ${f['Property Address']||''}</div>
+          <div style="font-size:11px;font-weight:600;color:${ps==='Paid'?'#10b981':'#f59e0b'};margin-top:2px;">${ps}</div>
+        </div>`;
+      });
+      html += '</div></div>';
+    }
+  }
+
+  html += '</div>';
+  grid.innerHTML = html;
 }
 
 // ===== BOOKINGS FUNCTIONS =====
