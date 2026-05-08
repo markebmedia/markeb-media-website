@@ -1557,10 +1557,7 @@ body {
       <i data-lucide="calendar" class="nav-icon" style="width: 20px; height: 20px;"></i>
       Calendar
     </div>
-    <div class="nav-item" onclick="showSection('bookings')">
-      <i data-lucide="clipboard-list" class="nav-icon" style="width: 20px; height: 20px;"></i>
-      All Bookings
-    </div>
+    
     <div class="nav-item" onclick="showSection('pending')">
       <i data-lucide="credit-card" class="nav-icon" style="width: 20px; height: 20px;"></i>
       Pending (Need Payment)
@@ -1942,36 +1939,15 @@ body {
           <button class="btn btn-primary" onclick="loadCalendar()">
             <i data-lucide="refresh-cw" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Refresh
           </button>
+          <button class="btn btn-secondary" onclick="showFindBookingModal()">
+            <i data-lucide="search" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Find Booking
+          </button>
         </div>
 
         <div id="calendarGrid">
           <div style="text-align: center; padding: 40px;">
             <div class="spinner"></div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- All Bookings Section -->
-    <div class="admin-section" id="bookings">
-      <div class="filters-bar">
-        <input type="text" class="filter-input" id="bookingSearch" placeholder="Search by name, email, address, reference...">
-        <select class="filter-select" id="bookingRegion">
-         <select class="filter-select" id="bookingRegion">
-        </select>
-        <select class="filter-select" id="bookingStatus">
-          <option value="">All Status</option>
-          <option value="Booked">Booked</option>
-          <option value="Cancelled">Cancelled</option>
-        </select>
-        <button class="btn btn-primary" onclick="loadBookings()">
-          <i data-lucide="search" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Search
-        </button>
-      </div>
-
-      <div class="calendar-container" id="bookingsContainer">
-        <div style="text-align: center; padding: 40px;">
-          <div class="spinner"></div>
         </div>
       </div>
     </div>
@@ -2558,6 +2534,37 @@ We wanted to reach out..." required></textarea>
 
 </div>
 <!-- END EMAIL BROADCAST SECTION -->
+
+  <!-- Find Booking Modal -->
+<div class="modal" id="findBookingModal" onclick="closeModal('findBookingModal')">
+  <div class="modal-dialog" style="max-width: 700px;" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Find Booking</h3>
+      <button class="modal-close" onclick="closeModal('findBookingModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:12px;margin-bottom:20px;">
+        <input 
+          type="text" 
+          id="findBookingInput" 
+          class="form-input" 
+          placeholder="Search by name, email, reference, address..."
+          style="flex:1;"
+          oninput="runFindBooking()"
+          onkeydown="if(event.key==='Enter') runFindBooking()"
+        >
+        <select id="findBookingStatus" class="form-input" style="max-width:160px;" onchange="runFindBooking()">
+          <option value="">All Status</option>
+          <option value="Booked">Booked</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div id="findBookingResults">
+        <div style="text-align:center;color:#94a3b8;padding:40px;">Type to search bookings</div>
+      </div>
+    </div>
+  </div>
+</div>
 
   <!-- Booking Detail Modal -->
   <div class="modal" id="bookingModal" onclick="closeModal('bookingModal')">
@@ -8836,6 +8843,101 @@ async function confirmSuspend() {
   } finally {
     btn.disabled = false;
     btn.textContent = isSuspended ? 'Reinstate Account' : 'Suspend Account';
+  }
+}
+
+function showFindBookingModal() {
+  document.getElementById('findBookingInput').value = '';
+  document.getElementById('findBookingStatus').value = '';
+  document.getElementById('findBookingResults').innerHTML = '<div style="text-align:center;color:#94a3b8;padding:40px;">Type to search bookings</div>';
+  document.getElementById('findBookingModal').classList.add('active');
+  setTimeout(() => document.getElementById('findBookingInput').focus(), 100);
+}
+
+async function runFindBooking() {
+  const term = document.getElementById('findBookingInput').value.trim();
+  const status = document.getElementById('findBookingStatus').value;
+  const results = document.getElementById('findBookingResults');
+
+  if (term.length < 2 && !status) {
+    results.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:40px;">Type at least 2 characters to search</div>';
+    return;
+  }
+
+  results.innerHTML = '<div style="text-align:center;padding:20px;"><div class="spinner" style="width:30px;height:30px;"></div></div>';
+
+  try {
+    const response = await fetch('/.netlify/functions/admin-bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ search: term, status })
+    });
+    const data = await response.json();
+
+    if (!data.success || data.bookings.length === 0) {
+      results.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:40px;">No bookings found</div>';
+      return;
+    }
+
+    const termLower = term.toLowerCase();
+    let filtered = data.bookings.filter(b => {
+      const f = b.fields;
+      return (
+        (f['Client Name'] || '').toLowerCase().includes(termLower) ||
+        (f['Client Email'] || '').toLowerCase().includes(termLower) ||
+        (f['Booking Reference'] || '').toLowerCase().includes(termLower) ||
+        (f['Property Address'] || '').toLowerCase().includes(termLower)
+      );
+    });
+
+    if (status) filtered = filtered.filter(b => b.fields['Booking Status'] === status);
+
+    if (filtered.length === 0) {
+      results.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:40px;">No bookings found</div>';
+      return;
+    }
+
+    filtered.forEach(b => {
+      if (!allBookings.find(x => x.id === b.id)) allBookings.push(b);
+    });
+
+    let html = `<div style="font-size:13px;color:#64748b;margin-bottom:12px;">${filtered.length} result${filtered.length !== 1 ? 's' : ''}</div>`;
+
+    filtered.forEach(b => {
+      const f = b.fields;
+      const ps = f['Payment Status'] || 'Pending';
+      const bs = f['Booking Status'] || 'Booked';
+      const price = f['Final Price'] || 0;
+      const psColor = ps === 'Paid' ? '#10b981' : '#f59e0b';
+      const bsColor = bs === 'Cancelled' ? '#ef4444' : '#10b981';
+
+      html += `
+        <div onclick="closeModal('findBookingModal');viewBookingById('${b.id}')" style="padding:14px 16px;border:2px solid #e2e8f0;border-radius:10px;margin-bottom:10px;cursor:pointer;transition:all .15s ease;" onmouseover="this.style.borderColor='#B46100';this.style.background='#fffbf5'" onmouseout="this.style.borderColor='#e2e8f0';this.style.background='#fff'">
+          <div style="display:flex;justify-content:space-between;align-items:start;gap:12px;">
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:15px;color:#0f172a;">${f['Client Name']}</div>
+              <div style="font-size:12px;color:#64748b;margin-top:2px;">${f['Client Email']}</div>
+              <div style="font-size:13px;color:#475569;margin-top:6px;">${f['Service']}</div>
+              <div style="font-size:12px;color:#94a3b8;margin-top:2px;">${f['Property Address'] || ''}</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0;">
+              <div style="font-weight:700;color:#B46100;font-size:15px;">£${price.toFixed(2)}</div>
+              <div style="font-size:12px;margin-top:4px;">${f['Date']} · ${f['Time']}</div>
+              <div style="margin-top:6px;display:flex;gap:6px;justify-content:flex-end;">
+                <span style="padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600;background:${psColor}20;color:${psColor};">${ps}</span>
+                <span style="padding:2px 8px;border-radius:8px;font-size:11px;font-weight:600;background:${bsColor}20;color:${bsColor};">${bs}</span>
+              </div>
+              <div style="font-size:11px;color:#94a3b8;margin-top:4px;font-family:monospace;">${f['Booking Reference']}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    results.innerHTML = html;
+
+  } catch (err) {
+    results.innerHTML = '<div style="text-align:center;color:#ef4444;padding:40px;">Error searching bookings</div>';
   }
 }
 
