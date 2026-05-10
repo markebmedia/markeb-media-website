@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markeb Media — Commercial Intelligence Framework</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root {
+  --pine:    #3F4D1B;
+  --pine2:   #2d3812;
+  --orange:  #B46100;
+  --orange2: #8a4a00;
+  --cream:   #FDF3E2;
+  --cream2:  #F5E8CC;
+  --ink:     #1e293b;
+  --mid:     #475569;
+  --muted:   #64748b;
+  --faint:   #94a3b8;
+  --border:  #e2e8f0;
+  --border2: rgba(63,77,27,0.3);
+}
+
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: #f8fafc; color: var(--ink); font-size: 14px; line-height: 1.6; min-height: 100vh; overflow-x: hidden; }
+img, video, input, textarea, select { max-width: 100%; }
+
+/* HEADER */
+.hdr { background: var(--pine); padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.hdr-logo { height: 48px; width: auto; filter: brightness(0) invert(1); }
+.hdr-title { font-size: clamp(16px,3vw,22px); font-weight: 800; color: var(--cream); margin-bottom: 3px; }
+.hdr-sub { font-size: 12px; color: rgba(253,243,226,.55); }
+
+/* TOP TABS */
+.top-tabs { background: #fff; border-bottom: 2px solid var(--border); display: flex; overflow-x: auto; scrollbar-width: none; position: sticky; top: 0; z-index: 50; }
+.top-tabs::-webkit-scrollbar { display: none; }
+.top-tab { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); background: none; border: none; border-bottom: 2.5px solid transparent; padding: 14px 22px; cursor: pointer; white-space: nowrap; transition: all .15s; -webkit-tap-highlight-color: transparent; flex-shrink: 0; display: flex; align-items: center; gap: 7px; }
+.top-tab svg { width: 15px; height: 15px; flex-shrink: 0; }
+.top-tab:hover { color: var(--pine); }
+.top-tab.on { color: var(--pine); border-bottom-color: var(--orange); font-weight: 700; }
+
+/* PANELS */
+.top-panel { display: none; padding: 28px 32px; }
+.top-panel.on { display: block; }
+
+/* FRAMEWORK PAGE */
+.fw-hero { margin-bottom: 32px; }
+.fw-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--orange); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.fw-eyebrow::before { content: ''; width: 22px; height: 1px; background: var(--orange); flex-shrink: 0; }
+.fw-heading { font-family: 'Cormorant Garamond', serif; font-size: clamp(32px,6vw,58px); font-weight: 700; line-height: 1.05; color: var(--ink); margin-bottom: 14px; letter-spacing: -.5px; }
+.fw-heading em { font-style: italic; color: var(--orange); }
+.fw-desc { font-size: 14px; color: var(--mid); line-height: 1.75; max-width: 600px; }
+
+/* FOUNDATION BLOCK */
+.foundation { background: var(--pine); border-radius: 14px; padding: 28px 32px; margin-bottom: 32px; position: relative; overflow: hidden; }
+.foundation::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--orange), #D4940A); }
+.foundation-label { font-size: 9px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: rgba(253,243,226,.5); margin-bottom: 14px; }
+.foundation-text { font-family: 'Cormorant Garamond', serif; font-size: clamp(18px,3vw,26px); font-weight: 700; color: var(--cream); line-height: 1.3; margin-bottom: 12px; }
+.foundation-text em { font-style: italic; color: #D4940A; }
+.foundation-sub { font-size: 13px; color: rgba(253,243,226,.65); line-height: 1.75; }
+
+/* SECTION LABEL */
+.sec-label { font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); margin: 28px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 6px; }
+.sec-label svg { width: 13px; height: 13px; }
+
+/* STEPS GRID */
+.steps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 28px; }
+.step-card { background: #fff; border: 2px solid var(--border); border-radius: 14px; padding: 24px 22px; transition: border-color .2s, box-shadow .2s; position: relative; overflow: hidden; }
+.step-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--pine), var(--orange)); opacity: 0; transition: opacity .2s; }
+.step-card:hover { border-color: rgba(63,77,27,.3); box-shadow: 0 4px 24px rgba(63,77,27,.08); }
+.step-card:hover::after { opacity: 1; }
+.step-card.gold { border-color: rgba(180,97,0,.3); background: rgba(180,97,0,.03); }
+.step-card.gold::after { background: linear-gradient(90deg, var(--orange), #D4940A); opacity: 1; }
+.step-num { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 700; color: #e2e8f0; line-height: 1; margin-bottom: 14px; transition: color .2s; }
+.step-card:hover .step-num { color: rgba(63,77,27,.15); }
+.step-card.gold .step-num { color: rgba(180,97,0,.15); }
+.step-title { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 8px; display: flex; align-items: center; gap: 7px; }
+.step-title svg { width: 15px; height: 15px; color: var(--pine); flex-shrink: 0; }
+.step-card.gold .step-title svg { color: var(--orange); }
+.step-body { font-size: 12.5px; color: var(--mid); line-height: 1.7; }
+.step-q { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 11.5px; color: var(--orange); font-weight: 600; font-style: italic; }
+
+/* DRIVERS */
+.drivers-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+.driver-tag { background: #fff; border: 1.5px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 12px; color: var(--mid); font-weight: 500; display: flex; align-items: center; gap: 6px; transition: border-color .15s; }
+.driver-tag:hover { border-color: var(--orange); color: var(--orange2); }
+.driver-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--orange); flex-shrink: 0; }
+
+/* FULL CIRCLE */
+.circle-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0; background: #fff; border: 2px solid var(--border); border-radius: 14px; overflow: hidden; }
+.circle-step { padding: 24px 22px; border-right: 1px solid var(--border); }
+.circle-step:last-child { border-right: none; }
+.circle-num { font-size: 9px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--orange); margin-bottom: 10px; }
+.circle-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+.circle-body { font-size: 12px; color: var(--mid); line-height: 1.65; }
+
+/* INFO BOXES */
+.info-box { background: rgba(63,77,27,.06); border-left: 3px solid var(--pine); border-radius: 0 10px 10px 0; padding: 12px 15px; margin-bottom: 14px; display: flex; gap: 10px; align-items: flex-start; }
+.info-box svg { width: 16px; height: 16px; color: var(--pine); flex-shrink: 0; margin-top: 1px; }
+.info-box p { font-size: 13px; color: var(--mid); line-height: 1.6; }
+
+.orange-box { background: rgba(180,97,0,.06); border-left: 3px solid var(--orange); border-radius: 0 10px 10px 0; padding: 12px 15px; margin-bottom: 14px; display: flex; gap: 10px; align-items: flex-start; }
+.orange-box svg { width: 16px; height: 16px; color: var(--orange); flex-shrink: 0; margin-top: 1px; }
+.orange-box p { font-size: 13px; color: var(--mid); line-height: 1.6; }
+
+/* WIN BOX */
+.win-box { background: linear-gradient(135deg, var(--pine), var(--pine2)); border-radius: 12px; padding: 14px 20px; display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.win-box svg { width: 20px; height: 20px; color: #c8d96b; flex-shrink: 0; }
+.win-box-text { color: var(--cream); font-weight: 700; font-size: 14px; }
+.win-box-sub { display: block; font-size: 11.5px; font-weight: 400; color: rgba(253,243,226,.6); margin-top: 2px; }
+
+/* SECTION CARD */
+.section-card { background: #fff; border: 2px solid var(--border); border-radius: 14px; padding: 22px 24px; margin-bottom: 14px; }
+.section-card:last-child { margin-bottom: 0; }
+.sc-title { font-size: 15px; font-weight: 700; color: var(--pine); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+.sc-title svg { width: 17px; height: 17px; flex-shrink: 0; color: var(--pine); }
+.sc-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+
+/* MINI GRID */
+.sf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.sf-mini { background: #f8fafc; border-radius: 8px; padding: 10px 12px; border: 1px solid var(--border); }
+.sf-mini-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); margin-bottom: 5px; display: flex; align-items: center; gap: 4px; }
+.sf-mini-label svg { width: 11px; height: 11px; }
+.sf-mini ul { list-style: none; padding: 0; }
+.sf-mini ul li { font-size: 12px; color: var(--mid); line-height: 1.55; padding-left: 12px; position: relative; margin-bottom: 3px; }
+.sf-mini ul li::before { content: '–'; position: absolute; left: 0; color: var(--orange); font-weight: 600; }
+
+/* STATS ROW */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; margin-bottom: 24px; }
+.stat-card { background: #fff; border: 2px solid var(--border); border-radius: 12px; padding: 16px 18px; text-align: center; }
+.stat-card.pine { border-color: var(--pine); }
+.stat-card.orange { border-color: var(--orange); }
+.stat-num { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 700; line-height: 1; }
+.stat-card.pine .stat-num { color: var(--pine); }
+.stat-card.orange .stat-num { color: var(--orange); }
+.stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-top: 5px; line-height: 1.3; }
+
+/* DECODER */
+.flow-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 24px; }
+.flow-btn { background: #fff; border: 2px solid var(--border); border-radius: 12px; padding: 14px 16px; cursor: pointer; text-align: left; transition: all .2s; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+.flow-btn:hover { border-color: var(--orange); background: rgba(180,97,0,.03); }
+.flow-btn.on { border-color: var(--pine); background: rgba(63,77,27,.05); }
+.flow-btn-num { font-size: 22px; font-weight: 800; color: #cbd5e1; line-height: 1; margin-bottom: 6px; }
+.flow-btn.on .flow-btn-num { color: var(--pine); }
+.flow-btn-title { font-size: 12.5px; font-weight: 700; color: var(--pine); margin-bottom: 2px; }
+.flow-btn-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+.flow-panel { display: none; }
+.flow-panel.on { display: block; animation: fadeUp .25s ease; }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* DECODER CARD */
+.decoder-card { background: #fff; border: 2px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 16px; }
+.decoder-card-hdr { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 16px; background: #f8fafc; }
+.decoder-badge { width: 36px; height: 36px; border-radius: 8px; background: var(--pine); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--cream); flex-shrink: 0; margin-top: 2px; }
+.decoder-card-hdr h3 { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.decoder-card-hdr p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.decoder-body { padding: 24px; }
+
+/* PROGRESS */
+.progress-wrap { margin-bottom: 28px; }
+.progress-label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.progress-label { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; }
+.progress-pct { font-size: 11px; font-weight: 700; color: var(--pine); }
+.progress-bar-bg { background: var(--border); border-radius: 99px; height: 4px; overflow: hidden; margin-bottom: 14px; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--pine), var(--orange)); border-radius: 99px; transition: width .4s ease; }
+.step-dots { display: flex; gap: 6px; flex-wrap: wrap; }
+.step-dot { width: 30px; height: 30px; border-radius: 8px; border: 2px solid var(--border); background: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--muted); cursor: pointer; transition: all .15s; -webkit-tap-highlight-color: transparent; }
+.step-dot.done { background: rgba(63,77,27,.1); border-color: var(--pine); color: var(--pine); }
+.step-dot.active { background: var(--pine); border-color: var(--pine); color: var(--cream); }
+
+/* FORM ELEMENTS */
+.field-group { margin-bottom: 18px; }
+.field-label { font-size: 10px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display: block; }
+.decoder-input { width: 100%; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 8px; color: var(--ink); font-family: 'Inter', sans-serif; font-size: 13px; padding: 11px 14px; outline: none; transition: border-color .2s; resize: vertical; }
+.decoder-input:focus { border-color: var(--pine); background: #fff; }
+.decoder-input::placeholder { color: var(--faint); }
+
+.party-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+.party-input { flex: 1; background: #f8fafc; border: 1.5px solid var(--border); border-radius: 8px; color: var(--ink); font-family: 'Inter', sans-serif; font-size: 13px; padding: 10px 14px; outline: none; transition: border-color .2s; }
+.party-input:focus { border-color: var(--pine); background: #fff; }
+.party-input::placeholder { color: var(--faint); }
+.party-select { background: #f8fafc; border: 1.5px solid var(--border); border-radius: 8px; color: var(--mid); font-family: 'Inter', sans-serif; font-size: 12px; padding: 10px 10px; outline: none; cursor: pointer; min-width: 100px; transition: border-color .2s; }
+.party-select:focus { border-color: var(--pine); }
+.btn-remove { background: none; border: none; color: var(--faint); cursor: pointer; font-size: 18px; padding: 4px 6px; line-height: 1; transition: color .15s; flex-shrink: 0; }
+.btn-remove:hover { color: #dc2626; }
+.btn-add-party { background: none; border: 1.5px dashed var(--border); border-radius: 8px; color: var(--muted); font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; padding: 9px 16px; cursor: pointer; width: 100%; transition: all .15s; margin-top: 4px; }
+.btn-add-party:hover { border-color: var(--orange); color: var(--orange2); }
+
+.driver-opts { display: flex; flex-wrap: wrap; gap: 7px; }
+.driver-opt { padding: 7px 14px; border: 1.5px solid var(--border); border-radius: 20px; background: #f8fafc; color: var(--mid); font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s; -webkit-tap-highlight-color: transparent; }
+.driver-opt:hover { border-color: var(--orange); color: var(--orange2); }
+.driver-opt.selected { background: rgba(180,97,0,.08); border-color: var(--orange); color: var(--orange2); font-weight: 600; }
+
+/* NAV BUTTONS */
+.decoder-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.btn-primary { background: var(--pine); border: none; border-radius: 8px; color: var(--cream); font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 13px 26px; cursor: pointer; transition: background .15s; }
+.btn-primary:hover { background: var(--pine2); }
+.btn-secondary { background: none; border: 1.5px solid var(--border); border-radius: 8px; color: var(--mid); font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: 13px 20px; cursor: pointer; transition: all .15s; }
+.btn-secondary:hover { border-color: var(--mid); color: var(--ink); }
+.btn-reset { background: none; border: 1.5px solid var(--border); border-radius: 8px; color: var(--muted); font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; padding: 10px 18px; cursor: pointer; transition: all .15s; margin-top: 14px; }
+.btn-reset:hover { border-color: var(--mid); color: var(--ink); }
+.btn-export { background: rgba(63,77,27,.08); border: 1.5px solid var(--border2); border-radius: 8px; color: var(--pine); font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 10px 18px; cursor: pointer; transition: all .15s; margin-top: 14px; margin-left: 8px; }
+.btn-export:hover { background: rgba(63,77,27,.14); }
+
+/* OUTPUT */
+.output-block { background: #fff; border: 2px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 12px; animation: fadeUp .25s ease; }
+.output-block-hdr { padding: 14px 20px; background: #f8fafc; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.output-block-num { font-size: 9px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; color: var(--cream); background: var(--pine); padding: 3px 9px; border-radius: 20px; }
+.output-block-title { font-size: 13px; font-weight: 700; color: var(--ink); }
+.output-block-body { padding: 18px 20px; font-size: 13px; line-height: 1.75; color: var(--mid); }
+.output-highlight { color: var(--orange2); font-weight: 600; }
+.output-party-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.output-party-row:last-child { border-bottom: none; }
+.output-party-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+.output-tag { font-size: 10px; padding: 2px 9px; border-radius: 20px; font-weight: 600; }
+.tag-direct { background: rgba(63,77,27,.1); color: var(--pine); }
+.tag-indirect { background: rgba(180,97,0,.1); color: var(--orange2); }
+.tag-hidden { background: rgba(71,85,105,.1); color: var(--mid); }
+.output-loop-item { display: flex; align-items: flex-start; gap: 12px; padding: 8px 0; }
+.output-loop-num { font-size: 11px; font-weight: 800; color: var(--pine); min-width: 18px; margin-top: 1px; }
+.output-insight { background: rgba(180,97,0,.06); border-left: 3px solid var(--orange); border-radius: 0 8px 8px 0; padding: 12px 14px; margin-top: 14px; font-size: 12.5px; color: var(--mid); line-height: 1.65; }
+.output-insight strong { color: var(--orange2); }
+
+/* FOOTER */
+.footer { text-align: center; padding: 20px; font-size: 12px; color: var(--faint); border-top: 1px solid var(--border); margin-top: 12px; }
+
+/* RESPONSIVE */
+@media(max-width:768px) {
+  /* Header */
+  .hdr { padding: 16px 18px; gap: 12px; }
+  .hdr-logo { height: 32px; }
+  .hdr-title { font-size: 16px; }
+  .hdr-sub { font-size: 11px; }
+
+  /* Tabs */
+  .top-tabs { padding: 0; }
+  .top-tab { padding: 12px 14px; font-size: 12px; gap: 5px; }
+  .top-tab svg { width: 13px; height: 13px; }
+
+  /* Panels */
+  .top-panel { padding: 16px 14px; }
+
+  /* Framework hero */
+  .fw-hero { margin-bottom: 20px; }
+  .fw-desc { font-size: 13px; }
+
+  /* Foundation */
+  .foundation { padding: 20px 18px; margin-bottom: 20px; }
+  .foundation-text { font-size: clamp(16px,4.5vw,20px); }
+  .foundation-sub { font-size: 12px; }
+
+  /* Section labels */
+  .sec-label { margin: 20px 0 12px; font-size: 9px; }
+
+  /* Steps grid — single column */
+  .steps-grid { grid-template-columns: 1fr; gap: 8px; margin-bottom: 20px; }
+  .step-card { padding: 18px 16px; }
+  .step-num { font-size: 38px; margin-bottom: 10px; }
+  .step-title { font-size: 13px; }
+  .step-body { font-size: 12px; }
+  .step-q { font-size: 11px; margin-top: 10px; padding-top: 10px; }
+
+  /* Drivers */
+  .drivers-wrap { gap: 6px; margin-bottom: 20px; }
+  .driver-tag { font-size: 11px; padding: 5px 11px; }
+
+  /* Full circle — stack */
+  .circle-grid { grid-template-columns: 1fr; }
+  .circle-step { border-right: none; border-bottom: 1px solid var(--border); padding: 18px 16px; }
+  .circle-step:last-child { border-bottom: none; }
+  .circle-title { font-size: 15px; }
+  .circle-body { font-size: 12px; }
+
+  /* Info / orange boxes */
+  .info-box, .orange-box { padding: 10px 12px; }
+  .info-box p, .orange-box p { font-size: 12px; }
+
+  /* Win box */
+  .win-box { padding: 12px 14px; gap: 8px; }
+  .win-box-text { font-size: 13px; }
+  .win-box-sub { font-size: 11px; }
+
+  /* Section cards */
+  .section-card { padding: 16px 14px; margin-bottom: 10px; }
+  .sc-title { font-size: 13px; }
+  .sc-sub { font-size: 12px; margin-bottom: 12px; }
+
+  /* Mini grids — stack on mobile */
+  .sf-grid { grid-template-columns: 1fr; gap: 8px; }
+  .sf-mini { padding: 9px 10px; }
+  .sf-mini ul li { font-size: 11.5px; }
+
+  /* Stat cards */
+  .stats-row { grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .stat-num { font-size: 28px; }
+  .stat-label { font-size: 9px; }
+
+  /* Decoder flow grid */
+  .flow-grid { grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .flow-btn { padding: 12px 12px; }
+  .flow-btn-num { font-size: 18px; }
+  .flow-btn-title { font-size: 11.5px; }
+  .flow-btn-desc { font-size: 10.5px; }
+
+  /* Decoder progress */
+  .progress-wrap { margin-bottom: 18px; }
+  .step-dots { gap: 5px; }
+  .step-dot { width: 26px; height: 26px; font-size: 9px; border-radius: 6px; }
+
+  /* Decoder card */
+  .decoder-card-hdr { padding: 14px 16px; gap: 12px; }
+  .decoder-badge { width: 30px; height: 30px; font-size: 10px; border-radius: 6px; flex-shrink: 0; }
+  .decoder-card-hdr h3 { font-size: 13px; }
+  .decoder-card-hdr p { font-size: 11.5px; }
+  .decoder-body { padding: 16px 14px; }
+
+  /* Form fields */
+  .field-label { font-size: 9px; margin-bottom: 6px; }
+  .decoder-input { font-size: 14px; padding: 10px 12px; } /* 14px prevents iOS zoom */
+  .field-group { margin-bottom: 14px; }
+
+  /* Party builder */
+  .party-row { flex-wrap: wrap; gap: 6px; }
+  .party-input { font-size: 14px; padding: 9px 10px; min-width: 0; flex: 1 1 160px; }
+  .party-select { font-size: 13px; padding: 9px 8px; min-width: 80px; flex-shrink: 0; }
+  .btn-add-party { font-size: 12px; padding: 9px 14px; }
+
+  /* Driver options */
+  .driver-opts { gap: 6px; }
+  .driver-opt { font-size: 11.5px; padding: 6px 12px; }
+
+  /* Nav buttons */
+  .decoder-nav { flex-direction: column-reverse; gap: 8px; margin-top: 14px; }
+  .btn-primary { width: 100%; padding: 14px; font-size: 12px; }
+  .btn-secondary { width: 100%; padding: 12px; font-size: 12px; }
+  .btn-reset { font-size: 10px; padding: 9px 14px; margin-top: 10px; }
+  .btn-export { font-size: 10px; padding: 9px 14px; margin-top: 10px; margin-left: 6px; }
+
+  /* Output blocks */
+  .output-block-hdr { padding: 12px 14px; }
+  .output-block-num { font-size: 8px; padding: 2px 8px; }
+  .output-block-title { font-size: 12px; }
+  .output-block-body { padding: 14px; font-size: 12px; }
+  .output-insight { font-size: 12px; padding: 10px 12px; }
+  .output-party-name { font-size: 12px; }
+}
+
+@media(max-width:420px) {
+  .hdr-logo { display: none; }
+  .flow-grid { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .top-tab { padding: 11px 12px; font-size: 11px; }
+  .step-dots { gap: 4px; }
+  .step-dot { width: 24px; height: 24px; font-size: 9px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div>
+    <div class="hdr-title">Commercial Intelligence Framework</div>
+    <div class="hdr-sub">The framework for decoding any business model · Mark Garside · 2026</div>
+  </div>
+  <img class="hdr-logo" src="/public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" onerror="this.style.display='none'">
+</div>
+
+<!-- TOP TABS -->
+<div class="top-tabs">
+  <button class="top-tab on" onclick="showTop('framework',this)">
+    <i data-lucide="layers"></i> The Framework
+  </button>
+  <button class="top-tab" onclick="showTop('decoder',this)">
+    <i data-lucide="scan-search"></i> Business Decoder
+  </button>
+</div>
+
+<!-- ═══════════════════ FRAMEWORK ═══════════════════ -->
+<div class="top-panel on" id="framework">
+
+  <div class="fw-hero">
+    <div class="fw-eyebrow">Internal · Markeb Media</div>
+    <h1 class="fw-heading">The Commercial<br><em>Intelligence Framework</em></h1>
+    <p class="fw-desc">A repeatable system for decoding any business model. Strip away the surface, identify who holds the power, map the loop, and find the gap. Applies to every industry without exception.</p>
+  </div>
+
+  <!-- FOUNDATION -->
+  <div class="foundation">
+    <div class="foundation-label">The Foundation — Start Here Every Time</div>
+    <div class="foundation-text">Everyone is a buyer and a seller.<br><em>Power belongs to whoever is selling the scarcer thing.</em></div>
+    <div class="foundation-sub">This is the root of every model. Every relationship, every transaction, every ecosystem sits on top of this truth. Before anything else, ask: what is each party buying and what are they selling?</div>
+  </div>
+
+  <!-- THE 7 STEPS -->
+  <div class="sec-label"><i data-lucide="list-ordered"></i> The Seven Steps</div>
+  <div class="steps-grid">
+
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <div class="step-title"><i data-lucide="flag"></i> Start With the Outcome</div>
+      <div class="step-body">What is the end goal of this entire ecosystem? Sell the house. Fill the stadium. Sign the player. Win the league. Everything else maps back to this single outcome. Define it clearly before anything else.</div>
+      <div class="step-q">→ What does success look like for the entire ecosystem?</div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">02</div>
+      <div class="step-title"><i data-lucide="users"></i> List Every Party Involved</div>
+      <div class="step-body">Map everyone directly and indirectly involved. The obvious ones and the hidden ones. No ecosystem is as simple as it first appears. The hidden parties often hold more power than the visible ones.</div>
+      <div class="step-q">→ Who else is in the room even when they're not in the room?</div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">03</div>
+      <div class="step-title"><i data-lucide="crosshair"></i> Identify the Real ICP</div>
+      <div class="step-body">Not who the business claims to serve. Who does the entire model actually depend on to function? In football it is the player not the fan. In property media it is the developer not the homeowner. The stated customer and the real customer are often different.</div>
+      <div class="step-q">→ Who does the loop collapse without?</div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">04</div>
+      <div class="step-title"><i data-lucide="trending-up"></i> Follow the Money Backwards</div>
+      <div class="step-body">Ignore the obvious revenue stream. Find the one the whole machine is actually built around. Surface revenue is rarely the real revenue. Follow it backwards until you find the engine that everything else is protecting.</div>
+      <div class="step-q">→ What would break the business if it stopped?</div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">05</div>
+      <div class="step-title"><i data-lucide="zap"></i> Find the Multiplier Asset</div>
+      <div class="step-body">What single thing generates return across multiple revenue streams simultaneously? The elite footballer triggers shirt sales, broadcast value, social growth and sponsorships all at once. One asset, multiple streams. Find it in every model you decode.</div>
+      <div class="step-q">→ What one thing makes everything else worth more?</div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">06</div>
+      <div class="step-title"><i data-lucide="refresh-cw"></i> Map the Loop</div>
+      <div class="step-body">Every sustainable model has a self reinforcing cycle. No loop means no compounding, no defensibility, no moat. Map every party and how they feed each other. Club attracts player, player attracts fans, fans attract money, money attracts better players.</div>
+      <div class="step-q">→ What feeds what and in what order?</div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-num">07</div>
+      <div class="step-title"><i data-lucide="shield-check"></i> Spot the Proof of Concept Layer</div>
+      <div class="step-body">What does each party need to see to trust the model enough to participate? Every party has a different proof requirement. Find what each side needs to see and you know exactly how to position yourself to enter or exploit the ecosystem.</div>
+      <div class="step-q">→ What does each side need to see before they commit?</div>
+    </div>
+
+    <div class="step-card gold">
+      <div class="step-num">+</div>
+      <div class="step-title"><i data-lucide="eye"></i> The Social Cues Layer</div>
+      <div class="step-body">Every ecosystem has unwritten rules about status, trust and belonging. These cues reveal what each party actually values beneath the surface. Sometimes the currency is money. Sometimes credibility, association or access. Read the cues, understand the real currency of that world.</div>
+      <div class="step-q" style="color:var(--orange2)">→ What signals status, safety and belonging in this world?</div>
+    </div>
+
+  </div>
+
+  <!-- DRIVERS -->
+  <div class="sec-label"><i data-lucide="heart"></i> Primary Drivers — What Each ICP Actually Wants</div>
+  <div class="drivers-wrap">
+    <div class="driver-tag">Money</div>
+    <div class="driver-tag">Fame</div>
+    <div class="driver-tag">Credibility</div>
+    <div class="driver-tag">Status</div>
+    <div class="driver-tag">Security</div>
+    <div class="driver-tag">Proof</div>
+    <div class="driver-tag">Legacy</div>
+    <div class="driver-tag">Access</div>
+    <div class="driver-tag">Freedom</div>
+    <div class="driver-tag">Recognition</div>
+    <div class="driver-tag">Control</div>
+    <div class="driver-tag">Belonging</div>
+  </div>
+
+  <!-- FULL CIRCLE -->
+  <div class="sec-label"><i data-lucide="circle"></i> The Full Circle Moment</div>
+  <div class="circle-grid" style="margin-bottom:28px">
+    <div class="circle-step">
+      <div class="circle-num">Step 01</div>
+      <div class="circle-title">What They Think About</div>
+      <div class="circle-body">Identify the primary driver of your ICP. What occupies their mind. What they want more than anything else in this context. That is the lens everything else gets filtered through.</div>
+    </div>
+    <div class="circle-step">
+      <div class="circle-num">Step 02</div>
+      <div class="circle-title">What They Notice</div>
+      <div class="circle-body">Whatever they think about is what they notice. Their attention filters for proof of their desired outcome. They only see what confirms their goal. Everything else is invisible to them.</div>
+    </div>
+    <div class="circle-step">
+      <div class="circle-num">Step 03</div>
+      <div class="circle-title">How You Move Them</div>
+      <div class="circle-body">Whatever they notice is what influences them. Become the proof of concept for what they want and you have their attention. Repeat from every angle. That is how you sell to every party in the ecosystem.</div>
+    </div>
+  </div>
+
+  <!-- REAL WORLD EXAMPLES -->
+  <div class="sec-label"><i data-lucide="building-2"></i> Real World Decoded — Examples</div>
+
+  <div class="section-card" style="margin-bottom:10px">
+    <div class="sc-title"><i data-lucide="trophy"></i> Football Club</div>
+    <div class="sc-sub">How the model actually works — not how most people think it works.</div>
+    <div class="sf-grid">
+      <div class="sf-mini">
+        <div class="sf-mini-label"><i data-lucide="crosshair"></i> Real ICP</div>
+        <ul><li>The elite player — not the fan</li><li>Without the player the loop collapses</li><li>Fan loyalty is downstream of player attachment</li></ul>
+      </div>
+      <div class="sf-mini">
+        <div class="sf-mini-label"><i data-lucide="trending-up"></i> Real Revenue</div>
+        <ul><li>Broadcast deals — not ticket sales</li><li>Shirt sponsorship and global brand deals</li><li>Digital audience monetisation</li></ul>
+      </div>
+      <div class="sf-mini">
+        <div class="sf-mini-label"><i data-lucide="zap"></i> Multiplier Asset</div>
+        <ul><li>The iconic player with a global audience</li><li>Triggers shirts, broadcast, social, sponsorship</li><li>ROI can be 4–5x wages monthly</li></ul>
+      </div>
+      <div class="sf-mini">
+        <div class="sf-mini-label"><i data-lucide="refresh-cw"></i> The Loop</div>
+        <ul><li>Club attracts player via stadium and network</li><li>Player attracts fans via lifestyle and fame</li><li>Fans attract broadcasters and sponsors</li><li>Money attracts the next elite player</li></ul>
+      </div>
+    </div>
+    <div class="output-insight">The club is not a football business. It is a media company that happens to play football. The sport is the content. The players are the talent. The fans are the audience sold to advertisers.</div>
+  </div>
+
+  <div class="section-card" style="margin-bottom:10px">
+    <div class="sc-title"><i data-lucide="sofa"></i> Property Staging Company</div>
+    <div class="sc-sub">Most staging companies target homeowners. That is the wrong ICP.</div>
+    <div class="sf-grid">
+      <div class="sf-mini">
+        <div class="sf-mini-label"><i data-lucide="crosshair"></i> Real ICP</div>
+        <ul><li>Property developer — not homeowner</li><li>Developers need empty spaces staged for lifestyle effect</li><li>Estate agents are the connector not the customer</li></ul>
+      </div>
+      <div class="sf-mini">
+        <div class="sf-mini-label"><i data-lucide="shield-check"></i> Proof of Concept</div>
+        <ul><li>Portfolio of completed high-end developments</li><li>Premium visual presence — website, materials</li><li>Streamlined process and delivery consistency</li></ul>
+      </div>
+      <div class="sf-mini">
+        <div class="sf-mini-label"><i data-lucide="zap"></i> Power Holder</div>
+        <ul><li>The developer holds all the leverage</li><li>They control the volume and the brief</li><li>Everything else orbits winning and keeping them</li></ul>
+      </div>
+      <div class="sf-mini">
+        <div class="sf-mini-label"><i data-lucide="refresh-cw"></i> The Loop</div>
+        <ul><li>Staging company wins developer trust</li><li>Well staged property sells faster</li><li>Agent looks good to developer</li><li>Developer trusts agent with next plot</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="sc-title"><i data-lucide="camera"></i> Markeb Media — Our Own Model Decoded</div>
+    <div class="sc-sub">The same framework applied to ourselves — two separate ICPs, one business serving both.</div>
+    <div class="sf-grid">
+      <div class="sf-mini">
+        <div class="sf-mini-label"><i data-lucide="home"></i> Agent ICP</div>
+        <ul><li>Fast, high-quality, consistent media</li><li>Driver: credibility with vendors</li><li>Proof: portfolio quality and 48hr turnaround</li><li>Media is the entry point — process closes the deal</li></ul>
+      </div>
+      <div class="sf-mini">
+        <div class="sf-mini-label"><i data-lucide="building-2"></i> Developer ICP</div>
+        <ul><li>Full campaign thinking and brand narrative</li><li>Driver: sales velocity and project prestige</li><li>Proof: Northstone case study and premium output</li><li>Media is the door — full service is the ceiling</li></ul>
+      </div>
+      <div class="sf-mini">
+        <div class="sf-mini-label"><i data-lucide="zap"></i> Multiplier Asset</div>
+        <ul><li>Great media opens both audiences simultaneously</li><li>One shoot generates agent loyalty and developer proof</li><li>Case study content feeds sales, marketing, and trust</li></ul>
+      </div>
+      <div class="sf-mini">
+        <div class="sf-mini-label"><i data-lucide="refresh-cw"></i> Our Loop</div>
+        <ul><li>Great media attracts agents</li><li>Agents introduce developers</li><li>Developers need full service</li><li>Full service creates case studies that attract more agents</li></ul>
+      </div>
+    </div>
+    <div class="output-insight" >Media is our acquisition tool and our proof of concept for both audiences. Our team is our retention and upsell infrastructure. Two ICPs, one business, one loop.</div>
+  </div>
+
+  <div class="win-box" style="margin-top:6px">
+    <i data-lucide="lightbulb"></i>
+    <div class="win-box-text">
+      The Commercial Intelligence Framework
+      <span class="win-box-sub">Start with the outcome → list every party → find the real ICP → follow the money → find the multiplier → map the loop → spot the proof layer → read the social cues → find the gap</span>
+    </div>
+  </div>
+
+</div><!-- /framework -->
+
+
+<!-- ═══════════════════ DECODER ═══════════════════ -->
+<div class="top-panel" id="decoder">
+
+  <div class="fw-hero" style="margin-bottom:24px">
+    <div class="fw-eyebrow">Run the framework</div>
+    <h2 class="fw-heading" style="font-size:clamp(26px,5vw,42px)">Business <em>Decoder</em></h2>
+    <p class="fw-desc">Run any business or industry through the Commercial Intelligence Framework. Work through each step and generate a full ecosystem breakdown you can export.</p>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap">
+    <div class="progress-label-row">
+      <span class="progress-label" id="progress-label">Step 1 of 7</span>
+      <span class="progress-pct" id="progress-pct">14%</span>
+    </div>
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar" style="width:14.28%"></div></div>
+    <div class="step-dots" id="step-dots"></div>
+  </div>
+
+  <div id="decoder-content"></div>
+
+  <div class="decoder-nav" id="decoder-nav">
+    <button class="btn-secondary" id="btn-back" onclick="decoderBack()" style="visibility:hidden">← Back</button>
+    <button class="btn-primary" id="btn-next" onclick="decoderNext()">Next Step →</button>
+  </div>
+
+</div><!-- /decoder -->
+
+<div class="footer">Markeb Media Ltd &nbsp;·&nbsp; Co. No. 15919272 &nbsp;·&nbsp; VAT No. 498444731 &nbsp;·&nbsp; Internal use only</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  initDecoder();
+});
+
+function showTop(id, btn) {
+  document.querySelectorAll('.top-panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.top-tab').forEach(b => b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  lucide.createIcons();
+}
+
+// ─── DECODER ───
+const STEPS = [
+  {
+    id:'start', num:'01', title:'Start With the Outcome',
+    desc:'Define the end goal of this entire ecosystem before anything else.',
+    fields:[
+      { id:'industry', label:'Industry or Business', type:'input', placeholder:'e.g. Premier League football club, property staging company, SaaS platform...' },
+      { id:'outcome', label:'The Ultimate Outcome', type:'textarea', placeholder:'What is the single end goal this entire ecosystem exists to achieve? e.g. Sell the property at maximum value. Fill the stadium. Win the league.' }
+    ]
+  },
+  {
+    id:'parties', num:'02', title:'List Every Party Involved',
+    desc:'Map everyone directly and indirectly involved. The hidden parties often hold the most power.',
+    custom:'parties'
+  },
+  {
+    id:'icp', num:'03', title:'Identify the Real ICP',
+    desc:'Not who the business claims to serve. Who does the entire model actually depend on?',
+    fields:[
+      { id:'icp', label:'The Real ICP', type:'input', placeholder:'e.g. The elite player, not the fan. The developer, not the homeowner.' },
+      { id:'icp_reason', label:'Why the Loop Collapses Without Them', type:'textarea', placeholder:'Explain why this party is the critical dependency that everything else orbits around...' },
+      { id:'icp_driver', label:'Their Primary Driver', type:'drivers' }
+    ]
+  },
+  {
+    id:'money', num:'04', title:'Follow the Money Backwards',
+    desc:'Ignore the obvious revenue. Find the stream the whole machine is actually built around.',
+    fields:[
+      { id:'obvious_revenue', label:'The Obvious Revenue Stream', type:'input', placeholder:'e.g. Ticket sales, hourly rates, product sales...' },
+      { id:'real_revenue', label:'The Real Revenue Stream', type:'input', placeholder:'e.g. Broadcast deals, developer retainers, data licensing...' },
+      { id:'multiplier', label:'The Multiplier Asset', type:'textarea', placeholder:'What single thing generates return across multiple revenue streams simultaneously?' }
+    ]
+  },
+  {
+    id:'loop', num:'05', title:'Map the Loop',
+    desc:'Every sustainable model has a self reinforcing cycle. Map how each party feeds the next.',
+    custom:'loop'
+  },
+  {
+    id:'proof', num:'06', title:'Proof of Concept & Power',
+    desc:'What does each party need to see before they commit? And who actually holds the power?',
+    fields:[
+      { id:'proof_icp', label:'What the ICP Needs to See', type:'textarea', placeholder:'What proof does your real ICP need before they fully commit to this ecosystem?' },
+      { id:'proof_you', label:'What You Need to Show', type:'textarea', placeholder:'How do you prove your value to each side of the ecosystem?' },
+      { id:'power_holder', label:'Who Holds the Power', type:'input', placeholder:'Who is selling the scarcer thing? Who could walk away and cause the most damage?' }
+    ]
+  },
+  {
+    id:'gap', num:'07', title:'The Gap & The Opportunity',
+    desc:'Now you understand the model. Where is the misalignment and what is the opportunity?',
+    fields:[
+      { id:'social_cues', label:'The Social Cues in This World', type:'textarea', placeholder:'What signals status, trust and belonging in this ecosystem? What is the unwritten currency?' },
+      { id:'gap', label:'The Gap', type:'textarea', placeholder:'What is misaligned, missing or being left on the table in this model?' },
+      { id:'opportunity', label:'The Opportunity', type:'textarea', placeholder:'How could you enter, exploit or restructure part of this model to create value?' }
+    ]
+  }
+];
+
+const DRIVERS = ['Money','Fame','Credibility','Status','Security','Proof','Legacy','Access','Freedom','Recognition','Control','Belonging'];
+
+let currentStep = 0;
+let data = {};
+let parties = [{ name:'', role:'direct' }];
+let loopSteps = ['','',''];
+
+function initDecoder() {
+  buildDots();
+  renderStep();
+}
+
+function buildDots() {
+  document.getElementById('step-dots').innerHTML = STEPS.map((s,i) =>
+    `<div class="step-dot ${i===0?'active':''}" id="dot-${i}" onclick="jumpToStep(${i})">${i+1}</div>`
+  ).join('');
+}
+
+function jumpToStep(i) {
+  if (i > currentStep) return;
+  saveStep();
+  currentStep = i;
+  renderStep();
+}
+
+function renderStep() {
+  updateProgress();
+  const step = STEPS[currentStep];
+  const content = document.getElementById('decoder-content');
+  content.innerHTML = '';
+
+  const card = document.createElement('div');
+  card.className = 'decoder-card';
+  card.style.animation = 'fadeUp .25s ease';
+  card.innerHTML = `
+    <div class="decoder-card-hdr">
+      <div class="decoder-badge">${step.num}</div>
+      <div><h3>${step.title}</h3><p>${step.desc}</p></div>
+    </div>
+    <div class="decoder-body" id="card-body"></div>`;
+  content.appendChild(card);
+
+  const body = document.getElementById('card-body');
+
+  if (step.custom === 'parties') {
+    renderParties(body);
+  } else if (step.custom === 'loop') {
+    renderLoop(body);
+  } else {
+    step.fields.forEach(f => {
+      const g = document.createElement('div');
+      g.className = 'field-group';
+      if (f.type === 'input') {
+        g.innerHTML = `<label class="field-label">${f.label}</label><input class="decoder-input" id="field-${f.id}" placeholder="${f.placeholder}" value="${data[f.id]||''}" />`;
+      } else if (f.type === 'textarea') {
+        g.innerHTML = `<label class="field-label">${f.label}</label><textarea class="decoder-input" id="field-${f.id}" placeholder="${f.placeholder}" rows="3">${data[f.id]||''}</textarea>`;
+      } else if (f.type === 'drivers') {
+        const sel = data['icp_driver'] || [];
+        g.innerHTML = `<label class="field-label">${f.label}</label><div class="driver-opts">${DRIVERS.map(d=>`<div class="driver-opt${sel.includes(d)?' selected':''}" onclick="toggleDriver(this,'${d}')">${d}</div>`).join('')}</div>`;
+      }
+      body.appendChild(g);
+    });
+  }
+
+  document.getElementById('btn-back').style.visibility = currentStep===0 ? 'hidden' : 'visible';
+  document.getElementById('btn-next').textContent = currentStep===STEPS.length-1 ? 'Generate Breakdown →' : 'Next Step →';
+  lucide.createIcons();
+}
+
+function renderParties(body) {
+  body.innerHTML = `<label class="field-label">All Parties in the Ecosystem</label><div id="party-list"></div><button class="btn-add-party" onclick="addParty()">+ Add Party</button>`;
+  refreshParties();
+}
+
+function refreshParties() {
+  const list = document.getElementById('party-list');
+  if (!list) return;
+  list.innerHTML = parties.map((p,i) => `
+    <div class="party-row">
+      <input class="party-input" placeholder="Party name e.g. Developer, Estate Agent, End Buyer..." value="${p.name}" oninput="parties[${i}].name=this.value" />
+      <select class="party-select" onchange="parties[${i}].role=this.value">
+        <option value="direct"${p.role==='direct'?' selected':''}>Direct</option>
+        <option value="indirect"${p.role==='indirect'?' selected':''}>Indirect</option>
+        <option value="hidden"${p.role==='hidden'?' selected':''}>Hidden</option>
+      </select>
+      ${i>0?`<button class="btn-remove" onclick="removeParty(${i})">×</button>`:'<div style="width:28px"></div>'}
+    </div>`).join('');
+}
+
+function addParty() { parties.push({name:'',role:'direct'}); refreshParties(); }
+function removeParty(i) { parties.splice(i,1); refreshParties(); }
+
+function renderLoop(body) {
+  body.innerHTML = `<label class="field-label">Map the Self Reinforcing Loop — Add each step in order</label><div id="loop-list"></div><button class="btn-add-party" onclick="addLoopStep()">+ Add Loop Step</button>`;
+  refreshLoop();
+}
+
+function refreshLoop() {
+  const list = document.getElementById('loop-list');
+  if (!list) return;
+  list.innerHTML = loopSteps.map((s,i) => `
+    <div class="party-row">
+      <span style="color:var(--pine);font-size:12px;font-weight:800;min-width:18px;flex-shrink:0">${i+1}</span>
+      <input class="party-input" placeholder="e.g. Club attracts elite player with stadium and network..." value="${s}" oninput="loopSteps[${i}]=this.value" />
+      ${i>2?`<button class="btn-remove" onclick="removeLoopStep(${i})">×</button>`:'<div style="width:28px"></div>'}
+    </div>`).join('');
+}
+
+function addLoopStep() { loopSteps.push(''); refreshLoop(); }
+function removeLoopStep(i) { loopSteps.splice(i,1); refreshLoop(); }
+
+function toggleDriver(el, driver) {
+  el.classList.toggle('selected');
+  if (!data['icp_driver']) data['icp_driver'] = [];
+  if (data['icp_driver'].includes(driver)) {
+    data['icp_driver'] = data['icp_driver'].filter(d=>d!==driver);
+  } else {
+    data['icp_driver'].push(driver);
+  }
+}
+
+function saveStep() {
+  const step = STEPS[currentStep];
+  if (step.custom) return;
+  step.fields.forEach(f => {
+    if (f.type !== 'drivers') {
+      const el = document.getElementById('field-'+f.id);
+      if (el) data[f.id] = el.value;
+    }
+  });
+}
+
+function updateProgress() {
+  const pct = Math.round(((currentStep+1)/STEPS.length)*100);
+  document.getElementById('progress-bar').style.width = ((currentStep+1)/STEPS.length*100)+'%';
+  document.getElementById('progress-label').textContent = `Step ${currentStep+1} of ${STEPS.length}`;
+  document.getElementById('progress-pct').textContent = pct+'%';
+  document.querySelectorAll('.step-dot').forEach((dot,i) => {
+    dot.className = 'step-dot';
+    if (i < currentStep) dot.classList.add('done');
+    else if (i === currentStep) dot.classList.add('active');
+  });
+}
+
+function decoderNext() {
+  saveStep();
+  if (currentStep < STEPS.length-1) {
+    currentStep++;
+    renderStep();
+    window.scrollTo({top:80,behavior:'smooth'});
+  } else {
+    saveStep();
+    renderOutput();
+  }
+}
+
+function decoderBack() {
+  saveStep();
+  if (currentStep > 0) {
+    currentStep--;
+    renderStep();
+    window.scrollTo({top:80,behavior:'smooth'});
+  }
+}
+
+function renderOutput() {
+  document.getElementById('decoder-nav').style.display = 'none';
+  document.getElementById('progress-label').textContent = 'Breakdown Complete';
+  document.getElementById('progress-bar').style.width = '100%';
+  document.getElementById('progress-pct').textContent = '100%';
+  document.querySelectorAll('.step-dot').forEach(d => d.className = 'step-dot done');
+
+  const drivers = (data['icp_driver']||[]).join(', ') || 'Not specified';
+  const vParties = parties.filter(p=>p.name.trim());
+  const vLoop = loopSteps.filter(s=>s.trim());
+
+  document.getElementById('decoder-content').innerHTML = `
+    <div>
+      <div class="output-block">
+        <div class="output-block-hdr"><span class="output-block-num">Foundation</span><span class="output-block-title">The Ecosystem</span></div>
+        <div class="output-block-body">
+          <strong style="color:var(--ink)">Industry:</strong> <span class="output-highlight">${data['industry']||'—'}</span><br><br>
+          <strong style="color:var(--ink)">Ultimate Outcome:</strong><br>${data['outcome']||'—'}
+        </div>
+      </div>
+
+      <div class="output-block">
+        <div class="output-block-hdr"><span class="output-block-num">Step 02</span><span class="output-block-title">Every Party in the Ecosystem</span></div>
+        <div class="output-block-body">
+          ${vParties.length ? vParties.map(p=>`
+            <div class="output-party-row">
+              <span class="output-party-name">${p.name}</span>
+              <span class="output-tag tag-${p.role}">${p.role}</span>
+            </div>`).join('') : '<span style="color:var(--faint)">No parties mapped</span>'}
+        </div>
+      </div>
+
+      <div class="output-block">
+        <div class="output-block-hdr"><span class="output-block-num">Step 03</span><span class="output-block-title">The Real ICP</span></div>
+        <div class="output-block-body">
+          <strong style="color:var(--ink)">Real ICP:</strong> <span class="output-highlight">${data['icp']||'—'}</span><br><br>
+          <strong style="color:var(--ink)">Why the loop needs them:</strong><br>${data['icp_reason']||'—'}<br><br>
+          <strong style="color:var(--ink)">Primary Driver:</strong> <span class="output-highlight">${drivers}</span>
+          <div class="output-insight"><strong>Full Circle:</strong> They think about ${drivers.toLowerCase()}. So they notice proof of ${drivers.toLowerCase()}. Become that proof and you have their attention and their trust. Repeat this from every angle.</div>
+        </div>
+      </div>
+
+      <div class="output-block">
+        <div class="output-block-hdr"><span class="output-block-num">Step 04</span><span class="output-block-title">The Money</span></div>
+        <div class="output-block-body">
+          <strong style="color:var(--ink)">Obvious Revenue:</strong> ${data['obvious_revenue']||'—'}<br><br>
+          <strong style="color:var(--ink)">Real Revenue:</strong> <span class="output-highlight">${data['real_revenue']||'—'}</span><br><br>
+          <strong style="color:var(--ink)">Multiplier Asset:</strong><br>${data['multiplier']||'—'}
+        </div>
+      </div>
+
+      <div class="output-block">
+        <div class="output-block-hdr"><span class="output-block-num">Step 05</span><span class="output-block-title">The Self Reinforcing Loop</span></div>
+        <div class="output-block-body">
+          ${vLoop.length ? vLoop.map((s,i)=>`
+            <div class="output-loop-item">
+              <span class="output-loop-num">${i+1}</span>
+              <span>${s}</span>
+            </div>`).join('')+'<div class="output-loop-item" style="color:var(--pine);font-weight:700">↺ &nbsp;Loop repeats and compounds</div>'
+          : '<span style="color:var(--faint)">No loop mapped</span>'}
+        </div>
+      </div>
+
+      <div class="output-block">
+        <div class="output-block-hdr"><span class="output-block-num">Step 06</span><span class="output-block-title">Proof of Concept & Power</span></div>
+        <div class="output-block-body">
+          <strong style="color:var(--ink)">What the ICP needs to see:</strong><br>${data['proof_icp']||'—'}<br><br>
+          <strong style="color:var(--ink)">What you need to show:</strong><br>${data['proof_you']||'—'}<br><br>
+          <strong style="color:var(--ink)">Power holder:</strong> <span class="output-highlight">${data['power_holder']||'—'}</span>
+        </div>
+      </div>
+
+      <div class="output-block">
+        <div class="output-block-hdr"><span class="output-block-num">Step 07</span><span class="output-block-title">The Gap & The Opportunity</span></div>
+        <div class="output-block-body">
+          <strong style="color:var(--ink)">Social Cues:</strong><br>${data['social_cues']||'—'}<br><br>
+          <strong style="color:var(--ink)">The Gap:</strong><br>${data['gap']||'—'}<br><br>
+          <strong style="color:var(--ink)">The Opportunity:</strong><br><span class="output-highlight">${data['opportunity']||'—'}</span>
+        </div>
+      </div>
+
+      <div>
+        <button class="btn-reset" onclick="resetDecoder()">← Start New Decode</button>
+        <button class="btn-export" onclick="exportBreakdown()">Export Breakdown</button>
+      </div>
+    </div>`;
+
+  window.scrollTo({top:80,behavior:'smooth'});
+  lucide.createIcons();
+}
+
+function resetDecoder() {
+  currentStep=0; data={}; parties=[{name:'',role:'direct'}]; loopSteps=['','',''];
+  document.getElementById('decoder-nav').style.display='flex';
+  buildDots(); renderStep();
+  window.scrollTo({top:80,behavior:'smooth'});
+}
+
+function exportBreakdown() {
+  const drivers = (data['icp_driver']||[]).join(', ')||'Not specified';
+  const vParties = parties.filter(p=>p.name.trim());
+  const vLoop = loopSteps.filter(s=>s.trim());
+  const text = `COMMERCIAL INTELLIGENCE FRAMEWORK
+Markeb Media — Internal Breakdown
+Generated: ${new Date().toLocaleDateString('en-GB')}
+
+INDUSTRY: ${data['industry']||'—'}
+OUTCOME: ${data['outcome']||'—'}
+
+PARTIES:
+${vParties.map(p=>`  · ${p.name} (${p.role})`).join('\n')||'  None mapped'}
+
+REAL ICP: ${data['icp']||'—'}
+WHY CRITICAL: ${data['icp_reason']||'—'}
+PRIMARY DRIVER: ${drivers}
+
+OBVIOUS REVENUE: ${data['obvious_revenue']||'—'}
+REAL REVENUE: ${data['real_revenue']||'—'}
+MULTIPLIER ASSET: ${data['multiplier']||'—'}
+
+THE LOOP:
+${vLoop.map((s,i)=>`  ${i+1}. ${s}`).join('\n')||'  Not mapped'}
+↺ Loop repeats
+
+PROOF (ICP NEEDS TO SEE): ${data['proof_icp']||'—'}
+PROOF (YOU SHOW): ${data['proof_you']||'—'}
+POWER HOLDER: ${data['power_holder']||'—'}
+
+SOCIAL CUES: ${data['social_cues']||'—'}
+THE GAP: ${data['gap']||'—'}
+THE OPPORTUNITY: ${data['opportunity']||'—'}
+
+—
+Markeb Media Ltd · Co. No. 15919272 · VAT No. 498444731`;
+
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text],{type:'text/plain'}));
+  a.download = `CIF-${(data['industry']||'breakdown').replace(/\s+/g,'-').toLowerCase()}-${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+}
+</script>
+</body>
+</html>
