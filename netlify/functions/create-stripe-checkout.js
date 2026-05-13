@@ -70,80 +70,17 @@ exports.handler = async (event, context) => {
 
     const hasDiscount = bookingData.discountCode && bookingData.discountAmount > 0;
 
-    if (hasDiscount) {
-      const priceBeforeDiscount = bookingData.priceBeforeDiscount || (bookingData.totalPrice + bookingData.discountAmount);
-      
-      lineItems.push({
-        price_data: {
-          currency: 'gbp',
-          product_data: {
-            name: bookingData.service,
-            description: `${bookingData.date} at ${bookingData.time} - ${bookingData.propertyAddress}\n\nOriginal Price: £${priceBeforeDiscount.toFixed(2)}\nDiscount (${bookingData.discountCode}): -£${bookingData.discountAmount.toFixed(2)}\nFinal Price: £${bookingData.totalPrice.toFixed(2)}`,
-          },
-          unit_amount: Math.round(bookingData.totalPrice * 100),
+    lineItems.push({
+      price_data: {
+        currency: 'gbp',
+        product_data: {
+          name: bookingData.service,
+          description: `${bookingData.date} at ${bookingData.time} - ${bookingData.propertyAddress}${bookingData.discountCode ? `\n\nDiscount (${bookingData.discountCode}): -£${bookingData.discountAmount.toFixed(2)}` : ''}`,
         },
-        quantity: 1,
-      });
-    } else {
-      lineItems.push({
-        price_data: {
-          currency: 'gbp',
-          product_data: {
-            name: bookingData.service,
-            description: `${bookingData.date} at ${bookingData.time} - ${bookingData.propertyAddress}`,
-          },
-          unit_amount: Math.round(bookingData.basePrice * 100),
-        },
-        quantity: 1,
-      });
-
-      if (bookingData.extraBedroomFee && bookingData.extraBedroomFee > 0) {
-        const extraBedrooms = bookingData.bedrooms - 4;
-        lineItems.push({
-          price_data: {
-            currency: 'gbp',
-            product_data: {
-              name: 'Extra Bedrooms',
-              description: `${extraBedrooms} additional bedroom(s) @ £25 + VAT each`,
-            },
-            unit_amount: Math.round(bookingData.extraBedroomFee * 100),
-          },
-          quantity: 1,
-        });
-      }
-
-      if (bookingData.squareFootageFee && bookingData.squareFootageFee > 0) {
-        lineItems.push({
-          price_data: {
-            currency: 'gbp',
-            product_data: {
-              name: 'Large Property Fee',
-              description: `Property over 3,000 sq ft (${bookingData.squareFootage} sq ft)`,
-            },
-            unit_amount: Math.round(bookingData.squareFootageFee * 100),
-          },
-          quantity: 1,
-        });
-      }
-
-      if (bookingData.addons && bookingData.addons.length > 0) {
-        bookingData.addons.forEach(addon => {
-          if (addon.price > 0) {
-            lineItems.push({
-              price_data: {
-                currency: 'gbp',
-                product_data: {
-                  name: addon.name,
-                  description: addon.description || '',
-                },
-                unit_amount: Math.round(addon.price * 100),
-              },
-              quantity: 1,
-            });
-          }
-        });
-      }
-    }
+        unit_amount: Math.round(bookingData.totalPrice * 100),
+      },
+      quantity: 1,
+    });
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
