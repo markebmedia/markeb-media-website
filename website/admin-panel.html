@@ -5930,10 +5930,11 @@ function calculateModifyPrice() {
     if (addon) addonsFee += addon.price;
   });
 
-  const totalPrice = servicePrice + bedroomFee + addonsFee;
+  const subtotalExVat = servicePrice + bedroomFee + addonsFee;
+const totalPrice = parseFloat((subtotalExVat * 1.2).toFixed(2));
 
-  document.getElementById('modifyServicePrice').textContent = `£${servicePrice.toFixed(2)}`;
-  document.getElementById('modifyTotalPrice').textContent = `£${totalPrice.toFixed(2)}`;
+document.getElementById('modifyServicePrice').textContent = `£${servicePrice.toFixed(2)}`;
+document.getElementById('modifyTotalPrice').textContent = `£${subtotalExVat.toFixed(2)} ex VAT — £${totalPrice.toFixed(2)} inc. VAT`;
 
   const bedroomRow = document.getElementById('modifyBedroomRow');
   if (bedroomFee > 0) {
@@ -5981,7 +5982,7 @@ async function confirmModifyService(bookingId) {
     };
   });
 
-  const totalPrice = servicePrice + bedroomFee + addonsFee;
+  const totalPrice = parseFloat(((servicePrice + bedroomFee + addonsFee) * 1.2).toFixed(2));
 
   try {
     const response = await fetch('/.netlify/functions/admin-modify-service', {

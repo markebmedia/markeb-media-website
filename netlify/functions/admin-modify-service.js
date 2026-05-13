@@ -83,29 +83,31 @@ exports.handler = async (event, context) => {
     const extraBedroomFee = extraBedrooms * 25;
     const newAddonsPrice = addonsPrice || 0;
 
-    const priceBeforeDiscount = newServicePrice + extraBedroomFee + newAddonsPrice;
+    const subtotalExVat = newServicePrice + extraBedroomFee + newAddonsPrice;
+const priceBeforeDiscount = parseFloat((subtotalExVat * 1.2).toFixed(2)); // inc VAT
 
-    // Apply discount if one exists
-    let discountAmount = 0;
-    let finalPrice = priceBeforeDiscount;
+// Apply discount if one exists
+let discountAmount = 0;
+let finalPrice = priceBeforeDiscount;
 
-    if (hasDiscount) {
-      const discountType = fields['Discount Type'] || 'Fixed Amount';
-      const discountValue = fields['Discount Value'] || fields['Discount Amount'];
+if (hasDiscount) {
+  const discountType = fields['Discount Type'] || 'Fixed Amount';
+  const discountValue = fields['Discount Value'] || fields['Discount Amount'];
 
-      if (discountType === 'Percentage') {
-        discountAmount = Math.round((priceBeforeDiscount * discountValue) / 100 * 100) / 100;
-      } else {
-        discountAmount = discountValue;
-      }
+  if (discountType === 'Percentage') {
+    discountAmount = Math.round((priceBeforeDiscount * discountValue) / 100 * 100) / 100;
+  } else {
+    discountAmount = discountValue;
+  }
 
-      discountAmount = Math.min(discountAmount, priceBeforeDiscount);
-      finalPrice = priceBeforeDiscount - discountAmount;
+  discountAmount = Math.min(discountAmount, priceBeforeDiscount);
+  finalPrice = parseFloat((priceBeforeDiscount - discountAmount).toFixed(2));
 
-      console.log(`Discount applied: ${discountCode} (${discountType}) = -£${discountAmount.toFixed(2)}`);
-    } else {
-      finalPrice = totalPrice;
-    }
+  console.log(`Discount applied: ${discountCode} (${discountType}) = -£${discountAmount.toFixed(2)}`);
+} else {
+  // totalPrice passed from frontend is already inc VAT
+  finalPrice = parseFloat((subtotalExVat * 1.2).toFixed(2));
+}
 
     const priceDifference = finalPrice - oldFinalPrice;
 
