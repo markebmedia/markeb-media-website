@@ -8196,25 +8196,38 @@ function mapRegionToBookingRegion(ukRegion) {
 // Load broadcast data on section show
 async function loadBroadcastData() {
   try {
-    const response = await fetch('/.netlify/functions/admin-users');
-    const data = await response.json();
-    
+    const [usersResponse, bookingsResponse] = await Promise.all([
+      fetch('/.netlify/functions/admin-users'),
+      fetch('/.netlify/functions/admin-bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      })
+    ]);
+
+    const data = await usersResponse.json();
+    const bookingsData = await bookingsResponse.json();
+
+    if (bookingsData.success) {
+      allBookings = bookingsData.bookings;
+    }
+
     if (data.success) {
       allBroadcastUsers = data.users;
-      
+
       // Update stats
       document.getElementById('broadcastTotalUsers').textContent = data.total;
-      
+
       // Load history from localStorage
       broadcastHistory = JSON.parse(localStorage.getItem('broadcastHistory') || '[]');
       const totalSent = broadcastHistory.reduce((sum, h) => sum + h.recipientCount, 0);
       document.getElementById('broadcastTotalSent').textContent = totalSent;
-      
+
       const lastSent = broadcastHistory.length > 0 
         ? new Date(broadcastHistory[0].timestamp).toLocaleDateString('en-GB')
         : 'Never';
       document.getElementById('broadcastLastSent').textContent = lastSent;
-      
+
       // Render recipient list
       renderBroadcastRecipients();
       renderBroadcastHistory();
