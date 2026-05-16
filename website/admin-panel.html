@@ -2434,6 +2434,16 @@ body {
         </p>
       </div>
 
+      <div class="template-card" onclick="loadBroadcastTemplate('first-shoot-offer')" style="border: 2px solid #B46100; background: linear-gradient(135deg, #fff3e0 0%, #ffffff 100%);">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+          <i data-lucide="gift" style="width: 24px; height: 24px; color: #B46100;"></i>
+          <strong style="font-size: 15px; color: #B46100;">1 for 1 — Free Second Shoot 🎁</strong>
+        </div>
+        <p style="font-size: 13px; color: #64748b; margin: 0;">
+          Send to customers who haven't booked yet — book their first shoot, get their second property photography free
+        </p>
+      </div>
+
       <div class="template-card" onclick="loadBroadcastTemplate('custom')">
         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
           <i data-lucide="pencil" style="width: 24px; height: 24px; color: #64748b;"></i>
@@ -8350,9 +8360,125 @@ function loadBroadcastTemplate(templateId) {
   let content = '';
   
   switch(templateId) {
-   case 'availability':
+    case 'availability':
       subjectInput.value = 'Available Shoot Dates - Book Your Slot';
       contentInput.value = '✅ Availability data will be fetched live for each recipient when sent.\n\nEach person will receive dates specific to their region — you don\'t need to edit this.';
+      composer.style.display = 'block';
+      updateBroadcastPreview();
+      return;
+
+    case 'first-shoot-offer':
+      subjectInput.value = 'Book one shoot, get your second completely free 🎁';
+      contentInput.value = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #3F4D1B; background-color: #f7ead5; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #FDF3E2; }
+    .header { background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%); padding: 40px 20px; text-align: center; }
+    .header img { max-width: 200px; width: 100%; height: auto; margin-bottom: 20px; }
+    .header h1 { color: #FDF3E2; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+    .header-accent { width: 40px; height: 3px; background: #B46100; margin: 14px auto 0; border-radius: 2px; }
+    .hero { background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); padding: 40px 30px; text-align: center; }
+    .hero h2 { color: #FDF3E2; font-size: 32px; font-weight: 700; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .hero p { color: rgba(253,243,226,0.9); font-size: 17px; margin: 0; }
+    .content { padding: 40px 30px; }
+    .content p { color: #3F4D1B; margin: 0 0 14px; font-size: 15px; }
+    .how-it-works { background: #f7ead5; border: 2px solid #e8d9be; border-radius: 12px; padding: 28px; margin: 28px 0; }
+    .how-it-works h3 { color: #3F4D1B; font-size: 17px; font-weight: 700; margin: 0 0 20px; }
+    .step { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 18px; }
+    .step:last-child { margin-bottom: 0; }
+    .step-number { background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); color: #FDF3E2; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; line-height: 32px; text-align: center; }
+    .step-text { color: #3F4D1B; font-size: 15px; padding-top: 4px; }
+    .step-text strong { color: #3F4D1B; }
+    .benefits { margin: 28px 0; }
+    .benefits h3 { color: #3F4D1B; font-size: 17px; font-weight: 700; margin: 0 0 16px; }
+    .benefit-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid #e8d9be; }
+    .benefit-item:last-child { border-bottom: none; }
+    .benefit-icon { color: #B46100; font-size: 18px; flex-shrink: 0; }
+    .benefit-text { color: #3F4D1B; font-size: 14px; }
+    .benefit-text strong { color: #3F4D1B; }
+    .alert-offer { background: #f7ead5; border: 2px solid #B46100; border-radius: 12px; padding: 20px 24px; margin: 28px 0; text-align: center; }
+    .alert-offer p { color: #8a4a00; font-size: 14px; margin: 0; font-weight: 600; }
+    .button-wrap { text-align: center; margin: 32px 0; }
+    .button { display: inline-block; background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); color: #FDF3E2 !important; padding: 16px 40px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 16px; letter-spacing: 0.01em; }
+    .footer { background-color: #3F4D1B; padding: 30px; text-align: center; color: rgba(253,243,226,0.7); font-size: 14px; }
+    .footer strong { color: #FDF3E2; }
+    .footer a { color: #B46100; text-decoration: none; }
+    .footer-divider { width: 32px; height: 2px; background: #B46100; margin: 16px auto; border-radius: 1px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png" alt="Markeb Media">
+      <h1>Markeb Media</h1>
+      <div class="header-accent"></div>
+    </div>
+    <div class="hero">
+      <h2>1 shoot.<br>2nd one free.</h2>
+      <p>Book your first property photography shoot and we'll give you your second one on us.</p>
+    </div>
+    <div class="content">
+      <p>Hi [Name],</p>
+      <p>We noticed you haven't booked your first shoot with us yet — so we wanted to make it a no-brainer.</p>
+      <p>Book any property photography shoot with Markeb Media and once it's complete, we'll send you a code for a <strong>100% free second shoot</strong>. No catch. No hidden fees.</p>
+      <div class="how-it-works">
+        <h3>Here's how it works</h3>
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-text"><strong>Book your first shoot</strong> — any property photography package at markebmedia.com</div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-text"><strong>We deliver your content</strong> — edited, high-resolution images within 48 hours</div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-text"><strong>We send you a code</strong> — for a completely free second property photography shoot</div>
+        </div>
+      </div>
+      <div class="benefits">
+        <h3>What you get with every shoot</h3>
+        <div class="benefit-item">
+          <div class="benefit-icon">📸</div>
+          <div class="benefit-text"><strong>Professional photography</strong> — delivered within 48 hours</div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">🖥️</div>
+          <div class="benefit-text"><strong>Rightmove &amp; Zoopla ready</strong> — high-resolution edited images</div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">📍</div>
+          <div class="benefit-text"><strong>Local media specialist</strong> — dedicated to your area</div>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">📊</div>
+          <div class="benefit-text"><strong>Client dashboard</strong> — track every project in real time</div>
+        </div>
+      </div>
+      <div class="alert-offer">
+        <p>🎁 &nbsp;This offer is exclusive to new Markeb Media clients. One free shoot per customer, applied automatically after your first paid shoot is confirmed.</p>
+      </div>
+      <div class="button-wrap">
+        <a href="https://markebmedia.com/website/booking.html" class="button">Book Your First Shoot →</a>
+      </div>
+      <p>Or simply reply to this email and we'll get you booked in personally.</p>
+      <p>We look forward to working with you, [Name].</p>
+      <p>Best regards,<br><strong>Mark Adiele</strong><br>Founder, Markeb Media</p>
+    </div>
+    <div class="footer">
+      <strong>Markeb Media</strong>
+      <div class="footer-divider"></div>
+      <p style="margin:0 0 6px;">Professional Property Media, Marketing &amp; Technology</p>
+      <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
+      <p style="margin-top: 20px; font-size: 12px; color: rgba(253,243,226,0.4);">You're receiving this because you registered at markebmedia.com</p>
+    </div>
+  </div>
+</body>
+</html>`;
       composer.style.display = 'block';
       updateBroadcastPreview();
       return;
@@ -8378,6 +8504,30 @@ function updateBroadcastPreview() {
   
   if (!subject && !content) {
     preview.innerHTML = '<div style="text-align: center; color: #94a3b8;">Select a template or enter content to preview</div>';
+    return;
+  }
+
+  // If it's a pre-built HTML template, show a clean summary instead of raw code
+  if (content.trim().startsWith('<!DOCTYPE')) {
+    preview.innerHTML = `
+      <div style="text-align: center; padding: 32px 20px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">🎨</div>
+        <div style="font-weight: 700; font-size: 16px; color: #0f172a; margin-bottom: 8px;">${subject}</div>
+        <div style="font-size: 13px; color: #64748b; margin-bottom: 20px;">This is a fully branded HTML email — preview not available in the composer.</div>
+        <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border: 2px solid #B46100; border-radius: 12px; padding: 16px; text-align: left; font-size: 13px; color: #7a3e00;">
+          <strong>✓ What recipients will see:</strong><br><br>
+          • Markeb Media branded header with logo<br>
+          • Bold hero banner: <em>"1 shoot. 2nd one free."</em><br>
+          • 3-step how it works section<br>
+          • Benefits list with icons<br>
+          • Book Your First Shoot CTA button<br>
+          • Branded footer
+        </div>
+        <div style="margin-top: 16px; font-size: 13px; color: #64748b;">
+          Use <strong>Send Test to Yourself</strong> below to see the full email in your inbox.
+        </div>
+      </div>
+    `;
     return;
   }
   
@@ -8450,6 +8600,7 @@ async function sendTestBroadcast() {
         subject: '[TEST] ' + subject,
         content: content,
         templateType: isAvailabilityTemplateTest ? 'availability' : 'custom',
+        isHtml: content.trim().startsWith('<!DOCTYPE'),
         testMode: true
       })
     });
@@ -8516,6 +8667,7 @@ async function sendBroadcastEmail() {
         subject: subject,
         content: content,
         templateType: isAvailabilityTemplate ? 'availability' : 'custom',
+        isHtml: content.trim().startsWith('<!DOCTYPE'),
         testMode: false
       })
     });

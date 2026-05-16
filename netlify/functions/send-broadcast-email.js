@@ -706,7 +706,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { recipients, subject, content, templateType, isTest, testEmail } = JSON.parse(event.body);
+    const { recipients, subject, content, templateType, isHtml, isTest, testEmail } = JSON.parse(event.body);
 
     console.log(`Sending ${isTest ? 'TEST' : 'BROADCAST'} email to ${recipients.length} recipients`);
     console.log(`Template type: ${templateType || 'custom'}`);
@@ -741,6 +741,14 @@ exports.handler = async (event, context) => {
           let emailContent = content;
           if (templateType === 'availability') {
             emailContent = await generateAvailabilityContent(user);
+          } else if (isHtml) {
+            // Replace [Name] only — leave the rest of the HTML untouched
+            const firstName = (user.name || 'there').split(' ')[0];
+            emailContent = content
+              .replace(/\[Name\]/g, firstName)
+              .replace(/\[Company\]/g, user.company || 'your company')
+              .replace(/\[Email\]/g, user.email || '')
+              .replace(/\[Region\]/g, user.ukRegion || user.region || 'your area');
           } else {
             emailContent = replaceMergeTags(content, user);
           }
@@ -758,7 +766,8 @@ exports.handler = async (event, context) => {
         return;
       }
       try {
-        const emailHtml = getEmailLayout(emailContent, user.email);
+        // If it's a pre-built HTML template, send as-is — don't wrap in the generic layout
+        const emailHtml = isHtml ? emailContent : getEmailLayout(emailContent, user.email);
         const recipientEmail = isTest ? testEmail : user.email;
         await resend.emails.send({
           from: FROM_EMAIL,
