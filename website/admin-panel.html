@@ -8245,9 +8245,17 @@ function renderBroadcastRecipients(filtered = null) {
     const isActive = fields['Account Status'] === 'Active';
     const hasEmail = fields['Email Notifications Enabled'] === true;
     const isSelected = selectedRecipients.includes(fields['Email']);
-    
+
+    const hasBooked = allBookings.some(b =>
+      b.fields['Client Email']?.toLowerCase() === fields['Email']?.toLowerCase() &&
+      b.fields['Booking Status'] !== 'Cancelled'
+    );
+
+    const rowBg = hasBooked ? '#f0fdf4' : '#fef2f2';
+    const rowBorder = hasBooked ? '#10b981' : '#ef4444';
+
     html += `
-      <div class="recipient-checkbox-item">
+      <div class="recipient-checkbox-item" style="background: ${rowBg}; border-left: 3px solid ${rowBorder};">
         <input 
           type="checkbox" 
           value="${fields['Email']}"
@@ -8261,9 +8269,12 @@ function renderBroadcastRecipients(filtered = null) {
             ${fields['Company'] || 'No company'} • ${fields['Email']}
           </div>
         </label>
-        <div>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
           <span class="recipient-badge ${isActive ? 'badge-active' : 'badge-inactive'}">
             ${isActive ? 'Active' : 'Inactive'}
+          </span>
+          <span style="font-size: 10px; font-weight: 700; color: ${hasBooked ? '#10b981' : '#ef4444'};">
+            ${hasBooked ? '✓ Booked' : '✗ Never booked'}
           </span>
         </div>
       </div>
@@ -8419,55 +8430,55 @@ function loadBroadcastTemplate(templateId) {
     </div>
     <div class="hero">
       <h2>1 shoot.<br>2nd one free.</h2>
-      <p>Book your first property photography shoot and we'll give you your second one on us.</p>
+      <p>Book your first shoot with Markeb Media and we'll give you your second one, the same value, completely free.</p>
     </div>
     <div class="content">
       <p>Hi [Name],</p>
-      <p>We noticed you haven't booked your first shoot with us yet — so we wanted to make it a no-brainer.</p>
-      <p>Book any property photography shoot with Markeb Media and once it's complete, we'll send you a code for a <strong>100% free second shoot</strong>. No catch. No hidden fees.</p>
+      <p>We noticed you haven't booked your first shoot with us yet, so we wanted to make it a no-brainer.</p>
+      <p>Book any shoot with Markeb Media and once it's complete, we'll send you a code worth the exact same value for your second shoot. No catch. No hidden fees.</p>
       <div class="how-it-works">
         <h3>Here's how it works</h3>
         <div class="step">
           <div class="step-number">1</div>
-          <div class="step-text"><strong>Book your first shoot</strong> — any property photography package at markebmedia.com</div>
+          <div class="step-text"><strong>Book your first shoot</strong> using any package at markebmedia.com</div>
         </div>
         <div class="step">
           <div class="step-number">2</div>
-          <div class="step-text"><strong>We deliver your content</strong> — edited, high-resolution images within 48 hours</div>
+          <div class="step-text"><strong>We deliver your content</strong>, edited and ready, within 48 hours</div>
         </div>
         <div class="step">
           <div class="step-number">3</div>
-          <div class="step-text"><strong>We send you a code</strong> — for a completely free second property photography shoot</div>
+          <div class="step-text"><strong>We send you a code</strong> worth the exact same value as your first shoot to use on any future booking</div>
         </div>
       </div>
       <div class="benefits">
         <h3>What you get with every shoot</h3>
         <div class="benefit-item">
           <div class="benefit-icon">📸</div>
-          <div class="benefit-text"><strong>Professional photography</strong> — delivered within 48 hours</div>
+          <div class="benefit-text"><strong>Professional photography</strong> delivered within 48 hours</div>
         </div>
         <div class="benefit-item">
           <div class="benefit-icon">🖥️</div>
-          <div class="benefit-text"><strong>Rightmove &amp; Zoopla ready</strong> — high-resolution edited images</div>
+          <div class="benefit-text"><strong>Rightmove and Zoopla ready</strong> high-resolution edited images</div>
         </div>
         <div class="benefit-item">
           <div class="benefit-icon">📍</div>
-          <div class="benefit-text"><strong>Local media specialist</strong> — dedicated to your area</div>
+          <div class="benefit-text"><strong>Local media specialist</strong> dedicated to your area</div>
         </div>
         <div class="benefit-item">
           <div class="benefit-icon">📊</div>
-          <div class="benefit-text"><strong>Client dashboard</strong> — track every project in real time</div>
+          <div class="benefit-text"><strong>Client dashboard</strong> to track every project in real time</div>
         </div>
       </div>
       <div class="alert-offer">
-        <p>🎁 &nbsp;This offer is exclusive to new Markeb Media clients. One free shoot per customer, applied automatically after your first paid shoot is confirmed.</p>
+        <p>🎁 This offer is exclusive to new Markeb Media clients. Your free shoot code will match the exact value of your first booking and can be used on any service. One per customer.</p>
       </div>
       <div class="button-wrap">
-        <a href="https://markebmedia.com/website/booking.html" class="button">Book Your First Shoot →</a>
+        <a href="https://markebmedia.com/website/booking.html" class="button">Book Your First Shoot</a>
       </div>
       <p>Or simply reply to this email and we'll get you booked in personally.</p>
       <p>We look forward to working with you, [Name].</p>
-      <p>Best regards,<br><strong>Mark Adiele</strong><br>Founder, Markeb Media</p>
+      <p>Best regards,<br><strong>Markeb Media</strong></p>
     </div>
     <div class="footer">
       <strong>Markeb Media</strong>
