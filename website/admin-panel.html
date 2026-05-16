@@ -6027,13 +6027,26 @@ async function confirmModifyService(bookingId) {
       container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
 
       try {
-        const response = await fetch('/.netlify/functions/admin-users');
-        const data = await response.json();
+        const [usersResponse, bookingsResponse] = await Promise.all([
+          fetch('/.netlify/functions/admin-users'),
+          fetch('/.netlify/functions/admin-bookings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+          })
+        ]);
+
+        const data = await usersResponse.json();
+        const bookingsData = await bookingsResponse.json();
+
+        if (bookingsData.success) {
+          allBookings = bookingsData.bookings;
+        }
 
         if (data.success) {
           allCustomers = data.users;
           renderCustomersTable(allCustomers);
-          populateCustomerDropdown(); // ADD THIS LINE
+          populateCustomerDropdown();
         }
 
       } catch (error) {
