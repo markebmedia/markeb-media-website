@@ -3556,6 +3556,7 @@ async function loadAcuityMetrics(email){
       recentBookings.forEach(booking => {
         const fields = booking.fields;
         const date = fields['Date'] ? new Date(fields['Date']).toLocaleDateString('en-GB') : 'TBD';
+        const time = fields['Time'] || fields['Shoot Time'] || fields['Start Time'] || '';
         const address = fields['Property Address'] || 'Property booking';
         const status = fields['Booking Status'] || 'Scheduled';
         
@@ -3565,7 +3566,7 @@ async function loadAcuityMetrics(email){
           <div class="activity-icon">📅</div>
           <div class="activity-content">
             <div class="activity-title">${address}</div>
-            <div class="activity-time">${date} • ${status}</div>
+            <div class="activity-time">${date}${time ? ' at ' + time : ''} • ${status}</div>
           </div>
         `;
         list.appendChild(row);
