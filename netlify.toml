@@ -20,6 +20,16 @@
   [headers.values]
     Basic-Auth = "markeb:Markebmedia230301"
 
+[[headers]]
+  for = "/website/client-map.html"
+  [headers.values]
+    Basic-Auth = "markeb:Markebmedia230301"
+
+[[headers]]
+  for = "/website/data-insights.html"
+  [headers.values]
+    Basic-Auth = "markeb:Markebmedia230301"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
