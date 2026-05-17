@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Client Map — Markeb Media</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      padding: 20px;
+      color: #0f172a;
+    }
+
+    .page-container { max-width: 1900px; margin: 0 auto; }
+
+    /* ── Header ── */
+    .header {
+      background: #fff;
+      border-radius: 16px;
+      padding: 22px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .header-left { display: flex; align-items: center; gap: 14px; }
+
+    .header-logo {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, #3F4D1B, #B46100);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .header-title { font-size: 20px; font-weight: 700; color: #0f172a; }
+    .header-sub   { font-size: 12px; color: #64748b; margin-top: 2px; }
+    .header-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+    .btn {
+      padding: 9px 18px;
+      border-radius: 9px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      text-decoration: none;
+      transition: all .2s ease;
+    }
+    .btn-primary   { background: linear-gradient(135deg, #B46100, #8a4a00); color: #fff; border: 1px solid #e07b00; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(180,97,0,0.4); }
+    .btn-secondary { background: #f8fafc; color: #475569; border: 2px solid #e2e8f0; }
+    .btn-secondary:hover { border-color: #B46100; color: #B46100; background: #fff3e0; }
+
+    /* ── KPI Strip ── */
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .kpi-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px 18px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+      border-left: 4px solid #B46100;
+      transition: all .2s ease;
+    }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(180,97,0,0.12); }
+
+    .kpi-value { font-size: 26px; font-weight: 700; color: #B46100; line-height: 1; margin-bottom: 4px; }
+    .kpi-label { font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ── Hero map ── */
+    .map-hero {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      border: 1px solid #e2e8f0;
+      margin-bottom: 14px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Floating filter pills — top left of map */
+    .map-filters {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 1000;
+      display: flex;
+      gap: 7px;
+    }
+
+    .filter-pill {
+      padding: 7px 13px;
+      border-radius: 20px;
+      border: none;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      display: flex; align-items: center; gap: 5px;
+      transition: all .2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .filter-pill.active { background: linear-gradient(135deg, #B46100, #8a4a00); color: #fff; }
+    .filter-pill:not(.active) { background: #fff; color: #475569; }
+    .filter-pill:not(.active):hover { background: #fff3e0; color: #B46100; }
+
+    .fp-count {
+      font-size: 10px; font-weight: 700; padding: 1px 6px;
+      border-radius: 8px; background: rgba(255,255,255,0.3);
+    }
+    .filter-pill:not(.active) .fp-count { background: #e2e8f0; color: #64748b; }
+
+    /* View toggle — top right of map */
+    .map-view-toggle {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 1000;
+      display: flex;
+      gap: 7px;
+    }
+
+    .view-pill {
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      display: flex; align-items: center; gap: 6px;
+      transition: all .2s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .view-pill.active { background: linear-gradient(135deg, #B46100, #8a4a00); color: #fff; }
+    .view-pill:not(.active) { background: #fff; color: #475569; }
+    .view-pill:not(.active):hover { background: #fff3e0; color: #B46100; }
+
+    #map { height: 580px; width: 100%; display: block; }
+
+    /* Legend bar */
+    .legend-bar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 11px 20px;
+      border-top: 1px solid #e2e8f0;
+      background: #f8fafc;
+      flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #475569; }
+    .legend-dot  { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+    .legend-box  { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+
+    /* ── Bottom grid ── */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 320px;
+      gap: 14px;
+    }
+
+    .panel {
+      background: #fff;
+      border-radius: 14px;
+      padding: 18px 20px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+      border: 1px solid #e2e8f0;
+    }
+
+    .panel-title {
+      font-size: 13px; font-weight: 700; color: #0f172a;
+      margin-bottom: 14px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .panel-title-left { display: flex; align-items: center; gap: 7px; }
+
+    /* Region list */
+    .region-scroll { max-height: 320px; overflow-y: auto; }
+
+    .region-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 10px;
+      border-radius: 7px;
+      margin-bottom: 2px;
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+    .region-item:hover { background: #fff3e0; }
+    .region-item.active { background: #fff3e0; border-left: 3px solid #B46100; padding-left: 7px; }
+    .region-item.empty  { opacity: 0.3; }
+
+    .region-name { font-weight: 600; color: #0f172a; font-size: 12px; }
+
+    .region-badge {
+      background: linear-gradient(135deg, #B46100, #8a4a00);
+      color: #fff; padding: 2px 9px; border-radius: 10px;
+      font-size: 11px; font-weight: 700;
+    }
+    .region-badge.zero { background: #e2e8f0; color: #94a3b8; }
+
+    /* Controls quick stats */
+    .stat-mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .stat-mini {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 9px;
+      padding: 11px; text-align: center;
+    }
+    .stat-mini-val { font-size: 22px; font-weight: 700; line-height: 1; margin-bottom: 3px; }
+    .stat-mini-lbl { font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px; }
+
+    .ctrl-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+    .date-row { display: flex; gap: 7px; }
+    .date-input {
+      flex: 1; padding: 8px 10px; border: 2px solid #e2e8f0;
+      border-radius: 8px; background: #fff; color: #0f172a;
+      font-size: 12px; font-family: 'Inter', sans-serif;
+    }
+    .date-input:focus { outline: none; border-color: #B46100; }
+
+    /* Detail */
+    .detail-scroll { max-height: 320px; overflow-y: auto; }
+
+    .never-booked-btn {
+      width: 100%; margin-bottom: 10px; padding: 8px 12px;
+      background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.3);
+      border-radius: 8px; color: #ef4444; font-weight: 700; font-size: 12px;
+      cursor: pointer; font-family: 'Inter', sans-serif;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: all .2s ease;
+    }
+    .never-booked-btn:hover { background: rgba(239,68,68,0.12); }
+
+    .card {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 9px;
+      padding: 10px 12px; margin-bottom: 7px;
+      transition: all .15s ease; cursor: pointer;
+    }
+    .card:hover { border-color: #B46100; background: #fff; transform: translateX(2px); }
+    .card-title { font-weight: 700; color: #0f172a; font-size: 12px; margin-bottom: 3px; }
+    .card-info  { font-size: 11px; color: #475569; margin-bottom: 2px; }
+
+    .badge { display: inline-block; padding: 2px 6px; border-radius: 5px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 4px; margin-right: 3px; }
+    .badge-active    { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid #10b981; }
+    .badge-inactive  { background: rgba(239,68,68,0.12);  color: #ef4444; border: 1px solid #ef4444; }
+    .badge-suspended { background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid #f59e0b; }
+
+    /* Cluster */
+    .marker-cluster-small  { background: rgba(180,97,0,0.85);   border: 3px solid #e07b00; }
+    .marker-cluster-medium { background: rgba(251,146,60,0.85); border: 3px solid #fb923c; }
+    .marker-cluster-large  { background: rgba(138,74,0,0.85);   border: 3px solid #B46100; }
+    .marker-cluster div { background: transparent; color: #fff; font-weight: 700; font-size: 13px; }
+
+    /* Popup */
+    .leaflet-popup-content-wrapper { background: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.14); border: 1px solid #e2e8f0; }
+    .leaflet-popup-tip { background: #fff; }
+    .leaflet-popup-content { margin: 13px; font-family: 'Inter', sans-serif; min-width: 185px; }
+    .popup-title  { font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e2e8f0; }
+    .popup-row    { font-size: 11px; color: #475569; margin-bottom: 4px; }
+    .popup-footer { margin-top: 7px; padding-top: 7px; border-top: 1px solid #f1f5f9; }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #f8fafc; }
+    ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #B46100; }
+
+    .spinner { margin: 20px auto 8px; width: 30px; height: 30px; border: 3px solid #e2e8f0; border-top-color: #B46100; border-radius: 50%; animation: spin 0.9s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-state { text-align: center; padding: 24px 12px; color: #64748b; font-size: 12px; }
+
+    @media (max-width: 1200px) {
+      .bottom-grid { grid-template-columns: 1fr 1fr; }
+      .kpi-strip   { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      body { padding: 10px; }
+      #map { height: 360px; }
+      .kpi-strip   { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .bottom-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-logo">
+        <i data-lucide="map-pin" style="width:20px;height:20px;color:#fff;"></i>
+      </div>
+      <div>
+        <div class="header-title">Client Map</div>
+        <div class="header-sub">Where our clients are across the UK — click a region to drill in</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" onclick="window.location.href='admin-panel.html'">
+        <i data-lucide="arrow-left" style="width:13px;height:13px;"></i> Admin
+      </button>
+      <button class="btn btn-secondary" onclick="window.location.href='uk-client-map.html'">
+        <i data-lucide="bar-chart-2" style="width:13px;height:13px;"></i> Full Dashboard
+      </button>
+      <button class="btn btn-primary" onclick="loadData()">
+        <i data-lucide="refresh-cw" style="width:13px;height:13px;"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Strip -->
+  <div class="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-value" id="kpiTotal">—</div>
+      <div class="kpi-label">Total Clients</div>
+    </div>
+    <div class="kpi-card" style="border-left-color:#3F4D1B;">
+      <div class="kpi-value" style="color:#3F4D1B;" id="kpiRegions">—</div>
+      <div class="kpi-label">Regions Covered</div>
+    </div>
+    <div class="kpi-card" style="border-left-color:#64748b;">
+      <div class="kpi-value" style="color:#64748b;" id="kpiOpportunities">—</div>
+      <div class="kpi-label">Untapped Regions</div>
+    </div>
+    <div class="kpi-card" style="border-left-color:#10b981;">
+      <div class="kpi-value" style="color:#10b981;" id="kpiGrowth">—</div>
+      <div class="kpi-label">Added (30 Days)</div>
+    </div>
+    <div class="kpi-card" style="border-left-color:#f59e0b;">
+      <div class="kpi-value" style="color:#f59e0b;font-size:15px;padding-top:6px;" id="kpiTopRegion">—</div>
+      <div class="kpi-label">Top Region</div>
+    </div>
+  </div>
+
+  <!-- HERO MAP -->
+  <div class="map-hero">
+
+    <!-- Filter pills overlaid on map -->
+    <div class="map-filters">
+      <button class="filter-pill active" onclick="applyFilter('all', this)">
+        All <span class="fp-count" id="fcAll">—</span>
+      </button>
+      <button class="filter-pill" onclick="applyFilter('active', this)">
+        Active <span class="fp-count" id="fcActive">—</span>
+      </button>
+      <button class="filter-pill" onclick="applyFilter('never', this)">
+        Never Booked <span class="fp-count" id="fcNever">—</span>
+      </button>
+    </div>
+
+    <!-- View toggle overlaid on map -->
+    <div class="map-view-toggle">
+      <button class="view-pill active" id="btnMarkers" onclick="setView('markers')">
+        <i data-lucide="map-pin" style="width:12px;height:12px;"></i> Markers
+      </button>
+      <button class="view-pill" id="btnHeat" onclick="setView('heat')">
+        <i data-lucide="flame" style="width:12px;height:12px;"></i> Heat Map
+      </button>
+    </div>
+
+    <div id="map"></div>
+
+    <!-- Legend -->
+    <div class="legend-bar">
+      <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div> Active client</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#94a3b8;"></div> Inactive</div>
+      <div class="legend-item"><div class="legend-box" style="background:#B46100;"></div> Cluster 2–10</div>
+      <div class="legend-item"><div class="legend-box" style="background:#fb923c;"></div> Cluster 10–20</div>
+      <div class="legend-item"><div class="legend-box" style="background:#8a4a00;"></div> Cluster 20+</div>
+      <div style="margin-left:auto;font-size:11px;color:#94a3b8;">Click a cluster to zoom · click a pin for details</div>
+    </div>
+  </div>
+
+  <!-- Bottom: Region list | Quick stats + date filter | Client detail -->
+  <div class="bottom-grid">
+
+    <!-- Region list -->
+    <div class="panel">
+      <div class="panel-title">
+        <div class="panel-title-left">
+          <i data-lucide="map" style="width:14px;height:14px;color:#B46100;"></i>
+          Regions by Client Count
+        </div>
+        <span style="font-size:11px;color:#94a3b8;font-weight:500;" id="regionTotal">—</span>
+      </div>
+      <div class="region-scroll" id="regionList">
+        <div class="empty-state"><div class="spinner"></div>Loading...</div>
+      </div>
+    </div>
+
+    <!-- Quick stats + date filter -->
+    <div class="panel">
+      <div class="panel-title">
+        <div class="panel-title-left">
+          <i data-lucide="bar-chart-2" style="width:14px;height:14px;color:#B46100;"></i>
+          Snapshot
+        </div>
+      </div>
+      <div class="stat-mini-grid">
+        <div class="stat-mini">
+          <div class="stat-mini-val" style="color:#10b981;" id="qs1">—</div>
+          <div class="stat-mini-lbl">Have Booked</div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-mini-val" style="color:#ef4444;" id="qs2">—</div>
+          <div class="stat-mini-lbl">Never Booked</div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-mini-val" style="color:#3b82f6;" id="qs3">—</div>
+          <div class="stat-mini-lbl">Active Accounts</div>
+        </div>
+        <div class="stat-mini">
+          <div class="stat-mini-val" style="color:#f59e0b;" id="qs4">—%</div>
+          <div class="stat-mini-lbl">Booking Rate</div>
+        </div>
+      </div>
+      <div class="ctrl-label">Filter by Date Joined</div>
+      <div class="date-row">
+        <input type="date" class="date-input" id="dateFrom" onchange="applyDateFilter()">
+        <input type="date" class="date-input" id="dateTo"   onchange="applyDateFilter()">
+      </div>
+    </div>
+
+    <!-- Client detail -->
+    <div class="panel">
+      <div class="panel-title">
+        <div class="panel-title-left">
+          <i data-lucide="users" style="width:14px;height:14px;color:#B46100;"></i>
+          <span id="detailTitle">All Clients</span>
+        </div>
+      </div>
+      <button class="never-booked-btn" id="neverBookedBtn" style="display:none;" onclick="showNeverBooked()">
+        <i data-lucide="user-x" style="width:12px;height:12px;"></i> Show Never Booked
+      </button>
+      <div class="detail-scroll" id="detailContent">
+        <div class="empty-state"><div class="spinner"></div>Loading...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const REGION_COORDS = {
+  'Cheshire East':[53.1603,-2.2119],'Cheshire West and Chester':[53.1905,-2.8909],
+  'Greater London':[51.5074,-0.1278],'Greater Manchester':[53.4808,-2.2426],
+  'Essex':[51.7341,0.4700],'West Midlands':[52.4862,-1.8904],
+  'Leicestershire':[52.6369,-1.1398],'South Yorkshire':[53.5400,-1.3500],
+  'West Yorkshire':[53.7900,-1.7500],'North Yorkshire':[54.2766,-1.4090],
+  'East Riding of Yorkshire':[53.8429,-0.4380],'York':[53.9600,-1.0873],
+  'Cumbria':[54.5772,-2.7974],'Lancashire':[53.7632,-2.7044],
+  'Merseyside':[53.4106,-2.9779],'Blackburn with Darwen':[53.7480,-2.4820],
+  'Blackpool':[53.8175,-3.0357],'Halton':[53.3340,-2.7350],
+  'Warrington':[53.3900,-2.5970],'County Durham':[54.7753,-1.5849],
+  'Northumberland':[55.2083,-2.0784],'Tyne and Wear':[54.9783,-1.6178],
+  'Derbyshire':[53.1235,-1.5650],'Derby':[52.9219,-1.4746],
+  'Herefordshire':[52.0564,-2.7160],'Lincolnshire':[53.2307,-0.5406],
+  'Northamptonshire':[52.2700,-0.8700],'Nottinghamshire':[53.1000,-0.9900],
+  'Nottingham':[52.9548,-1.1581],'Rutland':[52.6558,-0.6389],
+  'Shropshire':[52.7069,-2.7464],'Telford and Wrekin':[52.6766,-2.4469],
+  'Staffordshire':[52.8700,-2.0800],'Stoke-on-Trent':[53.0027,-2.1794],
+  'Warwickshire':[52.2819,-1.5849],'Worcestershire':[52.2500,-2.2200],
+  'Bedford':[52.1363,-0.4667],'Central Bedfordshire':[52.0029,-0.2982],
+  'Cambridgeshire':[52.2053,0.1218],'Peterborough':[52.5695,-0.2405],
+  'Hertfordshire':[51.8090,-0.2376],'Norfolk':[52.6295,0.7100],
+  'Suffolk':[52.1872,0.9708],'Berkshire':[51.4543,-1.0000],
+  'Brighton and Hove':[50.8225,-0.1372],'Buckinghamshire':[51.8133,-0.8084],
+  'East Sussex':[50.9085,0.2500],'Hampshire':[51.0577,-1.3081],
+  'Portsmouth':[50.8198,-1.0880],'Southampton':[50.9097,-1.4044],
+  'Isle of Wight':[50.6938,-1.3047],'Kent':[51.2787,0.5217],
+  'Medway':[51.4021,0.5501],'Oxfordshire':[51.7612,-1.2500],
+  'Surrey':[51.3148,-0.5600],'West Sussex':[50.9200,-0.6000],
+  'Bath and North East Somerset':[51.3811,-2.3590],'Bournemouth, Christchurch and Poole':[50.7192,-1.8808],
+  'Bristol':[51.4545,-2.5879],'Cornwall':[50.2660,-5.0527],
+  'Devon':[50.7184,-3.5339],'Plymouth':[50.3755,-4.1427],
+  'Torbay':[50.4619,-3.5253],'Dorset':[50.7480,-2.3440],
+  'Gloucestershire':[51.8642,-2.2381],'North Somerset':[51.3877,-2.7780],
+  'Somerset':[51.1054,-2.9260],'South Gloucestershire':[51.5260,-2.4729],
+  'Swindon':[51.5558,-1.7797],'Wiltshire':[51.3493,-1.9927],
+  'Aberdeen City':[57.1497,-2.0943],'City of Edinburgh':[55.9533,-3.1883],
+  'Glasgow City':[55.8642,-4.2518],'Highland':[57.4778,-4.2247],
+  'Cardiff':[51.4816,-3.1791],'Swansea':[51.6214,-3.9436],
+  'Belfast':[54.5973,-5.9301]
+};
+const UK_REGIONS = Object.keys(REGION_COORDS).sort();
+
+let allClients = [], displayedClients = [];
+let bookedEmails = new Set();
+let regionCounts = {};
+let map, cluster, heatLayer;
+let currentView = 'markers';
+
+document.addEventListener('DOMContentLoaded', () => {
+  initMap();
+  initDates();
+  loadData();
+  lucide.createIcons();
+});
+
+function initMap() {
+  map = L.map('map').setView([54.0, -2.5], 6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors', maxZoom: 18, minZoom: 5
+  }).addTo(map);
+  resetCluster();
+}
+
+function resetCluster() {
+  if (cluster) map.removeLayer(cluster);
+  cluster = L.markerClusterGroup({
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
+    spiderfyOnMaxZoom: true,
+    iconCreateFunction(c) {
+      const n  = c.getChildCount();
+      const sz = n >= 20 ? 'large' : n >= 10 ? 'medium' : 'small';
+      return L.divIcon({
+        html: '<div><span>' + n + '</span></div>',
+        className: 'marker-cluster marker-cluster-' + sz,
+        iconSize: L.point(40, 40)
+      });
+    }
+  });
+}
+
+function initDates() {
+  const now     = new Date();
+  const yearAgo = new Date(); yearAgo.setFullYear(now.getFullYear() - 1);
+  document.getElementById('dateTo').value   = now.toISOString().split('T')[0];
+  document.getElementById('dateFrom').value = yearAgo.toISOString().split('T')[0];
+}
+
+async function loadData() {
+  try {
+    const [usersRes, bookingsRes] = await Promise.all([
+      fetch('/.netlify/functions/admin-users'),
+      fetch('/.netlify/functions/get-all-bookings')
+    ]);
+    const userData     = await usersRes.json();
+    const bookingsData = await bookingsRes.json();
+
+    allClients       = userData.users || [];
+    displayedClients = [...allClients];
+
+    const bookings = bookingsData.bookings || [];
+    bookedEmails   = new Set(
+      bookings
+        .filter(b => b.bookingStatus !== 'Cancelled' && b.clientEmail)
+        .map(b => (b.clientEmail || '').toLowerCase())
+    );
+
+    buildRegionCounts();
+    updateKPIs();
+    updateFilterCounts();
+    renderRegionList();
+    renderMarkers();
+    renderDetailPanel(displayedClients, 'All Clients');
+    document.getElementById('neverBookedBtn').style.display = 'flex';
+    lucide.createIcons();
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById('detailContent').innerHTML =
+      '<div class="empty-state">Failed to load data.</div>';
+  }
+}
+
+function buildRegionCounts(clients) {
+  const list = clients || allClients;
+  regionCounts = {};
+  UK_REGIONS.forEach(r => regionCounts[r] = 0);
+  list.forEach(u => {
+    const r = u.fields['Region'];
+    if (r && regionCounts.hasOwnProperty(r)) regionCounts[r]++;
+  });
+}
+
+function updateKPIs() {
+  const total   = allClients.filter(u => u.fields['Region']).length;
+  const covered = Object.values(regionCounts).filter(c => c > 0).length;
+  const opp     = UK_REGIONS.length - covered;
+  const ago30   = new Date(); ago30.setDate(ago30.getDate() - 30);
+  const recent  = allClients.filter(u => new Date(u.fields['Created Date']) >= ago30).length;
+  let topRegion = '—', max = 0;
+  for (const [r, c] of Object.entries(regionCounts)) { if (c > max) { max = c; topRegion = r; } }
+
+  document.getElementById('kpiTotal').textContent         = total;
+  document.getElementById('kpiRegions').textContent       = covered;
+  document.getElementById('kpiOpportunities').textContent = opp;
+  document.getElementById('kpiGrowth').textContent        = '+' + recent;
+  document.getElementById('kpiTopRegion').textContent     = max > 0 ? topRegion : '—';
+
+  const hasBooked = allClients.filter(u => bookedEmails.has((u.fields['Email'] || '').toLowerCase())).length;
+  const neverBook = allClients.length - hasBooked;
+  const active    = allClients.filter(u => u.fields['Account Status'] === 'Active').length;
+  const rate      = allClients.length > 0 ? Math.round((hasBooked / allClients.length) * 100) : 0;
+
+  document.getElementById('qs1').textContent = hasBooked;
+  document.getElementById('qs2').textContent = neverBook;
+  document.getElementById('qs3').textContent = active;
+  document.getElementById('qs4').textContent = rate + '%';
+}
+
+function updateFilterCounts() {
+  document.getElementById('fcAll').textContent    = allClients.length;
+  document.getElementById('fcActive').textContent = allClients.filter(u => u.fields['Account Status'] === 'Active').length;
+  document.getElementById('fcNever').textContent  = allClients.filter(u => {
+    const email = (u.fields['Email'] || '').toLowerCase();
+    return email && !bookedEmails.has(email);
+  }).length;
+}
+
+function applyFilter(type, btn) {
+  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  if (type === 'all') {
+    displayedClients = [...allClients];
+  } else if (type === 'active') {
+    displayedClients = allClients.filter(u => u.fields['Account Status'] === 'Active');
+  } else if (type === 'never') {
+    displayedClients = allClients.filter(u => {
+      const email = (u.fields['Email'] || '').toLowerCase();
+      return email && !bookedEmails.has(email);
+    });
+  }
+
+  buildRegionCounts(displayedClients);
+  renderMarkers();
+  renderRegionList();
+  const label = type === 'never' ? 'Never Booked' : type === 'active' ? 'Active Clients' : 'All Clients';
+  renderDetailPanel(displayedClients, label);
+}
+
+function applyDateFilter() {
+  const from = document.getElementById('dateFrom').value;
+  const to   = document.getElementById('dateTo').value;
+  if (!from || !to) return;
+  const dFrom = new Date(from);
+  const dTo   = new Date(to); dTo.setHours(23,59,59);
+  displayedClients = allClients.filter(u => {
+    const d = new Date(u.fields['Created Date']);
+    return d >= dFrom && d <= dTo;
+  });
+  buildRegionCounts(displayedClients);
+  renderMarkers();
+  renderRegionList();
+  renderDetailPanel(displayedClients, 'Date Filtered');
+}
+
+function setView(mode) {
+  currentView = mode;
+  document.getElementById('btnMarkers').classList.toggle('active', mode === 'markers');
+  document.getElementById('btnHeat').classList.toggle('active', mode === 'heat');
+  renderMarkers();
+}
+
+function renderMarkers() {
+  if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+  resetCluster();
+
+  if (currentView === 'markers') {
+    displayedClients.forEach(u => {
+      const region = u.fields['Region'];
+      if (!region || !REGION_COORDS[region]) return;
+      const [lat, lng] = REGION_COORDS[region];
+      const jLat = lat + (Math.random() - 0.5) * 0.06;
+      const jLng = lng + (Math.random() - 0.5) * 0.06;
+      const isActive = u.fields['Account Status'] === 'Active';
+      const col = isActive ? '#ef4444' : '#94a3b8';
+
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="background:${col};border:3px solid #fff;border-radius:50%;width:18px;height:18px;box-shadow:0 2px 6px rgba(0,0,0,0.28);"></div>`,
+        iconSize: [18,18], iconAnchor: [9,9]
+      });
+
+      const email = (u.fields['Email'] || '').toLowerCase();
+      const m = L.marker([jLat, jLng], { icon });
+      m.bindPopup(`
+        <div class="popup-title">${u.fields['Name'] || 'Client'}</div>
+        <div class="popup-row">🏢 ${u.fields['Company'] || 'N/A'}</div>
+        <div class="popup-row">✉️ ${u.fields['Email'] || 'N/A'}</div>
+        <div class="popup-row">📍 ${region}</div>
+        <div class="popup-row">📅 Joined ${formatDate(u.fields['Created Date'])}</div>
+        <div class="popup-footer">
+          <span class="badge badge-${(u.fields['Account Status'] || 'inactive').toLowerCase()}">${u.fields['Account Status'] || 'Unknown'}</span>
+          ${bookedEmails.has(email)
+            ? '<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid #10b981;">Has Booked</span>'
+            : '<span class="badge" style="background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid #ef4444;">Never Booked</span>'}
+        </div>
+      `);
+      cluster.addLayer(m);
+    });
+    map.addLayer(cluster);
+
+  } else {
+    const heatData = UK_REGIONS
+      .filter(r => regionCounts[r] > 0 && REGION_COORDS[r])
+      .map(r => [...REGION_COORDS[r], regionCounts[r] / 10]);
+    heatLayer = L.heatLayer(heatData, {
+      radius: 40, blur: 50, maxZoom: 10,
+      gradient: { 0.0: '#3b82f6', 0.5: '#fb923c', 1.0: '#ef4444' }
+    }).addTo(map);
+  }
+}
+
+function renderRegionList() {
+  const covered = Object.values(regionCounts).filter(c => c > 0).length;
+  document.getElementById('regionTotal').textContent = covered + ' active regions';
+
+  const sorted = UK_REGIONS
+    .map(r => ({ r, c: regionCounts[r] || 0 }))
+    .sort((a, b) => b.c - a.c);
+
+  document.getElementById('regionList').innerHTML = sorted.map(({ r, c }) => `
+    <div class="region-item ${c === 0 ? 'empty' : ''}" onclick="flyToRegion('${r}', this)">
+      <div class="region-name">${r}</div>
+      <span class="region-badge ${c === 0 ? 'zero' : ''}">${c}</span>
+    </div>`).join('');
+}
+
+function flyToRegion(region, el) {
+  document.querySelectorAll('.region-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  if (REGION_COORDS[region]) {
+    map.flyTo(REGION_COORDS[region], 10, { duration: 1.3 });
+    const inRegion = displayedClients.filter(u => u.fields['Region'] === region);
+    renderDetailPanel(inRegion, region);
+  }
+}
+
+function renderDetailPanel(clients, title) {
+  document.getElementById('detailTitle').textContent = `${title} (${clients.length})`;
+  const shown = clients.slice(0, 60);
+  document.getElementById('detailContent').innerHTML = shown.length === 0
+    ? '<div class="empty-state">No clients found</div>'
+    : shown.map(clientCard).join('')
+      + (clients.length > 60 ? `<div style="text-align:center;padding:8px;color:#94a3b8;font-size:11px;">Showing 60 of ${clients.length}</div>` : '');
+  lucide.createIcons();
+}
+
+function showNeverBooked() {
+  const never = allClients.filter(u => {
+    const email = (u.fields['Email'] || '').toLowerCase();
+    return email && !bookedEmails.has(email);
+  }).sort((a, b) => new Date(b.fields['Created Date']) - new Date(a.fields['Created Date']));
+
+  document.getElementById('detailTitle').textContent = `Never Booked (${never.length})`;
+  document.getElementById('detailContent').innerHTML =
+    `<div style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.25);border-radius:7px;padding:8px 11px;margin-bottom:9px;font-size:11px;color:#ef4444;font-weight:600;">
+      ⚠ ${never.length} clients have never placed a booking
+    </div>`
+    + (never.length === 0
+      ? '<div class="empty-state">All clients have booked — great work!</div>'
+      : never.map(clientCard).join(''));
+  lucide.createIcons();
+}
+
+function clientCard(u) {
+  const status    = u.fields['Account Status'] || 'Unknown';
+  const email     = (u.fields['Email'] || '').toLowerCase();
+  const hasBooked = bookedEmails.has(email);
+  return `<div class="card">
+    <div class="card-title">${u.fields['Name'] || 'Client'}</div>
+    <div class="card-info">🏢 ${u.fields['Company'] || 'N/A'}</div>
+    <div class="card-info">📍 ${u.fields['Region'] || 'N/A'}</div>
+    <div class="card-info">📅 ${formatDate(u.fields['Created Date'])}</div>
+    <span class="badge badge-${status.toLowerCase()}">${status}</span>
+    ${hasBooked
+      ? '<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid #10b981;">Has Booked</span>'
+      : '<span class="badge" style="background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid #ef4444;">Never Booked</span>'}
+  </div>`;
+}
+
+function formatDate(d) {
+  if (!d) return 'N/A';
+  if (typeof d === 'string' && d.length >= 10) {
+    const [y, m, day] = d.slice(0,10).split('-').map(Number);
+    return new Date(y, m-1, day).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+  }
+  return new Date(d).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+</script>
+</body>
+</html>
