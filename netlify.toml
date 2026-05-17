@@ -5,6 +5,21 @@
 [functions."send-reminders"]
   schedule = "0 9 * * *"
 
+[[headers]]
+  for = "/website/admin-panel.html"
+  [headers.values]
+    Basic-Auth = "markeb:Markebmedia230301"
+
+[[headers]]
+  for = "/internal/outreach-flows.html"
+  [headers.values]
+    Basic-Auth = "markeb:Markebmedia230301"
+
+[[headers]]
+  for = "/internal/commercial-intelligence.html"
+  [headers.values]
+    Basic-Auth = "markeb:Markebmedia230301"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
