@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Brochure Builder — Markeb Media</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Mukta:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --brand:#B46100;--brand-light:#CC7A1A;--pine:#3F4D1B;
+  --cream:#FDF3E2;--white:#fff;--ink:#1C140A;--ink-mid:#5C4A2A;--ink-soft:#8A7050;
+  --rule:rgba(180,97,0,0.14);--rule-strong:rgba(180,97,0,0.28);
+  --client:#B46100;/* overridden by colour picker */
+  --sidebar:280px;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Mukta',sans-serif;background:#f1f5f9;color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+
+/* ── Layout ── */
+.app{display:grid;grid-template-columns:var(--sidebar) 1fr;min-height:100vh;}
+.sidebar{background:var(--cream);border-right:1px solid var(--rule);padding:28px 20px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:0;}
+.main{display:flex;flex-direction:column;}
+
+/* ── Sidebar header ── */
+.sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--rule);}
+.sb-logo img{height:48px;width:auto;}
+.sb-back{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--ink-soft);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px;transition:color .2s;}
+.sb-back:hover{color:var(--brand);}
+
+/* ── Form sections ── */
+.sb-section{margin-bottom:22px;}
+.sb-section-title{font-size:10px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.18em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sb-section-title::before{content:'';width:16px;height:1px;background:var(--brand);}
+.field{margin-bottom:10px;}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--ink-mid);margin-bottom:4px;letter-spacing:.04em;}
+.field input,.field textarea,.field select{width:100%;padding:9px 12px;border:1px solid var(--rule-strong);border-radius:6px;font-size:13px;font-family:'Mukta',sans-serif;color:var(--ink);background:#fff;transition:border-color .2s,box-shadow .2s;resize:vertical;}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(180,97,0,.1);}
+.field textarea{min-height:80px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.field-row.three{grid-template-columns:1fr 1fr 1fr;}
+
+/* Feature list */
+.feature-list{display:flex;flex-direction:column;gap:6px;}
+.feature-item{display:flex;gap:6px;align-items:center;}
+.feature-item input{flex:1;padding:7px 10px;border:1px solid var(--rule-strong);border-radius:6px;font-size:12px;font-family:'Mukta',sans-serif;}
+.feature-item button{width:28px;height:28px;border:none;background:#fee2e2;color:#dc2626;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.add-feature-btn{width:100%;padding:7px;border:1px dashed var(--rule-strong);background:transparent;color:var(--ink-soft);font-size:12px;font-family:'Mukta',sans-serif;border-radius:6px;cursor:pointer;margin-top:6px;transition:all .2s;}
+.add-feature-btn:hover{border-color:var(--brand);color:var(--brand);}
+
+/* Upload zones */
+.upload-zone{border:1px dashed var(--rule-strong);border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:#fff;}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--brand);background:rgba(180,97,0,.04);}
+.upload-zone input{display:none;}
+.upload-zone-icon{font-size:22px;margin-bottom:6px;}
+.upload-zone p{font-size:12px;color:var(--ink-soft);line-height:1.5;}
+.upload-zone strong{color:var(--brand);}
+.logo-preview{width:100%;max-height:70px;object-fit:contain;margin-top:8px;border-radius:4px;}
+.photo-thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;}
+.photo-thumb{position:relative;aspect-ratio:4/3;border-radius:4px;overflow:hidden;}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;}
+.photo-thumb-rm{position:absolute;top:2px;right:2px;width:18px;height:18px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;}
+.photo-count{font-size:11px;color:var(--ink-soft);margin-top:6px;text-align:center;}
+
+/* Colour picker */
+.colour-row{display:flex;align-items:center;gap:10px;}
+.colour-row input[type="color"]{width:40px;height:36px;border:1px solid var(--rule-strong);border-radius:6px;cursor:pointer;padding:2px;}
+.colour-row span{font-size:12px;color:var(--ink-mid);}
+
+/* Template picker */
+.template-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.tpl-card{border:2px solid var(--rule);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .2s;background:#fff;}
+.tpl-card.active{border-color:var(--brand);box-shadow:0 0 0 3px rgba(180,97,0,.15);}
+.tpl-card:hover{border-color:var(--brand-light);}
+.tpl-thumb{height:60px;display:flex;flex-direction:column;gap:3px;padding:6px;}
+.tpl-stripe{border-radius:2px;}
+.tpl-label{font-size:10px;font-weight:600;color:var(--ink-mid);text-align:center;padding:4px 0;border-top:1px solid var(--rule);}
+.tpl-card.active .tpl-label{color:var(--brand);}
+
+/* Export buttons */
+.export-group{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.btn-export{width:100%;padding:11px 16px;border:none;border-radius:8px;font-family:'Mukta',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
+.btn-pdf{background:var(--brand);color:#fff;box-shadow:0 4px 14px rgba(180,97,0,.3);}
+.btn-pdf:hover{background:var(--brand-light);transform:translateY(-1px);}
+.btn-word{background:var(--pine);color:#fff;box-shadow:0 4px 14px rgba(63,77,27,.3);}
+.btn-word:hover{background:#4a5920;transform:translateY(-1px);}
+.btn-print{background:#fff;color:var(--ink-mid);border:1px solid var(--rule-strong);}
+.btn-print:hover{border-color:var(--ink-mid);color:var(--ink);}
+
+/* ── Main content ── */
+.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--ink);}
+.topbar-title em{font-style:italic;color:var(--brand);}
+.topbar-sub{font-size:13px;color:var(--ink-soft);margin-top:2px;}
+.preview-area{padding:32px;flex:1;display:flex;flex-direction:column;align-items:center;}
+.preview-label{font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.16em;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.preview-label::before,.preview-label::after{content:'';flex:1;height:1px;background:#e2e8f0;}
+
+/* ── Brochure preview ── */
+#brochure{width:794px;max-width:100%;background:#fff;box-shadow:0 8px 48px rgba(0,0,0,.14);position:relative;font-family:'Mukta',sans-serif;}
+
+/* ── TEMPLATE 1: Classic Luxury ── */
+.tpl-classic .br-cover{position:relative;width:100%;height:480px;overflow:hidden;}
+.tpl-classic .br-cover-img{width:100%;height:100%;object-fit:cover;}
+.tpl-classic .br-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.18) 55%,transparent 100%);}
+.tpl-classic .br-cover-text{position:absolute;bottom:0;left:0;right:0;padding:40px 48px;}
+.tpl-classic .br-agency-logo{position:absolute;top:28px;right:32px;max-height:56px;max-width:160px;object-fit:contain;}
+.tpl-classic .br-address{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:#fff;line-height:1.1;margin-bottom:8px;}
+.tpl-classic .br-price-tag{display:inline-block;background:var(--client-colour,#B46100);color:#fff;font-size:14px;font-weight:700;padding:7px 18px;letter-spacing:.08em;}
+.tpl-classic .br-stats-bar{display:grid;grid-template-columns:repeat(4,1fr);background:#f8f6f2;border-bottom:3px solid var(--client-colour,#B46100);}
+.tpl-classic .br-stat{padding:18px 20px;text-align:center;border-right:1px solid #ede8df;}
+.tpl-classic .br-stat:last-child{border-right:none;}
+.tpl-classic .br-stat-val{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--client-colour,#B46100);line-height:1;}
+.tpl-classic .br-stat-lbl{font-size:10px;font-weight:600;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-top:3px;}
+.tpl-classic .br-body{padding:40px 48px;}
+.tpl-classic .br-section-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--client-colour,#B46100);margin-bottom:12px;display:flex;align-items:center;gap:12px;}
+.tpl-classic .br-section-title::after{content:'';flex:1;height:1px;background:var(--client-colour,#B46100);opacity:.25;}
+.tpl-classic .br-description{font-size:14px;color:#5C4A2A;line-height:1.85;margin-bottom:32px;font-weight:300;}
+.tpl-classic .br-features{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;margin-bottom:32px;}
+.tpl-classic .br-feature{font-size:13px;color:#5C4A2A;display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+.tpl-classic .br-feature::before{content:'◆';font-size:8px;color:var(--client-colour,#B46100);margin-top:4px;flex-shrink:0;}
+.tpl-classic .br-photo-grid{display:grid;gap:6px;margin-bottom:32px;}
+.tpl-classic .br-photo-grid.cols-2{grid-template-columns:1fr 1fr;}
+.tpl-classic .br-photo-grid.cols-3{grid-template-columns:1fr 1fr 1fr;}
+.tpl-classic .br-photo-grid img{width:100%;aspect-ratio:4/3;object-fit:cover;}
+.tpl-classic .br-details-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #ede8df;margin-bottom:32px;}
+.tpl-classic .br-detail{padding:12px 18px;border-bottom:1px solid #ede8df;border-right:1px solid #ede8df;}
+.tpl-classic .br-detail:nth-child(even){border-right:none;}
+.tpl-classic .br-detail-lbl{font-size:10px;font-weight:600;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;}
+.tpl-classic .br-detail-val{font-size:14px;font-weight:600;color:#1C140A;}
+.tpl-classic .br-floorplan{width:100%;max-height:320px;object-fit:contain;margin-bottom:32px;border:1px solid #ede8df;padding:12px;}
+.tpl-classic .br-footer{background:var(--client-colour,#B46100);padding:22px 48px;display:flex;justify-content:space-between;align-items:center;}
+.tpl-classic .br-footer-agency{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:#fff;}
+.tpl-classic .br-footer-note{font-size:10px;color:rgba(255,255,255,.65);text-align:right;line-height:1.6;}
+
+/* ── TEMPLATE 2: Modern Minimal ── */
+.tpl-modern .br-cover{width:100%;height:520px;position:relative;overflow:hidden;}
+.tpl-modern .br-cover-img{width:100%;height:100%;object-fit:cover;}
+.tpl-modern .br-cover-bar{position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--client-colour,#B46100);}
+.tpl-modern .br-cover-agency{position:absolute;top:32px;left:28px;max-height:48px;max-width:140px;object-fit:contain;}
+.tpl-modern .br-header-block{background:#fff;padding:32px 48px;border-bottom:1px solid #f0ebe2;display:grid;grid-template-columns:1fr auto;align-items:start;gap:24px;}
+.tpl-modern .br-address-modern{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:#1C140A;line-height:1.15;}
+.tpl-modern .br-price-modern{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:var(--client-colour,#B46100);white-space:nowrap;}
+.tpl-modern .br-tenure-pill{display:inline-block;background:#f8f6f2;border:1px solid #ede8df;font-size:11px;font-weight:600;color:#8A7050;padding:3px 10px;border-radius:20px;margin-top:6px;text-transform:uppercase;letter-spacing:.08em;}
+.tpl-modern .br-stats-modern{display:flex;gap:0;padding:0 48px;background:#f8f6f2;border-bottom:1px solid #ede8df;}
+.tpl-modern .br-stat-m{padding:16px 28px;text-align:center;border-right:1px solid #ede8df;display:flex;flex-direction:column;gap:2px;}
+.tpl-modern .br-stat-m:last-child{border-right:none;}
+.tpl-modern .br-stat-m-val{font-size:24px;font-weight:700;color:var(--client-colour,#B46100);font-family:'Cormorant Garamond',serif;}
+.tpl-modern .br-stat-m-lbl{font-size:10px;color:#8A7050;font-weight:600;text-transform:uppercase;letter-spacing:.1em;}
+.tpl-modern .br-body{padding:36px 48px;}
+.tpl-modern .br-col-2{display:grid;grid-template-columns:1.4fr 1fr;gap:36px;}
+.tpl-modern .br-desc-m{font-size:14px;color:#5C4A2A;line-height:1.85;font-weight:300;}
+.tpl-modern .br-features-m{list-style:none;}
+.tpl-modern .br-features-m li{padding:7px 0;border-bottom:1px solid #f0ebe2;font-size:13px;color:#5C4A2A;display:flex;align-items:flex-start;gap:8px;}
+.tpl-modern .br-features-m li:last-child{border-bottom:none;}
+.tpl-modern .br-features-m li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--client-colour,#B46100);margin-top:6px;flex-shrink:0;}
+.tpl-modern .br-photo-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px;margin:28px 0;}
+.tpl-modern .br-photo-strip img{width:100%;aspect-ratio:4/3;object-fit:cover;}
+.tpl-modern .br-details-m{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#ede8df;border:1px solid #ede8df;margin:28px 0;}
+.tpl-modern .br-det-m{background:#fff;padding:14px 18px;}
+.tpl-modern .br-det-m-l{font-size:10px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
+.tpl-modern .br-det-m-v{font-size:14px;font-weight:600;color:#1C140A;}
+.tpl-modern .br-floorplan{width:100%;max-height:300px;object-fit:contain;border:1px solid #ede8df;padding:12px;margin-bottom:28px;}
+.tpl-modern .br-footer{padding:20px 48px;background:#1C140A;display:flex;justify-content:space-between;align-items:center;}
+.tpl-modern .br-footer-l{font-size:13px;color:rgba(255,255,255,.55);}
+.tpl-modern .br-footer-accent{width:32px;height:3px;background:var(--client-colour,#B46100);margin-top:4px;}
+
+/* ── TEMPLATE 3: Estate Dark ── */
+.tpl-dark .br-cover{width:100%;height:500px;position:relative;overflow:hidden;}
+.tpl-dark .br-cover-img{width:100%;height:100%;object-fit:cover;opacity:.75;}
+.tpl-dark .br-cover-bg{position:absolute;inset:0;background:#0e0b08;}
+.tpl-dark .br-cover-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(14,11,8,.92) 0%,rgba(14,11,8,.4) 60%,transparent 100%);}
+.tpl-dark .br-cover-text{position:absolute;top:50%;left:56px;transform:translateY(-50%);}
+.tpl-dark .br-cover-line{width:40px;height:2px;background:var(--client-colour,#B46100);margin-bottom:18px;}
+.tpl-dark .br-address-dark{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;color:#fff;line-height:1.1;margin-bottom:12px;}
+.tpl-dark .br-price-dark{font-size:22px;font-weight:700;color:var(--client-colour,#B46100);font-family:'Cormorant Garamond',serif;}
+.tpl-dark .br-agency-dark{position:absolute;top:28px;right:32px;max-height:52px;max-width:150px;object-fit:contain;filter:brightness(10);}
+.tpl-dark .br-dark-stats{background:#0e0b08;display:grid;grid-template-columns:repeat(4,1fr);}
+.tpl-dark .br-stat-d{padding:18px 16px;text-align:center;border-right:1px solid rgba(255,255,255,.07);}
+.tpl-dark .br-stat-d:last-child{border-right:none;}
+.tpl-dark .br-stat-d-val{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--client-colour,#B46100);}
+.tpl-dark .br-stat-d-lbl{font-size:9px;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:.14em;margin-top:3px;}
+.tpl-dark .br-body{padding:44px 56px;background:#fff;}
+.tpl-dark .br-gold-rule{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.tpl-dark .br-gold-rule-line{flex:1;height:1px;background:var(--client-colour,#B46100);opacity:.28;}
+.tpl-dark .br-gold-rule-dia{width:7px;height:7px;background:var(--client-colour,#B46100);transform:rotate(45deg);opacity:.65;}
+.tpl-dark .br-gold-rule-txt{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--client-colour,#B46100);letter-spacing:.14em;text-transform:uppercase;}
+.tpl-dark .br-desc-d{font-size:14px;color:#5C4A2A;line-height:1.85;font-weight:300;margin-bottom:32px;}
+.tpl-dark .br-features-d{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 18px;margin-bottom:32px;}
+.tpl-dark .br-feature-d{font-size:12px;color:#5C4A2A;display:flex;align-items:flex-start;gap:7px;}
+.tpl-dark .br-feature-d::before{content:'—';color:var(--client-colour,#B46100);font-weight:700;flex-shrink:0;}
+.tpl-dark .br-photo-masonry{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:auto auto;gap:5px;margin-bottom:32px;}
+.tpl-dark .br-photo-masonry img{width:100%;height:100%;object-fit:cover;}
+.tpl-dark .br-photo-masonry img:first-child{grid-row:span 2;aspect-ratio:3/4;}
+.tpl-dark .br-photo-masonry img:not(:first-child){aspect-ratio:3/2;}
+.tpl-dark .br-photo-extra{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:5px;margin-bottom:32px;}
+.tpl-dark .br-photo-extra img{width:100%;aspect-ratio:4/3;object-fit:cover;}
+.tpl-dark .br-details-d{background:#f8f6f2;padding:24px 32px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;border-top:3px solid var(--client-colour,#B46100);}
+.tpl-dark .br-det-d-l{font-size:10px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
+.tpl-dark .br-det-d-v{font-size:14px;font-weight:600;color:#1C140A;}
+.tpl-dark .br-floorplan{width:100%;max-height:300px;object-fit:contain;border:1px solid #ede8df;padding:12px;margin-bottom:32px;}
+.tpl-dark .br-footer{background:#0e0b08;padding:24px 56px;display:flex;justify-content:space-between;align-items:center;}
+.tpl-dark .br-footer-agency{font-family:'Cormorant Garamond',serif;font-size:17px;color:#fff;font-weight:600;}
+.tpl-dark .br-footer-right{text-align:right;}
+.tpl-dark .br-footer-note{font-size:10px;color:rgba(255,255,255,.38);line-height:1.6;}
+.tpl-dark .br-footer-accent{height:2px;width:32px;background:var(--client-colour,#B46100);margin:4px 0 0 auto;}
+
+/* ── Placeholder UI ── */
+.br-placeholder{background:#f8f6f2;border:2px dashed #d8cfc4;display:flex;align-items:center;justify-content:center;font-size:12px;color:#A88E6E;letter-spacing:.08em;text-transform:uppercase;}
+.br-placeholder-sm{height:80px;}
+
+/* ── Responsive ── */
+@media(max-width:1100px){
+  .app{grid-template-columns:240px 1fr;}
+  #brochure{width:680px;}
+}
+@media(max-width:900px){
+  .app{grid-template-columns:1fr;}
+  .sidebar{position:static;height:auto;order:2;}
+  .main{order:1;}
+  #brochure{width:100%;}
+  .topbar{flex-direction:column;align-items:flex-start;gap:8px;}
+}
+
+/* Print */
+@media print{
+  .sidebar,.topbar,.preview-label{display:none!important;}
+  .main{margin:0;}
+  .preview-area{padding:0;}
+  #brochure{box-shadow:none;width:100%;}
+}
+
+/* Loading spinner */
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top:2px solid #fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sb-logo">
+      <img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media"/>
+    </div>
+
+    <a href="./dashboard.html" class="sb-back">
+      <i data-lucide="arrow-left" style="width:14px;height:14px;"></i>
+      Back to Dashboard
+    </a>
+
+    <!-- Template -->
+    <div class="sb-section">
+      <div class="sb-section-title">Layout Template</div>
+      <div class="template-grid">
+        <div class="tpl-card active" onclick="setTemplate('classic')" id="tpl-classic">
+          <div class="tpl-thumb">
+            <div class="tpl-stripe" style="height:28px;background:#c8bfb0;"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;flex:1;">
+              <div class="tpl-stripe" style="background:#e8e2d8;"></div>
+              <div class="tpl-stripe" style="background:#e8e2d8;"></div>
+            </div>
+          </div>
+          <div class="tpl-label">Classic</div>
+        </div>
+        <div class="tpl-card" onclick="setTemplate('modern')" id="tpl-modern">
+          <div class="tpl-thumb">
+            <div class="tpl-stripe" style="height:32px;background:#d0c8bc;"></div>
+            <div class="tpl-stripe" style="flex:1;background:#f0ebe2;margin-top:2px;"></div>
+          </div>
+          <div class="tpl-label">Modern</div>
+        </div>
+        <div class="tpl-card" onclick="setTemplate('dark')" id="tpl-dark">
+          <div class="tpl-thumb">
+            <div class="tpl-stripe" style="height:28px;background:#2a2420;"></div>
+            <div class="tpl-stripe" style="height:8px;background:#0e0b08;margin-top:1px;"></div>
+            <div class="tpl-stripe" style="flex:1;background:#f0ebe2;margin-top:2px;"></div>
+          </div>
+          <div class="tpl-label">Dark Estate</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Branding -->
+    <div class="sb-section">
+      <div class="sb-section-title">Agency Branding</div>
+      <div class="field">
+        <label>Agency Name</label>
+        <input type="text" id="f-agency" placeholder="Your Estate Agency" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Agency Logo</label>
+        <div class="upload-zone" onclick="document.getElementById('f-logo-input').click()" id="logo-zone">
+          <input type="file" id="f-logo-input" accept="image/*" onchange="handleLogo(this)"/>
+          <div class="upload-zone-icon">🏢</div>
+          <p><strong>Click to upload</strong> your logo<br>PNG or SVG recommended</p>
+        </div>
+        <img id="logo-preview-img" class="logo-preview" style="display:none;"/>
+      </div>
+      <div class="field">
+        <label>Brand Colour</label>
+        <div class="colour-row">
+          <input type="color" id="f-colour" value="#B46100" oninput="updateColour(this.value)"/>
+          <span id="colour-hex">#B46100</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Property -->
+    <div class="sb-section">
+      <div class="sb-section-title">Property Details</div>
+      <div class="field">
+        <label>Full Address</label>
+        <input type="text" id="f-address" placeholder="12 Oak Lane, Cheshire, WA1 2AB" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Asking Price</label>
+        <input type="text" id="f-price" placeholder="£850,000" oninput="update()"/>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Bedrooms</label>
+          <input type="text" id="f-beds" placeholder="4" oninput="update()"/>
+        </div>
+        <div class="field">
+          <label>Bathrooms</label>
+          <input type="text" id="f-baths" placeholder="3" oninput="update()"/>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Receptions</label>
+          <input type="text" id="f-rec" placeholder="2" oninput="update()"/>
+        </div>
+        <div class="field">
+          <label>Tenure</label>
+          <select id="f-tenure" onchange="update()">
+            <option value="">Select…</option>
+            <option>Freehold</option>
+            <option>Leasehold</option>
+            <option>Share of Freehold</option>
+            <option>Commonhold</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>EPC Rating</label>
+          <select id="f-epc" onchange="update()">
+            <option value="">Select…</option>
+            <option>A</option><option>B</option><option>C</option>
+            <option>D</option><option>E</option><option>F</option><option>G</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Council Tax Band</label>
+          <select id="f-ctax" onchange="update()">
+            <option value="">Select…</option>
+            <option>A</option><option>B</option><option>C</option><option>D</option>
+            <option>E</option><option>F</option><option>G</option><option>H</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Property Style</label>
+        <input type="text" id="f-style" placeholder="e.g. Detached Victorian" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Total Floor Area</label>
+        <input type="text" id="f-area" placeholder="e.g. 2,850 sq ft / 265 sq m" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Plot Size</label>
+        <input type="text" id="f-plot" placeholder="e.g. 0.35 acres" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Year Built / Age</label>
+        <input type="text" id="f-year" placeholder="e.g. c.1898 / Circa 1970s" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Parking</label>
+        <input type="text" id="f-parking" placeholder="e.g. Double garage + driveway" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Heating</label>
+        <input type="text" id="f-heating" placeholder="e.g. Gas central heating" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Property Description</label>
+        <textarea id="f-desc" placeholder="Write a compelling description of the property…" oninput="update()"></textarea>
+      </div>
+    </div>
+
+    <!-- Key Features -->
+    <div class="sb-section">
+      <div class="sb-section-title">Key Features</div>
+      <div class="feature-list" id="feature-list"></div>
+      <button class="add-feature-btn" onclick="addFeature()">+ Add feature</button>
+    </div>
+
+    <!-- Photos -->
+    <div class="sb-section">
+      <div class="sb-section-title">Property Photos</div>
+      <div class="upload-zone" id="photo-zone" onclick="document.getElementById('f-photos-input').click()">
+        <input type="file" id="f-photos-input" accept="image/*" multiple onchange="handlePhotos(this)"/>
+        <div class="upload-zone-icon">📷</div>
+        <p><strong>Click or drag</strong> to add photos<br>Unlimited • All formats</p>
+      </div>
+      <div class="photo-thumbs" id="photo-thumbs"></div>
+      <div class="photo-count" id="photo-count"></div>
+    </div>
+
+    <!-- Floorplan -->
+    <div class="sb-section">
+      <div class="sb-section-title">Floorplan</div>
+      <div class="upload-zone" onclick="document.getElementById('f-floorplan-input').click()" id="fp-zone">
+        <input type="file" id="f-floorplan-input" accept="image/*" onchange="handleFloorplan(this)"/>
+        <div class="upload-zone-icon">📐</div>
+        <p><strong>Upload floorplan</strong> image<br>PNG, JPG or PDF image</p>
+      </div>
+      <img id="fp-preview" style="display:none;width:100%;margin-top:8px;border:1px solid var(--rule);border-radius:4px;"/>
+    </div>
+
+    <!-- Export -->
+    <div class="sb-section">
+      <div class="sb-section-title">Export Brochure</div>
+      <div class="export-group">
+        <button class="btn-export btn-pdf" onclick="exportPDF()" id="btn-pdf">
+          <i data-lucide="file-text" style="width:16px;height:16px;"></i>
+          Download as PDF
+        </button>
+        <button class="btn-export btn-word" onclick="exportWord()" id="btn-word">
+          <i data-lucide="file" style="width:16px;height:16px;"></i>
+          Download as Word (.docx)
+        </button>
+        <button class="btn-export btn-print" onclick="window.print()">
+          <i data-lucide="printer" style="width:16px;height:16px;"></i>
+          Print Brochure
+        </button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Property <em>Brochure Builder</em></div>
+        <div class="topbar-sub">Fill in the details on the left — your brochure updates instantly</div>
+      </div>
+    </div>
+
+    <div class="preview-area">
+      <div class="preview-label">Live Preview</div>
+      <div id="brochure" class="tpl-classic">
+        <!-- rendered by JS -->
+      </div>
+    </div>
+  </main>
+
+</div>
+
+<!-- Scripts -->
+<script>
+/* ── State ── */
+let state = {
+  template: 'classic',
+  agency: '',
+  logoSrc: null,
+  colour: '#B46100',
+  address: '',
+  price: '',
+  beds: '',
+  baths: '',
+  rec: '',
+  tenure: '',
+  epc: '',
+  ctax: '',
+  style: '',
+  area: '',
+  plot: '',
+  year: '',
+  parking: '',
+  heating: '',
+  desc: '',
+  features: [],
+  photos: [],
+  floorplanSrc: null,
+};
+
+/* ── Template ── */
+function setTemplate(t) {
+  state.template = t;
+  ['classic','modern','dark'].forEach(n => {
+    document.getElementById('tpl-'+n).classList.toggle('active', n===t);
+  });
+  update();
+}
+
+/* ── Colour ── */
+function updateColour(v) {
+  state.colour = v;
+  document.getElementById('colour-hex').textContent = v;
+  document.documentElement.style.setProperty('--client-colour', v);
+  update();
+}
+
+/* ── Logo ── */
+function handleLogo(input) {
+  const f = input.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    state.logoSrc = e.target.result;
+    const img = document.getElementById('logo-preview-img');
+    img.src = state.logoSrc;
+    img.style.display = 'block';
+    update();
+  };
+  r.readAsDataURL(f);
+}
+
+/* ── Photos ── */
+function handlePhotos(input) {
+  const files = Array.from(input.files);
+  let loaded = 0;
+  files.forEach(f => {
+    const r = new FileReader();
+    r.onload = e => {
+      state.photos.push(e.target.result);
+      loaded++;
+      if (loaded === files.length) { renderThumbs(); update(); }
+    };
+    r.readAsDataURL(f);
+  });
+}
+
+function renderThumbs() {
+  const c = document.getElementById('photo-thumbs');
+  c.innerHTML = state.photos.map((src,i) => `
+    <div class="photo-thumb">
+      <img src="${src}"/>
+      <button class="photo-thumb-rm" onclick="removePhoto(${i})">×</button>
+    </div>`).join('');
+  document.getElementById('photo-count').textContent = state.photos.length
+    ? `${state.photos.length} photo${state.photos.length>1?'s':''} added`
+    : '';
+}
+
+function removePhoto(i) {
+  state.photos.splice(i,1);
+  renderThumbs();
+  update();
+}
+
+/* ── Floorplan ── */
+function handleFloorplan(input) {
+  const f = input.files[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    state.floorplanSrc = e.target.result;
+    const img = document.getElementById('fp-preview');
+    img.src = state.floorplanSrc;
+    img.style.display = 'block';
+    update();
+  };
+  r.readAsDataURL(f);
+}
+
+/* ── Features ── */
+function addFeature(val='') {
+  state.features.push(val);
+  renderFeatures();
+}
+
+function renderFeatures() {
+  document.getElementById('feature-list').innerHTML = state.features.map((f,i) => `
+    <div class="feature-item">
+      <input value="${esc(f)}" placeholder="e.g. Heated outdoor pool" oninput="state.features[${i}]=this.value;update()"/>
+      <button onclick="removeFeature(${i})">×</button>
+    </div>`).join('');
+}
+
+function removeFeature(i) {
+  state.features.splice(i,1);
+  renderFeatures();
+  update();
+}
+
+/* ── Read all fields ── */
+function readFields() {
+  const g = id => document.getElementById(id)?.value||'';
+  state.agency   = g('f-agency');
+  state.address  = g('f-address');
+  state.price    = g('f-price');
+  state.beds     = g('f-beds');
+  state.baths    = g('f-baths');
+  state.rec      = g('f-rec');
+  state.tenure   = g('f-tenure');
+  state.epc      = g('f-epc');
+  state.ctax     = g('f-ctax');
+  state.style    = g('f-style');
+  state.area     = g('f-area');
+  state.plot     = g('f-plot');
+  state.year     = g('f-year');
+  state.parking  = g('f-parking');
+  state.heating  = g('f-heating');
+  state.desc     = g('f-desc');
+}
+
+/* ── Render ── */
+function update() {
+  readFields();
+  const br = document.getElementById('brochure');
+  br.className = 'tpl-' + state.template;
+  br.innerHTML = renderTemplate();
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function statHTML(val, lbl, cls='') {
+  return val ? `<div class="br-stat${cls}"><div class="br-stat-val">${esc(val)}</div><div class="br-stat-lbl">${lbl}</div></div>` : '';
+}
+
+function renderTemplate() {
+  const c = state.colour;
+  const colStyle = `--client-colour:${c};`;
+
+  switch(state.template) {
+    case 'classic': return renderClassic(colStyle);
+    case 'modern':  return renderModern(colStyle);
+    case 'dark':    return renderDark(colStyle);
+  }
+}
+
+/* ── Photos helper ── */
+function photosHTML(start, end, gridClass='cols-2', classes='br-photo-grid') {
+  const slice = state.photos.slice(start, end);
+  if (!slice.length) return '';
+  return `<div class="${classes} ${gridClass}">${slice.map(s=>`<img src="${s}"/>`).join('')}</div>`;
+}
+
+/* ── Template: Classic ── */
+function renderClassic(colStyle) {
+  const heroImg = state.photos[0]
+    ? `<img class="br-cover-img" src="${state.photos[0]}"/>`
+    : `<div class="br-cover-img br-placeholder" style="height:480px;">Add your hero photo</div>`;
+  const logo = state.logoSrc
+    ? `<img class="br-agency-logo" src="${state.logoSrc}"/>`
+    : (state.agency ? `<div style="position:absolute;top:28px;right:32px;background:${state.colour};color:#fff;padding:8px 16px;font-weight:700;font-size:14px;">${esc(state.agency)}</div>` : '');
+
+  const stats = [
+    {v:state.beds,l:'Bedrooms'},{v:state.baths,l:'Bathrooms'},
+    {v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'}
+  ].filter(s=>s.v);
+  const statsHTML = stats.map(s=>`
+    <div class="br-stat">
+      <div class="br-stat-val">${esc(s.v)}</div>
+      <div class="br-stat-lbl">${s.l}</div>
+    </div>`).join('');
+
+  const details = [
+    {l:'EPC Rating',v:state.epc},{l:'Council Tax Band',v:state.ctax},
+    {l:'Property Style',v:state.style},{l:'Floor Area',v:state.area},
+    {l:'Plot Size',v:state.plot},{l:'Year Built',v:state.year},
+    {l:'Parking',v:state.parking},{l:'Heating',v:state.heating},
+  ].filter(d=>d.v);
+  const detailsHTML = details.map(d=>`
+    <div class="br-detail">
+      <div class="br-detail-lbl">${d.l}</div>
+      <div class="br-detail-val">${esc(d.v)}</div>
+    </div>`).join('');
+
+  const featuresHTML = state.features.filter(f=>f.trim()).map(f=>`
+    <div class="br-feature">${esc(f)}</div>`).join('');
+
+  const restPhotos = state.photos.slice(1);
+  const photosBlock = restPhotos.length
+    ? `<div class="br-photo-grid ${restPhotos.length===1?'':'cols-'+(Math.min(restPhotos.length,3))}">${restPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>`
+    : '';
+
+  return `
+  <div style="${colStyle}">
+    <div class="br-cover">
+      ${heroImg}
+      <div class="br-cover-overlay"></div>
+      ${logo}
+      <div class="br-cover-text">
+        ${state.address ? `<div class="br-address">${esc(state.address)}</div>` : '<div class="br-address" style="opacity:.4;">Property Address</div>'}
+        ${state.price ? `<div class="br-price-tag">${esc(state.price)}</div>` : ''}
+      </div>
+    </div>
+    ${stats.length ? `<div class="br-stats-bar">${statsHTML}</div>` : ''}
+    <div class="br-body">
+      ${state.desc ? `
+        <div class="br-section-title">About This Property</div>
+        <div class="br-description">${esc(state.desc).replace(/\n/g,'<br>')}</div>` : ''}
+      ${featuresHTML ? `
+        <div class="br-section-title">Key Features</div>
+        <div class="br-features">${featuresHTML}</div>` : ''}
+      ${photosBlock}
+      ${details.length ? `
+        <div class="br-section-title">Property Details</div>
+        <div class="br-details-grid">${detailsHTML}</div>` : ''}
+      ${state.floorplanSrc ? `
+        <div class="br-section-title">Floorplan</div>
+        <img class="br-floorplan" src="${state.floorplanSrc}"/>` : ''}
+    </div>
+    <div class="br-footer">
+      <div class="br-footer-agency">${esc(state.agency||'Your Estate Agency')}</div>
+      <div class="br-footer-note">
+        These particulars do not constitute any part of an offer or contract.<br>
+        All measurements are approximate and for guidance only.
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── Template: Modern ── */
+function renderModern(colStyle) {
+  const heroImg = state.photos[0]
+    ? `<img class="br-cover-img" src="${state.photos[0]}"/>`
+    : `<div class="br-cover-img br-placeholder" style="height:520px;">Add your hero photo</div>`;
+
+  const logo = state.logoSrc
+    ? `<img class="br-cover-agency" src="${state.logoSrc}"/>`
+    : (state.agency ? `<div class="br-cover-agency" style="background:rgba(0,0,0,.5);color:#fff;padding:6px 14px;font-weight:700;font-size:13px;">${esc(state.agency)}</div>` : '');
+
+  const statsItems = [
+    {v:state.beds,l:'Beds'},{v:state.baths,l:'Baths'},
+    {v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'},{v:state.epc,l:'EPC'}
+  ].filter(s=>s.v);
+
+  const details = [
+    {l:'Floor Area',v:state.area},{l:'Plot Size',v:state.plot},
+    {l:'Year Built',v:state.year},{l:'Council Tax',v:state.ctax},
+    {l:'Parking',v:state.parking},{l:'Heating',v:state.heating},
+  ].filter(d=>d.v);
+
+  const restPhotos = state.photos.slice(1);
+  const featuresHTML = state.features.filter(f=>f.trim()).map(f=>`<li>${esc(f)}</li>`).join('');
+
+  return `
+  <div style="${colStyle}">
+    <div class="br-cover">
+      ${heroImg}
+      <div class="br-cover-bar"></div>
+      ${logo}
+    </div>
+    <div class="br-header-block">
+      <div>
+        <div class="br-address-modern">${esc(state.address||'Property Address')}</div>
+        ${state.tenure ? `<span class="br-tenure-pill">${esc(state.tenure)}</span>` : ''}
+      </div>
+      <div>
+        ${state.price ? `<div class="br-price-modern">${esc(state.price)}</div>` : ''}
+      </div>
+    </div>
+    ${statsItems.length ? `<div class="br-stats-modern">${statsItems.map(s=>`
+      <div class="br-stat-m">
+        <div class="br-stat-m-val">${esc(s.v)}</div>
+        <div class="br-stat-m-lbl">${s.l}</div>
+      </div>`).join('')}</div>` : ''}
+    <div class="br-body">
+      <div class="br-col-2">
+        <div>
+          ${state.desc ? `<p class="br-desc-m">${esc(state.desc).replace(/\n/g,'<br>')}</p>` : ''}
+        </div>
+        <div>
+          ${featuresHTML ? `<ul class="br-features-m">${featuresHTML}</ul>` : ''}
+        </div>
+      </div>
+      ${restPhotos.length ? `<div class="br-photo-strip">${restPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>` : ''}
+      ${details.length ? `<div class="br-details-m">${details.map(d=>`
+        <div class="br-det-m">
+          <div class="br-det-m-l">${d.l}</div>
+          <div class="br-det-m-v">${esc(d.v)}</div>
+        </div>`).join('')}</div>` : ''}
+      ${state.floorplanSrc ? `<img class="br-floorplan" src="${state.floorplanSrc}"/>` : ''}
+    </div>
+    <div class="br-footer">
+      <div>
+        <div class="br-footer-l">${esc(state.agency||'Your Estate Agency')}</div>
+        <div class="br-footer-accent"></div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,.4);text-align:right;line-height:1.6;">
+        These particulars do not form part of any offer or contract.<br>
+        All measurements are approximate.
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── Template: Dark Estate ── */
+function renderDark(colStyle) {
+  const heroImg = state.photos[0]
+    ? `<img class="br-cover-img" src="${state.photos[0]}"/>`
+    : `<div class="br-cover-bg" style="height:500px;"></div>`;
+
+  const logo = state.logoSrc
+    ? `<img class="br-agency-dark" src="${state.logoSrc}"/>`
+    : (state.agency ? `<div class="br-agency-dark" style="filter:none;background:${state.colour};color:#fff;padding:6px 14px;font-weight:700;font-size:13px;">${esc(state.agency)}</div>` : '');
+
+  const statsItems = [
+    {v:state.beds,l:'Bedrooms'},{v:state.baths,l:'Bathrooms'},
+    {v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'}
+  ].filter(s=>s.v);
+
+  const details = [
+    {l:'EPC Rating',v:state.epc},{l:'Council Tax Band',v:state.ctax},
+    {l:'Floor Area',v:state.area},{l:'Plot Size',v:state.plot},
+    {l:'Year Built',v:state.year},{l:'Parking',v:state.parking},
+    {l:'Heating',v:state.heating},{l:'Property Style',v:state.style},
+  ].filter(d=>d.v);
+
+  const featuresHTML = state.features.filter(f=>f.trim()).map(f=>`
+    <div class="br-feature-d">${esc(f)}</div>`).join('');
+
+  const masonryPhotos = state.photos.slice(1,4);
+  const extraPhotos = state.photos.slice(4);
+
+  return `
+  <div style="${colStyle}">
+    <div class="br-cover">
+      <div class="br-cover-bg"></div>
+      ${heroImg}
+      <div class="br-cover-overlay"></div>
+      ${logo}
+      <div class="br-cover-text">
+        <div class="br-cover-line"></div>
+        <div class="br-address-dark">${esc(state.address||'Property Address')}</div>
+        ${state.price ? `<div class="br-price-dark">${esc(state.price)}</div>` : ''}
+      </div>
+    </div>
+    ${statsItems.length ? `<div class="br-dark-stats">${statsItems.map(s=>`
+      <div class="br-stat-d">
+        <div class="br-stat-d-val">${esc(s.v)}</div>
+        <div class="br-stat-d-lbl">${s.l}</div>
+      </div>`).join('')}</div>` : ''}
+    <div class="br-body">
+      <div class="br-gold-rule">
+        <div class="br-gold-rule-line"></div>
+        <div class="br-gold-rule-dia"></div>
+        <div class="br-gold-rule-txt">About This Property</div>
+        <div class="br-gold-rule-dia"></div>
+        <div class="br-gold-rule-line"></div>
+      </div>
+      ${state.desc ? `<div class="br-desc-d">${esc(state.desc).replace(/\n/g,'<br>')}</div>` : ''}
+      ${featuresHTML ? `<div class="br-features-d">${featuresHTML}</div>` : ''}
+      ${masonryPhotos.length ? `<div class="br-photo-masonry">${masonryPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>` : ''}
+      ${extraPhotos.length ? `<div class="br-photo-extra">${extraPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>` : ''}
+      ${details.length ? `<div class="br-details-d">${details.map(d=>`
+        <div>
+          <div class="br-det-d-l">${d.l}</div>
+          <div class="br-det-d-v">${esc(d.v)}</div>
+        </div>`).join('')}</div>` : ''}
+      ${state.floorplanSrc ? `
+        <div class="br-gold-rule" style="margin-bottom:16px;">
+          <div class="br-gold-rule-line"></div>
+          <div class="br-gold-rule-dia"></div>
+          <div class="br-gold-rule-txt">Floorplan</div>
+          <div class="br-gold-rule-dia"></div>
+          <div class="br-gold-rule-line"></div>
+        </div>
+        <img class="br-floorplan" src="${state.floorplanSrc}"/>` : ''}
+    </div>
+    <div class="br-footer">
+      <div class="br-footer-agency">${esc(state.agency||'Your Estate Agency')}</div>
+      <div class="br-footer-right">
+        <div class="br-footer-note">These particulars do not form part of any offer or contract.<br>All measurements are approximate.</div>
+        <div class="br-footer-accent"></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ── PDF Export ── */
+async function exportPDF() {
+  const btn = document.getElementById('btn-pdf');
+  btn.innerHTML = '<span class="spin"></span>Generating PDF…';
+  btn.disabled = true;
+
+  try {
+    // Load html2canvas + jsPDF dynamically
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+
+    const brochure = document.getElementById('brochure');
+    const canvas = await html2canvas(brochure, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+    });
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [canvas.width/2, canvas.height/2] });
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width/2, canvas.height/2);
+
+    const filename = (state.address||'property-brochure').replace(/[^a-z0-9]/gi,'-').toLowerCase() + '.pdf';
+    pdf.save(filename);
+  } catch(e) {
+    alert('PDF generation failed. Please try again.');
+    console.error(e);
+  }
+
+  btn.innerHTML = '<i data-lucide="file-text" style="width:16px;height:16px;"></i>Download as PDF';
+  btn.disabled = false;
+  lucide.createIcons();
+}
+
+/* ── Word Export ── */
+async function exportWord() {
+  const btn = document.getElementById('btn-word');
+  btn.innerHTML = '<span class="spin"></span>Generating Word doc…';
+  btn.disabled = true;
+
+  try {
+    await loadScript('https://unpkg.com/docx@7.8.2/build/index.js');
+    const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak } = docx;
+
+    const details = [
+      state.epc && `EPC Rating: ${state.epc}`,
+      state.ctax && `Council Tax Band: ${state.ctax}`,
+      state.style && `Property Style: ${state.style}`,
+      state.area && `Floor Area: ${state.area}`,
+      state.plot && `Plot Size: ${state.plot}`,
+      state.year && `Year Built: ${state.year}`,
+      state.parking && `Parking: ${state.parking}`,
+      state.heating && `Heating: ${state.heating}`,
+    ].filter(Boolean);
+
+    const statsLine = [
+      state.beds && `${state.beds} Bedrooms`,
+      state.baths && `${state.baths} Bathrooms`,
+      state.rec && `${state.rec} Receptions`,
+      state.tenure && state.tenure,
+    ].filter(Boolean).join('  |  ');
+
+    const children = [];
+
+    // Agency + title
+    if (state.agency) children.push(new Paragraph({
+      children:[new TextRun({text: state.agency.toUpperCase(), bold:true, size:24, color:'7A3E00'})],
+      alignment: AlignmentType.CENTER,
+      spacing:{after:200},
+    }));
+
+    // Address
+    children.push(new Paragraph({
+      children:[new TextRun({text: state.address||'Property Address', bold:true, size:36, color:'1C140A'})],
+      heading: HeadingLevel.HEADING_1,
+      alignment: AlignmentType.CENTER,
+      spacing:{after:120},
+    }));
+
+    // Price
+    if(state.price) children.push(new Paragraph({
+      children:[new TextRun({text: state.price, bold:true, size:32, color:state.colour.replace('#','')})],
+      alignment: AlignmentType.CENTER,
+      spacing:{after:200},
+    }));
+
+    // Stats
+    if(statsLine) children.push(new Paragraph({
+      children:[new TextRun({text: statsLine, size:22, color:'5C4A2A'})],
+      alignment: AlignmentType.CENTER,
+      spacing:{after:300},
+    }));
+
+    // Description
+    if(state.desc) {
+      children.push(new Paragraph({children:[new TextRun({text:'About This Property', bold:true, size:26, color:'1C140A'})], spacing:{after:120}}));
+      state.desc.split('\n').filter(l=>l.trim()).forEach(line => {
+        children.push(new Paragraph({children:[new TextRun({text:line, size:22, color:'5C4A2A'})], spacing:{after:80}}));
+      });
+    }
+
+    // Features
+    const cleanFeatures = state.features.filter(f=>f.trim());
+    if(cleanFeatures.length) {
+      children.push(new Paragraph({children:[new TextRun({text:'Key Features', bold:true, size:26, color:'1C140A'})], spacing:{before:200,after:120}}));
+      cleanFeatures.forEach(f => {
+        children.push(new Paragraph({
+          children:[new TextRun({text:`◆  ${f}`, size:22, color:'5C4A2A'})],
+          spacing:{after:60},
+        }));
+      });
+    }
+
+    // Property details
+    if(details.length) {
+      children.push(new Paragraph({children:[new TextRun({text:'Property Details', bold:true, size:26, color:'1C140A'})], spacing:{before:200,after:120}}));
+      details.forEach(d => {
+        children.push(new Paragraph({children:[new TextRun({text:d, size:22, color:'5C4A2A'})], spacing:{after:60}}));
+      });
+    }
+
+    // Disclaimer
+    children.push(new Paragraph({
+      children:[new TextRun({text:'These particulars do not form part of any offer or contract. All measurements are approximate and for guidance only.', size:16, color:'8A7050', italics:true})],
+      spacing:{before:400},
+      alignment: AlignmentType.CENTER,
+    }));
+
+    const doc = new Document({ sections:[{ children }] });
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (state.address||'property-brochure').replace(/[^a-z0-9]/gi,'-').toLowerCase() + '.docx';
+    a.click();
+    URL.revokeObjectURL(url);
+
+  } catch(e) {
+    alert('Word export failed. Please try again.');
+    console.error(e);
+  }
+
+  btn.innerHTML = '<i data-lucide="file" style="width:16px;height:16px;"></i>Download as Word (.docx)';
+  btn.disabled = false;
+  lucide.createIcons();
+}
+
+/* ── Script loader ── */
+function loadScript(src) {
+  return new Promise((res,rej) => {
+    if (document.querySelector(`script[src="${src}"]`)) { res(); return; }
+    const s = document.createElement('script');
+    s.src = src; s.onload = res; s.onerror = rej;
+    document.head.appendChild(s);
+  });
+}
+
+/* ── Drag and drop on photo zone ── */
+const pz = document.getElementById('photo-zone');
+pz.addEventListener('dragover', e => { e.preventDefault(); pz.classList.add('drag'); });
+pz.addEventListener('dragleave', () => pz.classList.remove('drag'));
+pz.addEventListener('drop', e => {
+  e.preventDefault(); pz.classList.remove('drag');
+  handlePhotos({ files: e.dataTransfer.files });
+});
+
+/* ── Init ── */
+lucide.createIcons();
+addFeature('');
+update();
+</script>
+
+</body>
+</html>
