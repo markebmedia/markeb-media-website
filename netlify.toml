@@ -5,6 +5,12 @@
 [functions."send-reminders"]
   schedule = "0 9 * * *"
 
+[functions."scheduled-welcome-email"]
+  schedule = "0 * * * *"
+
+[functions."scheduled-weekly-broadcast"]
+  schedule = "0 14 * * *"
+
 [[headers]]
   for = "/website/admin-panel.html"
   [headers.values]

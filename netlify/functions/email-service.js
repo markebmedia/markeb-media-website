@@ -752,10 +752,21 @@ async function sendReminderEmail(booking) {
 
   const emailHtml = getEmailLayout(content);
 
+  const reminderBcc = [BCC_EMAIL];
+
+  const SPECIALIST_EMAILS = {
+    'James Jago': 'James.Jago@markebmedia.com',
+    'Andrii':     'Andrii.Hutovych@markebmedia.com'
+  };
+
+  if (booking.mediaSpecialist && SPECIALIST_EMAILS[booking.mediaSpecialist]) {
+    reminderBcc.push(SPECIALIST_EMAILS[booking.mediaSpecialist]);
+  }
+
   await resend.emails.send({
     from: FROM_EMAIL,
     to: booking.clientEmail,
-    bcc: BCC_EMAIL,
+    bcc: reminderBcc,
     subject: `Reminder: Your Shoot Tomorrow - ${booking.bookingRef}`,
     html: emailHtml
   });
