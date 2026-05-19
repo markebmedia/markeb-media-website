@@ -2328,6 +2328,148 @@ box-shadow: 0 10px 40px rgba(63, 77, 27, 0.4);
     .gh-btn { min-width: 0; }
   }
 
+  /* ── Content journey progress bar ── */
+  .gh-journey {
+    margin: 0 20px 16px;
+    padding: 14px 16px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+  }
+  .gh-journey-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .gh-journey-steps {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+  }
+  .gh-journey-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+  }
+  .gh-journey-dot {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    border: 2px solid #e2e8f0;
+    background: #fff;
+    color: #94a3b8;
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+  }
+  .gh-journey-dot.done {
+    background: #10b981;
+    border-color: #10b981;
+    color: #fff;
+  }
+  .gh-journey-dot.active {
+    background: #fff;
+    border-color: #B46100;
+    color: #B46100;
+    box-shadow: 0 0 0 3px rgba(180,97,0,0.15);
+    animation: ghDotPulse 2s ease-in-out infinite;
+  }
+  .gh-journey-dot.delivered {
+    background: #6d28d9;
+    border-color: #6d28d9;
+    color: #fff;
+  }
+  @keyframes ghDotPulse {
+    0%,100% { box-shadow: 0 0 0 3px rgba(180,97,0,0.15); }
+    50%      { box-shadow: 0 0 0 7px rgba(180,97,0,0); }
+  }
+  .gh-journey-step-label {
+    font-size: 10px;
+    color: #94a3b8;
+    margin-top: 5px;
+    text-align: center;
+    line-height: 1.3;
+    max-width: 56px;
+    word-break: break-word;
+  }
+  .gh-journey-step-label.done     { color: #10b981; font-weight: 600; }
+  .gh-journey-step-label.active   { color: #B46100; font-weight: 700; }
+  .gh-journey-step-label.delivered { color: #6d28d9; font-weight: 700; }
+  .gh-journey-connector {
+    flex: 1;
+    height: 2px;
+    background: #e2e8f0;
+    margin-top: 14px;
+    z-index: 0;
+    transition: background 0.4s ease;
+  }
+  .gh-journey-connector.done      { background: #10b981; }
+  .gh-journey-connector.delivered { background: #6d28d9; }
+  .gh-journey-status-line {
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #B46100;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 10px;
+    border-top: 1px solid #e2e8f0;
+  }
+  .gh-journey-status-line.done      { color: #10b981; }
+  .gh-journey-status-line.delivered { color: #6d28d9; }
+  .gh-journey-status-line.pending   { color: #64748b; }
+  .gh-delivery-locked {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 13px 20px;
+    background: #f1f5f9;
+    border: 2px dashed #cbd5e1;
+    color: #94a3b8;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: not-allowed;
+    user-select: none;
+    box-sizing: border-box;
+  }
+  .gh-section-divider {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 8px 0 4px;
+  }
+  .gh-section-divider-line {
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+  }
+  .gh-section-divider-text {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #94a3b8;
+    white-space: nowrap;
+  }
+
   /* ── Section headers (Review / Delivered dividers) ── */
   .gh-section-header {
     padding: 8px 0 4px;
@@ -4556,8 +4698,527 @@ const GH_ENDPOINTS = {
   submitReview: '/.netlify/functions/submit-review',
 };
 
-let ghProjects  = [];   // Client Reviews records (raw content)
-let ghDelivered = [];   // Delivered bookings (completed work)
+let ghProjects  = [];
+let ghDelivered = [];
+
+async function loadGallery() {
+  const isAdmin = localStorage.getItem('admin_impersonation') === 'true';
+  const user = isAdmin
+    ? { email: localStorage.getItem('user_email') }
+    : window.AirtableAPI?.getCurrentUser?.();
+
+  if (!user?.email) { ghShowError('Please log in to view your content projects.'); return; }
+
+  const loading = document.getElementById('ghLoading');
+  const grid    = document.getElementById('ghGrid');
+
+  loading.style.display = 'flex';
+  grid.style.display    = 'none';
+  document.getElementById('ghProgressWrap').style.display = 'none';
+
+  try {
+    const res  = await fetch(GH_ENDPOINTS.getGallery, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail: user.email }),
+    });
+    const data = await res.json();
+
+    loading.style.display = 'none';
+    grid.style.display    = 'grid';
+
+    if (!data.success) { ghShowError('Unable to load your projects. Please try again.'); return; }
+
+    ghProjects  = data.projects  || [];
+    ghDelivered = data.delivered || [];
+
+    if (!ghProjects.length && !ghDelivered.length) {
+      grid.innerHTML = ghEmptyHTML();
+      return;
+    }
+
+    ghRenderGrid();
+    ghUpdateProgress();
+
+  } catch (err) {
+    console.error('Gallery load error:', err);
+    loading.style.display = 'none';
+    grid.style.display    = 'grid';
+    ghShowError('Unable to load your projects. Please try again.');
+  }
+}
+
+/* ── Journey progress bar ───────────────────────────────────────────── */
+function ghJourneyBarHTML(bookingStatus, reviewStatus) {
+  const steps = [
+    { key: 'booked',  label: 'Booked',      icon: '📅' },
+    { key: 'review',  label: 'Raw review',  icon: '👁' },
+    { key: 'editing', label: 'Editing',     icon: '✂️' },
+    { key: 'qc',      label: 'QC check',    icon: '🔍' },
+    { key: 'ready',   label: 'Delivery',    icon: '✅' },
+  ];
+
+  const bookingStepMap = {
+    'Booked':             1,
+    'Editing':            2,
+    'Quality Control':    3,
+    'Ready for Delivery': 4,
+  };
+
+  const activeIdx = bookingStepMap[bookingStatus] ?? 1;
+  const isReady   = bookingStatus === 'Ready for Delivery';
+
+  const messages = {
+    'Booked':             'Your shoot is booked — files will appear here when ready to review',
+    'Editing':            'Your content is with our editing team',
+    'Quality Control':    'Almost there — final quality check in progress',
+    'Ready for Delivery': 'Your content is ready to download',
+  };
+
+  const statusMsg = bookingStatus
+    ? (messages[bookingStatus] || bookingStatus)
+    : 'Awaiting shoot confirmation';
+
+  const statusLineClass = isReady ? 'delivered' : activeIdx === 0 ? 'pending' : '';
+
+  let html = `<div class="gh-journey">
+    <div class="gh-journey-label">📍 Production progress</div>
+    <div class="gh-journey-steps">`;
+
+  steps.forEach((step, i) => {
+    const isDone   = i < activeIdx;
+    const isActive = i === activeIdx;
+
+    const dotClass   = isReady && i === 4 ? 'delivered' : isDone ? 'done' : isActive ? 'active' : '';
+    const labelClass = isReady && i === 4 ? 'delivered' : isDone ? 'done' : isActive ? 'active' : '';
+    const dotIcon    = isDone ? '✓' : step.icon;
+
+    html += `<div class="gh-journey-step">
+      <div class="gh-journey-dot ${dotClass}">${dotIcon}</div>
+      <div class="gh-journey-step-label ${labelClass}">${step.label}</div>
+    </div>`;
+
+    if (i < steps.length - 1) {
+      const connClass = i < activeIdx ? (isReady ? 'delivered' : 'done') : '';
+      html += `<div class="gh-journey-connector ${connClass}"></div>`;
+    }
+  });
+
+  html += `</div>
+    <div class="gh-journey-status-line ${statusLineClass}">
+      ${isReady ? '✅' : '●'} ${statusMsg}
+    </div>
+  </div>`;
+
+  return html;
+}
+
+/* ── Render grid ────────────────────────────────────────────────────── */
+function ghRenderGrid() {
+  const grid = document.getElementById('ghGrid');
+  let html = '';
+
+  if (ghProjects.length) {
+    html += `
+      <div class="gh-section-header" style="grid-column:1/-1;">
+        <div class="gh-section-label">
+          <span class="gh-section-dot" style="background:#B46100;"></span>
+          Raw Content Review
+          <span class="gh-section-count">${ghProjects.length}</span>
+        </div>
+        <p class="gh-section-sub">Review your raw files, leave feedback, and approve before we send to editing</p>
+      </div>
+      <div class="gh-section-divider" style="grid-column:1/-1;">
+        <div class="gh-section-divider-line"></div>
+        <div class="gh-section-divider-text">Awaiting your action</div>
+        <div class="gh-section-divider-line"></div>
+      </div>`;
+    html += ghProjects.map(ghReviewCardHTML).join('');
+  }
+
+  if (ghDelivered.length) {
+    html += `
+      <div class="gh-section-header" style="grid-column:1/-1; ${ghProjects.length ? 'margin-top:40px;' : ''}">
+        <div class="gh-section-label">
+          <span class="gh-section-dot" style="background:#6d28d9;"></span>
+          Delivered Content
+          <span class="gh-section-count">${ghDelivered.length}</span>
+        </div>
+        <p class="gh-section-sub">Completed projects ready to download</p>
+      </div>
+      <div class="gh-section-divider" style="grid-column:1/-1;">
+        <div class="gh-section-divider-line"></div>
+        <div class="gh-section-divider-text">Ready to download</div>
+        <div class="gh-section-divider-line"></div>
+      </div>`;
+    html += ghDelivered.map(ghDeliveredCardHTML).join('');
+  }
+
+  grid.innerHTML = html;
+}
+
+/* ── Review card ────────────────────────────────────────────────────── */
+function ghReviewCardHTML(p) {
+  const st        = p.reviewStatus || 'Pending Review';
+  const bookingSt = p.bookingStatus || 'Booked';
+  const isReady   = bookingSt === 'Ready for Delivery';
+
+  const cardClass = {
+    'Notes Added':     'card-notes',
+    'Approved':        'card-approved',
+    'Sent to Editors': 'card-sent',
+  }[st] || '';
+
+  const badge = {
+    'Pending Review':  `<span class="gh-badge gh-badge-pending">● Pending Review</span>`,
+    'Notes Added':     `<span class="gh-badge gh-badge-notes">● Notes Added</span>`,
+    'Approved':        `<span class="gh-badge gh-badge-approved">● Approved</span>`,
+    'Sent to Editors': `<span class="gh-badge gh-badge-sent">● Sent to Editors</span>`,
+  }[st] || `<span class="gh-badge gh-badge-pending">● ${st}</span>`;
+
+  const shootDate = p.shootDate
+    ? new Date(p.shootDate).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+    : null;
+
+  const locked = ['Approved', 'Sent to Editors'].includes(st);
+
+  const photosPanel = (p.photosLink || p.photosNotes !== undefined) ? `
+    <div class="gh-media-panel photos-panel">
+      <div class="gh-media-panel-header">
+        <div class="gh-media-type-label">
+          <div class="gh-type-icon">📷</div>
+          Photos
+        </div>
+        ${p.photoCount ? `<span class="gh-media-count">${p.photoCount} files</span>` : ''}
+      </div>
+      ${p.photosLink
+        ? `<a href="${ghEsc(p.photosLink)}" target="_blank" rel="noopener" class="gh-dropbox-btn photos-btn">
+            ${ghDropboxIcon()} View Raw Photos in Dropbox
+           </a>`
+        : `<div class="gh-no-link">⏳ Photos folder not yet available</div>`
+      }
+      <div class="gh-panel-notes">
+        <div class="gh-notes-label">💬 Your Photos Feedback</div>
+        <textarea
+          class="gh-notes-textarea"
+          id="gh-photo-notes-${p.id}"
+          placeholder="e.g. Room 3 looks a bit dark, the kitchen shot is slightly blurry…"
+          ${locked ? 'disabled' : ''}
+        >${ghEsc(p.photosNotes)}</textarea>
+        ${!locked ? `<div class="gh-notes-hint">Mention specific rooms or angles so our editors know exactly what to fix.</div>` : ''}
+      </div>
+    </div>` : '';
+
+  const videoPanel = (p.videoLink || p.videoNotes !== undefined) ? `
+    <div class="gh-media-panel video-panel">
+      <div class="gh-media-panel-header">
+        <div class="gh-media-type-label">
+          <div class="gh-type-icon">🎬</div>
+          Video Clips
+        </div>
+        ${p.videoCount ? `<span class="gh-media-count">${p.videoCount} clips</span>` : ''}
+      </div>
+      ${p.videoLink
+        ? `<a href="${ghEsc(p.videoLink)}" target="_blank" rel="noopener" class="gh-dropbox-btn video-btn">
+            ${ghDropboxIcon()} View Raw Video Clips in Dropbox
+           </a>`
+        : `<div class="gh-no-link">⏳ Video folder not yet available</div>`
+      }
+      <div class="gh-panel-notes">
+        <div class="gh-notes-label">💬 Your Video Feedback</div>
+        <textarea
+          class="gh-notes-textarea"
+          id="gh-video-notes-${p.id}"
+          placeholder="e.g. Clip 2 has background noise, the walkthrough feels too fast after the hallway…"
+          ${locked ? 'disabled' : ''}
+        >${ghEsc(p.videoNotes)}</textarea>
+        ${!locked ? `<div class="gh-notes-hint">Mention clip numbers or timecodes where possible.</div>` : ''}
+      </div>
+    </div>` : '';
+
+  const noPanels = !photosPanel && !videoPanel
+    ? `<div class="gh-no-link" style="margin:16px 20px 0;">⏳ Your Dropbox folders will appear here once your content is ready</div>`
+    : '';
+
+  const deliverySection = p.deliveryLink
+    ? isReady
+      ? `<div style="padding: 0 20px 16px;">
+           <a href="${ghEsc(p.deliveryLink)}" target="_blank" rel="noopener" class="gh-download-btn">
+             ${ghDownloadIcon()} Download Your Delivered Files
+           </a>
+         </div>`
+      : `<div style="padding: 0 20px 16px;">
+           <div class="gh-delivery-locked">
+             🔒 Download available once editing is complete
+           </div>
+         </div>`
+    : '';
+
+  const actions = locked
+    ? st === 'Sent to Editors'
+      ? `<div class="gh-sent-banner">
+           ${ghCheckIcon()} Your content has been sent to our editing team
+         </div>`
+      : `<div class="gh-approved-banner">
+           ${ghCheckIcon()} Content approved — our team has been notified
+         </div>`
+    : `<div class="gh-card-actions">
+         <button class="gh-btn gh-btn-save" onclick="ghSaveNotes('${p.id}')">
+           ${ghEditIcon()} Save Notes
+         </button>
+         <button class="gh-btn gh-btn-approve" onclick="ghApprove('${p.id}')">
+           ${ghCheckIcon()} Approve &amp; Notify Team
+         </button>
+       </div>`;
+
+  return `
+    <div class="gh-card ${cardClass}" id="gh-card-${p.id}">
+      <div class="gh-card-ribbon"></div>
+      <div class="gh-card-top">
+        <div class="gh-card-address">${ghEsc(p.projectAddress)}</div>
+        ${badge}
+      </div>
+      <div class="gh-meta">
+        ${p.serviceType ? `<div class="gh-meta-item">📋 ${ghEsc(p.serviceType)}</div>` : ''}
+        ${shootDate     ? `<div class="gh-meta-item">📅 Shoot: ${shootDate}</div>` : ''}
+        ${bookingSt     ? `<div class="gh-meta-item">🏷 ${ghEsc(bookingSt)}</div>` : ''}
+      </div>
+      <div class="gh-divider"></div>
+      ${ghJourneyBarHTML(bookingSt, st)}
+      ${!locked ? `
+      <div class="gh-instructions">
+        <strong>📋 How to review your content</strong>
+        <ol>
+          <li>Click the button(s) below to open your raw files in Dropbox</li>
+          <li>Leave feedback in the notes box — photos and video separately</li>
+          <li><b>Save Notes</b> to save feedback without notifying us yet</li>
+          <li><b>Approve &amp; Notify Team</b> when you're happy — we'll send straight to our editors</li>
+        </ol>
+      </div>` : ''}
+      <div class="gh-media-panels">
+        ${photosPanel}
+        ${videoPanel}
+        ${noPanels}
+      </div>
+      <div style="height:8px;"></div>
+      ${deliverySection}
+      <div class="gh-feedback" id="gh-feedback-${p.id}"></div>
+      ${actions}
+    </div>`;
+}
+
+/* ── Delivered card ─────────────────────────────────────────────────── */
+function ghDeliveredCardHTML(b) {
+  const shootDate = b.shootDate
+    ? new Date(b.shootDate).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+    : null;
+
+  return `
+    <div class="gh-card gh-card-delivered" id="gh-card-${b.id}">
+      <div class="gh-card-ribbon gh-ribbon-delivered"></div>
+      <div class="gh-card-top">
+        <div class="gh-card-address">${ghEsc(b.projectAddress)}</div>
+        <span class="gh-badge gh-badge-delivered">● Delivered</span>
+      </div>
+      <div class="gh-meta">
+        ${b.serviceType ? `<div class="gh-meta-item">📋 ${ghEsc(b.serviceType)}</div>` : ''}
+        ${shootDate     ? `<div class="gh-meta-item">📅 ${shootDate}</div>`             : ''}
+      </div>
+      <div class="gh-divider"></div>
+      ${ghJourneyBarHTML('Ready for Delivery', 'Delivered')}
+      <div style="padding: 16px 20px 20px;">
+        <p style="font-size:13px;color:#64748b;margin-bottom:14px;line-height:1.6;">
+          Your edited content is ready. Click below to access your files.
+        </p>
+        <a href="${ghEsc(b.deliveryLink)}" target="_blank" rel="noopener" class="gh-download-btn">
+          ${ghDownloadIcon()} Download Your Delivered Files
+        </a>
+      </div>
+    </div>`;
+}
+
+/* ── Save notes ─────────────────────────────────────────────────────── */
+async function ghSaveNotes(recordId) {
+  const p = ghProjects.find(x => x.id === recordId);
+  if (!p) return;
+
+  const photosNotes = document.getElementById(`gh-photo-notes-${recordId}`)?.value?.trim() || '';
+  const videoNotes  = document.getElementById(`gh-video-notes-${recordId}`)?.value?.trim() || '';
+
+  if (!photosNotes && !videoNotes) {
+    ghFeedback(recordId, 'Please add some notes before saving.', 'error');
+    return;
+  }
+
+  ghSetLoading(recordId, true);
+
+  try {
+    const res  = await fetch(GH_ENDPOINTS.submitReview, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        recordId,
+        action:         'save_notes',
+        clientEmail:    p.clientEmail,
+        projectAddress: p.projectAddress,
+        photosNotes,
+        videoNotes,
+        photosLink:     p.photosLink,
+        videoLink:      p.videoLink,
+      }),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      p.photosNotes  = photosNotes;
+      p.videoNotes   = videoNotes;
+      p.reviewStatus = 'Notes Added';
+      ghFeedback(recordId, '✓ Notes saved — our team will review them before sending to editors.', 'success');
+      setTimeout(() => { ghRenderGrid(); ghUpdateProgress(); }, 2000);
+    } else {
+      ghFeedback(recordId, 'Failed to save notes. Please try again.', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    ghFeedback(recordId, 'Network error. Please check your connection.', 'error');
+  }
+  ghSetLoading(recordId, false);
+}
+
+/* ── Approve ────────────────────────────────────────────────────────── */
+async function ghApprove(recordId) {
+  const p = ghProjects.find(x => x.id === recordId);
+  if (!p) return;
+
+  const photosNotes = document.getElementById(`gh-photo-notes-${recordId}`)?.value?.trim() || '';
+  const videoNotes  = document.getElementById(`gh-video-notes-${recordId}`)?.value?.trim() || '';
+
+  const confirmed = confirm(
+    `Approve and notify the Markeb Media team?\n\nProject: ${p.projectAddress}\n\nOnce approved, our team will be emailed and your content will be sent to editing.`
+  );
+  if (!confirmed) return;
+
+  ghSetLoading(recordId, true);
+
+  try {
+    const res  = await fetch(GH_ENDPOINTS.submitReview, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        recordId,
+        action:         'approve',
+        clientEmail:    p.clientEmail,
+        projectAddress: p.projectAddress,
+        photosNotes,
+        videoNotes,
+        photosLink:     p.photosLink,
+        videoLink:      p.videoLink,
+      }),
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      p.photosNotes  = photosNotes;
+      p.videoNotes   = videoNotes;
+      p.reviewStatus = 'Approved';
+      ghFeedback(recordId, '✅ Approved! Our team has been notified and will send your content to editing.', 'success');
+      setTimeout(() => { ghRenderGrid(); ghUpdateProgress(); }, 2400);
+    } else {
+      ghFeedback(recordId, 'Failed to submit approval. Please try again.', 'error');
+    }
+  } catch (err) {
+    console.error(err);
+    ghFeedback(recordId, 'Network error. Please check your connection.', 'error');
+  }
+  ghSetLoading(recordId, false);
+}
+
+/* ── Helpers ────────────────────────────────────────────────────────── */
+function ghUpdateProgress() {
+  const wrap  = document.getElementById('ghProgressWrap');
+  const fill  = document.getElementById('ghProgressFill');
+  const count = document.getElementById('ghProgressCount');
+
+  if (!ghProjects.length) { wrap.style.display = 'none'; return; }
+
+  const done = ghProjects.filter(p =>
+    ['Notes Added', 'Approved', 'Sent to Editors'].includes(p.reviewStatus)
+  ).length;
+  const pct = Math.round((done / ghProjects.length) * 100);
+
+  fill.style.width  = pct + '%';
+  count.textContent = `${done} / ${ghProjects.length} reviewed`;
+  wrap.style.display = 'flex';
+}
+
+function ghSetLoading(recordId, loading) {
+  const card = document.getElementById(`gh-card-${recordId}`);
+  if (!card) return;
+  card.querySelectorAll('.gh-btn').forEach(b => b.disabled = loading);
+}
+
+function ghFeedback(recordId, msg, type) {
+  const el = document.getElementById(`gh-feedback-${recordId}`);
+  if (!el) return;
+  el.className = `gh-feedback ${type}`;
+  el.textContent = msg;
+  el.style.display = 'flex';
+  if (type === 'error') setTimeout(() => el.style.display = 'none', 5000);
+}
+
+function ghShowError(msg) {
+  const loading = document.getElementById('ghLoading');
+  const grid    = document.getElementById('ghGrid');
+  if (loading) loading.style.display = 'none';
+  if (grid) {
+    grid.style.display = 'grid';
+    grid.innerHTML = `
+      <div class="gh-empty" style="border-color:#fca5a5;background:linear-gradient(135deg,#fff5f5,#fff);">
+        <div class="gh-empty-icon" style="background:linear-gradient(135deg,#fee2e2,#fecaca);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h3 style="color:#991b1b;">Unable to Load Projects</h3>
+        <p>${msg}</p>
+      </div>`;
+  }
+}
+
+function ghEmptyHTML() {
+  return `
+    <div class="gh-empty">
+      <div class="gh-empty-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </div>
+      <h3>No Projects Yet</h3>
+      <p>Your completed and in-progress projects will appear here. You'll receive an email when your content is ready to review.</p>
+    </div>`;
+}
+
+function ghDropboxIcon() {
+  return `<svg width="16" height="16" viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.25 2L0 7.25L8.25 12.5L16.5 7.25L8.25 2Z" fill="white"/><path d="M24.75 2L16.5 7.25L24.75 12.5L33 7.25L24.75 2Z" fill="white"/><path d="M0 17.75L8.25 23L16.5 17.75L8.25 12.5L0 17.75Z" fill="white"/><path d="M33 17.75L24.75 12.5L16.5 17.75L24.75 23L33 17.75Z" fill="white"/><path d="M8.25 24.75L16.5 30L24.75 24.75L16.5 19.5L8.25 24.75Z" fill="white"/></svg>`;
+}
+
+function ghDownloadIcon() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+}
+
+function ghCheckIcon() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+}
+
+function ghEditIcon() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>`;
+}
+
+/* Patch showSection so gallery loads automatically when tab is clicked */
+(function() {
+  const _orig = window.showSection;
+  if (typeof _orig !== 'function') return;
+  window.showSection = function(id) {
+    _orig.call(this, id);
+    if (id === 'gallery') loadGallery();
+  };
+})();
 
 async function loadGallery() {
   const isAdmin = localStorage.getItem('admin_impersonation') === 'true';
