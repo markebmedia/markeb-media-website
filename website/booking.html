@@ -3294,7 +3294,7 @@ async function applyDiscountCode() {
       bookingData.discountCode = data.code;
       bookingData.discountAmount = data.discountAmount;
       bookingData.priceBeforeDiscount = bookingData.totalPrice; // full price before discount
-      bookingData.totalPrice = discountablePrice - data.discountAmount + (bookingData.addonsPrice || 0); // discount on service only, addons added back
+      bookingData.totalPrice = (discountablePrice - data.discountAmount + (bookingData.addonsPrice || 0)) * 1.2; // discount on service only, addons added back
       
       // Show success message
       const discountText = data.discountType === 'Percentage' 
