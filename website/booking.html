@@ -2468,6 +2468,10 @@ function handleAccessTypeChange() {
         sqftFeeRow.style.display = sqftFee > 0 ? 'flex' : 'none';
       }
 
+      document.getElementById('summaryExVat').textContent = `£${displaySubtotal.toFixed(2)}`;
+      document.getElementById('summaryVat').textContent = `£${displayVat.toFixed(2)}`;
+      document.getElementById('summaryTotal').textContent = `£${(displaySubtotal * 1.2).toFixed(2)}`;
+
       document.getElementById('priceBreakdown').style.display = 'block';
 
       // Refresh discount row if a code is already applied
@@ -3294,7 +3298,8 @@ async function applyDiscountCode() {
       bookingData.discountCode = data.code;
       bookingData.discountAmount = data.discountAmount;
       bookingData.priceBeforeDiscount = bookingData.totalPrice; // full price before discount
-      bookingData.totalPrice = (discountablePrice - data.discountAmount + (bookingData.addonsPrice || 0)) * 1.2; // discount on service only, addons added back
+      const subtotalWithAddons = bookingData.basePrice + (bookingData.extraBedroomFee || 0) + (bookingData.squareFootageFee || 0) + (bookingData.addonsPrice || 0);
+bookingData.totalPrice = (subtotalWithAddons - data.discountAmount) * 1.2; // discount on service only, addons added back
       
       // Show success message
       const discountText = data.discountType === 'Percentage' 
