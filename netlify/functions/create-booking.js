@@ -164,7 +164,7 @@ exports.handler = async (event, context) => {
       
       discountAmount = bookingData.discountAmount || 0;
       priceBeforeDiscount = bookingData.priceBeforeDiscount || (bookingData.totalPrice + discountAmount);
-      finalPrice = priceBeforeDiscount - discountAmount;
+      finalPrice = parseFloat(((priceBeforeDiscount - discountAmount) * 1.2).toFixed(2));
       
       console.log('Discount details:', {
         code: bookingData.discountCode,
