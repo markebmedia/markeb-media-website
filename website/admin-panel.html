@@ -4015,17 +4015,13 @@ function updateDiscountedPrice() {
       breakdown.insertBefore(discountRow, totalRow);
     }
 
-    // discountAmount is ex-VAT, totalPrice (from validate-discount-code) is also ex-VAT
-    // Re-apply VAT for display and storage
-    const discountedExVat = bookingFormData.totalPrice; // what the function returned
-    const discountedIncVat = parseFloat((discountedExVat * 1.2).toFixed(2));
-    
-    // Update stored value to inc-VAT so Stripe charges correctly
-    bookingFormData.totalPrice = discountedIncVat;
-    
+    // totalPrice is already inc-VAT from applyAdminDiscount — just derive ex-VAT for display
+    const incVat = bookingFormData.totalPrice;
+    const exVat = parseFloat((incVat / 1.2).toFixed(2));
+
     discountRow.style.display = 'flex';
-    document.getElementById('bookingDiscountAmount').textContent = `-£${bookingFormData.discountAmount.toFixed(2)} (ex VAT)`;
-    document.getElementById('bookingTotalPrice').textContent = `£${discountedExVat.toFixed(2)} ex VAT  —  £${discountedIncVat.toFixed(2)} inc. VAT`;
+    document.getElementById('bookingDiscountAmount').textContent = `-£${bookingFormData.discountAmount.toFixed(2)} ex VAT`;
+    document.getElementById('bookingTotalPrice').textContent = `£${exVat.toFixed(2)} ex VAT  —  £${incVat.toFixed(2)} inc. VAT`;
   }
 }
 
