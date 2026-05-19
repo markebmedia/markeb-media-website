@@ -3961,15 +3961,19 @@ async function applyAdminDiscount() {
     const data = await response.json();
 
     if (data.success) {
-      // Store discount info
+      // data.finalPrice and data.discountAmount come back ex-VAT from validate-discount-code
+      const discountedExVat = data.finalPrice;
+      const discountedIncVat = parseFloat((discountedExVat * 1.2).toFixed(2));
+
       bookingFormData.discountCode = code;
       bookingFormData.discountAmount = data.discountAmount;
       bookingFormData.priceBeforeDiscount = priceBeforeDiscount;
-      bookingFormData.totalPrice = data.finalPrice;
+      // Store inc-VAT as the final charge amount
+      bookingFormData.totalPrice = discountedIncVat;
 
       messageDiv.innerHTML = `
         <span style="color: #10b981;">
-          ✅ Code "${code}" applied! Saving £${data.discountAmount.toFixed(2)}
+          ✅ Code "${code}" applied! Saving £${data.discountAmount.toFixed(2)} (ex VAT) — new total £${discountedExVat.toFixed(2)} ex VAT / £${discountedIncVat.toFixed(2)} inc. VAT
         </span>
       `;
 
@@ -3997,7 +4001,6 @@ function updateDiscountedPrice() {
     let discountRow = document.getElementById('bookingDiscountRow');
     
     if (!discountRow) {
-      // Create discount row if it doesn't exist
       const breakdown = document.getElementById('bookingPriceBreakdown');
       const totalRow = breakdown.querySelector('[style*="border-top"]');
       
@@ -4011,10 +4014,18 @@ function updateDiscountedPrice() {
       
       breakdown.insertBefore(discountRow, totalRow);
     }
+
+    // discountAmount is ex-VAT, totalPrice (from validate-discount-code) is also ex-VAT
+    // Re-apply VAT for display and storage
+    const discountedExVat = bookingFormData.totalPrice; // what the function returned
+    const discountedIncVat = parseFloat((discountedExVat * 1.2).toFixed(2));
+    
+    // Update stored value to inc-VAT so Stripe charges correctly
+    bookingFormData.totalPrice = discountedIncVat;
     
     discountRow.style.display = 'flex';
-    document.getElementById('bookingDiscountAmount').textContent = `-£${bookingFormData.discountAmount.toFixed(2)}`;
-    document.getElementById('bookingTotalPrice').textContent = `£${bookingFormData.totalPrice.toFixed(2)}`;
+    document.getElementById('bookingDiscountAmount').textContent = `-£${bookingFormData.discountAmount.toFixed(2)} (ex VAT)`;
+    document.getElementById('bookingTotalPrice').textContent = `£${discountedExVat.toFixed(2)} ex VAT  —  £${discountedIncVat.toFixed(2)} inc. VAT`;
   }
 }
 
