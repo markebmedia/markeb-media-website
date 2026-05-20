@@ -113,8 +113,8 @@ async function sendWelcomeEmail(name, email, company) {
           <!-- Header -->
           <tr>
             <td style="padding:40px 40px 32px;text-align:center;background:linear-gradient(135deg,#3F4D1B 0%,#2d3813 100%);">
-              <h1 style="margin:0;color:#FDF3E2;font-size:26px;font-weight:700;letter-spacing:-0.02em;">Markeb Media</h1>
-              <p style="margin:10px 0 0;color:rgba(253,243,226,0.8);font-size:15px;">Your dashboard is ready</p>
+              <img src="https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png" alt="Markeb Media" style="max-width:160px;width:100%;height:auto;margin-bottom:16px;">
+              <p style="margin:0;color:rgba(253,243,226,0.8);font-size:15px;">Your dashboard is ready</p>
               <div style="width:40px;height:3px;background:#B46100;margin:16px auto 0;border-radius:2px;"></div>
             </td>
           </tr>
