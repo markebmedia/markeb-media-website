@@ -32,6 +32,9 @@ function normaliseAddress(str) {
   return (str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
+// Statuses that mean content is ready or complete
+const DELIVERY_STATUSES = ['Ready for Delivery', 'Complete'];
+
 exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -47,14 +50,29 @@ exports.handler = async (event) => {
   try {
     const { userEmail } = JSON.parse(event.body || '{}');
     if (!userEmail) {
-      return { statusCode: 400, headers, body: JSON.stringify({ success: false, error: 'userEmail is required' }) };
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ success: false, error: 'userEmail is required' }),
+      };
     }
 
     const emailLower = userEmail.toLowerCase().trim();
 
-    // ── 1. Client Reviews ─────────────────────────────────────────────
+    // ── 1. Fetch ALL bookings for this client (primary source) ─────────
+    const bookingsFormula = encodeURIComponent(
+      `LOWER({Email Address}) = "${emailLower}"`
+    );
+    const bookingsUrl =
+      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(BOOKINGS_TABLE)}` +
+      `?filterByFormula=${bookingsFormula}&sort[0][field]=Shoot%20Date&sort[0][direction]=desc`;
+
+    const bookingRecords = await fetchAllRecords(bookingsUrl);
+
+    // ── 2. Fetch Client Reviews for this client ────────────────────────
+    // No Opted In filter — we show review panel whenever a review record exists
     const reviewsFormula = encodeURIComponent(
-      `AND(LOWER({Client Email}) = "${emailLower}", {Opted In} = TRUE())`
+      `LOWER({Client Email}) = "${emailLower}"`
     );
     const reviewsUrl =
       `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(REVIEWS_TABLE)}` +
@@ -62,82 +80,80 @@ exports.handler = async (event) => {
 
     const reviewRecords = await fetchAllRecords(reviewsUrl);
 
-    // ── 2. ALL Active Bookings for this email ─────────────────────────
-    const bookingsFormula = encodeURIComponent(
-      `LOWER({Email Address}) = "${emailLower}"`
-    );
-    const bookingsUrl =
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(BOOKINGS_TABLE)}` +
-      `?filterByFormula=${bookingsFormula}&sort[0][field]=Shoot Date&sort[0][direction]=desc`;
-
-    const bookingRecords = await fetchAllRecords(bookingsUrl);
-
-    // Build lookup map: normalisedAddress → booking fields
-    const bookingsByAddress = {};
-    bookingRecords.forEach((record) => {
-      const f = record.fields;
-      const key = normaliseAddress(f['Project Address']);
-      if (key) bookingsByAddress[key] = f;
+    // Build review lookup: normalised address → review record fields + id
+    const reviewsByAddress = {};
+    reviewRecords.forEach((record) => {
+      const key = normaliseAddress(record.fields['Project Address']);
+      if (key) reviewsByAddress[key] = { id: record.id, fields: record.fields };
     });
 
-    // ── 3. Enrich review cards with booking status ────────────────────
-    const projects = reviewRecords.map((record) => {
-      const f = record.fields;
+    // ── 3. Build unified booking cards ────────────────────────────────
+    // Every booking becomes a card. We attach review data if a matching
+    // Client Reviews record exists for that address.
+    const allBookingCards = bookingRecords.map((record) => {
+      const f          = record.fields;
       const addressKey = normaliseAddress(f['Project Address']);
-      const booking = bookingsByAddress[addressKey] || {};
+      const review     = reviewsByAddress[addressKey] || null;
+      const status     = f['Status'] || 'Booked';
 
-      return {
-        id:               record.id,
-        cardType:         'review',
-        projectAddress:   f['Project Address']     || 'Unnamed Project',
-        clientEmail:      f['Client Email']        || '',
-        photosLink:       f['Photos Dropbox Link'] || '',
-        videoLink:        f['Video Dropbox Link']  || '',
-        photosNotes:      f['Photos Notes']        || '',
-        videoNotes:       f['Video Notes']         || '',
-        reviewStatus:     f['Review Status']       || 'Pending Review',
-        submittedAt:      f['Submitted At']        || null,
-        createdAt:        record.createdTime,
-        shootDate:        f['Shoot Date']          || null,
-        serviceType:      f['Service Type']        || '',
-        photographerName: f['Photographer Name']   || '',
-        photoCount:       f['Photo Count']         || null,
-        videoCount:       f['Video Count']         || null,
-        bookingStatus:    booking['Status']        || null,
-        deliveryLink:     booking['Delivery Link'] || null,
+      const card = {
+        id:             record.id,
+        projectAddress: f['Project Address']  || 'Unnamed Project',
+        clientEmail:    f['Email Address']    || '',
+        serviceType:    f['Service Type']     || '',
+        shootDate:      f['Shoot Date']       || null,
+        bookingStatus:  status,
+        deliveryLink:   f['Delivery Link']    || null,
+        trackingCode:   f['Tracking Code']    || null,
+        // Review panel — only populated when a Client Reviews record exists
+        hasReview:      !!review,
+        reviewId:       review ? review.id              : null,
+        reviewStatus:   review ? (review.fields['Review Status'] || 'Pending Review') : null,
+        photosLink:     review ? (review.fields['Photos Dropbox Link'] || '') : '',
+        videoLink:      review ? (review.fields['Video Dropbox Link']  || '') : '',
+        photosNotes:    review ? (review.fields['Photos Notes']        || '') : '',
+        videoNotes:     review ? (review.fields['Video Notes']         || '') : '',
+        photoCount:     review ? (review.fields['Photo Count']         || null) : null,
+        videoCount:     review ? (review.fields['Video Count']         || null) : null,
       };
+
+      return card;
     });
 
-    // ── 4. Delivered cards — bookings with delivery link not in review list ──
-    const reviewAddressKeys = new Set(projects.map(p => normaliseAddress(p.projectAddress)));
+    // ── 4. Split into two groups ──────────────────────────────────────
+    // "Your Deliveries" — status is Ready for Delivery or Complete
+    const deliveries = allBookingCards.filter(c =>
+      DELIVERY_STATUSES.includes(c.bookingStatus)
+    );
 
-    const delivered = bookingRecords
-      .filter((record) => {
-        const f = record.fields;
-        return (
-          f['Delivery Link'] &&
-          f['Status'] === 'Ready for Delivery' &&
-          !reviewAddressKeys.has(normaliseAddress(f['Project Address']))
-        );
-      })
-      .map((record) => {
-        const f = record.fields;
-        return {
-          id:             record.id,
-          cardType:       'delivered',
-          projectAddress: f['Project Address'] || 'Property',
-          clientEmail:    f['Email Address']   || '',
-          deliveryLink:   f['Delivery Link']   || '',
-          serviceType:    f['Service Type']    || '',
-          shootDate:      f['Shoot Date']      || null,
-          bookingStatus:  f['Status']          || 'Ready for Delivery',
-        };
-      });
+    // "Content Review" — has a Client Reviews record AND status is NOT
+    // yet delivered (i.e. we haven't sent to editors / completed yet).
+    // We still show the review panel on delivery cards if a review record
+    // exists, but the primary split uses booking status.
+    const reviewCards = allBookingCards.filter(c =>
+      c.hasReview && !DELIVERY_STATUSES.includes(c.bookingStatus)
+    );
+
+    // "In Progress" — all bookings not in delivery, for the journey tracker
+    const inProgress = allBookingCards.filter(c =>
+      !DELIVERY_STATUSES.includes(c.bookingStatus)
+    );
 
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ success: true, projects, delivered }),
+      body: JSON.stringify({
+        success:     true,
+        // All non-delivered bookings (journey tracker cards)
+        inProgress,
+        // Subset of inProgress that have a review record (raw content to approve)
+        reviewCards,
+        // Ready for Delivery + Complete
+        deliveries,
+        // Legacy keys so any other callers don't break
+        projects:  reviewCards,
+        delivered: deliveries,
+      }),
     };
 
   } catch (error) {
