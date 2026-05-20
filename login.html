@@ -169,10 +169,11 @@
         }
 
         /* BLUE focus ring */
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             outline: none;
             border-color: #B46100;
-box-shadow: 0 0 0 3px rgba(180,97,0,0.15);
+            box-shadow: 0 0 0 3px rgba(180,97,0,0.15);
         }
 
         /* BLUE button */
@@ -291,6 +292,171 @@ box-shadow: 0 0 0 3px rgba(180,97,0,0.15);
                 <div class="form-group">
                     <label for="signupCompany">Company</label>
                     <input type="text" id="signupCompany" name="company" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupRegion">Your Region</label>
+                    <select id="signupRegion" name="region" required style="width:100%;padding:14px;border:2px solid #e5e7eb;border-radius:12px;font-size:1rem;font-family:inherit;color:#1F2E3C;transition:all 0.3s ease;appearance:none;background:#fff url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236b7280%22 stroke-width=%222%22><polyline points=%226 9 12 15 18 9%22/></svg>') no-repeat right 14px center;">
+                        <option value="" disabled selected>Select your region</option>
+                        <optgroup label="North West">
+                            <option value="Cheshire East">Cheshire East</option>
+                            <option value="Cheshire West and Chester">Cheshire West and Chester</option>
+                            <option value="Cumbria">Cumbria</option>
+                            <option value="Greater Manchester">Greater Manchester</option>
+                            <option value="Lancashire">Lancashire</option>
+                            <option value="Merseyside">Merseyside</option>
+                            <option value="Blackburn with Darwen">Blackburn with Darwen</option>
+                            <option value="Blackpool">Blackpool</option>
+                            <option value="Halton">Halton</option>
+                            <option value="Warrington">Warrington</option>
+                        </optgroup>
+                        <optgroup label="North East">
+                            <option value="County Durham">County Durham</option>
+                            <option value="Northumberland">Northumberland</option>
+                            <option value="Tyne and Wear">Tyne and Wear</option>
+                        </optgroup>
+                        <optgroup label="Yorkshire & Humber">
+                            <option value="South Yorkshire">South Yorkshire</option>
+                            <option value="West Yorkshire">West Yorkshire</option>
+                            <option value="North Yorkshire">North Yorkshire</option>
+                            <option value="East Riding of Yorkshire">East Riding of Yorkshire</option>
+                            <option value="York">York</option>
+                        </optgroup>
+                        <optgroup label="East Midlands">
+                            <option value="Derbyshire">Derbyshire</option>
+                            <option value="Derby">Derby</option>
+                            <option value="Leicestershire">Leicestershire</option>
+                            <option value="Lincolnshire">Lincolnshire</option>
+                            <option value="Northamptonshire">Northamptonshire</option>
+                            <option value="Nottinghamshire">Nottinghamshire</option>
+                            <option value="Nottingham">Nottingham</option>
+                            <option value="Rutland">Rutland</option>
+                        </optgroup>
+                        <optgroup label="West Midlands">
+                            <option value="Herefordshire">Herefordshire</option>
+                            <option value="Shropshire">Shropshire</option>
+                            <option value="Staffordshire">Staffordshire</option>
+                            <option value="Stoke-on-Trent">Stoke-on-Trent</option>
+                            <option value="Telford and Wrekin">Telford and Wrekin</option>
+                            <option value="Warwickshire">Warwickshire</option>
+                            <option value="West Midlands">West Midlands</option>
+                            <option value="Worcestershire">Worcestershire</option>
+                        </optgroup>
+                        <optgroup label="East of England">
+                            <option value="Bedford">Bedford</option>
+                            <option value="Cambridgeshire">Cambridgeshire</option>
+                            <option value="Central Bedfordshire">Central Bedfordshire</option>
+                            <option value="Essex">Essex</option>
+                            <option value="Hertfordshire">Hertfordshire</option>
+                            <option value="Norfolk">Norfolk</option>
+                            <option value="Peterborough">Peterborough</option>
+                            <option value="Suffolk">Suffolk</option>
+                        </optgroup>
+                        <optgroup label="London">
+                            <option value="Greater London">Greater London</option>
+                        </optgroup>
+                        <optgroup label="South East">
+                            <option value="Berkshire">Berkshire</option>
+                            <option value="Brighton and Hove">Brighton and Hove</option>
+                            <option value="Buckinghamshire">Buckinghamshire</option>
+                            <option value="East Sussex">East Sussex</option>
+                            <option value="Hampshire">Hampshire</option>
+                            <option value="Isle of Wight">Isle of Wight</option>
+                            <option value="Kent">Kent</option>
+                            <option value="Medway">Medway</option>
+                            <option value="Oxfordshire">Oxfordshire</option>
+                            <option value="Portsmouth">Portsmouth</option>
+                            <option value="Southampton">Southampton</option>
+                            <option value="Surrey">Surrey</option>
+                            <option value="West Sussex">West Sussex</option>
+                        </optgroup>
+                        <optgroup label="South West">
+                            <option value="Bath and North East Somerset">Bath and North East Somerset</option>
+                            <option value="Bournemouth, Christchurch and Poole">Bournemouth, Christchurch and Poole</option>
+                            <option value="Bristol">Bristol</option>
+                            <option value="Cornwall">Cornwall</option>
+                            <option value="Devon">Devon</option>
+                            <option value="Dorset">Dorset</option>
+                            <option value="Gloucestershire">Gloucestershire</option>
+                            <option value="North Somerset">North Somerset</option>
+                            <option value="Plymouth">Plymouth</option>
+                            <option value="Somerset">Somerset</option>
+                            <option value="South Gloucestershire">South Gloucestershire</option>
+                            <option value="Swindon">Swindon</option>
+                            <option value="Torbay">Torbay</option>
+                            <option value="Wiltshire">Wiltshire</option>
+                        </optgroup>
+                        <optgroup label="Scotland">
+                            <option value="Aberdeen City">Aberdeen City</option>
+                            <option value="Aberdeenshire">Aberdeenshire</option>
+                            <option value="Angus">Angus</option>
+                            <option value="Argyll and Bute">Argyll and Bute</option>
+                            <option value="City of Edinburgh">City of Edinburgh</option>
+                            <option value="Clackmannanshire">Clackmannanshire</option>
+                            <option value="Dumfries and Galloway">Dumfries and Galloway</option>
+                            <option value="Dundee City">Dundee City</option>
+                            <option value="East Ayrshire">East Ayrshire</option>
+                            <option value="East Dunbartonshire">East Dunbartonshire</option>
+                            <option value="East Lothian">East Lothian</option>
+                            <option value="East Renfrewshire">East Renfrewshire</option>
+                            <option value="Falkirk">Falkirk</option>
+                            <option value="Fife">Fife</option>
+                            <option value="Glasgow City">Glasgow City</option>
+                            <option value="Highland">Highland</option>
+                            <option value="Inverclyde">Inverclyde</option>
+                            <option value="Midlothian">Midlothian</option>
+                            <option value="Moray">Moray</option>
+                            <option value="Na h-Eileanan Siar">Na h-Eileanan Siar</option>
+                            <option value="North Ayrshire">North Ayrshire</option>
+                            <option value="North Lanarkshire">North Lanarkshire</option>
+                            <option value="Orkney Islands">Orkney Islands</option>
+                            <option value="Perth and Kinross">Perth and Kinross</option>
+                            <option value="Renfrewshire">Renfrewshire</option>
+                            <option value="Scottish Borders">Scottish Borders</option>
+                            <option value="Shetland Islands">Shetland Islands</option>
+                            <option value="South Ayrshire">South Ayrshire</option>
+                            <option value="South Lanarkshire">South Lanarkshire</option>
+                            <option value="Stirling">Stirling</option>
+                            <option value="West Dunbartonshire">West Dunbartonshire</option>
+                            <option value="West Lothian">West Lothian</option>
+                        </optgroup>
+                        <optgroup label="Wales">
+                            <option value="Blaenau Gwent">Blaenau Gwent</option>
+                            <option value="Bridgend">Bridgend</option>
+                            <option value="Caerphilly">Caerphilly</option>
+                            <option value="Cardiff">Cardiff</option>
+                            <option value="Carmarthenshire">Carmarthenshire</option>
+                            <option value="Ceredigion">Ceredigion</option>
+                            <option value="Conwy">Conwy</option>
+                            <option value="Denbighshire">Denbighshire</option>
+                            <option value="Flintshire">Flintshire</option>
+                            <option value="Gwynedd">Gwynedd</option>
+                            <option value="Isle of Anglesey">Isle of Anglesey</option>
+                            <option value="Merthyr Tydfil">Merthyr Tydfil</option>
+                            <option value="Monmouthshire">Monmouthshire</option>
+                            <option value="Neath Port Talbot">Neath Port Talbot</option>
+                            <option value="Newport">Newport</option>
+                            <option value="Pembrokeshire">Pembrokeshire</option>
+                            <option value="Powys">Powys</option>
+                            <option value="Rhondda Cynon Taf">Rhondda Cynon Taf</option>
+                            <option value="Swansea">Swansea</option>
+                            <option value="Torfaen">Torfaen</option>
+                            <option value="Vale of Glamorgan">Vale of Glamorgan</option>
+                            <option value="Wrexham">Wrexham</option>
+                        </optgroup>
+                        <optgroup label="Northern Ireland">
+                            <option value="Antrim and Newtownabbey">Antrim and Newtownabbey</option>
+                            <option value="Ards and North Down">Ards and North Down</option>
+                            <option value="Armagh City, Banbridge and Craigavon">Armagh City, Banbridge and Craigavon</option>
+                            <option value="Belfast">Belfast</option>
+                            <option value="Causeway Coast and Glens">Causeway Coast and Glens</option>
+                            <option value="Derry City and Strabane">Derry City and Strabane</option>
+                            <option value="Fermanagh and Omagh">Fermanagh and Omagh</option>
+                            <option value="Lisburn and Castlereagh">Lisburn and Castlereagh</option>
+                            <option value="Mid and East Antrim">Mid and East Antrim</option>
+                            <option value="Mid Ulster">Mid Ulster</option>
+                            <option value="Newry, Mourne and Down">Newry, Mourne and Down</option>
+                        </optgroup>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="signupPassword">Password</label>
@@ -505,19 +671,21 @@ box-shadow: 0 0 0 3px rgba(180,97,0,0.15);
             const name = document.getElementById('signupName').value;
             const email = document.getElementById('signupEmail').value;
             const company = document.getElementById('signupCompany').value;
+            const region = document.getElementById('signupRegion').value;
             const password = document.getElementById('signupPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
             if (!AirtableAPI.validateRequired(name)) { showError('Full name is required.'); return; }
             if (!AirtableAPI.validateEmail(email)) { showError('Please enter a valid email address.'); return; }
             if (!AirtableAPI.validateRequired(company)) { showError('Company name is required.'); return; }
+            if (!region) { showError('Please select your region.'); return; }
             if (!AirtableAPI.validatePassword(password)) { showError('Password must be at least 8 characters with letters and numbers.'); return; }
             if (password !== confirmPassword) { showError('Passwords do not match.'); return; }
 
             showLoading();
 
             try {
-                const response = await AirtableAPI.createUser({ name, email, company, password });
+                const response = await AirtableAPI.createUser({ name, email, company, region, password });
                 if (response.success) {
                     // mark action for dashboard greeting
                     localStorage.setItem('auth_action','signup');
