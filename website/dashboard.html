@@ -2920,16 +2920,35 @@ box-shadow: 0 10px 40px rgba(63, 77, 27, 0.4);
             <p>Review your raw photos and video clips before we send them to the editing team</p>
           </div>
           <div class="gh-legend">
-            <div class="gh-legend-item"><div class="gh-legend-dot" style="background:#3b82f6;"></div>Pending Review</div>
-            <div class="gh-legend-item"><div class="gh-legend-dot" style="background:#f59e0b;"></div>Notes Added</div>
-            <div class="gh-legend-item"><div class="gh-legend-dot" style="background:#10b981;"></div>Approved</div>
-            <div class="gh-legend-item"><div class="gh-legend-dot" style="background:#8b5cf6;"></div>Sent to Editors</div>
+            <div class="gh-legend-item">
+              <i data-lucide="clock" style="width:13px;height:13px;color:#B46100;"></i>
+              Pending Review
+            </div>
+            <div class="gh-legend-item">
+              <i data-lucide="message-square" style="width:13px;height:13px;color:#f59e0b;"></i>
+              Notes Added
+            </div>
+            <div class="gh-legend-item">
+              <i data-lucide="check-circle" style="width:13px;height:13px;color:#10b981;"></i>
+              Approved
+            </div>
+            <div class="gh-legend-item">
+              <i data-lucide="send" style="width:13px;height:13px;color:#8b5cf6;"></i>
+              Sent to Editors
+            </div>
+            <div class="gh-legend-item">
+              <i data-lucide="download" style="width:13px;height:13px;color:#10b981;"></i>
+              Delivered
+            </div>
           </div>
         </div>
 
         <!-- Progress bar -->
         <div class="gh-progress-wrap" id="ghProgressWrap" style="display:none;flex-direction:row;">
-          <span class="gh-progress-label">Overall Review Progress</span>
+          <span class="gh-progress-label" style="display:flex;align-items:center;gap:6px;">
+            <i data-lucide="bar-chart-2" style="width:14px;height:14px;color:#B46100;"></i>
+            Overall Review Progress
+          </span>
           <div class="gh-progress-track">
             <div class="gh-progress-fill" id="ghProgressFill" style="width:0%;"></div>
           </div>
@@ -3702,7 +3721,7 @@ async function loadAcuityMetrics(email){
         const data=await fetchJSON(NETLIFY_ENDPOINTS.projects,{ userEmail: email });
         document.getElementById('completedProjects').textContent=data.completedProjects ?? 0;
 
-        
+
       }catch(e){console.warn('Airtable project metrics error:',e.message);}
     }
 
