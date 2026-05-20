@@ -269,13 +269,13 @@ exports.handler = async () => {
   const today    = new Date();
   const dayOfWeek = today.getDay(); // 0=Sun 1=Mon 2=Tue 3=Wed 4=Thu 5=Fri 6=Sat
 
-  // Only fire on Monday (1) or Wednesday (3)
-  if (dayOfWeek !== 1 && dayOfWeek !== 3) {
-    console.log(`Today is day ${dayOfWeek} — not Monday or Wednesday, skipping.`);
+  // Only fire on Monday (1) or Thursday (4)
+  if (dayOfWeek !== 1 && dayOfWeek !== 4) {
+    console.log(`Today is day ${dayOfWeek} — not Monday or Thursday, skipping.`);
     return { statusCode: 200, body: JSON.stringify({ message: 'Not a broadcast day' }) };
   }
 
-  const dayLabel = dayOfWeek === 1 ? 'Monday' : 'Wednesday';
+  const dayLabel = dayOfWeek === 1 ? 'Monday' : 'Thursday';
   console.log(`=== Scheduled Weekly Broadcast (${dayLabel}) — started ===`);
 
   try {

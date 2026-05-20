@@ -9,7 +9,7 @@
   schedule = "0 * * * *"
 
 [functions."scheduled-weekly-broadcast"]
-  schedule = "25 20 * * *"
+  schedule = "0 14 * * *"
 
 [[headers]]
   for = "/website/admin-panel.html"
