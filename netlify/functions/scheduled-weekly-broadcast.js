@@ -2,7 +2,7 @@
 // Schedule: daily at 14:00 UTC  →  netlify.toml: schedule = "0 14 * * *"
 //
 // Logic:
-//  1. Check if today is Monday (1) or Wednesday (3) — exit silently if not
+//  1. Check if today is Monday (1) or Thursday (4) — exit silently if not
 //  2. Fetch all users where Email Notifications Enabled = true
 //  3. Exclude Suspended accounts
 //  4. For each user generate live availability content (same as send-broadcast-email.js)
