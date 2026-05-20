@@ -121,10 +121,10 @@ async function sendWelcomeEmail(name, email, company) {
 
           <!-- Body -->
           <tr>
-            <td style="padding:40px;">
-              <p style="margin:0 0 20px;color:#3F4D1B;font-size:16px;line-height:1.6;">Hi ${name},</p>
-              <p style="margin:0 0 20px;color:#3F4D1B;font-size:16px;line-height:1.6;">Welcome to Markeb Media. Your personalised client dashboard is now live and ready to use.</p>
-              <p style="margin:0 0 28px;color:#3F4D1B;font-size:16px;line-height:1.6;">Here's everything included as a dashboard member:</p>
+            <td style="padding:40px 30px;">
+              <p style="margin:0 0 14px;color:#3F4D1B;font-size:16px;line-height:1.6;">Hi ${name},</p>
+              <p style="margin:0 0 14px;color:#3F4D1B;font-size:16px;line-height:1.6;">Welcome to Markeb Media. Your personalised client dashboard is now live and ready to use.</p>
+              <p style="margin:0 0 24px;color:#3F4D1B;font-size:16px;line-height:1.6;">Here's everything included as a dashboard member:</p>
 
               <!-- Features table -->
               <table role="presentation" style="width:100%;border-collapse:collapse;margin-bottom:28px;">
@@ -194,7 +194,7 @@ async function sendWelcomeEmail(name, email, company) {
                 </tr>
               </table>
 
-              <p style="margin:0 0 8px;color:#3F4D1B;font-size:15px;line-height:1.6;">Any questions, reply to this email and we'll get back to you.</p>
+              <p style="margin:0 0 14px;color:#3F4D1B;font-size:15px;line-height:1.6;">Any questions, reply to this email and we'll get back to you.</p>
               <p style="margin:0;color:#3F4D1B;font-size:15px;line-height:1.6;">The Markeb Media Team</p>
             </td>
           </tr>
