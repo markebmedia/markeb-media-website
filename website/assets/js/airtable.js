@@ -12,6 +12,7 @@ async function createUser(userData) {
                 name: userData.name,
                 email: userData.email,
                 company: userData.company,
+                region: userData.region || '',
                 password: userData.password
             })
         });
