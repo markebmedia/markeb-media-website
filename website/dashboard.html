@@ -3692,31 +3692,69 @@ async function loadAcuityMetrics(email){
     document.getElementById('totalSpending').textContent = fmtGBP(airtableTotalInvestment);
     document.getElementById('rewardPoints').textContent = totalPoints.toLocaleString('en-GB') + ' pts';
     
-    // ✅ ADD RECENT BOOKINGS TO ACTIVITY LIST
+    // Activity list — 5 most recent bookings, sorted by shoot date desc
     const list = document.getElementById('activityList');
-    if (bookingsData?.bookings) { // ✅ NOW bookingsData is accessible here
+    if (bookingsData?.bookings) {
       const recentBookings = bookingsData.bookings
         .filter(b => b.fields['Client Email']?.toLowerCase() === email.toLowerCase())
+        .sort((a, b) => {
+          const da = new Date(a.fields['Shoot Date'] || a.fields['Date'] || 0);
+          const db = new Date(b.fields['Shoot Date'] || b.fields['Date'] || 0);
+          return db - da;
+        })
         .slice(0, 5);
-      
+
       recentBookings.forEach(booking => {
-        const fields = booking.fields;
-        const date = fields['Date'] ? new Date(fields['Date']).toLocaleDateString('en-GB') : 'TBD';
-        const time = fields['Time'] || fields['Shoot Time'] || fields['Start Time'] || '';
-        const address = fields['Property Address'] || 'Property booking';
-        const status = fields['Booking Status'] || 'Scheduled';
-        
+        const fields   = booking.fields;
+        const rawDate  = fields['Shoot Date'] || fields['Date'] || null;
+        const dateStr  = rawDate
+          ? new Date(rawDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+          : 'Date TBC';
+        const address  = fields['Property Address'] || fields['Project Address'] || 'Property booking';
+        const status   = fields['Booking Status'] || fields['Status'] || 'Booked';
+        const service  = fields['Service Type'] || fields['Package'] || '';
+        const cancelled = status.toLowerCase() === 'cancelled';
+
+        // Status colour dot
+        const dotColour = {
+          'Booked':             '#B46100',
+          'Editing':            '#3b82f6',
+          'Quality Control':    '#f59e0b',
+          'Ready for Delivery': '#10b981',
+          'Complete':           '#10b981',
+          'Cancelled':          '#ef4444',
+        }[status] || '#64748b';
+
+        // Lucide icon name per status
+        const iconName = {
+          'Booked':             'calendar-check',
+          'Editing':            'scissors',
+          'Quality Control':    'search',
+          'Ready for Delivery': 'download',
+          'Complete':           'check-circle',
+          'Cancelled':          'x-circle',
+        }[status] || 'calendar';
+
         const row = document.createElement('div');
         row.className = 'activity-item';
         row.innerHTML = `
-          <div class="activity-icon">📅</div>
-          <div class="activity-content">
-            <div class="activity-title">${address}</div>
-            <div class="activity-time">${date}${time ? ' at ' + time : ''} • ${status}</div>
+          <div class="activity-icon" style="background:${cancelled ? '#fef2f2' : '#f8fafc'}; border: 1px solid ${dotColour}20;">
+            <i data-lucide="${iconName}" style="width:18px;height:18px;color:${dotColour};"></i>
+          </div>
+          <div class="activity-content" style="${cancelled ? 'opacity:0.6;' : ''}">
+            <div class="activity-title" style="${cancelled ? 'text-decoration:line-through;color:#ef4444;' : ''}">${address}</div>
+            <div class="activity-time" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:2px;">
+              <span style="background:${dotColour}18;color:${dotColour};font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;border:1px solid ${dotColour}40;">${status}</span>
+              <span>${dateStr}</span>
+              ${service ? `<span style="color:#94a3b8;">•</span><span>${service}</span>` : ''}
+            </div>
           </div>
         `;
         list.appendChild(row);
       });
+
+      // Re-init Lucide icons for dynamically added content
+      if (typeof lucide !== 'undefined') lucide.createIcons();
     }
   } catch(e) {
     console.warn('Booking metrics error:', e.message);
