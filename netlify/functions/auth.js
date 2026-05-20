@@ -107,8 +107,8 @@ async function sendWelcomeEmail(name, email, company) {
 <body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background-color:#f7ead5;">
   <table role="presentation" style="width:100%;border-collapse:collapse;">
     <tr>
-      <td style="padding:40px 0;background-color:#f7ead5;">
-        <table role="presentation" style="max-width:600px;margin:0 auto;background-color:#FDF3E2;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(63,77,27,0.12);">
+      <td style="padding:0;background-color:#f7ead5;">
+        <table role="presentation" style="max-width:600px;margin:0 auto;background-color:#FDF3E2;border-radius:0;overflow:hidden;">
 
           <!-- Header -->
           <tr>
