@@ -2802,7 +2802,7 @@ box-shadow: 0 10px 40px rgba(63, 77, 27, 0.4);
             <div class="card-content">
               <div class="action-grid">
                 <div class="action-item" onclick="window.location.href='./booking.html'">
-  <div class="action-icon">+</div>
+  <div class="action-icon"><i data-lucide="plus" style="width:18px;height:18px;"></i></div>
   <div>
     <div style="font-weight: 500;">Book New Shoot</div>
     <div style="font-size: 12px; color: #64748b;">Schedule photos and videos</div>
@@ -2991,7 +2991,7 @@ box-shadow: 0 10px 40px rgba(63, 77, 27, 0.4);
               <input id="trackingInput" type="text" class="form-input" placeholder="Enter your tracking code" style="width:100%;padding:14px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;">
             </div>
             <div style="margin-top:12px">
-              <button class="btn btn-primary" onclick="trackBooking()">🔍 Track Progress</button>
+              <button class="btn btn-primary" onclick="trackBooking()" style="display:inline-flex;align-items:center;gap:8px;"><i data-lucide="search" style="width:16px;height:16px;"></i> Track Progress</button>
             </div>
             <div class="result-container"><div id="result" style="margin-top:16px;"></div></div>
           </div>
@@ -3033,7 +3033,7 @@ box-shadow: 0 10px 40px rgba(63, 77, 27, 0.4);
 </div>
 
 <div id="calendarEmpty" class="calendar-empty-state" style="display:none;">
-  <div style="font-size:48px;margin-bottom:16px;">📅</div>
+  <div style="margin-bottom:16px;"><i data-lucide="calendar-x" style="width:48px;height:48px;color:#B46100;"></i></div>
   <h3>No Content Scheduled Yet</h3>
   <p>You don't have any social media content scheduled at the moment.<br>Interested in having us manage your social media presence?</p>
   
@@ -3043,10 +3043,10 @@ box-shadow: 0 10px 40px rgba(63, 77, 27, 0.4);
       <p>Let us handle your social media so you can focus on selling properties. Professional content creation, scheduling, and engagement management.</p>
       
       <div class="social-media-features">
-        <span class="sm-feature-badge">📱 Daily Posting</span>
-        <span class="sm-feature-badge">✍️ Professional Copywriting</span>
-        <span class="sm-feature-badge">📊 Performance Analytics</span>
-        <span class="sm-feature-badge">🎯 Targeted Strategy</span>
+        <span class="sm-feature-badge"><i data-lucide="smartphone" style="width:14px;height:14px;"></i> Daily Posting</span>
+        <span class="sm-feature-badge"><i data-lucide="pen-tool" style="width:14px;height:14px;"></i> Professional Copywriting</span>
+        <span class="sm-feature-badge"><i data-lucide="bar-chart-2" style="width:14px;height:14px;"></i> Performance Analytics</span>
+        <span class="sm-feature-badge"><i data-lucide="crosshair" style="width:14px;height:14px;"></i> Targeted Strategy</span>
       </div>
       
       <a href="mailto:commercial@markebmedia.com?subject=Social%20Media%20Management%20Enquiry" class="btn-sm-primary">
@@ -3109,9 +3109,9 @@ box-shadow: 0 10px 40px rgba(63, 77, 27, 0.4);
               <div class="form-group" style="margin-bottom:16px">
                 <label class="form-label" style="display:block;font-weight:600;margin-bottom:6px;">Reference Files (Optional)</label>
                 <div class="file-upload-area" id="fileUploadArea">
-                  <div style="font-size:1.1em;color:#6B7280;margin-bottom:8px;">Drag & drop files here, or click to browse</div>
-                  <div style="font-size:.9em;color:#94a3b8;">Max 150MB each • Images, PDFs, Videos supported</div>
-                  <button type="button" class="btn btn-primary" id="browseButton" style="margin-top:10px;">Choose Files</button>
+                  <div style="font-size:1.1em;color:#6B7280;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:6px;"><i data-lucide="upload-cloud" style="width:18px;height:18px;"></i> Drag & drop files here, or click to browse</div>
+              <div style="font-size:.9em;color:#94a3b8;">Max 150MB each • Images, PDFs, Videos supported</div>
+              <button type="button" class="btn btn-primary" id="browseButton" style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;"><i data-lucide="folder-open" style="width:15px;height:15px;"></i> Choose Files</button>
                   <input type="file" id="fileInput" style="display:none" multiple accept="image/*,video/*,.pdf,.doc,.docx,.txt">
                 </div>
                 <div class="file-preview" id="filePreview"></div>
@@ -3122,13 +3122,13 @@ box-shadow: 0 10px 40px rgba(63, 77, 27, 0.4);
                 </div>
               </div>
 
-              <button id="submitBtn" type="submit" class="btn btn-primary" style="width:100%">📤 Submit Amendment Request</button>
+              <button id="submitBtn" type="submit" class="btn btn-primary" style="width:100%;display:inline-flex;align-items:center;justify-content:center;gap:8px;"><i data-lucide="send" style="width:16px;height:16px;"></i> Submit Amendment Request</button>
             </form>
 
             <div id="responseMessage" class="response-message" style="display:none;margin-top:12px;font-weight:600;text-align:center"></div>
 
             <div class="info-box" style="margin-top:20px;background:linear-gradient(135deg,#fff3e0 0%, #ffe0b2 100%);border:2px solid #B46100;border-radius:16px;padding:20px;text-align:center;">
-              <h3 style="color:#7a3e00;font-weight:700;margin-bottom:10px;font-size:1.1em;">Free Amendment Policy</h3>
+              <h3 style="color:#7a3e00;font-weight:700;margin-bottom:10px;font-size:1.1em;display:flex;align-items:center;justify-content:center;gap:8px;"><i data-lucide="shield-check" style="width:18px;height:18px;"></i> Free Amendment Policy</h3>
               <p style=" color:#5c2e00;font-weight:500;margin-bottom:8px;">Each project comes with <span style=" color:#B46100;font-weight:700;">up to two free amendment requests</span> within <span style="color:#B46100;font-weight:700;">7 days of delivery</span> using your tracking code.</p>
               <p style="color:#1E3A8A;font-weight:500;">Our team typically completes all amendments within <span style=" color:#B46100;font-weight:700;">24 hours</span>.</p>
             </div>
@@ -3780,7 +3780,7 @@ async function loadAcuityMetrics(email){
   if(!user?.email) return;
 
   const list=document.getElementById('activityList');
-  list.innerHTML=`<div class="activity-item"><div class="activity-icon">+</div><div class="activity-content"><div class="activity-title">Signed in</div><div class="activity-time">${new Date().toLocaleString('en-GB')}</div></div></div>`;
+  list.innerHTML=`<div class="activity-item"><div class="activity-icon"><i data-lucide="log-in" style="width:18px;height:18px;color:#B46100;"></i></div><div class="activity-content"><div class="activity-title">Signed in</div><div class="activity-time">${new Date().toLocaleString('en-GB')}</div></div></div>`;
 
   await Promise.all([
     loadAcuityMetrics(user.email),
@@ -3796,7 +3796,7 @@ async function loadAcuityMetrics(email){
       const resultEl = document.getElementById('result');
 
       if (!code) {
-        resultEl.innerHTML = '<div class="warning-message">⚠️ Please enter your tracking code to continue.</div>';
+        resultEl.innerHTML = '<div class="warning-message"><i data-lucide="alert-triangle" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> Please enter your tracking code to continue.</div>';
         return;
       }
       resultEl.innerHTML = '<div class="spinner"></div>';
@@ -3809,13 +3809,18 @@ async function loadAcuityMetrics(email){
         });
         const data = await res.json();
         if (!res.ok || !data?.record) {
-          resultEl.innerHTML = '<div class="error-message">❗ No booking found with that tracking code. Please check your code and try again.</div>';
+          resultEl.innerHTML = '<div class="error-message"><i data-lucide="alert-circle" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> No booking found with that tracking code. Please check your code and try again.</div>';
           return;
         }
 
         const f = data.record;
         const stages = ['Booked','Editing','Quality Control','Ready for Delivery'];
-        const icons  = ['📅','🎬','🔍','✅'];
+        const icons  = [
+          '<i data-lucide="calendar-check" style="width:18px;height:18px;"></i>',
+          '<i data-lucide="scissors" style="width:18px;height:18px;"></i>',
+          '<i data-lucide="search" style="width:18px;height:18px;"></i>',
+          '<i data-lucide="download" style="width:18px;height:18px;"></i>',
+        ];
         const idx = Math.max(0, stages.indexOf(f.status || ''));
 
         const progressPct = (idx / (stages.length - 1)) * 80 + 10;
@@ -3831,7 +3836,7 @@ async function loadAcuityMetrics(email){
           const fmtFinal = `${String(final.getDate()).padStart(2,'0')}-${String(final.getMonth()+1).padStart(2,'0')}-${final.getFullYear()} ${String(final.getHours()).padStart(2,'0')}:00`;
           deadlineHTML = `
             <div class="deadline-alert">
-              <div style="font-size:1.1em;margin-bottom:6px;">⏳ <strong>Delivery Timeline</strong></div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;font-weight:600;"><i data-lucide="clock" style="width:16px;height:16px;color:#B46100;"></i> <strong>Delivery Timeline</strong></div>
               <div>Estimated completion: <strong>${hrsLeft} hours remaining</strong></div>
               <div>Expected delivery: <strong>${fmtFinal}</strong></div>
             </div>`;
@@ -3849,26 +3854,26 @@ async function loadAcuityMetrics(email){
 
         const deliveryHTML = (f.status === 'Ready for Delivery' && f.deliveryLink)
           ? `<div class="delivery-link">
-               <div style="font-size:1.05em;margin-bottom:8px;">🎉 <strong>Your Content is Ready!</strong></div>
-               <a href="${f.deliveryLink}" target="_blank" style="color:#065F46;text-decoration:none;font-weight:700;">📥 Download Your Files</a>
+               <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;font-weight:600;"><i data-lucide="party-popper" style="width:16px;height:16px;color:#10b981;"></i> <strong>Your Content is Ready!</strong></div>
+               <a href="${f.deliveryLink}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:#065F46;text-decoration:none;font-weight:700;"><i data-lucide="download" style="width:15px;height:15px;"></i> Download Your Files</a>
              </div>` : '';
 
         resultEl.innerHTML = `
           ${progressHTML}
           <div class="info-grid">
-            <div class="info-item"><strong>🎯 Current Status:</strong><div style="margin-top:5px;color:#3B82F6;font-weight:700;">${f.status || '-'}</div></div>
-            <div class="info-item"><strong>👤 Customer:</strong><div style="margin-top:5px;">${f.customerName || '-'}</div></div>
-            <div class="info-item"><strong>🏷️ Service Type:</strong><div style="margin-top:5px;">${f.serviceType || '-'}</div></div>
-            <div class="info-item"><strong>📅 Shoot Date:</strong><div style="margin-top:5px;">${fmtDate(shootDate)}</div></div>
-            <div class="info-item"><strong>📍 Project Address:</strong><div style="margin-top:5px;">${f.projectAddress || '-'}</div></div>
+            <div class="info-item"><strong style="display:flex;align-items:center;gap:6px;"><i data-lucide="target" style="width:14px;height:14px;"></i> Current Status:</strong><div style="margin-top:5px;color:#3B82F6;font-weight:700;">${f.status || '-'}</div></div>
+            <div class="info-item"><strong style="display:flex;align-items:center;gap:6px;"><i data-lucide="user" style="width:14px;height:14px;"></i> Customer:</strong><div style="margin-top:5px;">${f.customerName || '-'}</div></div>
+            <div class="info-item"><strong style="display:flex;align-items:center;gap:6px;"><i data-lucide="tag" style="width:14px;height:14px;"></i> Service Type:</strong><div style="margin-top:5px;">${f.serviceType || '-'}</div></div>
+            <div class="info-item"><strong style="display:flex;align-items:center;gap:6px;"><i data-lucide="calendar" style="width:14px;height:14px;"></i> Shoot Date:</strong><div style="margin-top:5px;">${fmtDate(shootDate)}</div></div>
+            <div class="info-item"><strong style="display:flex;align-items:center;gap:6px;"><i data-lucide="map-pin" style="width:14px;height:14px;"></i> Project Address:</strong><div style="margin-top:5px;">${f.projectAddress || '-'}</div></div>
           </div>
           ${deadlineHTML}
           ${deliveryHTML}
-          <div style="text-align:center;margin-top:10px;"><a href="#" onclick="location.reload()" style="color:#334155;text-decoration:none;font-weight:600">🔁 Track another project</a></div>
+          <div style="text-align:center;margin-top:10px;"><a href="#" onclick="location.reload()" style="display:inline-flex;align-items:center;gap:6px;color:#334155;text-decoration:none;font-weight:600;"><i data-lucide="refresh-cw" style="width:14px;height:14px;"></i> Track another project</a></div>
         `;
       } catch (e) {
         console.error(e);
-        resultEl.innerHTML = '<div class="error-message">❌ There was an error retrieving your tracking info. Please try again later.</div>';
+        resultEl.innerHTML = '<div class="error-message"><i data-lucide="x-circle" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> There was an error retrieving your tracking info. Please try again later.</div>';
       }
     }
 
@@ -4000,7 +4005,8 @@ async function loadAcuityMetrics(email){
       statusDiv.style.background='#eef2ff';
       statusDiv.style.border='1px solid #bfdbfe';
       statusDiv.style.color='#3730a3';
-      statusDiv.textContent='🔍 Checking amendment eligibility...';
+      statusDiv.innerHTML='<i data-lucide="search" style="width:13px;height:13px;display:inline-block;vertical-align:middle;margin-right:5px;"></i> Checking amendment eligibility...';
+      if (typeof lucide !== 'undefined') lucide.createIcons();
 
       try{
         const res=await fetch('https://markeb-amend-api.onrender.com/api/check-deadline',{
@@ -4009,12 +4015,12 @@ async function loadAcuityMetrics(email){
         const data=await res.json();
         if(!res.ok){
           statusDiv.style.background='#fee2e2'; statusDiv.style.border='1px solid #ef4444'; statusDiv.style.color='#991b1b';
-          statusDiv.textContent='❌ '+(data.message||'Unable to verify tracking code');
-          isExpired=true; submitBtn.disabled=true; submitBtn.textContent='⚠️ Not Eligible';
+          statusDiv.textContent=(data.message||'Unable to verify tracking code');
+          isExpired=true; submitBtn.disabled=true; submitBtn.textContent='Not Eligible';
           return;
         }
         if(data.isExpired){
-          statusDiv.style.display='none'; isExpired=true; submitBtn.disabled=true; submitBtn.textContent='⚠️ Amendment Window Expired';
+          statusDiv.style.display='none'; isExpired=true; submitBtn.disabled=true; submitBtn.textContent='Amendment Window Expired';
         }else{
           statusDiv.style.display='none'; isExpired=false; submitBtn.disabled=false; submitBtn.textContent='📤 Submit Amendment Request';
         }
@@ -4291,42 +4297,42 @@ function renderContentItem(item) {
   const statusClass = status.toLowerCase().replace(/\s+/g, '-');
   
   const platformIcon = {
-    'Instagram': '📸',
-    'Facebook': '👥',
-    'LinkedIn': '💼',
-    'Twitter': '🐦',
-  }[item.platform] || '📱';
+          'Instagram': '<i data-lucide="instagram" style="width:16px;height:16px;"></i>',
+          'Facebook':  '<i data-lucide="facebook" style="width:16px;height:16px;"></i>',
+          'LinkedIn':  '<i data-lucide="linkedin" style="width:16px;height:16px;"></i>',
+          'Twitter':   '<i data-lucide="twitter" style="width:16px;height:16px;"></i>',
+        }[item.platform] || '<i data-lucide="smartphone" style="width:16px;height:16px;"></i>';
 
   const caption = item.caption ? 
     `<div class="modal-caption"><strong>Caption:</strong><br>${escapeHtml(item.caption)}</div>` : '';
 
   const notesFromMarkeb = item.notesFromMarkeb ? 
-    `<div class="modal-notes"><strong>📝 Team Notes:</strong> ${escapeHtml(item.notesFromMarkeb)}</div>` : '';
+          `<div class="modal-notes"><strong style="display:inline-flex;align-items:center;gap:6px;"><i data-lucide="pencil" style="width:13px;height:13px;"></i> Team Notes:</strong> ${escapeHtml(item.notesFromMarkeb)}</div>` : '';
 
-  const clientNotes = item.notesFromClient ? 
-    `<div class="modal-client-notes"><strong>💬 Your Notes:</strong> ${escapeHtml(item.notesFromClient)}</div>` : '';
+        const clientNotes = item.notesFromClient ? 
+          `<div class="modal-client-notes"><strong style="display:inline-flex;align-items:center;gap:6px;"><i data-lucide="message-circle" style="width:13px;height:13px;"></i> Your Notes:</strong> ${escapeHtml(item.notesFromClient)}</div>` : '';
 
-  const mediaLink = item.mediaLink ? 
-    `<div><a href="${escapeHtml(item.mediaLink)}" target="_blank" class="media-link">🎬 View Media</a></div>` : '';
+        const mediaLink = item.mediaLink ? 
+          `<div><a href="${escapeHtml(item.mediaLink)}" target="_blank" class="media-link"><i data-lucide="play-circle" style="width:15px;height:15px;"></i> View Media</a></div>` : '';
 
   // Show approve/decline buttons ONLY for "Ready for Review"
   const showApprovalButtons = status === 'Ready for Review';
 
   const approvalButtons = showApprovalButtons ? `
     <div class="modal-actions" style="margin-top: 20px;">
-      <h4 style="font-size: 16px; font-weight: 700; color: #92400e; margin-bottom: 12px;">⚡ Ready to review this content?</h4>
+      <h4 style="font-size:16px;font-weight:700;color:#92400e;margin-bottom:12px;display:flex;align-items:center;gap:8px;"><i data-lucide="zap" style="width:16px;height:16px;"></i> Ready to review this content?</h4>
       <div class="modal-action-buttons">
-        <button class="btn btn-success" onclick="approveContent('${item.id}')">✓ APPROVE & PUBLISH</button>
-        <button class="btn btn-danger" onclick="showCommentSection('${item.id}')">✗ REQUEST CHANGES</button>
+        <button class="btn btn-success" onclick="approveContent('${item.id}')" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;"><i data-lucide="check" style="width:15px;height:15px;"></i> APPROVE & PUBLISH</button>
+        <button class="btn btn-danger" onclick="showCommentSection('${item.id}')" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;"><i data-lucide="x" style="width:15px;height:15px;"></i> REQUEST CHANGES</button>
       </div>
       <div id="comment-section-${item.id}" style="display: none; margin-top: 16px; padding: 16px; background: #fef3c7; border-radius: 8px; border: 2px solid #f59e0b;">
-        <label style="font-size: 14px; font-weight: 600; color: #92400e; margin-bottom: 8px; display: block;">💬 What changes would you like?</label>
+        <label style="font-size:14px;font-weight:600;color:#92400e;margin-bottom:8px;display:flex;align-items:center;gap:6px;"><i data-lucide="message-circle" style="width:14px;height:14px;"></i> What changes would you like?</label>
         <textarea 
           id="notes-${item.id}" 
           placeholder="Please describe the changes you'd like us to make..."
           style="width: 100%; padding: 12px; border: 2px solid #f59e0b; border-radius: 8px; font-size: 14px; font-family: 'Inter', sans-serif; resize: vertical; min-height: 100px;"
         >${escapeHtml(item.notesFromClient || '')}</textarea>
-        <button class="btn btn-secondary" onclick="submitChangesRequest('${item.id}')" style="margin-top: 12px;">📤 Save and Send Comment</button>
+        <button class="btn btn-secondary" onclick="submitChangesRequest('${item.id}')" style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;"><i data-lucide="send" style="width:15px;height:15px;"></i> Save and Send Comment</button>
         <div id="feedback-${item.id}"></div>
       </div>
     </div>
@@ -5072,7 +5078,7 @@ function ghDeliveryCardHTML(c) {
          </a>
        </div>`
     : `<div style="padding: 0 20px 20px;">
-         <div class="gh-delivery-locked">🔒 Delivery link will appear here shortly</div>
+         <div class="gh-delivery-locked"><i data-lucide="lock" style="width:14px;height:14px;"></i> Delivery link will appear here shortly</div>
        </div>`;
 
   return `
@@ -5083,9 +5089,9 @@ function ghDeliveryCardHTML(c) {
         ${badgeHTML}
       </div>
       <div class="gh-meta">
-        ${c.serviceType ? `<div class="gh-meta-item">📋 ${ghEsc(c.serviceType)}</div>` : ''}
-        ${shootDate     ? `<div class="gh-meta-item">📅 ${shootDate}</div>`             : ''}
-        ${c.trackingCode ? `<div class="gh-meta-item">🔖 ${ghEsc(c.trackingCode)}</div>` : ''}
+        ${c.serviceType ? `<div class="gh-meta-item"><i data-lucide="layers" style="width:12px;height:12px;"></i> ${ghEsc(c.serviceType)}</div>` : ''}
+        ${shootDate     ? `<div class="gh-meta-item"><i data-lucide="calendar" style="width:12px;height:12px;"></i> ${shootDate}</div>`             : ''}
+        ${c.trackingCode ? `<div class="gh-meta-item"><i data-lucide="hash" style="width:12px;height:12px;"></i> ${ghEsc(c.trackingCode)}</div>` : ''}
       </div>
       <div class="gh-divider"></div>
       ${ghJourneyBarHTML(c.bookingStatus)}
