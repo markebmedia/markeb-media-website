@@ -4837,16 +4837,17 @@ function ghRenderGrid() {
   }
 
   grid.innerHTML = html;
+  if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 // ─── Journey bar ───────────────────────────────────────────────────
 function ghJourneyBarHTML(bookingStatus) {
   const steps = [
-    { label: 'Booked',            icon: '📅' },
-    { label: 'Editing',           icon: '✂️' },
-    { label: 'Quality Control',   icon: '🔍' },
-    { label: 'Ready for Delivery', icon: '✅' },
-    { label: 'Complete',          icon: '🎉' },
+    { label: 'Booked',             icon: '<i data-lucide="calendar-check" style="width:13px;height:13px;"></i>' },
+    { label: 'Editing',            icon: '<i data-lucide="scissors" style="width:13px;height:13px;"></i>' },
+    { label: 'Quality Control',    icon: '<i data-lucide="search" style="width:13px;height:13px;"></i>' },
+    { label: 'Ready for Delivery', icon: '<i data-lucide="download" style="width:13px;height:13px;"></i>' },
+    { label: 'Complete',           icon: '<i data-lucide="check-circle" style="width:13px;height:13px;"></i>' },
   ];
 
   const statusIndex = {
@@ -4877,7 +4878,7 @@ function ghJourneyBarHTML(bookingStatus) {
                    : isDone  ? 'done'
                    : isActive ? 'active' : '';
     const labelClass = dotClass;
-    const dotIcon = isDone ? '✓' : step.icon;
+    const dotIcon = isDone ? '<i data-lucide="check" style="width:13px;height:13px;"></i>' : step.icon;
 
     stepsHTML += `<div class="gh-journey-step">
       <div class="gh-journey-dot ${dotClass}">${dotIcon}</div>
@@ -4893,10 +4894,10 @@ function ghJourneyBarHTML(bookingStatus) {
   const statusLineClass = isComplete ? 'delivered' : isDelivery ? 'delivered' : activeIdx === 0 ? 'pending' : '';
 
   return `<div class="gh-journey">
-    <div class="gh-journey-label">📍 Production progress</div>
+    <i data-lucide="${isDelivery ? 'check-circle' : 'circle'}" style="width:12px;height:12px;"></i> ${messages[bookingStatus] || bookingStatus}
     <div class="gh-journey-steps">${stepsHTML}</div>
     <div class="gh-journey-status-line ${statusLineClass}">
-      ${isDelivery ? '✅' : '●'} ${messages[bookingStatus] || bookingStatus}
+      <i data-lucide="${isDelivery ? 'check-circle' : 'circle'}" style="width:12px;height:12px;"></i> ${messages[bookingStatus] || bookingStatus}
     </div>
   </div>`;
 }
@@ -4927,7 +4928,7 @@ function ghReviewCardHTML(c) {
     <div class="gh-media-panel photos-panel">
       <div class="gh-media-panel-header">
         <div class="gh-media-type-label">
-          <div class="gh-type-icon">📷</div>Photos
+          <div class="gh-type-icon"><i data-lucide="camera" style="width:16px;height:16px;color:#1e293b;"></i></div>Photos
         </div>
         ${c.photoCount ? `<span class="gh-media-count">${c.photoCount} files</span>` : ''}
       </div>
@@ -4937,7 +4938,7 @@ function ghReviewCardHTML(c) {
            </a>`
         : `<div class="gh-no-link">⏳ Photos folder not yet available</div>`}
       <div class="gh-panel-notes">
-        <div class="gh-notes-label">💬 Your Photos Feedback</div>
+        <div class="gh-notes-label"><i data-lucide="message-circle" style="width:11px;height:11px;"></i> Your Photos Feedback</div>
         <textarea class="gh-notes-textarea" id="gh-photo-notes-${c.reviewId}"
           placeholder="e.g. Room 3 looks a bit dark, the kitchen shot is slightly blurry…"
           ${locked ? 'disabled' : ''}>${ghEsc(c.photosNotes)}</textarea>
@@ -4949,7 +4950,7 @@ function ghReviewCardHTML(c) {
     <div class="gh-media-panel video-panel">
       <div class="gh-media-panel-header">
         <div class="gh-media-type-label">
-          <div class="gh-type-icon">🎬</div>Video Clips
+          <div class="gh-type-icon"><i data-lucide="video" style="width:16px;height:16px;color:#1e293b;"></i></div>Video Clips
         </div>
         ${c.videoCount ? `<span class="gh-media-count">${c.videoCount} clips</span>` : ''}
       </div>
@@ -4959,7 +4960,7 @@ function ghReviewCardHTML(c) {
            </a>`
         : `<div class="gh-no-link">⏳ Video folder not yet available</div>`}
       <div class="gh-panel-notes">
-        <div class="gh-notes-label">💬 Your Video Feedback</div>
+        <div class="gh-notes-label"><i data-lucide="message-circle" style="width:11px;height:11px;"></i> Your Video Feedback</div>
         <textarea class="gh-notes-textarea" id="gh-video-notes-${c.reviewId}"
           placeholder="e.g. Clip 2 has background noise, the walkthrough feels too fast…"
           ${locked ? 'disabled' : ''}>${ghEsc(c.videoNotes)}</textarea>
@@ -4968,7 +4969,7 @@ function ghReviewCardHTML(c) {
     </div>` : '';
 
   const noPanels = !photosPanel && !videoPanel
-    ? `<div class="gh-no-link" style="margin:16px 20px 0;">⏳ Your Dropbox folders will appear here once your content is ready to review</div>` : '';
+    ? `<div class="gh-no-link" style="margin:16px 20px 0;"><i data-lucide="clock" style="width:13px;height:13px;"></i> Your Dropbox folders will appear here once your content is ready to review</div>` : '';
 
   const actions = locked
     ? st === 'Sent to Editors'
@@ -4991,15 +4992,15 @@ function ghReviewCardHTML(c) {
         ${badge}
       </div>
       <div class="gh-meta">
-        ${c.serviceType ? `<div class="gh-meta-item">📋 ${ghEsc(c.serviceType)}</div>` : ''}
-        ${shootDate     ? `<div class="gh-meta-item">📅 Shoot: ${shootDate}</div>`      : ''}
-        <div class="gh-meta-item">🏷 ${ghEsc(c.bookingStatus)}</div>
+        ${c.serviceType ? `<div class="gh-meta-item"><i data-lucide="layers" style="width:12px;height:12px;"></i> ${ghEsc(c.serviceType)}</div>` : ''}
+        ${shootDate     ? `<div class="gh-meta-item"><i data-lucide="calendar" style="width:12px;height:12px;"></i> Shoot: ${shootDate}</div>` : ''}
+        <div class="gh-meta-item"><i data-lucide="tag" style="width:12px;height:12px;"></i> ${ghEsc(c.bookingStatus)}</div>
       </div>
       <div class="gh-divider"></div>
       ${ghJourneyBarHTML(c.bookingStatus)}
       ${!locked ? `
       <div class="gh-instructions">
-        <strong>📋 How to review your content</strong>
+        <strong style="display:flex;align-items:center;gap:6px;"><i data-lucide="clipboard-list" style="width:13px;height:13px;"></i> How to review your content</strong>
         <ol>
           <li>Click the Dropbox button to open your raw files</li>
           <li>Leave feedback in the notes boxes — photos and video separately</li>
@@ -5032,9 +5033,9 @@ function ghProgressCardHTML(c) {
         <span class="gh-badge gh-badge-pending">● ${ghEsc(c.bookingStatus)}</span>
       </div>
       <div class="gh-meta">
-        ${c.serviceType ? `<div class="gh-meta-item">📋 ${ghEsc(c.serviceType)}</div>` : ''}
-        ${shootDate     ? `<div class="gh-meta-item">📅 Shoot: ${shootDate}</div>`      : ''}
-        ${c.trackingCode ? `<div class="gh-meta-item">🔖 ${ghEsc(c.trackingCode)}</div>` : ''}
+        ${c.serviceType ? `<div class="gh-meta-item"><i data-lucide="layers" style="width:12px;height:12px;"></i> ${ghEsc(c.serviceType)}</div>` : ''}
+        ${shootDate     ? `<div class="gh-meta-item"><i data-lucide="calendar" style="width:12px;height:12px;"></i> ${shootDate}</div>` : ''}
+        ${c.trackingCode ? `<div class="gh-meta-item"><i data-lucide="hash" style="width:12px;height:12px;"></i> ${ghEsc(c.trackingCode)}</div>` : ''}
       </div>
       <div class="gh-divider"></div>
       ${ghJourneyBarHTML(c.bookingStatus)}
