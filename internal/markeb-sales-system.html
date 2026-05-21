@@ -254,6 +254,19 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
 .flow-panel.on .section-card:nth-child(4){animation-delay:.15s}
 .flow-panel.on .section-card:nth-child(5){animation-delay:.2s}
 .flow-panel.on .section-card:nth-child(6){animation-delay:.25s}
+
+/* ── DEVELOPER PACKAGE MOBILE ── */
+@media(max-width:640px){
+  .dev-outer-box{padding:14px 12px!important}
+  .dev-included-grid{grid-template-columns:1fr!important}
+  .dev-tier-grid{grid-template-columns:1fr!important}
+  .dev-addon-grid{grid-template-columns:1fr 1fr!important}
+  .dev-footer-bar{flex-wrap:wrap!important;gap:8px!important}
+  .dev-footer-bar span{font-size:11.5px!important;line-height:1.5!important}
+}
+@media(max-width:380px){
+  .dev-addon-grid{grid-template-columns:1fr!important}
+}
 </style>
 </head>
 <body>
@@ -1499,11 +1512,11 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
 <div class="price-group">
     <div class="price-group-label"><i data-lucide="building-2"></i> Property Developer Package</div>
 
-    <div style="background:linear-gradient(135deg,rgba(63,77,27,.04),rgba(180,97,0,.04));border:2px solid rgba(63,77,27,.3);border-radius:14px;padding:22px 24px;margin-bottom:16px;">
+    <div class="dev-outer-box" style="background:linear-gradient(135deg,rgba(63,77,27,.04),rgba(180,97,0,.04));border:2px solid rgba(63,77,27,.3);border-radius:14px;padding:22px 24px;margin-bottom:16px;">
       <div style="font-size:13px;font-weight:700;color:var(--pine);margin-bottom:6px;display:flex;align-items:center;gap:8px;">
         <i data-lucide="layers" style="width:16px;height:16px;"></i> What's included in every tier
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:10px;">
+      <div class="dev-included-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:10px;">
         <div style="background:#fff;border-radius:8px;padding:10px 12px;border:1px solid var(--border);display:flex;align-items:flex-start;gap:8px;">
           <i data-lucide="check" style="width:14px;height:14px;color:var(--pine);flex-shrink:0;margin-top:2px;"></i>
           <div><div style="font-size:12.5px;font-weight:700;color:var(--ink);">Strategy & Planning</div><div style="font-size:11.5px;color:var(--muted);">Kick-off meeting, research, objectives, channel strategy</div></div>
@@ -1532,7 +1545,7 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
     </div>
 
     <!-- Tier cards -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:16px;">
+    <div class="dev-tier-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:16px;">
 
       <div class="price-card">
         <div class="pc-top">
@@ -1577,7 +1590,7 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
       <div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-bottom:10px;display:flex;align-items:center;gap:6px;padding-bottom:8px;border-bottom:1px solid var(--border);">
         <i data-lucide="plus-circle" style="width:13px;height:13px;"></i> Available Add-Ons (quoted per project)
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;">
+      <div class="dev-addon-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;">
         <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:8px;">
           <i data-lucide="box" style="width:14px;height:14px;color:var(--orange);flex-shrink:0;"></i>
           <span style="font-size:12.5px;font-weight:600;color:var(--ink);">CGI Visuals</span>
@@ -1617,7 +1630,7 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
       </div>
     </div>
 
-    <div style="background:var(--pine);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-top:4px;">
+    <div class="dev-footer-bar" style="background:var(--pine);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap;">
       <i data-lucide="info" style="width:16px;height:16px;color:#c8d96b;flex-shrink:0;"></i>
       <span style="font-size:12.5px;color:rgba(253,243,226,.85);">Quarterly contracts · Payments quarterly or full contract · Add-ons quoted per project scope · Agency resale pricing available</span>
     </div>
