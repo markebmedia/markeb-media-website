@@ -4,1440 +4,1107 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Brochure Builder — Markeb Media</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Mukta:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Mukta:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Serif+Display:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=Nunito+Sans:wght@300;400;600;700&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet"/>
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
   --brand:#B46100;--brand-light:#CC7A1A;--pine:#3F4D1B;
-  --cream:#FDF3E2;--white:#fff;--ink:#1C140A;--ink-mid:#5C4A2A;--ink-soft:#8A7050;
+  --cream:#FDF3E2;--ink:#1C140A;--ink-mid:#5C4A2A;--ink-soft:#8A7050;
   --rule:rgba(180,97,0,0.14);--rule-strong:rgba(180,97,0,0.28);
   --client-colour:#B46100;
-  --sidebar:296px;
+  --br-font-display:'Cormorant Garamond',serif;
+  --br-font-body:'Mukta',sans-serif;
+  --sidebar:300px;
 }
 html{scroll-behavior:smooth;}
-body{font-family:'Mukta',sans-serif;background:#f1f5f9;color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
-
-/* ── Layout ── */
+body{font-family:'Mukta',sans-serif;background:#eef0f4;color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
 .app{display:grid;grid-template-columns:var(--sidebar) 1fr;min-height:100vh;}
-.sidebar{background:var(--cream);border-right:1px solid var(--rule);padding:24px 18px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:0;}
-.main{display:flex;flex-direction:column;}
-
-/* ── Sidebar ── */
-.sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--rule);}
-.sb-logo img{height:44px;width:auto;}
-.sb-back{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--ink-soft);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;margin-bottom:18px;transition:color .2s;}
+.sidebar{background:var(--cream);border-right:1px solid var(--rule);padding:22px 16px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;}
+.main{display:flex;flex-direction:column;min-width:0;}
+.sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--rule);}
+.sb-logo img{height:40px;width:auto;}
+.sb-back{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--ink-soft);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;transition:color .2s;}
 .sb-back:hover{color:var(--brand);}
-
-/* ── Sections ── */
-.sb-section{margin-bottom:18px;}
-.sb-section-title{font-size:10px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.18em;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
-.sb-section-title::before{content:'';width:14px;height:1px;background:var(--brand);}
-.field{margin-bottom:8px;}
-.field label{display:block;font-size:11px;font-weight:600;color:var(--ink-mid);margin-bottom:3px;letter-spacing:.04em;}
-.field input,.field textarea,.field select{width:100%;padding:8px 11px;border:1px solid var(--rule-strong);border-radius:6px;font-size:12px;font-family:'Mukta',sans-serif;color:var(--ink);background:#fff;transition:border-color .2s,box-shadow .2s;resize:vertical;}
+.sb-section{margin-bottom:14px;border-bottom:1px solid var(--rule);padding-bottom:14px;}
+.sb-section:last-child{border-bottom:none;}
+.sb-section-title{font-size:10px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.18em;margin-bottom:9px;display:flex;align-items:center;gap:7px;}
+.sb-section-title::before{content:'';width:12px;height:1px;background:var(--brand);}
+.field{margin-bottom:6px;}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--ink-mid);margin-bottom:3px;letter-spacing:.03em;}
+.field input,.field textarea,.field select{width:100%;padding:7px 9px;border:1px solid var(--rule-strong);border-radius:5px;font-size:12px;font-family:'Mukta',sans-serif;color:var(--ink);background:#fff;transition:border-color .2s;resize:vertical;}
 .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(180,97,0,.1);}
-.field textarea{min-height:72px;}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.field-row.three{grid-template-columns:1fr 1fr 1fr;}
-
-/* Colour picker — combined swatch + hex input */
+.field textarea{min-height:60px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
 .colour-picker-row{display:flex;align-items:center;gap:8px;}
-.colour-swatch-wrap{position:relative;width:38px;height:34px;flex-shrink:0;}
+.colour-swatch-wrap{position:relative;width:36px;height:32px;flex-shrink:0;}
 .colour-swatch-wrap input[type="color"]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;padding:0;}
-.colour-swatch{width:38px;height:34px;border-radius:6px;border:1px solid var(--rule-strong);pointer-events:none;}
-.colour-hex-input{flex:1;padding:8px 11px;border:1px solid var(--rule-strong);border-radius:6px;font-size:12px;font-family:'Mukta',sans-serif;color:var(--ink);background:#fff;letter-spacing:.06em;}
+.colour-swatch{width:36px;height:32px;border-radius:5px;border:1px solid var(--rule-strong);pointer-events:none;}
+.colour-hex-input{flex:1;padding:7px 9px;border:1px solid var(--rule-strong);border-radius:5px;font-size:12px;font-family:'Mukta',sans-serif;color:var(--ink);background:#fff;letter-spacing:.06em;}
 .colour-hex-input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(180,97,0,.1);}
-
-/* Features */
-.feature-list{display:flex;flex-direction:column;gap:5px;}
-.feature-item{display:flex;gap:5px;align-items:center;}
-.feature-item input{flex:1;padding:7px 9px;border:1px solid var(--rule-strong);border-radius:6px;font-size:12px;font-family:'Mukta',sans-serif;}
-.feature-item button{width:26px;height:26px;border:none;background:#fee2e2;color:#dc2626;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.add-feature-btn{width:100%;padding:7px;border:1px dashed var(--rule-strong);background:transparent;color:var(--ink-soft);font-size:12px;font-family:'Mukta',sans-serif;border-radius:6px;cursor:pointer;margin-top:5px;transition:all .2s;}
-.add-feature-btn:hover{border-color:var(--brand);color:var(--brand);}
-
-/* Upload zones */
-.upload-zone{border:1px dashed var(--rule-strong);border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:#fff;}
+.font-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.font-card{border:2px solid var(--rule);border-radius:6px;padding:7px 8px;cursor:pointer;transition:all .2s;background:#fff;text-align:center;}
+.font-card.active{border-color:var(--brand);background:rgba(180,97,0,.05);}
+.font-card:hover:not(.active){border-color:var(--brand-light);}
+.font-card-name{font-size:10px;font-weight:700;color:var(--ink-mid);margin-top:2px;font-family:'Mukta',sans-serif!important;}
+.font-card.active .font-card-name{color:var(--brand);}
+.font-card-sample{font-size:16px;line-height:1.1;color:var(--ink);}
+.template-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;}
+.tpl-card{border:2px solid var(--rule);border-radius:6px;overflow:hidden;cursor:pointer;transition:all .2s;background:#fff;}
+.tpl-card.active{border-color:var(--brand);box-shadow:0 0 0 3px rgba(180,97,0,.12);}
+.tpl-card:hover{border-color:var(--brand-light);}
+.tpl-thumb{height:44px;display:flex;flex-direction:column;gap:2px;padding:4px;}
+.tpl-stripe{border-radius:2px;}
+.tpl-label{font-size:9px;font-weight:700;color:var(--ink-mid);text-align:center;padding:3px 0;border-top:1px solid var(--rule);letter-spacing:.05em;}
+.tpl-card.active .tpl-label{color:var(--brand);}
+.mode-toggle{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.mode-btn{padding:7px 5px;border:2px solid var(--rule-strong);border-radius:6px;background:#fff;cursor:pointer;font-size:11px;font-weight:700;font-family:'Mukta',sans-serif;color:var(--ink-mid);text-align:center;transition:all .2s;}
+.mode-btn.active{border-color:var(--brand);color:var(--brand);background:rgba(180,97,0,.05);}
+.mode-icon{font-size:14px;display:block;margin-bottom:2px;}
+.list-rows{display:flex;flex-direction:column;gap:4px;}
+.list-row{display:flex;gap:4px;align-items:center;}
+.list-row input{flex:1;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:5px;font-size:12px;font-family:'Mukta',sans-serif;}
+.list-row input.w-narrow{width:72px;flex:none;}
+.list-row-btns{display:flex;gap:2px;flex-shrink:0;}
+.btn-icon{width:23px;height:23px;border:none;border-radius:4px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.btn-icon.up,.btn-icon.dn{background:#f1f5f9;color:#64748b;}
+.btn-icon.up:hover,.btn-icon.dn:hover{background:#e2e8f0;}
+.btn-icon.rm{background:#fee2e2;color:#dc2626;}
+.btn-icon.rm:hover{background:#fecaca;}
+.btn-icon:disabled{opacity:.3;cursor:not-allowed;}
+.add-row-btn{width:100%;padding:6px;border:1px dashed var(--rule-strong);background:transparent;color:var(--ink-soft);font-size:11px;font-family:'Mukta',sans-serif;border-radius:5px;cursor:pointer;margin-top:4px;transition:all .2s;}
+.add-row-btn:hover{border-color:var(--brand);color:var(--brand);}
+.upload-zone{border:1px dashed var(--rule-strong);border-radius:6px;padding:11px;text-align:center;cursor:pointer;transition:all .2s;background:#fff;}
 .upload-zone:hover,.upload-zone.drag{border-color:var(--brand);background:rgba(180,97,0,.04);}
 .upload-zone input{display:none;}
 .upload-zone p{font-size:11px;color:var(--ink-soft);line-height:1.5;}
 .upload-zone strong{color:var(--brand);}
-.upload-zone-icon{font-size:20px;margin-bottom:5px;}
-.logo-preview{width:100%;max-height:60px;object-fit:contain;margin-top:8px;border-radius:4px;}
-.photo-thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:7px;}
-.photo-thumb{position:relative;aspect-ratio:4/3;border-radius:4px;overflow:hidden;cursor:grab;}
-.photo-thumb.dragging{opacity:.4;cursor:grabbing;}
-.photo-thumb img{width:100%;height:100%;object-fit:cover;}
-.photo-thumb-rm{position:absolute;top:2px;right:2px;width:17px;height:17px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:9px;display:flex;align-items:center;justify-content:center;}
-.photo-thumb-badge{position:absolute;bottom:2px;left:2px;background:rgba(180,97,0,.85);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;}
-.photo-count{font-size:11px;color:var(--ink-soft);margin-top:5px;text-align:center;}
-
-/* Mode toggle */
-.mode-toggle{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-.mode-btn{padding:9px 6px;border:2px solid var(--rule-strong);border-radius:8px;background:#fff;cursor:pointer;font-size:11px;font-weight:700;font-family:'Mukta',sans-serif;color:var(--ink-mid);text-align:center;transition:all .2s;letter-spacing:.04em;}
-.mode-btn.active{border-color:var(--brand);color:var(--brand);background:rgba(180,97,0,.06);}
-.mode-btn:hover:not(.active){border-color:var(--brand-light);color:var(--brand-light);}
-.mode-icon{font-size:16px;display:block;margin-bottom:3px;}
-
-/* Template picker */
-.template-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
-.tpl-card{border:2px solid var(--rule);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .2s;background:#fff;}
-.tpl-card.active{border-color:var(--brand);box-shadow:0 0 0 3px rgba(180,97,0,.15);}
-.tpl-card:hover{border-color:var(--brand-light);}
-.tpl-thumb{height:54px;display:flex;flex-direction:column;gap:3px;padding:5px;}
-.tpl-stripe{border-radius:2px;}
-.tpl-label{font-size:10px;font-weight:600;color:var(--ink-mid);text-align:center;padding:4px 0;border-top:1px solid var(--rule);}
-.tpl-card.active .tpl-label{color:var(--brand);}
-
-/* Disclaimer editor */
-.disclaimer-box{background:#fff;border:1px solid var(--rule-strong);border-radius:6px;padding:10px 12px;position:relative;}
-.disclaimer-box textarea{width:100%;border:none;resize:none;font-size:11px;color:var(--ink-mid);font-family:'Mukta',sans-serif;line-height:1.6;outline:none;min-height:52px;background:transparent;}
-.disclaimer-remove-btn{position:absolute;top:6px;right:6px;width:20px;height:20px;background:#fee2e2;color:#dc2626;border:none;border-radius:4px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;}
-.disclaimer-removed{background:#f1f5f9;border:1px dashed #cbd5e1;border-radius:6px;padding:10px 12px;font-size:11px;color:var(--ink-soft);display:flex;align-items:center;justify-content:space-between;}
+.upload-zone-icon{font-size:18px;margin-bottom:3px;}
+.logo-preview{width:100%;max-height:52px;object-fit:contain;margin-top:6px;border-radius:3px;}
+.photo-list{display:flex;flex-direction:column;gap:4px;margin-top:6px;}
+.photo-list-item{display:flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--rule);border-radius:5px;padding:4px 7px;}
+.photo-list-thumb{width:44px;height:33px;object-fit:cover;border-radius:3px;flex-shrink:0;}
+.photo-list-name{flex:1;font-size:11px;color:var(--ink-mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.photo-list-badge{font-size:8px;font-weight:700;background:var(--brand);color:#fff;padding:1px 4px;border-radius:3px;flex-shrink:0;}
+.photo-count{font-size:10px;color:var(--ink-soft);margin-top:3px;text-align:center;}
+.disclaimer-box{background:#fff;border:1px solid var(--rule-strong);border-radius:5px;padding:7px 9px;position:relative;}
+.disclaimer-box textarea{width:100%;border:none;resize:none;font-size:10px;color:var(--ink-mid);font-family:'Mukta',sans-serif;line-height:1.6;outline:none;min-height:44px;background:transparent;}
+.disclaimer-remove-btn{position:absolute;top:4px;right:4px;width:17px;height:17px;background:#fee2e2;color:#dc2626;border:none;border-radius:3px;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;}
+.disclaimer-removed{background:#f1f5f9;border:1px dashed #cbd5e1;border-radius:5px;padding:7px 9px;font-size:11px;color:var(--ink-soft);display:flex;align-items:center;justify-content:space-between;}
 .disclaimer-restore-btn{font-size:11px;color:var(--brand);background:none;border:none;cursor:pointer;font-family:'Mukta',sans-serif;font-weight:600;}
-
-/* Export */
-.export-group{display:flex;flex-direction:column;gap:7px;}
-.btn-export{width:100%;padding:10px 14px;border:none;border-radius:8px;font-family:'Mukta',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s;}
-.btn-pdf{background:var(--brand);color:#fff;box-shadow:0 4px 12px rgba(180,97,0,.3);}
+.export-group{display:flex;flex-direction:column;gap:5px;}
+.btn-export{width:100%;padding:9px 12px;border:none;border-radius:6px;font-family:'Mukta',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;}
+.btn-pdf{background:var(--brand);color:#fff;box-shadow:0 3px 10px rgba(180,97,0,.28);}
 .btn-pdf:hover{background:var(--brand-light);transform:translateY(-1px);}
-.btn-word{background:var(--pine);color:#fff;box-shadow:0 4px 12px rgba(63,77,27,.3);}
+.btn-word{background:var(--pine);color:#fff;box-shadow:0 3px 10px rgba(63,77,27,.28);}
 .btn-word:hover{background:#4a5920;transform:translateY(-1px);}
 .btn-print{background:#fff;color:var(--ink-mid);border:1px solid var(--rule-strong);}
 .btn-print:hover{border-color:var(--ink-mid);}
 .btn-save{background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd;}
 .btn-save:hover{background:#bae6fd;}
-
-/* Save toast */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--pine);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;z-index:9999;}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--pine);color:#fff;padding:10px 16px;border-radius:6px;font-size:12px;font-weight:600;opacity:0;transform:translateY(6px);transition:all .3s;pointer-events:none;z-index:9999;}
 .toast.show{opacity:1;transform:translateY(0);}
-
-/* ── Main ── */
-.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.05);}
-.topbar-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--ink);}
+.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 6px rgba(0,0,0,.05);flex-shrink:0;}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--ink);}
 .topbar-title em{font-style:italic;color:var(--brand);}
-.topbar-sub{font-size:12px;color:var(--ink-soft);margin-top:2px;}
-.preview-area{padding:28px;flex:1;display:flex;flex-direction:column;align-items:center;}
-.preview-label{font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.16em;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.topbar-sub{font-size:11px;color:var(--ink-soft);margin-top:1px;}
+.preview-area{padding:24px;flex:1;display:flex;flex-direction:column;align-items:center;overflow-x:auto;}
+.preview-label{font-size:10px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.16em;margin-bottom:14px;display:flex;align-items:center;gap:10px;width:100%;max-width:794px;}
 .preview-label::before,.preview-label::after{content:'';flex:1;height:1px;background:#e2e8f0;}
-
-/* ── Brochure ── */
-#brochure{width:794px;max-width:100%;background:#fff;box-shadow:0 8px 48px rgba(0,0,0,.14);position:relative;font-family:'Mukta',sans-serif;}
-
-/* PAGE BREAKS — multi-page */
-.page-break{width:100%;height:32px;background:#e8edf2;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#94a3b8;position:relative;}
-.page-break::before,.page-break::after{content:'';flex:1;height:1px;background:#cbd5e1;margin:0 12px;}
-.br-page{background:#fff;}
-
-/* ─────────────────────────────────────────
-   TEMPLATE: CLASSIC
-───────────────────────────────────────── */
-.tpl-classic .br-cover{position:relative;width:100%;height:480px;overflow:hidden;}
-.tpl-classic .br-cover-img{width:100%;height:100%;object-fit:cover;}
-.tpl-classic .br-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.18) 55%,transparent 100%);}
-.tpl-classic .br-cover-text{position:absolute;bottom:0;left:0;right:0;padding:36px 44px;}
-.tpl-classic .br-agency-logo{position:absolute;top:24px;right:28px;max-height:52px;max-width:150px;object-fit:contain;}
-.tpl-classic .br-address{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:#fff;line-height:1.1;margin-bottom:8px;}
-.tpl-classic .br-price-tag{display:inline-block;background:var(--client-colour,#B46100);color:#fff;font-size:13px;font-weight:700;padding:6px 16px;letter-spacing:.08em;}
+#brochure{width:794px;max-width:100%;background:#fff;box-shadow:0 8px 40px rgba(0,0,0,.14);font-family:var(--br-font-body);}
+.page-break-div{width:100%;height:26px;background:#dde2ea;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#94a3b8;}
+.br-page{background:#fff;position:relative;}
+.br-page-num{position:absolute;bottom:12px;right:18px;font-size:9px;color:rgba(0,0,0,.28);font-weight:600;letter-spacing:.08em;}
+.br-placeholder{background:#f8f6f2;border:2px dashed #d8cfc4;display:flex;align-items:center;justify-content:center;font-size:11px;color:#A88E6E;letter-spacing:.08em;text-transform:uppercase;}
+.br-vtour-badge{display:inline-flex;align-items:center;gap:6px;background:var(--client-colour,#B46100);color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:14px;letter-spacing:.06em;}
+.br-epc-bar{display:flex;flex-direction:column;gap:2px;margin-bottom:4px;}
+.br-epc-row{display:flex;align-items:center;gap:6px;font-size:10px;}
+.br-epc-band{height:14px;display:flex;align-items:center;padding:0 6px;color:#fff;font-weight:700;font-size:9px;letter-spacing:.04em;border-radius:0 3px 3px 0;}
+.br-epc-active{outline:2px solid #111;outline-offset:1px;}
+.epc-A{background:#008054;width:38px;}.epc-B{background:#19b459;width:50px;}.epc-C{background:#8dce46;width:62px;color:#333;}.epc-D{background:#ffd500;width:74px;color:#333;}.epc-E{background:#fcaa65;width:86px;color:#333;}.epc-F{background:#ef8023;width:98px;}.epc-G{background:#e9153b;width:110px;}
+.br-sdlt{font-size:11px;width:100%;margin-bottom:16px;}
+.br-sdlt td,.br-sdlt th{padding:4px 8px;border-bottom:1px solid #f0ebe2;color:var(--ink-mid);}
+.br-sdlt th{font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);background:#f8f6f2;}
+.br-sdlt .sdlt-total{font-weight:700;color:var(--client-colour,#B46100);}
+.br-mortgage{background:#f8f6f2;border-left:3px solid var(--client-colour,#B46100);padding:10px 14px;font-size:12px;margin-bottom:18px;}
+.br-mortgage-amount{font-size:20px;font-weight:700;font-family:var(--br-font-display);color:var(--client-colour,#B46100);}
+.br-mortgage-note{font-size:10px;color:var(--ink-soft);margin-top:3px;}
+.br-rooms{width:100%;font-size:12px;margin-bottom:18px;border-collapse:collapse;}
+.br-rooms td{padding:5px 10px;border-bottom:1px solid #f0ebe2;color:var(--ink-mid);}
+.br-rooms .room-name{font-weight:600;color:var(--ink);}
+.br-qr-wrap{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:12px 16px;background:#f8f6f2;border:1px solid #ede8df;}
+.br-qr-box{width:64px;height:64px;flex-shrink:0;}
+.br-qr-text{font-size:12px;color:var(--ink-mid);line-height:1.6;}
+.br-qr-text strong{display:block;font-size:13px;color:var(--ink);margin-bottom:2px;}
+.br-viewing{background:var(--client-colour,#B46100);color:#fff;padding:12px 18px;display:flex;gap:18px;flex-wrap:wrap;margin-bottom:18px;}
+.br-viewing-item{font-size:12px;}
+.br-viewing-lbl{font-size:9px;opacity:.7;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;}
+.br-viewing-val{font-weight:700;font-size:13px;}
+.br-w3w{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-mid);margin-bottom:8px;}
+.br-w3w-logo{color:#e11d48;font-weight:900;font-size:12px;}
+/* TPLS */
+.tpl-classic .br-cover{position:relative;width:100%;height:460px;overflow:hidden;}
+.tpl-classic .br-cover img.hero{width:100%;height:100%;object-fit:cover;}
+.tpl-classic .br-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.75) 0%,rgba(0,0,0,.15) 55%,transparent 100%);}
+.tpl-classic .br-cover-text{position:absolute;bottom:0;left:0;right:0;padding:34px 44px;}
+.tpl-classic .br-agency-logo{position:absolute;top:22px;right:26px;max-height:48px;max-width:140px;object-fit:contain;}
+.tpl-classic .br-address{font-family:var(--br-font-display);font-size:28px;font-weight:600;color:#fff;line-height:1.1;margin-bottom:6px;}
+.tpl-classic .br-price-type{font-size:10px;color:rgba(255,255,255,.7);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;}
+.tpl-classic .br-price-tag{display:inline-block;background:var(--client-colour,#B46100);color:#fff;font-size:13px;font-weight:700;padding:5px 16px;letter-spacing:.06em;}
 .tpl-classic .br-stats-bar{display:grid;grid-template-columns:repeat(4,1fr);background:#f8f6f2;border-bottom:3px solid var(--client-colour,#B46100);}
-.tpl-classic .br-stat{padding:16px 18px;text-align:center;border-right:1px solid #ede8df;}
+.tpl-classic .br-stat{padding:13px 14px;text-align:center;border-right:1px solid #ede8df;}
 .tpl-classic .br-stat:last-child{border-right:none;}
-.tpl-classic .br-stat-val{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;color:var(--client-colour,#B46100);line-height:1;}
-.tpl-classic .br-stat-lbl{font-size:9px;font-weight:600;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-top:3px;}
-.tpl-classic .br-body{padding:36px 44px;}
-.tpl-classic .br-section-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--client-colour,#B46100);margin-bottom:12px;display:flex;align-items:center;gap:12px;}
-.tpl-classic .br-section-title::after{content:'';flex:1;height:1px;background:var(--client-colour,#B46100);opacity:.25;}
-.tpl-classic .br-description{font-size:13px;color:#5C4A2A;line-height:1.85;margin-bottom:28px;font-weight:300;}
-.tpl-classic .br-features{display:grid;grid-template-columns:1fr 1fr;gap:5px 22px;margin-bottom:28px;}
-.tpl-classic .br-feature{font-size:12px;color:#5C4A2A;display:flex;align-items:flex-start;gap:7px;line-height:1.5;}
-.tpl-classic .br-feature::before{content:'◆';font-size:8px;color:var(--client-colour,#B46100);margin-top:4px;flex-shrink:0;}
-.tpl-classic .br-photo-grid{display:grid;gap:5px;margin-bottom:28px;}
-.tpl-classic .br-photo-grid.cols-1{grid-template-columns:1fr;}
-.tpl-classic .br-photo-grid.cols-2{grid-template-columns:1fr 1fr;}
-.tpl-classic .br-photo-grid.cols-3{grid-template-columns:1fr 1fr 1fr;}
-.tpl-classic .br-photo-grid img{width:100%;aspect-ratio:4/3;object-fit:cover;}
-.tpl-classic .br-details-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #ede8df;margin-bottom:28px;}
-.tpl-classic .br-detail{padding:11px 16px;border-bottom:1px solid #ede8df;border-right:1px solid #ede8df;}
+.tpl-classic .br-stat-val{font-family:var(--br-font-display);font-size:19px;font-weight:600;color:var(--client-colour,#B46100);line-height:1;}
+.tpl-classic .br-stat-lbl{font-size:9px;font-weight:600;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-top:2px;}
+.tpl-classic .br-body{padding:30px 44px;}
+.tpl-classic .br-section-title{font-family:var(--br-font-display);font-size:17px;font-weight:600;color:var(--client-colour,#B46100);margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+.tpl-classic .br-section-title::after{content:'';flex:1;height:1px;background:var(--client-colour,#B46100);opacity:.22;}
+.tpl-classic .br-description{font-size:13px;color:#5C4A2A;line-height:1.85;margin-bottom:20px;font-weight:300;}
+.tpl-classic .br-features{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;margin-bottom:20px;}
+.tpl-classic .br-feature{font-size:12px;color:#5C4A2A;display:flex;align-items:flex-start;gap:6px;line-height:1.5;}
+.tpl-classic .br-feature::before{content:'◆';font-size:7px;color:var(--client-colour,#B46100);margin-top:4px;flex-shrink:0;}
+.tpl-classic .br-details-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #ede8df;margin-bottom:20px;}
+.tpl-classic .br-detail{padding:9px 13px;border-bottom:1px solid #ede8df;border-right:1px solid #ede8df;}
 .tpl-classic .br-detail:nth-child(even){border-right:none;}
-.tpl-classic .br-detail-lbl{font-size:9px;font-weight:600;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;}
-.tpl-classic .br-detail-val{font-size:13px;font-weight:600;color:#1C140A;}
-.tpl-classic .br-floorplan{width:100%;max-height:300px;object-fit:contain;margin-bottom:28px;border:1px solid #ede8df;padding:12px;}
-.tpl-classic .br-local{font-size:13px;color:#5C4A2A;line-height:1.8;margin-bottom:28px;font-weight:300;}
-.tpl-classic .br-contact-strip{background:#f8f6f2;border-top:3px solid var(--client-colour,#B46100);padding:20px 44px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
-.tpl-classic .br-contact-item-lbl{font-size:9px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.12em;margin-bottom:3px;}
-.tpl-classic .br-contact-item-val{font-size:12px;font-weight:600;color:#1C140A;}
-.tpl-classic .br-footer{background:var(--client-colour,#B46100);padding:18px 44px;display:flex;justify-content:space-between;align-items:center;}
-.tpl-classic .br-footer-agency{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:#fff;}
-.tpl-classic .br-footer-note{font-size:9px;color:rgba(255,255,255,.65);text-align:right;line-height:1.6;max-width:320px;}
-.tpl-classic .br-price-type{font-size:11px;color:rgba(255,255,255,.75);margin-bottom:4px;letter-spacing:.06em;}
-
-/* ─────────────────────────────────────────
-   TEMPLATE: MODERN
-───────────────────────────────────────── */
-.tpl-modern .br-cover{width:100%;height:500px;position:relative;overflow:hidden;}
-.tpl-modern .br-cover-img{width:100%;height:100%;object-fit:cover;}
+.tpl-classic .br-detail-lbl{font-size:9px;font-weight:600;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:1px;}
+.tpl-classic .br-detail-val{font-size:12px;font-weight:600;color:#1C140A;}
+.tpl-classic .br-floorplan{width:100%;max-height:260px;object-fit:contain;margin-bottom:20px;border:1px solid #ede8df;padding:10px;}
+.tpl-classic .br-local{font-size:13px;color:#5C4A2A;line-height:1.8;margin-bottom:20px;font-weight:300;}
+.tpl-classic .br-footer{background:var(--client-colour,#B46100);padding:15px 44px;display:flex;justify-content:space-between;align-items:center;}
+.tpl-classic .br-footer-agency{font-family:var(--br-font-display);font-size:15px;font-weight:600;color:#fff;}
+.tpl-classic .br-footer-note{font-size:9px;color:rgba(255,255,255,.65);text-align:right;line-height:1.6;max-width:300px;}
+.tpl-modern .br-cover{width:100%;height:490px;position:relative;overflow:hidden;}
+.tpl-modern .br-cover img.hero{width:100%;height:100%;object-fit:cover;}
 .tpl-modern .br-cover-bar{position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--client-colour,#B46100);}
-.tpl-modern .br-cover-agency{position:absolute;top:28px;left:24px;max-height:44px;max-width:130px;object-fit:contain;}
-.tpl-modern .br-header-block{background:#fff;padding:28px 44px;border-bottom:1px solid #f0ebe2;display:grid;grid-template-columns:1fr auto;align-items:start;gap:22px;}
-.tpl-modern .br-address-modern{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#1C140A;line-height:1.15;}
-.tpl-modern .br-price-modern{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--client-colour,#B46100);white-space:nowrap;}
-.tpl-modern .br-price-type-m{font-size:10px;color:#8A7050;text-align:right;margin-top:2px;letter-spacing:.06em;}
-.tpl-modern .br-tenure-pill{display:inline-block;background:#f8f6f2;border:1px solid #ede8df;font-size:10px;font-weight:600;color:#8A7050;padding:2px 9px;border-radius:20px;margin-top:5px;text-transform:uppercase;letter-spacing:.08em;}
-.tpl-modern .br-stats-modern{display:flex;gap:0;padding:0 44px;background:#f8f6f2;border-bottom:1px solid #ede8df;}
-.tpl-modern .br-stat-m{padding:14px 24px;text-align:center;border-right:1px solid #ede8df;display:flex;flex-direction:column;gap:2px;}
+.tpl-modern .br-cover-logo{position:absolute;top:22px;left:20px;max-height:42px;max-width:126px;object-fit:contain;}
+.tpl-modern .br-header-block{background:#fff;padding:22px 44px;border-bottom:1px solid #f0ebe2;display:grid;grid-template-columns:1fr auto;align-items:start;gap:18px;}
+.tpl-modern .br-address-m{font-family:var(--br-font-display);font-size:24px;font-weight:600;color:#1C140A;line-height:1.15;}
+.tpl-modern .br-price-type-m{font-size:9px;color:#8A7050;text-align:right;margin-bottom:2px;letter-spacing:.08em;text-transform:uppercase;}
+.tpl-modern .br-price-m{font-family:var(--br-font-display);font-size:28px;font-weight:700;color:var(--client-colour,#B46100);white-space:nowrap;}
+.tpl-modern .br-tenure-pill{display:inline-block;background:#f8f6f2;border:1px solid #ede8df;font-size:9px;font-weight:600;color:#8A7050;padding:2px 8px;border-radius:20px;margin-top:4px;text-transform:uppercase;letter-spacing:.08em;}
+.tpl-modern .br-stats-m{display:flex;padding:0 44px;background:#f8f6f2;border-bottom:1px solid #ede8df;}
+.tpl-modern .br-stat-m{padding:11px 18px;text-align:center;border-right:1px solid #ede8df;display:flex;flex-direction:column;gap:2px;}
 .tpl-modern .br-stat-m:last-child{border-right:none;}
-.tpl-modern .br-stat-m-val{font-size:22px;font-weight:700;color:var(--client-colour,#B46100);font-family:'Cormorant Garamond',serif;}
+.tpl-modern .br-stat-m-val{font-size:19px;font-weight:700;color:var(--client-colour,#B46100);font-family:var(--br-font-display);}
 .tpl-modern .br-stat-m-lbl{font-size:9px;color:#8A7050;font-weight:600;text-transform:uppercase;letter-spacing:.1em;}
-.tpl-modern .br-body{padding:32px 44px;}
-.tpl-modern .br-col-2{display:grid;grid-template-columns:1.4fr 1fr;gap:32px;}
+.tpl-modern .br-body{padding:26px 44px;}
+.tpl-modern .br-col-2{display:grid;grid-template-columns:1.4fr 1fr;gap:26px;margin-bottom:18px;}
 .tpl-modern .br-desc-m{font-size:13px;color:#5C4A2A;line-height:1.85;font-weight:300;}
 .tpl-modern .br-features-m{list-style:none;}
-.tpl-modern .br-features-m li{padding:6px 0;border-bottom:1px solid #f0ebe2;font-size:12px;color:#5C4A2A;display:flex;align-items:flex-start;gap:7px;}
+.tpl-modern .br-features-m li{padding:5px 0;border-bottom:1px solid #f0ebe2;font-size:12px;color:#5C4A2A;display:flex;align-items:flex-start;gap:6px;}
 .tpl-modern .br-features-m li:last-child{border-bottom:none;}
-.tpl-modern .br-features-m li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--client-colour,#B46100);margin-top:5px;flex-shrink:0;}
-.tpl-modern .br-photo-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px;margin:24px 0;}
+.tpl-modern .br-features-m li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--client-colour,#B46100);margin-top:5px;flex-shrink:0;}
+.tpl-modern .br-photo-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:4px;margin-bottom:18px;}
 .tpl-modern .br-photo-strip img{width:100%;aspect-ratio:4/3;object-fit:cover;}
-.tpl-modern .br-details-m{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#ede8df;border:1px solid #ede8df;margin:24px 0;}
-.tpl-modern .br-det-m{background:#fff;padding:12px 16px;}
-.tpl-modern .br-det-m-l{font-size:9px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
-.tpl-modern .br-det-m-v{font-size:13px;font-weight:600;color:#1C140A;}
-.tpl-modern .br-floorplan{width:100%;max-height:280px;object-fit:contain;border:1px solid #ede8df;padding:12px;margin-bottom:24px;}
-.tpl-modern .br-local-m{font-size:13px;color:#5C4A2A;line-height:1.85;font-weight:300;margin-bottom:24px;}
-.tpl-modern .br-contact-m{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#ede8df;border:1px solid #ede8df;margin-bottom:24px;}
-.tpl-modern .br-contact-m-item{background:#fff;padding:14px 16px;}
-.tpl-modern .br-contact-m-lbl{font-size:9px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
-.tpl-modern .br-contact-m-val{font-size:12px;font-weight:600;color:#1C140A;}
-.tpl-modern .br-footer{padding:18px 44px;background:#1C140A;display:flex;justify-content:space-between;align-items:center;}
+.tpl-modern .br-details-m{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#ede8df;border:1px solid #ede8df;margin-bottom:18px;}
+.tpl-modern .br-det-m{background:#fff;padding:9px 13px;}
+.tpl-modern .br-det-m-l{font-size:9px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;}
+.tpl-modern .br-det-m-v{font-size:12px;font-weight:600;color:#1C140A;}
+.tpl-modern .br-floorplan{width:100%;max-height:250px;object-fit:contain;border:1px solid #ede8df;padding:10px;margin-bottom:18px;}
+.tpl-modern .br-local-m{font-size:13px;color:#5C4A2A;line-height:1.85;font-weight:300;margin-bottom:18px;}
+.tpl-modern .br-footer{padding:15px 44px;background:#1C140A;display:flex;justify-content:space-between;align-items:center;}
 .tpl-modern .br-footer-l{font-size:12px;color:rgba(255,255,255,.55);}
-.tpl-modern .br-footer-accent{width:28px;height:3px;background:var(--client-colour,#B46100);margin-top:4px;}
-.tpl-modern .br-footer-note{font-size:9px;color:rgba(255,255,255,.35);text-align:right;max-width:300px;line-height:1.6;}
-
-/* ─────────────────────────────────────────
-   TEMPLATE: DARK ESTATE
-───────────────────────────────────────── */
-.tpl-dark .br-cover{width:100%;height:480px;position:relative;overflow:hidden;}
-.tpl-dark .br-cover-img{width:100%;height:100%;object-fit:cover;opacity:.75;}
+.tpl-modern .br-footer-accent{width:22px;height:3px;background:var(--client-colour,#B46100);margin-top:3px;}
+.tpl-modern .br-footer-note{font-size:9px;color:rgba(255,255,255,.3);text-align:right;max-width:270px;line-height:1.6;}
+.tpl-dark .br-cover{width:100%;height:460px;position:relative;overflow:hidden;}
+.tpl-dark .br-cover img.hero{width:100%;height:100%;object-fit:cover;opacity:.72;}
 .tpl-dark .br-cover-bg{position:absolute;inset:0;background:#0e0b08;}
-.tpl-dark .br-cover-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(14,11,8,.92) 0%,rgba(14,11,8,.4) 60%,transparent 100%);}
-.tpl-dark .br-cover-text{position:absolute;top:50%;left:52px;transform:translateY(-50%);}
-.tpl-dark .br-cover-line{width:36px;height:2px;background:var(--client-colour,#B46100);margin-bottom:16px;}
-.tpl-dark .br-address-dark{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:#fff;line-height:1.1;margin-bottom:6px;}
-.tpl-dark .br-price-type-d{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;letter-spacing:.06em;}
-.tpl-dark .br-price-dark{font-size:22px;font-weight:700;color:var(--client-colour,#B46100);font-family:'Cormorant Garamond',serif;}
-.tpl-dark .br-agency-dark{position:absolute;top:24px;right:28px;max-height:48px;max-width:140px;object-fit:contain;filter:brightness(10);}
+.tpl-dark .br-cover-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(14,11,8,.92) 0%,rgba(14,11,8,.35) 60%,transparent 100%);}
+.tpl-dark .br-cover-text{position:absolute;top:50%;left:48px;transform:translateY(-50%);}
+.tpl-dark .br-cover-line{width:32px;height:2px;background:var(--client-colour,#B46100);margin-bottom:13px;}
+.tpl-dark .br-address-d{font-family:var(--br-font-display);font-size:30px;font-weight:600;color:#fff;line-height:1.1;margin-bottom:5px;}
+.tpl-dark .br-price-type-d{font-size:9px;color:rgba(255,255,255,.5);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;}
+.tpl-dark .br-price-d{font-size:20px;font-weight:700;color:var(--client-colour,#B46100);font-family:var(--br-font-display);}
+.tpl-dark .br-agency-d{position:absolute;top:20px;right:24px;max-height:44px;max-width:130px;object-fit:contain;filter:brightness(10);}
 .tpl-dark .br-dark-stats{background:#0e0b08;display:grid;grid-template-columns:repeat(4,1fr);}
-.tpl-dark .br-stat-d{padding:16px 14px;text-align:center;border-right:1px solid rgba(255,255,255,.07);}
+.tpl-dark .br-stat-d{padding:13px 11px;text-align:center;border-right:1px solid rgba(255,255,255,.07);}
 .tpl-dark .br-stat-d:last-child{border-right:none;}
-.tpl-dark .br-stat-d-val{font-family:'Cormorant Garamond',serif;font-size:21px;color:var(--client-colour,#B46100);}
-.tpl-dark .br-stat-d-lbl{font-size:9px;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:.14em;margin-top:3px;}
-.tpl-dark .br-body{padding:40px 52px;background:#fff;}
-.tpl-dark .br-gold-rule{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
-.tpl-dark .br-gold-rule-line{flex:1;height:1px;background:var(--client-colour,#B46100);opacity:.28;}
-.tpl-dark .br-gold-rule-dia{width:7px;height:7px;background:var(--client-colour,#B46100);transform:rotate(45deg);opacity:.65;}
-.tpl-dark .br-gold-rule-txt{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--client-colour,#B46100);letter-spacing:.14em;text-transform:uppercase;}
-.tpl-dark .br-desc-d{font-size:13px;color:#5C4A2A;line-height:1.85;font-weight:300;margin-bottom:28px;}
-.tpl-dark .br-features-d{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px 16px;margin-bottom:28px;}
-.tpl-dark .br-feature-d{font-size:12px;color:#5C4A2A;display:flex;align-items:flex-start;gap:6px;}
+.tpl-dark .br-stat-d-val{font-family:var(--br-font-display);font-size:19px;color:var(--client-colour,#B46100);}
+.tpl-dark .br-stat-d-lbl{font-size:8px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.12em;margin-top:2px;}
+.tpl-dark .br-body{padding:34px 50px;background:#fff;}
+.tpl-dark .gold-rule{display:flex;align-items:center;gap:10px;margin-bottom:11px;}
+.tpl-dark .gold-rule-line{flex:1;height:1px;background:var(--client-colour,#B46100);opacity:.25;}
+.tpl-dark .gold-rule-dia{width:6px;height:6px;background:var(--client-colour,#B46100);transform:rotate(45deg);opacity:.6;}
+.tpl-dark .gold-rule-txt{font-family:var(--br-font-display);font-style:italic;font-size:11px;color:var(--client-colour,#B46100);letter-spacing:.14em;text-transform:uppercase;}
+.tpl-dark .br-desc-d{font-size:13px;color:#5C4A2A;line-height:1.85;font-weight:300;margin-bottom:20px;}
+.tpl-dark .br-features-d{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 12px;margin-bottom:20px;}
+.tpl-dark .br-feature-d{font-size:12px;color:#5C4A2A;display:flex;align-items:flex-start;gap:5px;}
 .tpl-dark .br-feature-d::before{content:'—';color:var(--client-colour,#B46100);font-weight:700;flex-shrink:0;}
-.tpl-dark .br-photo-masonry{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:auto auto;gap:4px;margin-bottom:28px;}
+.tpl-dark .br-photo-masonry{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:auto auto;gap:4px;margin-bottom:20px;}
 .tpl-dark .br-photo-masonry img{width:100%;height:100%;object-fit:cover;}
 .tpl-dark .br-photo-masonry img:first-child{grid-row:span 2;aspect-ratio:3/4;}
 .tpl-dark .br-photo-masonry img:not(:first-child){aspect-ratio:3/2;}
-.tpl-dark .br-photo-extra{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px;margin-bottom:28px;}
+.tpl-dark .br-photo-extra{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:4px;margin-bottom:20px;}
 .tpl-dark .br-photo-extra img{width:100%;aspect-ratio:4/3;object-fit:cover;}
-.tpl-dark .br-details-d{background:#f8f6f2;padding:22px 28px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;border-top:3px solid var(--client-colour,#B46100);}
-.tpl-dark .br-det-d-l{font-size:9px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
-.tpl-dark .br-det-d-v{font-size:13px;font-weight:600;color:#1C140A;}
-.tpl-dark .br-floorplan{width:100%;max-height:280px;object-fit:contain;border:1px solid #ede8df;padding:12px;margin-bottom:28px;}
-.tpl-dark .br-local-d{font-size:13px;color:#5C4A2A;line-height:1.85;font-weight:300;margin-bottom:28px;}
-.tpl-dark .br-contact-d{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:28px;padding:20px 24px;background:#0e0b08;}
-.tpl-dark .br-contact-d-lbl{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.12em;margin-bottom:3px;}
-.tpl-dark .br-contact-d-val{font-size:12px;font-weight:600;color:#fff;}
-.tpl-dark .br-footer{background:#0e0b08;padding:20px 52px;display:flex;justify-content:space-between;align-items:center;}
-.tpl-dark .br-footer-agency{font-family:'Cormorant Garamond',serif;font-size:16px;color:#fff;font-weight:600;}
+.tpl-dark .br-details-d{background:#f8f6f2;padding:18px 24px;display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:20px;border-top:3px solid var(--client-colour,#B46100);}
+.tpl-dark .br-det-d-l{font-size:9px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;}
+.tpl-dark .br-det-d-v{font-size:12px;font-weight:600;color:#1C140A;}
+.tpl-dark .br-floorplan{width:100%;max-height:250px;object-fit:contain;border:1px solid #ede8df;padding:10px;margin-bottom:20px;}
+.tpl-dark .br-local-d{font-size:13px;color:#5C4A2A;line-height:1.85;font-weight:300;margin-bottom:20px;}
+.tpl-dark .br-footer{background:#0e0b08;padding:16px 50px;display:flex;justify-content:space-between;align-items:center;}
+.tpl-dark .br-footer-agency{font-family:var(--br-font-display);font-size:14px;color:#fff;font-weight:600;}
 .tpl-dark .br-footer-right{text-align:right;}
-.tpl-dark .br-footer-note{font-size:9px;color:rgba(255,255,255,.35);line-height:1.6;max-width:300px;}
-.tpl-dark .br-footer-accent{height:2px;width:28px;background:var(--client-colour,#B46100);margin:4px 0 0 auto;}
-
-/* ── Placeholder ── */
-.br-placeholder{background:#f8f6f2;border:2px dashed #d8cfc4;display:flex;align-items:center;justify-content:center;font-size:11px;color:#A88E6E;letter-spacing:.08em;text-transform:uppercase;}
-
-/* ── Responsive ── */
-@media(max-width:1100px){
-  .app{grid-template-columns:240px 1fr;}
-  #brochure{width:640px;}
-}
-@media(max-width:900px){
-  .app{grid-template-columns:1fr;}
-  .sidebar{position:static;height:auto;order:2;}
-  .main{order:1;}
-  #brochure{width:100%;}
-}
-
-/* Print */
+.tpl-dark .br-footer-note{font-size:9px;color:rgba(255,255,255,.35);line-height:1.6;max-width:270px;}
+.tpl-dark .br-footer-accent{height:2px;width:22px;background:var(--client-colour,#B46100);margin:3px 0 0 auto;}
+.tpl-editorial .br-cover{width:100%;height:500px;position:relative;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;}
+.tpl-editorial .br-cover img.hero{width:100%;height:100%;object-fit:cover;grid-column:1;}
+.tpl-editorial .br-cover-panel{background:#1a1a1a;grid-column:2;display:flex;flex-direction:column;justify-content:flex-end;padding:38px 34px;}
+.tpl-editorial .br-cover-overline{font-size:9px;font-weight:700;color:var(--client-colour,#B46100);text-transform:uppercase;letter-spacing:.22em;margin-bottom:10px;}
+.tpl-editorial .br-address-e{font-family:var(--br-font-display);font-size:26px;font-weight:700;color:#fff;line-height:1.1;margin-bottom:10px;}
+.tpl-editorial .br-price-e{font-size:12px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.06em;margin-bottom:4px;}
+.tpl-editorial .br-price-e strong{color:var(--client-colour,#B46100);font-size:20px;font-family:var(--br-font-display);}
+.tpl-editorial .br-cover-logo-e{max-height:32px;max-width:110px;object-fit:contain;margin-bottom:18px;opacity:.9;}
+.tpl-editorial .br-stats-e{background:#f5f0e8;display:grid;grid-template-columns:repeat(5,1fr);border-bottom:3px solid var(--client-colour,#B46100);}
+.tpl-editorial .br-stat-e{padding:11px 8px;text-align:center;border-right:1px solid #e8e0d4;}
+.tpl-editorial .br-stat-e:last-child{border-right:none;}
+.tpl-editorial .br-stat-e-val{font-family:var(--br-font-display);font-size:17px;font-weight:700;color:var(--client-colour,#B46100);}
+.tpl-editorial .br-stat-e-lbl{font-size:8px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-top:2px;}
+.tpl-editorial .br-body{padding:28px 44px;}
+.tpl-editorial .br-heading-e{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.2em;color:var(--client-colour,#B46100);border-left:3px solid var(--client-colour,#B46100);padding-left:9px;margin-bottom:10px;}
+.tpl-editorial .br-desc-e{font-size:13px;color:#3a3020;line-height:1.9;margin-bottom:20px;font-weight:300;columns:2;column-gap:26px;}
+.tpl-editorial .br-features-e{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px 14px;margin-bottom:20px;}
+.tpl-editorial .br-feature-e{font-size:12px;color:#5C4A2A;padding:3px 0;border-bottom:1px solid #f0ebe2;display:flex;align-items:flex-start;gap:5px;}
+.tpl-editorial .br-feature-e::before{content:'→';font-size:9px;color:var(--client-colour,#B46100);flex-shrink:0;font-weight:700;}
+.tpl-editorial .br-photo-feature{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:auto auto;gap:4px;margin-bottom:20px;}
+.tpl-editorial .br-photo-feature img{width:100%;height:100%;object-fit:cover;}
+.tpl-editorial .br-photo-feature img:first-child{grid-row:span 2;aspect-ratio:3/4;}
+.tpl-editorial .br-photo-feature img:not(:first-child){aspect-ratio:4/3;}
+.tpl-editorial .br-photo-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:4px;margin-bottom:20px;}
+.tpl-editorial .br-photo-row img{width:100%;aspect-ratio:4/3;object-fit:cover;}
+.tpl-editorial .br-details-e{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-bottom:20px;}
+.tpl-editorial .br-det-e{padding:9px 12px;border-bottom:1px solid #f0ebe2;border-right:1px solid #f0ebe2;}
+.tpl-editorial .br-det-e:nth-child(3n){border-right:none;}
+.tpl-editorial .br-det-e-l{font-size:8px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.12em;margin-bottom:2px;}
+.tpl-editorial .br-det-e-v{font-size:12px;font-weight:700;color:#1C140A;}
+.tpl-editorial .br-floorplan{width:100%;max-height:250px;object-fit:contain;border:1px solid #f0ebe2;padding:10px;margin-bottom:20px;}
+.tpl-editorial .br-local-e{font-size:13px;color:#5C4A2A;line-height:1.85;font-weight:300;margin-bottom:20px;}
+.tpl-editorial .br-footer{background:#1a1a1a;padding:13px 44px;display:flex;justify-content:space-between;align-items:center;}
+.tpl-editorial .br-footer-left{font-family:var(--br-font-display);font-size:13px;font-weight:700;color:#fff;letter-spacing:.04em;}
+.tpl-editorial .br-footer-bar{width:2px;height:28px;background:var(--client-colour,#B46100);margin:0 14px;}
+.tpl-editorial .br-footer-contact{font-size:11px;color:rgba(255,255,255,.45);line-height:1.6;}
+.tpl-editorial .br-footer-note{font-size:9px;color:rgba(255,255,255,.28);text-align:right;max-width:240px;line-height:1.6;}
+.tpl-scandi .br-cover{width:100%;height:440px;position:relative;overflow:hidden;}
+.tpl-scandi .br-cover img.hero{width:100%;height:100%;object-fit:cover;}
+.tpl-scandi .br-cover-caption{position:absolute;bottom:0;left:0;right:0;background:#fff;padding:18px 44px;display:flex;justify-content:space-between;align-items:flex-end;border-top:3px solid var(--client-colour,#B46100);}
+.tpl-scandi .br-address-s{font-family:var(--br-font-display);font-size:22px;font-weight:400;color:#1a1a1a;line-height:1.2;}
+.tpl-scandi .br-price-type-s{font-size:9px;color:#999;text-transform:uppercase;letter-spacing:.14em;margin-bottom:2px;}
+.tpl-scandi .br-price-val-s{font-family:var(--br-font-display);font-size:24px;font-weight:600;color:var(--client-colour,#B46100);}
+.tpl-scandi .br-logo-s{position:absolute;top:16px;right:20px;max-height:36px;max-width:110px;object-fit:contain;}
+.tpl-scandi .br-stats-s{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid #e8e8e8;}
+.tpl-scandi .br-stat-s{padding:12px 8px;text-align:center;border-right:1px solid #e8e8e8;}
+.tpl-scandi .br-stat-s:last-child{border-right:none;}
+.tpl-scandi .br-stat-s-val{font-family:var(--br-font-display);font-size:18px;font-weight:400;color:var(--client-colour,#B46100);}
+.tpl-scandi .br-stat-s-lbl{font-size:8px;color:#999;text-transform:uppercase;letter-spacing:.12em;margin-top:2px;}
+.tpl-scandi .br-body{padding:32px 44px;}
+.tpl-scandi .br-rule-s{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.tpl-scandi .br-rule-s-line{flex:1;height:1px;background:#e8e8e8;}
+.tpl-scandi .br-rule-s-label{font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.18em;white-space:nowrap;}
+.tpl-scandi .br-desc-s{font-size:13px;color:#4a4a4a;line-height:1.9;margin-bottom:24px;font-weight:300;}
+.tpl-scandi .br-features-s{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:24px;border:1px solid #e8e8e8;}
+.tpl-scandi .br-feature-s{font-size:12px;color:#4a4a4a;padding:7px 13px;border-bottom:1px solid #e8e8e8;border-right:1px solid #e8e8e8;display:flex;align-items:center;gap:7px;}
+.tpl-scandi .br-feature-s:nth-child(even){border-right:none;}
+.tpl-scandi .br-feature-s::before{content:'';width:4px;height:4px;background:var(--client-colour,#B46100);border-radius:50%;flex-shrink:0;}
+.tpl-scandi .br-details-s{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#e8e8e8;margin-bottom:24px;}
+.tpl-scandi .br-det-s{background:#fff;padding:11px 13px;}
+.tpl-scandi .br-det-s-l{font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.12em;margin-bottom:2px;}
+.tpl-scandi .br-det-s-v{font-size:12px;font-weight:600;color:#1a1a1a;}
+.tpl-scandi .br-photo-clean{display:grid;gap:4px;margin-bottom:24px;}
+.tpl-scandi .br-photo-clean img{width:100%;aspect-ratio:4/3;object-fit:cover;}
+.tpl-scandi .br-floorplan{width:100%;max-height:250px;object-fit:contain;border:1px solid #e8e8e8;padding:10px;margin-bottom:24px;}
+.tpl-scandi .br-local-s{font-size:13px;color:#4a4a4a;line-height:1.85;font-weight:300;margin-bottom:24px;}
+.tpl-scandi .br-footer{background:#f5f5f5;border-top:1px solid #e8e8e8;padding:14px 44px;display:flex;justify-content:space-between;align-items:center;}
+.tpl-scandi .br-footer-agency{font-family:var(--br-font-display);font-size:13px;font-weight:400;color:#1a1a1a;letter-spacing:.04em;}
+.tpl-scandi .br-footer-dot{width:4px;height:4px;border-radius:50%;background:var(--client-colour,#B46100);}
+.tpl-scandi .br-footer-note{font-size:9px;color:#999;text-align:right;max-width:240px;line-height:1.6;}
 @media print{
-  .sidebar,.topbar,.preview-label{display:none!important;}
-  .main{margin:0;}
-  .preview-area{padding:0;}
-  #brochure{box-shadow:none;width:100%;}
-  .page-break{display:none!important;}
-  .br-page{page-break-after:always;}
+  @page{size:A4 portrait;margin:0;}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  html,body{width:210mm;height:auto;margin:0;padding:0;background:#fff!important;}
+  .sidebar,.topbar,.preview-label,.export-group,.toast{display:none!important;}
+  .app{display:block!important;}
+  .main{display:block!important;margin:0;padding:0;}
+  .preview-area{padding:0!important;display:block!important;}
+  #brochure{box-shadow:none!important;width:210mm!important;max-width:210mm!important;margin:0!important;}
+  .page-break-div{display:none!important;}
+  .br-page{page-break-after:always;break-after:page;page-break-inside:avoid;}
+  .br-page:last-child{page-break-after:auto;}
 }
-
-/* Spinner */
-.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top:2px solid #fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px;}
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.4);border-top:2px solid #fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:4px;}
 @keyframes spin{to{transform:rotate(360deg);}}
-
-/* Virtual tour link badge */
-.br-vtour-badge{display:inline-flex;align-items:center;gap:7px;background:var(--client-colour,#B46100);color:#fff;font-size:11px;font-weight:600;padding:5px 13px;border-radius:20px;text-decoration:none;margin-bottom:20px;}
+@media(max-width:1100px){.app{grid-template-columns:248px 1fr;}#brochure{width:600px;}}
+@media(max-width:900px){.app{grid-template-columns:1fr;}.sidebar{position:static;height:auto;order:2;}.main{order:1;}#brochure{width:100%;}}
 </style>
 </head>
 <body>
-
 <div class="app">
-  <!-- ── SIDEBAR ── -->
-  <aside class="sidebar" id="sidebar">
-
-    <div class="sb-logo">
-      <img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" onerror="this.style.display='none'"/>
+<aside class="sidebar">
+  <div class="sb-logo"><img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" onerror="this.style.display='none'"/></div>
+  <a href="./dashboard.html" class="sb-back"><i data-lucide="arrow-left" style="width:12px;height:12px;"></i> Back to Dashboard</a>
+  <div class="sb-section">
+    <div class="sb-section-title">Layout Mode</div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" onclick="setMode('single')" id="mode-single"><span class="mode-icon">📄</span>Single Page</button>
+      <button class="mode-btn" onclick="setMode('multi')" id="mode-multi"><span class="mode-icon">📑</span>Multi-Page</button>
     </div>
-
-    <a href="./dashboard.html" class="sb-back">
-      <i data-lucide="arrow-left" style="width:13px;height:13px;"></i>
-      Back to Dashboard
-    </a>
-
-    <!-- Layout Mode -->
-    <div class="sb-section">
-      <div class="sb-section-title">Layout Mode</div>
-      <div class="mode-toggle">
-        <button class="mode-btn active" onclick="setMode('single')" id="mode-single">
-          <span class="mode-icon">📄</span>Single Page
-        </button>
-        <button class="mode-btn" onclick="setMode('multi')" id="mode-multi">
-          <span class="mode-icon">📑</span>Multi-Page
-        </button>
-      </div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Template Style</div>
+    <div class="template-grid">
+      <div class="tpl-card active" onclick="setTemplate('classic')" id="tpl-classic"><div class="tpl-thumb"><div class="tpl-stripe" style="height:20px;background:#c8bfb0;"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;flex:1;"><div class="tpl-stripe" style="background:#e8e2d8;"></div><div class="tpl-stripe" style="background:#e8e2d8;"></div></div></div><div class="tpl-label">Classic</div></div>
+      <div class="tpl-card" onclick="setTemplate('modern')" id="tpl-modern"><div class="tpl-thumb"><div class="tpl-stripe" style="height:24px;background:#d0c8bc;"></div><div class="tpl-stripe" style="flex:1;background:#f0ebe2;margin-top:2px;"></div></div><div class="tpl-label">Modern</div></div>
+      <div class="tpl-card" onclick="setTemplate('dark')" id="tpl-dark"><div class="tpl-thumb"><div class="tpl-stripe" style="height:20px;background:#2a2420;"></div><div class="tpl-stripe" style="height:5px;background:#0e0b08;margin-top:1px;"></div><div class="tpl-stripe" style="flex:1;background:#f0ebe2;margin-top:2px;"></div></div><div class="tpl-label">Dark Estate</div></div>
+      <div class="tpl-card" onclick="setTemplate('editorial')" id="tpl-editorial"><div class="tpl-thumb"><div style="display:grid;grid-template-columns:1fr 1fr;height:100%;gap:2px;"><div class="tpl-stripe" style="background:#c8c0b8;"></div><div class="tpl-stripe" style="background:#1a1a1a;"></div></div></div><div class="tpl-label">Editorial</div></div>
+      <div class="tpl-card" onclick="setTemplate('scandi')" id="tpl-scandi"><div class="tpl-thumb"><div class="tpl-stripe" style="height:26px;background:#d8d4cc;"></div><div class="tpl-stripe" style="flex:1;background:#f8f8f6;margin-top:2px;border-top:2px solid #B46100;"></div></div><div class="tpl-label">Scandi</div></div>
     </div>
-
-    <!-- Template -->
-    <div class="sb-section">
-      <div class="sb-section-title">Layout Template</div>
-      <div class="template-grid">
-        <div class="tpl-card active" onclick="setTemplate('classic')" id="tpl-classic">
-          <div class="tpl-thumb">
-            <div class="tpl-stripe" style="height:24px;background:#c8bfb0;"></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;flex:1;">
-              <div class="tpl-stripe" style="background:#e8e2d8;"></div>
-              <div class="tpl-stripe" style="background:#e8e2d8;"></div>
-            </div>
-          </div>
-          <div class="tpl-label">Classic</div>
-        </div>
-        <div class="tpl-card" onclick="setTemplate('modern')" id="tpl-modern">
-          <div class="tpl-thumb">
-            <div class="tpl-stripe" style="height:28px;background:#d0c8bc;"></div>
-            <div class="tpl-stripe" style="flex:1;background:#f0ebe2;margin-top:2px;"></div>
-          </div>
-          <div class="tpl-label">Modern</div>
-        </div>
-        <div class="tpl-card" onclick="setTemplate('dark')" id="tpl-dark">
-          <div class="tpl-thumb">
-            <div class="tpl-stripe" style="height:24px;background:#2a2420;"></div>
-            <div class="tpl-stripe" style="height:7px;background:#0e0b08;margin-top:1px;"></div>
-            <div class="tpl-stripe" style="flex:1;background:#f0ebe2;margin-top:2px;"></div>
-          </div>
-          <div class="tpl-label">Dark Estate</div>
-        </div>
-      </div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Typography</div>
+    <div class="font-grid" id="font-grid"></div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Agency Branding</div>
+    <div class="field"><label>Agency Name</label><input type="text" id="f-agency" placeholder="Your Estate Agency" oninput="update()"/></div>
+    <div class="field"><label>Agency Logo</label><div class="upload-zone" onclick="document.getElementById('f-logo-input').click()"><input type="file" id="f-logo-input" accept="image/*" onchange="handleLogo(this)"/><div class="upload-zone-icon">🏢</div><p><strong>Click to upload</strong> logo</p></div><img id="logo-preview-img" class="logo-preview" style="display:none;"/></div>
+    <div class="field"><label>Brand Colour</label><div class="colour-picker-row"><div class="colour-swatch-wrap"><input type="color" id="f-colour-picker" value="#B46100" oninput="syncColourFromPicker(this.value)"/><div class="colour-swatch" id="colour-swatch-display" style="background:#B46100;"></div></div><input type="text" class="colour-hex-input" id="f-colour-hex" value="#B46100" placeholder="#B46100" maxlength="7" oninput="syncColourFromHex(this.value)" onblur="normaliseHexInput()"/></div></div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Property Details</div>
+    <div class="field"><label>Full Address</label><input type="text" id="f-address" placeholder="12 Oak Lane, Cheshire, WA1 2AB" oninput="update()"/></div>
+    <div class="field-row"><div class="field"><label>Price Type</label><select id="f-pricetype" onchange="update()"><option value="">–</option><option>Asking Price</option><option>Guide Price</option><option>Offers Over</option><option>Offers In Excess Of</option><option>Offers In The Region Of</option><option>Fixed Price</option><option>POA</option></select></div><div class="field"><label>Price</label><input type="text" id="f-price" placeholder="£850,000" oninput="update()"/></div></div>
+    <div class="field-row"><div class="field"><label>Bedrooms</label><input type="text" id="f-beds" placeholder="4" oninput="update()"/></div><div class="field"><label>Bathrooms</label><input type="text" id="f-baths" placeholder="3" oninput="update()"/></div></div>
+    <div class="field-row"><div class="field"><label>Receptions</label><input type="text" id="f-rec" placeholder="2" oninput="update()"/></div><div class="field"><label>Tenure</label><select id="f-tenure" onchange="update()"><option value="">–</option><option>Freehold</option><option>Leasehold</option><option>Share of Freehold</option><option>Commonhold</option></select></div></div>
+    <div class="field-row"><div class="field"><label>EPC Rating</label><select id="f-epc" onchange="update()"><option value="">–</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option></select></div><div class="field"><label>Council Tax Band</label><select id="f-ctax" onchange="update()"><option value="">–</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option></select></div></div>
+    <div class="field-row"><div class="field"><label>Property Style</label><input type="text" id="f-style" placeholder="Detached Victorian" oninput="update()"/></div><div class="field"><label>New Build?</label><select id="f-newbuild" onchange="update()"><option value="">–</option><option>New Build</option><option>Existing</option></select></div></div>
+    <div class="field"><label>Total Floor Area</label><input type="text" id="f-area" placeholder="2,850 sq ft / 265 sq m" oninput="update()"/></div>
+    <div class="field-row"><div class="field"><label>Plot Size</label><input type="text" id="f-plot" placeholder="0.35 acres" oninput="update()"/></div><div class="field"><label>Year Built</label><input type="text" id="f-year" placeholder="c.1898" oninput="update()"/></div></div>
+    <div class="field"><label>Parking</label><input type="text" id="f-parking" placeholder="Double garage + driveway" oninput="update()"/></div>
+    <div class="field"><label>Heating</label><input type="text" id="f-heating" placeholder="Gas central heating" oninput="update()"/></div>
+    <div class="field"><label>Garden</label><input type="text" id="f-garden" placeholder="South-facing rear, approx 80ft" oninput="update()"/></div>
+    <div class="field"><label>What3Words Location</label><input type="text" id="f-w3w" placeholder="///example.words.here" oninput="update()"/></div>
+    <div class="field"><label>Virtual Tour / Listing URL</label><input type="text" id="f-vtour" placeholder="https://my.matterport.com/…" oninput="update()"/></div>
+    <div class="field"><label>Property Description</label><textarea id="f-desc" placeholder="Write a compelling description…" oninput="update()"></textarea></div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Leasehold Details <span style="font-size:10px;font-weight:400;color:var(--ink-soft);">(if applicable)</span></div>
+    <div class="field-row"><div class="field"><label>Years Remaining</label><input type="text" id="f-lease-years" placeholder="125 years" oninput="update()"/></div><div class="field"><label>Ground Rent</label><input type="text" id="f-lease-gr" placeholder="£250 p/a" oninput="update()"/></div></div>
+    <div class="field-row"><div class="field"><label>Service Charge</label><input type="text" id="f-lease-sc" placeholder="£2,400 p/a" oninput="update()"/></div><div class="field"><label>Maintenance Fund</label><input type="text" id="f-lease-mf" placeholder="£600 p/a" oninput="update()"/></div></div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Key Features</div>
+    <div class="list-rows" id="feature-list"></div>
+    <button class="add-row-btn" onclick="addFeature()">+ Add feature</button>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Room Dimensions</div>
+    <div class="list-rows" id="room-list"></div>
+    <button class="add-row-btn" onclick="addRoom()">+ Add room</button>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Local Area</div>
+    <div class="field"><label>Area Description</label><textarea id="f-local" placeholder="Describe local amenities, transport, schools…" oninput="update()"></textarea></div>
+    <div class="field"><label>Nearest Stations</label><input type="text" id="f-stations" placeholder="Sheffield 0.4 mi · Meadowhall 2.1 mi" oninput="update()"/></div>
+    <div class="field"><label>Nearby Schools</label><input type="text" id="f-schools" placeholder="King Edward VII (0.6 mi), Birkdale (1.2 mi)" oninput="update()"/></div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Viewing / Open Day</div>
+    <div class="field-row"><div class="field"><label>Date</label><input type="text" id="f-view-date" placeholder="Saturday 7 June" oninput="update()"/></div><div class="field"><label>Time</label><input type="text" id="f-view-time" placeholder="10:00 – 13:00" oninput="update()"/></div></div>
+    <div class="field"><label>Booking Info</label><input type="text" id="f-view-book" placeholder="By appointment only — call 0114 123 4567" oninput="update()"/></div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Financial Information</div>
+    <div class="field"><label>Stamp Duty Table</label><select id="f-sdlt" onchange="update()"><option value="yes">Show SDLT breakdown</option><option value="no">Hide</option></select></div>
+    <div class="field"><label>Mortgage Estimate</label><select id="f-mortgage-show" onchange="update()"><option value="yes">Show estimate</option><option value="no">Hide</option></select></div>
+    <div class="field-row"><div class="field"><label>Rate (% p/a)</label><input type="number" id="f-mortgage-rate" value="4.5" step="0.1" oninput="update()"/></div><div class="field"><label>Term (years)</label><input type="number" id="f-mortgage-term" value="25" oninput="update()"/></div></div>
+    <div class="field"><label>Deposit (%)</label><input type="number" id="f-mortgage-deposit" value="10" step="1" oninput="update()"/></div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Property Photos</div>
+    <div class="upload-zone" id="photo-zone" onclick="document.getElementById('f-photos-input').click()"><input type="file" id="f-photos-input" accept="image/*" multiple onchange="handlePhotos(this)"/><div class="upload-zone-icon">📷</div><p><strong>Click or drag</strong> to add photos<br>Use ↑↓ to reorder</p></div>
+    <div class="photo-list" id="photo-list"></div>
+    <div class="photo-count" id="photo-count"></div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Floorplan</div>
+    <div class="upload-zone" onclick="document.getElementById('f-floorplan-input').click()"><input type="file" id="f-floorplan-input" accept="image/*" onchange="handleFloorplan(this)"/><div class="upload-zone-icon">📐</div><p><strong>Upload floorplan</strong></p></div>
+    <img id="fp-preview" style="display:none;width:100%;margin-top:6px;border:1px solid var(--rule);border-radius:4px;"/>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Agent Contact(s)</div>
+    <div id="agent-list"></div>
+    <button class="add-row-btn" onclick="addAgent()" id="add-agent-btn">+ Add agent (max 3)</button>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Disclaimer</div>
+    <div id="disclaimer-container"></div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-section-title">Export</div>
+    <div class="export-group">
+      <button class="btn-export btn-pdf" onclick="exportPDF()" id="btn-pdf"><i data-lucide="file-text" style="width:14px;height:14px;"></i>Download PDF</button>
+      <button class="btn-export btn-word" onclick="exportWord()" id="btn-word"><i data-lucide="file" style="width:14px;height:14px;"></i>Download Word (.docx)</button>
+      <button class="btn-export btn-print" onclick="window.print()"><i data-lucide="printer" style="width:14px;height:14px;"></i>Print</button>
+      <button class="btn-export btn-save" onclick="saveDraft()"><i data-lucide="save" style="width:14px;height:14px;"></i>Save Draft</button>
     </div>
-
-    <!-- Branding -->
-    <div class="sb-section">
-      <div class="sb-section-title">Agency Branding</div>
-      <div class="field">
-        <label>Agency Name</label>
-        <input type="text" id="f-agency" placeholder="Your Estate Agency" oninput="update()"/>
-      </div>
-      <div class="field">
-        <label>Agency Logo</label>
-        <div class="upload-zone" onclick="document.getElementById('f-logo-input').click()" id="logo-zone">
-          <input type="file" id="f-logo-input" accept="image/*" onchange="handleLogo(this)"/>
-          <div class="upload-zone-icon">🏢</div>
-          <p><strong>Click to upload</strong> logo<br>PNG or SVG recommended</p>
-        </div>
-        <img id="logo-preview-img" class="logo-preview" style="display:none;"/>
-      </div>
-      <div class="field">
-        <label>Brand Colour</label>
-        <div class="colour-picker-row">
-          <div class="colour-swatch-wrap">
-            <input type="color" id="f-colour-picker" value="#B46100" oninput="syncColourFromPicker(this.value)"/>
-            <div class="colour-swatch" id="colour-swatch-display" style="background:#B46100;"></div>
-          </div>
-          <input type="text" class="colour-hex-input" id="f-colour-hex" value="#B46100" placeholder="#B46100" maxlength="7" oninput="syncColourFromHex(this.value)" onblur="normaliseHexInput()"/>
-        </div>
-      </div>
-    </div>
-
-    <!-- Property -->
-    <div class="sb-section">
-      <div class="sb-section-title">Property Details</div>
-      <div class="field">
-        <label>Full Address</label>
-        <input type="text" id="f-address" placeholder="12 Oak Lane, Cheshire, WA1 2AB" oninput="update()"/>
-      </div>
-      <div class="field-row">
-        <div class="field">
-          <label>Price Type</label>
-          <select id="f-pricetype" onchange="update()">
-            <option value="">–</option>
-            <option>Asking Price</option>
-            <option>Guide Price</option>
-            <option>Offers Over</option>
-            <option>Offers In Excess Of</option>
-            <option>Offers In The Region Of</option>
-            <option>Fixed Price</option>
-            <option>POA</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Price</label>
-          <input type="text" id="f-price" placeholder="£850,000" oninput="update()"/>
-        </div>
-      </div>
-      <div class="field-row">
-        <div class="field">
-          <label>Bedrooms</label>
-          <input type="text" id="f-beds" placeholder="4" oninput="update()"/>
-        </div>
-        <div class="field">
-          <label>Bathrooms</label>
-          <input type="text" id="f-baths" placeholder="3" oninput="update()"/>
-        </div>
-      </div>
-      <div class="field-row">
-        <div class="field">
-          <label>Receptions</label>
-          <input type="text" id="f-rec" placeholder="2" oninput="update()"/>
-        </div>
-        <div class="field">
-          <label>Tenure</label>
-          <select id="f-tenure" onchange="update()">
-            <option value="">Select…</option>
-            <option>Freehold</option>
-            <option>Leasehold</option>
-            <option>Share of Freehold</option>
-            <option>Commonhold</option>
-          </select>
-        </div>
-      </div>
-      <div class="field-row">
-        <div class="field">
-          <label>EPC Rating</label>
-          <select id="f-epc" onchange="update()">
-            <option value="">–</option>
-            <option>A</option><option>B</option><option>C</option>
-            <option>D</option><option>E</option><option>F</option><option>G</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Council Tax Band</label>
-          <select id="f-ctax" onchange="update()">
-            <option value="">–</option>
-            <option>A</option><option>B</option><option>C</option><option>D</option>
-            <option>E</option><option>F</option><option>G</option><option>H</option>
-          </select>
-        </div>
-      </div>
-      <div class="field-row">
-        <div class="field">
-          <label>Property Style</label>
-          <input type="text" id="f-style" placeholder="Detached Victorian" oninput="update()"/>
-        </div>
-        <div class="field">
-          <label>New Build?</label>
-          <select id="f-newbuild" onchange="update()">
-            <option value="">–</option>
-            <option>New Build</option>
-            <option>Existing Property</option>
-          </select>
-        </div>
-      </div>
-      <div class="field">
-        <label>Total Floor Area</label>
-        <input type="text" id="f-area" placeholder="2,850 sq ft / 265 sq m" oninput="update()"/>
-      </div>
-      <div class="field-row">
-        <div class="field">
-          <label>Plot Size</label>
-          <input type="text" id="f-plot" placeholder="0.35 acres" oninput="update()"/>
-        </div>
-        <div class="field">
-          <label>Year Built</label>
-          <input type="text" id="f-year" placeholder="c.1898" oninput="update()"/>
-        </div>
-      </div>
-      <div class="field">
-        <label>Parking</label>
-        <input type="text" id="f-parking" placeholder="Double garage + driveway" oninput="update()"/>
-      </div>
-      <div class="field">
-        <label>Heating</label>
-        <input type="text" id="f-heating" placeholder="Gas central heating" oninput="update()"/>
-      </div>
-      <div class="field">
-        <label>Garden</label>
-        <input type="text" id="f-garden" placeholder="South-facing rear garden, approx 80 ft" oninput="update()"/>
-      </div>
-      <div class="field">
-        <label>Virtual Tour URL <span style="font-size:10px;color:var(--ink-soft);font-weight:400;">(optional)</span></label>
-        <input type="text" id="f-vtour" placeholder="https://my.matterport.com/…" oninput="update()"/>
-      </div>
-      <div class="field">
-        <label>Property Description</label>
-        <textarea id="f-desc" placeholder="Write a compelling description of the property…" oninput="update()"></textarea>
-      </div>
-    </div>
-
-    <!-- Key Features -->
-    <div class="sb-section">
-      <div class="sb-section-title">Key Features</div>
-      <div class="feature-list" id="feature-list"></div>
-      <button class="add-feature-btn" onclick="addFeature()">+ Add feature</button>
-    </div>
-
-    <!-- Local Area -->
-    <div class="sb-section">
-      <div class="sb-section-title">Local Area</div>
-      <div class="field">
-        <label>Area Description</label>
-        <textarea id="f-local" placeholder="Describe local amenities, transport links, schools, parks…" oninput="update()"></textarea>
-      </div>
-      <div class="field">
-        <label>Nearest Stations</label>
-        <input type="text" id="f-stations" placeholder="e.g. Sheffield 0.4 mi · Meadowhall 2.1 mi" oninput="update()"/>
-      </div>
-      <div class="field">
-        <label>Nearby Schools</label>
-        <input type="text" id="f-schools" placeholder="e.g. King Edward VII (0.6 mi), Birkdale (1.2 mi)" oninput="update()"/>
-      </div>
-    </div>
-
-    <!-- Photos -->
-    <div class="sb-section">
-      <div class="sb-section-title">Property Photos</div>
-      <div class="upload-zone" id="photo-zone" onclick="document.getElementById('f-photos-input').click()">
-        <input type="file" id="f-photos-input" accept="image/*" multiple onchange="handlePhotos(this)"/>
-        <div class="upload-zone-icon">📷</div>
-        <p><strong>Click or drag</strong> to add photos<br>Drag thumbnails below to reorder</p>
-      </div>
-      <div class="photo-thumbs" id="photo-thumbs"></div>
-      <div class="photo-count" id="photo-count"></div>
-    </div>
-
-    <!-- Floorplan -->
-    <div class="sb-section">
-      <div class="sb-section-title">Floorplan</div>
-      <div class="upload-zone" onclick="document.getElementById('f-floorplan-input').click()" id="fp-zone">
-        <input type="file" id="f-floorplan-input" accept="image/*" onchange="handleFloorplan(this)"/>
-        <div class="upload-zone-icon">📐</div>
-        <p><strong>Upload floorplan</strong> image</p>
-      </div>
-      <img id="fp-preview" style="display:none;width:100%;margin-top:7px;border:1px solid var(--rule);border-radius:4px;"/>
-    </div>
-
-    <!-- Agent Contact -->
-    <div class="sb-section">
-      <div class="sb-section-title">Agent Contact</div>
-      <div class="field">
-        <label>Agent Name</label>
-        <input type="text" id="f-agent" placeholder="Sarah Johnson" oninput="update()"/>
-      </div>
-      <div class="field">
-        <label>Phone</label>
-        <input type="text" id="f-phone" placeholder="0114 123 4567" oninput="update()"/>
-      </div>
-      <div class="field">
-        <label>Email</label>
-        <input type="text" id="f-email" placeholder="sarah@youragency.co.uk" oninput="update()"/>
-      </div>
-      <div class="field">
-        <label>Branch Address</label>
-        <input type="text" id="f-branch" placeholder="123 High Street, Sheffield, S1 1AA" oninput="update()"/>
-      </div>
-      <div class="field">
-        <label>Website</label>
-        <input type="text" id="f-website" placeholder="www.youragency.co.uk" oninput="update()"/>
-      </div>
-    </div>
-
-    <!-- Disclaimer -->
-    <div class="sb-section">
-      <div class="sb-section-title">Disclaimer</div>
-      <div id="disclaimer-container"></div>
-    </div>
-
-    <!-- Export -->
-    <div class="sb-section">
-      <div class="sb-section-title">Export Brochure</div>
-      <div class="export-group">
-        <button class="btn-export btn-pdf" onclick="exportPDF()" id="btn-pdf">
-          <i data-lucide="file-text" style="width:15px;height:15px;"></i>
-          Download as PDF
-        </button>
-        <button class="btn-export btn-word" onclick="exportWord()" id="btn-word">
-          <i data-lucide="file" style="width:15px;height:15px;"></i>
-          Download as Word (.docx)
-        </button>
-        <button class="btn-export btn-print" onclick="window.print()">
-          <i data-lucide="printer" style="width:15px;height:15px;"></i>
-          Print Brochure
-        </button>
-        <button class="btn-export btn-save" onclick="saveDraft()">
-          <i data-lucide="save" style="width:15px;height:15px;"></i>
-          Save Draft
-        </button>
-      </div>
-    </div>
-
-  </aside>
-
-  <!-- ── MAIN ── -->
-  <main class="main">
-    <div class="topbar">
-      <div>
-        <div class="topbar-title">Property <em>Brochure Builder</em></div>
-        <div class="topbar-sub">Fill in the details on the left — your brochure updates instantly</div>
-      </div>
-    </div>
-    <div class="preview-area">
-      <div class="preview-label">Live Preview</div>
-      <div id="brochure" class="tpl-classic"></div>
-    </div>
-  </main>
+  </div>
+</aside>
+<main class="main">
+  <div class="topbar"><div><div class="topbar-title">Property <em>Brochure Builder</em></div><div class="topbar-sub">Fill in the details — your brochure updates instantly</div></div></div>
+  <div class="preview-area"><div class="preview-label">Live Preview</div><div id="brochure" class="tpl-classic"></div></div>
+</main>
 </div>
-
-<div class="toast" id="toast">Draft saved ✓</div>
-
+<div class="toast" id="toast"></div>
+<div id="qr-scratch" style="display:none;position:absolute;left:-9999px;top:-9999px;width:80px;height:80px;overflow:hidden;"></div>
 <script>
-/* ════════════════════════════════════════
-   STATE
-════════════════════════════════════════ */
-let state = {
-  template: 'classic',
-  mode: 'single',
-  agency: '', logoSrc: null, colour: '#B46100',
-  address: '', pricetype: '', price: '',
-  beds: '', baths: '', rec: '', tenure: '',
-  epc: '', ctax: '', style: '', newbuild: '',
-  area: '', plot: '', year: '', parking: '', heating: '', garden: '',
-  vtour: '', desc: '',
-  features: [],
-  photos: [],
-  floorplanSrc: null,
-  local: '', stations: '', schools: '',
-  agent: '', phone: '', email: '', branch: '', website: '',
-  disclaimer: 'These particulars do not constitute any part of an offer or contract. All measurements are approximate and for guidance only. Intending purchasers should satisfy themselves by inspection or otherwise.',
-  disclaimerRemoved: false,
+/* ═══ FONTS ═══ */
+const FONTS=[
+  {id:'cormorant',display:"'Cormorant Garamond',serif",body:"'Mukta',sans-serif",label:'Classic',sample:'Aa'},
+  {id:'playfair',display:"'Playfair Display',serif",body:"'Nunito Sans',sans-serif",label:'Editorial',sample:'Aa'},
+  {id:'dm',display:"'DM Serif Display',serif",body:"'Mukta',sans-serif",label:'Refined',sample:'Aa'},
+  {id:'libre',display:"'Libre Baskerville',serif",body:"'Nunito Sans',sans-serif",label:'Traditional',sample:'Aa'},
+  {id:'lora',display:"'Lora',serif",body:"'Mukta',sans-serif",label:'Warm',sample:'Aa'},
+  {id:'source',display:"'Source Serif 4',serif",body:"'Nunito Sans',sans-serif",label:'Modern',sample:'Aa'},
+];
+let activeFont=FONTS[0];
+function buildFontGrid(){
+  const g=document.getElementById('font-grid');
+  g.innerHTML=FONTS.map(f=>`<div class="font-card${f.id===activeFont.id?' active':''}" onclick="setFont('${f.id}')"><div class="font-card-sample" style="font-family:${f.display};">${f.sample}</div><div class="font-card-name">${f.label}</div></div>`).join('');
+}
+function setFont(id){
+  activeFont=FONTS.find(f=>f.id===id)||FONTS[0];
+  document.documentElement.style.setProperty('--br-font-display',activeFont.display);
+  document.documentElement.style.setProperty('--br-font-body',activeFont.body);
+  buildFontGrid();update();
+}
+
+/* ═══ STATE ═══ */
+let S={
+  template:'classic',mode:'single',
+  agency:'',logoSrc:null,colour:'#B46100',
+  address:'',pricetype:'',price:'',
+  beds:'',baths:'',rec:'',tenure:'',epc:'',ctax:'',
+  style:'',newbuild:'',area:'',plot:'',year:'',
+  parking:'',heating:'',garden:'',w3w:'',vtour:'',
+  leaseYears:'',leaseGR:'',leaseSC:'',leaseMF:'',
+  desc:'',features:[],rooms:[],
+  photos:[],floorplanSrc:null,
+  local:'',stations:'',schools:'',
+  viewDate:'',viewTime:'',viewBook:'',
+  sdlt:'yes',mortgageShow:'yes',mortgageRate:4.5,mortgageTerm:25,mortgageDeposit:10,
+  agents:[{name:'',phone:'',email:''}],
+  disclaimer:'These particulars do not constitute any part of an offer or contract. All measurements are approximate and for guidance only. Intending purchasers should satisfy themselves by inspection or otherwise.',
+  disclaimerRemoved:false,
 };
 
-/* ════════════════════════════════════════
-   MODE & TEMPLATE
-════════════════════════════════════════ */
-function setMode(m) {
-  state.mode = m;
-  document.getElementById('mode-single').classList.toggle('active', m==='single');
-  document.getElementById('mode-multi').classList.toggle('active', m==='multi');
-  update();
-}
+/* ═══ MODE / TEMPLATE ═══ */
+function setMode(m){S.mode=m;document.getElementById('mode-single').classList.toggle('active',m==='single');document.getElementById('mode-multi').classList.toggle('active',m==='multi');update();}
+function setTemplate(t){S.template=t;['classic','modern','dark','editorial','scandi'].forEach(n=>document.getElementById('tpl-'+n).classList.toggle('active',n===t));update();}
 
-function setTemplate(t) {
-  state.template = t;
-  ['classic','modern','dark'].forEach(n => {
-    document.getElementById('tpl-'+n).classList.toggle('active', n===t);
-  });
-  update();
-}
+/* ═══ COLOUR ═══ */
+function syncColourFromPicker(v){S.colour=v;document.getElementById('f-colour-hex').value=v;document.getElementById('colour-swatch-display').style.background=v;document.documentElement.style.setProperty('--client-colour',v);update();}
+function syncColourFromHex(raw){let v=raw.trim();if(!v.startsWith('#'))v='#'+v;document.getElementById('colour-swatch-display').style.background=validHex(v)?v:'#B46100';if(validHex(v)){S.colour=v;document.getElementById('f-colour-picker').value=v;document.documentElement.style.setProperty('--client-colour',v);update();}}
+function normaliseHexInput(){const el=document.getElementById('f-colour-hex');let v=el.value.trim();if(!v.startsWith('#'))v='#'+v;if(/^#[0-9a-fA-F]{3}$/.test(v))v='#'+v[1]+v[1]+v[2]+v[2]+v[3]+v[3];if(!validHex(v))v=S.colour;else{S.colour=v;document.getElementById('f-colour-picker').value=v;document.getElementById('colour-swatch-display').style.background=v;document.documentElement.style.setProperty('--client-colour',v);}el.value=v;update();}
+function validHex(v){return/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(v);}
 
-/* ════════════════════════════════════════
-   COLOUR PICKER — hex input + colour picker synced
-════════════════════════════════════════ */
-function syncColourFromPicker(v) {
-  state.colour = v;
-  document.getElementById('f-colour-hex').value = v;
-  document.getElementById('colour-swatch-display').style.background = v;
-  document.documentElement.style.setProperty('--client-colour', v);
-  update();
-}
+/* ═══ LOGO ═══ */
+function handleLogo(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{S.logoSrc=e.target.result;const img=document.getElementById('logo-preview-img');img.src=S.logoSrc;img.style.display='block';update();};r.readAsDataURL(f);}
 
-function syncColourFromHex(raw) {
-  let v = raw.trim();
-  if (!v.startsWith('#')) v = '#' + v;
-  document.getElementById('colour-swatch-display').style.background = isValidHex(v) ? v : '#B46100';
-  if (isValidHex(v)) {
-    state.colour = v;
-    document.getElementById('f-colour-picker').value = v;
-    document.documentElement.style.setProperty('--client-colour', v);
-    update();
-  }
-}
-
-function normaliseHexInput() {
-  const el = document.getElementById('f-colour-hex');
-  let v = el.value.trim();
-  if (!v.startsWith('#')) v = '#' + v;
-  if (!isValidHex(v)) {
-    v = state.colour;
-  } else {
-    // expand shorthand #abc → #aabbcc
-    if (/^#[0-9a-fA-F]{3}$/.test(v)) {
-      v = '#' + v[1]+v[1]+v[2]+v[2]+v[3]+v[3];
-    }
-    state.colour = v;
-    document.getElementById('f-colour-picker').value = v;
-    document.getElementById('colour-swatch-display').style.background = v;
-    document.documentElement.style.setProperty('--client-colour', v);
-  }
-  el.value = v;
-  update();
-}
-
-function isValidHex(v) {
-  return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(v);
-}
-
-/* ════════════════════════════════════════
-   LOGO
-════════════════════════════════════════ */
-function handleLogo(input) {
-  const f = input.files[0]; if (!f) return;
-  const r = new FileReader();
-  r.onload = e => {
-    state.logoSrc = e.target.result;
-    const img = document.getElementById('logo-preview-img');
-    img.src = state.logoSrc; img.style.display = 'block';
-    update();
-  };
-  r.readAsDataURL(f);
-}
-
-/* ════════════════════════════════════════
-   PHOTOS (with drag-to-reorder)
-════════════════════════════════════════ */
-function handlePhotos(input) {
-  const files = Array.from(input.files);
-  let loaded = 0;
-  files.forEach(f => {
-    const r = new FileReader();
-    r.onload = e => {
-      state.photos.push(e.target.result);
-      loaded++;
-      if (loaded === files.length) { renderThumbs(); update(); }
-    };
-    r.readAsDataURL(f);
-  });
-}
-
-let dragSrc = null;
-
-function renderThumbs() {
-  const c = document.getElementById('photo-thumbs');
-  c.innerHTML = state.photos.map((src, i) => `
-    <div class="photo-thumb" draggable="true" id="thumb-${i}" ondragstart="dragStart(event,${i})" ondragover="dragOver(event)" ondrop="dragDrop(event,${i})" ondragend="dragEnd()">
-      <img src="${src}"/>
-      ${i===0?'<div class="photo-thumb-badge">Cover</div>':''}
-      <button class="photo-thumb-rm" onclick="removePhoto(${i})" title="Remove">×</button>
+/* ═══ PHOTOS ═══ */
+function handlePhotos(input){const files=Array.from(input.files);let done=0;files.forEach(f=>{const r=new FileReader();r.onload=e=>{S.photos.push(e.target.result);done++;if(done===files.length){renderPhotoList();update();}};r.readAsDataURL(f);});}
+function renderPhotoList(){
+  document.getElementById('photo-list').innerHTML=S.photos.map((src,i)=>`
+    <div class="photo-list-item">
+      <img class="photo-list-thumb" src="${src}"/>
+      ${i===0?'<span class="photo-list-badge">Cover</span>':''}
+      <span class="photo-list-name">Photo ${i+1}</span>
+      <div class="list-row-btns">
+        <button class="btn-icon up" onclick="movePhoto(${i},-1)" ${i===0?'disabled':''}>↑</button>
+        <button class="btn-icon dn" onclick="movePhoto(${i},1)" ${i===S.photos.length-1?'disabled':''}>↓</button>
+        <button class="btn-icon rm" onclick="removePhoto(${i})">×</button>
+      </div>
     </div>`).join('');
-  document.getElementById('photo-count').textContent = state.photos.length
-    ? `${state.photos.length} photo${state.photos.length>1?'s':''} — drag to reorder`
-    : '';
-}
+  document.getElementById('photo-count').textContent=S.photos.length?`${S.photos.length} photo${S.photos.length>1?'s':''}`:'';}
+function movePhoto(i,dir){const j=i+dir;if(j<0||j>=S.photos.length)return;[S.photos[i],S.photos[j]]=[S.photos[j],S.photos[i]];renderPhotoList();update();}
+function removePhoto(i){S.photos.splice(i,1);renderPhotoList();update();}
 
-function removePhoto(i) { state.photos.splice(i,1); renderThumbs(); update(); }
+/* ═══ FLOORPLAN ═══ */
+function handleFloorplan(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{S.floorplanSrc=e.target.result;const img=document.getElementById('fp-preview');img.src=S.floorplanSrc;img.style.display='block';update();};r.readAsDataURL(f);}
 
-function dragStart(e, i) { dragSrc = i; e.dataTransfer.effectAllowed = 'move'; document.getElementById('thumb-'+i).classList.add('dragging'); }
-function dragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
-function dragDrop(e, i) {
-  e.preventDefault();
-  if (dragSrc === i) return;
-  const moved = state.photos.splice(dragSrc, 1)[0];
-  state.photos.splice(i, 0, moved);
-  renderThumbs(); update();
-}
-function dragEnd() { dragSrc = null; document.querySelectorAll('.photo-thumb').forEach(t => t.classList.remove('dragging')); }
+/* ═══ FEATURES ═══ */
+function addFeature(v=''){S.features.push(v);renderFeatures();}
+function renderFeatures(){
+  document.getElementById('feature-list').innerHTML=S.features.map((f,i)=>`
+    <div class="list-row">
+      <input value="${esc(f)}" placeholder="e.g. Heated outdoor pool" oninput="S.features[${i}]=this.value;update()"/>
+      <div class="list-row-btns">
+        <button class="btn-icon up" onclick="moveArr(S.features,${i},-1,renderFeatures)" ${i===0?'disabled':''}>↑</button>
+        <button class="btn-icon dn" onclick="moveArr(S.features,${i},1,renderFeatures)" ${i===S.features.length-1?'disabled':''}>↓</button>
+        <button class="btn-icon rm" onclick="S.features.splice(${i},1);renderFeatures();update()">×</button>
+      </div>
+    </div>`).join('');}
 
-/* ════════════════════════════════════════
-   FLOORPLAN
-════════════════════════════════════════ */
-function handleFloorplan(input) {
-  const f = input.files[0]; if (!f) return;
-  const r = new FileReader();
-  r.onload = e => {
-    state.floorplanSrc = e.target.result;
-    const img = document.getElementById('fp-preview');
-    img.src = state.floorplanSrc; img.style.display = 'block';
-    update();
-  };
-  r.readAsDataURL(f);
-}
+/* ═══ ROOMS ═══ */
+function addRoom(){S.rooms.push({name:'',dim:''});renderRooms();}
+function renderRooms(){
+  document.getElementById('room-list').innerHTML=S.rooms.map((r,i)=>`
+    <div class="list-row">
+      <input value="${esc(r.name)}" placeholder="Kitchen" style="flex:1.3;" oninput="S.rooms[${i}].name=this.value;update()"/>
+      <input value="${esc(r.dim)}" placeholder="5.2 × 3.8m" class="w-narrow" oninput="S.rooms[${i}].dim=this.value;update()"/>
+      <div class="list-row-btns">
+        <button class="btn-icon up" onclick="moveArr(S.rooms,${i},-1,renderRooms)" ${i===0?'disabled':''}>↑</button>
+        <button class="btn-icon dn" onclick="moveArr(S.rooms,${i},1,renderRooms)" ${i===S.rooms.length-1?'disabled':''}>↓</button>
+        <button class="btn-icon rm" onclick="S.rooms.splice(${i},1);renderRooms();update()">×</button>
+      </div>
+    </div>`).join('');}
 
-/* ════════════════════════════════════════
-   FEATURES
-════════════════════════════════════════ */
-function addFeature(val='') {
-  state.features.push(val);
-  renderFeatures();
+/* ═══ AGENTS ═══ */
+function addAgent(){
+  if(S.agents.length>=3)return;
+  S.agents.push({name:'',phone:'',email:''});
+  renderAgents();
+  document.getElementById('add-agent-btn').style.display=S.agents.length>=3?'none':'';
 }
-function renderFeatures() {
-  document.getElementById('feature-list').innerHTML = state.features.map((f,i) => `
-    <div class="feature-item">
-      <input value="${esc(f)}" placeholder="e.g. Heated outdoor pool" oninput="state.features[${i}]=this.value;update()"/>
-      <button onclick="removeFeature(${i})" title="Remove">×</button>
+function renderAgents(){
+  document.getElementById('agent-list').innerHTML=S.agents.map((a,i)=>`
+    <div style="background:#fff;border:1px solid var(--rule);border-radius:5px;padding:8px;margin-bottom:5px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+        <span style="font-size:9px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.1em;">Agent ${i+1}</span>
+        ${i>0?`<button class="btn-icon rm" onclick="S.agents.splice(${i},1);renderAgents();update();document.getElementById('add-agent-btn').style.display=''">×</button>`:''}
+      </div>
+      <input style="width:100%;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:4px;font-size:12px;font-family:'Mukta',sans-serif;margin-bottom:4px;" placeholder="Agent Name" value="${esc(a.name)}" oninput="S.agents[${i}].name=this.value;update()"/>
+      <input style="width:100%;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:4px;font-size:12px;font-family:'Mukta',sans-serif;margin-bottom:4px;" placeholder="Phone" value="${esc(a.phone)}" oninput="S.agents[${i}].phone=this.value;update()"/>
+      <input style="width:100%;padding:6px 8px;border:1px solid var(--rule-strong);border-radius:4px;font-size:12px;font-family:'Mukta',sans-serif;" placeholder="Email" value="${esc(a.email)}" oninput="S.agents[${i}].email=this.value;update()"/>
     </div>`).join('');
 }
-function removeFeature(i) { state.features.splice(i,1); renderFeatures(); update(); }
+function moveArr(arr,i,dir,fn){const j=i+dir;if(j<0||j>=arr.length)return;[arr[i],arr[j]]=[arr[j],arr[i]];fn();update();}
 
-/* ════════════════════════════════════════
-   DISCLAIMER
-════════════════════════════════════════ */
-function renderDisclaimer() {
-  const c = document.getElementById('disclaimer-container');
-  if (state.disclaimerRemoved) {
-    c.innerHTML = `<div class="disclaimer-removed">
-      <span>Disclaimer removed from brochure</span>
-      <button class="disclaimer-restore-btn" onclick="restoreDisclaimer()">Restore</button>
-    </div>`;
-  } else {
-    c.innerHTML = `<div class="disclaimer-box">
-      <textarea id="f-disclaimer" oninput="state.disclaimer=this.value;update()">${esc(state.disclaimer)}</textarea>
-      <button class="disclaimer-remove-btn" onclick="removeDisclaimer()" title="Remove disclaimer">×</button>
-    </div>`;
+/* ═══ DISCLAIMER ═══ */
+function renderDisclaimer(){
+  const c=document.getElementById('disclaimer-container');
+  if(S.disclaimerRemoved){
+    c.innerHTML=`<div class="disclaimer-removed"><span>Removed from brochure</span><button class="disclaimer-restore-btn" onclick="S.disclaimerRemoved=false;renderDisclaimer();update()">Restore</button></div>`;
+  }else{
+    c.innerHTML=`<div class="disclaimer-box"><textarea id="f-disclaimer" oninput="S.disclaimer=this.value;update()">${esc(S.disclaimer)}</textarea><button class="disclaimer-remove-btn" onclick="S.disclaimerRemoved=true;renderDisclaimer();update()">×</button></div>`;
   }
 }
-function removeDisclaimer() { state.disclaimerRemoved = true; renderDisclaimer(); update(); }
-function restoreDisclaimer() { state.disclaimerRemoved = false; renderDisclaimer(); update(); }
 
-/* ════════════════════════════════════════
-   READ FIELDS
-════════════════════════════════════════ */
-function readFields() {
-  const g = id => document.getElementById(id)?.value || '';
-  state.agency    = g('f-agency');
-  state.address   = g('f-address');
-  state.pricetype = g('f-pricetype');
-  state.price     = g('f-price');
-  state.beds      = g('f-beds');
-  state.baths     = g('f-baths');
-  state.rec       = g('f-rec');
-  state.tenure    = g('f-tenure');
-  state.epc       = g('f-epc');
-  state.ctax      = g('f-ctax');
-  state.style     = g('f-style');
-  state.newbuild  = g('f-newbuild');
-  state.area      = g('f-area');
-  state.plot      = g('f-plot');
-  state.year      = g('f-year');
-  state.parking   = g('f-parking');
-  state.heating   = g('f-heating');
-  state.garden    = g('f-garden');
-  state.vtour     = g('f-vtour');
-  state.desc      = g('f-desc');
-  state.local     = g('f-local');
-  state.stations  = g('f-stations');
-  state.schools   = g('f-schools');
-  state.agent     = g('f-agent');
-  state.phone     = g('f-phone');
-  state.email     = g('f-email');
-  state.branch    = g('f-branch');
-  state.website   = g('f-website');
-  if (!state.disclaimerRemoved) state.disclaimer = g('f-disclaimer') || state.disclaimer;
+/* ═══ READ FIELDS ═══ */
+function rf(id){return document.getElementById(id)?.value||'';}
+function readFields(){
+  S.agency=rf('f-agency');S.address=rf('f-address');S.pricetype=rf('f-pricetype');S.price=rf('f-price');
+  S.beds=rf('f-beds');S.baths=rf('f-baths');S.rec=rf('f-rec');S.tenure=rf('f-tenure');
+  S.epc=rf('f-epc');S.ctax=rf('f-ctax');S.style=rf('f-style');S.newbuild=rf('f-newbuild');
+  S.area=rf('f-area');S.plot=rf('f-plot');S.year=rf('f-year');S.parking=rf('f-parking');
+  S.heating=rf('f-heating');S.garden=rf('f-garden');S.w3w=rf('f-w3w');S.vtour=rf('f-vtour');
+  S.leaseYears=rf('f-lease-years');S.leaseGR=rf('f-lease-gr');S.leaseSC=rf('f-lease-sc');S.leaseMF=rf('f-lease-mf');
+  S.desc=rf('f-desc');S.local=rf('f-local');S.stations=rf('f-stations');S.schools=rf('f-schools');
+  S.viewDate=rf('f-view-date');S.viewTime=rf('f-view-time');S.viewBook=rf('f-view-book');
+  S.sdlt=rf('f-sdlt')||'yes';S.mortgageShow=rf('f-mortgage-show')||'yes';
+  S.mortgageRate=parseFloat(rf('f-mortgage-rate'))||4.5;
+  S.mortgageTerm=parseInt(rf('f-mortgage-term'))||25;
+  S.mortgageDeposit=parseFloat(rf('f-mortgage-deposit'))||10;
+  if(!S.disclaimerRemoved)S.disclaimer=rf('f-disclaimer')||S.disclaimer;
 }
 
-/* ════════════════════════════════════════
-   ESCAPE
-════════════════════════════════════════ */
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+/* ═══ ESCAPE ═══ */
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ═══ CALCULATIONS ═══ */
+function priceNum(){const n=parseFloat((S.price||'').replace(/[£,\s]/g,''));return isNaN(n)?0:n;}
+function calcSDLT(p){
+  const bands=[{max:250000,rate:0},{max:925000,rate:.05},{max:1500000,rate:.10},{max:Infinity,rate:.12}];
+  let tax=0,prev=0,rows=[];
+  for(const b of bands){
+    if(p<=prev)break;
+    const taxable=Math.min(p,b.max)-prev;
+    const t=taxable*b.rate;
+    tax+=t;
+    if(taxable>0)rows.push({band:`£${prev.toLocaleString()} – ${b.max===Infinity?'above':'£'+b.max.toLocaleString()}`,rate:`${(b.rate*100).toFixed(0)}%`,amount:t});
+    prev=b.max;
+  }
+  return{total:tax,rows};
+}
+function calcMortgage(p,rate,term,dep){
+  const loan=p*(1-dep/100);const r=rate/100/12;const n=term*12;
+  if(r===0)return loan/n;
+  return loan*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
 }
 
-/* ════════════════════════════════════════
-   RENDER DISPATCH
-════════════════════════════════════════ */
-function update() {
+/* ═══ QR CODE ═══ */
+let _qrUrl='',_qrData='';
+async function getQR(url){
+  if(!url)return null;
+  if(url===_qrUrl&&_qrData)return _qrData;
+  return new Promise(resolve=>{
+    const s=document.getElementById('qr-scratch');
+    s.innerHTML='';
+    try{
+      new QRCode(s,{text:url,width:72,height:72,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+      setTimeout(()=>{
+        const c=s.querySelector('canvas');
+        if(c){_qrUrl=url;_qrData=c.toDataURL();resolve(_qrData);}
+        else{const img=s.querySelector('img');if(img){_qrUrl=url;_qrData=img.src;resolve(_qrData);}else resolve(null);}
+      },120);
+    }catch(e){resolve(null);}
+  });
+}
+
+/* ═══ COMPONENT SNIPPETS ═══ */
+function epcBar(r){
+  if(!r)return'';
+  return'<div class="br-epc-bar">'+['A','B','C','D','E','F','G'].map(b=>`<div class="br-epc-row"><div class="br-epc-band epc-${b}${b===r?' br-epc-active':''}">${b}</div>${b===r?'<span style="font-size:10px;font-weight:700;color:var(--ink-mid)">← This property</span>':''}</div>`).join('')+'</div>';}
+
+function sdltBlock(p){
+  if(S.sdlt!=='yes'||!p)return'';
+  const{total,rows}=calcSDLT(p);
+  if(!total)return`<p style="font-size:12px;color:var(--ink-mid);margin-bottom:16px;">No Stamp Duty Land Tax payable at this price.</p>`;
+  return`<table class="br-sdlt"><thead><tr><th>Band</th><th style="text-align:center">Rate</th><th style="text-align:right">Tax</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.band}</td><td style="text-align:center">${r.rate}</td><td style="text-align:right">£${Math.round(r.amount).toLocaleString()}</td></tr>`).join('')}<tr><td colspan="2" style="font-weight:700;color:var(--ink);border-top:2px solid var(--client-colour,#B46100);font-size:12px;">Total SDLT</td><td class="sdlt-total" style="text-align:right;border-top:2px solid var(--client-colour,#B46100);">£${Math.round(total).toLocaleString()}</td></tr></tbody></table>`;
+}
+
+function mortgageBlock(p){
+  if(S.mortgageShow!=='yes'||!p)return'';
+  const m=calcMortgage(p,S.mortgageRate,S.mortgageTerm,S.mortgageDeposit);
+  return`<div class="br-mortgage"><div class="br-mortgage-amount">£${Math.round(m).toLocaleString()}<span style="font-size:13px;font-weight:400;"> /month</span></div><div class="br-mortgage-note">Indicative repayment — ${S.mortgageDeposit}% deposit, ${S.mortgageRate}% p/a, ${S.mortgageTerm}-year term. Subject to status and lender criteria. Not financial advice.</div></div>`;
+}
+
+function roomsTable(){
+  const rows=S.rooms.filter(r=>r.name.trim());
+  if(!rows.length)return'';
+  return`<table class="br-rooms"><tbody>${rows.map(r=>`<tr><td class="room-name">${esc(r.name)}</td><td class="room-dim">${esc(r.dim)}</td></tr>`).join('')}</tbody></table>`;
+}
+
+function leaseholdBlock(){
+  const items=[S.leaseYears&&`Lease remaining: <strong>${esc(S.leaseYears)}</strong>`,S.leaseGR&&`Ground rent: <strong>${esc(S.leaseGR)}</strong>`,S.leaseSC&&`Service charge: <strong>${esc(S.leaseSC)}</strong>`,S.leaseMF&&`Maintenance fund: <strong>${esc(S.leaseMF)}</strong>`].filter(Boolean);
+  if(!items.length)return'';
+  return`<div style="background:#fffbf5;border:1px solid #ede8df;border-left:3px solid var(--client-colour,#B46100);padding:10px 14px;font-size:12px;color:var(--ink-mid);line-height:2;margin-bottom:16px;">${items.join(' &nbsp;&middot;&nbsp; ')}</div>`;
+}
+
+function viewingBlock(){
+  if(!S.viewDate&&!S.viewTime&&!S.viewBook)return'';
+  return`<div class="br-viewing">${S.viewDate?`<div class="br-viewing-item"><div class="br-viewing-lbl">Open Day</div><div class="br-viewing-val">${esc(S.viewDate)}</div></div>`:''}${S.viewTime?`<div class="br-viewing-item"><div class="br-viewing-lbl">Time</div><div class="br-viewing-val">${esc(S.viewTime)}</div></div>`:''}${S.viewBook?`<div class="br-viewing-item"><div class="br-viewing-lbl">Booking</div><div class="br-viewing-val">${esc(S.viewBook)}</div></div>`:''}</div>`;
+}
+
+function w3wBlock(){if(!S.w3w)return'';return`<div class="br-w3w"><span class="br-w3w-logo">///</span><span>${esc(S.w3w)}</span></div>`;}
+function vtourBadge(){if(!S.vtour)return'';return`<div class="br-vtour-badge">▶ View Virtual Tour</div>`;}
+
+function qrBlock(qr){
+  if(!qr)return'';
+  return`<div class="br-qr-wrap"><div class="br-qr-box"><img src="${qr}" style="width:64px;height:64px;display:block;"/></div><div class="br-qr-text"><strong>Virtual Tour</strong>Scan to take an interactive tour of this property</div></div>`;
+}
+
+function agentStrip(dark=false){
+  const agents=S.agents.filter(a=>a.name||a.phone||a.email);
+  if(!agents.length)return'';
+  const items=agents.flatMap(a=>[a.name&&{l:'Negotiator',v:a.name},a.phone&&{l:'Tel',v:a.phone},a.email&&{l:'Email',v:a.email}].filter(Boolean));
+  if(!items.length)return'';
+  const bg=dark?'background:#0e0b08;':'background:#f8f6f2;';
+  const lc=dark?'rgba(255,255,255,.4)':'#8A7050';
+  const vc=dark?'#fff':'#1C140A';
+  const bc=dark?'rgba(255,255,255,.06)':'#ede8df';
+  const cols=Math.min(items.length,4);
+  return`<div style="${bg}display:grid;grid-template-columns:repeat(${cols},1fr);border-top:3px solid var(--client-colour,#B46100);">${items.slice(0,cols).map(it=>`<div style="padding:11px 14px;border-right:1px solid ${bc};"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:${lc};margin-bottom:2px;">${it.l}</div><div style="font-size:11px;font-weight:600;color:${vc};">${esc(it.v)}</div></div>`).join('')}</div>`;
+}
+
+function footerNote(light=false){
+  if(S.disclaimerRemoved||!S.disclaimer)return'';
+  const col=light?'rgba(255,255,255,.55)':'rgba(255,255,255,.4)';
+  return`<div style="font-size:9px;color:${col};text-align:right;max-width:280px;line-height:1.6;">${esc(S.disclaimer)}</div>`;
+}
+
+function logoImg(cls,dark=false){
+  if(S.logoSrc)return`<img class="${cls}" src="${S.logoSrc}" style="max-height:44px;max-width:130px;object-fit:contain;"/>`;
+  if(S.agency)return`<div class="${cls}" style="${dark?'color:#fff;font-size:13px;font-weight:700;':'color:var(--client-colour);font-size:13px;font-weight:700;'}">${esc(S.agency)}</div>`;
+  return'';
+}
+
+function localBlock(){
+  const p=[];
+  if(S.local)p.push(esc(S.local).replace(/\n/g,'<br>'));
+  if(S.stations)p.push(`<strong>Nearest Stations:</strong> ${esc(S.stations)}`);
+  if(S.schools)p.push(`<strong>Nearby Schools:</strong> ${esc(S.schools)}`);
+  return p.join('<br><br>');
+}
+
+function makeStats(){return[{v:S.beds,l:'Bedrooms'},{v:S.baths,l:'Bathrooms'},{v:S.rec,l:'Receptions'},{v:S.tenure,l:'Tenure'}].filter(s=>s.v);}
+function makeDetails(){return[{l:'EPC Rating',v:S.epc},{l:'Council Tax Band',v:S.ctax},{l:'Property Style',v:S.style},{l:'New Build',v:S.newbuild},{l:'Floor Area',v:S.area},{l:'Plot Size',v:S.plot},{l:'Year Built',v:S.year},{l:'Parking',v:S.parking},{l:'Heating',v:S.heating},{l:'Garden',v:S.garden}].filter(d=>d.v);}
+
+/* ═══ UPDATE (async for QR) ═══ */
+async function update(){
   readFields();
-  const br = document.getElementById('brochure');
-  br.className = 'tpl-' + state.template;
-  const c = state.colour;
-  const cs = `--client-colour:${c};`;
-  if (state.mode === 'multi') {
-    br.innerHTML = renderMulti(cs);
-  } else {
-    switch(state.template) {
-      case 'classic': br.innerHTML = renderClassic(cs); break;
-      case 'modern':  br.innerHTML = renderModern(cs); break;
-      case 'dark':    br.innerHTML = renderDark(cs); break;
-    }
+  const p=priceNum();
+  const qr=S.vtour?await getQR(S.vtour):null;
+  const br=document.getElementById('brochure');
+  br.className='tpl-'+S.template;
+  if(S.mode==='multi'){br.innerHTML=buildMulti(p,qr);return;}
+  switch(S.template){
+    case'classic':br.innerHTML=renderClassic(p,qr);break;
+    case'modern':br.innerHTML=renderModern(p,qr);break;
+    case'dark':br.innerHTML=renderDark(p,qr);break;
+    case'editorial':br.innerHTML=renderEditorial(p,qr);break;
+    case'scandi':br.innerHTML=renderScandi(p,qr);break;
   }
 }
 
-/* ════════════════════════════════════════
-   SHARED HELPERS
-════════════════════════════════════════ */
-function priceBlock(suffix='') {
-  if (!state.price && !state.pricetype) return '';
-  return (state.pricetype ? `<div class="br-price-type${suffix}">${esc(state.pricetype)}</div>` : '') +
-         (state.price ? `${state.price}` : '');
+/* ═══ TEMPLATE: CLASSIC LUXURY ═══ */
+function renderClassic(p,qr){
+  const stats=makeStats();const det=makeDetails();const feats=S.features.filter(f=>f);const ph=S.photos;
+  const hero=ph[0]?`<img class="hero" src="${ph[0]}"/>`:`<div class="br-placeholder" style="height:460px;">Add hero photo</div>`;
+  const phGrid=ph.length>1?`<div style="display:grid;grid-template-columns:repeat(${Math.min(ph.length-1,3)},1fr);gap:4px;margin-bottom:20px;">${ph.slice(1).map(s=>`<img src="${s}" style="width:100%;aspect-ratio:4/3;object-fit:cover;"/>`).join('')}</div>`:'';
+  return`
+  <div class="br-cover">${hero}<div class="br-cover-overlay"></div>
+    <div class="br-agency-logo" style="position:absolute;top:22px;right:26px;">${logoImg('',false)}</div>
+    <div class="br-cover-text">
+      ${S.pricetype?`<div class="br-price-type">${esc(S.pricetype)}</div>`:''}
+      <div class="br-address">${esc(S.address)||'<span style="opacity:.3">Property Address</span>'}</div>
+      ${p?`<div class="br-price-tag">${esc(S.price)}</div>`:''}
+    </div>
+  </div>
+  ${stats.length?`<div class="br-stats-bar">${stats.map(s=>`<div class="br-stat"><div class="br-stat-val">${esc(s.v)}</div><div class="br-stat-lbl">${s.l}</div></div>`).join('')}</div>`:''}
+  <div class="br-body">
+    ${vtourBadge()}${w3wBlock()}${viewingBlock()}
+    ${S.desc?`<div class="br-section-title">About This Property</div><div class="br-description">${esc(S.desc).replace(/\n/g,'<br>')}</div>`:''}
+    ${feats.length?`<div class="br-section-title">Key Features</div><div class="br-features">${feats.map(f=>`<div class="br-feature">${esc(f)}</div>`).join('')}</div>`:''}
+    ${phGrid}
+    ${det.length?`<div class="br-section-title">Property Details</div><div class="br-details-grid">${det.map(d=>`<div class="br-detail"><div class="br-detail-lbl">${d.l}</div><div class="br-detail-val">${esc(d.v)}</div></div>`).join('')}</div>`:''}
+    ${S.epc?`<div class="br-section-title">EPC Rating</div>${epcBar(S.epc)}<br/>`:''}
+    ${leaseholdBlock()}
+    ${roomsTable()?`<div class="br-section-title">Room Dimensions</div>${roomsTable()}`:''}
+    ${localBlock()?`<div class="br-section-title">Local Area</div><div class="br-local">${localBlock()}</div>`:''}
+    ${S.floorplanSrc?`<div class="br-section-title">Floorplan</div><img class="br-floorplan" src="${S.floorplanSrc}"/>`:''}
+    ${p&&S.sdlt==='yes'?`<div class="br-section-title">Stamp Duty (England &amp; NI)</div>${sdltBlock(p)}`:''}
+    ${p&&S.mortgageShow==='yes'?`<div class="br-section-title">Mortgage Estimate</div>${mortgageBlock(p)}`:''}
+    ${qrBlock(qr)}
+  </div>
+  ${agentStrip(false)}
+  <div class="br-footer"><div class="br-footer-agency">${esc(S.agency||'Your Estate Agency')}</div>${footerNote()}</div>`;
 }
 
-function contactItems() {
-  const items = [
-    {l:'Agent', v:state.agent},
-    {l:'Telephone', v:state.phone},
-    {l:'Email', v:state.email},
-    {l:'Branch', v:state.branch},
-    {l:'Website', v:state.website},
-  ].filter(d=>d.v);
-  return items;
+/* ═══ TEMPLATE: MODERN MINIMAL ═══ */
+function renderModern(p,qr){
+  const stats=[{v:S.beds,l:'Beds'},{v:S.baths,l:'Baths'},{v:S.rec,l:'Recep.'},{v:S.tenure,l:'Tenure'},{v:S.epc,l:'EPC'}].filter(s=>s.v);
+  const det=makeDetails();const feats=S.features.filter(f=>f);const ph=S.photos;
+  const hero=ph[0]?`<img class="hero" src="${ph[0]}"/>`:`<div class="br-placeholder" style="height:490px;">Add hero photo</div>`;
+  const stripPhotos=ph.length>1?`<div class="br-photo-strip">${ph.slice(1).map(s=>`<img src="${s}"/>`).join('')}</div>`:'';
+  return`
+  <div class="br-cover">${hero}<div class="br-cover-bar"></div>
+    <div class="br-cover-logo" style="position:absolute;top:22px;left:20px;">${logoImg('')}</div>
+  </div>
+  <div class="br-header-block">
+    <div><div class="br-address-m">${esc(S.address||'Property Address')}</div>${S.tenure?`<span class="br-tenure-pill">${esc(S.tenure)}</span>`:''}</div>
+    <div style="text-align:right">${S.pricetype?`<div class="br-price-type-m">${esc(S.pricetype)}</div>`:''}${p?`<div class="br-price-m">${esc(S.price)}</div>`:''}</div>
+  </div>
+  ${stats.length?`<div class="br-stats-m">${stats.map(s=>`<div class="br-stat-m"><div class="br-stat-m-val">${esc(s.v)}</div><div class="br-stat-m-lbl">${s.l}</div></div>`).join('')}</div>`:''}
+  <div class="br-body">
+    ${vtourBadge()}${w3wBlock()}${viewingBlock()}
+    <div class="br-col-2">
+      <div>${S.desc?`<p class="br-desc-m">${esc(S.desc).replace(/\n/g,'<br>')}</p>`:''}</div>
+      <div>${feats.length?`<ul class="br-features-m">${feats.map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`:''}</div>
+    </div>
+    ${stripPhotos}
+    ${det.length?`<div class="br-details-m">${det.map(d=>`<div class="br-det-m"><div class="br-det-m-l">${d.l}</div><div class="br-det-m-v">${esc(d.v)}</div></div>`).join('')}</div>`:''}
+    ${S.epc?epcBar(S.epc)+'<br/>':''}
+    ${leaseholdBlock()}
+    ${roomsTable()?`<div style="font-family:var(--br-font-display);font-size:16px;font-weight:600;color:var(--client-colour,#B46100);margin-bottom:8px;">Room Dimensions</div>${roomsTable()}`:''}
+    ${localBlock()?`<div class="br-local-m">${localBlock()}</div>`:''}
+    ${S.floorplanSrc?`<img class="br-floorplan" src="${S.floorplanSrc}"/>`:''}
+    ${p&&S.sdlt==='yes'?sdltBlock(p):''}
+    ${p&&S.mortgageShow==='yes'?mortgageBlock(p):''}
+    ${qrBlock(qr)}
+  </div>
+  ${agentStrip(false)}
+  <div class="br-footer"><div><div class="br-footer-l">${esc(S.agency||'Your Estate Agency')}</div><div class="br-footer-accent"></div></div>${footerNote()}</div>`;
 }
 
-function vtourBadge() {
-  if (!state.vtour) return '';
-  return `<a class="br-vtour-badge" href="${esc(state.vtour)}" target="_blank">
-    ▶ View Virtual Tour
-  </a>`;
+/* ═══ TEMPLATE: DARK ESTATE ═══ */
+function renderDark(p,qr){
+  const stats=makeStats();const det=makeDetails();const feats=S.features.filter(f=>f);const ph=S.photos;
+  const hero=ph[0]?`<img class="hero" src="${ph[0]}"/>`:`<div class="br-cover-bg" style="position:absolute;inset:0;"></div>`;
+  const gr=lbl=>`<div class="gold-rule"><div class="gold-rule-line"></div><div class="gold-rule-dia"></div><div class="gold-rule-txt">${lbl}</div><div class="gold-rule-dia"></div><div class="gold-rule-line"></div></div>`;
+  const logoD=S.logoSrc?`<img class="br-agency-d" src="${S.logoSrc}"/>`:S.agency?`<div class="br-agency-d" style="filter:none;padding:5px 10px;background:var(--client-colour,#B46100);color:#fff;font-size:11px;font-weight:700;">${esc(S.agency)}</div>`:'';
+  const masonry=ph.length>1?`<div class="br-photo-masonry">${ph.slice(1,4).map(s=>`<img src="${s}"/>`).join('')}</div>`:'';
+  const extra=ph.length>4?`<div class="br-photo-extra">${ph.slice(4).map(s=>`<img src="${s}"/>`).join('')}</div>`:'';
+  return`
+  <div class="br-cover"><div class="br-cover-bg"></div>${hero}<div class="br-cover-overlay"></div>${logoD}
+    <div class="br-cover-text"><div class="br-cover-line"></div>
+      <div class="br-address-d">${esc(S.address||'Property Address')}</div>
+      ${S.pricetype?`<div class="br-price-type-d">${esc(S.pricetype)}</div>`:''}
+      ${p?`<div class="br-price-d">${esc(S.price)}</div>`:''}
+    </div>
+  </div>
+  ${stats.length?`<div class="br-dark-stats">${stats.map(s=>`<div class="br-stat-d"><div class="br-stat-d-val">${esc(s.v)}</div><div class="br-stat-d-lbl">${s.l}</div></div>`).join('')}</div>`:''}
+  <div class="br-body">
+    ${vtourBadge()}${w3wBlock()}${viewingBlock()}
+    ${gr('About This Property')}
+    ${S.desc?`<div class="br-desc-d">${esc(S.desc).replace(/\n/g,'<br>')}</div>`:''}
+    ${feats.length?`<div class="br-features-d">${feats.map(f=>`<div class="br-feature-d">${esc(f)}</div>`).join('')}</div>`:''}
+    ${masonry}${extra}
+    ${det.length?`<div class="br-details-d">${det.map(d=>`<div><div class="br-det-d-l">${d.l}</div><div class="br-det-d-v">${esc(d.v)}</div></div>`).join('')}</div>`:''}
+    ${S.epc?gr('EPC Rating')+epcBar(S.epc)+'<br/>':''}
+    ${leaseholdBlock()}
+    ${roomsTable()?gr('Room Dimensions')+roomsTable():''}
+    ${localBlock()?gr('Local Area')+`<div class="br-local-d">${localBlock()}</div>`:''}
+    ${S.floorplanSrc?gr('Floorplan')+`<img class="br-floorplan" src="${S.floorplanSrc}"/>`:''}
+    ${p&&S.sdlt==='yes'?gr('Stamp Duty')+sdltBlock(p):''}
+    ${p&&S.mortgageShow==='yes'?gr('Mortgage Estimate')+mortgageBlock(p):''}
+    ${qrBlock(qr)}
+  </div>
+  ${agentStrip(true)}
+  <div class="br-footer"><div class="br-footer-agency">${esc(S.agency||'Your Estate Agency')}</div><div class="br-footer-right">${footerNote()}<div class="br-footer-accent"></div></div></div>`;
 }
 
-function pageBreak(label='') {
-  return `<div class="page-break">${label ? label : 'Page Break'}</div>`;
+/* ═══ TEMPLATE: EDITORIAL MAGAZINE ═══ */
+function renderEditorial(p,qr){
+  const stats=[{v:S.beds,l:'Beds'},{v:S.baths,l:'Baths'},{v:S.rec,l:'Recep.'},{v:S.tenure,l:'Tenure'},{v:S.area,l:'Area'}].filter(s=>s.v);
+  const det=makeDetails();const feats=S.features.filter(f=>f);const ph=S.photos;
+  const hero=ph[0]?`<img class="hero" src="${ph[0]}"/>`:`<div style="background:#2a2420;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.3);font-size:12px;letter-spacing:.12em;">ADD HERO PHOTO</div>`;
+  const logoE=S.logoSrc?`<img class="br-cover-logo-e" src="${S.logoSrc}"/>`:S.agency?`<div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:18px;letter-spacing:.08em;text-transform:uppercase;">${esc(S.agency)}</div>`:'';
+  const phFeature=ph.length>1?`<div class="br-photo-feature">${ph.slice(1,4).map(s=>`<img src="${s}"/>`).join('')}</div>`:'';
+  const phRow=ph.length>4?`<div class="br-photo-row">${ph.slice(4).map(s=>`<img src="${s}"/>`).join('')}</div>`:'';
+  return`
+  <div class="br-cover">${hero}
+    <div class="br-cover-panel">
+      ${logoE}
+      <div class="br-cover-overline">${esc(S.style||'Residential Property')}</div>
+      <div class="br-address-e">${esc(S.address||'Property Address')}</div>
+      <div class="br-price-e">${S.pricetype?esc(S.pricetype)+' ':''}${p?`<strong>${esc(S.price)}</strong>`:''}</div>
+    </div>
+  </div>
+  ${stats.length?`<div class="br-stats-e">${stats.map(s=>`<div class="br-stat-e"><div class="br-stat-e-val">${esc(s.v)}</div><div class="br-stat-e-lbl">${s.l}</div></div>`).join('')}</div>`:''}
+  <div class="br-body">
+    ${vtourBadge()}${w3wBlock()}${viewingBlock()}
+    ${S.desc?`<div class="br-heading-e">About This Property</div><div class="br-desc-e">${esc(S.desc).replace(/\n/g,'<br>')}</div>`:''}
+    ${feats.length?`<div class="br-heading-e">Key Features</div><div class="br-features-e">${feats.map(f=>`<div class="br-feature-e">${esc(f)}</div>`).join('')}</div>`:''}
+    ${phFeature}${phRow}
+    ${det.length?`<div class="br-heading-e">Property Details</div><div class="br-details-e">${det.map(d=>`<div class="br-det-e"><div class="br-det-e-l">${d.l}</div><div class="br-det-e-v">${esc(d.v)}</div></div>`).join('')}</div>`:''}
+    ${S.epc?`<div class="br-heading-e">EPC Rating</div>${epcBar(S.epc)}<br/>`:''}
+    ${leaseholdBlock()}
+    ${roomsTable()?`<div class="br-heading-e">Room Dimensions</div>${roomsTable()}`:''}
+    ${localBlock()?`<div class="br-heading-e">Local Area</div><div class="br-local-e">${localBlock()}</div>`:''}
+    ${S.floorplanSrc?`<div class="br-heading-e">Floorplan</div><img class="br-floorplan" src="${S.floorplanSrc}"/>`:''}
+    ${p&&S.sdlt==='yes'?`<div class="br-heading-e">Stamp Duty</div>${sdltBlock(p)}`:''}
+    ${p&&S.mortgageShow==='yes'?`<div class="br-heading-e">Mortgage Estimate</div>${mortgageBlock(p)}`:''}
+    ${qrBlock(qr)}
+  </div>
+  ${agentStrip(false)}
+  <div class="br-footer"><div class="br-footer-left">${esc(S.agency||'Your Estate Agency')}</div><div class="br-footer-bar"></div><div class="br-footer-contact">${S.agents[0]?.phone?esc(S.agents[0].phone):''}${S.agents[0]?.email?`<br>${esc(S.agents[0].email)}`:''}</div>${footerNote()}</div>`;
 }
 
-/* ════════════════════════════════════════
-   MULTI-PAGE WRAPPER
-   Splits brochure into distinct pages
-════════════════════════════════════════ */
-function renderMulti(cs) {
-  switch(state.template) {
-    case 'classic': return renderClassicMulti(cs);
-    case 'modern':  return renderModernMulti(cs);
-    case 'dark':    return renderDarkMulti(cs);
-  }
+/* ═══ TEMPLATE: SCANDINAVIAN CLEAN ═══ */
+function renderScandi(p,qr){
+  const stats=[{v:S.beds,l:'Beds'},{v:S.baths,l:'Baths'},{v:S.rec,l:'Receptions'},{v:S.tenure,l:'Tenure'},{v:S.epc,l:'EPC'}].filter(s=>s.v);
+  const det=makeDetails();const feats=S.features.filter(f=>f);const ph=S.photos;
+  const hero=ph[0]?`<img class="hero" src="${ph[0]}"/>`:`<div class="br-placeholder" style="height:440px;">Add hero photo</div>`;
+  const rule=lbl=>`<div class="br-rule-s"><div class="br-rule-s-line"></div><div class="br-rule-s-label">${lbl}</div><div class="br-rule-s-line"></div></div>`;
+  const logoS=S.logoSrc?`<img class="br-logo-s" src="${S.logoSrc}"/>`:S.agency?`<div class="br-logo-s" style="background:var(--client-colour,#B46100);color:#fff;padding:3px 9px;font-size:11px;font-weight:700;">${esc(S.agency)}</div>`:'';
+  const n=ph.length-1;
+  const pgCols=n<=0?'':n===1?'grid-template-columns:1fr;':n===2?'grid-template-columns:1fr 1fr;':'grid-template-columns:1fr 1fr 1fr;';
+  const phClean=n>0?`<div style="display:grid;${pgCols}gap:4px;margin-bottom:24px;">${ph.slice(1).map(s=>`<img src="${s}" style="width:100%;aspect-ratio:4/3;object-fit:cover;"/>`).join('')}</div>`:'';
+  return`
+  <div class="br-cover">${hero}${logoS}
+    <div class="br-cover-caption">
+      <div><div class="br-address-s">${esc(S.address||'Property Address')}</div></div>
+      <div style="text-align:right;">${S.pricetype?`<div class="br-price-type-s">${esc(S.pricetype)}</div>`:''}${p?`<div class="br-price-val-s">${esc(S.price)}</div>`:''}</div>
+    </div>
+  </div>
+  ${stats.length?`<div class="br-stats-s">${stats.map(s=>`<div class="br-stat-s"><div class="br-stat-s-val">${esc(s.v)}</div><div class="br-stat-s-lbl">${s.l}</div></div>`).join('')}</div>`:''}
+  <div class="br-body">
+    ${vtourBadge()}${w3wBlock()}${viewingBlock()}
+    ${S.desc?rule('About This Property')+`<div class="br-desc-s">${esc(S.desc).replace(/\n/g,'<br>')}</div>`:''}
+    ${feats.length?rule('Key Features')+`<div class="br-features-s">${feats.map(f=>`<div class="br-feature-s">${esc(f)}</div>`).join('')}</div>`:''}
+    ${phClean}
+    ${det.length?rule('Property Details')+`<div class="br-details-s">${det.map(d=>`<div class="br-det-s"><div class="br-det-s-l">${d.l}</div><div class="br-det-s-v">${esc(d.v)}</div></div>`).join('')}</div>`:''}
+    ${S.epc?rule('EPC Rating')+epcBar(S.epc)+'<br/>':''}
+    ${leaseholdBlock()}
+    ${roomsTable()?rule('Room Dimensions')+roomsTable():''}
+    ${localBlock()?rule('Local Area')+`<div class="br-local-s">${localBlock()}</div>`:''}
+    ${S.floorplanSrc?rule('Floorplan')+`<img class="br-floorplan" src="${S.floorplanSrc}"/>`:''}
+    ${p&&S.sdlt==='yes'?rule('Stamp Duty')+sdltBlock(p):''}
+    ${p&&S.mortgageShow==='yes'?rule('Mortgage Estimate')+mortgageBlock(p):''}
+    ${qrBlock(qr)}
+  </div>
+  ${agentStrip(false)}
+  <div class="br-footer"><div class="br-footer-agency">${esc(S.agency||'Your Estate Agency')}</div><div class="br-footer-dot"></div><div style="font-size:9px;color:#999;text-align:right;max-width:240px;line-height:1.6;">${S.disclaimerRemoved?'':esc(S.disclaimer)}</div></div>`;
 }
 
-/* ════════════════════════════════════════
-   TEMPLATE: CLASSIC — SINGLE
-════════════════════════════════════════ */
-function renderClassic(cs) {
-  const heroImg = state.photos[0]
-    ? `<img class="br-cover-img" src="${state.photos[0]}"/>`
-    : `<div class="br-cover-img br-placeholder" style="height:480px;">Add your hero photo</div>`;
-  const logo = logoBlock('br-agency-logo');
-  const stats = makeStats();
-  const details = makeDetails();
-  const featuresHTML = state.features.filter(f=>f).map(f=>`<div class="br-feature">${esc(f)}</div>`).join('');
-  const restPhotos = state.photos.slice(1);
-  const photosBlock = restPhotos.length ? `<div class="br-photo-grid cols-${Math.min(restPhotos.length,3)}">${restPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>` : '';
-  const contactItemsHTML = contactItems();
-  const disclaimer = !state.disclaimerRemoved && state.disclaimer ? `<div class="br-footer-note">${esc(state.disclaimer)}</div>` : '';
+/* ═══ MULTI-PAGE ═══ */
+function buildMulti(p,qr){
+  const pb=(lbl='')=>`<div class="page-break-div">${lbl?'— Page Break —':''}</div>`;
+  const pn=(n)=>`<div class="br-page-num">Page ${n}</div>`;
+  const stats=makeStats();const det=makeDetails();const feats=S.features.filter(f=>f);const ph=S.photos;
 
-  return `<div style="${cs}">
-    <div class="br-cover">
-      ${heroImg}
-      <div class="br-cover-overlay"></div>
-      ${logo}
+  const pg1Hero=ph[0]?`<img class="hero" src="${ph[0]}"/>`:`<div class="br-placeholder" style="height:460px;">Add hero photo</div>`;
+
+  const page1=`<div class="br-page">
+    <div class="br-cover">${pg1Hero}<div class="br-cover-overlay"></div>
+      <div style="position:absolute;top:22px;right:26px;">${logoImg('')}</div>
       <div class="br-cover-text">
-        ${state.pricetype ? `<div class="br-price-type">${esc(state.pricetype)}</div>` : ''}
-        ${state.address ? `<div class="br-address">${esc(state.address)}</div>` : '<div class="br-address" style="opacity:.3;">Property Address</div>'}
-        ${state.price ? `<div class="br-price-tag">${esc(state.price)}</div>` : ''}
+        ${S.pricetype?`<div class="br-price-type">${esc(S.pricetype)}</div>`:''}
+        <div class="br-address">${esc(S.address||'Property Address')}</div>
+        ${p?`<div class="br-price-tag">${esc(S.price)}</div>`:''}
       </div>
     </div>
-    ${stats.length ? `<div class="br-stats-bar">${stats.map(s=>`<div class="br-stat"><div class="br-stat-val">${esc(s.v)}</div><div class="br-stat-lbl">${s.l}</div></div>`).join('')}</div>` : ''}
+    ${stats.length?`<div class="br-stats-bar">${stats.map(s=>`<div class="br-stat"><div class="br-stat-val">${esc(s.v)}</div><div class="br-stat-lbl">${s.l}</div></div>`).join('')}</div>`:''}
     <div class="br-body">
-      ${state.vtour ? vtourBadge() : ''}
-      ${state.desc ? `<div class="br-section-title">About This Property</div><div class="br-description">${esc(state.desc).replace(/\n/g,'<br>')}</div>` : ''}
-      ${featuresHTML ? `<div class="br-section-title">Key Features</div><div class="br-features">${featuresHTML}</div>` : ''}
-      ${photosBlock}
-      ${details.length ? `<div class="br-section-title">Property Details</div><div class="br-details-grid">${details.map(d=>`<div class="br-detail"><div class="br-detail-lbl">${d.l}</div><div class="br-detail-val">${esc(d.v)}</div></div>`).join('')}</div>` : ''}
-      ${(state.local||state.stations||state.schools) ? `<div class="br-section-title">Local Area</div><div class="br-local">${localBlock()}</div>` : ''}
-      ${state.floorplanSrc ? `<div class="br-section-title">Floorplan</div><img class="br-floorplan" src="${state.floorplanSrc}"/>` : ''}
+      ${vtourBadge()}${w3wBlock()}${viewingBlock()}
+      ${S.desc?`<div class="br-section-title">About This Property</div><div class="br-description">${esc(S.desc).replace(/\n/g,'<br>')}</div>`:''}
+      ${feats.length?`<div class="br-section-title">Key Features</div><div class="br-features">${feats.map(f=>`<div class="br-feature">${esc(f)}</div>`).join('')}</div>`:''}
     </div>
-    ${contactItemsHTML.length ? `<div class="br-contact-strip">${contactItemsHTML.map(d=>`<div><div class="br-contact-item-lbl">${d.l}</div><div class="br-contact-item-val">${esc(d.v)}</div></div>`).join('')}</div>` : ''}
-    <div class="br-footer">
-      <div class="br-footer-agency">${esc(state.agency||'Your Estate Agency')}</div>
-      ${disclaimer}
-    </div>
-  </div>`;
-}
-
-/* CLASSIC MULTI */
-function renderClassicMulti(cs) {
-  const heroImg = state.photos[0]
-    ? `<img class="br-cover-img" src="${state.photos[0]}"/>`
-    : `<div class="br-cover-img br-placeholder" style="height:480px;">Add your hero photo</div>`;
-  const logo = logoBlock('br-agency-logo');
-  const stats = makeStats();
-  const details = makeDetails();
-  const featuresHTML = state.features.filter(f=>f).map(f=>`<div class="br-feature">${esc(f)}</div>`).join('');
-  const restPhotos = state.photos.slice(1);
-  const contactItemsHTML = contactItems();
-  const disclaimer = !state.disclaimerRemoved && state.disclaimer ? `<div class="br-footer-note">${esc(state.disclaimer)}</div>` : '';
-
-  let html = `<div style="${cs}">`;
-
-  // Page 1: Cover
-  html += `<div class="br-page">
-    <div class="br-cover">
-      ${heroImg}<div class="br-cover-overlay"></div>${logo}
-      <div class="br-cover-text">
-        ${state.pricetype ? `<div class="br-price-type">${esc(state.pricetype)}</div>` : ''}
-        ${state.address ? `<div class="br-address">${esc(state.address)}</div>` : '<div class="br-address" style="opacity:.3;">Property Address</div>'}
-        ${state.price ? `<div class="br-price-tag">${esc(state.price)}</div>` : ''}
-      </div>
-    </div>
-    ${stats.length ? `<div class="br-stats-bar">${stats.map(s=>`<div class="br-stat"><div class="br-stat-val">${esc(s.v)}</div><div class="br-stat-lbl">${s.l}</div></div>`).join('')}</div>` : ''}
-    <div class="br-body">
-      ${state.vtour ? vtourBadge() : ''}
-      ${state.desc ? `<div class="br-section-title">About This Property</div><div class="br-description">${esc(state.desc).replace(/\n/g,'<br>')}</div>` : ''}
-      ${featuresHTML ? `<div class="br-section-title">Key Features</div><div class="br-features">${featuresHTML}</div>` : ''}
-    </div>
+    ${pn(1)}
   </div>`;
 
-  // Page 2: Details + Photos
-  if (details.length || restPhotos.length) {
-    html += pageBreak('Page 2 — Details & Photos');
-    html += `<div class="br-page"><div class="br-body">
-      ${restPhotos.length ? `<div class="br-section-title">Property Photos</div><div class="br-photo-grid cols-${Math.min(restPhotos.length,3)}">${restPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>` : ''}
-      ${details.length ? `<div class="br-section-title">Property Details</div><div class="br-details-grid">${details.map(d=>`<div class="br-detail"><div class="br-detail-lbl">${d.l}</div><div class="br-detail-val">${esc(d.v)}</div></div>`).join('')}</div>` : ''}
-      ${(state.local||state.stations||state.schools) ? `<div class="br-section-title">Local Area</div><div class="br-local">${localBlock()}</div>` : ''}
-    </div></div>`;
-  }
-
-  // Page 3: Floorplan
-  if (state.floorplanSrc) {
-    html += pageBreak('Page 3 — Floorplan');
-    html += `<div class="br-page"><div class="br-body">
-      <div class="br-section-title">Floorplan</div>
-      <img class="br-floorplan" src="${state.floorplanSrc}"/>
-    </div></div>`;
-  }
-
-  // Contact + footer
-  html += `${contactItemsHTML.length ? `<div class="br-contact-strip">${contactItemsHTML.map(d=>`<div><div class="br-contact-item-lbl">${d.l}</div><div class="br-contact-item-val">${esc(d.v)}</div></div>`).join('')}</div>` : ''}
-  <div class="br-footer">
-    <div class="br-footer-agency">${esc(state.agency||'Your Estate Agency')}</div>
-    ${disclaimer}
-  </div></div>`;
-
-  return html;
-}
-
-/* ════════════════════════════════════════
-   TEMPLATE: MODERN
-════════════════════════════════════════ */
-function renderModern(cs) {
-  const heroImg = state.photos[0]
-    ? `<img class="br-cover-img" src="${state.photos[0]}"/>`
-    : `<div class="br-cover-img br-placeholder" style="height:500px;">Add your hero photo</div>`;
-  const logo = logoBlock('br-cover-agency');
-  const statsItems = [
-    {v:state.beds,l:'Beds'},{v:state.baths,l:'Baths'},
-    {v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'},{v:state.epc,l:'EPC'}
-  ].filter(s=>s.v);
-  const details = makeDetails();
-  const restPhotos = state.photos.slice(1);
-  const featuresHTML = state.features.filter(f=>f).map(f=>`<li>${esc(f)}</li>`).join('');
-  const contactItemsHTML = contactItems();
-  const disclaimer = !state.disclaimerRemoved && state.disclaimer ? `<div class="br-footer-note">${esc(state.disclaimer)}</div>` : '';
-
-  return `<div style="${cs}">
-    <div class="br-cover">
-      ${heroImg}<div class="br-cover-bar"></div>${logo}
+  const phGrid=ph.length>1?`<div style="display:grid;grid-template-columns:repeat(${Math.min(ph.length-1,3)},1fr);gap:4px;margin-bottom:20px;">${ph.slice(1).map(s=>`<img src="${s}" style="width:100%;aspect-ratio:4/3;object-fit:cover;"/>`).join('')}</div>`:'';
+  const page2=`<div class="br-page">
+    <div class="br-body" style="padding-top:32px;">
+      ${phGrid}
+      ${det.length?`<div class="br-section-title">Property Details</div><div class="br-details-grid">${det.map(d=>`<div class="br-detail"><div class="br-detail-lbl">${d.l}</div><div class="br-detail-val">${esc(d.v)}</div></div>`).join('')}</div>`:''}
+      ${S.epc?`<div class="br-section-title">EPC Rating</div>${epcBar(S.epc)}<br/>`:''}
+      ${leaseholdBlock()}
+      ${roomsTable()?`<div class="br-section-title">Room Dimensions</div>${roomsTable()}`:''}
+      ${localBlock()?`<div class="br-section-title">Local Area</div><div class="br-local">${localBlock()}</div>`:''}
     </div>
-    <div class="br-header-block">
-      <div>
-        <div class="br-address-modern">${esc(state.address||'Property Address')}</div>
-        ${state.tenure ? `<span class="br-tenure-pill">${esc(state.tenure)}</span>` : ''}
-      </div>
-      <div style="text-align:right;">
-        ${state.pricetype ? `<div class="br-price-type-m">${esc(state.pricetype)}</div>` : ''}
-        ${state.price ? `<div class="br-price-modern">${esc(state.price)}</div>` : ''}
-      </div>
-    </div>
-    ${statsItems.length ? `<div class="br-stats-modern">${statsItems.map(s=>`<div class="br-stat-m"><div class="br-stat-m-val">${esc(s.v)}</div><div class="br-stat-m-lbl">${s.l}</div></div>`).join('')}</div>` : ''}
-    <div class="br-body">
-      ${state.vtour ? vtourBadge() : ''}
-      <div class="br-col-2">
-        <div>${state.desc ? `<p class="br-desc-m">${esc(state.desc).replace(/\n/g,'<br>')}</p>` : ''}</div>
-        <div>${featuresHTML ? `<ul class="br-features-m">${featuresHTML}</ul>` : ''}</div>
-      </div>
-      ${restPhotos.length ? `<div class="br-photo-strip">${restPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>` : ''}
-      ${details.length ? `<div class="br-details-m">${details.map(d=>`<div class="br-det-m"><div class="br-det-m-l">${d.l}</div><div class="br-det-m-v">${esc(d.v)}</div></div>`).join('')}</div>` : ''}
-      ${(state.local||state.stations||state.schools) ? `<div class="br-section-title" style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--client-colour);margin-bottom:10px;">Local Area</div><div class="br-local-m">${localBlock()}</div>` : ''}
-      ${state.floorplanSrc ? `<img class="br-floorplan" src="${state.floorplanSrc}"/>` : ''}
-      ${contactItemsHTML.length ? `<div class="br-contact-m">${contactItemsHTML.map(d=>`<div class="br-contact-m-item"><div class="br-contact-m-lbl">${d.l}</div><div class="br-contact-m-val">${esc(d.v)}</div></div>`).join('')}</div>` : ''}
-    </div>
-    <div class="br-footer">
-      <div><div class="br-footer-l">${esc(state.agency||'Your Estate Agency')}</div><div class="br-footer-accent"></div></div>
-      ${disclaimer}
-    </div>
-  </div>`;
-}
-
-function renderModernMulti(cs) {
-  // Similar page splitting logic for modern
-  const heroImg = state.photos[0]
-    ? `<img class="br-cover-img" src="${state.photos[0]}"/>`
-    : `<div class="br-cover-img br-placeholder" style="height:500px;">Add your hero photo</div>`;
-  const logo = logoBlock('br-cover-agency');
-  const statsItems = [{v:state.beds,l:'Beds'},{v:state.baths,l:'Baths'},{v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'},{v:state.epc,l:'EPC'}].filter(s=>s.v);
-  const details = makeDetails();
-  const restPhotos = state.photos.slice(1);
-  const featuresHTML = state.features.filter(f=>f).map(f=>`<li>${esc(f)}</li>`).join('');
-  const contactItemsHTML = contactItems();
-  const disclaimer = !state.disclaimerRemoved && state.disclaimer ? `<div class="br-footer-note">${esc(state.disclaimer)}</div>` : '';
-
-  let html = `<div style="${cs}">`;
-  // Page 1
-  html += `<div class="br-page">
-    <div class="br-cover">${heroImg}<div class="br-cover-bar"></div>${logo}</div>
-    <div class="br-header-block">
-      <div><div class="br-address-modern">${esc(state.address||'Property Address')}</div>${state.tenure?`<span class="br-tenure-pill">${esc(state.tenure)}</span>`:''}</div>
-      <div style="text-align:right;">${state.pricetype?`<div class="br-price-type-m">${esc(state.pricetype)}</div>`:''}${state.price?`<div class="br-price-modern">${esc(state.price)}</div>`:''}</div>
-    </div>
-    ${statsItems.length?`<div class="br-stats-modern">${statsItems.map(s=>`<div class="br-stat-m"><div class="br-stat-m-val">${esc(s.v)}</div><div class="br-stat-m-lbl">${s.l}</div></div>`).join('')}</div>`:''}
-    <div class="br-body">
-      ${state.vtour?vtourBadge():''}
-      <div class="br-col-2">
-        <div>${state.desc?`<p class="br-desc-m">${esc(state.desc).replace(/\n/g,'<br>')}</p>`:''}</div>
-        <div>${featuresHTML?`<ul class="br-features-m">${featuresHTML}</ul>`:''}</div>
-      </div>
-    </div>
+    ${pn(2)}
   </div>`;
 
-  if (restPhotos.length || details.length) {
-    html += pageBreak('Page 2 — Photos & Details');
-    html += `<div class="br-page"><div class="br-body">
-      ${restPhotos.length?`<div class="br-photo-strip">${restPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>`:''}
-      ${details.length?`<div class="br-details-m">${details.map(d=>`<div class="br-det-m"><div class="br-det-m-l">${d.l}</div><div class="br-det-m-v">${esc(d.v)}</div></div>`).join('')}</div>`:''}
-      ${(state.local||state.stations||state.schools)?`<p class="br-local-m">${localBlock()}</p>`:''}
-    </div></div>`;
-  }
-
-  if (state.floorplanSrc) {
-    html += pageBreak('Page 3 — Floorplan');
-    html += `<div class="br-page"><div class="br-body"><img class="br-floorplan" src="${state.floorplanSrc}"/></div></div>`;
-  }
-
-  html += `<div class="br-body">${contactItemsHTML.length?`<div class="br-contact-m">${contactItemsHTML.map(d=>`<div class="br-contact-m-item"><div class="br-contact-m-lbl">${d.l}</div><div class="br-contact-m-val">${esc(d.v)}</div></div>`).join('')}</div>`:''}</div>
-  <div class="br-footer"><div><div class="br-footer-l">${esc(state.agency||'Your Estate Agency')}</div><div class="br-footer-accent"></div></div>${disclaimer}</div>
-  </div>`;
-  return html;
-}
-
-/* ════════════════════════════════════════
-   TEMPLATE: DARK ESTATE
-════════════════════════════════════════ */
-function renderDark(cs) {
-  const heroImg = state.photos[0]
-    ? `<img class="br-cover-img" src="${state.photos[0]}"/>`
-    : `<div class="br-cover-bg" style="height:480px;"></div>`;
-  const logo = state.logoSrc
-    ? `<img class="br-agency-dark" src="${state.logoSrc}"/>`
-    : (state.agency ? `<div class="br-agency-dark" style="filter:none;background:${state.colour};color:#fff;padding:5px 12px;font-weight:700;font-size:12px;">${esc(state.agency)}</div>` : '');
-  const statsItems = [{v:state.beds,l:'Bedrooms'},{v:state.baths,l:'Bathrooms'},{v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'}].filter(s=>s.v);
-  const details = makeDetails();
-  const featuresHTML = state.features.filter(f=>f).map(f=>`<div class="br-feature-d">${esc(f)}</div>`).join('');
-  const masonryPhotos = state.photos.slice(1,4);
-  const extraPhotos = state.photos.slice(4);
-  const contactItemsHTML = contactItems();
-  const disclaimer = !state.disclaimerRemoved && state.disclaimer ? `<div class="br-footer-note">${esc(state.disclaimer)}</div>` : '';
-
-  return `<div style="${cs}">
-    <div class="br-cover">
-      <div class="br-cover-bg"></div>${heroImg}<div class="br-cover-overlay"></div>${logo}
-      <div class="br-cover-text">
-        <div class="br-cover-line"></div>
-        <div class="br-address-dark">${esc(state.address||'Property Address')}</div>
-        ${state.pricetype?`<div class="br-price-type-d">${esc(state.pricetype)}</div>`:''}
-        ${state.price?`<div class="br-price-dark">${esc(state.price)}</div>`:''}
-      </div>
+  const page3=(S.floorplanSrc||p)?`<div class="br-page">
+    <div class="br-body" style="padding-top:32px;">
+      ${S.floorplanSrc?`<div class="br-section-title">Floorplan</div><img class="br-floorplan" src="${S.floorplanSrc}"/>`:''}
+      ${p&&S.sdlt==='yes'?`<div class="br-section-title">Stamp Duty</div>${sdltBlock(p)}`:''}
+      ${p&&S.mortgageShow==='yes'?`<div class="br-section-title">Mortgage Estimate</div>${mortgageBlock(p)}`:''}
+      ${qrBlock(qr)}
     </div>
-    ${statsItems.length?`<div class="br-dark-stats">${statsItems.map(s=>`<div class="br-stat-d"><div class="br-stat-d-val">${esc(s.v)}</div><div class="br-stat-d-lbl">${s.l}</div></div>`).join('')}</div>`:''}
-    <div class="br-body">
-      ${goldRule('About This Property')}
-      ${state.vtour?vtourBadge():''}
-      ${state.desc?`<div class="br-desc-d">${esc(state.desc).replace(/\n/g,'<br>')}</div>`:''}
-      ${featuresHTML?`<div class="br-features-d">${featuresHTML}</div>`:''}
-      ${masonryPhotos.length?`<div class="br-photo-masonry">${masonryPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>`:''}
-      ${extraPhotos.length?`<div class="br-photo-extra">${extraPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>`:''}
-      ${details.length?`<div class="br-details-d">${details.map(d=>`<div><div class="br-det-d-l">${d.l}</div><div class="br-det-d-v">${esc(d.v)}</div></div>`).join('')}</div>`:''}
-      ${(state.local||state.stations||state.schools)?`${goldRule('Local Area')}<div class="br-local-d">${localBlock()}</div>`:''}
-      ${state.floorplanSrc?`${goldRule('Floorplan')}<img class="br-floorplan" src="${state.floorplanSrc}"/>`:''}
-    </div>
-    ${contactItemsHTML.length?`<div class="br-contact-d">${contactItemsHTML.map(d=>`<div><div class="br-contact-d-lbl">${d.l}</div><div class="br-contact-d-val">${esc(d.v)}</div></div>`).join('')}</div>`:''}
-    <div class="br-footer">
-      <div class="br-footer-agency">${esc(state.agency||'Your Estate Agency')}</div>
-      <div class="br-footer-right">${disclaimer}<div class="br-footer-accent"></div></div>
-    </div>
-  </div>`;
+    ${pn(3)}
+  </div>`:'';
+
+  const footer=`${agentStrip(false)}<div class="br-footer"><div class="br-footer-agency">${esc(S.agency||'Your Estate Agency')}</div>${footerNote()}</div>`;
+
+  return page1+pb()+page2+(page3?pb()+page3:'')+footer;
 }
 
-function renderDarkMulti(cs) {
-  const heroImg = state.photos[0] ? `<img class="br-cover-img" src="${state.photos[0]}"/>` : `<div class="br-cover-bg" style="height:480px;"></div>`;
-  const logo = state.logoSrc ? `<img class="br-agency-dark" src="${state.logoSrc}"/>` : (state.agency?`<div class="br-agency-dark" style="filter:none;background:${state.colour};color:#fff;padding:5px 12px;font-weight:700;font-size:12px;">${esc(state.agency)}</div>`:'');
-  const statsItems = [{v:state.beds,l:'Bedrooms'},{v:state.baths,l:'Bathrooms'},{v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'}].filter(s=>s.v);
-  const details = makeDetails();
-  const featuresHTML = state.features.filter(f=>f).map(f=>`<div class="br-feature-d">${esc(f)}</div>`).join('');
-  const masonryPhotos = state.photos.slice(1,4);
-  const extraPhotos = state.photos.slice(4);
-  const contactItemsHTML = contactItems();
-  const disclaimer = !state.disclaimerRemoved && state.disclaimer ? `<div class="br-footer-note">${esc(state.disclaimer)}</div>` : '';
-
-  let html = `<div style="${cs}">`;
-  html += `<div class="br-page">
-    <div class="br-cover"><div class="br-cover-bg"></div>${heroImg}<div class="br-cover-overlay"></div>${logo}
-      <div class="br-cover-text"><div class="br-cover-line"></div>
-        <div class="br-address-dark">${esc(state.address||'Property Address')}</div>
-        ${state.pricetype?`<div class="br-price-type-d">${esc(state.pricetype)}</div>`:''}
-        ${state.price?`<div class="br-price-dark">${esc(state.price)}</div>`:''}
-      </div>
-    </div>
-    ${statsItems.length?`<div class="br-dark-stats">${statsItems.map(s=>`<div class="br-stat-d"><div class="br-stat-d-val">${esc(s.v)}</div><div class="br-stat-d-lbl">${s.l}</div></div>`).join('')}</div>`:''}
-    <div class="br-body">
-      ${goldRule('About This Property')}
-      ${state.vtour?vtourBadge():''}
-      ${state.desc?`<div class="br-desc-d">${esc(state.desc).replace(/\n/g,'<br>')}</div>`:''}
-      ${featuresHTML?`<div class="br-features-d">${featuresHTML}</div>`:''}
-    </div>
-  </div>`;
-
-  if (masonryPhotos.length || details.length) {
-    html += pageBreak('Page 2 — Photos & Details');
-    html += `<div class="br-page"><div class="br-body">
-      ${masonryPhotos.length?`${goldRule('Property Photos')}<div class="br-photo-masonry">${masonryPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>`:''}
-      ${extraPhotos.length?`<div class="br-photo-extra">${extraPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>`:''}
-      ${details.length?`<div class="br-details-d">${details.map(d=>`<div><div class="br-det-d-l">${d.l}</div><div class="br-det-d-v">${esc(d.v)}</div></div>`).join('')}</div>`:''}
-      ${(state.local||state.stations||state.schools)?`${goldRule('Local Area')}<div class="br-local-d">${localBlock()}</div>`:''}
-    </div></div>`;
-  }
-
-  if (state.floorplanSrc) {
-    html += pageBreak('Page 3 — Floorplan');
-    html += `<div class="br-page"><div class="br-body">${goldRule('Floorplan')}<img class="br-floorplan" src="${state.floorplanSrc}"/></div></div>`;
-  }
-
-  html += `${contactItemsHTML.length?`<div class="br-contact-d">${contactItemsHTML.map(d=>`<div><div class="br-contact-d-lbl">${d.l}</div><div class="br-contact-d-val">${esc(d.v)}</div></div>`).join('')}</div>`:''}
-  <div class="br-footer"><div class="br-footer-agency">${esc(state.agency||'Your Estate Agency')}</div><div class="br-footer-right">${disclaimer}<div class="br-footer-accent"></div></div></div>
-  </div>`;
-  return html;
-}
-
-/* ════════════════════════════════════════
-   HELPERS
-════════════════════════════════════════ */
-function goldRule(label) {
-  return `<div class="br-gold-rule" style="margin-bottom:14px;">
-    <div class="br-gold-rule-line"></div>
-    <div class="br-gold-rule-dia"></div>
-    <div class="br-gold-rule-txt">${label}</div>
-    <div class="br-gold-rule-dia"></div>
-    <div class="br-gold-rule-line"></div>
-  </div>`;
-}
-
-function logoBlock(cls) {
-  if (state.logoSrc) return `<img class="${cls}" src="${state.logoSrc}"/>`;
-  if (state.agency) return `<div class="${cls}" style="background:rgba(0,0,0,.5);color:#fff;padding:6px 13px;font-weight:700;font-size:12px;">${esc(state.agency)}</div>`;
-  return '';
-}
-
-function makeStats() {
-  return [{v:state.beds,l:'Bedrooms'},{v:state.baths,l:'Bathrooms'},{v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'}].filter(s=>s.v);
-}
-
-function makeDetails() {
-  return [
-    {l:'EPC Rating',v:state.epc},{l:'Council Tax Band',v:state.ctax},
-    {l:'Property Style',v:state.style},{l:'Floor Area',v:state.area},
-    {l:'Plot Size',v:state.plot},{l:'Year Built',v:state.year},
-    {l:'Parking',v:state.parking},{l:'Heating',v:state.heating},
-    {l:'Garden',v:state.garden},{l:'New Build',v:state.newbuild},
-  ].filter(d=>d.v);
-}
-
-function localBlock() {
-  let parts = [];
-  if (state.local) parts.push(esc(state.local).replace(/\n/g,'<br>'));
-  if (state.stations) parts.push(`<strong>Nearest Stations:</strong> ${esc(state.stations)}`);
-  if (state.schools) parts.push(`<strong>Nearby Schools:</strong> ${esc(state.schools)}`);
-  return parts.join('<br><br>');
-}
-
-/* ════════════════════════════════════════
-   SAVE DRAFT
-════════════════════════════════════════ */
-function saveDraft() {
-  try {
-    const save = {...state};
-    // Don't persist large base64 images in localStorage (just IDs)
-    save.photos = state.photos.length + ' photos';
-    save.logoSrc = state.logoSrc ? 'logo_saved' : null;
-    save.floorplanSrc = state.floorplanSrc ? 'fp_saved' : null;
-    localStorage.setItem('mm_brochure_draft', JSON.stringify(save));
-    showToast('Draft saved ✓');
-  } catch(e) {
-    showToast('Draft saved (text only — images not stored)');
-  }
-}
-
-function loadDraft() {
-  try {
-    const raw = localStorage.getItem('mm_brochure_draft');
-    if (!raw) return;
-    const d = JSON.parse(raw);
-    const fields = ['agency','colour','address','pricetype','price','beds','baths','rec','tenure','epc','ctax','style','newbuild','area','plot','year','parking','heating','garden','vtour','desc','local','stations','schools','agent','phone','email','branch','website','disclaimer','disclaimerRemoved','features','template','mode'];
-    fields.forEach(k => { if (d[k] !== undefined) state[k] = d[k]; });
-    // Restore form fields
-    const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val||''; };
-    setVal('f-agency', state.agency); setVal('f-address', state.address);
-    setVal('f-pricetype', state.pricetype); setVal('f-price', state.price);
-    setVal('f-beds', state.beds); setVal('f-baths', state.baths); setVal('f-rec', state.rec);
-    setVal('f-tenure', state.tenure); setVal('f-epc', state.epc); setVal('f-ctax', state.ctax);
-    setVal('f-style', state.style); setVal('f-newbuild', state.newbuild);
-    setVal('f-area', state.area); setVal('f-plot', state.plot); setVal('f-year', state.year);
-    setVal('f-parking', state.parking); setVal('f-heating', state.heating); setVal('f-garden', state.garden);
-    setVal('f-vtour', state.vtour); setVal('f-desc', state.desc);
-    setVal('f-local', state.local); setVal('f-stations', state.stations); setVal('f-schools', state.schools);
-    setVal('f-agent', state.agent); setVal('f-phone', state.phone); setVal('f-email', state.email);
-    setVal('f-branch', state.branch); setVal('f-website', state.website);
-    setTemplate(state.template);
-    setMode(state.mode || 'single');
-    syncColourFromPicker(state.colour || '#B46100');
-    renderFeatures();
-    renderDisclaimer();
-    update();
-  } catch(e) {}
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-/* ════════════════════════════════════════
-   PDF EXPORT
-════════════════════════════════════════ */
-async function exportPDF() {
-  const btn = document.getElementById('btn-pdf');
-  btn.innerHTML = '<span class="spin"></span>Generating PDF…';
-  btn.disabled = true;
-  try {
+/* ═══ PDF EXPORT ═══ */
+async function exportPDF(){
+  const btn=document.getElementById('btn-pdf');
+  btn.innerHTML='<span class="spin"></span> Generating PDF…';btn.disabled=true;
+  try{
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
-    const brochure = document.getElementById('brochure');
-    const canvas = await html2canvas(brochure, { scale:2, useCORS:true, allowTaint:true, backgroundColor:'#ffffff', logging:false });
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ orientation:'portrait', unit:'px', format:[canvas.width/2, canvas.height/2] });
-    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, canvas.width/2, canvas.height/2);
-    const filename = (state.address||'property-brochure').replace(/[^a-z0-9]/gi,'-').toLowerCase() + '.pdf';
-    pdf.save(filename);
-  } catch(e) { alert('PDF generation failed. Please try again.'); console.error(e); }
-  btn.innerHTML = '<i data-lucide="file-text" style="width:15px;height:15px;"></i>Download as PDF';
-  btn.disabled = false;
-  lucide.createIcons();
+    const{jsPDF}=window.jspdf;
+    const br=document.getElementById('brochure');
+    const pages=br.querySelectorAll('.br-page');
+    const fname=(S.address||'property-brochure').replace(/[^a-z0-9]/gi,'-').toLowerCase()+'.pdf';
+    if(S.mode==='multi'&&pages.length>0){
+      let pdf=null;
+      for(let i=0;i<pages.length;i++){
+        const canvas=await html2canvas(pages[i],{scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false});
+        const w=canvas.width/2,h=canvas.height/2;
+        if(!pdf){pdf=new jsPDF({orientation:'portrait',unit:'px',format:[w,h]});}
+        else pdf.addPage([w,h],'portrait');
+        pdf.addImage(canvas.toDataURL('image/jpeg',0.92),'JPEG',0,0,w,h);
+      }
+      if(pdf)pdf.save(fname);
+    }else{
+      const canvas=await html2canvas(br,{scale:2,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false});
+      const pdf=new jsPDF({orientation:'portrait',unit:'px',format:[canvas.width/2,canvas.height/2]});
+      pdf.addImage(canvas.toDataURL('image/jpeg',0.92),'JPEG',0,0,canvas.width/2,canvas.height/2);
+      pdf.save(fname);
+    }
+  }catch(e){alert('PDF export failed — please try again.');console.error(e);}
+  btn.innerHTML='<i data-lucide="file-text" style="width:14px;height:14px;"></i>Download PDF';
+  btn.disabled=false;lucide.createIcons();
 }
 
-/* ════════════════════════════════════════
-   WORD EXPORT
-════════════════════════════════════════ */
-async function exportWord() {
-  const btn = document.getElementById('btn-word');
-  btn.innerHTML = '<span class="spin"></span>Generating Word doc…';
-  btn.disabled = true;
-  try {
+/* ═══ WORD EXPORT ═══ */
+async function exportWord(){
+  const btn=document.getElementById('btn-word');
+  btn.innerHTML='<span class="spin"></span> Generating…';btn.disabled=true;
+  try{
     await loadScript('https://unpkg.com/docx@7.8.2/build/index.js');
-    const { Document, Packer, Paragraph, TextRun, AlignmentType } = docx;
-    const hexCol = state.colour.replace('#','');
-    const children = [];
-    const add = (text, opts={}) => children.push(new Paragraph({ children:[new TextRun({text, size:22, color:'5C4A2A', ...opts})], spacing:{after:80} }));
-    const addH = (text) => children.push(new Paragraph({ children:[new TextRun({text, bold:true, size:28, color:'1C140A'})], spacing:{before:240, after:100} }));
-
-    if (state.agency) add(state.agency.toUpperCase(), {bold:true, size:22, color:'7A3E00'});
-    children.push(new Paragraph({ children:[new TextRun({text: state.address||'Property Address', bold:true, size:40, color:'1C140A'})], alignment:AlignmentType.CENTER, spacing:{after:80} }));
-    if (state.pricetype) add(state.pricetype, {size:18, color:'8A7050'});
-    if (state.price) children.push(new Paragraph({ children:[new TextRun({text: state.price, bold:true, size:36, color:hexCol})], alignment:AlignmentType.CENTER, spacing:{after:200} }));
-
-    const statsLine = [state.beds&&`${state.beds} Bedrooms`, state.baths&&`${state.baths} Bathrooms`, state.rec&&`${state.rec} Receptions`, state.tenure&&state.tenure].filter(Boolean).join('  |  ');
-    if (statsLine) add(statsLine, {size:20});
-
-    if (state.desc) { addH('About This Property'); state.desc.split('\n').filter(l=>l.trim()).forEach(l=>add(l)); }
-
-    const feats = state.features.filter(f=>f.trim());
-    if (feats.length) { addH('Key Features'); feats.forEach(f=>add(`◆  ${f}`)); }
-
-    const details = makeDetails();
-    if (details.length) { addH('Property Details'); details.forEach(d=>add(`${d.l}: ${d.v}`, {bold:false})); }
-
-    if (state.local||state.stations||state.schools) {
-      addH('Local Area');
-      if (state.local) add(state.local);
-      if (state.stations) add(`Nearest Stations: ${state.stations}`);
-      if (state.schools) add(`Nearby Schools: ${state.schools}`);
-    }
-
-    const ci = contactItems();
-    if (ci.length) { addH('Contact'); ci.forEach(d=>add(`${d.l}: ${d.v}`)); }
-
-    if (!state.disclaimerRemoved && state.disclaimer) {
-      children.push(new Paragraph({ children:[new TextRun({text:state.disclaimer, size:16, color:'8A7050', italics:true})], spacing:{before:400}, alignment:AlignmentType.CENTER }));
-    }
-
-    const doc = new Document({ sections:[{ children }] });
-    const blob = await Packer.toBlob(doc);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = (state.address||'property-brochure').replace(/[^a-z0-9]/gi,'-').toLowerCase() + '.docx';
-    a.click();
-    URL.revokeObjectURL(url);
-  } catch(e) { alert('Word export failed. Please try again.'); console.error(e); }
-  btn.innerHTML = '<i data-lucide="file" style="width:15px;height:15px;"></i>Download as Word (.docx)';
-  btn.disabled = false;
-  lucide.createIcons();
+    const{Document,Packer,Paragraph,TextRun,AlignmentType,BorderStyle}=docx;
+    const p=priceNum();
+    const mk=(text,opts={})=>new Paragraph({children:[new TextRun({text:String(text||''),size:22,color:'5C4A2A',...opts})],spacing:{after:60}});
+    const h=(text)=>new Paragraph({children:[new TextRun({text,bold:true,size:28,color:'1C140A'})],spacing:{before:180,after:60}});
+    const ch=[];
+    if(S.agency)ch.push(mk(S.agency.toUpperCase(),{bold:true,size:20,color:'7A3E00'}));
+    ch.push(new Paragraph({children:[new TextRun({text:S.address||'Property Address',bold:true,size:40,color:'1C140A'})],alignment:AlignmentType.CENTER,spacing:{after:50}}));
+    if(S.pricetype)ch.push(mk(S.pricetype,{italics:true,size:18,color:'8A7050'}));
+    if(p)ch.push(new Paragraph({children:[new TextRun({text:S.price,bold:true,size:36,color:S.colour.replace('#','')})],alignment:AlignmentType.CENTER,spacing:{after:120}}));
+    const stats=[S.beds&&`${S.beds} Beds`,S.baths&&`${S.baths} Baths`,S.rec&&`${S.rec} Recep.`,S.tenure].filter(Boolean).join('  ·  ');
+    if(stats)ch.push(mk(stats,{size:20,bold:true}));
+    if(S.desc){ch.push(h('About This Property'));S.desc.split('\n').filter(l=>l.trim()).forEach(l=>ch.push(mk(l)));}
+    const feats=S.features.filter(f=>f.trim());
+    if(feats.length){ch.push(h('Key Features'));feats.forEach(f=>ch.push(mk(`◆  ${f}`)));}
+    const det=makeDetails();
+    if(det.length){ch.push(h('Property Details'));det.forEach(d=>ch.push(mk(`${d.l}: ${d.v}`)));}
+    if(S.epc)ch.push(mk(`EPC Rating: ${S.epc}`,{bold:true}));
+    const lease=[S.leaseYears&&`Years remaining: ${S.leaseYears}`,S.leaseGR&&`Ground rent: ${S.leaseGR}`,S.leaseSC&&`Service charge: ${S.leaseSC}`,S.leaseMF&&`Maintenance fund: ${S.leaseMF}`].filter(Boolean);
+    if(lease.length){ch.push(h('Leasehold Details'));lease.forEach(l=>ch.push(mk(l)));}
+    const rooms=S.rooms.filter(r=>r.name.trim());
+    if(rooms.length){ch.push(h('Room Dimensions'));rooms.forEach(r=>ch.push(mk(`${r.name}: ${r.dim}`)));}
+    if(S.local||S.stations||S.schools){ch.push(h('Local Area'));if(S.local)ch.push(mk(S.local));if(S.stations)ch.push(mk(`Stations: ${S.stations}`));if(S.schools)ch.push(mk(`Schools: ${S.schools}`));}
+    if(S.viewDate||S.viewTime){ch.push(h('Viewing'));if(S.viewDate)ch.push(mk(`Date: ${S.viewDate}`));if(S.viewTime)ch.push(mk(`Time: ${S.viewTime}`));if(S.viewBook)ch.push(mk(S.viewBook));}
+    if(p&&S.sdlt==='yes'){const{total}=calcSDLT(p);ch.push(h('Stamp Duty'));ch.push(mk(`Estimated SDLT: £${Math.round(total).toLocaleString()}`));}
+    if(p&&S.mortgageShow==='yes'){const m=calcMortgage(p,S.mortgageRate,S.mortgageTerm,S.mortgageDeposit);ch.push(h('Mortgage Estimate'));ch.push(mk(`Approx £${Math.round(m).toLocaleString()}/month (${S.mortgageDeposit}% deposit, ${S.mortgageRate}% rate, ${S.mortgageTerm}-yr term)`));}
+    const agents=S.agents.filter(a=>a.name||a.phone||a.email);
+    if(agents.length){ch.push(h('Agent Contact'));agents.forEach(a=>{if(a.name)ch.push(mk(a.name,{bold:true}));if(a.phone)ch.push(mk(`Tel: ${a.phone}`));if(a.email)ch.push(mk(`Email: ${a.email}`));});}
+    if(!S.disclaimerRemoved&&S.disclaimer)ch.push(new Paragraph({children:[new TextRun({text:S.disclaimer,size:16,color:'8A7050',italics:true})],spacing:{before:360},alignment:AlignmentType.CENTER}));
+    const doc=new Document({sections:[{children:ch}]});
+    const blob=await Packer.toBlob(doc);
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=(S.address||'property-brochure').replace(/[^a-z0-9]/gi,'-').toLowerCase()+'.docx';a.click();URL.revokeObjectURL(url);
+  }catch(e){alert('Word export failed.');console.error(e);}
+  btn.innerHTML='<i data-lucide="file" style="width:14px;height:14px;"></i>Download Word (.docx)';
+  btn.disabled=false;lucide.createIcons();
 }
 
-/* ════════════════════════════════════════
-   SCRIPT LOADER
-════════════════════════════════════════ */
-function loadScript(src) {
-  return new Promise((res,rej) => {
-    if (document.querySelector(`script[src="${src}"]`)) { res(); return; }
-    const s = document.createElement('script');
-    s.src = src; s.onload = res; s.onerror = rej;
-    document.head.appendChild(s);
-  });
+/* ═══ SAVE / LOAD ═══ */
+function saveDraft(){
+  try{
+    const save={...S,photos:[],logoSrc:null,floorplanSrc:null,_photoCount:S.photos.length,_hasLogo:!!S.logoSrc,_hasFP:!!S.floorplanSrc};
+    localStorage.setItem('mm_bb_v2',JSON.stringify(save));
+    showToast('Draft saved ✓');
+  }catch(e){showToast('Could not save draft');}
+}
+function loadDraft(){
+  try{
+    const raw=localStorage.getItem('mm_bb_v2');if(!raw)return;
+    const d=JSON.parse(raw);
+    const keys=['agency','colour','address','pricetype','price','beds','baths','rec','tenure','epc','ctax','style','newbuild','area','plot','year','parking','heating','garden','w3w','vtour','leaseYears','leaseGR','leaseSC','leaseMF','desc','features','rooms','local','stations','schools','viewDate','viewTime','viewBook','sdlt','mortgageShow','mortgageRate','mortgageTerm','mortgageDeposit','agents','disclaimer','disclaimerRemoved','template','mode'];
+    keys.forEach(k=>{if(d[k]!==undefined)S[k]=d[k];});
+    const sv=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||'';};
+    sv('f-agency',S.agency);sv('f-address',S.address);sv('f-pricetype',S.pricetype);sv('f-price',S.price);
+    sv('f-beds',S.beds);sv('f-baths',S.baths);sv('f-rec',S.rec);sv('f-tenure',S.tenure);
+    sv('f-epc',S.epc);sv('f-ctax',S.ctax);sv('f-style',S.style);sv('f-newbuild',S.newbuild);
+    sv('f-area',S.area);sv('f-plot',S.plot);sv('f-year',S.year);sv('f-parking',S.parking);sv('f-heating',S.heating);sv('f-garden',S.garden);
+    sv('f-w3w',S.w3w);sv('f-vtour',S.vtour);
+    sv('f-lease-years',S.leaseYears);sv('f-lease-gr',S.leaseGR);sv('f-lease-sc',S.leaseSC);sv('f-lease-mf',S.leaseMF);
+    sv('f-desc',S.desc);sv('f-local',S.local);sv('f-stations',S.stations);sv('f-schools',S.schools);
+    sv('f-view-date',S.viewDate);sv('f-view-time',S.viewTime);sv('f-view-book',S.viewBook);
+    sv('f-sdlt',S.sdlt);sv('f-mortgage-show',S.mortgageShow);
+    sv('f-mortgage-rate',S.mortgageRate);sv('f-mortgage-term',S.mortgageTerm);sv('f-mortgage-deposit',S.mortgageDeposit);
+    setTemplate(S.template||'classic');setMode(S.mode||'single');
+    syncColourFromPicker(S.colour||'#B46100');
+    renderFeatures();renderRooms();renderAgents();renderDisclaimer();
+    update();
+  }catch(e){console.warn('Draft load failed:',e);}
 }
 
-/* ════════════════════════════════════════
-   DRAG DROP ON PHOTO ZONE
-════════════════════════════════════════ */
-const pz = document.getElementById('photo-zone');
-pz.addEventListener('dragover', e => { e.preventDefault(); pz.classList.add('drag'); });
-pz.addEventListener('dragleave', () => pz.classList.remove('drag'));
-pz.addEventListener('drop', e => {
-  e.preventDefault(); pz.classList.remove('drag');
-  handlePhotos({ files: e.dataTransfer.files });
-});
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
 
-/* ════════════════════════════════════════
-   INIT
-════════════════════════════════════════ */
+/* ═══ SCRIPT LOADER ═══ */
+function loadScript(src){return new Promise((res,rej)=>{if(document.querySelector(`script[src="${src}"]`)){res();return;}const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+
+/* ═══ DRAG/DROP ═══ */
+const pz=document.getElementById('photo-zone');
+pz.addEventListener('dragover',e=>{e.preventDefault();pz.classList.add('drag');});
+pz.addEventListener('dragleave',()=>pz.classList.remove('drag'));
+pz.addEventListener('drop',e=>{e.preventDefault();pz.classList.remove('drag');const dt={files:e.dataTransfer.files};handlePhotos(dt);});
+
+/* ═══ INIT ═══ */
 lucide.createIcons();
-renderDisclaimer();
+buildFontGrid();
 addFeature('');
+renderRooms();
+renderAgents();
+renderDisclaimer();
 loadDraft();
 update();
 </script>
