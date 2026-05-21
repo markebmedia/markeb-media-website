@@ -29,7 +29,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { email, name } = JSON.parse(event.body);
+    const { email, name, bookingId } = JSON.parse(event.body);
 
     if (!email) {
       return {
@@ -71,8 +71,8 @@ exports.handler = async (event, context) => {
       usage: 'off_session',
       payment_method_types: ['card'],
       metadata: {
-        clientEmail: email,
-        source: 'markeb-media-reserve'
+clientEmail: email,
+source: bookingId ? 'markeb-media-card-update' : 'markeb-media-reserve'
       }
     });
 

@@ -854,11 +854,112 @@ async function sendServiceModificationConfirmation(booking, oldService, oldPrice
   });
 }
 
+// 7. Card Update Request (admin-triggered — sends client the update link)
+async function sendCardUpdateEmail(booking) {
+  const content = `
+    <h2>💳 Update Your Payment Details</h2>
+    <p>Hi ${booking.clientName},</p>
+    <p>We need you to update the payment details we hold on file for your upcoming booking. This is quick and secure — it only takes a minute.</p>
+
+    <div class="booking-details">
+      <div class="detail-row">
+        <span class="detail-label">Booking Reference</span>
+        <span class="detail-value">${booking.bookingRef}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Service</span>
+        <span class="detail-value">${booking.service || '—'}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Date &amp; Time</span>
+        <span class="detail-value">${booking.date ? formatDate(booking.date) : '—'} at ${booking.time || '—'}</span>
+      </div>
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>⚠️ Action Required</strong><br>
+      Please update your payment details before your shoot date to ensure everything runs smoothly.
+    </div>
+
+    <center>
+      <a href="${booking.updateLink}" class="button">Update My Payment Details</a>
+    </center>
+
+    <div class="alert alert-success">
+      <strong>🔒 Secure &amp; Encrypted</strong><br>
+      Your card details are handled directly by Stripe and are never stored on our servers. You may be asked to authenticate with your bank — this is normal and ensures your card can be safely charged after your shoot.
+    </div>
+
+    <p>If you have any questions, feel free to reach out!</p>
+    <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+  `;
+
+  const emailHtml = getEmailLayout(content);
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: booking.clientEmail,
+    bcc: BCC_EMAIL,
+    subject: `Action Required: Update Your Payment Details — ${booking.bookingRef}`,
+    html: emailHtml
+  });
+}
+
+// 8. Card Updated Confirmation (webhook-triggered — confirms new card saved)
+async function sendCardUpdatedConfirmation(booking, bookingsUpdated) {
+  const content = `
+    <h2>💳 Payment Details Updated</h2>
+    <p>Hi ${booking.clientName},</p>
+    <p>Your payment details have been updated successfully. Your new card is now on file and will be used for ${bookingsUpdated > 1 ? `all ${bookingsUpdated} of your upcoming bookings` : 'your upcoming booking'}.</p>
+
+    <div class="booking-details">
+      <div class="detail-row">
+        <span class="detail-label">Booking Reference</span>
+        <span class="detail-value">${booking.bookingRef}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Status</span>
+        <span class="detail-value">✅ Card Updated</span>
+      </div>
+      ${bookingsUpdated > 1 ? `
+      <div class="detail-row">
+        <span class="detail-label">Bookings Updated</span>
+        <span class="detail-value">${bookingsUpdated} bookings</span>
+      </div>
+      ` : ''}
+    </div>
+
+    <div class="alert alert-success">
+      <strong>✅ All Set</strong><br>
+      Your new card will be charged automatically once your content has been delivered.
+    </div>
+
+    <div class="alert alert-warning">
+      <strong>🔒 Didn't make this change?</strong><br>
+      If you did not update your payment details, please contact us immediately at <a href="mailto:commercial@markebmedia.com" style="color: #B46100;">commercial@markebmedia.com</a>
+    </div>
+
+    <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+  `;
+
+  const emailHtml = getEmailLayout(content);
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: booking.clientEmail,
+    bcc: BCC_EMAIL,
+    subject: 'Your Payment Details Have Been Updated',
+    html: emailHtml
+  });
+}
+
 module.exports = {
   sendBookingConfirmation,
   sendPaymentConfirmation,
   sendRescheduleConfirmation,
   sendCancellationConfirmation,
   sendReminderEmail,
-  sendServiceModificationConfirmation
+  sendServiceModificationConfirmation,
+  sendCardUpdateEmail,
+  sendCardUpdatedConfirmation
 };

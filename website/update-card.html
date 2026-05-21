@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Update Payment Details | Markeb Media</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Mukta:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pine:       #3F4D1B;
+      --pine-dark:  #2d3813;
+      --orange:     #B46100;
+      --cream:      #FDF3E2;
+      --cream-dark: #f7ead5;
+      --border:     #e8d9be;
+      --muted:      #6b7c2e;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background-color: var(--cream-dark);
+      font-family: 'Mukta', sans-serif;
+      color: var(--pine);
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .card {
+      background: var(--cream);
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(63,77,27,0.12);
+      max-width: 480px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, var(--pine) 0%, var(--pine-dark) 100%);
+      padding: 40px 40px 32px;
+      text-align: center;
+    }
+
+    .card-header img {
+      max-width: 180px;
+      width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    .card-header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--cream);
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .card-header p {
+      font-size: 14px;
+      color: rgba(253,243,226,0.75);
+      line-height: 1.5;
+    }
+
+    .header-accent {
+      width: 40px;
+      height: 3px;
+      background: var(--orange);
+      border-radius: 2px;
+      margin: 16px auto 0;
+    }
+
+    .card-body {
+      padding: 36px 40px;
+    }
+
+    .booking-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--cream-dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 28px;
+    }
+
+    .booking-pill .ref-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .booking-pill .ref-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--pine);
+    }
+
+    .field-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    #payment-element {
+      padding: 14px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      transition: border-color 0.2s;
+    }
+
+    #payment-element:focus-within {
+      border-color: var(--pine);
+    }
+
+    #error-message {
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      border-radius: 8px;
+      color: #991b1b;
+      font-size: 13px;
+      line-height: 1.5;
+      display: none;
+    }
+
+    #error-message.visible { display: block; }
+
+    .btn-submit {
+      width: 100%;
+      margin-top: 24px;
+      padding: 15px 20px;
+      background: linear-gradient(135deg, var(--orange) 0%, #8a4a00 100%);
+      color: var(--cream);
+      border: none;
+      border-radius: 8px;
+      font-family: 'Mukta', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-submit:hover:not(:disabled) { opacity: 0.9; }
+    .btn-submit:active:not(:disabled) { transform: scale(0.99); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(253,243,226,0.3);
+      border-top-color: var(--cream);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    .btn-submit.loading .spinner { display: block; }
+    .btn-submit.loading .btn-text { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .security-note {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .alert {
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .alert-warning {
+      background-color: #fff8ee;
+      border: 1px solid var(--orange);
+      color: #8a4a00;
+    }
+
+    .success-state { display: none; text-align: center; padding: 10px 0 8px; }
+    .success-state.visible { display: block; }
+    .form-state.hidden { display: none; }
+    .invalid-state { display: none; text-align: center; padding: 10px 0 8px; }
+    .invalid-state.visible { display: block; }
+
+    .success-state h2, .invalid-state h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--pine);
+      margin: 16px 0 10px;
+    }
+
+    .invalid-state h2 { color: #991b1b; }
+    .state-icon { font-size: 48px; }
+
+    .success-state p, .invalid-state p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .card-footer {
+      padding: 24px 40px 28px;
+      text-align: center;
+      background-color: var(--pine);
+    }
+
+    .card-footer p {
+      font-size: 12px;
+      color: rgba(253,243,226,0.6);
+      line-height: 1.5;
+    }
+
+    .card-footer a { color: var(--orange); text-decoration: none; }
+
+    .footer-divider {
+      width: 32px;
+      height: 2px;
+      background: var(--orange);
+      margin: 12px auto;
+      border-radius: 1px;
+    }
+
+    @media (max-width: 520px) {
+      .card-header, .card-body, .card-footer { padding-left: 24px; padding-right: 24px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="card">
+
+    <div class="card-header">
+      <img src="/public/images/Markeb%20Media%20Logo%20(2).png" alt="Markeb Media">
+      <h1>Update Payment Details</h1>
+      <p>Securely update the card we hold on file for your booking</p>
+      <div class="header-accent"></div>
+    </div>
+
+    <div class="card-body">
+
+      <div id="loading-state" style="text-align:center; padding:20px 0; color:var(--muted); font-size:14px;">
+        Loading your booking details…
+      </div>
+
+      <div class="invalid-state" id="invalid-state">
+        <div class="state-icon">⚠️</div>
+        <h2>Link Invalid or Expired</h2>
+        <p>This link is not valid. Please contact us and we'll send you a new one.</p>
+      </div>
+
+      <div class="form-state hidden" id="form-state">
+
+        <div class="booking-pill" id="booking-pill" style="display:none;">
+          <div style="font-size:18px;">📋</div>
+          <div>
+            <div class="ref-label">Booking Reference</div>
+            <div class="ref-value" id="booking-ref-display">—</div>
+          </div>
+        </div>
+
+        <div class="alert alert-warning">
+          <strong>⚠️ Bank Verification Required</strong><br>
+          Your bank may ask you to verify this card. This is normal and ensures your card can be safely charged after your shoot.
+        </div>
+
+        <div class="field-label">New Card Details</div>
+        <div id="payment-element"></div>
+        <div id="error-message"></div>
+
+        <button class="btn-submit" id="submit-btn">
+          <span class="spinner"></span>
+          <span class="btn-text">Save New Card</span>
+        </button>
+
+        <div class="security-note">
+          🔒 Secured by Stripe · Your card details are never stored on our servers
+        </div>
+
+      </div>
+
+      <div class="success-state" id="success-state">
+        <div class="state-icon">✅</div>
+        <h2>Card Updated Successfully</h2>
+        <p>Your new payment details have been saved.<br>We'll use this card for any future charges on your booking.</p>
+      </div>
+
+    </div>
+
+    <div class="card-footer">
+      <p><strong style="color:#FDF3E2;">Markeb Media</strong></p>
+      <div class="footer-divider"></div>
+      <p>Questions? <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a></p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const params            = new URLSearchParams(window.location.search);
+  const bookingId         = params.get('bookingId');
+
+  const loadingEl         = document.getElementById('loading-state');
+  const invalidEl         = document.getElementById('invalid-state');
+  const formEl            = document.getElementById('form-state');
+  const successEl         = document.getElementById('success-state');
+  const errorEl           = document.getElementById('error-message');
+  const submitBtn         = document.getElementById('submit-btn');
+  const bookingPill       = document.getElementById('booking-pill');
+  const bookingRefDisplay = document.getElementById('booking-ref-display');
+
+  function showInvalid() {
+    loadingEl.style.display = 'none';
+    invalidEl.classList.add('visible');
+  }
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.classList.add('visible');
+  }
+
+  function clearError() {
+    errorEl.textContent = '';
+    errorEl.classList.remove('visible');
+  }
+
+  async function init() {
+    if (!bookingId) { showInvalid(); return; }
+
+    try {
+      const res = await fetch('/.netlify/functions/create-setup-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId })
+      });
+
+      const data = await res.json();
+
+      if (!data.success || !data.clientSecret) {
+        console.error('Setup intent failed:', data);
+        showInvalid();
+        return;
+      }
+
+      if (data.bookingRef) {
+        bookingRefDisplay.textContent = data.bookingRef;
+        bookingPill.style.display = 'flex';
+      }
+
+      const stripe   = Stripe('pk_live_51QycLvQAVOs8qTDFVfXTNzuuhBnPjgZQSS3AH30NGMuSf3SxAWF9pLzYwL0ulj1wMMCC2jnhDyeqeop7BkWDfeZ400wT3Ko8aK');
+      const elements = stripe.elements({
+        clientSecret: data.clientSecret,
+        appearance: {
+          theme: 'stripe',
+          variables: {
+            colorPrimary:     '#3F4D1B',
+            colorBackground:  '#ffffff',
+            colorText:        '#3F4D1B',
+            colorDanger:      '#991b1b',
+            fontFamily:       'Mukta, sans-serif',
+            borderRadius:     '6px',
+          }
+        }
+      });
+
+      const paymentElement = elements.create('payment');
+      paymentElement.mount('#payment-element');
+
+      loadingEl.style.display = 'none';
+      formEl.classList.remove('hidden');
+
+      submitBtn.addEventListener('click', async () => {
+        clearError();
+        submitBtn.classList.add('loading');
+        submitBtn.disabled = true;
+
+        const { error } = await stripe.confirmSetup({
+          elements,
+          redirect: 'if_required'
+        });
+
+        if (error) {
+          showError(error.message || 'Something went wrong. Please try again.');
+          submitBtn.classList.remove('loading');
+          submitBtn.disabled = false;
+          return;
+        }
+
+        formEl.classList.add('hidden');
+        successEl.classList.add('visible');
+      });
+
+    } catch (err) {
+      console.error('Init error:', err);
+      showInvalid();
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>

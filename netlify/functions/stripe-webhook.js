@@ -411,6 +411,100 @@ exports.handler = async (event, context) => {
     }
   }
 
+  // ── Handle setup_intent.succeeded ──────────────────────────────────────────
+  if (stripeEvent.type === 'setup_intent.succeeded') {
+    const setupIntent = stripeEvent.data.object;
+    const metadata    = setupIntent.metadata || {};
+    const clientEmail = metadata.clientEmail;
+    const newPmId     = setupIntent.payment_method;
+    const customerId  = setupIntent.customer;
+
+    console.log('setup_intent.succeeded:', setupIntent.id);
+    console.log('Client email:', clientEmail, '| New PM:', newPmId, '| Customer:', customerId);
+
+    if (!clientEmail || metadata.source !== 'markeb-media-card-update') {
+      console.log('Not a card-update SetupIntent — ignoring');
+      return { statusCode: 200, headers, body: JSON.stringify({ received: true }) };
+    }
+
+    try {
+      if (customerId && newPmId) {
+        await stripe.customers.update(customerId, {
+          invoice_settings: { default_payment_method: newPmId }
+        });
+        console.log(`✅ Stripe customer ${customerId} default PM updated to ${newPmId}`);
+      }
+
+      const unpaidBookings = await base('Bookings').select({
+        filterByFormula: `AND(
+          LOWER({Client Email}) = "${clientEmail.toLowerCase()}",
+          {Payment Status} != "Paid",
+          {Payment Status} != "Cancelled"
+        )`
+      }).firstPage();
+
+      console.log(`Found ${unpaidBookings.length} unpaid booking(s) for ${clientEmail}`);
+
+      if (unpaidBookings.length === 0) {
+        console.log('No unpaid bookings to update — card saved on Stripe customer only');
+        return { statusCode: 200, headers, body: JSON.stringify({ received: true, action: 'stripe-only', bookingsUpdated: 0 }) };
+      }
+
+      let updatedCount = 0;
+
+      for (const record of unpaidBookings) {
+        try {
+          await base('Bookings').update(record.id, {
+            'Stripe Payment Method ID': newPmId,
+            'Stripe Payment Intent ID': ''
+          });
+          console.log(`✅ Updated booking ${record.fields['Booking Reference']} (${record.id})`);
+          updatedCount++;
+        } catch (recordErr) {
+          console.error(`⚠️ Failed to update booking ${record.id}:`, recordErr.message);
+        }
+      }
+
+      console.log(`✅ Card updated on ${updatedCount} booking(s) for ${clientEmail}`);
+
+      if (process.env.RESEND_API_KEY) {
+        try {
+          const { sendCardUpdatedConfirmation } = require('./email-service');
+          const firstBooking = unpaidBookings[0].fields;
+
+          await sendCardUpdatedConfirmation({
+            clientName:  firstBooking['Client Name'] || 'there',
+            clientEmail: clientEmail,
+            bookingRef:  firstBooking['Booking Reference'] || metadata.bookingRef || ''
+          }, updatedCount);
+
+          console.log('✅ Card update confirmation email sent to', clientEmail);
+        } catch (emailErr) {
+          console.error('⚠️ Card update email failed:', emailErr);
+        }
+      }
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          received: true,
+          action: 'card-updated',
+          bookingsUpdated: updatedCount,
+          clientEmail
+        })
+      };
+
+    } catch (err) {
+      console.error('❌ setup_intent.succeeded handler failed:', err);
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: 'Failed to update card on file' })
+      };
+    }
+  }
+
   return {
     statusCode: 200,
     headers,

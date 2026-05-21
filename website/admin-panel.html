@@ -5270,6 +5270,9 @@ ${hasPaymentMethod ? `
                 <i data-lucide="credit-card" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Charge Card
               </button>
             ` : ''}
+            <button class="btn btn-small" style="background:#7c3aed;color:#fff;" onclick="sendCardUpdateLink('${booking.id}', '${fields['Booking Reference']}')">
+              <i data-lucide="refresh-cw" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Update Card
+            </button>
             <button class="btn btn-warning btn-small" onclick="markAsPaid('${booking.id}')">
               <i data-lucide="check-circle" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Mark Paid
             </button>
@@ -9217,6 +9220,25 @@ async function fetchSavedPaymentMethod(email) {
   } catch (e) {
     console.warn('Could not fetch saved payment method:', e);
     return null;
+  }
+}
+
+async function sendCardUpdateLink(bookingId, bookingRef) {
+  if (!confirm(`Send a card update link to the client for booking ${bookingRef}?\n\nThey'll receive an email with a secure link to update their payment details.`)) return;
+  try {
+    const res = await fetch('/.netlify/functions/send-card-update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert(`✅ Card update link sent!\n\nBooking: ${data.bookingRef}\n\nThe client will receive an email with a secure link to update their card.`);
+    } else {
+      alert(`❌ Failed to send: ${data.error}`);
+    }
+  } catch (err) {
+    alert('❌ Network error: ' + err.message);
   }
 }
 </script>
