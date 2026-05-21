@@ -111,7 +111,7 @@ exports.handler = async (event, context) => {
     console.log('SetupIntent created:', setupIntent.id);
 
     // ── Step 4: Build the update link ───────────────────────────────────────
-    const updateLink = `https://markebmedia.com/update-card?bookingId=${bookingId}`;
+    const updateLink = `https://markebmedia.com/website/update-card?bookingId=${bookingId}`;
 
     // ── Step 5: Send the email via email-service ────────────────────────────
     await sendCardUpdateEmail({
