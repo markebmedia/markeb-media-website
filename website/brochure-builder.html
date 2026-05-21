@@ -12,215 +12,267 @@
   --brand:#B46100;--brand-light:#CC7A1A;--pine:#3F4D1B;
   --cream:#FDF3E2;--white:#fff;--ink:#1C140A;--ink-mid:#5C4A2A;--ink-soft:#8A7050;
   --rule:rgba(180,97,0,0.14);--rule-strong:rgba(180,97,0,0.28);
-  --client:#B46100;/* overridden by colour picker */
-  --sidebar:280px;
+  --client-colour:#B46100;
+  --sidebar:296px;
 }
 html{scroll-behavior:smooth;}
 body{font-family:'Mukta',sans-serif;background:#f1f5f9;color:var(--ink);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
 
 /* ── Layout ── */
 .app{display:grid;grid-template-columns:var(--sidebar) 1fr;min-height:100vh;}
-.sidebar{background:var(--cream);border-right:1px solid var(--rule);padding:28px 20px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:0;}
+.sidebar{background:var(--cream);border-right:1px solid var(--rule);padding:24px 18px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:0;}
 .main{display:flex;flex-direction:column;}
 
-/* ── Sidebar header ── */
-.sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--rule);}
-.sb-logo img{height:48px;width:auto;}
-.sb-back{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--ink-soft);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px;transition:color .2s;}
+/* ── Sidebar ── */
+.sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--rule);}
+.sb-logo img{height:44px;width:auto;}
+.sb-back{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--ink-soft);text-decoration:none;letter-spacing:.08em;text-transform:uppercase;margin-bottom:18px;transition:color .2s;}
 .sb-back:hover{color:var(--brand);}
 
-/* ── Form sections ── */
-.sb-section{margin-bottom:22px;}
-.sb-section-title{font-size:10px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.18em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
-.sb-section-title::before{content:'';width:16px;height:1px;background:var(--brand);}
-.field{margin-bottom:10px;}
-.field label{display:block;font-size:12px;font-weight:600;color:var(--ink-mid);margin-bottom:4px;letter-spacing:.04em;}
-.field input,.field textarea,.field select{width:100%;padding:9px 12px;border:1px solid var(--rule-strong);border-radius:6px;font-size:13px;font-family:'Mukta',sans-serif;color:var(--ink);background:#fff;transition:border-color .2s,box-shadow .2s;resize:vertical;}
+/* ── Sections ── */
+.sb-section{margin-bottom:18px;}
+.sb-section-title{font-size:10px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.18em;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.sb-section-title::before{content:'';width:14px;height:1px;background:var(--brand);}
+.field{margin-bottom:8px;}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--ink-mid);margin-bottom:3px;letter-spacing:.04em;}
+.field input,.field textarea,.field select{width:100%;padding:8px 11px;border:1px solid var(--rule-strong);border-radius:6px;font-size:12px;font-family:'Mukta',sans-serif;color:var(--ink);background:#fff;transition:border-color .2s,box-shadow .2s;resize:vertical;}
 .field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(180,97,0,.1);}
-.field textarea{min-height:80px;}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.field textarea{min-height:72px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
 .field-row.three{grid-template-columns:1fr 1fr 1fr;}
 
-/* Feature list */
-.feature-list{display:flex;flex-direction:column;gap:6px;}
-.feature-item{display:flex;gap:6px;align-items:center;}
-.feature-item input{flex:1;padding:7px 10px;border:1px solid var(--rule-strong);border-radius:6px;font-size:12px;font-family:'Mukta',sans-serif;}
-.feature-item button{width:28px;height:28px;border:none;background:#fee2e2;color:#dc2626;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.add-feature-btn{width:100%;padding:7px;border:1px dashed var(--rule-strong);background:transparent;color:var(--ink-soft);font-size:12px;font-family:'Mukta',sans-serif;border-radius:6px;cursor:pointer;margin-top:6px;transition:all .2s;}
+/* Colour picker — combined swatch + hex input */
+.colour-picker-row{display:flex;align-items:center;gap:8px;}
+.colour-swatch-wrap{position:relative;width:38px;height:34px;flex-shrink:0;}
+.colour-swatch-wrap input[type="color"]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;padding:0;}
+.colour-swatch{width:38px;height:34px;border-radius:6px;border:1px solid var(--rule-strong);pointer-events:none;}
+.colour-hex-input{flex:1;padding:8px 11px;border:1px solid var(--rule-strong);border-radius:6px;font-size:12px;font-family:'Mukta',sans-serif;color:var(--ink);background:#fff;letter-spacing:.06em;}
+.colour-hex-input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(180,97,0,.1);}
+
+/* Features */
+.feature-list{display:flex;flex-direction:column;gap:5px;}
+.feature-item{display:flex;gap:5px;align-items:center;}
+.feature-item input{flex:1;padding:7px 9px;border:1px solid var(--rule-strong);border-radius:6px;font-size:12px;font-family:'Mukta',sans-serif;}
+.feature-item button{width:26px;height:26px;border:none;background:#fee2e2;color:#dc2626;border-radius:6px;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.add-feature-btn{width:100%;padding:7px;border:1px dashed var(--rule-strong);background:transparent;color:var(--ink-soft);font-size:12px;font-family:'Mukta',sans-serif;border-radius:6px;cursor:pointer;margin-top:5px;transition:all .2s;}
 .add-feature-btn:hover{border-color:var(--brand);color:var(--brand);}
 
 /* Upload zones */
-.upload-zone{border:1px dashed var(--rule-strong);border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;background:#fff;}
+.upload-zone{border:1px dashed var(--rule-strong);border-radius:8px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:#fff;}
 .upload-zone:hover,.upload-zone.drag{border-color:var(--brand);background:rgba(180,97,0,.04);}
 .upload-zone input{display:none;}
-.upload-zone-icon{font-size:22px;margin-bottom:6px;}
-.upload-zone p{font-size:12px;color:var(--ink-soft);line-height:1.5;}
+.upload-zone p{font-size:11px;color:var(--ink-soft);line-height:1.5;}
 .upload-zone strong{color:var(--brand);}
-.logo-preview{width:100%;max-height:70px;object-fit:contain;margin-top:8px;border-radius:4px;}
-.photo-thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;}
-.photo-thumb{position:relative;aspect-ratio:4/3;border-radius:4px;overflow:hidden;}
+.upload-zone-icon{font-size:20px;margin-bottom:5px;}
+.logo-preview{width:100%;max-height:60px;object-fit:contain;margin-top:8px;border-radius:4px;}
+.photo-thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:7px;}
+.photo-thumb{position:relative;aspect-ratio:4/3;border-radius:4px;overflow:hidden;cursor:grab;}
+.photo-thumb.dragging{opacity:.4;cursor:grabbing;}
 .photo-thumb img{width:100%;height:100%;object-fit:cover;}
-.photo-thumb-rm{position:absolute;top:2px;right:2px;width:18px;height:18px;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;}
-.photo-count{font-size:11px;color:var(--ink-soft);margin-top:6px;text-align:center;}
+.photo-thumb-rm{position:absolute;top:2px;right:2px;width:17px;height:17px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:9px;display:flex;align-items:center;justify-content:center;}
+.photo-thumb-badge{position:absolute;bottom:2px;left:2px;background:rgba(180,97,0,.85);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;}
+.photo-count{font-size:11px;color:var(--ink-soft);margin-top:5px;text-align:center;}
 
-/* Colour picker */
-.colour-row{display:flex;align-items:center;gap:10px;}
-.colour-row input[type="color"]{width:40px;height:36px;border:1px solid var(--rule-strong);border-radius:6px;cursor:pointer;padding:2px;}
-.colour-row span{font-size:12px;color:var(--ink-mid);}
+/* Mode toggle */
+.mode-toggle{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.mode-btn{padding:9px 6px;border:2px solid var(--rule-strong);border-radius:8px;background:#fff;cursor:pointer;font-size:11px;font-weight:700;font-family:'Mukta',sans-serif;color:var(--ink-mid);text-align:center;transition:all .2s;letter-spacing:.04em;}
+.mode-btn.active{border-color:var(--brand);color:var(--brand);background:rgba(180,97,0,.06);}
+.mode-btn:hover:not(.active){border-color:var(--brand-light);color:var(--brand-light);}
+.mode-icon{font-size:16px;display:block;margin-bottom:3px;}
 
 /* Template picker */
-.template-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.template-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
 .tpl-card{border:2px solid var(--rule);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .2s;background:#fff;}
 .tpl-card.active{border-color:var(--brand);box-shadow:0 0 0 3px rgba(180,97,0,.15);}
 .tpl-card:hover{border-color:var(--brand-light);}
-.tpl-thumb{height:60px;display:flex;flex-direction:column;gap:3px;padding:6px;}
+.tpl-thumb{height:54px;display:flex;flex-direction:column;gap:3px;padding:5px;}
 .tpl-stripe{border-radius:2px;}
 .tpl-label{font-size:10px;font-weight:600;color:var(--ink-mid);text-align:center;padding:4px 0;border-top:1px solid var(--rule);}
 .tpl-card.active .tpl-label{color:var(--brand);}
 
-/* Export buttons */
-.export-group{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
-.btn-export{width:100%;padding:11px 16px;border:none;border-radius:8px;font-family:'Mukta',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;}
-.btn-pdf{background:var(--brand);color:#fff;box-shadow:0 4px 14px rgba(180,97,0,.3);}
+/* Disclaimer editor */
+.disclaimer-box{background:#fff;border:1px solid var(--rule-strong);border-radius:6px;padding:10px 12px;position:relative;}
+.disclaimer-box textarea{width:100%;border:none;resize:none;font-size:11px;color:var(--ink-mid);font-family:'Mukta',sans-serif;line-height:1.6;outline:none;min-height:52px;background:transparent;}
+.disclaimer-remove-btn{position:absolute;top:6px;right:6px;width:20px;height:20px;background:#fee2e2;color:#dc2626;border:none;border-radius:4px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;}
+.disclaimer-removed{background:#f1f5f9;border:1px dashed #cbd5e1;border-radius:6px;padding:10px 12px;font-size:11px;color:var(--ink-soft);display:flex;align-items:center;justify-content:space-between;}
+.disclaimer-restore-btn{font-size:11px;color:var(--brand);background:none;border:none;cursor:pointer;font-family:'Mukta',sans-serif;font-weight:600;}
+
+/* Export */
+.export-group{display:flex;flex-direction:column;gap:7px;}
+.btn-export{width:100%;padding:10px 14px;border:none;border-radius:8px;font-family:'Mukta',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s;}
+.btn-pdf{background:var(--brand);color:#fff;box-shadow:0 4px 12px rgba(180,97,0,.3);}
 .btn-pdf:hover{background:var(--brand-light);transform:translateY(-1px);}
-.btn-word{background:var(--pine);color:#fff;box-shadow:0 4px 14px rgba(63,77,27,.3);}
+.btn-word{background:var(--pine);color:#fff;box-shadow:0 4px 12px rgba(63,77,27,.3);}
 .btn-word:hover{background:#4a5920;transform:translateY(-1px);}
 .btn-print{background:#fff;color:var(--ink-mid);border:1px solid var(--rule-strong);}
-.btn-print:hover{border-color:var(--ink-mid);color:var(--ink);}
+.btn-print:hover{border-color:var(--ink-mid);}
+.btn-save{background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd;}
+.btn-save:hover{background:#bae6fd;}
 
-/* ── Main content ── */
-.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.05);}
-.topbar-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--ink);}
+/* Save toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--pine);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;z-index:9999;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* ── Main ── */
+.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--ink);}
 .topbar-title em{font-style:italic;color:var(--brand);}
-.topbar-sub{font-size:13px;color:var(--ink-soft);margin-top:2px;}
-.preview-area{padding:32px;flex:1;display:flex;flex-direction:column;align-items:center;}
+.topbar-sub{font-size:12px;color:var(--ink-soft);margin-top:2px;}
+.preview-area{padding:28px;flex:1;display:flex;flex-direction:column;align-items:center;}
 .preview-label{font-size:11px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.16em;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
 .preview-label::before,.preview-label::after{content:'';flex:1;height:1px;background:#e2e8f0;}
 
-/* ── Brochure preview ── */
+/* ── Brochure ── */
 #brochure{width:794px;max-width:100%;background:#fff;box-shadow:0 8px 48px rgba(0,0,0,.14);position:relative;font-family:'Mukta',sans-serif;}
 
-/* ── TEMPLATE 1: Classic Luxury ── */
+/* PAGE BREAKS — multi-page */
+.page-break{width:100%;height:32px;background:#e8edf2;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#94a3b8;position:relative;}
+.page-break::before,.page-break::after{content:'';flex:1;height:1px;background:#cbd5e1;margin:0 12px;}
+.br-page{background:#fff;}
+
+/* ─────────────────────────────────────────
+   TEMPLATE: CLASSIC
+───────────────────────────────────────── */
 .tpl-classic .br-cover{position:relative;width:100%;height:480px;overflow:hidden;}
 .tpl-classic .br-cover-img{width:100%;height:100%;object-fit:cover;}
 .tpl-classic .br-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.18) 55%,transparent 100%);}
-.tpl-classic .br-cover-text{position:absolute;bottom:0;left:0;right:0;padding:40px 48px;}
-.tpl-classic .br-agency-logo{position:absolute;top:28px;right:32px;max-height:56px;max-width:160px;object-fit:contain;}
-.tpl-classic .br-address{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:#fff;line-height:1.1;margin-bottom:8px;}
-.tpl-classic .br-price-tag{display:inline-block;background:var(--client-colour,#B46100);color:#fff;font-size:14px;font-weight:700;padding:7px 18px;letter-spacing:.08em;}
+.tpl-classic .br-cover-text{position:absolute;bottom:0;left:0;right:0;padding:36px 44px;}
+.tpl-classic .br-agency-logo{position:absolute;top:24px;right:28px;max-height:52px;max-width:150px;object-fit:contain;}
+.tpl-classic .br-address{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:#fff;line-height:1.1;margin-bottom:8px;}
+.tpl-classic .br-price-tag{display:inline-block;background:var(--client-colour,#B46100);color:#fff;font-size:13px;font-weight:700;padding:6px 16px;letter-spacing:.08em;}
 .tpl-classic .br-stats-bar{display:grid;grid-template-columns:repeat(4,1fr);background:#f8f6f2;border-bottom:3px solid var(--client-colour,#B46100);}
-.tpl-classic .br-stat{padding:18px 20px;text-align:center;border-right:1px solid #ede8df;}
+.tpl-classic .br-stat{padding:16px 18px;text-align:center;border-right:1px solid #ede8df;}
 .tpl-classic .br-stat:last-child{border-right:none;}
-.tpl-classic .br-stat-val{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--client-colour,#B46100);line-height:1;}
-.tpl-classic .br-stat-lbl{font-size:10px;font-weight:600;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-top:3px;}
-.tpl-classic .br-body{padding:40px 48px;}
-.tpl-classic .br-section-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--client-colour,#B46100);margin-bottom:12px;display:flex;align-items:center;gap:12px;}
+.tpl-classic .br-stat-val{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;color:var(--client-colour,#B46100);line-height:1;}
+.tpl-classic .br-stat-lbl{font-size:9px;font-weight:600;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-top:3px;}
+.tpl-classic .br-body{padding:36px 44px;}
+.tpl-classic .br-section-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--client-colour,#B46100);margin-bottom:12px;display:flex;align-items:center;gap:12px;}
 .tpl-classic .br-section-title::after{content:'';flex:1;height:1px;background:var(--client-colour,#B46100);opacity:.25;}
-.tpl-classic .br-description{font-size:14px;color:#5C4A2A;line-height:1.85;margin-bottom:32px;font-weight:300;}
-.tpl-classic .br-features{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;margin-bottom:32px;}
-.tpl-classic .br-feature{font-size:13px;color:#5C4A2A;display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+.tpl-classic .br-description{font-size:13px;color:#5C4A2A;line-height:1.85;margin-bottom:28px;font-weight:300;}
+.tpl-classic .br-features{display:grid;grid-template-columns:1fr 1fr;gap:5px 22px;margin-bottom:28px;}
+.tpl-classic .br-feature{font-size:12px;color:#5C4A2A;display:flex;align-items:flex-start;gap:7px;line-height:1.5;}
 .tpl-classic .br-feature::before{content:'◆';font-size:8px;color:var(--client-colour,#B46100);margin-top:4px;flex-shrink:0;}
-.tpl-classic .br-photo-grid{display:grid;gap:6px;margin-bottom:32px;}
+.tpl-classic .br-photo-grid{display:grid;gap:5px;margin-bottom:28px;}
+.tpl-classic .br-photo-grid.cols-1{grid-template-columns:1fr;}
 .tpl-classic .br-photo-grid.cols-2{grid-template-columns:1fr 1fr;}
 .tpl-classic .br-photo-grid.cols-3{grid-template-columns:1fr 1fr 1fr;}
 .tpl-classic .br-photo-grid img{width:100%;aspect-ratio:4/3;object-fit:cover;}
-.tpl-classic .br-details-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #ede8df;margin-bottom:32px;}
-.tpl-classic .br-detail{padding:12px 18px;border-bottom:1px solid #ede8df;border-right:1px solid #ede8df;}
+.tpl-classic .br-details-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #ede8df;margin-bottom:28px;}
+.tpl-classic .br-detail{padding:11px 16px;border-bottom:1px solid #ede8df;border-right:1px solid #ede8df;}
 .tpl-classic .br-detail:nth-child(even){border-right:none;}
-.tpl-classic .br-detail-lbl{font-size:10px;font-weight:600;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;}
-.tpl-classic .br-detail-val{font-size:14px;font-weight:600;color:#1C140A;}
-.tpl-classic .br-floorplan{width:100%;max-height:320px;object-fit:contain;margin-bottom:32px;border:1px solid #ede8df;padding:12px;}
-.tpl-classic .br-footer{background:var(--client-colour,#B46100);padding:22px 48px;display:flex;justify-content:space-between;align-items:center;}
-.tpl-classic .br-footer-agency{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:#fff;}
-.tpl-classic .br-footer-note{font-size:10px;color:rgba(255,255,255,.65);text-align:right;line-height:1.6;}
+.tpl-classic .br-detail-lbl{font-size:9px;font-weight:600;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;}
+.tpl-classic .br-detail-val{font-size:13px;font-weight:600;color:#1C140A;}
+.tpl-classic .br-floorplan{width:100%;max-height:300px;object-fit:contain;margin-bottom:28px;border:1px solid #ede8df;padding:12px;}
+.tpl-classic .br-local{font-size:13px;color:#5C4A2A;line-height:1.8;margin-bottom:28px;font-weight:300;}
+.tpl-classic .br-contact-strip{background:#f8f6f2;border-top:3px solid var(--client-colour,#B46100);padding:20px 44px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.tpl-classic .br-contact-item-lbl{font-size:9px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.12em;margin-bottom:3px;}
+.tpl-classic .br-contact-item-val{font-size:12px;font-weight:600;color:#1C140A;}
+.tpl-classic .br-footer{background:var(--client-colour,#B46100);padding:18px 44px;display:flex;justify-content:space-between;align-items:center;}
+.tpl-classic .br-footer-agency{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:#fff;}
+.tpl-classic .br-footer-note{font-size:9px;color:rgba(255,255,255,.65);text-align:right;line-height:1.6;max-width:320px;}
+.tpl-classic .br-price-type{font-size:11px;color:rgba(255,255,255,.75);margin-bottom:4px;letter-spacing:.06em;}
 
-/* ── TEMPLATE 2: Modern Minimal ── */
-.tpl-modern .br-cover{width:100%;height:520px;position:relative;overflow:hidden;}
+/* ─────────────────────────────────────────
+   TEMPLATE: MODERN
+───────────────────────────────────────── */
+.tpl-modern .br-cover{width:100%;height:500px;position:relative;overflow:hidden;}
 .tpl-modern .br-cover-img{width:100%;height:100%;object-fit:cover;}
 .tpl-modern .br-cover-bar{position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--client-colour,#B46100);}
-.tpl-modern .br-cover-agency{position:absolute;top:32px;left:28px;max-height:48px;max-width:140px;object-fit:contain;}
-.tpl-modern .br-header-block{background:#fff;padding:32px 48px;border-bottom:1px solid #f0ebe2;display:grid;grid-template-columns:1fr auto;align-items:start;gap:24px;}
-.tpl-modern .br-address-modern{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:#1C140A;line-height:1.15;}
-.tpl-modern .br-price-modern{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:var(--client-colour,#B46100);white-space:nowrap;}
-.tpl-modern .br-tenure-pill{display:inline-block;background:#f8f6f2;border:1px solid #ede8df;font-size:11px;font-weight:600;color:#8A7050;padding:3px 10px;border-radius:20px;margin-top:6px;text-transform:uppercase;letter-spacing:.08em;}
-.tpl-modern .br-stats-modern{display:flex;gap:0;padding:0 48px;background:#f8f6f2;border-bottom:1px solid #ede8df;}
-.tpl-modern .br-stat-m{padding:16px 28px;text-align:center;border-right:1px solid #ede8df;display:flex;flex-direction:column;gap:2px;}
+.tpl-modern .br-cover-agency{position:absolute;top:28px;left:24px;max-height:44px;max-width:130px;object-fit:contain;}
+.tpl-modern .br-header-block{background:#fff;padding:28px 44px;border-bottom:1px solid #f0ebe2;display:grid;grid-template-columns:1fr auto;align-items:start;gap:22px;}
+.tpl-modern .br-address-modern{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:#1C140A;line-height:1.15;}
+.tpl-modern .br-price-modern{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--client-colour,#B46100);white-space:nowrap;}
+.tpl-modern .br-price-type-m{font-size:10px;color:#8A7050;text-align:right;margin-top:2px;letter-spacing:.06em;}
+.tpl-modern .br-tenure-pill{display:inline-block;background:#f8f6f2;border:1px solid #ede8df;font-size:10px;font-weight:600;color:#8A7050;padding:2px 9px;border-radius:20px;margin-top:5px;text-transform:uppercase;letter-spacing:.08em;}
+.tpl-modern .br-stats-modern{display:flex;gap:0;padding:0 44px;background:#f8f6f2;border-bottom:1px solid #ede8df;}
+.tpl-modern .br-stat-m{padding:14px 24px;text-align:center;border-right:1px solid #ede8df;display:flex;flex-direction:column;gap:2px;}
 .tpl-modern .br-stat-m:last-child{border-right:none;}
-.tpl-modern .br-stat-m-val{font-size:24px;font-weight:700;color:var(--client-colour,#B46100);font-family:'Cormorant Garamond',serif;}
-.tpl-modern .br-stat-m-lbl{font-size:10px;color:#8A7050;font-weight:600;text-transform:uppercase;letter-spacing:.1em;}
-.tpl-modern .br-body{padding:36px 48px;}
-.tpl-modern .br-col-2{display:grid;grid-template-columns:1.4fr 1fr;gap:36px;}
-.tpl-modern .br-desc-m{font-size:14px;color:#5C4A2A;line-height:1.85;font-weight:300;}
+.tpl-modern .br-stat-m-val{font-size:22px;font-weight:700;color:var(--client-colour,#B46100);font-family:'Cormorant Garamond',serif;}
+.tpl-modern .br-stat-m-lbl{font-size:9px;color:#8A7050;font-weight:600;text-transform:uppercase;letter-spacing:.1em;}
+.tpl-modern .br-body{padding:32px 44px;}
+.tpl-modern .br-col-2{display:grid;grid-template-columns:1.4fr 1fr;gap:32px;}
+.tpl-modern .br-desc-m{font-size:13px;color:#5C4A2A;line-height:1.85;font-weight:300;}
 .tpl-modern .br-features-m{list-style:none;}
-.tpl-modern .br-features-m li{padding:7px 0;border-bottom:1px solid #f0ebe2;font-size:13px;color:#5C4A2A;display:flex;align-items:flex-start;gap:8px;}
+.tpl-modern .br-features-m li{padding:6px 0;border-bottom:1px solid #f0ebe2;font-size:12px;color:#5C4A2A;display:flex;align-items:flex-start;gap:7px;}
 .tpl-modern .br-features-m li:last-child{border-bottom:none;}
-.tpl-modern .br-features-m li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--client-colour,#B46100);margin-top:6px;flex-shrink:0;}
-.tpl-modern .br-photo-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px;margin:28px 0;}
+.tpl-modern .br-features-m li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--client-colour,#B46100);margin-top:5px;flex-shrink:0;}
+.tpl-modern .br-photo-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px;margin:24px 0;}
 .tpl-modern .br-photo-strip img{width:100%;aspect-ratio:4/3;object-fit:cover;}
-.tpl-modern .br-details-m{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#ede8df;border:1px solid #ede8df;margin:28px 0;}
-.tpl-modern .br-det-m{background:#fff;padding:14px 18px;}
-.tpl-modern .br-det-m-l{font-size:10px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
-.tpl-modern .br-det-m-v{font-size:14px;font-weight:600;color:#1C140A;}
-.tpl-modern .br-floorplan{width:100%;max-height:300px;object-fit:contain;border:1px solid #ede8df;padding:12px;margin-bottom:28px;}
-.tpl-modern .br-footer{padding:20px 48px;background:#1C140A;display:flex;justify-content:space-between;align-items:center;}
-.tpl-modern .br-footer-l{font-size:13px;color:rgba(255,255,255,.55);}
-.tpl-modern .br-footer-accent{width:32px;height:3px;background:var(--client-colour,#B46100);margin-top:4px;}
+.tpl-modern .br-details-m{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#ede8df;border:1px solid #ede8df;margin:24px 0;}
+.tpl-modern .br-det-m{background:#fff;padding:12px 16px;}
+.tpl-modern .br-det-m-l{font-size:9px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
+.tpl-modern .br-det-m-v{font-size:13px;font-weight:600;color:#1C140A;}
+.tpl-modern .br-floorplan{width:100%;max-height:280px;object-fit:contain;border:1px solid #ede8df;padding:12px;margin-bottom:24px;}
+.tpl-modern .br-local-m{font-size:13px;color:#5C4A2A;line-height:1.85;font-weight:300;margin-bottom:24px;}
+.tpl-modern .br-contact-m{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#ede8df;border:1px solid #ede8df;margin-bottom:24px;}
+.tpl-modern .br-contact-m-item{background:#fff;padding:14px 16px;}
+.tpl-modern .br-contact-m-lbl{font-size:9px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
+.tpl-modern .br-contact-m-val{font-size:12px;font-weight:600;color:#1C140A;}
+.tpl-modern .br-footer{padding:18px 44px;background:#1C140A;display:flex;justify-content:space-between;align-items:center;}
+.tpl-modern .br-footer-l{font-size:12px;color:rgba(255,255,255,.55);}
+.tpl-modern .br-footer-accent{width:28px;height:3px;background:var(--client-colour,#B46100);margin-top:4px;}
+.tpl-modern .br-footer-note{font-size:9px;color:rgba(255,255,255,.35);text-align:right;max-width:300px;line-height:1.6;}
 
-/* ── TEMPLATE 3: Estate Dark ── */
-.tpl-dark .br-cover{width:100%;height:500px;position:relative;overflow:hidden;}
+/* ─────────────────────────────────────────
+   TEMPLATE: DARK ESTATE
+───────────────────────────────────────── */
+.tpl-dark .br-cover{width:100%;height:480px;position:relative;overflow:hidden;}
 .tpl-dark .br-cover-img{width:100%;height:100%;object-fit:cover;opacity:.75;}
 .tpl-dark .br-cover-bg{position:absolute;inset:0;background:#0e0b08;}
 .tpl-dark .br-cover-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(14,11,8,.92) 0%,rgba(14,11,8,.4) 60%,transparent 100%);}
-.tpl-dark .br-cover-text{position:absolute;top:50%;left:56px;transform:translateY(-50%);}
-.tpl-dark .br-cover-line{width:40px;height:2px;background:var(--client-colour,#B46100);margin-bottom:18px;}
-.tpl-dark .br-address-dark{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;color:#fff;line-height:1.1;margin-bottom:12px;}
+.tpl-dark .br-cover-text{position:absolute;top:50%;left:52px;transform:translateY(-50%);}
+.tpl-dark .br-cover-line{width:36px;height:2px;background:var(--client-colour,#B46100);margin-bottom:16px;}
+.tpl-dark .br-address-dark{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:#fff;line-height:1.1;margin-bottom:6px;}
+.tpl-dark .br-price-type-d{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;letter-spacing:.06em;}
 .tpl-dark .br-price-dark{font-size:22px;font-weight:700;color:var(--client-colour,#B46100);font-family:'Cormorant Garamond',serif;}
-.tpl-dark .br-agency-dark{position:absolute;top:28px;right:32px;max-height:52px;max-width:150px;object-fit:contain;filter:brightness(10);}
+.tpl-dark .br-agency-dark{position:absolute;top:24px;right:28px;max-height:48px;max-width:140px;object-fit:contain;filter:brightness(10);}
 .tpl-dark .br-dark-stats{background:#0e0b08;display:grid;grid-template-columns:repeat(4,1fr);}
-.tpl-dark .br-stat-d{padding:18px 16px;text-align:center;border-right:1px solid rgba(255,255,255,.07);}
+.tpl-dark .br-stat-d{padding:16px 14px;text-align:center;border-right:1px solid rgba(255,255,255,.07);}
 .tpl-dark .br-stat-d:last-child{border-right:none;}
-.tpl-dark .br-stat-d-val{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--client-colour,#B46100);}
+.tpl-dark .br-stat-d-val{font-family:'Cormorant Garamond',serif;font-size:21px;color:var(--client-colour,#B46100);}
 .tpl-dark .br-stat-d-lbl{font-size:9px;color:rgba(255,255,255,.38);text-transform:uppercase;letter-spacing:.14em;margin-top:3px;}
-.tpl-dark .br-body{padding:44px 56px;background:#fff;}
-.tpl-dark .br-gold-rule{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.tpl-dark .br-body{padding:40px 52px;background:#fff;}
+.tpl-dark .br-gold-rule{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
 .tpl-dark .br-gold-rule-line{flex:1;height:1px;background:var(--client-colour,#B46100);opacity:.28;}
 .tpl-dark .br-gold-rule-dia{width:7px;height:7px;background:var(--client-colour,#B46100);transform:rotate(45deg);opacity:.65;}
-.tpl-dark .br-gold-rule-txt{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:13px;color:var(--client-colour,#B46100);letter-spacing:.14em;text-transform:uppercase;}
-.tpl-dark .br-desc-d{font-size:14px;color:#5C4A2A;line-height:1.85;font-weight:300;margin-bottom:32px;}
-.tpl-dark .br-features-d{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px 18px;margin-bottom:32px;}
-.tpl-dark .br-feature-d{font-size:12px;color:#5C4A2A;display:flex;align-items:flex-start;gap:7px;}
+.tpl-dark .br-gold-rule-txt{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--client-colour,#B46100);letter-spacing:.14em;text-transform:uppercase;}
+.tpl-dark .br-desc-d{font-size:13px;color:#5C4A2A;line-height:1.85;font-weight:300;margin-bottom:28px;}
+.tpl-dark .br-features-d{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px 16px;margin-bottom:28px;}
+.tpl-dark .br-feature-d{font-size:12px;color:#5C4A2A;display:flex;align-items:flex-start;gap:6px;}
 .tpl-dark .br-feature-d::before{content:'—';color:var(--client-colour,#B46100);font-weight:700;flex-shrink:0;}
-.tpl-dark .br-photo-masonry{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:auto auto;gap:5px;margin-bottom:32px;}
+.tpl-dark .br-photo-masonry{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:auto auto;gap:4px;margin-bottom:28px;}
 .tpl-dark .br-photo-masonry img{width:100%;height:100%;object-fit:cover;}
 .tpl-dark .br-photo-masonry img:first-child{grid-row:span 2;aspect-ratio:3/4;}
 .tpl-dark .br-photo-masonry img:not(:first-child){aspect-ratio:3/2;}
-.tpl-dark .br-photo-extra{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:5px;margin-bottom:32px;}
+.tpl-dark .br-photo-extra{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px;margin-bottom:28px;}
 .tpl-dark .br-photo-extra img{width:100%;aspect-ratio:4/3;object-fit:cover;}
-.tpl-dark .br-details-d{background:#f8f6f2;padding:24px 32px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;border-top:3px solid var(--client-colour,#B46100);}
-.tpl-dark .br-det-d-l{font-size:10px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
-.tpl-dark .br-det-d-v{font-size:14px;font-weight:600;color:#1C140A;}
-.tpl-dark .br-floorplan{width:100%;max-height:300px;object-fit:contain;border:1px solid #ede8df;padding:12px;margin-bottom:32px;}
-.tpl-dark .br-footer{background:#0e0b08;padding:24px 56px;display:flex;justify-content:space-between;align-items:center;}
-.tpl-dark .br-footer-agency{font-family:'Cormorant Garamond',serif;font-size:17px;color:#fff;font-weight:600;}
+.tpl-dark .br-details-d{background:#f8f6f2;padding:22px 28px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;border-top:3px solid var(--client-colour,#B46100);}
+.tpl-dark .br-det-d-l{font-size:9px;font-weight:700;color:#8A7050;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
+.tpl-dark .br-det-d-v{font-size:13px;font-weight:600;color:#1C140A;}
+.tpl-dark .br-floorplan{width:100%;max-height:280px;object-fit:contain;border:1px solid #ede8df;padding:12px;margin-bottom:28px;}
+.tpl-dark .br-local-d{font-size:13px;color:#5C4A2A;line-height:1.85;font-weight:300;margin-bottom:28px;}
+.tpl-dark .br-contact-d{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:28px;padding:20px 24px;background:#0e0b08;}
+.tpl-dark .br-contact-d-lbl{font-size:9px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.12em;margin-bottom:3px;}
+.tpl-dark .br-contact-d-val{font-size:12px;font-weight:600;color:#fff;}
+.tpl-dark .br-footer{background:#0e0b08;padding:20px 52px;display:flex;justify-content:space-between;align-items:center;}
+.tpl-dark .br-footer-agency{font-family:'Cormorant Garamond',serif;font-size:16px;color:#fff;font-weight:600;}
 .tpl-dark .br-footer-right{text-align:right;}
-.tpl-dark .br-footer-note{font-size:10px;color:rgba(255,255,255,.38);line-height:1.6;}
-.tpl-dark .br-footer-accent{height:2px;width:32px;background:var(--client-colour,#B46100);margin:4px 0 0 auto;}
+.tpl-dark .br-footer-note{font-size:9px;color:rgba(255,255,255,.35);line-height:1.6;max-width:300px;}
+.tpl-dark .br-footer-accent{height:2px;width:28px;background:var(--client-colour,#B46100);margin:4px 0 0 auto;}
 
-/* ── Placeholder UI ── */
-.br-placeholder{background:#f8f6f2;border:2px dashed #d8cfc4;display:flex;align-items:center;justify-content:center;font-size:12px;color:#A88E6E;letter-spacing:.08em;text-transform:uppercase;}
-.br-placeholder-sm{height:80px;}
+/* ── Placeholder ── */
+.br-placeholder{background:#f8f6f2;border:2px dashed #d8cfc4;display:flex;align-items:center;justify-content:center;font-size:11px;color:#A88E6E;letter-spacing:.08em;text-transform:uppercase;}
 
 /* ── Responsive ── */
 @media(max-width:1100px){
   .app{grid-template-columns:240px 1fr;}
-  #brochure{width:680px;}
+  #brochure{width:640px;}
 }
 @media(max-width:900px){
   .app{grid-template-columns:1fr;}
   .sidebar{position:static;height:auto;order:2;}
   .main{order:1;}
   #brochure{width:100%;}
-  .topbar{flex-direction:column;align-items:flex-start;gap:8px;}
 }
 
 /* Print */
@@ -229,28 +281,45 @@ body{font-family:'Mukta',sans-serif;background:#f1f5f9;color:var(--ink);-webkit-
   .main{margin:0;}
   .preview-area{padding:0;}
   #brochure{box-shadow:none;width:100%;}
+  .page-break{display:none!important;}
+  .br-page{page-break-after:always;}
 }
 
-/* Loading spinner */
-.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top:2px solid #fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+/* Spinner */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top:2px solid #fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:5px;}
 @keyframes spin{to{transform:rotate(360deg);}}
+
+/* Virtual tour link badge */
+.br-vtour-badge{display:inline-flex;align-items:center;gap:7px;background:var(--client-colour,#B46100);color:#fff;font-size:11px;font-weight:600;padding:5px 13px;border-radius:20px;text-decoration:none;margin-bottom:20px;}
 </style>
 </head>
 <body>
 
 <div class="app">
-
   <!-- ── SIDEBAR ── -->
   <aside class="sidebar" id="sidebar">
 
     <div class="sb-logo">
-      <img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media"/>
+      <img src="../public/images/Markeb Media Logo (2).PNG" alt="Markeb Media" onerror="this.style.display='none'"/>
     </div>
 
     <a href="./dashboard.html" class="sb-back">
-      <i data-lucide="arrow-left" style="width:14px;height:14px;"></i>
+      <i data-lucide="arrow-left" style="width:13px;height:13px;"></i>
       Back to Dashboard
     </a>
+
+    <!-- Layout Mode -->
+    <div class="sb-section">
+      <div class="sb-section-title">Layout Mode</div>
+      <div class="mode-toggle">
+        <button class="mode-btn active" onclick="setMode('single')" id="mode-single">
+          <span class="mode-icon">📄</span>Single Page
+        </button>
+        <button class="mode-btn" onclick="setMode('multi')" id="mode-multi">
+          <span class="mode-icon">📑</span>Multi-Page
+        </button>
+      </div>
+    </div>
 
     <!-- Template -->
     <div class="sb-section">
@@ -258,7 +327,7 @@ body{font-family:'Mukta',sans-serif;background:#f1f5f9;color:var(--ink);-webkit-
       <div class="template-grid">
         <div class="tpl-card active" onclick="setTemplate('classic')" id="tpl-classic">
           <div class="tpl-thumb">
-            <div class="tpl-stripe" style="height:28px;background:#c8bfb0;"></div>
+            <div class="tpl-stripe" style="height:24px;background:#c8bfb0;"></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;flex:1;">
               <div class="tpl-stripe" style="background:#e8e2d8;"></div>
               <div class="tpl-stripe" style="background:#e8e2d8;"></div>
@@ -268,15 +337,15 @@ body{font-family:'Mukta',sans-serif;background:#f1f5f9;color:var(--ink);-webkit-
         </div>
         <div class="tpl-card" onclick="setTemplate('modern')" id="tpl-modern">
           <div class="tpl-thumb">
-            <div class="tpl-stripe" style="height:32px;background:#d0c8bc;"></div>
+            <div class="tpl-stripe" style="height:28px;background:#d0c8bc;"></div>
             <div class="tpl-stripe" style="flex:1;background:#f0ebe2;margin-top:2px;"></div>
           </div>
           <div class="tpl-label">Modern</div>
         </div>
         <div class="tpl-card" onclick="setTemplate('dark')" id="tpl-dark">
           <div class="tpl-thumb">
-            <div class="tpl-stripe" style="height:28px;background:#2a2420;"></div>
-            <div class="tpl-stripe" style="height:8px;background:#0e0b08;margin-top:1px;"></div>
+            <div class="tpl-stripe" style="height:24px;background:#2a2420;"></div>
+            <div class="tpl-stripe" style="height:7px;background:#0e0b08;margin-top:1px;"></div>
             <div class="tpl-stripe" style="flex:1;background:#f0ebe2;margin-top:2px;"></div>
           </div>
           <div class="tpl-label">Dark Estate</div>
@@ -296,15 +365,18 @@ body{font-family:'Mukta',sans-serif;background:#f1f5f9;color:var(--ink);-webkit-
         <div class="upload-zone" onclick="document.getElementById('f-logo-input').click()" id="logo-zone">
           <input type="file" id="f-logo-input" accept="image/*" onchange="handleLogo(this)"/>
           <div class="upload-zone-icon">🏢</div>
-          <p><strong>Click to upload</strong> your logo<br>PNG or SVG recommended</p>
+          <p><strong>Click to upload</strong> logo<br>PNG or SVG recommended</p>
         </div>
         <img id="logo-preview-img" class="logo-preview" style="display:none;"/>
       </div>
       <div class="field">
         <label>Brand Colour</label>
-        <div class="colour-row">
-          <input type="color" id="f-colour" value="#B46100" oninput="updateColour(this.value)"/>
-          <span id="colour-hex">#B46100</span>
+        <div class="colour-picker-row">
+          <div class="colour-swatch-wrap">
+            <input type="color" id="f-colour-picker" value="#B46100" oninput="syncColourFromPicker(this.value)"/>
+            <div class="colour-swatch" id="colour-swatch-display" style="background:#B46100;"></div>
+          </div>
+          <input type="text" class="colour-hex-input" id="f-colour-hex" value="#B46100" placeholder="#B46100" maxlength="7" oninput="syncColourFromHex(this.value)" onblur="normaliseHexInput()"/>
         </div>
       </div>
     </div>
@@ -316,9 +388,24 @@ body{font-family:'Mukta',sans-serif;background:#f1f5f9;color:var(--ink);-webkit-
         <label>Full Address</label>
         <input type="text" id="f-address" placeholder="12 Oak Lane, Cheshire, WA1 2AB" oninput="update()"/>
       </div>
-      <div class="field">
-        <label>Asking Price</label>
-        <input type="text" id="f-price" placeholder="£850,000" oninput="update()"/>
+      <div class="field-row">
+        <div class="field">
+          <label>Price Type</label>
+          <select id="f-pricetype" onchange="update()">
+            <option value="">–</option>
+            <option>Asking Price</option>
+            <option>Guide Price</option>
+            <option>Offers Over</option>
+            <option>Offers In Excess Of</option>
+            <option>Offers In The Region Of</option>
+            <option>Fixed Price</option>
+            <option>POA</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Price</label>
+          <input type="text" id="f-price" placeholder="£850,000" oninput="update()"/>
+        </div>
       </div>
       <div class="field-row">
         <div class="field">
@@ -350,7 +437,7 @@ body{font-family:'Mukta',sans-serif;background:#f1f5f9;color:var(--ink);-webkit-
         <div class="field">
           <label>EPC Rating</label>
           <select id="f-epc" onchange="update()">
-            <option value="">Select…</option>
+            <option value="">–</option>
             <option>A</option><option>B</option><option>C</option>
             <option>D</option><option>E</option><option>F</option><option>G</option>
           </select>
@@ -358,35 +445,55 @@ body{font-family:'Mukta',sans-serif;background:#f1f5f9;color:var(--ink);-webkit-
         <div class="field">
           <label>Council Tax Band</label>
           <select id="f-ctax" onchange="update()">
-            <option value="">Select…</option>
+            <option value="">–</option>
             <option>A</option><option>B</option><option>C</option><option>D</option>
             <option>E</option><option>F</option><option>G</option><option>H</option>
           </select>
         </div>
       </div>
-      <div class="field">
-        <label>Property Style</label>
-        <input type="text" id="f-style" placeholder="e.g. Detached Victorian" oninput="update()"/>
+      <div class="field-row">
+        <div class="field">
+          <label>Property Style</label>
+          <input type="text" id="f-style" placeholder="Detached Victorian" oninput="update()"/>
+        </div>
+        <div class="field">
+          <label>New Build?</label>
+          <select id="f-newbuild" onchange="update()">
+            <option value="">–</option>
+            <option>New Build</option>
+            <option>Existing Property</option>
+          </select>
+        </div>
       </div>
       <div class="field">
         <label>Total Floor Area</label>
-        <input type="text" id="f-area" placeholder="e.g. 2,850 sq ft / 265 sq m" oninput="update()"/>
+        <input type="text" id="f-area" placeholder="2,850 sq ft / 265 sq m" oninput="update()"/>
       </div>
-      <div class="field">
-        <label>Plot Size</label>
-        <input type="text" id="f-plot" placeholder="e.g. 0.35 acres" oninput="update()"/>
-      </div>
-      <div class="field">
-        <label>Year Built / Age</label>
-        <input type="text" id="f-year" placeholder="e.g. c.1898 / Circa 1970s" oninput="update()"/>
+      <div class="field-row">
+        <div class="field">
+          <label>Plot Size</label>
+          <input type="text" id="f-plot" placeholder="0.35 acres" oninput="update()"/>
+        </div>
+        <div class="field">
+          <label>Year Built</label>
+          <input type="text" id="f-year" placeholder="c.1898" oninput="update()"/>
+        </div>
       </div>
       <div class="field">
         <label>Parking</label>
-        <input type="text" id="f-parking" placeholder="e.g. Double garage + driveway" oninput="update()"/>
+        <input type="text" id="f-parking" placeholder="Double garage + driveway" oninput="update()"/>
       </div>
       <div class="field">
         <label>Heating</label>
-        <input type="text" id="f-heating" placeholder="e.g. Gas central heating" oninput="update()"/>
+        <input type="text" id="f-heating" placeholder="Gas central heating" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Garden</label>
+        <input type="text" id="f-garden" placeholder="South-facing rear garden, approx 80 ft" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Virtual Tour URL <span style="font-size:10px;color:var(--ink-soft);font-weight:400;">(optional)</span></label>
+        <input type="text" id="f-vtour" placeholder="https://my.matterport.com/…" oninput="update()"/>
       </div>
       <div class="field">
         <label>Property Description</label>
@@ -401,13 +508,30 @@ body{font-family:'Mukta',sans-serif;background:#f1f5f9;color:var(--ink);-webkit-
       <button class="add-feature-btn" onclick="addFeature()">+ Add feature</button>
     </div>
 
+    <!-- Local Area -->
+    <div class="sb-section">
+      <div class="sb-section-title">Local Area</div>
+      <div class="field">
+        <label>Area Description</label>
+        <textarea id="f-local" placeholder="Describe local amenities, transport links, schools, parks…" oninput="update()"></textarea>
+      </div>
+      <div class="field">
+        <label>Nearest Stations</label>
+        <input type="text" id="f-stations" placeholder="e.g. Sheffield 0.4 mi · Meadowhall 2.1 mi" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Nearby Schools</label>
+        <input type="text" id="f-schools" placeholder="e.g. King Edward VII (0.6 mi), Birkdale (1.2 mi)" oninput="update()"/>
+      </div>
+    </div>
+
     <!-- Photos -->
     <div class="sb-section">
       <div class="sb-section-title">Property Photos</div>
       <div class="upload-zone" id="photo-zone" onclick="document.getElementById('f-photos-input').click()">
         <input type="file" id="f-photos-input" accept="image/*" multiple onchange="handlePhotos(this)"/>
         <div class="upload-zone-icon">📷</div>
-        <p><strong>Click or drag</strong> to add photos<br>Unlimited • All formats</p>
+        <p><strong>Click or drag</strong> to add photos<br>Drag thumbnails below to reorder</p>
       </div>
       <div class="photo-thumbs" id="photo-thumbs"></div>
       <div class="photo-count" id="photo-count"></div>
@@ -419,9 +543,40 @@ body{font-family:'Mukta',sans-serif;background:#f1f5f9;color:var(--ink);-webkit-
       <div class="upload-zone" onclick="document.getElementById('f-floorplan-input').click()" id="fp-zone">
         <input type="file" id="f-floorplan-input" accept="image/*" onchange="handleFloorplan(this)"/>
         <div class="upload-zone-icon">📐</div>
-        <p><strong>Upload floorplan</strong> image<br>PNG, JPG or PDF image</p>
+        <p><strong>Upload floorplan</strong> image</p>
       </div>
-      <img id="fp-preview" style="display:none;width:100%;margin-top:8px;border:1px solid var(--rule);border-radius:4px;"/>
+      <img id="fp-preview" style="display:none;width:100%;margin-top:7px;border:1px solid var(--rule);border-radius:4px;"/>
+    </div>
+
+    <!-- Agent Contact -->
+    <div class="sb-section">
+      <div class="sb-section-title">Agent Contact</div>
+      <div class="field">
+        <label>Agent Name</label>
+        <input type="text" id="f-agent" placeholder="Sarah Johnson" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Phone</label>
+        <input type="text" id="f-phone" placeholder="0114 123 4567" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="text" id="f-email" placeholder="sarah@youragency.co.uk" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Branch Address</label>
+        <input type="text" id="f-branch" placeholder="123 High Street, Sheffield, S1 1AA" oninput="update()"/>
+      </div>
+      <div class="field">
+        <label>Website</label>
+        <input type="text" id="f-website" placeholder="www.youragency.co.uk" oninput="update()"/>
+      </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="sb-section">
+      <div class="sb-section-title">Disclaimer</div>
+      <div id="disclaimer-container"></div>
     </div>
 
     <!-- Export -->
@@ -429,16 +584,20 @@ body{font-family:'Mukta',sans-serif;background:#f1f5f9;color:var(--ink);-webkit-
       <div class="sb-section-title">Export Brochure</div>
       <div class="export-group">
         <button class="btn-export btn-pdf" onclick="exportPDF()" id="btn-pdf">
-          <i data-lucide="file-text" style="width:16px;height:16px;"></i>
+          <i data-lucide="file-text" style="width:15px;height:15px;"></i>
           Download as PDF
         </button>
         <button class="btn-export btn-word" onclick="exportWord()" id="btn-word">
-          <i data-lucide="file" style="width:16px;height:16px;"></i>
+          <i data-lucide="file" style="width:15px;height:15px;"></i>
           Download as Word (.docx)
         </button>
         <button class="btn-export btn-print" onclick="window.print()">
-          <i data-lucide="printer" style="width:16px;height:16px;"></i>
+          <i data-lucide="printer" style="width:15px;height:15px;"></i>
           Print Brochure
+        </button>
+        <button class="btn-export btn-save" onclick="saveDraft()">
+          <i data-lucide="save" style="width:15px;height:15px;"></i>
+          Save Draft
         </button>
       </div>
     </div>
@@ -453,46 +612,47 @@ body{font-family:'Mukta',sans-serif;background:#f1f5f9;color:var(--ink);-webkit-
         <div class="topbar-sub">Fill in the details on the left — your brochure updates instantly</div>
       </div>
     </div>
-
     <div class="preview-area">
       <div class="preview-label">Live Preview</div>
-      <div id="brochure" class="tpl-classic">
-        <!-- rendered by JS -->
-      </div>
+      <div id="brochure" class="tpl-classic"></div>
     </div>
   </main>
-
 </div>
 
-<!-- Scripts -->
+<div class="toast" id="toast">Draft saved ✓</div>
+
 <script>
-/* ── State ── */
+/* ════════════════════════════════════════
+   STATE
+════════════════════════════════════════ */
 let state = {
   template: 'classic',
-  agency: '',
-  logoSrc: null,
-  colour: '#B46100',
-  address: '',
-  price: '',
-  beds: '',
-  baths: '',
-  rec: '',
-  tenure: '',
-  epc: '',
-  ctax: '',
-  style: '',
-  area: '',
-  plot: '',
-  year: '',
-  parking: '',
-  heating: '',
-  desc: '',
+  mode: 'single',
+  agency: '', logoSrc: null, colour: '#B46100',
+  address: '', pricetype: '', price: '',
+  beds: '', baths: '', rec: '', tenure: '',
+  epc: '', ctax: '', style: '', newbuild: '',
+  area: '', plot: '', year: '', parking: '', heating: '', garden: '',
+  vtour: '', desc: '',
   features: [],
   photos: [],
   floorplanSrc: null,
+  local: '', stations: '', schools: '',
+  agent: '', phone: '', email: '', branch: '', website: '',
+  disclaimer: 'These particulars do not constitute any part of an offer or contract. All measurements are approximate and for guidance only. Intending purchasers should satisfy themselves by inspection or otherwise.',
+  disclaimerRemoved: false,
 };
 
-/* ── Template ── */
+/* ════════════════════════════════════════
+   MODE & TEMPLATE
+════════════════════════════════════════ */
+function setMode(m) {
+  state.mode = m;
+  document.getElementById('mode-single').classList.toggle('active', m==='single');
+  document.getElementById('mode-multi').classList.toggle('active', m==='multi');
+  update();
+}
+
 function setTemplate(t) {
   state.template = t;
   ['classic','modern','dark'].forEach(n => {
@@ -501,30 +661,71 @@ function setTemplate(t) {
   update();
 }
 
-/* ── Colour ── */
-function updateColour(v) {
+/* ════════════════════════════════════════
+   COLOUR PICKER — hex input + colour picker synced
+════════════════════════════════════════ */
+function syncColourFromPicker(v) {
   state.colour = v;
-  document.getElementById('colour-hex').textContent = v;
+  document.getElementById('f-colour-hex').value = v;
+  document.getElementById('colour-swatch-display').style.background = v;
   document.documentElement.style.setProperty('--client-colour', v);
   update();
 }
 
-/* ── Logo ── */
+function syncColourFromHex(raw) {
+  let v = raw.trim();
+  if (!v.startsWith('#')) v = '#' + v;
+  document.getElementById('colour-swatch-display').style.background = isValidHex(v) ? v : '#B46100';
+  if (isValidHex(v)) {
+    state.colour = v;
+    document.getElementById('f-colour-picker').value = v;
+    document.documentElement.style.setProperty('--client-colour', v);
+    update();
+  }
+}
+
+function normaliseHexInput() {
+  const el = document.getElementById('f-colour-hex');
+  let v = el.value.trim();
+  if (!v.startsWith('#')) v = '#' + v;
+  if (!isValidHex(v)) {
+    v = state.colour;
+  } else {
+    // expand shorthand #abc → #aabbcc
+    if (/^#[0-9a-fA-F]{3}$/.test(v)) {
+      v = '#' + v[1]+v[1]+v[2]+v[2]+v[3]+v[3];
+    }
+    state.colour = v;
+    document.getElementById('f-colour-picker').value = v;
+    document.getElementById('colour-swatch-display').style.background = v;
+    document.documentElement.style.setProperty('--client-colour', v);
+  }
+  el.value = v;
+  update();
+}
+
+function isValidHex(v) {
+  return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(v);
+}
+
+/* ════════════════════════════════════════
+   LOGO
+════════════════════════════════════════ */
 function handleLogo(input) {
-  const f = input.files[0];
-  if (!f) return;
+  const f = input.files[0]; if (!f) return;
   const r = new FileReader();
   r.onload = e => {
     state.logoSrc = e.target.result;
     const img = document.getElementById('logo-preview-img');
-    img.src = state.logoSrc;
-    img.style.display = 'block';
+    img.src = state.logoSrc; img.style.display = 'block';
     update();
   };
   r.readAsDataURL(f);
 }
 
-/* ── Photos ── */
+/* ════════════════════════════════════════
+   PHOTOS (with drag-to-reorder)
+════════════════════════════════════════ */
 function handlePhotos(input) {
   const files = Array.from(input.files);
   let loaded = 0;
@@ -539,476 +740,660 @@ function handlePhotos(input) {
   });
 }
 
+let dragSrc = null;
+
 function renderThumbs() {
   const c = document.getElementById('photo-thumbs');
-  c.innerHTML = state.photos.map((src,i) => `
-    <div class="photo-thumb">
+  c.innerHTML = state.photos.map((src, i) => `
+    <div class="photo-thumb" draggable="true" id="thumb-${i}" ondragstart="dragStart(event,${i})" ondragover="dragOver(event)" ondrop="dragDrop(event,${i})" ondragend="dragEnd()">
       <img src="${src}"/>
-      <button class="photo-thumb-rm" onclick="removePhoto(${i})">×</button>
+      ${i===0?'<div class="photo-thumb-badge">Cover</div>':''}
+      <button class="photo-thumb-rm" onclick="removePhoto(${i})" title="Remove">×</button>
     </div>`).join('');
   document.getElementById('photo-count').textContent = state.photos.length
-    ? `${state.photos.length} photo${state.photos.length>1?'s':''} added`
+    ? `${state.photos.length} photo${state.photos.length>1?'s':''} — drag to reorder`
     : '';
 }
 
-function removePhoto(i) {
-  state.photos.splice(i,1);
-  renderThumbs();
-  update();
-}
+function removePhoto(i) { state.photos.splice(i,1); renderThumbs(); update(); }
 
-/* ── Floorplan ── */
+function dragStart(e, i) { dragSrc = i; e.dataTransfer.effectAllowed = 'move'; document.getElementById('thumb-'+i).classList.add('dragging'); }
+function dragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+function dragDrop(e, i) {
+  e.preventDefault();
+  if (dragSrc === i) return;
+  const moved = state.photos.splice(dragSrc, 1)[0];
+  state.photos.splice(i, 0, moved);
+  renderThumbs(); update();
+}
+function dragEnd() { dragSrc = null; document.querySelectorAll('.photo-thumb').forEach(t => t.classList.remove('dragging')); }
+
+/* ════════════════════════════════════════
+   FLOORPLAN
+════════════════════════════════════════ */
 function handleFloorplan(input) {
-  const f = input.files[0];
-  if (!f) return;
+  const f = input.files[0]; if (!f) return;
   const r = new FileReader();
   r.onload = e => {
     state.floorplanSrc = e.target.result;
     const img = document.getElementById('fp-preview');
-    img.src = state.floorplanSrc;
-    img.style.display = 'block';
+    img.src = state.floorplanSrc; img.style.display = 'block';
     update();
   };
   r.readAsDataURL(f);
 }
 
-/* ── Features ── */
+/* ════════════════════════════════════════
+   FEATURES
+════════════════════════════════════════ */
 function addFeature(val='') {
   state.features.push(val);
   renderFeatures();
 }
-
 function renderFeatures() {
   document.getElementById('feature-list').innerHTML = state.features.map((f,i) => `
     <div class="feature-item">
       <input value="${esc(f)}" placeholder="e.g. Heated outdoor pool" oninput="state.features[${i}]=this.value;update()"/>
-      <button onclick="removeFeature(${i})">×</button>
+      <button onclick="removeFeature(${i})" title="Remove">×</button>
     </div>`).join('');
 }
+function removeFeature(i) { state.features.splice(i,1); renderFeatures(); update(); }
 
-function removeFeature(i) {
-  state.features.splice(i,1);
-  renderFeatures();
-  update();
+/* ════════════════════════════════════════
+   DISCLAIMER
+════════════════════════════════════════ */
+function renderDisclaimer() {
+  const c = document.getElementById('disclaimer-container');
+  if (state.disclaimerRemoved) {
+    c.innerHTML = `<div class="disclaimer-removed">
+      <span>Disclaimer removed from brochure</span>
+      <button class="disclaimer-restore-btn" onclick="restoreDisclaimer()">Restore</button>
+    </div>`;
+  } else {
+    c.innerHTML = `<div class="disclaimer-box">
+      <textarea id="f-disclaimer" oninput="state.disclaimer=this.value;update()">${esc(state.disclaimer)}</textarea>
+      <button class="disclaimer-remove-btn" onclick="removeDisclaimer()" title="Remove disclaimer">×</button>
+    </div>`;
+  }
 }
+function removeDisclaimer() { state.disclaimerRemoved = true; renderDisclaimer(); update(); }
+function restoreDisclaimer() { state.disclaimerRemoved = false; renderDisclaimer(); update(); }
 
-/* ── Read all fields ── */
+/* ════════════════════════════════════════
+   READ FIELDS
+════════════════════════════════════════ */
 function readFields() {
-  const g = id => document.getElementById(id)?.value||'';
-  state.agency   = g('f-agency');
-  state.address  = g('f-address');
-  state.price    = g('f-price');
-  state.beds     = g('f-beds');
-  state.baths    = g('f-baths');
-  state.rec      = g('f-rec');
-  state.tenure   = g('f-tenure');
-  state.epc      = g('f-epc');
-  state.ctax     = g('f-ctax');
-  state.style    = g('f-style');
-  state.area     = g('f-area');
-  state.plot     = g('f-plot');
-  state.year     = g('f-year');
-  state.parking  = g('f-parking');
-  state.heating  = g('f-heating');
-  state.desc     = g('f-desc');
+  const g = id => document.getElementById(id)?.value || '';
+  state.agency    = g('f-agency');
+  state.address   = g('f-address');
+  state.pricetype = g('f-pricetype');
+  state.price     = g('f-price');
+  state.beds      = g('f-beds');
+  state.baths     = g('f-baths');
+  state.rec       = g('f-rec');
+  state.tenure    = g('f-tenure');
+  state.epc       = g('f-epc');
+  state.ctax      = g('f-ctax');
+  state.style     = g('f-style');
+  state.newbuild  = g('f-newbuild');
+  state.area      = g('f-area');
+  state.plot      = g('f-plot');
+  state.year      = g('f-year');
+  state.parking   = g('f-parking');
+  state.heating   = g('f-heating');
+  state.garden    = g('f-garden');
+  state.vtour     = g('f-vtour');
+  state.desc      = g('f-desc');
+  state.local     = g('f-local');
+  state.stations  = g('f-stations');
+  state.schools   = g('f-schools');
+  state.agent     = g('f-agent');
+  state.phone     = g('f-phone');
+  state.email     = g('f-email');
+  state.branch    = g('f-branch');
+  state.website   = g('f-website');
+  if (!state.disclaimerRemoved) state.disclaimer = g('f-disclaimer') || state.disclaimer;
 }
 
-/* ── Render ── */
+/* ════════════════════════════════════════
+   ESCAPE
+════════════════════════════════════════ */
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ════════════════════════════════════════
+   RENDER DISPATCH
+════════════════════════════════════════ */
 function update() {
   readFields();
   const br = document.getElementById('brochure');
   br.className = 'tpl-' + state.template;
-  br.innerHTML = renderTemplate();
-}
-
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-function statHTML(val, lbl, cls='') {
-  return val ? `<div class="br-stat${cls}"><div class="br-stat-val">${esc(val)}</div><div class="br-stat-lbl">${lbl}</div></div>` : '';
-}
-
-function renderTemplate() {
   const c = state.colour;
-  const colStyle = `--client-colour:${c};`;
-
-  switch(state.template) {
-    case 'classic': return renderClassic(colStyle);
-    case 'modern':  return renderModern(colStyle);
-    case 'dark':    return renderDark(colStyle);
+  const cs = `--client-colour:${c};`;
+  if (state.mode === 'multi') {
+    br.innerHTML = renderMulti(cs);
+  } else {
+    switch(state.template) {
+      case 'classic': br.innerHTML = renderClassic(cs); break;
+      case 'modern':  br.innerHTML = renderModern(cs); break;
+      case 'dark':    br.innerHTML = renderDark(cs); break;
+    }
   }
 }
 
-/* ── Photos helper ── */
-function photosHTML(start, end, gridClass='cols-2', classes='br-photo-grid') {
-  const slice = state.photos.slice(start, end);
-  if (!slice.length) return '';
-  return `<div class="${classes} ${gridClass}">${slice.map(s=>`<img src="${s}"/>`).join('')}</div>`;
+/* ════════════════════════════════════════
+   SHARED HELPERS
+════════════════════════════════════════ */
+function priceBlock(suffix='') {
+  if (!state.price && !state.pricetype) return '';
+  return (state.pricetype ? `<div class="br-price-type${suffix}">${esc(state.pricetype)}</div>` : '') +
+         (state.price ? `${state.price}` : '');
 }
 
-/* ── Template: Classic ── */
-function renderClassic(colStyle) {
+function contactItems() {
+  const items = [
+    {l:'Agent', v:state.agent},
+    {l:'Telephone', v:state.phone},
+    {l:'Email', v:state.email},
+    {l:'Branch', v:state.branch},
+    {l:'Website', v:state.website},
+  ].filter(d=>d.v);
+  return items;
+}
+
+function vtourBadge() {
+  if (!state.vtour) return '';
+  return `<a class="br-vtour-badge" href="${esc(state.vtour)}" target="_blank">
+    ▶ View Virtual Tour
+  </a>`;
+}
+
+function pageBreak(label='') {
+  return `<div class="page-break">${label ? label : 'Page Break'}</div>`;
+}
+
+/* ════════════════════════════════════════
+   MULTI-PAGE WRAPPER
+   Splits brochure into distinct pages
+════════════════════════════════════════ */
+function renderMulti(cs) {
+  switch(state.template) {
+    case 'classic': return renderClassicMulti(cs);
+    case 'modern':  return renderModernMulti(cs);
+    case 'dark':    return renderDarkMulti(cs);
+  }
+}
+
+/* ════════════════════════════════════════
+   TEMPLATE: CLASSIC — SINGLE
+════════════════════════════════════════ */
+function renderClassic(cs) {
   const heroImg = state.photos[0]
     ? `<img class="br-cover-img" src="${state.photos[0]}"/>`
     : `<div class="br-cover-img br-placeholder" style="height:480px;">Add your hero photo</div>`;
-  const logo = state.logoSrc
-    ? `<img class="br-agency-logo" src="${state.logoSrc}"/>`
-    : (state.agency ? `<div style="position:absolute;top:28px;right:32px;background:${state.colour};color:#fff;padding:8px 16px;font-weight:700;font-size:14px;">${esc(state.agency)}</div>` : '');
-
-  const stats = [
-    {v:state.beds,l:'Bedrooms'},{v:state.baths,l:'Bathrooms'},
-    {v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'}
-  ].filter(s=>s.v);
-  const statsHTML = stats.map(s=>`
-    <div class="br-stat">
-      <div class="br-stat-val">${esc(s.v)}</div>
-      <div class="br-stat-lbl">${s.l}</div>
-    </div>`).join('');
-
-  const details = [
-    {l:'EPC Rating',v:state.epc},{l:'Council Tax Band',v:state.ctax},
-    {l:'Property Style',v:state.style},{l:'Floor Area',v:state.area},
-    {l:'Plot Size',v:state.plot},{l:'Year Built',v:state.year},
-    {l:'Parking',v:state.parking},{l:'Heating',v:state.heating},
-  ].filter(d=>d.v);
-  const detailsHTML = details.map(d=>`
-    <div class="br-detail">
-      <div class="br-detail-lbl">${d.l}</div>
-      <div class="br-detail-val">${esc(d.v)}</div>
-    </div>`).join('');
-
-  const featuresHTML = state.features.filter(f=>f.trim()).map(f=>`
-    <div class="br-feature">${esc(f)}</div>`).join('');
-
+  const logo = logoBlock('br-agency-logo');
+  const stats = makeStats();
+  const details = makeDetails();
+  const featuresHTML = state.features.filter(f=>f).map(f=>`<div class="br-feature">${esc(f)}</div>`).join('');
   const restPhotos = state.photos.slice(1);
-  const photosBlock = restPhotos.length
-    ? `<div class="br-photo-grid ${restPhotos.length===1?'':'cols-'+(Math.min(restPhotos.length,3))}">${restPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>`
-    : '';
+  const photosBlock = restPhotos.length ? `<div class="br-photo-grid cols-${Math.min(restPhotos.length,3)}">${restPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>` : '';
+  const contactItemsHTML = contactItems();
+  const disclaimer = !state.disclaimerRemoved && state.disclaimer ? `<div class="br-footer-note">${esc(state.disclaimer)}</div>` : '';
 
-  return `
-  <div style="${colStyle}">
+  return `<div style="${cs}">
     <div class="br-cover">
       ${heroImg}
       <div class="br-cover-overlay"></div>
       ${logo}
       <div class="br-cover-text">
-        ${state.address ? `<div class="br-address">${esc(state.address)}</div>` : '<div class="br-address" style="opacity:.4;">Property Address</div>'}
+        ${state.pricetype ? `<div class="br-price-type">${esc(state.pricetype)}</div>` : ''}
+        ${state.address ? `<div class="br-address">${esc(state.address)}</div>` : '<div class="br-address" style="opacity:.3;">Property Address</div>'}
         ${state.price ? `<div class="br-price-tag">${esc(state.price)}</div>` : ''}
       </div>
     </div>
-    ${stats.length ? `<div class="br-stats-bar">${statsHTML}</div>` : ''}
+    ${stats.length ? `<div class="br-stats-bar">${stats.map(s=>`<div class="br-stat"><div class="br-stat-val">${esc(s.v)}</div><div class="br-stat-lbl">${s.l}</div></div>`).join('')}</div>` : ''}
     <div class="br-body">
-      ${state.desc ? `
-        <div class="br-section-title">About This Property</div>
-        <div class="br-description">${esc(state.desc).replace(/\n/g,'<br>')}</div>` : ''}
-      ${featuresHTML ? `
-        <div class="br-section-title">Key Features</div>
-        <div class="br-features">${featuresHTML}</div>` : ''}
+      ${state.vtour ? vtourBadge() : ''}
+      ${state.desc ? `<div class="br-section-title">About This Property</div><div class="br-description">${esc(state.desc).replace(/\n/g,'<br>')}</div>` : ''}
+      ${featuresHTML ? `<div class="br-section-title">Key Features</div><div class="br-features">${featuresHTML}</div>` : ''}
       ${photosBlock}
-      ${details.length ? `
-        <div class="br-section-title">Property Details</div>
-        <div class="br-details-grid">${detailsHTML}</div>` : ''}
-      ${state.floorplanSrc ? `
-        <div class="br-section-title">Floorplan</div>
-        <img class="br-floorplan" src="${state.floorplanSrc}"/>` : ''}
+      ${details.length ? `<div class="br-section-title">Property Details</div><div class="br-details-grid">${details.map(d=>`<div class="br-detail"><div class="br-detail-lbl">${d.l}</div><div class="br-detail-val">${esc(d.v)}</div></div>`).join('')}</div>` : ''}
+      ${(state.local||state.stations||state.schools) ? `<div class="br-section-title">Local Area</div><div class="br-local">${localBlock()}</div>` : ''}
+      ${state.floorplanSrc ? `<div class="br-section-title">Floorplan</div><img class="br-floorplan" src="${state.floorplanSrc}"/>` : ''}
     </div>
+    ${contactItemsHTML.length ? `<div class="br-contact-strip">${contactItemsHTML.map(d=>`<div><div class="br-contact-item-lbl">${d.l}</div><div class="br-contact-item-val">${esc(d.v)}</div></div>`).join('')}</div>` : ''}
     <div class="br-footer">
       <div class="br-footer-agency">${esc(state.agency||'Your Estate Agency')}</div>
-      <div class="br-footer-note">
-        These particulars do not constitute any part of an offer or contract.<br>
-        All measurements are approximate and for guidance only.
-      </div>
+      ${disclaimer}
     </div>
   </div>`;
 }
 
-/* ── Template: Modern ── */
-function renderModern(colStyle) {
+/* CLASSIC MULTI */
+function renderClassicMulti(cs) {
   const heroImg = state.photos[0]
     ? `<img class="br-cover-img" src="${state.photos[0]}"/>`
-    : `<div class="br-cover-img br-placeholder" style="height:520px;">Add your hero photo</div>`;
+    : `<div class="br-cover-img br-placeholder" style="height:480px;">Add your hero photo</div>`;
+  const logo = logoBlock('br-agency-logo');
+  const stats = makeStats();
+  const details = makeDetails();
+  const featuresHTML = state.features.filter(f=>f).map(f=>`<div class="br-feature">${esc(f)}</div>`).join('');
+  const restPhotos = state.photos.slice(1);
+  const contactItemsHTML = contactItems();
+  const disclaimer = !state.disclaimerRemoved && state.disclaimer ? `<div class="br-footer-note">${esc(state.disclaimer)}</div>` : '';
 
-  const logo = state.logoSrc
-    ? `<img class="br-cover-agency" src="${state.logoSrc}"/>`
-    : (state.agency ? `<div class="br-cover-agency" style="background:rgba(0,0,0,.5);color:#fff;padding:6px 14px;font-weight:700;font-size:13px;">${esc(state.agency)}</div>` : '');
+  let html = `<div style="${cs}">`;
 
+  // Page 1: Cover
+  html += `<div class="br-page">
+    <div class="br-cover">
+      ${heroImg}<div class="br-cover-overlay"></div>${logo}
+      <div class="br-cover-text">
+        ${state.pricetype ? `<div class="br-price-type">${esc(state.pricetype)}</div>` : ''}
+        ${state.address ? `<div class="br-address">${esc(state.address)}</div>` : '<div class="br-address" style="opacity:.3;">Property Address</div>'}
+        ${state.price ? `<div class="br-price-tag">${esc(state.price)}</div>` : ''}
+      </div>
+    </div>
+    ${stats.length ? `<div class="br-stats-bar">${stats.map(s=>`<div class="br-stat"><div class="br-stat-val">${esc(s.v)}</div><div class="br-stat-lbl">${s.l}</div></div>`).join('')}</div>` : ''}
+    <div class="br-body">
+      ${state.vtour ? vtourBadge() : ''}
+      ${state.desc ? `<div class="br-section-title">About This Property</div><div class="br-description">${esc(state.desc).replace(/\n/g,'<br>')}</div>` : ''}
+      ${featuresHTML ? `<div class="br-section-title">Key Features</div><div class="br-features">${featuresHTML}</div>` : ''}
+    </div>
+  </div>`;
+
+  // Page 2: Details + Photos
+  if (details.length || restPhotos.length) {
+    html += pageBreak('Page 2 — Details & Photos');
+    html += `<div class="br-page"><div class="br-body">
+      ${restPhotos.length ? `<div class="br-section-title">Property Photos</div><div class="br-photo-grid cols-${Math.min(restPhotos.length,3)}">${restPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>` : ''}
+      ${details.length ? `<div class="br-section-title">Property Details</div><div class="br-details-grid">${details.map(d=>`<div class="br-detail"><div class="br-detail-lbl">${d.l}</div><div class="br-detail-val">${esc(d.v)}</div></div>`).join('')}</div>` : ''}
+      ${(state.local||state.stations||state.schools) ? `<div class="br-section-title">Local Area</div><div class="br-local">${localBlock()}</div>` : ''}
+    </div></div>`;
+  }
+
+  // Page 3: Floorplan
+  if (state.floorplanSrc) {
+    html += pageBreak('Page 3 — Floorplan');
+    html += `<div class="br-page"><div class="br-body">
+      <div class="br-section-title">Floorplan</div>
+      <img class="br-floorplan" src="${state.floorplanSrc}"/>
+    </div></div>`;
+  }
+
+  // Contact + footer
+  html += `${contactItemsHTML.length ? `<div class="br-contact-strip">${contactItemsHTML.map(d=>`<div><div class="br-contact-item-lbl">${d.l}</div><div class="br-contact-item-val">${esc(d.v)}</div></div>`).join('')}</div>` : ''}
+  <div class="br-footer">
+    <div class="br-footer-agency">${esc(state.agency||'Your Estate Agency')}</div>
+    ${disclaimer}
+  </div></div>`;
+
+  return html;
+}
+
+/* ════════════════════════════════════════
+   TEMPLATE: MODERN
+════════════════════════════════════════ */
+function renderModern(cs) {
+  const heroImg = state.photos[0]
+    ? `<img class="br-cover-img" src="${state.photos[0]}"/>`
+    : `<div class="br-cover-img br-placeholder" style="height:500px;">Add your hero photo</div>`;
+  const logo = logoBlock('br-cover-agency');
   const statsItems = [
     {v:state.beds,l:'Beds'},{v:state.baths,l:'Baths'},
     {v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'},{v:state.epc,l:'EPC'}
   ].filter(s=>s.v);
-
-  const details = [
-    {l:'Floor Area',v:state.area},{l:'Plot Size',v:state.plot},
-    {l:'Year Built',v:state.year},{l:'Council Tax',v:state.ctax},
-    {l:'Parking',v:state.parking},{l:'Heating',v:state.heating},
-  ].filter(d=>d.v);
-
+  const details = makeDetails();
   const restPhotos = state.photos.slice(1);
-  const featuresHTML = state.features.filter(f=>f.trim()).map(f=>`<li>${esc(f)}</li>`).join('');
+  const featuresHTML = state.features.filter(f=>f).map(f=>`<li>${esc(f)}</li>`).join('');
+  const contactItemsHTML = contactItems();
+  const disclaimer = !state.disclaimerRemoved && state.disclaimer ? `<div class="br-footer-note">${esc(state.disclaimer)}</div>` : '';
 
-  return `
-  <div style="${colStyle}">
+  return `<div style="${cs}">
     <div class="br-cover">
-      ${heroImg}
-      <div class="br-cover-bar"></div>
-      ${logo}
+      ${heroImg}<div class="br-cover-bar"></div>${logo}
     </div>
     <div class="br-header-block">
       <div>
         <div class="br-address-modern">${esc(state.address||'Property Address')}</div>
         ${state.tenure ? `<span class="br-tenure-pill">${esc(state.tenure)}</span>` : ''}
       </div>
-      <div>
+      <div style="text-align:right;">
+        ${state.pricetype ? `<div class="br-price-type-m">${esc(state.pricetype)}</div>` : ''}
         ${state.price ? `<div class="br-price-modern">${esc(state.price)}</div>` : ''}
       </div>
     </div>
-    ${statsItems.length ? `<div class="br-stats-modern">${statsItems.map(s=>`
-      <div class="br-stat-m">
-        <div class="br-stat-m-val">${esc(s.v)}</div>
-        <div class="br-stat-m-lbl">${s.l}</div>
-      </div>`).join('')}</div>` : ''}
+    ${statsItems.length ? `<div class="br-stats-modern">${statsItems.map(s=>`<div class="br-stat-m"><div class="br-stat-m-val">${esc(s.v)}</div><div class="br-stat-m-lbl">${s.l}</div></div>`).join('')}</div>` : ''}
     <div class="br-body">
+      ${state.vtour ? vtourBadge() : ''}
       <div class="br-col-2">
-        <div>
-          ${state.desc ? `<p class="br-desc-m">${esc(state.desc).replace(/\n/g,'<br>')}</p>` : ''}
-        </div>
-        <div>
-          ${featuresHTML ? `<ul class="br-features-m">${featuresHTML}</ul>` : ''}
-        </div>
+        <div>${state.desc ? `<p class="br-desc-m">${esc(state.desc).replace(/\n/g,'<br>')}</p>` : ''}</div>
+        <div>${featuresHTML ? `<ul class="br-features-m">${featuresHTML}</ul>` : ''}</div>
       </div>
       ${restPhotos.length ? `<div class="br-photo-strip">${restPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>` : ''}
-      ${details.length ? `<div class="br-details-m">${details.map(d=>`
-        <div class="br-det-m">
-          <div class="br-det-m-l">${d.l}</div>
-          <div class="br-det-m-v">${esc(d.v)}</div>
-        </div>`).join('')}</div>` : ''}
+      ${details.length ? `<div class="br-details-m">${details.map(d=>`<div class="br-det-m"><div class="br-det-m-l">${d.l}</div><div class="br-det-m-v">${esc(d.v)}</div></div>`).join('')}</div>` : ''}
+      ${(state.local||state.stations||state.schools) ? `<div class="br-section-title" style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--client-colour);margin-bottom:10px;">Local Area</div><div class="br-local-m">${localBlock()}</div>` : ''}
       ${state.floorplanSrc ? `<img class="br-floorplan" src="${state.floorplanSrc}"/>` : ''}
+      ${contactItemsHTML.length ? `<div class="br-contact-m">${contactItemsHTML.map(d=>`<div class="br-contact-m-item"><div class="br-contact-m-lbl">${d.l}</div><div class="br-contact-m-val">${esc(d.v)}</div></div>`).join('')}</div>` : ''}
     </div>
     <div class="br-footer">
-      <div>
-        <div class="br-footer-l">${esc(state.agency||'Your Estate Agency')}</div>
-        <div class="br-footer-accent"></div>
-      </div>
-      <div style="font-size:10px;color:rgba(255,255,255,.4);text-align:right;line-height:1.6;">
-        These particulars do not form part of any offer or contract.<br>
-        All measurements are approximate.
-      </div>
+      <div><div class="br-footer-l">${esc(state.agency||'Your Estate Agency')}</div><div class="br-footer-accent"></div></div>
+      ${disclaimer}
     </div>
   </div>`;
 }
 
-/* ── Template: Dark Estate ── */
-function renderDark(colStyle) {
+function renderModernMulti(cs) {
+  // Similar page splitting logic for modern
   const heroImg = state.photos[0]
     ? `<img class="br-cover-img" src="${state.photos[0]}"/>`
-    : `<div class="br-cover-bg" style="height:500px;"></div>`;
+    : `<div class="br-cover-img br-placeholder" style="height:500px;">Add your hero photo</div>`;
+  const logo = logoBlock('br-cover-agency');
+  const statsItems = [{v:state.beds,l:'Beds'},{v:state.baths,l:'Baths'},{v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'},{v:state.epc,l:'EPC'}].filter(s=>s.v);
+  const details = makeDetails();
+  const restPhotos = state.photos.slice(1);
+  const featuresHTML = state.features.filter(f=>f).map(f=>`<li>${esc(f)}</li>`).join('');
+  const contactItemsHTML = contactItems();
+  const disclaimer = !state.disclaimerRemoved && state.disclaimer ? `<div class="br-footer-note">${esc(state.disclaimer)}</div>` : '';
 
+  let html = `<div style="${cs}">`;
+  // Page 1
+  html += `<div class="br-page">
+    <div class="br-cover">${heroImg}<div class="br-cover-bar"></div>${logo}</div>
+    <div class="br-header-block">
+      <div><div class="br-address-modern">${esc(state.address||'Property Address')}</div>${state.tenure?`<span class="br-tenure-pill">${esc(state.tenure)}</span>`:''}</div>
+      <div style="text-align:right;">${state.pricetype?`<div class="br-price-type-m">${esc(state.pricetype)}</div>`:''}${state.price?`<div class="br-price-modern">${esc(state.price)}</div>`:''}</div>
+    </div>
+    ${statsItems.length?`<div class="br-stats-modern">${statsItems.map(s=>`<div class="br-stat-m"><div class="br-stat-m-val">${esc(s.v)}</div><div class="br-stat-m-lbl">${s.l}</div></div>`).join('')}</div>`:''}
+    <div class="br-body">
+      ${state.vtour?vtourBadge():''}
+      <div class="br-col-2">
+        <div>${state.desc?`<p class="br-desc-m">${esc(state.desc).replace(/\n/g,'<br>')}</p>`:''}</div>
+        <div>${featuresHTML?`<ul class="br-features-m">${featuresHTML}</ul>`:''}</div>
+      </div>
+    </div>
+  </div>`;
+
+  if (restPhotos.length || details.length) {
+    html += pageBreak('Page 2 — Photos & Details');
+    html += `<div class="br-page"><div class="br-body">
+      ${restPhotos.length?`<div class="br-photo-strip">${restPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>`:''}
+      ${details.length?`<div class="br-details-m">${details.map(d=>`<div class="br-det-m"><div class="br-det-m-l">${d.l}</div><div class="br-det-m-v">${esc(d.v)}</div></div>`).join('')}</div>`:''}
+      ${(state.local||state.stations||state.schools)?`<p class="br-local-m">${localBlock()}</p>`:''}
+    </div></div>`;
+  }
+
+  if (state.floorplanSrc) {
+    html += pageBreak('Page 3 — Floorplan');
+    html += `<div class="br-page"><div class="br-body"><img class="br-floorplan" src="${state.floorplanSrc}"/></div></div>`;
+  }
+
+  html += `<div class="br-body">${contactItemsHTML.length?`<div class="br-contact-m">${contactItemsHTML.map(d=>`<div class="br-contact-m-item"><div class="br-contact-m-lbl">${d.l}</div><div class="br-contact-m-val">${esc(d.v)}</div></div>`).join('')}</div>`:''}</div>
+  <div class="br-footer"><div><div class="br-footer-l">${esc(state.agency||'Your Estate Agency')}</div><div class="br-footer-accent"></div></div>${disclaimer}</div>
+  </div>`;
+  return html;
+}
+
+/* ════════════════════════════════════════
+   TEMPLATE: DARK ESTATE
+════════════════════════════════════════ */
+function renderDark(cs) {
+  const heroImg = state.photos[0]
+    ? `<img class="br-cover-img" src="${state.photos[0]}"/>`
+    : `<div class="br-cover-bg" style="height:480px;"></div>`;
   const logo = state.logoSrc
     ? `<img class="br-agency-dark" src="${state.logoSrc}"/>`
-    : (state.agency ? `<div class="br-agency-dark" style="filter:none;background:${state.colour};color:#fff;padding:6px 14px;font-weight:700;font-size:13px;">${esc(state.agency)}</div>` : '');
-
-  const statsItems = [
-    {v:state.beds,l:'Bedrooms'},{v:state.baths,l:'Bathrooms'},
-    {v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'}
-  ].filter(s=>s.v);
-
-  const details = [
-    {l:'EPC Rating',v:state.epc},{l:'Council Tax Band',v:state.ctax},
-    {l:'Floor Area',v:state.area},{l:'Plot Size',v:state.plot},
-    {l:'Year Built',v:state.year},{l:'Parking',v:state.parking},
-    {l:'Heating',v:state.heating},{l:'Property Style',v:state.style},
-  ].filter(d=>d.v);
-
-  const featuresHTML = state.features.filter(f=>f.trim()).map(f=>`
-    <div class="br-feature-d">${esc(f)}</div>`).join('');
-
+    : (state.agency ? `<div class="br-agency-dark" style="filter:none;background:${state.colour};color:#fff;padding:5px 12px;font-weight:700;font-size:12px;">${esc(state.agency)}</div>` : '');
+  const statsItems = [{v:state.beds,l:'Bedrooms'},{v:state.baths,l:'Bathrooms'},{v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'}].filter(s=>s.v);
+  const details = makeDetails();
+  const featuresHTML = state.features.filter(f=>f).map(f=>`<div class="br-feature-d">${esc(f)}</div>`).join('');
   const masonryPhotos = state.photos.slice(1,4);
   const extraPhotos = state.photos.slice(4);
+  const contactItemsHTML = contactItems();
+  const disclaimer = !state.disclaimerRemoved && state.disclaimer ? `<div class="br-footer-note">${esc(state.disclaimer)}</div>` : '';
 
-  return `
-  <div style="${colStyle}">
+  return `<div style="${cs}">
     <div class="br-cover">
-      <div class="br-cover-bg"></div>
-      ${heroImg}
-      <div class="br-cover-overlay"></div>
-      ${logo}
+      <div class="br-cover-bg"></div>${heroImg}<div class="br-cover-overlay"></div>${logo}
       <div class="br-cover-text">
         <div class="br-cover-line"></div>
         <div class="br-address-dark">${esc(state.address||'Property Address')}</div>
-        ${state.price ? `<div class="br-price-dark">${esc(state.price)}</div>` : ''}
+        ${state.pricetype?`<div class="br-price-type-d">${esc(state.pricetype)}</div>`:''}
+        ${state.price?`<div class="br-price-dark">${esc(state.price)}</div>`:''}
       </div>
     </div>
-    ${statsItems.length ? `<div class="br-dark-stats">${statsItems.map(s=>`
-      <div class="br-stat-d">
-        <div class="br-stat-d-val">${esc(s.v)}</div>
-        <div class="br-stat-d-lbl">${s.l}</div>
-      </div>`).join('')}</div>` : ''}
+    ${statsItems.length?`<div class="br-dark-stats">${statsItems.map(s=>`<div class="br-stat-d"><div class="br-stat-d-val">${esc(s.v)}</div><div class="br-stat-d-lbl">${s.l}</div></div>`).join('')}</div>`:''}
     <div class="br-body">
-      <div class="br-gold-rule">
-        <div class="br-gold-rule-line"></div>
-        <div class="br-gold-rule-dia"></div>
-        <div class="br-gold-rule-txt">About This Property</div>
-        <div class="br-gold-rule-dia"></div>
-        <div class="br-gold-rule-line"></div>
-      </div>
-      ${state.desc ? `<div class="br-desc-d">${esc(state.desc).replace(/\n/g,'<br>')}</div>` : ''}
-      ${featuresHTML ? `<div class="br-features-d">${featuresHTML}</div>` : ''}
-      ${masonryPhotos.length ? `<div class="br-photo-masonry">${masonryPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>` : ''}
-      ${extraPhotos.length ? `<div class="br-photo-extra">${extraPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>` : ''}
-      ${details.length ? `<div class="br-details-d">${details.map(d=>`
-        <div>
-          <div class="br-det-d-l">${d.l}</div>
-          <div class="br-det-d-v">${esc(d.v)}</div>
-        </div>`).join('')}</div>` : ''}
-      ${state.floorplanSrc ? `
-        <div class="br-gold-rule" style="margin-bottom:16px;">
-          <div class="br-gold-rule-line"></div>
-          <div class="br-gold-rule-dia"></div>
-          <div class="br-gold-rule-txt">Floorplan</div>
-          <div class="br-gold-rule-dia"></div>
-          <div class="br-gold-rule-line"></div>
-        </div>
-        <img class="br-floorplan" src="${state.floorplanSrc}"/>` : ''}
+      ${goldRule('About This Property')}
+      ${state.vtour?vtourBadge():''}
+      ${state.desc?`<div class="br-desc-d">${esc(state.desc).replace(/\n/g,'<br>')}</div>`:''}
+      ${featuresHTML?`<div class="br-features-d">${featuresHTML}</div>`:''}
+      ${masonryPhotos.length?`<div class="br-photo-masonry">${masonryPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>`:''}
+      ${extraPhotos.length?`<div class="br-photo-extra">${extraPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>`:''}
+      ${details.length?`<div class="br-details-d">${details.map(d=>`<div><div class="br-det-d-l">${d.l}</div><div class="br-det-d-v">${esc(d.v)}</div></div>`).join('')}</div>`:''}
+      ${(state.local||state.stations||state.schools)?`${goldRule('Local Area')}<div class="br-local-d">${localBlock()}</div>`:''}
+      ${state.floorplanSrc?`${goldRule('Floorplan')}<img class="br-floorplan" src="${state.floorplanSrc}"/>`:''}
     </div>
+    ${contactItemsHTML.length?`<div class="br-contact-d">${contactItemsHTML.map(d=>`<div><div class="br-contact-d-lbl">${d.l}</div><div class="br-contact-d-val">${esc(d.v)}</div></div>`).join('')}</div>`:''}
     <div class="br-footer">
       <div class="br-footer-agency">${esc(state.agency||'Your Estate Agency')}</div>
-      <div class="br-footer-right">
-        <div class="br-footer-note">These particulars do not form part of any offer or contract.<br>All measurements are approximate.</div>
-        <div class="br-footer-accent"></div>
-      </div>
+      <div class="br-footer-right">${disclaimer}<div class="br-footer-accent"></div></div>
     </div>
   </div>`;
 }
 
-/* ── PDF Export ── */
+function renderDarkMulti(cs) {
+  const heroImg = state.photos[0] ? `<img class="br-cover-img" src="${state.photos[0]}"/>` : `<div class="br-cover-bg" style="height:480px;"></div>`;
+  const logo = state.logoSrc ? `<img class="br-agency-dark" src="${state.logoSrc}"/>` : (state.agency?`<div class="br-agency-dark" style="filter:none;background:${state.colour};color:#fff;padding:5px 12px;font-weight:700;font-size:12px;">${esc(state.agency)}</div>`:'');
+  const statsItems = [{v:state.beds,l:'Bedrooms'},{v:state.baths,l:'Bathrooms'},{v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'}].filter(s=>s.v);
+  const details = makeDetails();
+  const featuresHTML = state.features.filter(f=>f).map(f=>`<div class="br-feature-d">${esc(f)}</div>`).join('');
+  const masonryPhotos = state.photos.slice(1,4);
+  const extraPhotos = state.photos.slice(4);
+  const contactItemsHTML = contactItems();
+  const disclaimer = !state.disclaimerRemoved && state.disclaimer ? `<div class="br-footer-note">${esc(state.disclaimer)}</div>` : '';
+
+  let html = `<div style="${cs}">`;
+  html += `<div class="br-page">
+    <div class="br-cover"><div class="br-cover-bg"></div>${heroImg}<div class="br-cover-overlay"></div>${logo}
+      <div class="br-cover-text"><div class="br-cover-line"></div>
+        <div class="br-address-dark">${esc(state.address||'Property Address')}</div>
+        ${state.pricetype?`<div class="br-price-type-d">${esc(state.pricetype)}</div>`:''}
+        ${state.price?`<div class="br-price-dark">${esc(state.price)}</div>`:''}
+      </div>
+    </div>
+    ${statsItems.length?`<div class="br-dark-stats">${statsItems.map(s=>`<div class="br-stat-d"><div class="br-stat-d-val">${esc(s.v)}</div><div class="br-stat-d-lbl">${s.l}</div></div>`).join('')}</div>`:''}
+    <div class="br-body">
+      ${goldRule('About This Property')}
+      ${state.vtour?vtourBadge():''}
+      ${state.desc?`<div class="br-desc-d">${esc(state.desc).replace(/\n/g,'<br>')}</div>`:''}
+      ${featuresHTML?`<div class="br-features-d">${featuresHTML}</div>`:''}
+    </div>
+  </div>`;
+
+  if (masonryPhotos.length || details.length) {
+    html += pageBreak('Page 2 — Photos & Details');
+    html += `<div class="br-page"><div class="br-body">
+      ${masonryPhotos.length?`${goldRule('Property Photos')}<div class="br-photo-masonry">${masonryPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>`:''}
+      ${extraPhotos.length?`<div class="br-photo-extra">${extraPhotos.map(s=>`<img src="${s}"/>`).join('')}</div>`:''}
+      ${details.length?`<div class="br-details-d">${details.map(d=>`<div><div class="br-det-d-l">${d.l}</div><div class="br-det-d-v">${esc(d.v)}</div></div>`).join('')}</div>`:''}
+      ${(state.local||state.stations||state.schools)?`${goldRule('Local Area')}<div class="br-local-d">${localBlock()}</div>`:''}
+    </div></div>`;
+  }
+
+  if (state.floorplanSrc) {
+    html += pageBreak('Page 3 — Floorplan');
+    html += `<div class="br-page"><div class="br-body">${goldRule('Floorplan')}<img class="br-floorplan" src="${state.floorplanSrc}"/></div></div>`;
+  }
+
+  html += `${contactItemsHTML.length?`<div class="br-contact-d">${contactItemsHTML.map(d=>`<div><div class="br-contact-d-lbl">${d.l}</div><div class="br-contact-d-val">${esc(d.v)}</div></div>`).join('')}</div>`:''}
+  <div class="br-footer"><div class="br-footer-agency">${esc(state.agency||'Your Estate Agency')}</div><div class="br-footer-right">${disclaimer}<div class="br-footer-accent"></div></div></div>
+  </div>`;
+  return html;
+}
+
+/* ════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════ */
+function goldRule(label) {
+  return `<div class="br-gold-rule" style="margin-bottom:14px;">
+    <div class="br-gold-rule-line"></div>
+    <div class="br-gold-rule-dia"></div>
+    <div class="br-gold-rule-txt">${label}</div>
+    <div class="br-gold-rule-dia"></div>
+    <div class="br-gold-rule-line"></div>
+  </div>`;
+}
+
+function logoBlock(cls) {
+  if (state.logoSrc) return `<img class="${cls}" src="${state.logoSrc}"/>`;
+  if (state.agency) return `<div class="${cls}" style="background:rgba(0,0,0,.5);color:#fff;padding:6px 13px;font-weight:700;font-size:12px;">${esc(state.agency)}</div>`;
+  return '';
+}
+
+function makeStats() {
+  return [{v:state.beds,l:'Bedrooms'},{v:state.baths,l:'Bathrooms'},{v:state.rec,l:'Receptions'},{v:state.tenure,l:'Tenure'}].filter(s=>s.v);
+}
+
+function makeDetails() {
+  return [
+    {l:'EPC Rating',v:state.epc},{l:'Council Tax Band',v:state.ctax},
+    {l:'Property Style',v:state.style},{l:'Floor Area',v:state.area},
+    {l:'Plot Size',v:state.plot},{l:'Year Built',v:state.year},
+    {l:'Parking',v:state.parking},{l:'Heating',v:state.heating},
+    {l:'Garden',v:state.garden},{l:'New Build',v:state.newbuild},
+  ].filter(d=>d.v);
+}
+
+function localBlock() {
+  let parts = [];
+  if (state.local) parts.push(esc(state.local).replace(/\n/g,'<br>'));
+  if (state.stations) parts.push(`<strong>Nearest Stations:</strong> ${esc(state.stations)}`);
+  if (state.schools) parts.push(`<strong>Nearby Schools:</strong> ${esc(state.schools)}`);
+  return parts.join('<br><br>');
+}
+
+/* ════════════════════════════════════════
+   SAVE DRAFT
+════════════════════════════════════════ */
+function saveDraft() {
+  try {
+    const save = {...state};
+    // Don't persist large base64 images in localStorage (just IDs)
+    save.photos = state.photos.length + ' photos';
+    save.logoSrc = state.logoSrc ? 'logo_saved' : null;
+    save.floorplanSrc = state.floorplanSrc ? 'fp_saved' : null;
+    localStorage.setItem('mm_brochure_draft', JSON.stringify(save));
+    showToast('Draft saved ✓');
+  } catch(e) {
+    showToast('Draft saved (text only — images not stored)');
+  }
+}
+
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem('mm_brochure_draft');
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    const fields = ['agency','colour','address','pricetype','price','beds','baths','rec','tenure','epc','ctax','style','newbuild','area','plot','year','parking','heating','garden','vtour','desc','local','stations','schools','agent','phone','email','branch','website','disclaimer','disclaimerRemoved','features','template','mode'];
+    fields.forEach(k => { if (d[k] !== undefined) state[k] = d[k]; });
+    // Restore form fields
+    const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val||''; };
+    setVal('f-agency', state.agency); setVal('f-address', state.address);
+    setVal('f-pricetype', state.pricetype); setVal('f-price', state.price);
+    setVal('f-beds', state.beds); setVal('f-baths', state.baths); setVal('f-rec', state.rec);
+    setVal('f-tenure', state.tenure); setVal('f-epc', state.epc); setVal('f-ctax', state.ctax);
+    setVal('f-style', state.style); setVal('f-newbuild', state.newbuild);
+    setVal('f-area', state.area); setVal('f-plot', state.plot); setVal('f-year', state.year);
+    setVal('f-parking', state.parking); setVal('f-heating', state.heating); setVal('f-garden', state.garden);
+    setVal('f-vtour', state.vtour); setVal('f-desc', state.desc);
+    setVal('f-local', state.local); setVal('f-stations', state.stations); setVal('f-schools', state.schools);
+    setVal('f-agent', state.agent); setVal('f-phone', state.phone); setVal('f-email', state.email);
+    setVal('f-branch', state.branch); setVal('f-website', state.website);
+    setTemplate(state.template);
+    setMode(state.mode || 'single');
+    syncColourFromPicker(state.colour || '#B46100');
+    renderFeatures();
+    renderDisclaimer();
+    update();
+  } catch(e) {}
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ════════════════════════════════════════
+   PDF EXPORT
+════════════════════════════════════════ */
 async function exportPDF() {
   const btn = document.getElementById('btn-pdf');
   btn.innerHTML = '<span class="spin"></span>Generating PDF…';
   btn.disabled = true;
-
   try {
-    // Load html2canvas + jsPDF dynamically
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
     await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
-
     const brochure = document.getElementById('brochure');
-    const canvas = await html2canvas(brochure, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff',
-      logging: false,
-    });
-
+    const canvas = await html2canvas(brochure, { scale:2, useCORS:true, allowTaint:true, backgroundColor:'#ffffff', logging:false });
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [canvas.width/2, canvas.height/2] });
-    const imgData = canvas.toDataURL('image/jpeg', 0.92);
-    pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width/2, canvas.height/2);
-
+    const pdf = new jsPDF({ orientation:'portrait', unit:'px', format:[canvas.width/2, canvas.height/2] });
+    pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, canvas.width/2, canvas.height/2);
     const filename = (state.address||'property-brochure').replace(/[^a-z0-9]/gi,'-').toLowerCase() + '.pdf';
     pdf.save(filename);
-  } catch(e) {
-    alert('PDF generation failed. Please try again.');
-    console.error(e);
-  }
-
-  btn.innerHTML = '<i data-lucide="file-text" style="width:16px;height:16px;"></i>Download as PDF';
+  } catch(e) { alert('PDF generation failed. Please try again.'); console.error(e); }
+  btn.innerHTML = '<i data-lucide="file-text" style="width:15px;height:15px;"></i>Download as PDF';
   btn.disabled = false;
   lucide.createIcons();
 }
 
-/* ── Word Export ── */
+/* ════════════════════════════════════════
+   WORD EXPORT
+════════════════════════════════════════ */
 async function exportWord() {
   const btn = document.getElementById('btn-word');
   btn.innerHTML = '<span class="spin"></span>Generating Word doc…';
   btn.disabled = true;
-
   try {
     await loadScript('https://unpkg.com/docx@7.8.2/build/index.js');
-    const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak } = docx;
-
-    const details = [
-      state.epc && `EPC Rating: ${state.epc}`,
-      state.ctax && `Council Tax Band: ${state.ctax}`,
-      state.style && `Property Style: ${state.style}`,
-      state.area && `Floor Area: ${state.area}`,
-      state.plot && `Plot Size: ${state.plot}`,
-      state.year && `Year Built: ${state.year}`,
-      state.parking && `Parking: ${state.parking}`,
-      state.heating && `Heating: ${state.heating}`,
-    ].filter(Boolean);
-
-    const statsLine = [
-      state.beds && `${state.beds} Bedrooms`,
-      state.baths && `${state.baths} Bathrooms`,
-      state.rec && `${state.rec} Receptions`,
-      state.tenure && state.tenure,
-    ].filter(Boolean).join('  |  ');
-
+    const { Document, Packer, Paragraph, TextRun, AlignmentType } = docx;
+    const hexCol = state.colour.replace('#','');
     const children = [];
+    const add = (text, opts={}) => children.push(new Paragraph({ children:[new TextRun({text, size:22, color:'5C4A2A', ...opts})], spacing:{after:80} }));
+    const addH = (text) => children.push(new Paragraph({ children:[new TextRun({text, bold:true, size:28, color:'1C140A'})], spacing:{before:240, after:100} }));
 
-    // Agency + title
-    if (state.agency) children.push(new Paragraph({
-      children:[new TextRun({text: state.agency.toUpperCase(), bold:true, size:24, color:'7A3E00'})],
-      alignment: AlignmentType.CENTER,
-      spacing:{after:200},
-    }));
+    if (state.agency) add(state.agency.toUpperCase(), {bold:true, size:22, color:'7A3E00'});
+    children.push(new Paragraph({ children:[new TextRun({text: state.address||'Property Address', bold:true, size:40, color:'1C140A'})], alignment:AlignmentType.CENTER, spacing:{after:80} }));
+    if (state.pricetype) add(state.pricetype, {size:18, color:'8A7050'});
+    if (state.price) children.push(new Paragraph({ children:[new TextRun({text: state.price, bold:true, size:36, color:hexCol})], alignment:AlignmentType.CENTER, spacing:{after:200} }));
 
-    // Address
-    children.push(new Paragraph({
-      children:[new TextRun({text: state.address||'Property Address', bold:true, size:36, color:'1C140A'})],
-      heading: HeadingLevel.HEADING_1,
-      alignment: AlignmentType.CENTER,
-      spacing:{after:120},
-    }));
+    const statsLine = [state.beds&&`${state.beds} Bedrooms`, state.baths&&`${state.baths} Bathrooms`, state.rec&&`${state.rec} Receptions`, state.tenure&&state.tenure].filter(Boolean).join('  |  ');
+    if (statsLine) add(statsLine, {size:20});
 
-    // Price
-    if(state.price) children.push(new Paragraph({
-      children:[new TextRun({text: state.price, bold:true, size:32, color:state.colour.replace('#','')})],
-      alignment: AlignmentType.CENTER,
-      spacing:{after:200},
-    }));
+    if (state.desc) { addH('About This Property'); state.desc.split('\n').filter(l=>l.trim()).forEach(l=>add(l)); }
 
-    // Stats
-    if(statsLine) children.push(new Paragraph({
-      children:[new TextRun({text: statsLine, size:22, color:'5C4A2A'})],
-      alignment: AlignmentType.CENTER,
-      spacing:{after:300},
-    }));
+    const feats = state.features.filter(f=>f.trim());
+    if (feats.length) { addH('Key Features'); feats.forEach(f=>add(`◆  ${f}`)); }
 
-    // Description
-    if(state.desc) {
-      children.push(new Paragraph({children:[new TextRun({text:'About This Property', bold:true, size:26, color:'1C140A'})], spacing:{after:120}}));
-      state.desc.split('\n').filter(l=>l.trim()).forEach(line => {
-        children.push(new Paragraph({children:[new TextRun({text:line, size:22, color:'5C4A2A'})], spacing:{after:80}}));
-      });
+    const details = makeDetails();
+    if (details.length) { addH('Property Details'); details.forEach(d=>add(`${d.l}: ${d.v}`, {bold:false})); }
+
+    if (state.local||state.stations||state.schools) {
+      addH('Local Area');
+      if (state.local) add(state.local);
+      if (state.stations) add(`Nearest Stations: ${state.stations}`);
+      if (state.schools) add(`Nearby Schools: ${state.schools}`);
     }
 
-    // Features
-    const cleanFeatures = state.features.filter(f=>f.trim());
-    if(cleanFeatures.length) {
-      children.push(new Paragraph({children:[new TextRun({text:'Key Features', bold:true, size:26, color:'1C140A'})], spacing:{before:200,after:120}}));
-      cleanFeatures.forEach(f => {
-        children.push(new Paragraph({
-          children:[new TextRun({text:`◆  ${f}`, size:22, color:'5C4A2A'})],
-          spacing:{after:60},
-        }));
-      });
-    }
+    const ci = contactItems();
+    if (ci.length) { addH('Contact'); ci.forEach(d=>add(`${d.l}: ${d.v}`)); }
 
-    // Property details
-    if(details.length) {
-      children.push(new Paragraph({children:[new TextRun({text:'Property Details', bold:true, size:26, color:'1C140A'})], spacing:{before:200,after:120}}));
-      details.forEach(d => {
-        children.push(new Paragraph({children:[new TextRun({text:d, size:22, color:'5C4A2A'})], spacing:{after:60}}));
-      });
+    if (!state.disclaimerRemoved && state.disclaimer) {
+      children.push(new Paragraph({ children:[new TextRun({text:state.disclaimer, size:16, color:'8A7050', italics:true})], spacing:{before:400}, alignment:AlignmentType.CENTER }));
     }
-
-    // Disclaimer
-    children.push(new Paragraph({
-      children:[new TextRun({text:'These particulars do not form part of any offer or contract. All measurements are approximate and for guidance only.', size:16, color:'8A7050', italics:true})],
-      spacing:{before:400},
-      alignment: AlignmentType.CENTER,
-    }));
 
     const doc = new Document({ sections:[{ children }] });
     const blob = await Packer.toBlob(doc);
@@ -1018,18 +1403,15 @@ async function exportWord() {
     a.download = (state.address||'property-brochure').replace(/[^a-z0-9]/gi,'-').toLowerCase() + '.docx';
     a.click();
     URL.revokeObjectURL(url);
-
-  } catch(e) {
-    alert('Word export failed. Please try again.');
-    console.error(e);
-  }
-
-  btn.innerHTML = '<i data-lucide="file" style="width:16px;height:16px;"></i>Download as Word (.docx)';
+  } catch(e) { alert('Word export failed. Please try again.'); console.error(e); }
+  btn.innerHTML = '<i data-lucide="file" style="width:15px;height:15px;"></i>Download as Word (.docx)';
   btn.disabled = false;
   lucide.createIcons();
 }
 
-/* ── Script loader ── */
+/* ════════════════════════════════════════
+   SCRIPT LOADER
+════════════════════════════════════════ */
 function loadScript(src) {
   return new Promise((res,rej) => {
     if (document.querySelector(`script[src="${src}"]`)) { res(); return; }
@@ -1039,7 +1421,9 @@ function loadScript(src) {
   });
 }
 
-/* ── Drag and drop on photo zone ── */
+/* ════════════════════════════════════════
+   DRAG DROP ON PHOTO ZONE
+════════════════════════════════════════ */
 const pz = document.getElementById('photo-zone');
 pz.addEventListener('dragover', e => { e.preventDefault(); pz.classList.add('drag'); });
 pz.addEventListener('dragleave', () => pz.classList.remove('drag'));
@@ -1048,11 +1432,14 @@ pz.addEventListener('drop', e => {
   handlePhotos({ files: e.dataTransfer.files });
 });
 
-/* ── Init ── */
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
 lucide.createIcons();
+renderDisclaimer();
 addFeature('');
+loadDraft();
 update();
 </script>
-
 </body>
 </html>
