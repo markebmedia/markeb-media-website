@@ -2,6 +2,7 @@
 // Creates a Stripe SetupIntent with usage: 'off_session'
 // This gets the bank's explicit permission to charge the card later
 // without the customer being present — fixing the authentication_required error
+// UPDATED: supports bookingId-only flow for card update page
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Airtable = require('airtable');
@@ -31,20 +32,47 @@ exports.handler = async (event, context) => {
   try {
     const { email, name, bookingId } = JSON.parse(event.body);
 
-    if (!email) {
+    // ✅ Allow either email (reserve flow) or bookingId (card update flow)
+    if (!email && !bookingId) {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ success: false, error: 'Email is required' })
+        body: JSON.stringify({ success: false, error: 'Email or bookingId is required' })
       };
     }
 
-    // Find or create a Stripe customer so the SetupIntent is linked to them
-    // This means the payment method is attached to the customer after confirmation
-    let customerId;
+    // ✅ If bookingId provided, look up the booking to get the client email
+    let resolvedEmail = email;
+    let bookingRef = '';
 
+    if (bookingId) {
+      try {
+        const booking = await base('Bookings').find(bookingId);
+        resolvedEmail = booking.fields['Client Email'];
+        bookingRef = booking.fields['Booking Reference'] || '';
+        console.log('Resolved booking:', bookingRef, '| Email:', resolvedEmail);
+      } catch (err) {
+        console.error('Booking lookup failed:', err.message);
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ success: false, error: 'Booking not found' })
+        };
+      }
+    }
+
+    if (!resolvedEmail) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ success: false, error: 'Could not resolve client email' })
+      };
+    }
+
+    // Find or create a Stripe customer
+    let customerId;
     const existingCustomers = await stripe.customers.list({
-      email: email,
+      email: resolvedEmail,
       limit: 1
     });
 
@@ -53,26 +81,24 @@ exports.handler = async (event, context) => {
       console.log('Found existing Stripe customer:', customerId);
     } else {
       const customer = await stripe.customers.create({
-        email: email,
+        email: resolvedEmail,
         name: name || '',
-        metadata: {
-          source: 'markeb-media-booking'
-        }
+        metadata: { source: 'markeb-media-booking' }
       });
       customerId = customer.id;
       console.log('Created new Stripe customer:', customerId);
     }
 
     // Create SetupIntent with usage: 'off_session'
-    // This is the key difference — it tells Stripe (and the bank) that
-    // this card will be charged later without the customer present
     const setupIntent = await stripe.setupIntents.create({
       customer: customerId,
       usage: 'off_session',
       payment_method_types: ['card'],
       metadata: {
-clientEmail: email,
-source: bookingId ? 'markeb-media-card-update' : 'markeb-media-reserve'
+        clientEmail: resolvedEmail,
+        source: bookingId ? 'markeb-media-card-update' : 'markeb-media-reserve',
+        ...(bookingId && { bookingId }),
+        ...(bookingRef && { bookingRef })
       }
     });
 
@@ -84,7 +110,8 @@ source: bookingId ? 'markeb-media-card-update' : 'markeb-media-reserve'
       body: JSON.stringify({
         success: true,
         clientSecret: setupIntent.client_secret,
-        customerId: customerId
+        customerId: customerId,
+        bookingRef: bookingRef
       })
     };
 

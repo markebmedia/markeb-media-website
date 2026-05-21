@@ -359,7 +359,7 @@
       const res = await fetch('/.netlify/functions/create-setup-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingId })
+        body: JSON.stringify({ bookingId: bookingId, email: '' })
       });
 
       const data = await res.json();
