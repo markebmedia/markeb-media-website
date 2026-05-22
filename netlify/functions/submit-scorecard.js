@@ -79,7 +79,7 @@ exports.handler = async (event, context) => {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
+        'Authorization': `Bearer ${process.env.AIRTABLE_RECRUITMENT_API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ fields })

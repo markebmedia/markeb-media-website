@@ -36,6 +36,10 @@
   [headers.values]
     Basic-Auth = "markeb:Markebmedia230301"
 
+[[headers]]
+  for = "/internal/interview.html"
+  [headers.values]
+    Basic-Auth = "markeb:Markebmedia230301"
 [[redirects]]
   from = "/*"
   to = "/index.html"
