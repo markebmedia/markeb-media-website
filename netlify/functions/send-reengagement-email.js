@@ -271,7 +271,7 @@ function buildEmail(firstName, regionLabel) {
                     Agents you know are already shooting with us. Because we work with agents across your network, we already know the standard expected, the quality required and the turnaround that keeps your clients happy.
                   </p>
                   <p style="margin:0;color:rgba(253,243,226,0.88);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;line-height:1.7;">
-                    As the network grows, so does the value of being a dashboard member. Exclusive pricing, priority availability, and a direct line to your specialist. That's something you won't get booking ad hoc.
+                    As the network grows, so does the value of being a dashboard member. Exclusive pricing, priority availability and a team that already knows your standards.
                   </p>
                 </td>
               </tr>
