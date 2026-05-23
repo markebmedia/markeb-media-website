@@ -69,6 +69,7 @@ body {
   color: #64748b;
   text-decoration: none;
   font-weight: 500;
+  font-size: 13px;
   transition: all .2s ease;
   cursor: pointer;
   margin-bottom: 4px;
@@ -1535,8 +1536,11 @@ body {
 
  <!-- Sidebar Navigation -->
 <div class="admin-sidebar" id="adminSidebar">
-  <div class="admin-logo">
-    <img src="/public/images/Markeb Media Logo (2).png" alt="Markeb Media" style="height: 80px; width: auto;">
+  <div class="admin-logo" style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 32px;">
+    <div style="width: 110px; height: 110px; border-radius: 50%; background: #FDF3E2; border: 3px solid #ef4444; box-shadow: 0 4px 20px rgba(239,68,68,0.35); display: flex; align-items: center; justify-content: center; overflow: hidden;">
+      <img src="/public/images/Markeb Media Logo (2).png" alt="Markeb Media" style="width: 90px; height: 90px; object-fit: contain;" />
+    </div>
+    <span style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 12px; border-radius: 20px;">Admin Panel</span>
   </div>
 
   <div class="nav-section">
