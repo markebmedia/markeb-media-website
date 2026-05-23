@@ -3219,7 +3219,10 @@ Any media produced remains the property of Markeb Media until full payment has b
       <button class="footer-btn" onclick="showSection('terms')">Terms & Conditions</button>
       <button class="footer-btn" onclick="showSection('privacy')">Privacy Policy</button>
     </div>
-    <div class="footer-copyright" id="footerCopyright">© 2025 Markeb Media. All rights reserved.</div>
+    <div class="footer-copyright" id="footerCopyright" style="text-align:right;line-height:1.8;">
+  <span id="footerCopyrightYear"></span><br>
+  Markeb Media Ltd &nbsp;|&nbsp; Co. No. 15919272 &nbsp;|&nbsp; VAT No. 498444731
+</div>
   </div>
 
   <!-- Auth/session helper -->
@@ -3871,6 +3874,7 @@ async function loadAcuityMetrics(email){
           ${deliveryHTML}
           <div style="text-align:center;margin-top:10px;"><a href="#" onclick="location.reload()" style="display:inline-flex;align-items:center;gap:6px;color:#334155;text-decoration:none;font-weight:600;"><i data-lucide="refresh-cw" style="width:14px;height:14px;"></i> Track another project</a></div>
         `;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
       } catch (e) {
         console.error(e);
         resultEl.innerHTML = '<div class="error-message"><i data-lucide="x-circle" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> There was an error retrieving your tracking info. Please try again later.</div>';
@@ -4636,7 +4640,7 @@ function logoutAll(){
   const startYear = 2025;
   const currentYear = new Date().getFullYear();
   const yearText = (currentYear > startYear) ? `${startYear}–${currentYear}` : `${startYear}`;
-  document.getElementById('footerCopyright').textContent = `© ${yearText} Markeb Media. All rights reserved.`;
+  document.getElementById('footerCopyrightYear').textContent = `© ${yearText} Markeb Media Ltd. All rights reserved.`;
 })();
 
 async function loadRecentBookings() {
