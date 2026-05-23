@@ -109,7 +109,7 @@ function buildEmail(firstName, regionLabel) {
               A lot's happened since<br>you last logged in, ${firstName}.
             </h1>
             <p style="margin:0;color:rgba(253,243,226,0.88);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.6;">
-              Agents across your area are shooting more, tracking every piece of content through their dashboard and winning more instructions. Here's everything waiting for you.
+             Agents in your network are already using their dashboard every week. They're tracking shoots, building brochures and getting content out faster than ever. Here's everything that's been waiting for you.
             </p>
           </td>
         </tr>
@@ -121,7 +121,7 @@ function buildEmail(firstName, regionLabel) {
               Hi ${firstName},
             </p>
             <p style="margin:0 0 14px;color:#3F4D1B;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;line-height:1.7;">
-              We noticed you haven't logged into your dashboard recently. We're not chasing you — we just want to make sure you're getting everything out of it, because there's genuinely a lot in there that saves time every day.
+              Agents in your area are logging in every week to track shoots, request amendments and download content. Everything they need is in one place.
             </p>
             <p style="margin:0;color:#3F4D1B;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;line-height:1.7;">
               Here's a quick rundown of what's available to you right now, and how other agents in <strong>${regionLabel}</strong> are using each feature in their day-to-day.
@@ -148,7 +148,7 @@ function buildEmail(firstName, regionLabel) {
                 </td>
                 <td valign="top" style="padding-left:14px;">
                   <h2 style="margin:0 0 6px;color:#B46100;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:17px;font-weight:800;letter-spacing:-0.01em;">
-                    Content Tracking — know exactly where your shoot is
+                    Content Tracking: Know exactly where your shoot is
                   </h2>
                   <p style="margin:0;color:#3F4D1B;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;line-height:1.7;">
                     Every booking has a live tracking code. From the moment your specialist arrives on site through to editing, QC and final delivery you can see exactly what stage each property is at without calling or emailing us. Agents told us this alone saves them 20 to 30 minutes a week.
@@ -171,7 +171,7 @@ function buildEmail(firstName, regionLabel) {
                 </td>
                 <td valign="top" style="padding-left:14px;">
                   <h2 style="margin:0 0 6px;color:#B46100;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:17px;font-weight:800;letter-spacing:-0.01em;">
-                    Amendment Requests — no more back and forth emails
+                    Amendment Requests: No more back and forth emails
                   </h2>
                   <p style="margin:0;color:#3F4D1B;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;line-height:1.7;">
                     Need a re-edit, a different crop, or a colour correction? Submit it directly from your dashboard in seconds. The request goes straight to your media specialist with all the context attached. No email threads, no missed messages, no delays.
@@ -194,7 +194,7 @@ function buildEmail(firstName, regionLabel) {
                 </td>
                 <td valign="top" style="padding-left:14px;">
                   <h2 style="margin:0 0 6px;color:#B46100;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:17px;font-weight:800;letter-spacing:-0.01em;">
-                    Property Brochure Builder — professional PDFs in minutes
+                    Property Brochure Builder: Professional PDFs in minutes
                   </h2>
                   <p style="margin:0;color:#3F4D1B;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;line-height:1.7;">
                     Once your photos are delivered, you can build a fully branded property brochure straight from your dashboard in PDF or Word format. Pull in your images, add descriptions, done. No designer needed. Exclusive to dashboard members.
@@ -217,7 +217,7 @@ function buildEmail(firstName, regionLabel) {
                 </td>
                 <td valign="top" style="padding-left:14px;">
                   <h2 style="margin:0 0 6px;color:#B46100;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:17px;font-weight:800;letter-spacing:-0.01em;">
-                    CopyRyta AI — property descriptions in seconds
+                    CopyRyta AI: Property descriptions in seconds
                   </h2>
                   <p style="margin:0;color:#3F4D1B;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;line-height:1.7;">
                     Generate polished property descriptions and social media captions directly from your dashboard. Just fill in a few details and CopyRyta writes the copy for you. Rightmove ready and on brand. Agents are using this before every listing goes live.
@@ -240,7 +240,7 @@ function buildEmail(firstName, regionLabel) {
                 </td>
                 <td valign="top" style="padding-left:14px;">
                   <h2 style="margin:0 0 6px;color:#B46100;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:17px;font-weight:800;letter-spacing:-0.01em;">
-                    Social Media Content Calendar — see what's going out
+                    Social Media Content Calendar: See what's going out
                   </h2>
                   <p style="margin:0;color:#3F4D1B;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;line-height:1.7;">
                     Your content calendar shows every scheduled post before it goes live so you're never caught off guard, and you can approve or flag anything before it publishes. Full visibility, full control, all in one place.
