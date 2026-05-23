@@ -1960,6 +1960,15 @@ body {
 
     <!-- Customers Section -->
     <div class="admin-section" id="customers">
+      <div id="inactiveAlert" style="display:none;background:linear-gradient(135deg,#7c3aed,#5b21b6);border-radius:12px;padding:16px 20px;margin-bottom:16px;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div style="color:#fff;">
+          <span id="inactiveCount" style="font-size:22px;font-weight:700;"></span>
+          <span style="font-size:14px;font-weight:500;opacity:0.9;margin-left:8px;">customers haven't logged in for 14+ days</span>
+        </div>
+        <button class="btn btn-small" style="background:#fff;color:#7c3aed;font-weight:700;white-space:nowrap;" onclick="sendBulkReengagement(this)">
+          Send Re-engagement to All
+        </button>
+      </div>
       <div class="filters-bar">
         <input type="text" class="filter-input" id="customerSearch" placeholder="Search by name, email, company...">
         <button class="btn btn-primary" onclick="loadCustomers()">
@@ -6118,6 +6127,18 @@ async function confirmModifyService(bookingId) {
         return;
       }
 
+      // Update inactive alert banner
+      const inactiveCount = filtered.filter(c => getDaysSinceLogin(c.fields['Last Login']) >= 14).length;
+      const alertEl = document.getElementById('inactiveAlert');
+      if (alertEl) {
+        if (inactiveCount > 0) {
+          alertEl.style.display = 'flex';
+          document.getElementById('inactiveCount').textContent = inactiveCount;
+        } else {
+          alertEl.style.display = 'none';
+        }
+      }
+
       let html = `
         <div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap;">
           <div style="display:flex;align-items:center;gap:8px;padding:8px 16px;background:#f0fdf4;border:2px solid #10b981;border-radius:8px;font-size:13px;font-weight:600;color:#065f46;">
@@ -6138,6 +6159,7 @@ async function confirmModifyService(bookingId) {
               <th>Region</th>
               <th>Status</th>
               <th>Email Alerts</th>
+              <th>Last Login</th>
               <th>Skip Payment</th>
               <th>Actions</th>
             </tr>
@@ -6193,6 +6215,9 @@ async function confirmModifyService(bookingId) {
                 <span class="toggle-slider"></span>
               </label>
             </td>
+            <td data-label="Last Login">
+              ${renderLastLoginBadge(customer.fields['Last Login'])}
+            </td>
             <td data-label="Skip Payment">
               <label class="toggle-switch">
                 <input 
@@ -6204,9 +6229,17 @@ async function confirmModifyService(bookingId) {
               </label>
             </td>
             <td data-label="Actions">
-              <button class="btn btn-primary btn-small" onclick='viewCustomer(${JSON.stringify(customer).replace(/'/g, "&#39;")})'>
-                View
-              </button>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <button class="btn btn-primary btn-small" onclick='viewCustomer(${JSON.stringify(customer).replace(/'/g, "&#39;")})'>
+                  View
+                </button>
+                ${getDaysSinceLogin(customer.fields['Last Login']) >= 14 ? `
+                  <button class="btn btn-small" style="background:#7c3aed;color:#fff;white-space:nowrap;"
+                    onclick='sendReengagementEmail("${customer.fields['Email']}", "${customer.fields['Name']}", "${(customer.fields['Company'] || '').replace(/'/g, '')}", "${customer.fields['Region'] || ''}", this)'>
+                    Re-engage
+                  </button>
+                ` : ''}
+              </div>
             </td>
           </tr>
         `;
@@ -6499,6 +6532,97 @@ async function confirmModifyService(bookingId) {
         alert(`✓ Logged in as ${user.fields['Name']}`);
       }
     }
+
+    // ===== LAST LOGIN & RE-ENGAGEMENT HELPERS =====
+
+function getDaysSinceLogin(lastLogin) {
+  if (!lastLogin) return 999;
+  const last = new Date(lastLogin);
+  const now  = new Date();
+  return Math.floor((now - last) / (1000 * 60 * 60 * 24));
+}
+
+function renderLastLoginBadge(lastLogin) {
+  const days = getDaysSinceLogin(lastLogin);
+  if (days === 999) {
+    return `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#f1f5f9;color:#94a3b8;">
+      <span style="width:7px;height:7px;border-radius:50%;background:#cbd5e1;flex-shrink:0;"></span>Never</span>`;
+  }
+  if (days === 0) {
+    return `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#d1fae5;color:#065f46;">
+      <span style="width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0;"></span>Today</span>`;
+  }
+  if (days <= 7) {
+    return `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#d1fae5;color:#065f46;">
+      <span style="width:7px;height:7px;border-radius:50%;background:#10b981;flex-shrink:0;"></span>${days}d ago</span>`;
+  }
+  if (days <= 14) {
+    return `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#fef3c7;color:#92400e;">
+      <span style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0;"></span>${days}d ago</span>`;
+  }
+  return `<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#fee2e2;color:#991b1b;">
+    <span style="width:7px;height:7px;border-radius:50%;background:#ef4444;flex-shrink:0;animation:pulseLoginDot 1.5s ease-in-out infinite;"></span>${days}d ago</span>`;
+}
+
+// Inject pulse keyframe once
+(function() {
+  if (document.getElementById('loginPulseStyle')) return;
+  const s = document.createElement('style');
+  s.id = 'loginPulseStyle';
+  s.textContent = `@keyframes pulseLoginDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(1.4)}}`;
+  document.head.appendChild(s);
+})();
+
+async function sendReengagementEmail(email, name, company, region, btnEl) {
+  if (!confirm(`Send re-engagement email to ${name}?\n\nThis sends them a personalised email with dashboard features, local market context, and a booking prompt.`)) return;
+  if (btnEl) { btnEl.disabled = true; btnEl.textContent = '⏳ Sending…'; }
+  try {
+    const res  = await fetch('/.netlify/functions/send-reengagement-email', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email, name, company, region })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert(`✅ Re-engagement email sent to ${name}!`);
+      if (btnEl) { btnEl.textContent = '✓ Sent'; btnEl.style.background = '#10b981'; }
+    } else {
+      alert(`❌ Failed: ${data.error}`);
+      if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Re-engage'; }
+    }
+  } catch (err) {
+    alert('❌ Error: ' + err.message);
+    if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Re-engage'; }
+  }
+}
+
+async function sendBulkReengagement(btnEl) {
+  const inactive = allCustomers.filter(c => getDaysSinceLogin(c.fields['Last Login']) >= 14);
+  if (inactive.length === 0) { alert('No customers are inactive for 14+ days right now.'); return; }
+  if (!confirm(`Send re-engagement emails to ${inactive.length} customer${inactive.length !== 1 ? 's' : ''} who haven't logged in for 14+ days?\n\nEach will receive a personalised email. This cannot be undone.`)) return;
+  if (btnEl) { btnEl.disabled = true; btnEl.textContent = '⏳ Sending…'; }
+  let sent = 0, failed = 0;
+  for (const customer of inactive) {
+    try {
+      const res = await fetch('/.netlify/functions/send-reengagement-email', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          email:   customer.fields['Email'],
+          name:    customer.fields['Name'],
+          company: customer.fields['Company'] || '',
+          region:  customer.fields['Region']  || ''
+        })
+      });
+      const data = await res.json();
+      if (data.success) sent++; else failed++;
+    } catch { failed++; }
+    await new Promise(r => setTimeout(r, 250));
+  }
+  alert(`✅ Bulk re-engagement complete!\n\nSent: ${sent}\nFailed: ${failed}`);
+  if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Send Re-engagement to All'; }
+  loadCustomers();
+}
 
     // Real-time search
     document.getElementById('bookingSearch')?.addEventListener('input', (e) => {

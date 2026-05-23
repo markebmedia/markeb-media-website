@@ -11,6 +11,10 @@
 [functions."scheduled-weekly-broadcast"]
   schedule = "0 14 * * *"
 
+  [[functions]]
+  name = "scheduled-reengagement"
+  schedule = "0 9 * * *"
+
 [[headers]]
   for = "/website/admin-panel.html"
   [headers.values]

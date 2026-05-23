@@ -329,6 +329,18 @@ async function handleLogin(event, headers) {
             };
         }
 
+        // Non-blocking Last Login write
+        fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}/${user.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                fields: { 'Last Login': new Date().toISOString().split('T')[0] }
+            })
+        }).catch(err => console.warn('Last Login update failed:', err));
+
         const sessionData = {
             email: user.fields['Email'],
             name: user.fields['Name'],
