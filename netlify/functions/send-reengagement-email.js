@@ -109,7 +109,7 @@ function buildEmail(firstName, regionLabel) {
               A lot's happened since<br>you last logged in, ${firstName}.
             </h1>
             <p style="margin:0;color:rgba(253,243,226,0.88);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.6;">
-             Agents in your network are already using their dashboard every week. They're tracking shoots, building brochures and getting content out faster than ever. Here's everything that's been waiting for you.
+             Agents in your network are already using their dashboard every week. They're tracking shoots, building brochures and selling properties faster than ever. Here's everything that's been waiting for you.
             </p>
           </td>
         </tr>
