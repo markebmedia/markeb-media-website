@@ -11,8 +11,7 @@
 [functions."scheduled-weekly-broadcast"]
   schedule = "0 14 * * *"
 
-  [[functions]]
-  name = "scheduled-reengagement"
+[functions."scheduled-reengagement"]
   schedule = "0 9 * * *"
 
 [[headers]]
@@ -44,6 +43,7 @@
   for = "/internal/interview.html"
   [headers.values]
     Basic-Auth = "markeb:Markebmedia230301"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
