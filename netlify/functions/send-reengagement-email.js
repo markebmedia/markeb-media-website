@@ -121,7 +121,7 @@ function buildEmail(firstName, regionLabel) {
               Hi ${firstName},
             </p>
             <p style="margin:0 0 14px;color:#3F4D1B;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;line-height:1.7;">
-              Agents in your area are logging in every week to track shoots, request amendments and download content. Everything they need is in one place.
+              Agents in your network are logging in every week to track shoots, request amendments and download content. Everything they need is in one place.
             </p>
             <p style="margin:0;color:#3F4D1B;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;line-height:1.7;">
               Here's a quick rundown of what's available to you right now, and how other agents in <strong>${regionLabel}</strong> are using each feature in their day-to-day.
