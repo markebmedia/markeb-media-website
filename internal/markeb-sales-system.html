@@ -2141,7 +2141,7 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
     <div class="sc-sub">Fires the moment a client creates their dashboard account. Their first impression of Markeb as a platform — confirms access is live and tells them exactly what to do next.</div>
     <div class="info-box">
       <i data-lucide="zap"></i>
-      <p><strong>Trigger:</strong> New account created · <strong>Sent via:</strong> Resend · <strong>From:</strong> commercial@markebmedia.com · <strong>Template:</strong> welcome-email.html</p>
+      <p><strong>Trigger:</strong> New account created · <strong>Sent via:</strong> Resend · <strong>From:</strong> commercial@markebmedia.com · <strong>Template:</strong> netlify/functions/auth.js (inline HTML — handleRegister → sendWelcomeEmail)</p>
     </div>
     <div class="step-flow">
       <div class="sf-step">
@@ -2149,7 +2149,7 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
         <div class="sf-body">
           <div class="sf-title">Subject: Welcome to Markeb Media — you're in</div>
           <div class="sf-text">Opens with their name. Confirms dashboard access is live. Explains in three lines what the dashboard does — bookings, content tracking, amendments. Single CTA to book their first shoot.</div>
-          <div class="sf-example">"Hi [Name], your Markeb Media dashboard is live. This is where you'll book every shoot, track your content, and manage amendments. The next step is simple — book your first shoot and we'll take care of everything from there."</div>
+          <div class="sf-example">"Hi [Name], welcome to Markeb Media. Your personalised client dashboard is now live and ready to use. From here you can track every project from shoot to delivery, build property brochures, request amendments, use the AI copywriting tool, and view your social media content calendar. Watch the 2-minute walkthrough to get started — the link is in your dashboard. Book your first shoot whenever you're ready."</div>
           <div class="sf-note orange"><i data-lucide="lightbulb"></i> CTA button links to the dashboard booking page. Sign-off uses the BDM's name — never the generic "Markeb Media Team."</div>
         </div>
       </div>
@@ -2206,30 +2206,31 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
     <div class="sc-sub">Three emails fire as the content moves through production. The client's dashboard updates in real time — the emails mirror that progress and keep them informed without needing to log in and check.</div>
     <div class="info-box">
       <i data-lucide="zap"></i>
-      <p><strong>Trigger:</strong> Status field updated in admin panel · <strong>Sent via:</strong> Resend · <strong>From:</strong> commercial@markebmedia.com · <strong>Template:</strong> content-status-emails.js and content-approval-email.js</p>
+      <p><strong>Trigger:</strong> Status field updated in admin panel · <strong>Sent via:</strong> Resend · <strong>From:</strong> commercial@markebmedia.com · <strong>Template:</strong> netlify/functions/send-progress-update.js</p>
     </div>
     <div class="step-flow">
       <div class="sf-step">
         <div class="sf-icon" style="background:var(--orange)"><i data-lucide="film"></i></div>
         <div class="sf-body" style="border-left:3px solid var(--orange)">
           <div class="sf-title">Status 1 — Editing</div>
-          <div class="sf-text">Subject: <em>Your content is in editing — [Address]</em>. Confirms the shoot is done and content is now being edited. Sets expectation for the QC step that follows. No CTA — reassurance that it's moving.</div>
+          <div class="sf-text">Subject: <em>Your Content is Being Edited - [Address]</em>. Confirms the shoot is done and content is now being edited. Sets expectation for the QC step that follows.</div>
+          <div class="sf-example">"Hi [Name], we are pleased to let you know that we are currently editing the content for [Address]. Our team is meticulously enhancing your visuals to ensure they reflect the property in the best possible light — sharp, refined, and market-ready. You're one step closer to getting [Address] on the market. Track every stage through your personalised dashboard."</div>
         </div>
       </div>
       <div class="sf-step">
         <div class="sf-icon" style="background:var(--orange)"><i data-lucide="shield-check"></i></div>
         <div class="sf-body" style="border-left:3px solid var(--orange)">
           <div class="sf-title">Status 2 — Quality Control</div>
-          <div class="sf-text">Subject: <em>Your content is in quality control — [Address]</em>. Explains what Prestige Quality Control means — a dedicated team member reviewing every piece before it goes out. Brand-building as much as a status update.</div>
-          <div class="sf-example">"Before anything is sent to you, every image and video goes through our Prestige Quality Control — reviewed by a member of our team and signed off to our standard. Nothing leaves Markeb without a human approving it first."</div>
+          <div class="sf-text">Subject: <em>Your Content is in Quality Control - [Address]</em>. Explains what Prestige Quality Control means — a dedicated team member reviewing every piece before it goes out. Brand-building as much as a status update.</div>
+          <div class="sf-example">"Hi [Name], we are pleased to let you know that we are currently performing the final quality control on the content for [Address]. Our team is thoroughly reviewing every detail to ensure your content is flawless, on-brand, and ready for delivery. [Address] is just one step away from going live on the market."</div>
         </div>
       </div>
       <div class="sf-step">
         <div class="sf-icon" style="background:var(--c-win)"><i data-lucide="download"></i></div>
         <div class="sf-body" style="border-left:3px solid var(--c-win)">
           <div class="sf-title">Status 3 — Ready for Delivery</div>
-          <div class="sf-text">Subject: <em>Your content is ready — download it now</em>. Includes the direct download link. Reminds them of the amendment request system and the 24-hour turnaround. Tone is confident — we've done something great.</div>
-          <div class="sf-example">"Your content from [Address] is ready. Download everything here →. If you'd like any changes, submit an amendment request through your dashboard — we'll have it back to you within 24 hours."</div>
+          <div class="sf-text">Subject: <em>Your Content is Ready! - [Address]</em>. Includes the direct download link. Reminds them of the amendment request system and the 24-hour turnaround. Tone is confident — we've done something great.</div>
+          <div class="sf-example">"Hi [Name], your content for [Address] is now ready! Your download link is included in your dashboard — click it to download everything instantly. Need tweaks? Submit an amendment request through your dashboard and we'll have it back to you within 24 hours."</div>
           <div class="sf-note green"><i data-lucide="lightbulb"></i> This is the highest-satisfaction moment in the entire client journey — the email should match that energy. CTA: Download your content.</div>
         </div>
       </div>
@@ -2244,7 +2245,7 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
     <div class="sc-sub">Fires after a client's first shoot payment is confirmed. The moment when they've just paid and experienced the service for the first time — reward it immediately to convert a first-time client into a returning one.</div>
     <div class="info-box">
       <i data-lucide="zap"></i>
-      <p><strong>Trigger:</strong> First Stripe payment confirmed on a client's account (total booking count = 1, payment status = paid) · <strong>Sent via:</strong> Resend · <strong>Template:</strong> loyalty-email-templates.js (first booking variant)</p>
+      <p><strong>Trigger:</strong> First Stripe payment confirmed on a client's account (total booking count = 1, payment status = paid) · <strong>Sent via:</strong> Resend · <strong>Template:</strong> netlify/functions/check-first-booking.js (inline HTML)</p>
     </div>
     <div class="step-flow">
       <div class="sf-step">
@@ -2252,7 +2253,7 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
         <div class="sf-body">
           <div class="sf-title">Subject: Thank you — here's something for your next shoot</div>
           <div class="sf-text">Thanks them for their first booking. Delivers a discount code for their second shoot. Time-limited to drive urgency. Unique code generated per client — trackable and exclusive.</div>
-          <div class="sf-example">"Hi [Name], thank you for your first booking with Markeb Media. As a thank you, your second shoot is on us — use code [UNIQUE CODE] when you book and the full cost of your next shoot will be deducted. Code valid for 30 days. Book through your dashboard whenever you're ready."</div>
+          <div class="sf-example">"Hi [Name], as promised, now that your first shoot is confirmed we're giving you a code for your next one completely free — worth the exact same value as your first booking. Enter code [UNIQUE CODE] at checkout and your discount is applied automatically. This code has no expiry date — use it whenever your next listing comes in. Book through your dashboard whenever you're ready."</div>
           <div class="sf-note green"><i data-lucide="lightbulb"></i> This is the single highest-converting email in the system. The client has just paid, the content is incoming, and the next listing is always coming. The free shoot closes the second booking before they've even received the first.</div>
           <div class="sf-note orange"><i data-lucide="shield-check"></i> Unique code per client — generated at send time, stored against their Airtable record, one-use only.</div>
         </div>
