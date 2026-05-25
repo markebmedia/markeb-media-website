@@ -292,6 +292,9 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
   <button class="top-tab" onclick="showTop('marketing',this)">
     <i data-lucide="trending-up"></i> Marketing System
   </button>
+  <button class="top-tab" onclick="showTop('emailflows',this)">
+    <i data-lucide="mail"></i> Email Flows
+  </button>
 </div>
 
 
@@ -2100,6 +2103,168 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
 
 </div><!-- /top-panel marketing -->
 
+
+<!-- ═══════════════════════════════════════
+     EMAIL FLOWS
+═══════════════════════════════════════ -->
+<div class="top-panel" id="emailflows">
+
+  <div class="prices-header" style="margin-bottom:22px">
+    <h2><i data-lucide="mail"></i> Email Flows</h2>
+    <p>Every automated email the platform sends — what triggers it, when it fires, and what it does. Only emails that are live and built.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:24px">
+    <div style="background:#fff;border:2px solid var(--pine);border-radius:12px;padding:16px 20px;text-align:center">
+      <div style="font-size:32px;font-weight:800;color:var(--pine);line-height:1">5</div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.08em">Emails live</div>
+    </div>
+    <div style="background:#fff;border:2px solid var(--orange);border-radius:12px;padding:16px 20px;text-align:center">
+      <div style="font-size:32px;font-weight:800;color:var(--orange);line-height:1">2×</div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.08em">Weekly availability broadcast</div>
+    </div>
+    <div style="background:#fff;border:2px solid var(--pine);border-radius:12px;padding:16px 20px;text-align:center">
+      <div style="font-size:32px;font-weight:800;color:var(--pine);line-height:1">3</div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.08em">Fulfilment status emails</div>
+    </div>
+    <div style="background:#fff;border:2px solid var(--orange);border-radius:12px;padding:16px 20px;text-align:center">
+      <div style="font-size:32px;font-weight:800;color:var(--orange);line-height:1">1</div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.08em">Reward after first paid shoot</div>
+    </div>
+  </div>
+
+  <!-- ── ONBOARDING ── -->
+  <div class="sec-label"><i data-lucide="user-plus"></i> Onboarding</div>
+
+  <div class="section-card">
+    <div class="sc-title"><i data-lucide="mail"></i> Welcome Email</div>
+    <div class="sc-sub">Fires the moment a client creates their dashboard account. Their first impression of Markeb as a platform — confirms access is live and tells them exactly what to do next.</div>
+    <div class="info-box">
+      <i data-lucide="zap"></i>
+      <p><strong>Trigger:</strong> New account created · <strong>Sent via:</strong> Resend · <strong>From:</strong> commercial@markebmedia.com · <strong>Template:</strong> welcome-email.html</p>
+    </div>
+    <div class="step-flow">
+      <div class="sf-step">
+        <div class="sf-icon" style="background:var(--pine)"><i data-lucide="mail"></i></div>
+        <div class="sf-body">
+          <div class="sf-title">Subject: Welcome to Markeb Media — you're in</div>
+          <div class="sf-text">Opens with their name. Confirms dashboard access is live. Explains in three lines what the dashboard does — bookings, content tracking, amendments. Single CTA to book their first shoot.</div>
+          <div class="sf-example">"Hi [Name], your Markeb Media dashboard is live. This is where you'll book every shoot, track your content, and manage amendments. The next step is simple — book your first shoot and we'll take care of everything from there."</div>
+          <div class="sf-note orange"><i data-lucide="lightbulb"></i> CTA button links to the dashboard booking page. Sign-off uses the BDM's name — never the generic "Markeb Media Team."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BROADCAST ── -->
+  <div class="sec-label"><i data-lucide="radio"></i> Broadcast — Scheduled sends to active clients</div>
+
+  <div class="section-card">
+    <div class="sc-title"><i data-lucide="calendar"></i> Monday & Thursday Availability Broadcast</div>
+    <div class="sc-sub">Fires twice a week to all active clients with email notifications enabled. Each client receives real available slots from their own region — not a generic message. This is what keeps Markeb front of mind between shoots.</div>
+    <div class="info-box">
+      <i data-lucide="zap"></i>
+      <p><strong>Trigger:</strong> Netlify scheduled function (scheduled-weekly-broadcast.js) runs daily at 14:00 UTC — fires email only on Monday (day 1) and Thursday (day 4) · <strong>Condition:</strong> Client's <em>Email Notifications Enabled</em> = true in Airtable · <strong>Sent via:</strong> Resend · <strong>From:</strong> commercial@markebmedia.com</p>
+    </div>
+    <div class="step-flow">
+      <div class="sf-step">
+        <div class="sf-icon" style="background:var(--pine)"><i data-lucide="database"></i></div>
+        <div class="sf-body">
+          <div class="sf-title">Step 1 — Pull active clients from Airtable</div>
+          <div class="sf-text">Function queries Airtable for all records where Email Notifications Enabled = true. Any client without that flag is excluded and will never receive the broadcast.</div>
+        </div>
+      </div>
+      <div class="sf-step">
+        <div class="sf-icon" style="background:var(--pine)"><i data-lucide="map-pin"></i></div>
+        <div class="sf-body">
+          <div class="sf-title">Step 2 — Fetch real availability per region</div>
+          <div class="sf-text">For each client the function hits the check-availability endpoint using their postcode and region. It checks the next 7 weekdays and filters for days with available slots. Up to 5 days of availability are included — each showing available times for that date.</div>
+          <div class="sf-note orange"><i data-lucide="lightbulb"></i> If no availability exists in a client's region the email tells them to check live availability in the dashboard. If the client has no region set they're prompted to update their profile.</div>
+        </div>
+      </div>
+      <div class="sf-step">
+        <div class="sf-icon" style="background:var(--pine)"><i data-lucide="mail"></i></div>
+        <div class="sf-body">
+          <div class="sf-title">Step 3 — Personalised send per client</div>
+          <div class="sf-text">Subject: <em>Available shoot dates in [Region] — book your slot</em>. Opens with their first name. Lists the available days and times for their region. Single CTA to book via the dashboard.</div>
+          <div class="sf-example">"Hi [Name], we have availability in [Region] coming up: Monday 26th: 9am, 11am, 2pm · Wednesday 28th: 10am, 3pm · Friday 30th: 9am. Ready to book your next shoot? Book now →"</div>
+          <div class="sf-note green"><i data-lucide="shield-check"></i> Line breaks convert to br tags so spacing renders correctly across all email clients. The 7-day window deliberately avoids "this week" phrasing since it can span two calendar weeks.</div>
+        </div>
+      </div>
+    </div>
+    <div class="orange-box" style="margin-top:14px;margin-bottom:0">
+      <i data-lucide="settings"></i>
+      <p><strong>Admin control:</strong> The Email Notifications toggle in the admin panel maps directly to the <em>Email Notifications Enabled</em> field in Airtable. Toggling it off immediately removes that client from all future broadcasts — no code changes needed.</p>
+    </div>
+  </div>
+
+  <!-- ── FULFILMENT ── -->
+  <div class="sec-label"><i data-lucide="sliders"></i> Fulfilment — Content status updates</div>
+
+  <div class="section-card">
+    <div class="sc-title"><i data-lucide="sliders"></i> Editing → QC → Ready for Delivery</div>
+    <div class="sc-sub">Three emails fire as the content moves through production. The client's dashboard updates in real time — the emails mirror that progress and keep them informed without needing to log in and check.</div>
+    <div class="info-box">
+      <i data-lucide="zap"></i>
+      <p><strong>Trigger:</strong> Status field updated in admin panel · <strong>Sent via:</strong> Resend · <strong>From:</strong> commercial@markebmedia.com · <strong>Template:</strong> content-status-emails.js and content-approval-email.js</p>
+    </div>
+    <div class="step-flow">
+      <div class="sf-step">
+        <div class="sf-icon" style="background:var(--orange)"><i data-lucide="film"></i></div>
+        <div class="sf-body" style="border-left:3px solid var(--orange)">
+          <div class="sf-title">Status 1 — Editing</div>
+          <div class="sf-text">Subject: <em>Your content is in editing — [Address]</em>. Confirms the shoot is done and content is now being edited. Sets expectation for the QC step that follows. No CTA — reassurance that it's moving.</div>
+        </div>
+      </div>
+      <div class="sf-step">
+        <div class="sf-icon" style="background:var(--orange)"><i data-lucide="shield-check"></i></div>
+        <div class="sf-body" style="border-left:3px solid var(--orange)">
+          <div class="sf-title">Status 2 — Quality Control</div>
+          <div class="sf-text">Subject: <em>Your content is in quality control — [Address]</em>. Explains what Prestige Quality Control means — a dedicated team member reviewing every piece before it goes out. Brand-building as much as a status update.</div>
+          <div class="sf-example">"Before anything is sent to you, every image and video goes through our Prestige Quality Control — reviewed by a member of our team and signed off to our standard. Nothing leaves Markeb without a human approving it first."</div>
+        </div>
+      </div>
+      <div class="sf-step">
+        <div class="sf-icon" style="background:var(--c-win)"><i data-lucide="download"></i></div>
+        <div class="sf-body" style="border-left:3px solid var(--c-win)">
+          <div class="sf-title">Status 3 — Ready for Delivery</div>
+          <div class="sf-text">Subject: <em>Your content is ready — download it now</em>. Includes the direct download link. Reminds them of the amendment request system and the 24-hour turnaround. Tone is confident — we've done something great.</div>
+          <div class="sf-example">"Your content from [Address] is ready. Download everything here →. If you'd like any changes, submit an amendment request through your dashboard — we'll have it back to you within 24 hours."</div>
+          <div class="sf-note green"><i data-lucide="lightbulb"></i> This is the highest-satisfaction moment in the entire client journey — the email should match that energy. CTA: Download your content.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── REWARD ── -->
+  <div class="sec-label"><i data-lucide="gift"></i> Reward — First paid shoot</div>
+
+  <div class="section-card">
+    <div class="sc-title"><i data-lucide="gift"></i> Book One Get Second Shoot Free</div>
+    <div class="sc-sub">Fires after a client's first shoot payment is confirmed. The moment when they've just paid and experienced the service for the first time — reward it immediately to convert a first-time client into a returning one.</div>
+    <div class="info-box">
+      <i data-lucide="zap"></i>
+      <p><strong>Trigger:</strong> First Stripe payment confirmed on a client's account (total booking count = 1, payment status = paid) · <strong>Sent via:</strong> Resend · <strong>Template:</strong> loyalty-email-templates.js (first booking variant)</p>
+    </div>
+    <div class="step-flow">
+      <div class="sf-step">
+        <div class="sf-icon" style="background:var(--c-win)"><i data-lucide="mail"></i></div>
+        <div class="sf-body">
+          <div class="sf-title">Subject: Thank you — here's something for your next shoot</div>
+          <div class="sf-text">Thanks them for their first booking. Delivers a discount code for their second shoot. Time-limited to drive urgency. Unique code generated per client — trackable and exclusive.</div>
+          <div class="sf-example">"Hi [Name], thank you for your first booking with Markeb Media. As a thank you, your second shoot is on us — use code [UNIQUE CODE] when you book and the full cost of your next shoot will be deducted. Code valid for 30 days. Book through your dashboard whenever you're ready."</div>
+          <div class="sf-note green"><i data-lucide="lightbulb"></i> This is the single highest-converting email in the system. The client has just paid, the content is incoming, and the next listing is always coming. The free shoot closes the second booking before they've even received the first.</div>
+          <div class="sf-note orange"><i data-lucide="shield-check"></i> Unique code per client — generated at send time, stored against their Airtable record, one-use only.</div>
+        </div>
+      </div>
+    </div>
+    <div class="win-box" style="margin-top:14px">
+      <i data-lucide="check-circle"></i>
+      <div class="win-box-text">First-time client converts to repeat client <span class="win-box-sub">Second booking made — recurring revenue pipeline established.</span></div>
+    </div>
+  </div>
+
+</div><!-- /top-panel emailflows -->
 
 <div class="footer">Markeb Media Ltd &nbsp;·&nbsp; Co. No. 15919272 &nbsp;·&nbsp; VAT No. 498444731 &nbsp;·&nbsp; All prices ex-VAT · VAT at 20% applies to all services</div>
 
