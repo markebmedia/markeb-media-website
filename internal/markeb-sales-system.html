@@ -2238,30 +2238,108 @@ body{font-family:'Inter',sans-serif;background:#f8fafc;color:var(--ink);font-siz
   </div>
 
   <!-- ── REWARD ── -->
-  <div class="sec-label"><i data-lucide="gift"></i> Reward — First paid shoot</div>
+  <div class="sec-label"><i data-lucide="gift"></i> Reward — Free Second Shoot</div>
 
   <div class="section-card">
-    <div class="sc-title"><i data-lucide="gift"></i> Book One Get Second Shoot Free</div>
-    <div class="sc-sub">Fires after a client's first shoot payment is confirmed. The moment when they've just paid and experienced the service for the first time — reward it immediately to convert a first-time client into a returning one.</div>
+    <div class="sc-title"><i data-lucide="gift"></i> Free Second Shoot — Manual Offer</div>
+    <div class="sc-sub">A manually controlled reward offered to selected clients at our discretion. Not automatic — we decide who gets it, when, and why. Used to reward high-value clients, honour verbal promises, or incentivise clients we want to retain long-term.</div>
+
     <div class="info-box">
       <i data-lucide="zap"></i>
-      <p><strong>Trigger:</strong> First Stripe payment confirmed on a client's account (total booking count = 1, payment status = paid) · <strong>Sent via:</strong> Resend · <strong>Template:</strong> netlify/functions/check-first-booking.js (inline HTML)</p>
+      <p><strong>Trigger:</strong> <em>Free Second Shoot</em> checkbox manually ticked on the client's user record in Airtable → client pays for a confirmed booking → Stripe webhook fires → check-first-booking.js checks the toggle · <strong>Sent via:</strong> Resend · <strong>Template:</strong> netlify/functions/check-first-booking.js (inline HTML) · <strong>BCC:</strong> commercial@markebmedia.com on every send</p>
     </div>
+
     <div class="step-flow">
+
+      <div class="sf-step">
+        <div class="sf-icon" style="background:var(--pine)"><i data-lucide="toggle-right"></i></div>
+        <div class="sf-body">
+          <div class="sf-title">Step 1 — We manually enable the toggle on the client's account</div>
+          <div class="sf-text">In Airtable, open the client's record in the Users table and tick the <strong>Free Second Shoot</strong> checkbox. This is the only action required from us. Nothing fires until this is on and the client completes a paid booking.</div>
+          <div class="sf-grid">
+            <div class="sf-mini">
+              <div class="sf-mini-label"><i data-lucide="user-check"></i> When to enable it</div>
+              <ul>
+                <li>High-value or VIP clients we want to reward</li>
+                <li>A verbal promise made during a meeting or sales call</li>
+                <li>Clients we want to convert from one-time to recurring</li>
+                <li>Any situation where a goodwill gesture is appropriate</li>
+              </ul>
+            </div>
+            <div class="sf-mini">
+              <div class="sf-mini-label"><i data-lucide="shield-check"></i> What the toggle does</div>
+              <ul>
+                <li>Enables the offer for that client only</li>
+                <li>No effect until they complete a paid booking</li>
+                <li>Automatically resets to OFF after the code is sent</li>
+                <li>Can be re-enabled at any time for future offers</li>
+              </ul>
+            </div>
+          </div>
+          <div class="sf-note orange"><i data-lucide="lightbulb"></i> The client must already have a user account for the toggle to exist. Clients create their account before booking — the toggle is set after account creation and before their booking is confirmed.</div>
+        </div>
+      </div>
+
+      <div class="sf-step">
+        <div class="sf-icon" style="background:var(--orange)"><i data-lucide="credit-card"></i></div>
+        <div class="sf-body">
+          <div class="sf-title">Step 2 — Client completes a paid booking</div>
+          <div class="sf-text">The client books and pays as normal through the platform. Stripe confirms the payment and fires a webhook. The check-first-booking function is called automatically as part of the payment confirmation flow.</div>
+        </div>
+      </div>
+
+      <div class="sf-step">
+        <div class="sf-icon" style="background:var(--pine)"><i data-lucide="search"></i></div>
+        <div class="sf-body">
+          <div class="sf-title">Step 3 — Function checks the toggle</div>
+          <div class="sf-text">The function looks up the client's user record in Airtable by email. If the <strong>Free Second Shoot</strong> checkbox is OFF — it exits silently, nothing happens. If it is ON — it proceeds to generate and send the code.</div>
+          <div class="sf-grid">
+            <div class="sf-mini">
+              <div class="sf-mini-label"><i data-lucide="x-circle"></i> Toggle OFF</div>
+              <ul>
+                <li>Function exits immediately</li>
+                <li>No code generated</li>
+                <li>No email sent</li>
+                <li>Client has no idea — fully silent</li>
+              </ul>
+            </div>
+            <div class="sf-mini">
+              <div class="sf-mini-label"><i data-lucide="check-circle"></i> Toggle ON</div>
+              <ul>
+                <li>Idempotency check runs first</li>
+                <li>Unique code generated for this booking</li>
+                <li>Code saved to Airtable discount table</li>
+                <li>Email sent · Toggle reset to OFF</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="sf-step">
         <div class="sf-icon" style="background:var(--c-win)"><i data-lucide="mail"></i></div>
         <div class="sf-body">
-          <div class="sf-title">Subject: Thank you — here's something for your next shoot</div>
-          <div class="sf-text">Thanks them for their first booking. Delivers a discount code for their second shoot. Time-limited to drive urgency. Unique code generated per client — trackable and exclusive.</div>
-          <div class="sf-example">"Hi [Name], as promised, now that your first shoot is confirmed we're giving you a code for your next one completely free — worth the exact same value as your first booking. Enter code [UNIQUE CODE] at checkout and your discount is applied automatically. This code has no expiry date — use it whenever your next listing comes in. Book through your dashboard whenever you're ready."</div>
-          <div class="sf-note green"><i data-lucide="lightbulb"></i> This is the single highest-converting email in the system. The client has just paid, the content is incoming, and the next listing is always coming. The free shoot closes the second booking before they've even received the first.</div>
-          <div class="sf-note orange"><i data-lucide="shield-check"></i> Unique code per client — generated at send time, stored against their Airtable record, one-use only.</div>
+          <div class="sf-title">Step 4 — Code generated and email sent</div>
+          <div class="sf-text">A unique discount code is generated worth the exact value of the client's booking. It is saved to the Airtable discount table and linked to the client's user record — one use, one client. The branded email is sent immediately.</div>
+          <div class="sf-example">"Hi [Name], as promised, now that your first shoot is confirmed we're giving you a code for your next one completely free — worth the exact same value as your first booking. Enter code [UNIQUE CODE] at checkout and your discount is applied automatically. This code has no expiry date — use it whenever your next listing comes in."</div>
+          <div class="sf-note green"><i data-lucide="shield-check"></i> Unique code per booking — generated at send time, linked to the client's Airtable user record, one-use only, no expiry date.</div>
         </div>
       </div>
+
+      <div class="sf-step">
+        <div class="sf-icon" style="background:var(--pine)"><i data-lucide="toggle-left"></i></div>
+        <div class="sf-body">
+          <div class="sf-title">Step 5 — Toggle automatically resets to OFF</div>
+          <div class="sf-text">Immediately after the email is sent, the function flips the <strong>Free Second Shoot</strong> checkbox back to OFF on the client's user record. This means the offer can only fire once per manual activation — even if the webhook fires twice, the idempotency check and the toggle reset both prevent a duplicate send. To offer it again in future, simply tick the toggle on again.</div>
+          <div class="sf-note orange"><i data-lucide="refresh-cw"></i> Self-cleaning toggle — we turn it on, it fires once, turns itself off. Full control, zero risk of accidental duplicate sends.</div>
+        </div>
+      </div>
+
     </div>
+
     <div class="win-box" style="margin-top:14px">
       <i data-lucide="check-circle"></i>
-      <div class="win-box-text">First-time client converts to repeat client <span class="win-box-sub">Second booking made — recurring revenue pipeline established.</span></div>
+      <div class="win-box-text">Selected client receives free second shoot code <span class="win-box-sub">Offer is fully manual, fully controlled, self-resetting — used only where we choose to use it.</span></div>
     </div>
   </div>
 
