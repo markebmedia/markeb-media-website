@@ -1,6 +1,6 @@
 // netlify/functions/check-first-booking.js
-// Called after any payment is confirmed — checks if this is the customer's
-// first ever paid booking and if so, generates a free second shoot code
+// Sends a free second shoot code for clients where the
+// "Free Second Shoot" toggle has been manually enabled on their user account
 
 const Airtable = require('airtable');
 const { Resend } = require('resend');
@@ -15,28 +15,31 @@ async function checkFirstBooking({ clientEmail, clientName, bookingRef, finalPri
   console.log(`=== Check First Booking: ${clientEmail} ===`);
 
   try {
-    // 1. Count all paid, non-cancelled bookings for this email
-    const paidBookings = await base('Bookings')
+    // 1. Look up the user record and check the Free Second Shoot toggle
+    const userRecords = await base(process.env.AIRTABLE_USER_TABLE)
       .select({
-        filterByFormula: `AND(
-          LOWER({Client Email}) = "${clientEmail.toLowerCase()}",
-          {Payment Status} = "Paid",
-          {Booking Status} != "Cancelled"
-        )`,
-        fields: ['Booking Reference', 'Final Price', 'Client Email']
+        filterByFormula: `LOWER({Email}) = "${clientEmail.toLowerCase()}"`,
+        fields: ['Email', 'Free Second Shoot']
       })
-      .all();
+      .firstPage();
 
-    console.log(`Paid bookings found for ${clientEmail}: ${paidBookings.length}`);
-
-    // Only trigger on exactly the first paid booking
-    if (paidBookings.length !== 1) {
-      console.log('Not first booking — skipping free shoot offer');
-      return { success: true, triggered: false };
+    if (!userRecords || userRecords.length === 0) {
+      console.log(`No user record found for ${clientEmail} — skipping`);
+      return { success: true, triggered: false, reason: 'no_user_record' };
     }
 
-    // 2. Check we haven't already sent a code for this booking
-    const discountTableId = process.env.AIRTABLE_DISCOUNT_CODES_TABL;
+    const userRecord = userRecords[0];
+    const toggleEnabled = userRecord.fields['Free Second Shoot'] === true;
+
+    if (!toggleEnabled) {
+      console.log(`Free Second Shoot toggle is OFF for ${clientEmail} — skipping`);
+      return { success: true, triggered: false, reason: 'toggle_off' };
+    }
+
+    console.log(`Free Second Shoot toggle is ON for ${clientEmail} — proceeding`);
+
+    // 2. Idempotency check — don't send twice for the same booking
+    const discountTableId = process.env.AIRTABLE_DISCOUNT_CODES_TABLE;
     const existingCode = await base(discountTableId)
       .select({
         filterByFormula: `{Notes} = "First booking offer - ${bookingRef}"`,
@@ -56,25 +59,7 @@ async function checkFirstBooking({ clientEmail, clientName, bookingRef, finalPri
 
     console.log(`Generating free shoot code: ${discountCode} worth £${codeValue}`);
 
-    // 4. Find the customer's Airtable user record ID
-    let applicableCustomerIds = [];
-    try {
-      const userRecords = await base(process.env.AIRTABLE_USER_TABLE)
-        .select({
-          filterByFormula: `LOWER({Email}) = "${clientEmail.toLowerCase()}"`,
-          fields: ['Email']
-        })
-        .firstPage();
-
-      if (userRecords && userRecords.length > 0) {
-        applicableCustomerIds = [userRecords[0].id];
-        console.log(`Linked to user record: ${userRecords[0].id}`);
-      }
-    } catch (userError) {
-      console.warn('Could not find user record — code will not be customer-restricted', userError.message);
-    }
-
-    // 5. Save the discount code to Airtable
+    // 4. Save the discount code to Airtable, linked to the user record
     await base(discountTableId).create({
       'Code': discountCode,
       'Discount Type': 'Fixed Amount',
@@ -84,12 +69,17 @@ async function checkFirstBooking({ clientEmail, clientName, bookingRef, finalPri
       'Per Customer Limit': 1,
       'Times Used': 0,
       'Notes': `First booking offer - ${bookingRef}`,
-      ...(applicableCustomerIds.length > 0 && {
-        'Applicable Customers': applicableCustomerIds
-      })
+      'Applicable Customers': [userRecord.id]
     });
 
     console.log(`✅ Discount code created in Airtable: ${discountCode}`);
+
+    // 5. Flip the toggle OFF so it can't fire again unless manually re-enabled
+    await base(process.env.AIRTABLE_USER_TABLE).update(userRecord.id, {
+      'Free Second Shoot': false
+    });
+
+    console.log(`✅ Free Second Shoot toggle reset to OFF for ${clientEmail}`);
 
     // 6. Send the branded email
     const firstName = (clientName || 'there').split(' ')[0];
@@ -134,29 +124,23 @@ async function checkFirstBooking({ clientEmail, clientName, bookingRef, finalPri
 </head>
 <body>
   <div class="container">
-
     <div class="header">
       <img src="${LOGO_URL}" alt="Markeb Media">
       <h1>Markeb Media</h1>
       <div class="header-accent"></div>
     </div>
-
     <div class="hero">
       <h2>Your free shoot is ready.</h2>
       <p>Thank you for your first booking. Here's your reward.</p>
     </div>
-
     <div class="content">
-
       <p>Hi ${firstName},</p>
       <p>As promised, now that your first shoot is confirmed we're giving you a code for your next one completely free. It's worth the exact same value as your first booking.</p>
-
       <div class="code-box">
         <div class="code-label">Your Free Shoot Code</div>
         <div class="code-value">${discountCode}</div>
         <div class="code-worth">Worth <strong>£${codeValue.toFixed(2)}</strong> off your next booking</div>
       </div>
-
       <div class="how-to-use">
         <h3>How to use it</h3>
         <div class="step">
@@ -172,28 +156,22 @@ async function checkFirstBooking({ clientEmail, clientName, bookingRef, finalPri
           <div class="step-text">Your discount of £${codeValue.toFixed(2)} is applied automatically</div>
         </div>
       </div>
-
       <div class="alert-info">
         <strong>Good to know:</strong> This code is valid for one use and is linked to your account. It can be used on any service we offer. There is no expiry date.
       </div>
-
       <div class="button-wrap">
         <a href="https://markebmedia.com/website/booking.html" class="button">Book Your Next Shoot</a>
       </div>
-
       <p>If you have any questions just reply to this email and we'll help straight away.</p>
       <p>Thank you for choosing Markeb Media, ${firstName}.</p>
       <p>Best regards,<br><strong>Markeb Media</strong></p>
-
     </div>
-
     <div class="footer">
       <strong>Markeb Media</strong>
       <div class="footer-divider"></div>
       <p style="margin: 0 0 6px;">Professional Property Media, Marketing &amp; Technology</p>
       <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
     </div>
-
   </div>
 </body>
 </html>
@@ -226,7 +204,6 @@ async function checkFirstBooking({ clientEmail, clientName, bookingRef, finalPri
   }
 }
 
-// Allow calling as a Netlify function directly if needed
 exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -245,5 +222,4 @@ exports.handler = async (event) => {
   }
 };
 
-// Export so other functions can require() it
 module.exports = { checkFirstBooking };
