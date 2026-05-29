@@ -759,6 +759,23 @@ body {
     <div class="stats-overview" id="kpiGrid"></div>
     <div id="weekBreakdownRow" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;"></div>
 
+<!-- Day of Week Heatmap -->
+<div class="map-section" style="margin-bottom:24px;" id="dayOfWeekSection">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+    <div>
+      <h3 style="font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;">
+        <i data-lucide="calendar-days" style="width:18px;height:18px;"></i> Busiest Days of the Week
+      </h3>
+      <p style="font-size:13px;color:#64748b;margin-top:3px;">Average bookings per day across all historical data · <strong style="color:#0f172a;">Mon–Sun breakdown</strong> showing volume and percentage share</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;" id="dowModeToggle">
+      <button class="rr-btn active" id="dowFulfil" onclick="setDOWMode('fulfilment')">Shoot Date</button>
+      <button class="rr-btn" id="dowWon" onclick="setDOWMode('won')">Booking Created</button>
+    </div>
+  </div>
+  <div id="dayOfWeekContent"></div>
+</div>
+
     <!-- Run Rate Projection Chart -->
 <div class="map-section" style="margin-bottom:24px;" id="runRateSection">
   <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
@@ -2223,6 +2240,7 @@ function renderPerformanceSection() {
   }).join('');
 
   renderRoadmap();
+  renderDayOfWeek();
   lucide.createIcons();
 }
 
@@ -3229,6 +3247,167 @@ const MONTHLY_TARGET = 4000 * BDM_COUNT;
 
 let runRateChartInstance = null;
 let currentRunRateMetric = 'revenue';
+let currentDOWMode = 'fulfilment';
+
+function setDOWMode(mode) {
+  currentDOWMode = mode;
+  document.getElementById('dowFulfil').className = 'rr-btn' + (mode === 'fulfilment' ? ' active' : '');
+  document.getElementById('dowWon').className    = 'rr-btn' + (mode === 'won'         ? ' active' : '');
+  renderDayOfWeek();
+}
+
+function renderDayOfWeek() {
+  const DAY_NAMES = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const dayIndex = d => (d.getDay() + 6) % 7;
+
+  const dayCounts = Array(7).fill(0);
+
+  const relevantBookings = bookingData.filter(b => b.bookingStatus !== 'Cancelled');
+
+  relevantBookings.forEach(b => {
+    let dateStr = null;
+    if (currentDOWMode === 'fulfilment') {
+      dateStr = b.date;
+    } else {
+      dateStr = b.createdTime ? new Date(b.createdTime).toISOString().slice(0, 10) : null;
+    }
+    if (!dateStr) return;
+    const [y, m, day] = dateStr.slice(0, 10).split('-').map(Number);
+    const d = new Date(y, m - 1, day);
+    const idx = dayIndex(d);
+    dayCounts[idx]++;
+  });
+
+  const total = dayCounts.reduce((s, v) => s + v, 0);
+  if (total === 0) {
+    document.getElementById('dayOfWeekContent').innerHTML =
+      '<div class="empty-state"><div class="empty-state-text">No booking data yet</div></div>';
+    return;
+  }
+
+  const allDates = relevantBookings
+    .map(b => currentDOWMode === 'fulfilment' ? b.date : (b.createdTime ? new Date(b.createdTime).toISOString().slice(0,10) : null))
+    .filter(Boolean);
+  const earliest = allDates.reduce((a,b) => a < b ? a : b);
+  const latest   = allDates.reduce((a,b) => a > b ? a : b);
+  const dEarliest = new Date(earliest.slice(0,4), earliest.slice(5,7)-1, earliest.slice(8,10));
+  const dLatest   = new Date(latest.slice(0,4),   latest.slice(5,7)-1,   latest.slice(8,10));
+  const totalWeeks = Math.max(1, Math.ceil((dLatest - dEarliest) / (7 * 24 * 60 * 60 * 1000)));
+
+  const dayAvgs = dayCounts.map(c => c / totalWeeks);
+  const maxCount = Math.max(...dayCounts, 1);
+  const peakIdx  = dayCounts.indexOf(Math.max(...dayCounts));
+  const quietIdx = dayCounts.indexOf(Math.min(...dayCounts));
+
+  const PALETTE = [
+    { bg: '#dbeafe', bar: '#3b82f6', text: '#1d4ed8' },
+    { bg: '#ede9fe', bar: '#8b5cf6', text: '#6d28d9' },
+    { bg: '#fce7f3', bar: '#ec4899', text: '#be185d' },
+    { bg: '#fff7ed', bar: '#f97316', text: '#c2410c' },
+    { bg: '#fefce8', bar: '#eab308', text: '#a16207' },
+    { bg: '#f0fdf4', bar: '#22c55e', text: '#15803d' },
+    { bg: '#fff1f2', bar: '#f43f5e', text: '#be123c' },
+  ];
+
+  const summaryHtml = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:20px;">
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:14px 16px;">
+        <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">📈 Busiest Day</div>
+        <div style="font-size:22px;font-weight:800;color:#10b981;">${DAY_NAMES[peakIdx]}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px;">${dayCounts[peakIdx]} total · ${((dayCounts[peakIdx]/total)*100).toFixed(1)}% of all bookings</div>
+      </div>
+      <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:12px;padding:14px 16px;">
+        <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">📉 Quietest Day</div>
+        <div style="font-size:22px;font-weight:800;color:#f43f5e;">${DAY_NAMES[quietIdx]}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px;">${dayCounts[quietIdx]} total · ${((dayCounts[quietIdx]/total)*100).toFixed(1)}% of all bookings</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+        <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">📊 Total Analysed</div>
+        <div style="font-size:22px;font-weight:800;color:#0f172a;">${total}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px;">bookings across ~${totalWeeks} weeks of data</div>
+      </div>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+        <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">📅 Avg per Week</div>
+        <div style="font-size:22px;font-weight:800;color:#0f172a;">${(total/totalWeeks).toFixed(1)}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px;">bookings / week avg</div>
+      </div>
+    </div>`;
+
+  const barsHtml = `
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;align-items:end;">
+      ${DAY_NAMES.map((name, i) => {
+        const count  = dayCounts[i];
+        const pct    = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
+        const avg    = dayAvgs[i].toFixed(1);
+        const barH   = Math.round((count / maxCount) * 160);
+        const isPeak = i === peakIdx;
+        const p      = PALETTE[i];
+        return `
+          <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+            <div style="font-size:12px;font-weight:700;color:${p.text};">${pct}%</div>
+            <div style="font-size:11px;font-weight:600;color:#64748b;">${count}</div>
+            <div style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:160px;">
+              <div style="
+                width:100%;
+                height:${barH}px;
+                background:${isPeak ? p.bar : p.bg};
+                border:2px solid ${p.bar};
+                border-radius:10px 10px 4px 4px;
+                transition:height 0.8s ease;
+                position:relative;
+                display:flex;align-items:flex-start;justify-content:center;padding-top:6px;
+              ">
+                ${isPeak ? `<span style="font-size:9px;font-weight:800;color:#fff;background:${p.bar};padding:1px 5px;border-radius:4px;white-space:nowrap;">PEAK</span>` : ''}
+              </div>
+            </div>
+            <div style="font-size:13px;font-weight:700;color:#0f172a;">${name.slice(0,3)}</div>
+            <div style="font-size:10px;color:#94a3b8;">${avg}/wk avg</div>
+          </div>`;
+      }).join('')}
+    </div>`;
+
+  const tableHtml = `
+    <div style="margin-top:20px;overflow-x:auto;">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Total Bookings</th>
+            <th>% of All Bookings</th>
+            <th>Avg per Week</th>
+            <th>vs Monday</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${DAY_NAMES.map((name, i) => {
+            const count  = dayCounts[i];
+            const pct    = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
+            const avg    = dayAvgs[i].toFixed(1);
+            const vsMon  = dayCounts[0] > 0 ? ((count / dayCounts[0] - 1) * 100).toFixed(1) : '0.0';
+            const vsMonClass = parseFloat(vsMon) > 0 ? 'up' : parseFloat(vsMon) < 0 ? 'down' : 'flat';
+            const vsMonArrow = parseFloat(vsMon) > 0 ? '↑' : parseFloat(vsMon) < 0 ? '↓' : '—';
+            const p = PALETTE[i];
+            return `<tr>
+              <td class="metric-name">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div style="width:10px;height:10px;border-radius:50%;background:${p.bar};flex-shrink:0;"></div>
+                  ${name}${i === peakIdx ? ' <span style="font-size:9px;background:#10b981;color:#fff;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:4px;">PEAK</span>' : ''}
+                  ${i === quietIdx ? ' <span style="font-size:9px;background:#94a3b8;color:#fff;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:4px;">QUIET</span>' : ''}
+                </div>
+              </td>
+              <td class="current-val">${count}</td>
+              <td><strong style="color:${p.text};">${pct}%</strong></td>
+              <td>${avg}</td>
+              <td><span class="micro-delta ${vsMonClass}">${vsMonArrow} ${Math.abs(parseFloat(vsMon)).toFixed(1)}%</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+
+  document.getElementById('dayOfWeekContent').innerHTML = summaryHtml + barsHtml + tableHtml;
+  lucide.createIcons();
+}
 
 function setRunRateMetric(metric) {
   currentRunRateMetric = metric;
