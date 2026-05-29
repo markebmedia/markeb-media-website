@@ -2110,6 +2110,7 @@ function renderPerformanceSection() {
   const prevFulfil = filterToWindow(windows.previous, 'fulfilment');
   const currNewVsEx = splitNewVsExisting(curr.bookings, windows.current[0]);
   const prevNewVsEx = splitNewVsExisting(prev.bookings, windows.previous[0]);
+  const live = calcLiveMonthlyAverages();
 
   const currSignups = curr.clients.filter(u => new Date(u.fields['Created Date']) <= windows.current[1]);
   const prevSignups = prev.clients.filter(u => new Date(u.fields['Created Date']) <= windows.previous[1]);
