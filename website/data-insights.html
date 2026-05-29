@@ -769,8 +769,8 @@ body {
       <p style="font-size:13px;color:#64748b;margin-top:3px;">Average bookings per day across all historical data · <strong style="color:#0f172a;">Mon–Sun breakdown</strong> showing volume and percentage share</p>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;" id="dowModeToggle">
-      <button class="rr-btn active" id="dowFulfil" onclick="setDOWMode('fulfilment')">Shoot Date</button>
-      <button class="rr-btn" id="dowWon" onclick="setDOWMode('won')">Booking Created</button>
+      <button class="rr-btn" id="dowFulfil" onclick="setDOWMode('fulfilment')">Shoot Date</button>
+      <button class="rr-btn active" id="dowWon" onclick="setDOWMode('won')">Booking Created</button>
     </div>
   </div>
   <div id="dayOfWeekContent"></div>
@@ -3247,7 +3247,7 @@ const MONTHLY_TARGET = 4000 * BDM_COUNT;
 
 let runRateChartInstance = null;
 let currentRunRateMetric = 'revenue';
-let currentDOWMode = 'fulfilment';
+let currentDOWMode = 'won';
 
 function setDOWMode(mode) {
   currentDOWMode = mode;
