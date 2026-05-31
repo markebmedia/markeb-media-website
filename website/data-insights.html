@@ -832,6 +832,18 @@ body {
       </div>
 
       <div id="ltvAnalysisSection"></div>
+
+      <div style="margin-top:32px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+          <div style="background:#fef2f2;border-radius:8px;padding:7px;"><i data-lucide="user-x" style="width:16px;height:16px;color:#ef4444;"></i></div>
+          <div>
+            <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin:0;">Churned Clients</h3>
+            <p style="font-size:13px;color:#64748b;margin:3px 0 0;">Clients who have booked at least once but not in the last 90 days · sorted by most dormant first</p>
+          </div>
+        </div>
+        <div id="churnedClientsSection"></div>
+      </div>
+
     </div>
 
   </div><!-- end #performanceSection -->
@@ -1462,6 +1474,153 @@ const milestoneSub = `<strong>${fmtMoney(Math.round(remaining))}</strong> to nex
     : 'Not enough data yet';
 
   return { churnCount, churnSub, bestRev, bestMonthSub, totalThisMonthRev, revSplitSub, nextMilestone, milestoneLabel, milestoneSub, topRegion, regionSub };
+}
+
+function renderChurnedClients() {
+  const now = new Date();
+  const CHURN_DAYS = 90;
+  const churnCutoff = new Date(now.getTime() - CHURN_DAYS * 24 * 60 * 60 * 1000);
+
+  const clientEmailMap = {};
+  clientData.forEach(u => {
+    const email = (u.fields['Email'] || '').toLowerCase();
+    if (email) clientEmailMap[email] = {
+      name: u.fields['Name'] || 'Unknown',
+      company: u.fields['Company'] || '',
+      region: u.fields['Region'] || '',
+      status: u.fields['Account Status'] || ''
+    };
+  });
+
+  const lastBookingByEmail = {};
+  const ltvByEmail = {};
+  const bookingCountByEmail = {};
+
+  bookingData.filter(b => b.date && b.bookingStatus !== 'Cancelled' && b.clientEmail)
+    .forEach(b => {
+      const email = (b.clientEmail || '').toLowerCase();
+      const d = new Date(b.date);
+      if (!lastBookingByEmail[email] || d > lastBookingByEmail[email]) lastBookingByEmail[email] = d;
+      ltvByEmail[email] = (ltvByEmail[email] || 0) + (parseFloat(b.priceExVAT) || 0);
+      bookingCountByEmail[email] = (bookingCountByEmail[email] || 0) + 1;
+    });
+
+  const churned = Object.entries(lastBookingByEmail)
+    .filter(([email, lastDate]) => lastDate < churnCutoff && clientEmailMap[email])
+    .map(([email, lastDate]) => ({
+      email,
+      ...clientEmailMap[email],
+      lastDate,
+      daysDormant: Math.round((now - lastDate) / (1000 * 60 * 60 * 24)),
+      ltv: ltvByEmail[email] || 0,
+      bookingCount: bookingCountByEmail[email] || 0
+    }))
+    .sort((a, b) => b.daysDormant - a.daysDormant);
+
+  const el = document.getElementById('churnedClientsSection');
+  if (!el) return;
+
+  if (churned.length === 0) {
+    el.innerHTML = `<div style="text-align:center;padding:40px;color:#475569;font-size:13px;">No churned clients — all active clients have booked within the last 90 days.</div>`;
+    return;
+  }
+
+  const avgDormant = Math.round(churned.reduce((s, c) => s + c.daysDormant, 0) / churned.length);
+  const totalLostLTV = churned.reduce((s, c) => s + c.ltv, 0);
+  const highValue = churned.filter(c => c.ltv >= 500).length;
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;">
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:#ef4444;">${churned.length}</div>
+        <div style="font-size:11px;color:#ef4444;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Churned Clients</div>
+      </div>
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:#f97316;">${avgDormant}</div>
+        <div style="font-size:11px;color:#f97316;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Avg Days Dormant</div>
+      </div>
+      <div style="background:#fef9ec;border:1px solid #fde68a;border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:#d97706;">${highValue}</div>
+        <div style="font-size:11px;color:#d97706;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">High Value (£500+)</div>
+      </div>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:28px;font-weight:800;color:#10b981;">£${Math.round(totalLostLTV).toLocaleString()}</div>
+        <div style="font-size:11px;color:#10b981;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;">Total LTV at Risk</div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <input type="text" id="churnSearch" placeholder="Search by name, company or region..." oninput="filterChurnList()" style="flex:1;min-width:220px;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:'Inter',sans-serif;font-size:13px;color:#0f172a;background:#fff;outline:none;">
+      <select id="churnSort" onchange="filterChurnList()" style="padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:'Inter',sans-serif;font-size:13px;color:#0f172a;background:#fff;outline:none;">
+        <option value="dormant">Sort: Most Dormant</option>
+        <option value="ltv">Sort: Highest LTV</option>
+        <option value="bookings">Sort: Most Bookings</option>
+        <option value="name">Sort: Name A–Z</option>
+      </select>
+    </div>
+
+    <div id="churnList"></div>`;
+
+  window._churnedData = churned;
+  filterChurnList();
+}
+
+function filterChurnList() {
+  const query = (document.getElementById('churnSearch')?.value || '').toLowerCase();
+  const sort  = document.getElementById('churnSort')?.value || 'dormant';
+  let list = [...(window._churnedData || [])];
+
+  if (query) {
+    list = list.filter(c =>
+      c.name.toLowerCase().includes(query) ||
+      c.company.toLowerCase().includes(query) ||
+      c.region.toLowerCase().includes(query)
+    );
+  }
+
+  if (sort === 'ltv')      list.sort((a, b) => b.ltv - a.ltv);
+  else if (sort === 'bookings') list.sort((a, b) => b.bookingCount - a.bookingCount);
+  else if (sort === 'name')     list.sort((a, b) => a.name.localeCompare(b.name));
+  else                          list.sort((a, b) => b.daysDormant - a.daysDormant);
+
+  const urgencyColour = days =>
+    days >= 180 ? { bg:'#fef2f2', border:'#fecaca', text:'#ef4444', label:'Critical' } :
+    days >= 120 ? { bg:'#fff7ed', border:'#fed7aa', text:'#f97316', label:'At Risk' } :
+                  { bg:'#fefce8', border:'#fde68a', text:'#d97706', label:'Watch' };
+
+  const el = document.getElementById('churnList');
+  if (!el) return;
+
+  el.innerHTML = list.length === 0
+    ? `<div style="text-align:center;padding:30px;color:#475569;font-size:13px;">No results match your search.</div>`
+    : list.map(c => {
+        const u = urgencyColour(c.daysDormant);
+        return `
+          <div style="background:#fff;border:1px solid #e2e8f0;border-left:4px solid ${u.text};border-radius:12px;padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;transition:border-color .2s;">
+            <div style="flex:1;min-width:180px;">
+              <div style="font-weight:700;color:#0f172a;font-size:14px;">${c.name}</div>
+              ${c.company ? `<div style="font-size:12px;color:#475569;margin-top:2px;">${c.company}</div>` : ''}
+              ${c.region  ? `<div style="font-size:11px;color:#94a3b8;margin-top:2px;">${c.region}</div>`  : ''}
+            </div>
+            <div style="text-align:center;min-width:100px;">
+              <div style="font-size:22px;font-weight:800;color:${u.text};">${c.daysDormant}</div>
+              <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">days dormant</div>
+              <div style="display:inline-block;margin-top:4px;padding:2px 8px;background:${u.bg};border:1px solid ${u.border};border-radius:5px;font-size:10px;font-weight:700;color:${u.text};">${u.label}</div>
+            </div>
+            <div style="text-align:center;min-width:80px;">
+              <div style="font-size:16px;font-weight:700;color:#10b981;">£${Math.round(c.ltv).toLocaleString()}</div>
+              <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">LTV</div>
+            </div>
+            <div style="text-align:center;min-width:70px;">
+              <div style="font-size:16px;font-weight:700;color:#8b5cf6;">${c.bookingCount}</div>
+              <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">bookings</div>
+            </div>
+            <div style="text-align:right;min-width:100px;">
+              <div style="font-size:12px;color:#475569;">Last booking</div>
+              <div style="font-size:12px;font-weight:600;color:#0f172a;margin-top:2px;">${formatDate(c.lastDate.toISOString().slice(0,10))}</div>
+            </div>
+          </div>`;
+      }).join('');
 }
 
 function renderInsightCards() {
@@ -2657,6 +2816,7 @@ function renderRoadmap() {
     </div>`;
 
   lucide.createIcons();
+  renderChurnedClients();
 }
 
 // ── Client Intelligence ──
