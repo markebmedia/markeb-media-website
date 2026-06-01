@@ -1,9 +1,11 @@
 const Airtable = require('airtable');
+const { sendReviewRewardEmail } = require('./email-service');
+
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
 const PRIZE_CODES = {
-  floor_plan:  { code: 'REVIEWFP2025', label: 'Free floor plan' },
-  speed_tour:  { code: 'REVIEWST2025', label: 'Free speed tour' },
+  floor_plan:  { code: 'REVIEWFP2026', label: 'Free floor plan' },
+  speed_tour:  { code: 'REVIEWST2026', label: 'Free speed tour' },
   discount_10: { code: 'REVIEW10OFF',  label: '10% off' }
 };
 
@@ -14,13 +16,15 @@ exports.handler = async (event) => {
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type'
   };
+
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' };
 
   try {
     const { email, prize, checkOnly } = JSON.parse(event.body);
+
     if (!email) return { statusCode: 400, headers, body: JSON.stringify({ error: 'Email required' }) };
 
-    const records = await base('Users')
+    const records = await base('Markeb Media Users')
       .select({ filterByFormula: `{Email} = '${email}'`, maxRecords: 1 })
       .firstPage();
 
@@ -46,10 +50,18 @@ exports.handler = async (event) => {
 
     // Record the win
     const won = prize || Object.keys(PRIZE_CODES)[Math.floor(Math.random() * 3)];
-    await base('Users').update(user.id, {
+
+    await base('Markeb Media Users').update(user.id, {
       'Review Reward Spun': true,
       'Review Reward Prize': won
     });
+
+    // Send reward email
+    try {
+      await sendReviewRewardEmail(email, fields['Name'] || 'there', won);
+    } catch (emailErr) {
+      console.error('Review reward email failed:', emailErr.message);
+    }
 
     return { statusCode: 200, headers, body: JSON.stringify({ alreadySpun: false, prize: won, ...PRIZE_CODES[won] }) };
 

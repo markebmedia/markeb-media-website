@@ -953,6 +953,79 @@ async function sendCardUpdatedConfirmation(booking, bookingsUpdated) {
   });
 }
 
+// 9. Review Reward Prize Email
+async function sendReviewRewardEmail(clientEmail, clientName, prize) {
+  const PRIZE_DETAILS = {
+    floor_plan:  {
+      name: 'Free Floor Plan',
+      desc: 'A professional floor plan will be added to your next booking completely free of charge. No code needed — we\'ll apply it automatically.',
+      icon: '🏠',
+      code: null
+    },
+    speed_tour:  {
+      name: 'Free Speed Tour',
+      desc: 'A complimentary speed tour video will be added to your next shoot at no charge. No code needed — we\'ll apply it automatically.',
+      icon: '🎬',
+      code: null
+    },
+    discount_10: {
+      name: '10% Off Your Next Booking',
+      desc: 'Use the code below at checkout on your next booking to receive 10% off.',
+      icon: '🎁',
+      code: 'REVIEW10OFF'
+    }
+  };
+
+  const p = PRIZE_DETAILS[prize] || PRIZE_DETAILS.discount_10;
+
+  const content = `
+    <h2>${p.icon} You've won a reward!</h2>
+    <p>Hi ${clientName},</p>
+    <p>Thank you so much for taking the time to leave us a Google review — it means the world to us and helps other estate agents discover Markeb Media.</p>
+    <p>As promised, here's your reward:</p>
+
+    <div class="booking-details">
+      <div class="detail-row">
+        <span class="detail-label">Your Prize</span>
+        <span class="detail-value"><strong>${p.name}</strong></span>
+      </div>
+      ${p.code ? `
+      <div class="detail-row">
+        <span class="detail-label">Your Discount Code</span>
+        <span class="detail-value" style="font-family: monospace; font-size: 18px; letter-spacing: 0.12em; color: #B46100;"><strong>${p.code}</strong></span>
+      </div>
+      ` : ''}
+    </div>
+
+    <div class="alert alert-success">
+      <strong>${p.icon} How to claim</strong><br>
+      ${p.desc}
+    </div>
+
+    <div class="alert alert-info">
+      <strong>📅 Valid for your next booking</strong><br>
+      Your reward is tied to your account and ready to use on your next shoot with us. Simply book as normal${p.code ? ' and enter the code at checkout' : ' and we\'ll take care of the rest'}.
+    </div>
+
+    <center>
+      <a href="https://markebmedia.com/website/booking.html" class="button">Book Your Next Shoot</a>
+    </center>
+
+    <p>Thank you again for your support — reviews like yours help us grow and keep delivering the best property media in the UK.</p>
+    <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+  `;
+
+  const emailHtml = getEmailLayout(content);
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: clientEmail,
+    bcc: BCC_EMAIL,
+    subject: `🎁 Your Markeb Media Review Reward — ${p.name}`,
+    html: emailHtml
+  });
+}
+
 module.exports = {
   sendBookingConfirmation,
   sendPaymentConfirmation,
@@ -961,5 +1034,6 @@ module.exports = {
   sendReminderEmail,
   sendServiceModificationConfirmation,
   sendCardUpdateEmail,
-  sendCardUpdatedConfirmation
+  sendCardUpdatedConfirmation,
+  sendReviewRewardEmail
 };
