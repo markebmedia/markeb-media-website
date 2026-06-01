@@ -2848,6 +2848,26 @@ We wanted to reach out..." required></textarea>
           </div>
         </div>
 
+        <!-- Addon Discount Target -->
+        <div class="form-group">
+          <label class="form-label" for="addonDiscountTarget">Addon Discount Target</label>
+          <select id="addonDiscountTarget" class="form-input">
+            <option value="">None — applies to base service price</option>
+            <option value="standard-floor-plan">Standard Floor Plan</option>
+            <option value="plus-floor-plan">Plus Floor Plan</option>
+            <option value="floor-plan-3d">Floor Plan Bundle</option>
+            <option value="property-speed-tours">Property Speed Tours</option>
+            <option value="elevate-edit">Elevate Your Edit</option>
+            <option value="property-video">Property Videography</option>
+            <option value="property-drone-photo">Property Drone Photography</option>
+            <option value="property-drone-video">Property Drone Videography</option>
+            <option value="add-branded-outro">Add Branded Outro</option>
+          </select>
+          <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+            If set, this code will discount that specific add-on rather than the base service price
+          </div>
+        </div>
+
         <!-- Notes -->
         <div class="form-group">
           <label class="form-label" for="discountNotes">Internal Notes</label>
@@ -6165,7 +6185,8 @@ async function confirmModifyService(bookingId) {
               <th>Email Alerts</th>
               <th>Last Login</th>
               <th>Skip Payment</th>
-              <th>Actions</th>
+          <th>Review Reward</th>
+          <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -6231,6 +6252,17 @@ async function confirmModifyService(bookingId) {
                 >
                 <span class="toggle-slider"></span>
               </label>
+            </td>
+            <td data-label="Review Reward">
+              <label class="toggle-switch">
+                <input 
+                  type="checkbox" 
+                  ${customer.fields['Google Review Reward Eligible'] ? 'checked' : ''} 
+                  onchange='toggleReviewReward("${customer.id}", this.checked)'
+                >
+                <span class="toggle-slider"></span>
+              </label>
+              ${customer.fields['Review Reward Spun'] ? `<div style="font-size:11px;color:#10b981;margin-top:4px;font-weight:600;">✓ Spun — ${customer.fields['Review Reward Prize'] || 'prize set'}</div>` : ''}
             </td>
             <td data-label="Actions">
               <div style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -6389,7 +6421,36 @@ async function confirmModifyService(bookingId) {
   lucide.createIcons();
 }
 
-    async function toggleReservePrivilege(recordId, email, enabled) {
+    async function toggleReviewReward(recordId, enabled) {
+  try {
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'PATCH',
+        table: 'Markeb Media Users',
+        recordId: recordId,
+        body: { fields: { 'Google Review Reward Eligible': enabled } }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update review reward eligibility');
+    }
+
+    const customer = allCustomers.find(c => c.id === recordId);
+    if (customer) {
+      customer.fields['Google Review Reward Eligible'] = enabled;
+    }
+
+  } catch (error) {
+    console.error('Error toggling review reward:', error);
+    alert('Error updating review reward eligibility');
+    event.target.checked = !enabled;
+  }
+}
+
+async function toggleReservePrivilege(recordId, email, enabled) {
   try {
     const response = await fetch('/.netlify/functions/update-reserve-privilege', {
       method: 'POST',
@@ -7113,6 +7174,8 @@ async function saveDiscountCode(event) {
     if (maxUses) fields['Max Uses'] = maxUses;
     if (minPurchase) fields['Min Purchase'] = minPurchase;
     if (notes) fields['Notes'] = notes;
+    const addonTarget = document.getElementById('addonDiscountTarget').value;
+    if (addonTarget) fields['Addon Discount Target'] = addonTarget;
     if (selectedRegions.length > 0) fields['Applicable Regions'] = selectedRegions;
     if (selectedServices.length > 0) fields['Applicable Services'] = selectedServices;
 
@@ -7179,6 +7242,7 @@ function editDiscountCode(codeId) {
   document.getElementById('validUntil').value = fields['Valid Until'] || '';
   document.getElementById('maxUses').value = fields['Max Uses'] || '';
   document.getElementById('minPurchase').value = fields['Min Purchase'] || '';
+  document.getElementById('addonDiscountTarget').value = fields['Addon Discount Target'] || '';
   document.getElementById('discountNotes').value = fields['Notes'] || '';
   
   updateDiscountValueLabel();

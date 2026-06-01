@@ -3249,6 +3249,84 @@ Any media produced remains the property of Markeb Media until full payment has b
 </div>
   </div>
 
+  <!-- ===== GOOGLE REVIEW REWARD MODAL ===== -->
+  <div id="review-reward-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:99999; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#fff; border-radius:20px; max-width:440px; width:100%; overflow:hidden; position:relative;">
+      
+      <!-- Header -->
+      <div id="rrm-header" style="background:#0F6E56; padding:28px 28px 24px; text-align:center; position:relative;">
+        <button onclick="closeReviewModal()" style="position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;cursor:pointer;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;">✕</button>
+        <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+          <i data-lucide="gift" style="width:26px;height:26px;color:#fff;"></i>
+        </div>
+        <p id="rrm-title" style="font-size:18px;font-weight:600;color:#fff;margin:0 0 6px;">You've got a mystery gift waiting</p>
+        <p id="rrm-sub" style="font-size:13px;color:rgba(255,255,255,0.8);margin:0;line-height:1.5;">Leave us a Google review and spin to win an exclusive reward.</p>
+      </div>
+
+      <!-- Step 1: How it works -->
+      <div id="rrm-step-howit" style="display:block;">
+        <div style="padding:20px 24px;">
+          <!-- Step 1 -->
+          <div style="display:flex;gap:14px;padding:14px 0;border-bottom:0.5px solid #e2e8f0;">
+            <div id="rrm-circle-1" style="width:30px;height:30px;border-radius:50%;background:#E1F5EE;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#085041;flex-shrink:0;">1</div>
+            <div style="flex:1;padding-top:4px;">
+              <p style="font-size:14px;font-weight:600;color:#0f172a;margin:0 0 4px;">Leave us a Google review</p>
+              <p style="font-size:13px;color:#64748b;margin:0 0 10px;line-height:1.5;">Takes about 60 seconds. Share your honest experience.</p>
+              <a href="https://g.page/r/YOUR_GOOGLE_REVIEW_LINK/review" target="_blank" onclick="rrmTrackClick()" style="display:inline-flex;align-items:center;gap:8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;color:#0f172a;text-decoration:none;">
+                <div style="width:18px;height:18px;border-radius:50%;background:#4285F4;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;">G</div>
+                Open Google Reviews
+                <i data-lucide="external-link" style="width:13px;height:13px;color:#94a3b8;"></i>
+              </a>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding:12px 14px;background:#f8fafc;border-radius:8px;cursor:pointer;" onclick="rrmToggleCheck()">
+                <input type="checkbox" id="rrm-check" onchange="rrmHandleCheck()" style="width:16px;height:16px;accent-color:#1D9E75;cursor:pointer;flex-shrink:0;">
+                <label for="rrm-check" style="font-size:13px;color:#64748b;cursor:pointer;line-height:1.4;">I've posted my Google review</label>
+              </div>
+            </div>
+          </div>
+          <!-- Step 2 -->
+          <div style="display:flex;gap:14px;padding:14px 0;">
+            <div id="rrm-circle-2" style="width:30px;height:30px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#94a3b8;flex-shrink:0;">2</div>
+            <div style="flex:1;padding-top:4px;">
+              <p style="font-size:14px;font-weight:600;color:#0f172a;margin:0 0 4px;">Spin to win</p>
+              <p style="font-size:13px;color:#64748b;margin:0;line-height:1.5;">Win a free floor plan, speed tour, or 10% off your next booking.</p>
+            </div>
+          </div>
+        </div>
+        <div style="padding:0 24px 20px;">
+          <button id="rrm-unlock-btn" onclick="rrmGoSpin()" disabled style="width:100%;padding:12px;border-radius:8px;font-size:14px;font-weight:600;cursor:not-allowed;border:none;background:#e2e8f0;color:#94a3b8;">Unlock my spin</button>
+          <button onclick="closeReviewModal()" style="width:100%;padding:10px;background:none;border:none;font-size:13px;color:#94a3b8;cursor:pointer;margin-top:8px;">Maybe later</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Spin wheel -->
+      <div id="rrm-step-spin" style="display:none;">
+        <div style="padding:20px 24px 8px;text-align:center;">
+          <p style="font-size:13px;color:#64748b;margin:0 0 16px;">Tap spin to reveal your mystery gift</p>
+          <div style="position:relative;width:200px;height:200px;margin:0 auto 20px;">
+            <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:20px solid #0F6E56;z-index:2;"></div>
+            <canvas id="rrm-wheel" width="200" height="200" style="border-radius:50%;"></canvas>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid #e2e8f0;z-index:2;"></div>
+          </div>
+        </div>
+        <div style="padding:0 24px 20px;">
+          <button id="rrm-spin-btn" onclick="rrmDoSpin()" style="width:100%;padding:12px;background:#1D9E75;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">
+            Spin now
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Prize reveal -->
+      <div id="rrm-step-prize" style="display:none;">
+        <div style="padding:20px 24px 8px;text-align:center;" id="rrm-prize-content"></div>
+        <div style="padding:0 24px 20px;">
+          <button onclick="closeReviewModal()" style="width:100%;padding:12px;background:#1D9E75;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">Got it, thanks</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- ===== END REVIEW REWARD MODAL ===== -->
+
   <!-- Auth/session helper -->
   <script src="./assets/js/airtable.js"></script>
   <script>
@@ -4607,6 +4685,7 @@ if (paymentStatus === 'success' && sessionId) {
     window.history.replaceState({}, '', '/website/dashboard.html');
     // Reload dashboard data
     loadDashboardData();
+checkReviewRewardPopup();
   }, 500);
 }
 
@@ -4739,10 +4818,192 @@ async function loadRecentBookings() {
  </script>
   
   <script>
-    // Initialize all Lucide icons
-    lucide.createIcons();
+  // Initialize all Lucide icons
+  lucide.createIcons();
   </script>
 
+  <script>
+  /* ===== GOOGLE REVIEW REWARD MODAL ===== */
+  const RRM_PRIZES = [
+    { id:'floor_plan',  name:'Free floor plan',  desc:'A professional floor plan added to your next booking — completely free.', code:'REVIEWFP2026', isCode:false, bg:'#E1F5EE', iconColor:'#085041' },
+    { id:'speed_tour',  name:'Free speed tour',  desc:'A complimentary speed tour video added to your next shoot at no charge.', code:'REVIEWST2026', isCode:false, bg:'#E6F1FB', iconColor:'#0C447C' },
+    { id:'discount_10', name:'10% off',           desc:'Use the code below at checkout to get 10% off your next booking.', code:'REVIEW10OFF', isCode:true,  bg:'#FAEEDA', iconColor:'#633806' }
+  ];
+  const RRM_SEGS = [
+    {label:'Floor\nPlan', fill:'#1D9E75', txt:'#fff'},
+    {label:'10%\nOff',    fill:'#EF9F27', txt:'#fff'},
+    {label:'Speed\nTour', fill:'#378ADD', txt:'#fff'},
+    {label:'Floor\nPlan', fill:'#0F6E56', txt:'#fff'},
+    {label:'10%\nOff',    fill:'#BA7517', txt:'#fff'},
+    {label:'Speed\nTour', fill:'#185FA5', txt:'#fff'},
+  ];
+  const RRM_SEG_MAP = { floor_plan:[0,3], speed_tour:[2,5], discount_10:[1,4] };
+
+  let rrmAngle = 0;
+  let rrmSpinning = false;
+
+  function openReviewModal() {
+    const overlay = document.getElementById('review-reward-overlay');
+    overlay.style.display = 'flex';
+    setTimeout(() => { rrmDrawWheel(0); if (typeof lucide !== 'undefined') lucide.createIcons(); }, 60);
+  }
+
+  function closeReviewModal() {
+    document.getElementById('review-reward-overlay').style.display = 'none';
+    sessionStorage.setItem('reviewPopupShown', 'true');
+  }
+
+  function rrmShowStep(id) {
+    ['rrm-step-howit','rrm-step-spin','rrm-step-prize'].forEach(s => {
+      document.getElementById(s).style.display = 'none';
+    });
+    document.getElementById(id).style.display = 'block';
+  }
+
+  function rrmToggleCheck() {
+    const cb = document.getElementById('rrm-check');
+    cb.checked = !cb.checked;
+    rrmHandleCheck();
+  }
+
+  function rrmHandleCheck() {
+    const checked = document.getElementById('rrm-check').checked;
+    const btn = document.getElementById('rrm-unlock-btn');
+    const circle2 = document.getElementById('rrm-circle-2');
+    btn.disabled = !checked;
+    btn.style.background = checked ? '#1D9E75' : '#e2e8f0';
+    btn.style.color = checked ? '#fff' : '#94a3b8';
+    btn.style.cursor = checked ? 'pointer' : 'not-allowed';
+    circle2.style.background = checked ? '#E1F5EE' : '#f1f5f9';
+    circle2.style.color = checked ? '#085041' : '#94a3b8';
+  }
+
+  function rrmTrackClick() {
+    // optional — could set a flag to confirm they opened Google
+  }
+
+  function rrmGoSpin() {
+    document.getElementById('rrm-title').textContent = 'Spin to reveal your gift';
+    document.getElementById('rrm-sub').textContent = 'One spin — one prize. Good luck!';
+    rrmShowStep('rrm-step-spin');
+    setTimeout(() => rrmDrawWheel(0), 60);
+  }
+
+  function rrmDrawWheel(a) {
+    const canvas = document.getElementById('rrm-wheel');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const cx = 100, cy = 100, r = 98;
+    const n = RRM_SEGS.length;
+    const arc = (2 * Math.PI) / n;
+    const rot = ((a || 0) * Math.PI / 180) - Math.PI / 2;
+    ctx.clearRect(0, 0, 200, 200);
+    RRM_SEGS.forEach((seg, i) => {
+      const s = rot + i * arc, e = s + arc;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, s, e); ctx.closePath();
+      ctx.fillStyle = seg.fill; ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.save(); ctx.translate(cx, cy); ctx.rotate(rot + i * arc + arc / 2);
+      ctx.textAlign = 'right'; ctx.fillStyle = seg.txt; ctx.font = '10px sans-serif';
+      seg.label.split('\n').forEach((line, li, arr) => {
+        ctx.fillText(line, r - 12, (li - (arr.length - 1) / 2) * 13);
+      });
+      ctx.restore();
+    });
+  }
+
+  function rrmDoSpin() {
+    if (rrmSpinning) return;
+    rrmSpinning = true;
+    document.getElementById('rrm-spin-btn').disabled = true;
+
+    const prizeIdx = Math.floor(Math.random() * 3);
+    const prize = RRM_PRIZES[prizeIdx];
+    const segs = RRM_SEG_MAP[prize.id];
+    const targetSeg = segs[Math.floor(Math.random() * segs.length)];
+    const arcDeg = 360 / RRM_SEGS.length;
+    const extra = Math.random() * arcDeg * 0.5;
+    const targetAngle = 360 - (targetSeg * arcDeg + arcDeg / 2 + extra);
+    const total = 1800 + targetAngle;
+
+    let start = null;
+    const dur = 4200;
+    function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+    function frame(ts) {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / dur, 1);
+      rrmAngle = ease(p) * total;
+      rrmDrawWheel(rrmAngle);
+      if (p < 1) { requestAnimationFrame(frame); }
+      else {
+        rrmSpinning = false;
+        setTimeout(() => rrmShowPrize(prize), 500);
+        rrmRecordPrize(prize);
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function rrmShowPrize(prize) {
+    document.getElementById('rrm-title').textContent = 'You won!';
+    document.getElementById('rrm-sub').textContent = 'Your reward is confirmed — see details below.';
+
+    const inner = prize.isCode
+      ? `<div style="background:#f8fafc;border:1px dashed #e2e8f0;border-radius:8px;padding:14px 20px;margin-bottom:8px;">
+           <p style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 4px;">Your discount code</p>
+           <p style="font-size:20px;font-weight:600;color:#0f172a;font-family:monospace;letter-spacing:0.12em;margin:0;">${prize.code}</p>
+         </div>
+         <p style="font-size:12px;color:#94a3b8;margin:0 0 20px;">Enter this at checkout on your next booking.</p>`
+      : `<div style="background:#f8fafc;border:1px dashed #e2e8f0;border-radius:8px;padding:14px 20px;margin-bottom:8px;">
+           <p style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 4px;">Your reward</p>
+           <p style="font-size:15px;font-weight:600;color:#0f172a;margin:0;">${prize.name} — added to your account</p>
+         </div>
+         <p style="font-size:12px;color:#94a3b8;margin:0 0 20px;">We'll apply this automatically to your next shoot.</p>`;
+
+    document.getElementById('rrm-prize-content').innerHTML = `
+      <div style="width:64px;height:64px;border-radius:50%;background:${prize.bg};display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <i data-lucide="gift" style="width:28px;height:28px;color:${prize.iconColor};"></i>
+      </div>
+      <p style="font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 6px;">You won</p>
+      <p style="font-size:20px;font-weight:600;color:#0f172a;margin:0 0 8px;">${prize.name}</p>
+      <p style="font-size:13px;color:#64748b;margin:0 0 20px;line-height:1.6;max-width:300px;margin-left:auto;margin-right:auto;">${prize.desc}</p>
+      ${inner}
+    `;
+    rrmShowStep('rrm-step-prize');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+
+  async function rrmRecordPrize(prize) {
+    try {
+      const email = window.AirtableAPI?.getCurrentUser?.()?.email || localStorage.getItem('user_email');
+      if (!email) return;
+      await fetch('/.netlify/functions/claim-review-reward', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, prize: prize.id })
+      });
+    } catch(e) { console.warn('Review reward record error:', e); }
+  }
+
+  async function checkReviewRewardPopup() {
+    try {
+      if (sessionStorage.getItem('reviewPopupShown')) return;
+      const email = window.AirtableAPI?.getCurrentUser?.()?.email || localStorage.getItem('user_email');
+      if (!email) return;
+      const res = await fetch('/.netlify/functions/claim-review-reward', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, checkOnly: true })
+      });
+      const data = await res.json();
+      if (data.eligible && !data.alreadySpun) {
+        setTimeout(() => openReviewModal(), 1500);
+      }
+    } catch(e) { console.warn('Review reward check error:', e); }
+  }
+  /* ===== END REVIEW REWARD MODAL ===== */
+  </script>
+  
   <script>
 /* ═══════════════════════════════════════════════════════════════════
    GALLERY / CONTENT HUB — drop-in replacement script block

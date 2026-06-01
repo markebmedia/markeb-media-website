@@ -257,7 +257,8 @@ exports.handler = async (event, context) => {
         discountAmount: discountAmount,
         originalPrice: totalPrice,
         finalPrice: finalPrice,
-        recordId: discountRecord.id
+        recordId: discountRecord.id,
+        addonDiscountTarget: discount['Addon Discount Target'] || null
       })
     };
 

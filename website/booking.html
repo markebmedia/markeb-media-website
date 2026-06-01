@@ -3283,6 +3283,24 @@ async function applyDiscountCode() {
     const data = await response.json();
     
     if (data.success) {
+      // If this code targets a specific addon, recalculate against addon price
+      if (data.addonDiscountTarget) {
+        const targetAddonId = data.addonDiscountTarget;
+        if (!bookingData.selectedAddons.includes(targetAddonId)) {
+          input.classList.add('error');
+          errorMsg.textContent = `This code requires the ${ADDONS[targetAddonId]?.name || targetAddonId} add-on to be selected first`;
+          errorMsg.classList.add('show');
+          applyBtn.disabled = false;
+          applyBtn.innerHTML = 'Apply';
+          return;
+        }
+        const addonPrice = ADDONS[targetAddonId]?.price || 0;
+        data.discountAmount = data.discountType === 'Percentage'
+          ? (addonPrice * data.discountValue) / 100
+          : Math.min(data.discountValue, addonPrice);
+        data.finalPrice = Math.max(0, addonPrice - data.discountAmount);
+      }
+
       // Store discount data
       appliedDiscount = {
         code: data.code,
@@ -3291,7 +3309,8 @@ async function applyDiscountCode() {
         discountAmount: data.discountAmount,
         originalPrice: data.originalPrice,
         finalPrice: data.finalPrice,
-        recordId: data.recordId
+        recordId: data.recordId,
+        addonDiscountTarget: data.addonDiscountTarget || null
       };
       
       // Update booking data
