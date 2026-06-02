@@ -2312,9 +2312,10 @@ function handleAccessTypeChange() {
 // ===== OFFER POPUP SYSTEM =====
 
 let _activeOffersCache = null;
+let _offersCacheBust = 0;
 
 async function fetchActiveOffers() {
-  if (_activeOffersCache !== null) return _activeOffersCache;
+  if (_activeOffersCache !== null && _activeOffersCache.length > 0) return _activeOffersCache;
   try {
     const res = await fetch('/.netlify/functions/airtable-proxy', {
       method: 'POST',
