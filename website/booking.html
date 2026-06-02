@@ -2322,7 +2322,7 @@ async function fetchActiveOffers() {
       body: JSON.stringify({
         method: 'GET',
         table: 'Offers',
-        filterFormula: '{Active} = TRUE()'
+        filterFormula: "OR({Active} = TRUE(), {Active} = 1)"
       })
     });
     const data = await res.json();
