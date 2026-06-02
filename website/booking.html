@@ -2347,10 +2347,7 @@ async function maybeShowOfferPopup(trigger) {
 
   const active = await fetchActiveOffers();
   const record = active.find(r => r.fields['Offer ID'] === offerId);
-  if (!record) {
-    renderOfferPopup(offerId);
-    return;
-  }
+  if (!record) return;
 
   const triggerType = record.fields['Trigger Type'] || 'on-select';
 
