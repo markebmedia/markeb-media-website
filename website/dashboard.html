@@ -3277,10 +3277,10 @@ Any media produced remains the property of Markeb Media until full payment has b
                 Open Google Reviews
                 <i data-lucide="external-link" style="width:13px;height:13px;color:#94a3b8;"></i>
               </a>
-              <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding:12px 14px;background:#f8fafc;border-radius:8px;cursor:pointer;" onclick="rrmToggleCheck()">
+              <label for="rrm-check" style="display:flex;align-items:center;gap:10px;margin-top:12px;padding:12px 14px;background:#f8fafc;border-radius:8px;cursor:pointer;">
                 <input type="checkbox" id="rrm-check" onchange="rrmHandleCheck()" style="width:16px;height:16px;accent-color:#1D9E75;cursor:pointer;flex-shrink:0;">
-                <label for="rrm-check" style="font-size:13px;color:#64748b;cursor:pointer;line-height:1.4;">I've posted my Google review</label>
-              </div>
+                <span style="font-size:13px;color:#64748b;line-height:1.4;">I've posted my Google review</span>
+              </label>
             </div>
           </div>
           <!-- Step 2 -->
@@ -4859,12 +4859,6 @@ async function loadRecentBookings() {
       document.getElementById(s).style.display = 'none';
     });
     document.getElementById(id).style.display = 'block';
-  }
-
-  function rrmToggleCheck() {
-    const cb = document.getElementById('rrm-check');
-    cb.checked = !cb.checked;
-    rrmHandleCheck();
   }
 
   function rrmHandleCheck() {
