@@ -2035,6 +2035,7 @@ function handleAddressSelection() {
 
       if (stepNumber === 2) {
         renderServices();
+        checkOnLoadOffers();
       }
 
       if (stepNumber === 3) {
@@ -2298,7 +2299,124 @@ function handleAccessTypeChange() {
       showDiscountSection();
 
       document.getElementById('continueToCalendarBtn').disabled = false;
+
+      // Show offer popup if active (checks Airtable toggle)
+      const existingPromo = document.getElementById('goldBrandingPromo');
+      if (existingPromo) existingPromo.remove();
+
+      if (serviceId === 'gold-package') {
+        maybeShowOfferPopup('service:gold-package');
+      }
     }
+
+// ===== OFFER POPUP SYSTEM =====
+
+let _activeOffersCache = null;
+
+async function fetchActiveOffers() {
+  if (_activeOffersCache !== null) return _activeOffersCache;
+  try {
+    const res = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'GET',
+        table: 'Offers',
+        filterFormula: '{Active} = TRUE()'
+      })
+    });
+    const data = await res.json();
+    _activeOffersCache = data.records || [];
+    return _activeOffersCache;
+  } catch (e) {
+    console.warn('Could not fetch active offers — showing popup by default:', e);
+    _activeOffersCache = [{ fields: { 'Offer ID': 'gold-branding-popup', 'Trigger Type': 'on-select' } }];
+    return _activeOffersCache;
+  }
+}
+
+async function maybeShowOfferPopup(trigger) {
+  const offerId = trigger === 'service:gold-package' ? 'gold-branding-popup' : null;
+  if (!offerId) return;
+
+  const active = await fetchActiveOffers();
+  const record = active.find(r => r.fields['Offer ID'] === offerId);
+  if (!record) return;
+
+  const triggerType = record.fields['Trigger Type'] || 'on-select';
+
+  if (triggerType === 'on-load' && trigger !== 'step2-load') return;
+  if (triggerType === 'on-select' && trigger === 'step2-load') return;
+
+  renderOfferPopup(offerId);
+}
+
+async function checkOnLoadOffers() {
+  await maybeShowOfferPopup('step2-load');
+}
+
+function renderOfferPopup(offerId) {
+  if (offerId !== 'gold-branding-popup') return;
+
+  const el = document.createElement('div');
+  el.id = 'goldBrandingPromo';
+  el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#3F4D1B 0%,#2e3812 100%);border-radius:20px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;color:#fff;position:relative;box-shadow:0 24px 60px rgba(0,0,0,0.4);">
+      <button onclick="document.getElementById('goldBrandingPromo').remove()" style="position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;cursor:pointer;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;z-index:2;">✕</button>
+      <div style="padding:32px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:rgba(255,255,255,0.05);border-radius:50%;pointer-events:none;"></div>
+        <div style="position:relative;z-index:1;">
+          <div style="display:inline-flex;align-items:center;gap:8px;background:#B46100;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:0.5px;margin-bottom:16px;text-transform:uppercase;">
+            🎁 Gold Package Exclusive
+          </div>
+          <h3 style="font-size:22px;font-weight:700;margin-bottom:10px;font-family:'Mukta',sans-serif;line-height:1.3;">
+            You unlocked 40% off a Personal Branding Session
+          </h3>
+          <p style="font-size:14px;opacity:0.9;line-height:1.6;margin-bottom:24px;">
+            As a Gold Package client, you're entitled to 40% off any Personal Branding Session — put your face to the property and build your brand as the local expert. This is our biggest branding discount — exclusively for Gold Package clients.
+          </p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;">
+            <div style="background:rgba(255,255,255,0.1);border-radius:12px;padding:16px;">
+              <div style="font-size:11px;font-weight:700;opacity:0.7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">📸 What's in Gold</div>
+              <ul style="list-style:none;padding:0;margin:0;font-size:13px;line-height:2;opacity:0.95;">
+                <li>✓ Up to 30 photos</li>
+                <li>✓ Full 4K videography</li>
+                <li>✓ Drone photo & video</li>
+                <li>✓ Property Speed Tour</li>
+                <li>✓ Local Area Highlights</li>
+                <li>✓ Plus Floor Plan</li>
+                <li>✓ Elevate Your Edit</li>
+              </ul>
+            </div>
+            <div style="background:rgba(255,255,255,0.1);border-radius:12px;padding:16px;">
+              <div style="font-size:11px;font-weight:700;opacity:0.7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">🎬 Branding Sessions</div>
+              <ul style="list-style:none;padding:0;margin:0;font-size:13px;line-height:2;opacity:0.95;">
+                <li>📷 Photography<br><s style="opacity:0.5;font-size:12px;">£345</s> → <strong>£207</strong></li>
+                <li>🎥 Videography<br><s style="opacity:0.5;font-size:12px;">£445</s> → <strong>£267</strong></li>
+                <li>⭐ Complete Bundle<br><s style="opacity:0.5;font-size:12px;">£745</s> → <strong>£447</strong></li>
+              </ul>
+            </div>
+          </div>
+          <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:14px 16px;margin-bottom:20px;text-align:center;">
+            <div style="font-size:12px;opacity:0.75;margin-bottom:4px;">Your exclusive discount code</div>
+            <div style="font-size:20px;font-weight:700;letter-spacing:3px;">GOLD40BRAND</div>
+          </div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <a href="./booking.html" target="_blank" style="flex:1;min-width:140px;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#3F4D1B;padding:14px 20px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;">
+              Book Branding Session →
+            </a>
+            <button onclick="document.getElementById('goldBrandingPromo').remove()" style="flex:1;min-width:140px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:#fff;padding:14px 20px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;">
+              Continue Booking
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(el);
+  el.addEventListener('click', e => { if (e.target === el) el.remove(); });
+}
 
     // Render Add-Ons
     function renderAddons() {

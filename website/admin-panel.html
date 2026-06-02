@@ -1570,6 +1570,10 @@ body {
 
   <div class="nav-section">
     <div class="nav-section-title">Marketing</div>
+    <div class="nav-item" onclick="showSection('offers')">
+      <i data-lucide="zap" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      Offers
+    </div>
     <div class="nav-item" onclick="showSection('discount-codes')">
       <i data-lucide="gift" class="nav-icon" style="width: 20px; height: 20px;"></i>
       Discount Codes
@@ -1882,6 +1886,21 @@ body {
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Offers Section -->
+<div class="admin-section" id="offers">
+  <div style="margin-bottom: 24px;">
+    <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Offers & Campaigns</h2>
+    <p style="color: #64748b; font-size: 14px;">Toggle offers on or off — changes take effect immediately on the booking page.</p>
+  </div>
+
+  <div id="offersGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px;">
+    <div style="text-align: center; padding: 40px; color: #94a3b8;">
+      <div class="spinner"></div>
+      <p style="margin-top: 12px;">Loading offers...</p>
+    </div>
   </div>
 </div>
 
@@ -7550,6 +7569,336 @@ async function deleteBlockedTime(recordId, date) {
 document.addEventListener('DOMContentLoaded', function() {
   lucide.createIcons();
 });
+
+// ===== OFFERS & CAMPAIGNS =====
+
+const OFFER_TEMPLATES = [
+  {
+    id: 'exclusive-unlock',
+    name: 'Exclusive Unlock',
+    preview: 'linear-gradient(135deg, #3F4D1B 0%, #2e3812 100%)'
+  },
+  {
+    id: 'flash-sale',
+    name: 'Flash Sale',
+    preview: 'linear-gradient(135deg, #B46100 0%, #8a4a00 100%)'
+  },
+  {
+    id: 'seasonal',
+    name: 'Seasonal',
+    preview: 'linear-gradient(135deg, #0c1e4a 0%, #1e3a8a 100%)'
+  },
+  {
+    id: 'soft-promo',
+    name: 'Soft Promo',
+    preview: 'linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%)'
+  }
+];
+
+const OFFERS_CATALOG = [
+  {
+    id: 'gold-branding-popup',
+    name: 'Gold Package — 40% Off Branding',
+    description: 'Shows a popup when a client selects the Gold Package on the booking page, offering 40% off any Personal Branding Session.',
+    code: 'GOLD40BRAND',
+    discount: '40% off branding sessions',
+    triggeredBy: 'Gold Package selection',
+    trigger: 'service:gold-package',
+    triggerOptions: [
+      { value: 'on-select', label: 'When Gold Package is selected' },
+      { value: 'on-load', label: 'As soon as Step 2 loads (before any click)' }
+    ],
+    icon: 'star',
+    color: '#B46100',
+    bg: '#fff3e0',
+    template: 'exclusive-unlock'
+  },
+  {
+    id: 'first-shoot-free-second',
+    name: '1 for 1 — Free Second Shoot',
+    description: 'Book your first shoot, get your second property photography completely free. Sent via Email Broadcast to new customers.',
+    code: 'Managed via Email Broadcast',
+    discount: '100% off second property photography shoot',
+    triggeredBy: 'Email Broadcast template',
+    trigger: 'email-broadcast',
+    icon: 'gift',
+    color: '#10b981',
+    bg: '#d1fae5',
+    template: 'soft-promo'
+  },
+  {
+    id: 'review-reward-spin',
+    name: 'Google Review Reward Spin',
+    description: 'Eligible customers see a spin-to-win popup after leaving a Google review. Prizes: free floor plan, free speed tour, or 10% off.',
+    code: 'Auto-generated per prize',
+    discount: 'Floor plan / Speed tour / 10% off',
+    triggeredBy: 'Google review completion',
+    trigger: 'review-complete',
+    icon: 'star',
+    color: '#8b5cf6',
+    bg: '#ede9fe',
+    template: 'soft-promo'
+  }
+];
+
+async function loadOffers() {
+  const grid = document.getElementById('offersGrid');
+
+  try {
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ method: 'GET', table: 'Offers' })
+    });
+
+    let offerStates = {};
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.records) {
+        data.records.forEach(r => {
+          offerStates[r.fields['Offer ID']] = {
+            recordId: r.id,
+            active: r.fields['Active'] === true,
+            triggerType: r.fields['Trigger Type'] || 'on-select',
+            lastToggled: r.fields['Last Toggled'] || null
+          };
+        });
+      }
+    }
+
+    grid.innerHTML = OFFERS_CATALOG.map(offer => {
+      const state = offerStates[offer.id] || { active: false, recordId: null, triggerType: 'on-select' };
+      const isActive = state.active;
+      const currentTrigger = state.triggerType || 'on-select';
+      const tmpl = OFFER_TEMPLATES.find(t => t.id === offer.template);
+
+      const triggerRadiosHTML = offer.triggerOptions ? `
+        <div style="margin-top: 14px;">
+          <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">When to show</div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            ${offer.triggerOptions.map(opt => `
+              <label style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: ${currentTrigger === opt.value ? '#fff3e0' : '#f8fafc'}; border: 2px solid ${currentTrigger === opt.value ? '#B46100' : '#e2e8f0'}; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;">
+                <input
+                  type="radio"
+                  name="trigger-${offer.id}"
+                  value="${opt.value}"
+                  ${currentTrigger === opt.value ? 'checked' : ''}
+                  onchange="saveTriggerType('${offer.id}', '${state.recordId || ''}', '${opt.value}')"
+                  style="width: 16px; height: 16px; accent-color: #B46100; flex-shrink: 0;"
+                >
+                <span style="font-size: 13px; font-weight: 600; color: #0f172a;">${opt.label}</span>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      ` : '';
+
+      return `
+        <div id="offer-card-${offer.id}" style="background: #fff; border: 2px solid ${isActive ? offer.color : '#e2e8f0'}; border-radius: 16px; overflow: hidden; transition: all 0.3s ease; box-shadow: ${isActive ? `0 4px 20px ${offer.color}30` : 'none'};">
+
+          <div style="background: ${isActive ? offer.color : '#f8fafc'}; padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 40px; height: 40px; background: ${isActive ? 'rgba(255,255,255,0.2)' : offer.bg}; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="${offer.icon}" style="width: 20px; height: 20px; color: ${isActive ? '#fff' : offer.color};"></i>
+              </div>
+              <div>
+                <div style="font-weight: 700; font-size: 15px; color: ${isActive ? '#fff' : '#0f172a'};">${offer.name}</div>
+                <div style="font-size: 12px; color: ${isActive ? 'rgba(255,255,255,0.75)' : '#94a3b8'}; margin-top: 2px;">
+                  ${isActive ? '🟢 Live now' : '⚫ Off'}
+                </div>
+              </div>
+            </div>
+            <label class="toggle-switch" style="flex-shrink: 0;">
+              <input
+                type="checkbox"
+                ${isActive ? 'checked' : ''}
+                onchange="toggleOffer('${offer.id}', '${state.recordId || ''}', this.checked)"
+              >
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div style="padding: 20px 24px;">
+            <p style="font-size: 14px; color: #475569; line-height: 1.6; margin: 0 0 16px;">${offer.description}</p>
+
+            <div style="display: grid; gap: 10px;">
+              <div style="display: flex; gap: 10px; align-items: center; padding: 10px 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <i data-lucide="tag" style="width: 14px; height: 14px; color: #64748b; flex-shrink: 0;"></i>
+                <div>
+                  <div style="font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Code</div>
+                  <div style="font-size: 13px; font-weight: 700; color: #0f172a; font-family: monospace;">${offer.code}</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: center; padding: 10px 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <i data-lucide="percent" style="width: 14px; height: 14px; color: #64748b; flex-shrink: 0;"></i>
+                <div>
+                  <div style="font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Discount</div>
+                  <div style="font-size: 13px; font-weight: 600; color: #0f172a;">${offer.discount}</div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px; align-items: center; padding: 10px 14px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <i data-lucide="zap" style="width: 14px; height: 14px; color: #64748b; flex-shrink: 0;"></i>
+                <div>
+                  <div style="font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Triggered by</div>
+                  <div style="font-size: 13px; font-weight: 600; color: #0f172a;">${offer.triggeredBy}</div>
+                </div>
+              </div>
+            </div>
+
+            ${tmpl ? `
+              <div style="margin-top: 12px; display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <div style="width: 28px; height: 14px; border-radius: 4px; background: ${tmpl.preview}; flex-shrink: 0;"></div>
+                <div style="font-size: 12px; font-weight: 600; color: #475569;">Template: ${tmpl.name}</div>
+              </div>
+            ` : ''}
+
+            ${triggerRadiosHTML}
+
+            ${state.lastToggled ? `
+              <div style="margin-top: 10px; font-size: 11px; color: #94a3b8; text-align: right;">
+                Last changed: ${new Date(state.lastToggled).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    lucide.createIcons();
+
+  } catch (error) {
+    console.error('Error loading offers:', error);
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444;">Unable to load offers. Check Airtable connection.</div>`;
+  }
+}
+
+async function saveTriggerType(offerId, recordId, triggerType) {
+  // Update radio styling immediately
+  document.querySelectorAll(`input[name="trigger-${offerId}"]`).forEach(radio => {
+    const label = radio.closest('label');
+    if (radio.value === triggerType) {
+      label.style.background = '#fff3e0';
+      label.style.borderColor = '#B46100';
+    } else {
+      label.style.background = '#f8fafc';
+      label.style.borderColor = '#e2e8f0';
+    }
+  });
+
+  try {
+    if (recordId) {
+      const res = await fetch('/.netlify/functions/airtable-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          method: 'PATCH',
+          table: 'Offers',
+          recordId,
+          body: { fields: { 'Trigger Type': triggerType } }
+        })
+      });
+      const data = await res.json();
+      if (!data.id) throw new Error('Airtable did not confirm save');
+    } else {
+      // No record yet — create one with defaults
+      const offer = OFFERS_CATALOG.find(o => o.id === offerId);
+      const res = await fetch('/.netlify/functions/airtable-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          method: 'POST',
+          table: 'Offers',
+          body: {
+            fields: {
+              'Offer ID': offerId,
+              'Name': offer?.name || offerId,
+              'Active': false,
+              'Trigger Type': triggerType,
+              'Last Toggled': new Date().toISOString().split('T')[0]
+            }
+          }
+        })
+      });
+      const data = await res.json();
+      if (!data.id) throw new Error('Failed to create Offers record');
+      setTimeout(() => loadOffers(), 500);
+    }
+  } catch (error) {
+    console.error('Error saving trigger type:', error);
+    loadOffers(); // Revert to actual saved state
+    alert('❌ Failed to save trigger setting — please try again');
+  }
+}
+
+async function toggleOffer(offerId, recordId, enabled) {
+  const card = document.getElementById(`offer-card-${offerId}`);
+  const offer = OFFERS_CATALOG.find(o => o.id === offerId);
+  if (!card || !offer) return;
+
+  // Update card styling immediately
+  card.style.borderColor = enabled ? offer.color : '#e2e8f0';
+  card.style.boxShadow = enabled ? `0 4px 20px ${offer.color}30` : 'none';
+
+  try {
+    const fields = {
+      'Offer ID': offerId,
+      'Active': enabled,
+      'Last Toggled': new Date().toISOString().split('T')[0]
+    };
+
+    if (recordId) {
+      await fetch('/.netlify/functions/airtable-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          method: 'PATCH',
+          table: 'Offers',
+          recordId,
+          body: { fields }
+        })
+      });
+    } else {
+      // Create new record with default trigger type
+      const res = await fetch('/.netlify/functions/airtable-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          method: 'POST',
+          table: 'Offers',
+          body: {
+            fields: {
+              ...fields,
+              'Name': offer.name,
+              'Trigger Type': 'on-select'
+            }
+          }
+        })
+      });
+      const data = await res.json();
+      if (data.id) {
+        const toggle = card.querySelector('input[type="checkbox"]');
+        if (toggle) toggle.setAttribute('onchange', `toggleOffer('${offerId}', '${data.id}', this.checked)`);
+      }
+    }
+
+    // Reload after a short delay to refresh header colour, status text and lastToggled
+    setTimeout(() => loadOffers(), 500);
+
+  } catch (error) {
+    console.error('Error toggling offer:', error);
+    alert('❌ Failed to update offer status');
+    const toggle = card.querySelector('input[type="checkbox"]');
+    if (toggle) toggle.checked = !enabled;
+  }
+}
+
+// Hook into showSection
+const _origShowOffers = showSection;
+showSection = function(sectionId) {
+  _origShowOffers(sectionId);
+  if (sectionId === 'offers') loadOffers();
+};
 
 // ===== EDIT PRICE FUNCTIONS =====
 
