@@ -4948,7 +4948,6 @@ async function loadRecentBookings() {
   function rrmShowPrize(prize) {
     document.getElementById('rrm-title').textContent = 'You won!';
     document.getElementById('rrm-sub').textContent = 'Your reward is confirmed — see details below.';
-    console.log('rrmShowPrize called, launching fireworks');
 
     const inner = prize.isCode
       ? `<div style="background:#f8fafc;border:1px dashed #e2e8f0;border-radius:8px;padding:14px 20px;margin-bottom:8px;">
