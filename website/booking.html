@@ -2353,6 +2353,7 @@ async function maybeShowOfferPopup(trigger) {
 }
 
 async function checkOnLoadOffers() {
+  await new Promise(resolve => setTimeout(resolve, 500));
   await maybeShowOfferPopup('step2-load');
 }
 
