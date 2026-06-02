@@ -2336,44 +2336,23 @@ async function fetchActiveOffers() {
   }
 }
 
-async function maybeShowOfferPopup(trigger) {
-  const offerId = trigger === 'service:gold-package' ? 'gold-branding-popup' : null;
-  if (!offerId) return;
-
-  const active = await fetchActiveOffers();
-  const record = active.find(r => r.fields['Offer ID'] === offerId);
-  if (!record) return;
-
-  const triggerType = record.fields['Trigger Type'] || 'on-select';
-
-  if (triggerType === 'on-load' && trigger !== 'step2-load') return;
-  if (triggerType === 'on-select' && trigger === 'step2-load') return;
-
-  renderOfferPopup(offerId);
-}
-
 async function checkOnLoadOffers() {
   await new Promise(resolve => setTimeout(resolve, 500));
-  console.log('checkOnLoadOffers firing...');
   await maybeShowOfferPopup('step2-load');
 }
 
 async function maybeShowOfferPopup(trigger) {
-  console.log('maybeShowOfferPopup called with trigger:', trigger);
-  const offerId = trigger === 'service:gold-package' ? 'gold-branding-popup' : null;
+  const offerId = trigger === 'service:gold-package' || trigger === 'step2-load' ? 'gold-branding-popup' : null;
   if (!offerId) return;
 
   const active = await fetchActiveOffers();
-  console.log('fetchActiveOffers result:', active);
   const record = active.find(r => r.fields['Offer ID'] === offerId);
-  console.log('matching record:', record);
   if (!record) {
     renderOfferPopup(offerId);
     return;
   }
 
   const triggerType = record.fields['Trigger Type'] || 'on-select';
-  console.log('triggerType:', triggerType, '| trigger:', trigger);
 
   if (triggerType === 'on-load' && trigger !== 'step2-load') return;
   if (triggerType === 'on-select' && trigger === 'step2-load') return;
