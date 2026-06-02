@@ -2862,6 +2862,7 @@ We wanted to reach out..." required></textarea>
             <option value="property-drone-photo">Property Drone Photography</option>
             <option value="property-drone-video">Property Drone Videography</option>
             <option value="add-branded-outro">Add Branded Outro</option>
+            <option value="local-area-highlights">Local Area Highlights</option>
           </select>
           <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
             If set, this code will discount that specific add-on rather than the base service price
@@ -3246,7 +3247,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 500.00,
       duration: 150,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['add-branded-outro']
     },
     {
       id: 'silver-package',
@@ -3254,7 +3255,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 219.00,
       duration: 90,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'bronze-package',
@@ -3262,7 +3263,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 169.00,
       duration: 90,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights']
     },
     {
       id: 'all-in-one-drone',
@@ -3270,7 +3271,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 179.00,
       duration: 45,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'property-video',
@@ -3278,7 +3279,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 129.00,
       duration: 60,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'property-photo',
@@ -3286,7 +3287,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 99.00,
       duration: 45,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights']
     },
     {
       id: 'drone-video',
@@ -3294,7 +3295,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 109.00,
       duration: 20,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'drone-photo',
@@ -3302,7 +3303,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 109.00,
       duration: 20,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours', 'local-area-highlights']
     }
   ],
   south: [
@@ -3336,7 +3337,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 500.00,
       duration: 150,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['add-branded-outro']
     },
     {
       id: 'silver-package',
@@ -3344,7 +3345,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 219.00,
       duration: 90,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'bronze-package',
@@ -3352,7 +3353,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 169.00,
       duration: 90,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights']
     },
     {
       id: 'all-in-one-drone',
@@ -3360,7 +3361,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 179.00,
       duration: 45,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'property-video',
@@ -3368,7 +3369,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 129.00,
       duration: 60,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'property-photo',
@@ -3376,7 +3377,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 99.00,
       duration: 45,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights']
     },
     {
       id: 'drone-video',
@@ -3384,7 +3385,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 109.00,
       duration: 20,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'drone-photo',
@@ -3392,7 +3393,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 109.00,
       duration: 20,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours', 'local-area-highlights']
     }
   ]
 };
@@ -3452,6 +3453,12 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
         price: 0.00,
         description: 'Add your branded outro to any video content'
       },
+    'local-area-highlights': {
+        id: 'local-area-highlights',
+        name: 'Local Area Highlights',
+        price: 100.00,
+        description: 'Showcase the lifestyle around the property — nearby cafes, parks, green spaces, transport links and local amenities captured on shoot day'
+      }
     };
 
     // Global state

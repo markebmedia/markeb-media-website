@@ -1511,7 +1511,15 @@ width: 100%;
   duration: 0,
   description: 'Immersive 3D floor plan giving buyers a realistic sense of space and layout — includes a 2D & 3D floor plan at no extra cost.',
   appliesToVideo: false
-}
+},
+  'local-area-highlights': {
+    id: 'local-area-highlights',
+    name: 'Local Area Highlights',
+    price: 100.00,
+    duration: 30,
+    description: 'Showcase the lifestyle around the property — nearby cafes, parks, green spaces, transport links and local amenities captured on shoot day',
+    appliesToVideo: true
+  }
 };
     // Service Catalog with Add-Ons
    const SERVICES = {
@@ -1548,9 +1556,9 @@ width: 100%;
       name: 'Gold Package',
       price: 500.00,
       duration: 150,
-      description: 'Everything in our Silver Package, plus enhanced lifestyle content with classic editing included.',
+      description: 'Everything in our Silver Package with Elevate Your Edit included — plus Local Area Highlights and a Plus Floor Plan for high-end listings.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['add-branded-outro']
     },
     {
       id: 'silver-package',
@@ -1560,7 +1568,7 @@ width: 100%;
       description: 'Everything in our Bronze Package, plus full videography and drone shots with classic editing included for complete property marketing.',
       popular: true,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'bronze-package',
@@ -1569,7 +1577,7 @@ width: 100%;
       duration: 90,
       description: 'Up to 30 interior and exterior photos, plus drone shots included. Professional photography.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights']
     },
     {
       id: 'all-in-one-drone',
@@ -1578,7 +1586,7 @@ width: 100%;
       duration: 45,
       description: '10 aerial photos and a 30-second drone video with classic editing included for your property marketing.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'property-video',
@@ -1587,7 +1595,7 @@ width: 100%;
       duration: 60,
       description: 'Shot in 4K with classic editing included (color grading & smooth transitions) to captivate viewers and drive enquiries.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'property-photo',
@@ -1596,7 +1604,7 @@ width: 100%;
       duration: 45,
       description: 'Up to 30 magazine-quality images that make your property irresistible to potential buyers.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights']
     },
     {
       id: 'drone-video',
@@ -1605,7 +1613,7 @@ width: 100%;
       duration: 20,
       description: 'Up to 30-second cinematic aerial showcase with classic editing included.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'drone-photo',
@@ -1614,7 +1622,7 @@ width: 100%;
       duration: 20,
       description: 'Up to 10 stunning aerial photographs.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours', 'local-area-highlights']
     }
   ],
   south: [
@@ -1623,9 +1631,9 @@ width: 100%;
       name: 'Gold Package',
       price: 500.00,
       duration: 150,
-      description: 'Everything in our Silver Package, plus enhanced lifestyle content with classic editing included.',
+      description: 'Everything in our Silver Package with Elevate Your Edit included — plus Local Area Highlights and a Plus Floor Plan for high-end listings.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['add-branded-outro']
     },
     {
       id: 'silver-package',
@@ -1635,7 +1643,7 @@ width: 100%;
       description: 'Everything in our Bronze Package, plus full videography and drone shots with classic editing included for complete property marketing.',
       popular: true,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'bronze-package',
@@ -1644,7 +1652,7 @@ width: 100%;
       duration: 90,
       description: 'Up to 30 interior and exterior photos, plus drone shots included. Professional photography.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights']
     },
     {
       id: 'all-in-one-drone',
@@ -1653,7 +1661,7 @@ width: 100%;
       duration: 45,
       description: '10 aerial photos and a 30-second drone video with classic editing included for your property marketing.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'property-video',
@@ -1662,7 +1670,7 @@ width: 100%;
       duration: 60,
       description: 'Shot in 4K with classic editing included (color grading & smooth transitions) to captivate viewers and drive enquiries.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'property-photo',
@@ -1671,7 +1679,7 @@ width: 100%;
       duration: 45,
       description: 'Up to 30 magazine-quality images that make your property irresistible to potential buyers.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights']
     },
     {
       id: 'drone-video',
@@ -1680,7 +1688,7 @@ width: 100%;
       duration: 20,
       description: 'Up to 30-second cinematic aerial showcase with classic editing included.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
     },
     {
       id: 'drone-photo',
@@ -1689,7 +1697,7 @@ width: 100%;
       duration: 20,
       description: 'Up to 10 stunning aerial photographs.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours', 'local-area-highlights']
     }
   ]
 };
