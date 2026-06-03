@@ -714,6 +714,20 @@
         <div class="notes-box">${booking.clientNotes}</div>
       </div>` : '';
 
+    const localPlaces = booking.localPlaces && booking.localPlaces.length > 0 ? booking.localPlaces : null;
+    const localPlacesHtml = localPlaces ? `
+      <div class="detail-item full">
+        <div class="detail-label"><i data-lucide="map-pin"></i> Local Area Highlights</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+          ${localPlaces.map((place, i) => `
+            <div style="display:flex;align-items:center;gap:10px;background:#BFC6B1;border-radius:8px;padding:8px 12px;">
+              <div style="width:22px;height:22px;background:#3F4D1B;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${i + 1}</div>
+              <span style="font-size:13px;font-weight:600;color:#1e293b;">${place}</span>
+            </div>`).join('')}
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:#64748b;">All locations must be within a 5 minute drive of the property.</div>
+      </div>` : '';
+
     const duration = booking.duration
       ? Math.floor(booking.duration / 60) + 'h' + (booking.duration % 60 ? ' ' + (booking.duration % 60) + 'm' : '')
       : '—';
@@ -772,6 +786,7 @@
             </div>
             ${addonsHtml}
             ${notesHtml}
+            ${localPlacesHtml}
           </div>
         </div>
       </div>`;
@@ -915,6 +930,20 @@
         <div class="notes-box">${booking.clientNotes}</div>
       </div>` : '';
 
+    const localPlaces = booking.localPlaces && booking.localPlaces.length > 0 ? booking.localPlaces : null;
+    const localPlacesHtml = localPlaces ? `
+      <div class="detail-item full" style="margin-top:4px;">
+        <div class="detail-label"><i data-lucide="map-pin"></i> Local Area Highlights</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+          ${localPlaces.map((place, i) => `
+            <div style="display:flex;align-items:center;gap:10px;background:#BFC6B1;border-radius:8px;padding:8px 12px;">
+              <div style="width:22px;height:22px;background:#3F4D1B;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${i + 1}</div>
+              <span style="font-size:13px;font-weight:600;color:#1e293b;">${place}</span>
+            </div>`).join('')}
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:#64748b;">All locations must be within a 5 minute drive of the property.</div>
+      </div>` : '';
+
     document.getElementById('calDetailBody').innerHTML = `
       ${accessHtml}
       <div style="margin-bottom:16px;">${badgeMap[status]}</div>
@@ -954,6 +983,7 @@
         </div>
         ${addonsHtml}
         ${notesHtml}
+        ${localPlacesHtml}
       </div>
     `;
 

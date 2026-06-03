@@ -298,6 +298,11 @@ exports.handler = async (event, context) => {
         'Access Type': bookingData.accessType || undefined,
         'Key Pickup Location': bookingData.keyPickupLocation || undefined,
         
+        // Local Area Highlights places
+        'Local Area Places': bookingData.localPlaces && bookingData.localPlaces.length > 0
+          ? bookingData.localPlaces.join('\n')
+          : undefined,
+        
         // Square footage
         'Square Footage': bookingData.squareFootage || undefined,
         'Square Footage Fee': bookingData.squareFootageFee || 0,
@@ -411,7 +416,8 @@ exports.handler = async (event, context) => {
   region: bookingData.region,
   accessType: bookingData.accessType || '',
   keyPickupLocation: bookingData.keyPickupLocation || '',
-  addons: bookingData.addons || []  // ✅ ADD THIS LINE
+  localPlaces: bookingData.localPlaces || [],
+  addons: bookingData.addons || []
 };
 
         await sendBookingConfirmation(emailData);

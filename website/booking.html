@@ -1000,6 +1000,52 @@ width: 100%;
   </div>
 </div>
 
+        <!-- Local Area Highlights Section (Gold Package only) -->
+        <div id="localAreaHighlightsSection" style="display: none; background: #BFC6B1; border-radius: 16px; padding: 28px; margin-bottom: 28px;">
+          <div style="margin-bottom: 20px;">
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: #3F4D1B; color: #fff; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 14px; text-transform: uppercase;">
+              📍 Local Area Highlights
+            </div>
+            <h3 style="font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">
+              Where should we visit?
+            </h3>
+            <p style="font-size: 14px; color: #334155; line-height: 1.7; margin-bottom: 6px;">
+              Your Gold Package includes Local Area Highlights. Tell us up to 5 places you would like your Media Specialist to capture on shoot day. Think cafes, parks, restaurants, transport links or anything that sells the lifestyle of the area.
+            </p>
+            <div style="background: rgba(255,255,255,0.45); border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #334155; line-height: 1.6;">
+              <strong>Please note:</strong> All locations must be within a 5 minute drive of the property. Places outside this range may not be possible on shoot day.
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 12px;" id="localPlacesInputs">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 28px; height: 28px; background: #3F4D1B; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;">1</div>
+              <input type="text" id="localPlace1" class="form-input" placeholder="e.g. The Coffee House, High Street" style="margin: 0;" oninput="updateLocalPlaces()" />
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 28px; height: 28px; background: #3F4D1B; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;">2</div>
+              <input type="text" id="localPlace2" class="form-input" placeholder="e.g. Victoria Park" style="margin: 0;" oninput="updateLocalPlaces()" />
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 28px; height: 28px; background: #3F4D1B; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;">3</div>
+              <input type="text" id="localPlace3" class="form-input" placeholder="e.g. Riverside Walk" style="margin: 0;" oninput="updateLocalPlaces()" />
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 28px; height: 28px; background: #3F4D1B; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;">4</div>
+              <input type="text" id="localPlace4" class="form-input" placeholder="e.g. The Train Station" style="margin: 0;" oninput="updateLocalPlaces()" />
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 28px; height: 28px; background: #3F4D1B; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;">5</div>
+              <input type="text" id="localPlace5" class="form-input" placeholder="e.g. Neighbourhood Deli" style="margin: 0;" oninput="updateLocalPlaces()" />
+            </div>
+          </div>
+
+          <div style="margin-top: 14px; font-size: 13px; color: #64748b;">
+            At least 1 location is required for Local Area Highlights.
+          </div>
+          <div class="error-message" id="localPlacesError">Please add at least 1 location for Local Area Highlights.</div>
+        </div>
+
         <!-- Terms & Conditions -->
         <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 28px;">
           <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 16px;">
@@ -2080,6 +2126,7 @@ if (bookingData.selectedAddons && bookingData.selectedAddons.length > 0) {
       document.getElementById('summaryTotal').textContent = `£${bookingData.totalPrice.toFixed(2)}`;
 
       updateTermsVisibility();
+      updateLocalAreaHighlightsVisibility();
     }
 
     // Update Terms Visibility
@@ -2364,24 +2411,27 @@ function renderOfferPopup(offerId) {
   el.id = 'goldBrandingPromo';
   el.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;';
   el.innerHTML = `
-    <div style="background:linear-gradient(135deg,#3F4D1B 0%,#2e3812 100%);border-radius:20px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;color:#fff;position:relative;box-shadow:0 24px 60px rgba(0,0,0,0.4);">
-      <button onclick="document.getElementById('goldBrandingPromo').remove()" style="position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;cursor:pointer;color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;z-index:2;">✕</button>
+    <div style="background:#BFC6B1;border-radius:20px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;color:#1e293b;position:relative;box-shadow:0 24px 60px rgba(0,0,0,0.3);">
+      <button onclick="document.getElementById('goldBrandingPromo').remove()" style="position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.1);border:none;cursor:pointer;color:#1e293b;font-size:18px;display:flex;align-items:center;justify-content:center;z-index:2;">✕</button>
       <div style="padding:32px;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:rgba(255,255,255,0.05);border-radius:50%;pointer-events:none;"></div>
+        <div style="position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:rgba(255,255,255,0.15);border-radius:50%;pointer-events:none;"></div>
         <div style="position:relative;z-index:1;">
-          <div style="display:inline-flex;align-items:center;gap:8px;background:#B46100;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:0.5px;margin-bottom:16px;text-transform:uppercase;">
-            🎁 Gold Package Exclusive
+          <div style="display:inline-flex;align-items:center;gap:8px;background:#3F4D1B;color:#fff;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:0.5px;margin-bottom:16px;text-transform:uppercase;">
+            🏆 The Industry Is Shifting
           </div>
-          <h3 style="font-size:22px;font-weight:700;margin-bottom:10px;font-family:'Mukta',sans-serif;line-height:1.3;">
-            You unlocked 40% off a Personal Branding Session
+          <h3 style="font-size:22px;font-weight:700;margin-bottom:10px;font-family:'Mukta',sans-serif;line-height:1.3;color:#1e293b;">
+            When you book a Gold Package you unlock 40% off a Personal Branding Session
           </h3>
-          <p style="font-size:14px;opacity:0.9;line-height:1.6;margin-bottom:24px;">
-            As a Gold Package client, you're entitled to 40% off any Personal Branding Session — put your face to the property and build your brand as the local expert. This is our biggest branding discount — exclusively for Gold Package clients.
+          <p style="font-size:14px;color:#334155;line-height:1.7;margin-bottom:16px;">
+            Buyers are no longer just choosing a property. They're choosing the person behind it. Agents who show up on camera, with a face, a voice, a story, are winning more instructions, building deeper client relationships and becoming the name people remember in their area.
+          </p>
+          <p style="font-size:14px;color:#334155;line-height:1.7;margin-bottom:24px;">
+            Your network already knows this. Personal branding isn't a trend. It's now the baseline expectation. The Gold Package gives you the complete property media suite, and as a Gold client, you unlock our biggest branding discount exclusively: <strong>40% off any Personal Branding Session</strong>.
           </p>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;">
-            <div style="background:rgba(255,255,255,0.1);border-radius:12px;padding:16px;">
-              <div style="font-size:11px;font-weight:700;opacity:0.7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">📸 What's in Gold</div>
-              <ul style="list-style:none;padding:0;margin:0;font-size:13px;line-height:2;opacity:0.95;">
+            <div style="background:rgba(255,255,255,0.45);border-radius:12px;padding:16px;">
+              <div style="font-size:11px;font-weight:700;color:#3F4D1B;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">📸 Gold Package Includes</div>
+              <ul style="list-style:none;padding:0;margin:0;font-size:13px;line-height:2;color:#1e293b;">
                 <li>✓ Up to 30 photos</li>
                 <li>✓ Full 4K videography</li>
                 <li>✓ Drone photo & video</li>
@@ -2391,26 +2441,18 @@ function renderOfferPopup(offerId) {
                 <li>✓ Elevate Your Edit</li>
               </ul>
             </div>
-            <div style="background:rgba(255,255,255,0.1);border-radius:12px;padding:16px;">
-              <div style="font-size:11px;font-weight:700;opacity:0.7;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">🎬 Branding Sessions</div>
-              <ul style="list-style:none;padding:0;margin:0;font-size:13px;line-height:2;opacity:0.95;">
+            <div style="background:rgba(255,255,255,0.45);border-radius:12px;padding:16px;">
+              <div style="font-size:11px;font-weight:700;color:#3F4D1B;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">🎬 Your Branding Discount</div>
+              <ul style="list-style:none;padding:0;margin:0;font-size:13px;line-height:2;color:#1e293b;">
                 <li>📷 Photography<br><s style="opacity:0.5;font-size:12px;">£345</s> → <strong>£207</strong></li>
                 <li>🎥 Videography<br><s style="opacity:0.5;font-size:12px;">£445</s> → <strong>£267</strong></li>
                 <li>⭐ Complete Bundle<br><s style="opacity:0.5;font-size:12px;">£745</s> → <strong>£447</strong></li>
               </ul>
             </div>
           </div>
-          <div style="background:rgba(255,255,255,0.12);border-radius:10px;padding:14px 16px;margin-bottom:20px;text-align:center;">
-            <div style="font-size:12px;opacity:0.75;margin-bottom:4px;">Your exclusive discount code</div>
-            <div style="font-size:20px;font-weight:700;letter-spacing:3px;">GOLD40BRAND</div>
-          </div>
-          <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <a href="./booking.html" target="_blank" style="flex:1;min-width:140px;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#3F4D1B;padding:14px 20px;border-radius:10px;font-weight:700;font-size:14px;text-decoration:none;">
-              Book Branding Session →
-            </a>
-            <button onclick="document.getElementById('goldBrandingPromo').remove()" style="flex:1;min-width:140px;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);color:#fff;padding:14px 20px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;">
-              Continue Booking
-            </button>
+          <div style="background:rgba(255,255,255,0.45);border-radius:10px;padding:14px 16px;margin-bottom:20px;text-align:center;">
+            <div style="font-size:12px;color:#64748b;margin-bottom:4px;">Your exclusive discount code, unlocked with Gold</div>
+            <div style="font-size:20px;font-weight:700;letter-spacing:3px;color:#3F4D1B;">GOLD40BRAND</div>
           </div>
         </div>
       </div>
@@ -2975,6 +3017,20 @@ async function completeBooking() {
 
   // ✅ ADD THIS ENTIRE ACCESS TYPE VALIDATION SECTION RIGHT HERE (AFTER PHONE VALIDATION):
   
+  // Validate Local Area Highlights places if section is visible
+  const localSection = document.getElementById('localAreaHighlightsSection');
+  if (localSection && localSection.style.display !== 'none') {
+    updateLocalPlaces();
+    if (!bookingData.localPlaces || bookingData.localPlaces.length === 0) {
+      document.getElementById('localPlacesError').classList.add('show');
+      document.getElementById('localPlace1').classList.add('error');
+      hasError = true;
+    } else {
+      document.getElementById('localPlacesError').classList.remove('show');
+      document.getElementById('localPlace1').classList.remove('error');
+    }
+  }
+
   // Validate Access Type
   const accessType = document.getElementById('accessType').value;
   
@@ -3359,6 +3415,26 @@ let appliedDiscount = null;
 
 // No-op: discount section now lives on step 4 and is always visible
 function showDiscountSection() {}
+
+// Show or hide Local Area Highlights section based on service
+function updateLocalAreaHighlightsVisibility() {
+  const section = document.getElementById('localAreaHighlightsSection');
+  if (!section) return;
+  const service = bookingData.service;
+  const isGold = service && service.id === 'gold-package';
+  const hasLocalAreaAddon = bookingData.selectedAddons && bookingData.selectedAddons.includes('local-area-highlights');
+  section.style.display = (isGold || hasLocalAreaAddon) ? 'block' : 'none';
+}
+
+// Collect local places and store on bookingData
+function updateLocalPlaces() {
+  const places = [];
+  for (let i = 1; i <= 5; i++) {
+    const val = (document.getElementById(`localPlace${i}`)?.value || '').trim();
+    if (val) places.push(val);
+  }
+  bookingData.localPlaces = places;
+}
 
 // Apply Discount Code
 async function applyDiscountCode() {

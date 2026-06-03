@@ -1876,6 +1876,46 @@ body {
         </select>
       </div>
 
+      <!-- Local Area Highlights (Gold Package or local-area-highlights addon) -->
+      <div id="adminLocalAreaSection" style="display: none; background: #BFC6B1; border-radius: 16px; padding: 28px; margin-bottom: 24px;">
+        <div style="margin-bottom: 20px;">
+          <div style="display: inline-flex; align-items: center; gap: 8px; background: #3F4D1B; color: #fff; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 14px; text-transform: uppercase;">
+            📍 Local Area Highlights
+          </div>
+          <h3 style="font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">
+            Where should we visit?
+          </h3>
+          <p style="font-size: 14px; color: #334155; line-height: 1.7; margin-bottom: 6px;">
+            This service includes Local Area Highlights. Add up to 5 places for the Media Specialist to capture on shoot day.
+          </p>
+          <div style="background: rgba(255,255,255,0.45); border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #334155; line-height: 1.6;">
+            <strong>Please note:</strong> All locations must be within a 5 minute drive of the property.
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 28px; height: 28px; background: #3F4D1B; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;">1</div>
+            <input type="text" id="adminLocalPlace1" class="form-input" placeholder="e.g. The Coffee House, High Street" style="margin: 0;" />
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 28px; height: 28px; background: #3F4D1B; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;">2</div>
+            <input type="text" id="adminLocalPlace2" class="form-input" placeholder="e.g. Victoria Park" style="margin: 0;" />
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 28px; height: 28px; background: #3F4D1B; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;">3</div>
+            <input type="text" id="adminLocalPlace3" class="form-input" placeholder="e.g. Riverside Walk" style="margin: 0;" />
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 28px; height: 28px; background: #3F4D1B; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;">4</div>
+            <input type="text" id="adminLocalPlace4" class="form-input" placeholder="e.g. The Train Station" style="margin: 0;" />
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 28px; height: 28px; background: #3F4D1B; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0;">5</div>
+            <input type="text" id="adminLocalPlace5" class="form-input" placeholder="e.g. Neighbourhood Deli" style="margin: 0;" />
+          </div>
+        </div>
+      </div>
+
       <!-- Submit Buttons -->
       <div class="button-group" style="margin-top: 24px;">
         <button type="button" class="btn btn-secondary" onclick="resetBookingForm()" style="flex: 1;">
@@ -3865,6 +3905,7 @@ function handleAdminAccessTypeChange() {
       bookingFormData.selectedAddons = [];
       calculateBookingPrice();
       document.getElementById('bookingPriceBreakdown').style.display = 'block';
+      updateAdminLocalAreaVisibility();
     }
 
     function toggleBookingAddon(addonId) {
@@ -3875,6 +3916,7 @@ function handleAdminAccessTypeChange() {
         bookingFormData.selectedAddons.push(addonId);
       }
       calculateBookingPrice();
+      updateAdminLocalAreaVisibility();
     }
 
     function adjustBookingBedrooms(change) {
@@ -4251,6 +4293,7 @@ if (!mediaSpecialist) {
     accessType: document.getElementById('bookingAccessType').value || undefined,
     keyPickupLocation: document.getElementById('adminKeyPickupLocation').value || undefined,
     accessInstructions: document.getElementById('bookingAccess').value || '',
+    localPlaces: getAdminLocalPlaces(),
     squareFootage: bookingFormData.squareFootage || '',
     squareFootageFee: bookingFormData.squareFootageFee || 0,
     
@@ -9425,6 +9468,25 @@ showSection = function(sectionId) {
     loadMarketUpdateStats();
   }
 };
+
+function updateAdminLocalAreaVisibility() {
+  const section = document.getElementById('adminLocalAreaSection');
+  if (!section) return;
+  const serviceSelect = document.getElementById('bookingService');
+  const serviceId = serviceSelect?.value || '';
+  const isGold = serviceId === 'gold-package';
+  const hasLocalAddon = bookingFormData.selectedAddons.includes('local-area-highlights');
+  section.style.display = (isGold || hasLocalAddon) ? 'block' : 'none';
+}
+
+function getAdminLocalPlaces() {
+  const places = [];
+  for (let i = 1; i <= 5; i++) {
+    const val = (document.getElementById(`adminLocalPlace${i}`)?.value || '').trim();
+    if (val) places.push(val);
+  }
+  return places;
+}
 
 // Calculate extra duration based on bedrooms and sq ft
 function calculateExtraDuration(serviceId, bedrooms, squareFootage) {

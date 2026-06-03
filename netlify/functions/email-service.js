@@ -68,6 +68,26 @@ function getAccessTypeSection(booking) {
   return accessDetails;
 }
 
+// ✅ Format Local Area Places
+function getLocalAreaPlacesSection(booking) {
+  if (!booking.localPlaces || booking.localPlaces.length === 0) return '';
+
+  const placesList = booking.localPlaces
+    .map((place, i) => `<li style="margin-bottom: 6px;"><strong>${i + 1}.</strong> ${place}</li>`)
+    .join('');
+
+  return `
+    <div class="detail-row">
+      <span class="detail-label">Local Area Places</span>
+      <span class="detail-value">
+        <ul style="margin: 0; padding-left: 16px; text-align: left;">
+          ${placesList}
+        </ul>
+      </span>
+    </div>
+  `;
+}
+
 // ✅ Format Square Footage Information
 function getSquareFootageSection(booking) {
   if (!booking.squareFootage) return '';
@@ -310,6 +330,7 @@ async function sendBookingConfirmation(booking) {
       </div>
       ${getAccessTypeSection(booking)}
       ${getSquareFootageSection(booking)}
+      ${getLocalAreaPlacesSection(booking)}
       <div class="detail-row">
         <span class="detail-label">Subtotal (ex. VAT)</span>
         <span class="detail-value">£${(booking.totalPrice / 1.2).toFixed(2)}</span>
