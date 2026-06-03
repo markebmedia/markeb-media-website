@@ -2404,6 +2404,48 @@ function handleAccessTypeChange() {
       container.innerHTML = servicesHTML;
     }
 
+    const BRANDING_PACKAGE_DETAILS = {
+  'complete-branding': {
+    tagline: 'The complete personal brand suite for estate agents who want to dominate their area.',
+    duration: 'Full day shoot — up to 5 hours',
+    includes: [
+      'Personal brand photography across multiple looks and locations',
+      'Personal brand videography — multiple sequences for social content',
+      'Classic editing included (colour grading and smooth transitions)',
+      'Delivered within 48 hours',
+      'Shoot plan prepared in advance based on your brand brief'
+    ],
+    perfectFor: 'Agents who want photography and video in one day — the complete content library.',
+    addons: ['Elevate Your Edit', 'Branded Outro']
+  },
+  'branding-video': {
+    tagline: 'A focused video session built around your brand story and social presence.',
+    duration: 'Half day shoot — up to 3 hours',
+    includes: [
+      'Multiple video sequences across locations',
+      'Designed for Instagram Reels, LinkedIn video and YouTube shorts',
+      'Classic editing included (colour grading and smooth transitions)',
+      'Delivered within 48 hours',
+      'Shoot plan prepared in advance based on your brand brief'
+    ],
+    perfectFor: 'Agents already active on social who want high quality video content.',
+    addons: ['Elevate Your Edit', 'Branded Outro']
+  },
+  'branding-photo': {
+    tagline: '10 signature shots that tell your brand story across every platform.',
+    duration: '2 hour shoot',
+    includes: [
+      '10 professionally edited signature shots',
+      'Multiple locations and looks within the session',
+      'High resolution files delivered within 48 hours',
+      'Suitable for LinkedIn, Rightmove profile, website and social',
+      'Shoot plan prepared in advance based on your brand brief'
+    ],
+    perfectFor: 'Agents who want a strong photography foundation without the full day commitment.',
+    addons: []
+  }
+};
+
     // Select Service
     function selectService(serviceId) {
       const services = SERVICES[getCatalogKeyForRegion(bookingData.region)] || SERVICES.south;
@@ -2440,6 +2482,9 @@ function handleAccessTypeChange() {
 
       document.getElementById('continueToCalendarBtn').disabled = false;
 
+      // Show branding expandable panel if branding service selected
+      renderBrandingExpandable(serviceId);
+
       // Show offer popup if active (checks Airtable toggle)
       const existingPromo = document.getElementById('goldBrandingPromo');
       if (existingPromo) existingPromo.remove();
@@ -2448,6 +2493,108 @@ function handleAccessTypeChange() {
         maybeShowOfferPopup('service:gold-package');
       }
     }
+
+// ===== BRANDING EXPANDABLE PANEL =====
+
+function renderBrandingExpandable(serviceId) {
+  // Remove any existing panel
+  const existing = document.getElementById('brandingExpandable');
+  if (existing) existing.remove();
+
+  if (!BRANDING_SERVICE_IDS.includes(serviceId)) return;
+
+  const details = BRANDING_PACKAGE_DETAILS[serviceId];
+  if (!details) return;
+
+  const card = document.querySelector(`[data-service-id="${serviceId}"]`);
+  if (!card) return;
+
+  const panel = document.createElement('div');
+  panel.id = 'brandingExpandable';
+  panel.style.cssText = 'overflow: hidden; animation: expandDown 0.3s ease-out;';
+  panel.innerHTML = `
+    <style>
+      @keyframes expandDown {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+    <div style="background: #3F4D1B; border-radius: 14px; padding: 28px; margin-top: 4px; margin-bottom: 4px;">
+
+      <p style="font-size: 15px; color: #BFC6B1; line-height: 1.7; margin-bottom: 24px; font-style: italic;">
+        "${details.tagline}"
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+
+        <div style="background: rgba(255,255,255,0.07); border-radius: 10px; padding: 18px;">
+          <div style="font-size: 11px; font-weight: 700; color: #BFC6B1; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px;">
+            What's included
+          </div>
+          <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+            ${details.includes.map(item => `
+              <li style="display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #fff; line-height: 1.5;">
+                <span style="color: #B46100; flex-shrink: 0; margin-top: 1px;">✓</span>
+                ${item}
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div style="background: rgba(255,255,255,0.07); border-radius: 10px; padding: 16px;">
+            <div style="font-size: 11px; font-weight: 700; color: #BFC6B1; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">
+              Shoot length
+            </div>
+            <div style="font-size: 14px; color: #fff; font-weight: 600;">
+              ${details.duration}
+            </div>
+          </div>
+
+          <div style="background: rgba(255,255,255,0.07); border-radius: 10px; padding: 16px;">
+            <div style="font-size: 11px; font-weight: 700; color: #BFC6B1; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">
+              Perfect for
+            </div>
+            <div style="font-size: 13px; color: #fff; line-height: 1.6;">
+              ${details.perfectFor}
+            </div>
+          </div>
+
+          ${details.addons.length > 0 ? `
+          <div style="background: rgba(180,97,0,0.2); border: 1px solid #B46100; border-radius: 10px; padding: 16px;">
+            <div style="font-size: 11px; font-weight: 700; color: #B46100; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">
+              Available add-ons
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              ${details.addons.map(a => `
+                <div style="font-size: 13px; color: #fff;">+ ${a}</div>
+              `).join('')}
+            </div>
+          </div>
+          ` : `
+          <div style="background: rgba(255,255,255,0.07); border-radius: 10px; padding: 16px;">
+            <div style="font-size: 11px; font-weight: 700; color: #BFC6B1; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;">
+              Add-ons
+            </div>
+            <div style="font-size: 13px; color: #BFC6B1;">None available for this package</div>
+          </div>
+          `}
+        </div>
+
+      </div>
+
+      <div style="background: rgba(255,255,255,0.07); border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 18px;">📋</span>
+        <span style="font-size: 13px; color: #BFC6B1; line-height: 1.6;">
+          A <strong style="color: #fff;">10 question brand brief</strong> will appear on the next step to help us plan your shoot day, locations and script.
+        </span>
+      </div>
+
+    </div>
+  `;
+
+  card.insertAdjacentElement('afterend', panel);
+}
 
 // ===== OFFER POPUP SYSTEM =====
 
