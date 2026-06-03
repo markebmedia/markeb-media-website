@@ -1876,6 +1876,66 @@ body {
         </select>
       </div>
 
+      <!-- Personal Branding Questions Section (admin) -->
+      <div id="adminBrandingSection" style="display: none; background: #f8fafc; border: 2px solid #3F4D1B; border-radius: 16px; padding: 28px; margin-bottom: 24px;">
+        <div style="margin-bottom: 20px;">
+          <div style="display: inline-flex; align-items: center; gap: 8px; background: #3F4D1B; color: #fff; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 14px; text-transform: uppercase;">
+            🎬 Personal Brand
+          </div>
+          <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">Tell us about their brand</h3>
+          <p style="font-size: 14px; color: #64748b; line-height: 1.6;">Complete on behalf of the client or leave for them to fill in via the booking form.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">1. What area do they specialise in?</label>
+            <input type="text" id="adminBrandQ1" class="form-input" placeholder="e.g. South Manchester, LS1 Leeds city centre" />
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">2. Describe their personal brand in 3 words</label>
+            <input type="text" id="adminBrandQ2" class="form-input" placeholder="e.g. Trustworthy, Modern, Approachable" />
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">3. Who is their ideal client?</label>
+            <input type="text" id="adminBrandQ3" class="form-input" placeholder="e.g. First-time buyers, downsizers, landlords" />
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">4. What makes them different from other agents?</label>
+            <textarea id="adminBrandQ4" class="form-input" rows="3" placeholder="Their USP — becomes the core message of the content" style="resize: vertical;"></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">5. Preferred filming or photography style</label>
+            <select id="adminBrandQ5" class="form-input">
+              <option value="">-- Select a style --</option>
+              <option value="Clean and corporate">Clean and corporate</option>
+              <option value="Warm and relaxed">Warm and relaxed</option>
+              <option value="Cinematic and bold">Cinematic and bold</option>
+              <option value="Natural and documentary">Natural and documentary</option>
+              <option value="Not sure — happy to be guided">Not sure — happy to be guided</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">6. Existing brand materials to match?</label>
+            <input type="text" id="adminBrandQ6" class="form-input" placeholder="e.g. Brand colours, logo, existing website or social presence" />
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">7. Where do they want to be seen?</label>
+            <input type="text" id="adminBrandQ7" class="form-input" placeholder="e.g. Instagram, LinkedIn, Rightmove profile, company website" />
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">8. Specific locations to feature?</label>
+            <input type="text" id="adminBrandQ8" class="form-input" placeholder="e.g. The high street, a local cafe, a park, a landmark building" />
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">9. What should viewers feel after watching?</label>
+            <input type="text" id="adminBrandQ9" class="form-input" placeholder="e.g. Confident, reassured, inspired, like they already trust you" />
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">10. Anything not comfortable with on camera?</label>
+            <input type="text" id="adminBrandQ10" class="form-input" placeholder="e.g. Scripts only, no walking and talking, no close-ups" />
+          </div>
+        </div>
+      </div>
+
       <!-- Local Area Highlights (Gold Package or local-area-highlights addon) -->
       <div id="adminLocalAreaSection" style="display: none; background: #BFC6B1; border-radius: 16px; padding: 28px; margin-bottom: 24px;">
         <div style="margin-bottom: 20px;">
@@ -3278,7 +3338,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
   north: [
     {
       id: 'complete-branding',
-      name: 'Complete Branding Package - Photo & Video',
+      name: 'Personal Branding Package — Complete Photo & Video',
       price: 745.00,
       duration: 300,
       isPropertyService: false,
@@ -3286,7 +3346,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
     },
     {
       id: 'branding-video',
-      name: 'Branding Videography Session',
+      name: 'Personal Branding — Videography Session',
       price: 445.00,
       duration: 180,
       isPropertyService: false,
@@ -3294,7 +3354,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
     },
     {
       id: 'branding-photo',
-      name: 'Branding Photography Session - 10 Signature Shots',
+      name: 'Personal Branding — Photography Session (10 Signature Shots)',
       price: 345.00,
       duration: 120,
       isPropertyService: false,
@@ -3368,7 +3428,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
   south: [
     {
       id: 'complete-branding',
-      name: 'Complete Branding Package - Photo & Video',
+      name: 'Personal Branding Package — Complete Photo & Video',
       price: 745.00,
       duration: 300,
       isPropertyService: false,
@@ -3376,7 +3436,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
     },
     {
       id: 'branding-video',
-      name: 'Branding Videography Session',
+      name: 'Personal Branding — Videography Session',
       price: 445.00,
       duration: 180,
       isPropertyService: false,
@@ -3384,7 +3444,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
     },
     {
       id: 'branding-photo',
-      name: 'Branding Photography Session - 10 Signature Shots',
+      name: 'Personal Branding — Photography Session (10 Signature Shots)',
       price: 345.00,
       duration: 120,
       isPropertyService: false,
@@ -3906,6 +3966,7 @@ function handleAdminAccessTypeChange() {
       calculateBookingPrice();
       document.getElementById('bookingPriceBreakdown').style.display = 'block';
       updateAdminLocalAreaVisibility();
+      updateAdminBrandingVisibility();
     }
 
     function toggleBookingAddon(addonId) {
@@ -4294,6 +4355,7 @@ if (!mediaSpecialist) {
     keyPickupLocation: document.getElementById('adminKeyPickupLocation').value || undefined,
     accessInstructions: document.getElementById('bookingAccess').value || '',
     localPlaces: getAdminLocalPlaces(),
+    brandingAnswers: getAdminBrandingAnswers(),
     squareFootage: bookingFormData.squareFootage || '',
     squareFootageFee: bookingFormData.squareFootageFee || 0,
     
@@ -9468,6 +9530,24 @@ showSection = function(sectionId) {
     loadMarketUpdateStats();
   }
 };
+
+const ADMIN_BRANDING_SERVICE_IDS = ['complete-branding', 'branding-video', 'branding-photo'];
+
+function updateAdminBrandingVisibility() {
+  const section = document.getElementById('adminBrandingSection');
+  if (!section) return;
+  const serviceId = document.getElementById('bookingService')?.value || '';
+  section.style.display = ADMIN_BRANDING_SERVICE_IDS.includes(serviceId) ? 'block' : 'none';
+}
+
+function getAdminBrandingAnswers() {
+  const answers = {};
+  for (let i = 1; i <= 10; i++) {
+    const el = document.getElementById(`adminBrandQ${i}`);
+    if (el) answers[`q${i}`] = el.value.trim();
+  }
+  return answers;
+}
 
 function updateAdminLocalAreaVisibility() {
   const section = document.getElementById('adminLocalAreaSection');

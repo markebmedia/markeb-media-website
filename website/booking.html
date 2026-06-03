@@ -1000,6 +1000,98 @@ width: 100%;
   </div>
 </div>
 
+        <!-- Personal Branding Questions Section -->
+        <div id="brandingQuestionsSection" style="display: none; background: #f8fafc; border: 2px solid #3F4D1B; border-radius: 16px; padding: 28px; margin-bottom: 28px;">
+          <div style="margin-bottom: 20px;">
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: #3F4D1B; color: #fff; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 14px; text-transform: uppercase;">
+              🎬 Your Personal Brand
+            </div>
+            <h3 style="font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">
+              Tell us about your brand
+            </h3>
+            <p style="font-size: 14px; color: #64748b; line-height: 1.7; margin-bottom: 6px;">
+              Your answers help us plan the perfect shoot day including locations, style, script and brand positioning. The more detail you give us, the better your content will be.
+            </p>
+            <div style="background: #fff3e0; border: 1px solid #B46100; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #7a3e00; line-height: 1.6;">
+              <strong>Please note:</strong> Personal Branding sessions require a minimum of 3 working days notice so we can properly prepare your shoot plan, locations and script brief.
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">1. What area do you specialise in? *</label>
+              <input type="text" id="brandQ1" class="form-input" placeholder="e.g. South Manchester, LS1 Leeds city centre" oninput="updateBrandingAnswers()" />
+              <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Town, postcode or neighbourhood — helps us scout local filming spots</div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">2. How would you describe your personal brand in 3 words? *</label>
+              <input type="text" id="brandQ2" class="form-input" placeholder="e.g. Trustworthy, Modern, Approachable" oninput="updateBrandingAnswers()" />
+              <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Sets the visual tone and direction for the whole shoot</div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">3. Who is your ideal client?</label>
+              <input type="text" id="brandQ3" class="form-input" placeholder="e.g. First-time buyers, downsizers, landlords, high-net-worth" oninput="updateBrandingAnswers()" />
+              <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Shapes the script and overall style of your content</div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">4. What makes you different from other agents in your area? *</label>
+              <textarea id="brandQ4" class="form-input" rows="3" placeholder="Your USP — this becomes the core message of your content" oninput="updateBrandingAnswers()" style="resize: vertical;"></textarea>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">5. What is your preferred filming or photography style?</label>
+              <select id="brandQ5" class="form-input" onchange="updateBrandingAnswers()">
+                <option value="">-- Select a style --</option>
+                <option value="Clean and corporate">Clean and corporate</option>
+                <option value="Warm and relaxed">Warm and relaxed</option>
+                <option value="Cinematic and bold">Cinematic and bold</option>
+                <option value="Natural and documentary">Natural and documentary</option>
+                <option value="Not sure — happy to be guided">Not sure — happy to be guided</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">6. Do you have existing brand materials we should match?</label>
+              <input type="text" id="brandQ6" class="form-input" placeholder="e.g. Brand colours, logo, existing website or social presence" oninput="updateBrandingAnswers()" />
+              <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Ensures consistency across all your content</div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">7. Where do you want to be seen? *</label>
+              <input type="text" id="brandQ7" class="form-input" placeholder="e.g. Instagram, LinkedIn, Rightmove profile, company website" oninput="updateBrandingAnswers()" />
+              <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Determines format and aspect ratios of your deliverables</div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">8. Are there specific locations in your area you'd like to feature?</label>
+              <input type="text" id="brandQ8" class="form-input" placeholder="e.g. The high street, a local cafe, a park, a landmark building" oninput="updateBrandingAnswers()" />
+              <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Adds local authority and personality to your content</div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">9. What do you want viewers to feel after watching your content?</label>
+              <input type="text" id="brandQ9" class="form-input" placeholder="e.g. Confident, reassured, inspired, like they already trust you" oninput="updateBrandingAnswers()" />
+              <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Drives the script direction and edit style</div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">10. Is there anything you're not comfortable with on camera?</label>
+              <input type="text" id="brandQ10" class="form-input" placeholder="e.g. Scripts only, no walking and talking, no close-ups" oninput="updateBrandingAnswers()" />
+              <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Helps us plan the day entirely around you</div>
+            </div>
+
+          </div>
+
+          <div style="margin-top: 14px; font-size: 13px; color: #64748b;">
+            Questions marked * are required for Personal Branding bookings.
+          </div>
+          <div class="error-message" id="brandingQuestionsError">Please answer the required branding questions (1, 2, 4 and 7).</div>
+        </div>
+
         <!-- Local Area Highlights Section (Gold Package only) -->
         <div id="localAreaHighlightsSection" style="display: none; background: #BFC6B1; border-radius: 16px; padding: 28px; margin-bottom: 28px;">
           <div style="margin-bottom: 20px;">
@@ -1572,7 +1664,7 @@ width: 100%;
   north: [
     {
       id: 'complete-branding',
-      name: 'Complete Branding Package - Photo & Video',
+      name: 'Personal Branding Package — Complete Photo & Video',
       price: 745.00,
       duration: 300,
       description: 'Full personal branding suite for estate agents. Photography and video content with classic editing included.',
@@ -1581,7 +1673,7 @@ width: 100%;
     },
     {
       id: 'branding-video',
-      name: 'Branding Videography Session',
+      name: 'Personal Branding — Videography Session',
       price: 445.00,
       duration: 180,
       description: 'Personal branding video for estate agents. Multiple sequences for social content with classic editing included.',
@@ -1590,7 +1682,7 @@ width: 100%;
     },
     {
       id: 'branding-photo',
-      name: 'Branding Photography Session - 10 Signature Shots',
+      name: 'Personal Branding — Photography Session (10 Signature Shots)',
       price: 345.00,
       duration: 120,
       description: 'Personal branding for estate agents. You\'re in every shot.',
@@ -2127,6 +2219,7 @@ if (bookingData.selectedAddons && bookingData.selectedAddons.length > 0) {
 
       updateTermsVisibility();
       updateLocalAreaHighlightsVisibility();
+      updateBrandingQuestionsVisibility();
     }
 
     // Update Terms Visibility
@@ -2727,7 +2820,23 @@ async function loadAvailableDates(year, month) {
 
     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
     const isAvailable = !isWeekend && availableDates && availableDates.includes(dateString);
-    const isDisabled = isWeekend || !isAvailable;
+
+    // Apply 3 calendar day buffer (skipping weekends) for branding services
+    let isTooSoon = false;
+    if (bookingData.service && BRANDING_SERVICE_IDS.includes(bookingData.service.id)) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let bufferDays = 0;
+      let check = new Date(today);
+      while (bufferDays < 3) {
+        check.setDate(check.getDate() + 1);
+        const checkDow = check.getDay();
+        if (checkDow !== 0 && checkDow !== 6) bufferDays++;
+      }
+      isTooSoon = date < check;
+    }
+
+    const isDisabled = isWeekend || !isAvailable || isTooSoon;
     const isToday = dateString === toLocalDateString(new Date());
     const isSelected = bookingData.selectedDate === dateString;
 
@@ -3017,6 +3126,19 @@ async function completeBooking() {
 
   // ✅ ADD THIS ENTIRE ACCESS TYPE VALIDATION SECTION RIGHT HERE (AFTER PHONE VALIDATION):
   
+  // Validate Personal Branding questions if section is visible
+  const brandingSection = document.getElementById('brandingQuestionsSection');
+  if (brandingSection && brandingSection.style.display !== 'none') {
+    updateBrandingAnswers();
+    if (!validateBrandingQuestions()) {
+      document.getElementById('brandingQuestionsError').classList.add('show');
+      document.getElementById('brandQ1').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      hasError = true;
+    } else {
+      document.getElementById('brandingQuestionsError').classList.remove('show');
+    }
+  }
+
   // Validate Local Area Highlights places if section is visible
   const localSection = document.getElementById('localAreaHighlightsSection');
   if (localSection && localSection.style.display !== 'none') {
@@ -3275,6 +3397,8 @@ async function createBooking() {
     // ✅ ADD THESE TWO LINES RIGHT HERE (AFTER clientNotes):
     accessType: bookingData.accessType || '',
     keyPickupLocation: bookingData.keyPickupLocation || '',
+    localPlaces: bookingData.localPlaces || [],
+    brandingAnswers: bookingData.brandingAnswers || {},
     squareFootage: bookingData.squareFootage || '',
     squareFootageFee: bookingData.squareFootageFee || 0,
     
@@ -3415,6 +3539,36 @@ let appliedDiscount = null;
 
 // No-op: discount section now lives on step 4 and is always visible
 function showDiscountSection() {}
+
+// ===== PERSONAL BRANDING QUESTIONS =====
+
+const BRANDING_SERVICE_IDS = ['complete-branding', 'branding-video', 'branding-photo'];
+
+function updateBrandingQuestionsVisibility() {
+  const section = document.getElementById('brandingQuestionsSection');
+  if (!section) return;
+  const service = bookingData.service;
+  const isBranding = service && BRANDING_SERVICE_IDS.includes(service.id);
+  section.style.display = isBranding ? 'block' : 'none';
+}
+
+function updateBrandingAnswers() {
+  const answers = {};
+  for (let i = 1; i <= 10; i++) {
+    const el = document.getElementById(`brandQ${i}`);
+    if (el) answers[`q${i}`] = el.value.trim();
+  }
+  bookingData.brandingAnswers = answers;
+}
+
+function validateBrandingQuestions() {
+  const required = ['brandQ1', 'brandQ2', 'brandQ4', 'brandQ7'];
+  const allFilled = required.every(id => {
+    const el = document.getElementById(id);
+    return el && el.value.trim().length > 0;
+  });
+  return allFilled;
+}
 
 // Show or hide Local Area Highlights section based on service
 function updateLocalAreaHighlightsVisibility() {

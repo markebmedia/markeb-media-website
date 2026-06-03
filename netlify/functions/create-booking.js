@@ -302,6 +302,9 @@ exports.handler = async (event, context) => {
         'Local Area Places': bookingData.localPlaces && bookingData.localPlaces.length > 0
           ? bookingData.localPlaces.join('\n')
           : undefined,
+        'Branding Answers': bookingData.brandingAnswers && Object.keys(bookingData.brandingAnswers).length > 0
+          ? JSON.stringify(bookingData.brandingAnswers)
+          : undefined,
         
         // Square footage
         'Square Footage': bookingData.squareFootage || undefined,
@@ -417,6 +420,7 @@ exports.handler = async (event, context) => {
   accessType: bookingData.accessType || '',
   keyPickupLocation: bookingData.keyPickupLocation || '',
   localPlaces: bookingData.localPlaces || [],
+  brandingAnswers: bookingData.brandingAnswers || {},
   addons: bookingData.addons || []
 };
 
