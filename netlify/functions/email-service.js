@@ -105,6 +105,45 @@ function getSquareFootageSection(booking) {
   `;
 }
 
+// ✅ Format Personal Branding Answers
+function getBrandingAnswersSection(booking) {
+  const answers = booking.brandingAnswers;
+  if (!answers || Object.keys(answers).length === 0) return '';
+
+  const QUESTIONS = [
+    'Area of specialisation',
+    'Brand in 3 words',
+    'Ideal client',
+    'What makes you different',
+    'Preferred filming style',
+    'Existing brand materials',
+    'Where you want to be seen',
+    'Specific locations to feature',
+    'How viewers should feel',
+    'Not comfortable with on camera'
+  ];
+
+  const rows = QUESTIONS.map((q, i) => {
+    const val = answers[`q${i + 1}`];
+    if (!val) return '';
+    return `
+      <div class="detail-row">
+        <span class="detail-label">${i + 1}. ${q}</span>
+        <span class="detail-value" style="text-align: left;">${val}</span>
+      </div>
+    `;
+  }).filter(Boolean).join('');
+
+  if (!rows) return '';
+
+  return `
+    <h3>🎬 Personal Brand Brief</h3>
+    <div class="booking-details">
+      ${rows}
+    </div>
+  `;
+}
+
 // Email Layout Wrapper
 function getEmailLayout(content) {
   return `
@@ -381,6 +420,8 @@ async function sendBookingConfirmation(booking) {
       <a href="${manageUrl}" class="button">Manage Your Booking</a>
     </center>
 
+    ${getBrandingAnswersSection(booking)}
+
     <div class="alert alert-info">
       <strong>📅 Need to Reschedule?</strong><br>
       You can reschedule or cancel free of charge up to 24 hours before your shoot.
@@ -416,7 +457,13 @@ async function sendBookingConfirmation(booking) {
 
   const emailHtml = getEmailLayout(content);
 
+  const BRANDING_SERVICE_IDS = ['complete-branding', 'branding-video', 'branding-photo'];
+  const isBrandingBooking = BRANDING_SERVICE_IDS.includes(booking.serviceId);
+
   const bccRecipients = [BCC_EMAIL];
+  if (isBrandingBooking) {
+    bccRecipients.push('marketing@markebmedia.com');
+  }
   
   // ── SPECIALIST EMAIL ROUTING ─────────────────────────────────────────────
   // Add a new entry here when hiring a new specialist.
