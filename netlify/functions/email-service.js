@@ -512,6 +512,12 @@ async function sendBookingConfirmation(booking) {
         </div>
         ${getAccessTypeSection(booking)}
         ${getSquareFootageSection(booking)}
+        ${booking.clientNotes ? `
+        <div class="detail-row">
+          <span class="detail-label">Client Notes</span>
+          <span class="detail-value" style="text-align:left;">${booking.clientNotes}</span>
+        </div>
+        ` : ''}
         ${booking.discountCode && booking.discountAmount > 0 ? `
         <div class="detail-row">
           <span class="detail-label">Discount (${booking.discountCode})</span>
