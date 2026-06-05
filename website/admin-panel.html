@@ -10152,9 +10152,32 @@ table.lines th:last-child{text-align:right;}
 </html>`;
 }
 
-function showInvoiceModal(bookingId) {
-  const booking = allBookings.find(b => b.id === bookingId);
-  if (!booking) { alert('Booking not found — try refreshing the Pending tab first.'); return; }
+async function showInvoiceModal(bookingId) {
+  // Try allBookings first, fall back to fetching directly from Airtable
+  let booking = allBookings.find(b => b.id === bookingId);
+
+  if (!booking) {
+    try {
+      const res = await fetch('/.netlify/functions/airtable-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          method: 'GET',
+          table: 'Bookings',
+          recordId: bookingId
+        })
+      });
+      const data = await res.json();
+      if (data && data.id) {
+        booking = data;
+        allBookings.push(booking);
+      }
+    } catch (err) {
+      console.error('Failed to fetch booking for invoice:', err);
+    }
+  }
+
+  if (!booking) { alert('Booking not found — please try again.'); return; }
 
   const f = booking.fields;
   const ref = f['Booking Reference'] || bookingId.slice(-6).toUpperCase();
