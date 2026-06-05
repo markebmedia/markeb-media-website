@@ -4843,8 +4843,8 @@ async function loadPaymentsInvoices() {
       source:      'airtable'
     }));
 
-    // Fetch bookings to get card-on-file status and derive missing invoices
-    const bkRes = await fetch('/.netlify/functions/get-client-bookings', {
+    // Fetch bookings from main Bookings table via get-client-bookings-v2
+    const bkRes = await fetch('/.netlify/functions/get-client-bookings-v2', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userEmail: user.email })
@@ -4854,7 +4854,8 @@ async function loadPaymentsInvoices() {
     // Build card map keyed by bookingRef
     const cardMap = {};
     if (bkData.success && bkData.bookings) {
-      bkData.bookings.forEach(b => {
+      bkData.bookings.filter(b => !b.cancelled).forEach(b => {
+        if (!b.bookingRef) return;
         cardMap[b.bookingRef] = {
           hasCard:   !!b.stripePaymentMethodId,
           cardLast4: b.cardLast4 || null,
@@ -4880,19 +4881,19 @@ async function loadPaymentsInvoices() {
     const derived = [];
     if (bkData.success && bkData.bookings) {
       bkData.bookings
-        .filter(b => !b.cancelled && !existingRefs.has(b.bookingRef))
+        .filter(b => !b.cancelled && b.bookingRef && !existingRefs.has(b.bookingRef))
         .forEach(b => {
           derived.push({
-            invoiceNum:  `INV-MM${b.bookingRef}`,
-            bookingRef:  b.bookingRef || '',
-            amount:      parseFloat(b.totalPrice || 0),
-            status:      b.paymentStatus === 'Paid' ? 'Paid' : 'Unpaid',
-            issuedDate:  b.shootDate || '',
-            hasCard:     !!b.stripePaymentMethodId,
-            cardLast4:   b.cardLast4 || null,
-            service:     b.serviceType || '',
-            address:     b.projectAddress || '',
-            source:      'booking'
+            invoiceNum: `INV-MM${b.bookingRef}`,
+            bookingRef: b.bookingRef,
+            amount:     b.finalPrice || b.totalPrice || 0,
+            status:     b.paymentStatus === 'Paid' ? 'Paid' : 'Unpaid',
+            issuedDate: b.shootDate || '',
+            hasCard:    !!b.stripePaymentMethodId,
+            cardLast4:  b.cardLast4 || null,
+            service:    b.serviceType || '',
+            address:    b.projectAddress || '',
+            source:     'booking'
           });
         });
     }
