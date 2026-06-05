@@ -367,7 +367,7 @@ body {
 }
 
 .calendar-booking {
-  background: #B46100;
+  background: #10b981;
   color: #fff;
   padding: 4px 6px;
   border-radius: 4px;
@@ -1127,7 +1127,7 @@ body {
   .calendar-booking { height: 8px; padding: 0; margin-bottom: 2px; border-radius: 4px; text-indent: -9999px; overflow: hidden; cursor: pointer; }
   .calendar-booking:not(.pending):not(.cancelled):not(.blocked) { background: #B46100; }
   .calendar-booking.pending { background: #f59e0b; }
-  .calendar-booking.cancelled { background: #94a3b8; }
+  .calendar-booking.cancelled { background: #ef4444; }
   .calendar-booking.blocked { background: #ef4444; }
   .calendar-day .calendar-booking:nth-child(n+6) { display: none; }
   .calendar-day:has(.calendar-booking:nth-child(6))::after { content: '+'; font-size: 10px; font-weight: 900; color: #fff; background: #64748b; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: 2px; }
@@ -1161,9 +1161,10 @@ body {
   .calendar-booking { display: none !important; }
   .cal-dot-row { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 3px; }
   .cal-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .cal-dot.paid { background: #B46100; }
+  .cal-dot.paid { background: #10b981; }
   .cal-dot.pending { background: #f59e0b; }
   .cal-dot.blocked { background: #ef4444; }
+  .cal-dot.cancelled { background: #ef4444; }
   .calendar-day.today .calendar-day-number { color: #B46100; font-weight: 800; }
 }
 .day-sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 20000; display: flex; align-items: flex-end; }
@@ -4699,7 +4700,8 @@ const isMobile = window.innerWidth <= 600;
       const paidCount = dayBookings.filter(b => b.fields['Payment Status'] === 'Paid' && b.fields['Booking Status'] !== 'Cancelled').length;
       const pendingCount = dayBookings.filter(b => b.fields['Payment Status'] === 'Pending' && b.fields['Booking Status'] !== 'Cancelled').length;
       const blockedCount = dayBlocks.length;
-      const hasAnything = paidCount + pendingCount + blockedCount > 0;
+      const cancelledCount = dayBookings.filter(b => b.fields['Booking Status'] === 'Cancelled').length;
+      const hasAnything = paidCount + pendingCount + blockedCount + cancelledCount > 0;
       html += `<div class="calendar-day ${isToday ? 'today' : ''}" onclick="showDaySheet('${dateStr}', ${JSON.stringify(dayBookings).replace(/"/g,'&quot;')}, ${JSON.stringify(dayBlocks).replace(/"/g,'&quot;')})">`;
       html += `<div class="calendar-day-number">${day}</div>`;
       if (hasAnything) {
@@ -4707,6 +4709,7 @@ const isMobile = window.innerWidth <= 600;
         html += '<span class="cal-dot paid"></span>'.repeat(Math.min(paidCount, 4));
         html += '<span class="cal-dot pending"></span>'.repeat(Math.min(pendingCount, 4));
         html += '<span class="cal-dot blocked"></span>'.repeat(Math.min(blockedCount, 2));
+        html += '<span class="cal-dot cancelled"></span>'.repeat(Math.min(cancelledCount, 2));
         html += '</div>';
       }
       html += '</div>';
@@ -4729,11 +4732,11 @@ html += `
     dayBookings.forEach(booking => {
       const paymentStatus = booking.fields['Payment Status'] || 'Pending';
       const statusClass =
-        booking.fields['Booking Status'] === 'Cancelled'
-          ? 'cancelled'
-          : paymentStatus === 'Pending'
-          ? 'pending'
-          : '';
+  booking.fields['Booking Status'] === 'Cancelled'
+    ? 'cancelled'
+    : paymentStatus === 'Paid'
+    ? 'paid'
+    : 'pending';
 
       html += `<div class="calendar-booking ${statusClass}" onclick="event.stopPropagation(); viewBookingById('${booking.id}')">${booking.fields['Time']} ${booking.fields['Client Name']}</div>`;
     });
@@ -4832,7 +4835,7 @@ function renderWeekView(bookings, blockedTimes) {
       });
       slotBookings.forEach(bk => {
         const ps = bk.fields['Payment Status']||'Pending';
-        const bg = bk.fields['Booking Status']==='Cancelled' ? '#94a3b8' : ps==='Pending' ? '#f59e0b' : '#B46100';
+        const bg = bk.fields['Booking Status']==='Cancelled' ? '#ef4444' : ps==='Paid' ? '#10b981' : '#f59e0b';
         html += `<div onclick="viewBookingById('${bk.id}')" style="border-radius:4px;padding:2px 4px;font-size:10px;font-weight:600;color:#fff;background:${bg};margin-bottom:1px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${bk.fields['Time']} ${bk.fields['Client Name']}</div>`;
       });
       html += '</div>';
@@ -4945,8 +4948,8 @@ function renderDayView(bookings, blockedTimes) {
       slotBookings.forEach(bk => {
         const f = bk.fields;
         const ps = f['Payment Status']||'Pending';
-        const border = f['Booking Status']==='Cancelled' ? '#94a3b8' : ps==='Pending' ? '#f59e0b' : '#B46100';
-        const bg = f['Booking Status']==='Cancelled' ? '#f1f5f9' : ps==='Pending' ? '#fef3c7' : '#fff3e0';
+        const border = f['Booking Status']==='Cancelled' ? '#ef4444' : ps==='Paid' ? '#10b981' : '#f59e0b';
+const bg = f['Booking Status']==='Cancelled' ? '#fee2e2' : ps==='Paid' ? '#d1fae5' : '#fef3c7';
         html += `<div onclick="viewBookingById('${bk.id}')" style="border-radius:6px;padding:6px 10px;background:${bg};border-left:3px solid ${border};margin-bottom:4px;cursor:pointer;">
           <div style="font-size:13px;font-weight:700;color:#0f172a;">${f['Client Name']}</div>
           <div style="font-size:11px;color:#64748b;margin-top:2px;">${f['Service']} · ${f['Property Address']||''}</div>
