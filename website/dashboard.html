@@ -2651,6 +2651,10 @@ box-shadow: 0 10px 40px rgba(63, 77, 27, 0.4);
   <i data-lucide="book-open" style="width: 20px; height: 20px;"></i>
   Brochure Builder
 </div>
+    <div class="nav-item" onclick="showSection('payments')">
+      <i data-lucide="receipt" style="width: 20px; height: 20px;"></i>
+      Payments & Invoices
+    </div>
     <div class="nav-item" onclick="showSection('amend')">
       <i data-lucide="pencil" style="width: 20px; height: 20px;"></i>
       Request Amendment
@@ -3092,6 +3096,66 @@ box-shadow: 0 10px 40px rgba(63, 77, 27, 0.4);
   </div>
 </div>
 </div>
+      <!-- PAYMENTS & INVOICES -->
+      <div id="payments" class="section">
+
+        <div style="margin-bottom:24px;">
+          <h2 style="font-family:'Playfair Display',serif;font-size:clamp(22px,3.5vw,30px);font-weight:700;background:linear-gradient(135deg,#1e293b 0%,#B46100 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0 0 4px;">Payments & Invoices</h2>
+          <p style="color:#64748b;font-size:14px;margin:0;">A full record of your payments and outstanding balances with Markeb Media</p>
+        </div>
+
+        <!-- Info banner -->
+        <div style="background:linear-gradient(135deg,#fff3e0 0%,#ffe0b2 100%);border:2px solid #B46100;border-radius:12px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:flex-start;gap:12px;">
+          <i data-lucide="info" style="width:18px;height:18px;color:#B46100;flex-shrink:0;margin-top:2px;"></i>
+          <div style="font-size:13px;color:#7a3e00;line-height:1.7;">
+            <strong>How payments work at Markeb Media</strong><br>
+            If we hold a card on file for you, outstanding balances are collected automatically — you don't need to do anything. If a payment fails we'll contact you directly. If no card is on file, bank transfer details will be shown below.
+          </div>
+        </div>
+
+        <!-- Stats strip -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:28px;">
+          <div class="metric-card">
+            <div class="metric-value" id="payInvoiceCount" style="font-size:28px;">—</div>
+            <div class="metric-label">Total Invoices</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" id="payPaidTotal" style="font-size:28px;color:#10b981;">—</div>
+            <div class="metric-label">Total Paid</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-value" id="payOutstanding" style="font-size:28px;color:#ef4444;">—</div>
+            <div class="metric-label">Outstanding</div>
+          </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+          <button onclick="filterPayments('all')" id="payTabAll" style="padding:8px 18px;border-radius:20px;border:2px solid #B46100;background:#B46100;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">All</button>
+          <button onclick="filterPayments('Unpaid')" id="payTabUnpaid" style="padding:8px 18px;border-radius:20px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Outstanding</button>
+          <button onclick="filterPayments('Paid')" id="payTabPaid" style="padding:8px 18px;border-radius:20px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">Paid</button>
+        </div>
+
+        <!-- Loading -->
+        <div id="paymentsLoading" style="text-align:center;padding:60px 20px;">
+          <div class="spinner"></div>
+          <p style="margin-top:16px;color:#64748b;font-size:14px;">Loading your invoices...</p>
+        </div>
+
+        <!-- List -->
+        <div id="paymentsList" style="display:none;flex-direction:column;gap:12px;"></div>
+
+        <!-- Empty -->
+        <div id="paymentsEmpty" style="display:none;text-align:center;padding:80px 20px;">
+          <div style="width:72px;height:72px;background:linear-gradient(135deg,#fff3e0,#ffe0b2);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <i data-lucide="receipt" style="width:32px;height:32px;color:#B46100;"></i>
+          </div>
+          <h3 style="font-size:20px;font-weight:700;color:#1e293b;margin:0 0 10px;">No invoices yet</h3>
+          <p style="color:#64748b;font-size:14px;max-width:320px;margin:0 auto;line-height:1.6;">Your invoices will appear here once you have confirmed bookings with Markeb Media.</p>
+        </div>
+
+      </div>
+
       <!-- REQUEST AMENDMENT (with file upload and Render endpoints) -->
       <div id="amend" class="section">
         <div class="card" style="padding:24px">
@@ -3384,6 +3448,9 @@ Any media produced remains the property of Markeb Media until full payment has b
   
   if (id === 'calendar') {
     loadContentCalendar();
+  }
+  if (id === 'payments') {
+    loadPaymentsInvoices();
   }
 }
     function openCopyryta(){window.location.href='./copyryta.html';}
@@ -4733,6 +4800,235 @@ if (paymentStatus === 'cancelled') {
     }
   });
 });
+
+/* ===== PAYMENTS & INVOICES ===== */
+
+let allPaymentInvoices = [];
+let currentPaymentFilter = 'all';
+
+async function loadPaymentsInvoices() {
+  const isAdmin = localStorage.getItem('admin_impersonation') === 'true';
+  const user = isAdmin
+    ? { email: localStorage.getItem('user_email') }
+    : window.AirtableAPI?.getCurrentUser?.();
+  if (!user?.email) return;
+
+  const loading = document.getElementById('paymentsLoading');
+  const list    = document.getElementById('paymentsList');
+  const empty   = document.getElementById('paymentsEmpty');
+
+  loading.style.display = 'block';
+  list.style.display    = 'none';
+  empty.style.display   = 'none';
+
+  try {
+    // Fetch Airtable Invoices records for this client
+    const invRes = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'GET',
+        table:  'Invoices',
+        filterFormula: `LOWER({Client Email}) = "${user.email.toLowerCase()}"`,
+        sort: [{ field: 'Issued Date', direction: 'desc' }]
+      })
+    });
+    const invData = await invRes.json();
+    const airtableInvoices = (invData.records || []).map(r => ({
+      invoiceNum:  r.fields['Invoice Number'] || '',
+      bookingRef:  r.fields['Booking Reference'] || '',
+      amount:      parseFloat(r.fields['Amount'] || 0),
+      status:      r.fields['Status'] || 'Unpaid',
+      issuedDate:  r.fields['Issued Date'] || '',
+      source:      'airtable'
+    }));
+
+    // Fetch bookings to get card-on-file status and derive missing invoices
+    const bkRes = await fetch('/.netlify/functions/get-client-bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userEmail: user.email })
+    });
+    const bkData = await bkRes.json();
+
+    // Build card map keyed by bookingRef
+    const cardMap = {};
+    if (bkData.success && bkData.bookings) {
+      bkData.bookings.forEach(b => {
+        cardMap[b.bookingRef] = {
+          hasCard:   !!b.stripePaymentMethodId,
+          cardLast4: b.cardLast4 || null,
+          service:   b.serviceType || '',
+          address:   b.projectAddress || ''
+        };
+      });
+    }
+
+    // Merge card info into Airtable invoices
+    airtableInvoices.forEach(inv => {
+      const bk = cardMap[inv.bookingRef];
+      if (bk) {
+        inv.hasCard   = bk.hasCard;
+        inv.cardLast4 = bk.cardLast4;
+        inv.service   = bk.service;
+        inv.address   = bk.address;
+      }
+    });
+
+    // Derive bookings not yet formally invoiced
+    const existingRefs = new Set(airtableInvoices.map(i => i.bookingRef));
+    const derived = [];
+    if (bkData.success && bkData.bookings) {
+      bkData.bookings
+        .filter(b => !b.cancelled && !existingRefs.has(b.bookingRef))
+        .forEach(b => {
+          derived.push({
+            invoiceNum:  `INV-MM${b.bookingRef}`,
+            bookingRef:  b.bookingRef || '',
+            amount:      parseFloat(b.totalPrice || 0),
+            status:      b.paymentStatus === 'Paid' ? 'Paid' : 'Unpaid',
+            issuedDate:  b.shootDate || '',
+            hasCard:     !!b.stripePaymentMethodId,
+            cardLast4:   b.cardLast4 || null,
+            service:     b.serviceType || '',
+            address:     b.projectAddress || '',
+            source:      'booking'
+          });
+        });
+    }
+
+    allPaymentInvoices = [...airtableInvoices, ...derived];
+
+    // Stats
+    const totalPaid        = allPaymentInvoices.filter(i => i.status === 'Paid').reduce((s, i) => s + i.amount, 0);
+    const totalOutstanding = allPaymentInvoices.filter(i => i.status === 'Unpaid').reduce((s, i) => s + i.amount, 0);
+    document.getElementById('payInvoiceCount').textContent = allPaymentInvoices.length;
+    document.getElementById('payPaidTotal').textContent    = fmtGBP(totalPaid);
+    document.getElementById('payOutstanding').textContent  = fmtGBP(totalOutstanding);
+
+    loading.style.display = 'none';
+    renderPayments();
+
+  } catch (err) {
+    console.error('Payments load error:', err);
+    document.getElementById('paymentsLoading').style.display = 'none';
+    document.getElementById('paymentsEmpty').style.display   = 'block';
+  }
+}
+
+function filterPayments(filter) {
+  currentPaymentFilter = filter;
+  ['all', 'Unpaid', 'Paid'].forEach(f => {
+    const id  = `payTab${f === 'all' ? 'All' : f}`;
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    const active = f === filter;
+    btn.style.background  = active ? '#B46100' : '#fff';
+    btn.style.color       = active ? '#fff'    : '#64748b';
+    btn.style.borderColor = active ? '#B46100' : '#e2e8f0';
+  });
+  renderPayments();
+}
+
+function renderPayments() {
+  const list  = document.getElementById('paymentsList');
+  const empty = document.getElementById('paymentsEmpty');
+
+  const filtered = currentPaymentFilter === 'all'
+    ? allPaymentInvoices
+    : allPaymentInvoices.filter(i => i.status === currentPaymentFilter);
+
+  if (filtered.length === 0) {
+    list.style.display  = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  list.style.display  = 'flex';
+
+  list.innerHTML = filtered.map(inv => {
+    const isPaid  = inv.status === 'Paid';
+    const dateFmt = inv.issuedDate
+      ? new Date(inv.issuedDate + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+      : '—';
+
+    // Core payment logic
+    let paymentBlock = '';
+    if (isPaid) {
+      paymentBlock = `
+        <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;font-size:13px;color:#065f46;font-weight:600;">
+          <i data-lucide="check-circle" style="width:16px;height:16px;color:#10b981;flex-shrink:0;"></i>
+          Payment received — thank you
+        </div>`;
+    } else if (inv.hasCard) {
+      paymentBlock = `
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:14px 16px;background:#fff8ee;border:1.5px solid #fcd34d;border-radius:10px;font-size:13px;color:#92400e;line-height:1.6;">
+          <i data-lucide="credit-card" style="width:16px;height:16px;color:#f59e0b;flex-shrink:0;margin-top:1px;"></i>
+          <div>
+            <strong>Payment collected automatically</strong><br>
+            We'll charge your saved card${inv.cardLast4 ? ` ending <strong>${inv.cardLast4}</strong>` : ''} once your content has been delivered. No action needed from you. If there's any issue we'll be in touch directly.
+          </div>
+        </div>`;
+    } else {
+      paymentBlock = `
+        <div style="padding:16px;background:#fffbf0;border:1.5px solid #e8d9be;border-radius:10px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#7a5c2e;margin-bottom:12px;">Bank Transfer Details</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;">
+            <div>
+              <div style="font-size:11px;color:#8a6e44;margin-bottom:2px;">Account name</div>
+              <div style="font-size:14px;font-weight:700;color:#2d1f00;font-family:monospace;">Markeb Media Ltd</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:#8a6e44;margin-bottom:2px;">Sort code</div>
+              <div style="font-size:14px;font-weight:700;color:#2d1f00;font-family:monospace;">04-00-03</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:#8a6e44;margin-bottom:2px;">Account number</div>
+              <div style="font-size:14px;font-weight:700;color:#2d1f00;font-family:monospace;">57382906</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:#8a6e44;margin-bottom:2px;">Reference</div>
+              <div style="font-size:14px;font-weight:700;color:#B46100;font-family:monospace;">${inv.invoiceNum}</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;font-size:12px;color:#7a3e00;padding:10px 12px;background:#fff;border-radius:8px;border:1px solid #e8d9be;">
+            Please use <strong>${inv.invoiceNum}</strong> as your payment reference so we can match your transfer instantly.
+          </div>
+        </div>`;
+    }
+
+    return `
+      <div style="background:#fff;border:2px solid ${isPaid ? '#bbf7d0' : inv.hasCard ? '#fcd34d' : '#e8d9be'};border-radius:14px;overflow:hidden;"
+        onmouseover="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'"
+        onmouseout="this.style.boxShadow='none'">
+
+        <div style="padding:16px 20px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+          <div>
+            <div style="font-size:15px;font-weight:700;color:#0f172a;font-family:monospace;">${inv.invoiceNum}</div>
+            ${inv.address ? `<div style="font-size:12px;color:#64748b;margin-top:2px;">${inv.address}</div>` : ''}
+            ${inv.service ? `<div style="font-size:12px;color:#94a3b8;margin-top:1px;">${inv.service}</div>` : ''}
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:20px;font-weight:700;color:${isPaid ? '#10b981' : '#B46100'};font-family:monospace;">£${inv.amount.toFixed(2)}</div>
+            <div style="margin-top:4px;">
+              <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;${isPaid ? 'background:#d1fae5;color:#065f46;' : 'background:#fef3c7;color:#92400e;'}">
+                ${isPaid ? 'Paid' : 'Outstanding'}
+              </span>
+            </div>
+            ${dateFmt !== '—' ? `<div style="font-size:11px;color:#94a3b8;margin-top:4px;">${dateFmt}</div>` : ''}
+          </div>
+        </div>
+
+        <div style="padding:16px 20px;">
+          ${paymentBlock}
+        </div>
+
+      </div>`;
+  }).join('');
+
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+}
 
 function logoutAll(){
   if(window.AirtableAPI?.logoutUser){ AirtableAPI.logoutUser(); }
