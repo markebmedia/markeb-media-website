@@ -5446,6 +5446,9 @@ ${hasPaymentMethod ? `
             <button class="btn btn-primary btn-small" onclick="viewBookingById('${booking.id}')">
               <i data-lucide="eye" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> View
             </button>
+            <button class="btn btn-small" style="background:#3F4D1B;color:#FDF3E2;border-color:#3F4D1B;" onclick="showInvoiceModal('${booking.id}')">
+              <i data-lucide="file-text" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Invoice
+            </button>
           </div>
         </td>
       </tr>
@@ -9905,6 +9908,426 @@ async function sendCardUpdateLink(bookingId, bookingRef) {
     alert('❌ Network error: ' + err.message);
   }
 }
+// ===== INVOICING =====
+
+function buildInvoiceHTML(booking) {
+  const f = booking.fields;
+  const ref = f['Booking Reference'] || booking.id.slice(-6).toUpperCase();
+  const invoiceNum = `INV-MM${ref}`;
+  const today = new Date();
+  const due = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
+  const fmt = d => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  const isPaid = (f['Payment Status'] || '').toLowerCase() === 'paid';
+
+  const service = f['Service'] || '';
+  const basePrice = parseFloat(f['Base Price'] || 0);
+  const bedroomFee = parseFloat(f['Extra Bedroom Fee'] || 0);
+  const sqftFee = parseFloat(f['Square Footage Fee'] || 0);
+  const addonsRaw = f['Add-Ons'] || f['Add-ons'] || '';
+  const addonsPrice = parseFloat(f['Add-ons Price'] || f['Addons Price'] || 0);
+  const discountCode = f['Discount Code'] || '';
+  const discountAmount = parseFloat(f['Discount Amount'] || 0);
+  const finalPrice = parseFloat(f['Final Price'] || 0);
+  const exVAT = parseFloat((finalPrice / 1.2).toFixed(2));
+  const vatAmount = parseFloat((finalPrice - exVAT).toFixed(2));
+  const bedrooms = parseInt(f['Bedrooms'] || 0);
+  const address = f['Property Address'] || '';
+  const postcode = f['Postcode'] || '';
+  const date = f['Date'] || '';
+  const time = f['Time'] || '';
+  const clientName = f['Client Name'] || '';
+  const clientEmail = f['Client Email'] || '';
+
+  let shootDate = '';
+  if (date) {
+    const [y, m, d2] = date.split('-').map(Number);
+    shootDate = new Date(y, m - 1, d2).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  const statusPillStyle = isPaid
+    ? 'background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.4);color:#10b981;'
+    : 'background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.4);color:#f59e0b;';
+  const statusLabel = isPaid ? '✅ Paid' : '⏳ Awaiting Payment';
+
+  const lines = [];
+
+  lines.push({
+    desc: service,
+    sub: `Shoot date: ${shootDate}${time ? ' at ' + time : ''}${bedrooms ? ' · ' + bedrooms + ' bedrooms' : ''}`,
+    sub2: address ? `${address}${postcode ? ', ' + postcode : ''}` : '',
+    ref: ref,
+    amount: basePrice > 0 ? basePrice : exVAT
+  });
+
+  if (bedroomFee > 0) {
+    const extraBeds = Math.max(0, bedrooms - 4);
+    lines.push({ desc: `Extra bedrooms (${extraBeds} × £25)`, sub: '', sub2: '', ref: '', amount: bedroomFee });
+  }
+
+  if (sqftFee > 0) {
+    lines.push({ desc: 'Large property fee (property over 3,000 sq ft)', sub: '', sub2: '', ref: '', amount: sqftFee });
+  }
+
+  if (addonsRaw) {
+    const addonList = addonsRaw.split(',').map(a => a.trim()).filter(Boolean);
+    addonList.forEach((a, i) => {
+      lines.push({
+        desc: `${a} (add-on)`,
+        sub: '', sub2: '', ref: '',
+        amount: i === addonList.length - 1 && addonsPrice > 0 ? addonsPrice : (addonList.length === 1 ? addonsPrice : null)
+      });
+    });
+  }
+
+  const linesHTML = lines.map(l => `
+    <tr>
+      <td style="padding:12px 16px;vertical-align:top;border-bottom:1px solid #e8d5b5;">
+        <div style="font-weight:600;color:#2d1f00;font-size:14px;">${l.desc}</div>
+        ${l.sub ? `<div style="font-size:11px;color:#8a6e44;margin-top:3px;">${l.sub}</div>` : ''}
+        ${l.sub2 ? `<div style="font-size:11px;color:#8a6e44;">${l.sub2}</div>` : ''}
+      </td>
+      <td style="padding:12px 16px;vertical-align:top;border-bottom:1px solid #e8d5b5;font-size:12px;color:#8a6e44;font-family:monospace;white-space:nowrap;">${l.ref}</td>
+      <td style="padding:12px 16px;vertical-align:top;border-bottom:1px solid #e8d5b5;text-align:right;font-family:monospace;font-size:13px;color:#2d1f00;white-space:nowrap;">
+        ${l.amount !== null && l.amount !== undefined ? `£${parseFloat(l.amount).toFixed(2)}` : '—'}
+      </td>
+    </tr>`).join('');
+
+  const discountRow = discountCode && discountAmount > 0 ? `
+    <tr>
+      <td colspan="2" style="padding:12px 16px;border-bottom:1px solid #e8d5b5;">
+        <div style="color:#10b981;font-size:14px;font-weight:500;">Discount — ${discountCode}</div>
+      </td>
+      <td style="padding:12px 16px;text-align:right;border-bottom:1px solid #e8d5b5;font-family:monospace;font-size:13px;color:#10b981;white-space:nowrap;">−£${discountAmount.toFixed(2)}</td>
+    </tr>` : '';
+
+  const paidStampHTML = isPaid ? `
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-18deg);border:5px solid rgba(16,185,129,0.35);border-radius:12px;padding:10px 28px;pointer-events:none;">
+      <div style="font-size:44px;font-weight:800;color:rgba(16,185,129,0.35);letter-spacing:0.1em;white-space:nowrap;">PAID</div>
+    </div>` : '';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>${invoiceNum} — Markeb Media</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:#f7ead5;color:#2d1f00;min-height:100vh;padding:40px 20px;}
+.page{max-width:760px;margin:0 auto;background:#FDF3E2;border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(61,48,18,0.18);position:relative;}
+.head{background:#3F4D1B;padding:36px 40px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px;}
+.head-left{display:flex;flex-direction:column;gap:10px;align-items:flex-start;}
+.logo-wrap{background:#FDF3E2;border-radius:10px;padding:10px 14px;display:inline-flex;align-items:center;justify-content:center;}
+.logo-wrap img{height:48px;width:auto;display:block;}
+.inv-badge{background:#B46100;color:#FDF3E2;font-size:10px;font-weight:700;padding:4px 14px;border-radius:4px;letter-spacing:0.12em;text-transform:uppercase;}
+.head-right{text-align:right;flex-shrink:0;}
+.inv-num{font-size:22px;font-weight:700;color:#FDF3E2;font-family:monospace;letter-spacing:0.02em;}
+.inv-meta{font-size:12px;color:rgba(253,243,226,0.6);margin-top:8px;line-height:1.9;}
+.status-pill{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;margin-top:12px;}
+.body{padding:36px 40px;position:relative;}
+.parties{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:32px;}
+.party-label{font-size:10px;font-weight:700;color:#8a6e44;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;}
+.party-name{font-size:15px;font-weight:700;color:#2d1f00;}
+.party-detail{font-size:12px;color:#6b4f2a;line-height:1.75;margin-top:4px;}
+table.lines{width:100%;border-collapse:collapse;margin-bottom:24px;}
+table.lines th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#8a6e44;padding:8px 16px;border-bottom:2px solid #e8d5b5;text-align:left;background:#f7ead5;}
+table.lines th:last-child{text-align:right;}
+.totals-wrap{margin-left:auto;width:290px;margin-bottom:28px;}
+.total-row{display:flex;justify-content:space-between;font-size:13px;color:#6b4f2a;padding:4px 0;}
+.total-row.grand{font-size:17px;font-weight:700;color:#2d1f00;border-top:2px solid #d4b896;padding-top:10px;margin-top:8px;}
+.total-row.grand .tv{color:#B46100;font-family:monospace;}
+.tv{font-family:monospace;font-size:13px;}
+.bank-box{background:#f0e3c8;border:1.5px solid #e8d5b5;border-radius:10px;padding:20px 24px;margin-bottom:24px;}
+.bank-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#8a6e44;margin-bottom:14px;}
+.bank-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 32px;}
+.bk-label{font-size:11px;color:#8a6e44;margin-bottom:2px;}
+.bk-val{font-size:14px;font-weight:600;color:#2d1f00;font-family:monospace;}
+.foot{background:#f0e3c8;border-top:1.5px solid #e8d5b5;padding:18px 40px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.foot-note{font-size:11px;color:#8a6e44;line-height:1.6;}
+.no-print{max-width:760px;margin:0 auto 20px;display:flex;gap:10px;}
+@media print{
+  body{background:#FDF3E2;padding:0;}
+  .page{box-shadow:none;border-radius:0;max-width:100%;}
+  .no-print{display:none!important;}
+}
+</style>
+</head>
+<body>
+<div class="no-print">
+  <button onclick="window.print()" style="padding:10px 22px;background:#3F4D1B;color:#FDF3E2;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-weight:600;font-size:14px;cursor:pointer;">🖨 Print / Save PDF</button>
+  <button onclick="window.close()" style="padding:10px 22px;background:#f7ead5;color:#2d1f00;border:1.5px solid #c8a97a;border-radius:8px;font-family:'Inter',sans-serif;font-weight:600;font-size:14px;cursor:pointer;">✕ Close</button>
+</div>
+<div class="page">
+  <div class="head">
+    <div class="head-left">
+      <div class="logo-wrap">
+        <img src="/public/images/Markeb Media Logo (2).png" alt="Markeb Media" />
+      </div>
+      <div class="inv-badge">Invoice</div>
+    </div>
+    <div class="head-right">
+      <div class="inv-num">${invoiceNum}</div>
+      <div class="inv-meta">
+        Issued: ${fmt(today)}<br>
+        Due: ${fmt(due)}
+      </div>
+      <div class="status-pill" style="${statusPillStyle}">${statusLabel}</div>
+    </div>
+  </div>
+
+  <div class="body">
+    ${paidStampHTML}
+    <div class="parties">
+      <div>
+        <div class="party-label">From</div>
+        <div class="party-name">Markeb Media Ltd</div>
+        <div class="party-detail">
+          Spaces Pennine 5<br>
+          20-22 Hawley Street<br>
+          Sheffield, England, S1 2EA<br>
+          commercial@markebmedia.com<br>
+          markebmedia.com
+        </div>
+      </div>
+      <div>
+        <div class="party-label">Billed to</div>
+        <div class="party-name">${clientName}</div>
+        <div class="party-detail">${clientEmail}</div>
+      </div>
+    </div>
+
+    <table class="lines">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Booking ref</th>
+          <th style="text-align:right;">Amount (ex VAT)</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${linesHTML}
+        ${discountRow}
+      </tbody>
+    </table>
+
+    <div class="totals-wrap">
+      <div class="total-row"><span>Subtotal (ex VAT)</span><span class="tv">£${exVAT.toFixed(2)}</span></div>
+      <div class="total-row"><span>VAT @ 20%</span><span class="tv">£${vatAmount.toFixed(2)}</span></div>
+      <div class="total-row grand"><span>Total ${isPaid ? 'paid' : 'due'}</span><span class="tv">£${finalPrice.toFixed(2)}</span></div>
+    </div>
+
+    ${!isPaid ? `
+    <div class="bank-box">
+      <div class="bank-title">Bank Transfer Details</div>
+      <div class="bank-grid">
+        <div><div class="bk-label">Account name</div><div class="bk-val">Markeb Media Ltd</div></div>
+        <div><div class="bk-label">Sort code</div><div class="bk-val">04-00-03</div></div>
+        <div><div class="bk-label">Account number</div><div class="bk-val">57382906</div></div>
+        <div><div class="bk-label">Payment reference</div><div class="bk-val">${invoiceNum}</div></div>
+      </div>
+    </div>` : `
+    <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:12px;">
+      <div style="font-size:28px;">✅</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;color:#065f46;">Payment received — thank you</div>
+        <div style="font-size:12px;color:#047857;margin-top:2px;">This invoice has been settled. Please retain for your records.</div>
+      </div>
+    </div>`}
+  </div>
+
+  <div class="foot">
+    <div class="foot-note">
+      ${!isPaid ? 'Payment terms: 14 days from invoice date · Thank you for your business.' : 'Thank you for your business.'}<br>
+      Company No. 15919272 · VAT No. 498 4447 31
+    </div>
+    <div class="foot-note" style="text-align:right;">
+      Markeb Media Ltd<br>
+      Sheffield, England
+    </div>
+  </div>
+</div>
+</body>
+</html>`;
+}
+
+function showInvoiceModal(bookingId) {
+  const booking = allBookings.find(b => b.id === bookingId);
+  if (!booking) { alert('Booking not found — try refreshing the Pending tab first.'); return; }
+
+  const f = booking.fields;
+  const ref = f['Booking Reference'] || bookingId.slice(-6).toUpperCase();
+  const invoiceNum = `INV-MM${ref}`;
+  const finalPrice = parseFloat(f['Final Price'] || 0);
+  const isPaid = (f['Payment Status'] || '').toLowerCase() === 'paid';
+
+  const existing = document.getElementById('invoicePreviewModal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.className = 'modal active';
+  modal.id = 'invoicePreviewModal';
+  modal.style.zIndex = '10001';
+  modal.onclick = e => { if (e.target === modal) closeInvoiceModal(); };
+
+  modal.innerHTML = `
+    <div class="modal-dialog" style="max-width:520px;" onclick="event.stopPropagation()">
+      <div class="modal-header" style="background:linear-gradient(135deg,#3F4D1B,#2e3812);">
+        <h3><i data-lucide="file-text" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:8px;"></i>${invoiceNum}</h3>
+        <button class="modal-close" onclick="closeInvoiceModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+
+        <div style="background:${isPaid ? '#f0fdf4' : '#fff3e0'};border:1.5px solid ${isPaid ? '#bbf7d0' : '#fcd34d'};border-radius:12px;padding:16px 20px;margin-bottom:20px;">
+          <div style="font-size:13px;font-weight:600;color:${isPaid ? '#065f46' : '#92400e'};margin-bottom:4px;">
+            ${isPaid ? '✅ Invoice — Paid' : '📄 Invoice — Awaiting Payment'}
+          </div>
+          <div style="font-size:12px;color:${isPaid ? '#047857' : '#78350f'};">
+            ${f['Client Name']} · ${f['Service']}<br>
+            <strong>£${finalPrice.toFixed(2)} inc. VAT</strong>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+          <button class="btn btn-primary" onclick="openInvoiceTab('${bookingId}')" style="width:100%;justify-content:center;background:#3F4D1B;border-color:#3F4D1B;font-size:14px;padding:12px 20px;">
+            <i data-lucide="external-link" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:8px;"></i>
+            Open Invoice &amp; Print / Save PDF
+          </button>
+          <button class="btn" onclick="emailInvoice('${bookingId}', this)" style="width:100%;justify-content:center;background:#B46100;color:#FDF3E2;border-color:#B46100;font-size:14px;padding:12px 20px;">
+            <i data-lucide="send" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:8px;"></i>
+            Email to ${f['Client Email']}
+          </button>
+          <button class="btn" onclick="openInvoiceTab('${bookingId}'); emailInvoice('${bookingId}')" style="width:100%;justify-content:center;background:#f8fafc;border:2px solid #e2e8f0;color:#0f172a;font-size:14px;padding:12px 20px;">
+            <i data-lucide="check-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:8px;"></i>
+            Both — Open for me &amp; Email client
+          </button>
+        </div>
+
+        <div style="font-size:12px;color:#64748b;line-height:1.6;padding:12px 14px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+          <strong>Invoice number:</strong> ${invoiceNum}<br>
+          <strong>Status:</strong> ${isPaid ? 'Paid' : 'Awaiting payment'}<br>
+          <strong>VAT:</strong> £${(finalPrice - finalPrice / 1.2).toFixed(2)} (20%) · Ex VAT: £${(finalPrice / 1.2).toFixed(2)}
+        </div>
+      </div>
+    </div>`;
+
+  document.body.appendChild(modal);
+  lucide.createIcons();
+}
+
+function closeInvoiceModal() {
+  const m = document.getElementById('invoicePreviewModal');
+  if (m) m.remove();
+}
+
+function openInvoiceTab(bookingId) {
+  const booking = allBookings.find(b => b.id === bookingId);
+  if (!booking) return;
+  const html = buildInvoiceHTML(booking);
+  const win = window.open('', '_blank');
+  if (!win) { alert('Pop-up blocked — please allow pop-ups for this page.'); return; }
+  win.document.write(html);
+  win.document.close();
+}
+
+async function emailInvoice(bookingId, btn) {
+  const booking = allBookings.find(b => b.id === bookingId);
+  if (!booking) return;
+
+  const f = booking.fields;
+  const ref = f['Booking Reference'] || bookingId.slice(-6).toUpperCase();
+  const invoiceNum = `INV-MM${ref}`;
+  const finalPrice = parseFloat(f['Final Price'] || 0);
+  const isPaid = (f['Payment Status'] || '').toLowerCase() === 'paid';
+  const exVAT = parseFloat((finalPrice / 1.2).toFixed(2));
+  const bedroomFee = parseFloat(f['Extra Bedroom Fee'] || 0);
+  const sqftFee = parseFloat(f['Square Footage Fee'] || 0);
+  const addonsRaw = f['Add-Ons'] || f['Add-ons'] || '';
+  const addonsPrice = parseFloat(f['Add-ons Price'] || f['Addons Price'] || 0);
+  const bedrooms = parseInt(f['Bedrooms'] || 0);
+  const basePrice = parseFloat(f['Base Price'] || 0);
+  const address = f['Property Address'] || '';
+  const postcode = f['Postcode'] || '';
+  const date = f['Date'] || '';
+  const time = f['Time'] || '';
+
+  let shootDate = '';
+  if (date) {
+    const [y, m, d2] = date.split('-').map(Number);
+    shootDate = new Date(y, m - 1, d2).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  // Build line items to pass to the function
+  const lineItems = [];
+  lineItems.push({
+    desc: f['Service'] || '',
+    sub: `Shoot date: ${shootDate}${time ? ' at ' + time : ''}${bedrooms ? ' · ' + bedrooms + ' bedrooms' : ''}`,
+    sub2: address ? `${address}${postcode ? ', ' + postcode : ''}` : '',
+    ref: ref,
+    amount: basePrice > 0 ? basePrice : exVAT
+  });
+  if (bedroomFee > 0) {
+    lineItems.push({ desc: `Extra bedrooms (${Math.max(0, bedrooms - 4)} × £25)`, sub: '', sub2: '', ref: '', amount: bedroomFee });
+  }
+  if (sqftFee > 0) {
+    lineItems.push({ desc: 'Large property fee (property over 3,000 sq ft)', sub: '', sub2: '', ref: '', amount: sqftFee });
+  }
+  if (addonsRaw) {
+    const addonList = addonsRaw.split(',').map(a => a.trim()).filter(Boolean);
+    addonList.forEach((a, i) => {
+      lineItems.push({
+        desc: `${a} (add-on)`,
+        sub: '', sub2: '', ref: '',
+        amount: i === addonList.length - 1 && addonsPrice > 0 ? addonsPrice : (addonList.length === 1 ? addonsPrice : null)
+      });
+    });
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i data-lucide="loader-2" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> Sending...';
+    lucide.createIcons();
+  }
+
+  try {
+    const response = await fetch('/.netlify/functions/send-invoice', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        invoiceNum,
+        isPaid,
+        booking: {
+          clientName: f['Client Name'],
+          clientEmail: f['Client Email'],
+          finalPrice,
+          discountCode: f['Discount Code'] || '',
+          discountAmount: parseFloat(f['Discount Amount'] || 0),
+          lineItems
+        }
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      alert(`✅ Invoice ${invoiceNum} emailed to ${f['Client Email']}!`);
+      closeInvoiceModal();
+    } else {
+      alert(`❌ Failed to send: ${data.error || 'Unknown error'}`);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<i data-lucide="send" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:6px;"></i> Email to ${f['Client Email']}`;
+        lucide.createIcons();
+      }
+    }
+  } catch (err) {
+    console.error('Invoice email error:', err);
+    alert('❌ Network error sending invoice: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Email Invoice'; }
+  }
+}
+
 </script>
 </body>
 </html>
