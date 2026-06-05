@@ -1590,6 +1590,14 @@ body {
   </div>
 
   <div class="nav-section">
+    <div class="nav-section-title">Finance</div>
+    <div class="nav-item" onclick="showSection('invoices')">
+      <i data-lucide="receipt" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      Invoices
+    </div>
+  </div>
+
+  <div class="nav-section">
   <div class="nav-section-title">COMMUNICATIONS</div>
   <div class="nav-item" onclick="showSection('market-updates')">
     <i data-lucide="trending-up" class="nav-icon"></i>
@@ -2106,6 +2114,47 @@ body {
         </div>
       </div>
     </div>
+
+  <!-- Invoices Section -->
+<div class="admin-section" id="invoices">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h2 style="font-size:24px;font-weight:700;margin-bottom:4px;">Invoices</h2>
+      <p style="color:#64748b;font-size:14px;">All clients with invoices — click a client to view their invoice history</p>
+    </div>
+    <button class="btn btn-primary" onclick="loadInvoices()">
+      <i data-lucide="refresh-cw" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Refresh
+    </button>
+  </div>
+  <div class="filters-bar" style="margin-bottom:20px;">
+    <input type="text" id="invoiceClientSearch" class="filter-input" placeholder="Search by client name or email..." oninput="filterInvoiceClients()">
+    <select id="invoiceStatusFilter" class="filter-select" onchange="filterInvoiceClients()">
+      <option value="">All Status</option>
+      <option value="Paid">Paid</option>
+      <option value="Unpaid">Unpaid</option>
+    </select>
+  </div>
+  <div id="invoicesContainer">
+    <div style="text-align:center;padding:40px;"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- Invoice Client Detail Panel -->
+<div id="invoiceClientPanel" style="display:none;position:fixed;top:0;right:0;width:520px;max-width:100vw;height:100vh;background:#fff;border-left:2px solid #e2e8f0;z-index:9998;box-shadow:-8px 0 40px rgba(0,0,0,0.15);overflow-y:auto;">
+  <div style="background:linear-gradient(135deg,#3F4D1B 0%,#2d3813 100%);padding:20px 24px;display:flex;justify-content:space-between;align-items:center;">
+    <div>
+      <div id="invoicePanelClientName" style="font-size:18px;font-weight:700;color:#FDF3E2;"></div>
+      <div id="invoicePanelClientEmail" style="font-size:12px;color:rgba(253,243,226,0.65);margin-top:3px;"></div>
+    </div>
+    <button onclick="closeInvoicePanel()" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.25);color:#FDF3E2;border-radius:50%;width:36px;height:36px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">&times;</button>
+  </div>
+  <div id="invoicePanelStats" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:2px solid #e2e8f0;"></div>
+  <div style="padding:20px 24px;">
+    <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;">Invoice History</div>
+    <div id="invoicePanelList"></div>
+  </div>
+</div>
+<div id="invoicePanelOverlay" onclick="closeInvoicePanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9997;"></div>
 
   <!-- Blocked Times Section -->
 <div class="admin-section" id="blocked-times">
@@ -9529,12 +9578,9 @@ function clearBroadcastForm() {
 const originalShowSectionBroadcast = showSection;
 showSection = function(sectionId) {
   originalShowSectionBroadcast(sectionId);
-  if (sectionId === 'email-broadcast') {
-    loadBroadcastData();
-  }
-  if (sectionId === 'market-updates') {
-    loadMarketUpdateStats();
-  }
+  if (sectionId === 'email-broadcast') loadBroadcastData();
+  if (sectionId === 'market-updates') loadMarketUpdateStats();
+  if (sectionId === 'invoices') loadInvoices();
 };
 
 const ADMIN_BRANDING_SERVICE_IDS = ['complete-branding', 'branding-video', 'branding-photo'];
@@ -9911,6 +9957,265 @@ async function sendCardUpdateLink(bookingId, bookingRef) {
     alert('❌ Network error: ' + err.message);
   }
 }
+// ===== INVOICES SECTION =====
+
+let allInvoicesData = [];
+let filteredInvoiceClients = [];
+
+async function loadInvoices() {
+  const container = document.getElementById('invoicesContainer');
+  container.innerHTML = '<div style="text-align:center;padding:40px;"><div class="spinner"></div></div>';
+
+  try {
+    const [invoicesRes, bookingsRes] = await Promise.all([
+      fetch('/.netlify/functions/airtable-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method: 'GET', table: 'Invoices', sort: [{ field: 'Issued Date', direction: 'desc' }] })
+      }),
+      fetch('/.netlify/functions/admin-bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      })
+    ]);
+
+    const invoicesData = await invoicesRes.json();
+    const bookingsData = await bookingsRes.json();
+
+    const airtableInvoices = (invoicesData.records || []).map(r => ({
+      id: r.id,
+      invoiceNum: r.fields['Invoice Number'] || '',
+      bookingId: r.fields['Booking ID'] || '',
+      bookingRef: r.fields['Booking Reference'] || '',
+      clientName: r.fields['Client Name'] || '',
+      clientEmail: (r.fields['Client Email'] || '').toLowerCase(),
+      amount: parseFloat(r.fields['Amount'] || 0),
+      status: r.fields['Status'] || 'Unpaid',
+      issuedDate: r.fields['Issued Date'] || '',
+      source: 'airtable'
+    }));
+
+    const existingBookingIds = new Set(airtableInvoices.map(i => i.bookingId));
+    const derivedInvoices = [];
+
+    if (bookingsData.success) {
+      allBookings = bookingsData.bookings;
+      bookingsData.bookings
+        .filter(b => b.fields['Booking Status'] !== 'Cancelled')
+        .forEach(b => {
+          if (!existingBookingIds.has(b.id)) {
+            const ref = b.fields['Booking Reference'] || b.id.slice(-6).toUpperCase();
+            derivedInvoices.push({
+              id: null,
+              invoiceNum: `INV-MM${ref}`,
+              bookingId: b.id,
+              bookingRef: ref,
+              clientName: b.fields['Client Name'] || '',
+              clientEmail: (b.fields['Client Email'] || '').toLowerCase(),
+              amount: parseFloat(b.fields['Final Price'] || 0),
+              status: b.fields['Payment Status'] === 'Paid' ? 'Paid' : 'Unpaid',
+              issuedDate: b.fields['Date'] || '',
+              source: 'booking'
+            });
+          }
+        });
+    }
+
+    allInvoicesData = [...airtableInvoices, ...derivedInvoices];
+    renderInvoiceClientList(allInvoicesData);
+
+  } catch (err) {
+    console.error('Error loading invoices:', err);
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;">Error loading invoices</div>';
+  }
+}
+
+function groupInvoicesByClient(invoices) {
+  const map = {};
+  invoices.forEach(inv => {
+    const key = inv.clientEmail || inv.clientName;
+    if (!map[key]) {
+      map[key] = { clientName: inv.clientName, clientEmail: inv.clientEmail, invoices: [], totalAmount: 0, paidAmount: 0, unpaidAmount: 0, lastDate: '' };
+    }
+    map[key].invoices.push(inv);
+    map[key].totalAmount += inv.amount;
+    if (inv.status === 'Paid') map[key].paidAmount += inv.amount;
+    else map[key].unpaidAmount += inv.amount;
+    if (!map[key].lastDate || inv.issuedDate > map[key].lastDate) map[key].lastDate = inv.issuedDate;
+  });
+  return Object.values(map).sort((a, b) => b.lastDate.localeCompare(a.lastDate));
+}
+
+function renderInvoiceClientList(invoices) {
+  const container = document.getElementById('invoicesContainer');
+  const clients = groupInvoicesByClient(invoices);
+  filteredInvoiceClients = clients;
+
+  if (clients.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:60px;color:#94a3b8;">No invoices found</div>';
+    return;
+  }
+
+  const totalOutstanding = clients.reduce((s, c) => s + c.unpaidAmount, 0);
+  const totalPaid = clients.reduce((s, c) => s + c.paidAmount, 0);
+
+  let html = `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;">
+      <div class="stat-card"><div class="stat-value">${clients.length}</div><div class="stat-label">Clients with Invoices</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:#10b981;">£${totalPaid.toFixed(2)}</div><div class="stat-label">Total Collected</div></div>
+      <div class="stat-card"><div class="stat-value" style="color:#ef4444;">£${totalOutstanding.toFixed(2)}</div><div class="stat-label">Outstanding</div></div>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Client</th><th>Invoices</th><th>Last Invoice</th><th>Total Paid</th><th>Outstanding</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  clients.forEach(client => {
+    const hasUnpaid = client.unpaidAmount > 0;
+    const lastFmt = client.lastDate
+      ? new Date(client.lastDate + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+      : '—';
+    const clientJson = JSON.stringify(client).replace(/"/g, '&quot;');
+
+    html += `
+      <tr style="cursor:pointer;" onclick="openInvoicePanel(${clientJson})">
+        <td data-label="Client">
+          <div style="font-weight:700;font-size:14px;">${client.clientName}</div>
+          <div style="font-size:12px;color:#64748b;">${client.clientEmail}</div>
+        </td>
+        <td data-label="Invoices">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:#f1f5f9;border-radius:50%;font-weight:700;font-size:14px;color:#0f172a;">${client.invoices.length}</span>
+        </td>
+        <td data-label="Last Invoice">${lastFmt}</td>
+        <td data-label="Total Paid"><span style="color:#10b981;font-weight:600;font-family:monospace;">£${client.paidAmount.toFixed(2)}</span></td>
+        <td data-label="Outstanding">
+          ${hasUnpaid
+            ? `<span style="color:#ef4444;font-weight:700;font-family:monospace;">£${client.unpaidAmount.toFixed(2)}</span>`
+            : `<span style="color:#10b981;font-size:12px;font-weight:600;">Settled</span>`}
+        </td>
+        <td data-label="Actions">
+          <button class="btn btn-primary btn-small" onclick="event.stopPropagation();openInvoicePanel(${clientJson})">
+            <i data-lucide="folder-open" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> View
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+  lucide.createIcons();
+}
+
+function filterInvoiceClients() {
+  const search = (document.getElementById('invoiceClientSearch')?.value || '').toLowerCase();
+  const status = document.getElementById('invoiceStatusFilter')?.value || '';
+  let filtered = allInvoicesData;
+  if (status) filtered = filtered.filter(inv => inv.status === status);
+  if (search) filtered = filtered.filter(inv => inv.clientName.toLowerCase().includes(search) || inv.clientEmail.toLowerCase().includes(search));
+  renderInvoiceClientList(filtered);
+}
+
+function openInvoicePanel(client) {
+  if (typeof client === 'string') client = JSON.parse(client);
+
+  document.getElementById('invoicePanelClientName').textContent = client.clientName;
+  document.getElementById('invoicePanelClientEmail').textContent = client.clientEmail;
+
+  const stats = document.getElementById('invoicePanelStats');
+  stats.innerHTML = [
+    { label: 'Invoices', value: client.invoices.length, color: '#B46100' },
+    { label: 'Collected', value: `£${client.paidAmount.toFixed(2)}`, color: '#10b981' },
+    { label: 'Outstanding', value: `£${client.unpaidAmount.toFixed(2)}`, color: client.unpaidAmount > 0 ? '#ef4444' : '#10b981' }
+  ].map(s => `
+    <div style="padding:14px 16px;text-align:center;border-right:1px solid #e2e8f0;">
+      <div style="font-size:18px;font-weight:700;color:${s.color};">${s.value}</div>
+      <div style="font-size:11px;color:#64748b;font-weight:600;margin-top:2px;">${s.label}</div>
+    </div>
+  `).join('');
+
+  const list = document.getElementById('invoicePanelList');
+  const sorted = [...client.invoices].sort((a, b) => b.issuedDate.localeCompare(a.issuedDate));
+
+  list.innerHTML = sorted.map(inv => {
+    const dateFmt = inv.issuedDate
+      ? new Date(inv.issuedDate + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+      : '—';
+    const isPaid = inv.status === 'Paid';
+    return `
+      <div onclick="openInvoiceFromPanel('${inv.bookingId}')" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:2px solid #e2e8f0;border-radius:10px;margin-bottom:10px;cursor:pointer;background:#fff;"
+        onmouseover="this.style.borderColor='#B46100';this.style.background='#fffbf5'"
+        onmouseout="this.style.borderColor='#e2e8f0';this.style.background='#fff'">
+        <div style="width:40px;height:40px;background:${isPaid ? '#d1fae5' : '#fef3c7'};border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i data-lucide="${isPaid ? 'check-circle' : 'clock'}" style="width:18px;height:18px;color:${isPaid ? '#10b981' : '#f59e0b'};"></i>
+        </div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:13px;color:#0f172a;font-family:monospace;">${inv.invoiceNum}</div>
+          <div style="font-size:12px;color:#64748b;margin-top:2px;">${inv.bookingRef}</div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:1px;">${dateFmt}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-weight:700;font-size:14px;color:#0f172a;font-family:monospace;">£${inv.amount.toFixed(2)}</div>
+          <span style="display:inline-block;margin-top:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;${isPaid ? 'background:#d1fae5;color:#065f46;' : 'background:#fef3c7;color:#92400e;'}">${inv.status}</span>
+        </div>
+        <i data-lucide="chevron-right" style="width:16px;height:16px;color:#cbd5e1;flex-shrink:0;"></i>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('invoiceClientPanel').style.display = 'block';
+  document.getElementById('invoicePanelOverlay').style.display = 'block';
+  lucide.createIcons();
+}
+
+function closeInvoicePanel() {
+  document.getElementById('invoiceClientPanel').style.display = 'none';
+  document.getElementById('invoicePanelOverlay').style.display = 'none';
+}
+
+function openInvoiceFromPanel(bookingId) {
+  const booking = allBookings.find(b => b.id === bookingId);
+  if (!booking) { alert('Booking data not in memory — please refresh the Invoices tab and try again.'); return; }
+  const html = buildInvoiceHTML(booking);
+  const win = window.open('', '_blank');
+  if (!win) { alert('Pop-up blocked — please allow pop-ups for this page.'); return; }
+  win.document.write(html);
+  win.document.close();
+}
+
+async function recordInvoiceToAirtable(booking, invoiceNum, isPaid) {
+  try {
+    const f = booking.fields;
+    await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'POST',
+        table: 'Invoices',
+        body: {
+          fields: {
+            'Invoice Number': invoiceNum,
+            'Booking ID': booking.id,
+            'Booking Reference': f['Booking Reference'] || '',
+            'Client Name': f['Client Name'] || '',
+            'Client Email': f['Client Email'] || '',
+            'Amount': parseFloat(f['Final Price'] || 0),
+            'Status': isPaid ? 'Paid' : 'Unpaid',
+            'Issued Date': new Date().toISOString().split('T')[0]
+          }
+        }
+      })
+    });
+  } catch (err) {
+    console.warn('Could not record invoice to Airtable:', err);
+  }
+}
+
 // ===== INVOICING =====
 
 function buildInvoiceHTML(booking) {
@@ -10234,7 +10539,7 @@ async function showInvoiceModal(bookingId) {
   modal.onclick = e => { if (e.target === modal) closeInvoiceModal(); };
 
   modal.innerHTML = `
-    <div class="modal-dialog" style="max-width:520px;" onclick="event.stopPropagation()">
+    <div class="modal-dialog" style="max-width:540px;" onclick="event.stopPropagation()">
       <div class="modal-header" style="background:linear-gradient(135deg,#3F4D1B,#2e3812);">
         <h3><i data-lucide="file-text" style="width:18px;height:18px;display:inline-block;vertical-align:middle;margin-right:8px;"></i>${invoiceNum}</h3>
         <button class="modal-close" onclick="closeInvoiceModal()">&times;</button>
@@ -10246,8 +10551,31 @@ async function showInvoiceModal(bookingId) {
             ${isPaid ? '✅ Invoice — Paid' : '📄 Invoice — Awaiting Payment'}
           </div>
           <div style="font-size:12px;color:${isPaid ? '#047857' : '#78350f'};">
-            ${f['Client Name']} · ${f['Service']}<br>
-            <strong>£${finalPrice.toFixed(2)} inc. VAT</strong>
+            ${f['Service']} · <strong>£${finalPrice.toFixed(2)} inc. VAT</strong>
+          </div>
+        </div>
+
+        <div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:16px 18px;margin-bottom:18px;">
+          <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">
+            <i data-lucide="edit-3" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Edit before sending
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;">Client name on invoice</label>
+            <input id="invoiceClientName" type="text" value="${(f['Client Name'] || '').replace(/'/g, '&#39;')}" class="form-input" style="font-size:14px;padding:9px 12px;" placeholder="Client name" />
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;">Send to (primary)</label>
+            <input id="invoicePrimaryEmail" type="email" value="${f['Client Email'] || ''}" class="form-input" style="font-size:14px;padding:9px 12px;" placeholder="primary@email.com" />
+          </div>
+
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;">
+              Additional recipients
+              <span style="font-weight:400;color:#94a3b8;margin-left:4px;">optional — comma separated</span>
+            </label>
+            <input id="invoiceExtraEmails" type="text" value="" class="form-input" style="font-size:14px;padding:9px 12px;" placeholder="accounts@agency.co.uk, director@agency.co.uk" />
           </div>
         </div>
 
@@ -10256,11 +10584,11 @@ async function showInvoiceModal(bookingId) {
             <i data-lucide="external-link" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:8px;"></i>
             Open Invoice &amp; Print / Save PDF
           </button>
-          <button class="btn" onclick="emailInvoice('${bookingId}', this)" style="width:100%;justify-content:center;background:#B46100;color:#FDF3E2;border-color:#B46100;font-size:14px;padding:12px 20px;">
+          <button class="btn" onclick="emailInvoiceFromModal('${bookingId}', this)" style="width:100%;justify-content:center;background:#B46100;color:#FDF3E2;border-color:#B46100;font-size:14px;padding:12px 20px;">
             <i data-lucide="send" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:8px;"></i>
-            Email to ${f['Client Email']}
+            Email Invoice
           </button>
-          <button class="btn" onclick="openInvoiceTab('${bookingId}'); emailInvoice('${bookingId}')" style="width:100%;justify-content:center;background:#f8fafc;border:2px solid #e2e8f0;color:#0f172a;font-size:14px;padding:12px 20px;">
+          <button class="btn" onclick="openInvoiceTab('${bookingId}'); emailInvoiceFromModal('${bookingId}')" style="width:100%;justify-content:center;background:#f8fafc;border:2px solid #e2e8f0;color:#0f172a;font-size:14px;padding:12px 20px;">
             <i data-lucide="check-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:8px;"></i>
             Both — Open for me &amp; Email client
           </button>
@@ -10293,7 +10621,38 @@ function openInvoiceTab(bookingId) {
   win.document.close();
 }
 
-async function emailInvoice(bookingId, btn) {
+async function emailInvoiceFromModal(bookingId, btn) {
+  // Read the editable fields from the modal
+  const overrideName = document.getElementById('invoiceClientName')?.value.trim();
+  const primaryEmail = document.getElementById('invoicePrimaryEmail')?.value.trim();
+  const extraEmailsRaw = document.getElementById('invoiceExtraEmails')?.value.trim();
+
+  const extraEmails = extraEmailsRaw
+    ? extraEmailsRaw.split(',').map(e => e.trim()).filter(e => e.includes('@'))
+    : [];
+
+  const booking = allBookings.find(b => b.id === bookingId);
+  if (!booking) return;
+
+  // Temporarily override the fields for this send
+  const originalName = booking.fields['Client Name'];
+  const originalEmail = booking.fields['Client Email'];
+
+  if (overrideName) booking.fields['Client Name'] = overrideName;
+  if (primaryEmail) booking.fields['Client Email'] = primaryEmail;
+
+  // Build extra recipient list for BCC-style sending
+  booking._extraEmailRecipients = extraEmails;
+
+  await emailInvoice(bookingId, btn, { extraRecipients: extraEmails, overrideName, primaryEmail });
+
+  // Restore originals
+  booking.fields['Client Name'] = originalName;
+  booking.fields['Client Email'] = originalEmail;
+  delete booking._extraEmailRecipients;
+}
+
+async function emailInvoice(bookingId, btn, overrides = {}) {
   const booking = allBookings.find(b => b.id === bookingId);
   if (!booking) return;
 
@@ -10360,8 +10719,9 @@ async function emailInvoice(bookingId, btn) {
         invoiceNum,
         isPaid,
         booking: {
-          clientName: f['Client Name'],
-          clientEmail: f['Client Email'],
+          clientName: overrides.overrideName || f['Client Name'],
+          clientEmail: overrides.primaryEmail || f['Client Email'],
+          extraRecipients: overrides.extraRecipients || [],
           finalPrice,
           discountCode: f['Discount Code'] || '',
           discountAmount: parseFloat(f['Discount Amount'] || 0),
@@ -10374,6 +10734,7 @@ async function emailInvoice(bookingId, btn) {
 
     if (data.success) {
       alert(`✅ Invoice ${invoiceNum} emailed to ${f['Client Email']}!`);
+      await recordInvoiceToAirtable(booking, invoiceNum, isPaid);
       closeInvoiceModal();
     } else {
       alert(`❌ Failed to send: ${data.error || 'Unknown error'}`);

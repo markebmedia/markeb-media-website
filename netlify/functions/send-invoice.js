@@ -129,7 +129,7 @@ exports.handler = async (event) => {
 
     const bankSection = !isPaid ? `
       <div class="bank-box">
-        <div class="bank-title">🏦 Bank Transfer Details</div>
+        <div class="bank-title">Bank Transfer Details</div>
         <div class="bank-grid">
           <div><div class="bk-label">Account name</div><div class="bk-val">Markeb Media Ltd</div></div>
           <div><div class="bk-label">Sort code</div><div class="bk-val">04-00-03</div></div>
@@ -138,11 +138,11 @@ exports.handler = async (event) => {
         </div>
       </div>
       <div class="alert-info">
-        <strong>💳 Payment due on receipt</strong><br>
+        <strong>Payment due on receipt</strong><br>
         Please use reference <strong>${invoiceNum}</strong> when making your bank transfer so we can match your payment instantly.
       </div>` : `
       <div class="paid-banner">
-        <div class="paid-icon">✅</div>
+        <div class="paid-icon"></div>
         <div>
           <div class="paid-text-title">Payment received — thank you</div>
           <div class="paid-text-sub">This invoice has been settled. Please retain for your records.</div>
@@ -173,7 +173,7 @@ exports.handler = async (event) => {
         <div class="inv-meta-row">
           <span class="inv-meta-label">Status</span>
           <span class="inv-meta-value">
-            <span class="status-pill ${isPaid ? 'status-paid' : 'status-pending'}">${isPaid ? '✅ Paid' : '⏳ Awaiting Payment'}</span>
+            <span class="status-pill ${isPaid ? 'status-paid' : 'status-pending'}">${isPaid ? 'Paid' : 'Awaiting Payment'}</span>
           </span>
         </div>
         <div class="inv-meta-row">
@@ -205,6 +205,13 @@ exports.handler = async (event) => {
 
       ${bankSection}
 
+      <div style="text-align:center;margin:28px 0;">
+        <a href="https://markebmedia.com/admin/admin-panel.html" style="display:inline-block;background:linear-gradient(135deg,#3F4D1B 0%,#2d3813 100%);color:#FDF3E2;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0.01em;">
+          View &amp; Print Invoice
+        </a>
+        <div style="margin-top:10px;font-size:12px;color:#8a6e44;">Opens the invoice — use your browser's Print or Save as PDF option</div>
+      </div>
+
       <p>If you have any questions about this invoice, please reply to this email or contact us at <a href="mailto:commercial@markebmedia.com" style="color:#B46100;">commercial@markebmedia.com</a>.</p>
       <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
     `;
@@ -215,10 +222,15 @@ exports.handler = async (event) => {
       ? `Invoice ${invoiceNum} — Markeb Media (Paid)`
       : `Invoice ${invoiceNum} — Markeb Media · Payment Due`;
 
+    const bccList = [BCC_EMAIL];
+    if (f.extraRecipients && f.extraRecipients.length > 0) {
+      bccList.push(...f.extraRecipients);
+    }
+
     await resend.emails.send({
       from: FROM_EMAIL,
       to: f.clientEmail,
-      bcc: BCC_EMAIL,
+      bcc: bccList,
       subject,
       html: emailHtml
     });
