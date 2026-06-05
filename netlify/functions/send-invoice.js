@@ -138,7 +138,7 @@ exports.handler = async (event) => {
         </div>
       </div>
       <div class="alert-info">
-        <strong>💳 Payment terms: 14 days</strong><br>
+        <strong>💳 Payment due on receipt</strong><br>
         Please use reference <strong>${invoiceNum}</strong> when making your bank transfer so we can match your payment instantly.
       </div>` : `
       <div class="paid-banner">

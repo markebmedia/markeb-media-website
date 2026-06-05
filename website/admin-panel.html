@@ -10107,7 +10107,7 @@ table.lines th:last-child{text-align:right;}
       <div class="inv-num">${invoiceNum}</div>
       <div class="inv-meta">
         Issued: ${fmt(today)}<br>
-        Due: ${fmt(due)}
+        Due on receipt
       </div>
       <div class="status-pill" style="${statusPillStyle}">${statusLabel}</div>
     </div>
@@ -10175,7 +10175,7 @@ table.lines th:last-child{text-align:right;}
 
   <div class="foot">
     <div class="foot-note">
-      ${!isPaid ? 'Payment terms: 14 days from invoice date · Thank you for your business.' : 'Thank you for your business.'}<br>
+      ${!isPaid ? 'Payment terms: Due on receipt · Thank you for your business.' : 'Thank you for your business.'}<br>
       Company No. 15919272 · VAT No. 498 4447 31
     </div>
     <div class="foot-note" style="text-align:right;">
