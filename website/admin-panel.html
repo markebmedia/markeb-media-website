@@ -9920,24 +9920,29 @@ function buildInvoiceHTML(booking) {
 
   const isPaid = (f['Payment Status'] || '').toLowerCase() === 'paid';
 
-  const service = f['Service'] || '';
-  const basePrice = parseFloat(f['Base Price'] || 0);
-  const bedroomFee = parseFloat(f['Extra Bedroom Fee'] || 0);
-  const sqftFee = parseFloat(f['Square Footage Fee'] || 0);
-  const addonsRaw = f['Add-Ons'] || f['Add-ons'] || '';
-  const addonsPrice = parseFloat(f['Add-ons Price'] || f['Addons Price'] || 0);
-  const discountCode = f['Discount Code'] || '';
-  const discountAmount = parseFloat(f['Discount Amount'] || 0);
-  const finalPrice = parseFloat(f['Final Price'] || 0);
-  const exVAT = parseFloat((finalPrice / 1.2).toFixed(2));
-  const vatAmount = parseFloat((finalPrice - exVAT).toFixed(2));
-  const bedrooms = parseInt(f['Bedrooms'] || 0);
-  const address = f['Property Address'] || '';
-  const postcode = f['Postcode'] || '';
-  const date = f['Date'] || '';
-  const time = f['Time'] || '';
-  const clientName = f['Client Name'] || '';
-  const clientEmail = f['Client Email'] || '';
+  // Support both booking.fields (Airtable raw) and flat object (from airtable-proxy GET)
+  const isFlat = !f['Service'] && (f.service || f.bookingRef);
+  const service       = f['Service']             || f.service        || '';
+  const basePrice     = parseFloat(f['Base Price']         || f.basePrice      || 0);
+  const bedroomFee    = parseFloat(f['Extra Bedroom Fee']  || f.extraBedroomFee|| 0);
+  const sqftFee       = parseFloat(f['Square Footage Fee'] || f.squareFootageFee|| 0);
+  const addonsRaw     = f['Add-Ons'] || f['Add-ons']       || '';
+  const addonsPrice   = parseFloat(f['Add-ons Price'] || f['Addons Price'] || f.addonsPrice || 0);
+  const discountCode  = f['Discount Code']        || f.discountCode   || '';
+  const discountAmount= parseFloat(f['Discount Amount']    || f.discountAmount || 0);
+  const finalPrice    = parseFloat(f['Final Price']        || f.finalPrice     || 0);
+  const exVAT         = parseFloat((finalPrice / 1.2).toFixed(2));
+  const vatAmount     = parseFloat((finalPrice - exVAT).toFixed(2));
+  const bedrooms      = parseInt(f['Bedrooms']             || f.bedrooms       || 0);
+  const address       = f['Property Address']     || f.propertyAddress || '';
+  const postcode      = f['Postcode']             || f.postcode        || '';
+  const date          = f['Date']                 || f.date            || '';
+  const time          = f['Time']                 || f.time            || '';
+  const clientName    = f['Client Name']          || f.clientName      || '';
+  const clientEmail   = f['Client Email']         || f.clientEmail     || '';
+
+  // If fetched via airtable-proxy GET, addons come back as structured array
+  const structuredAddonsFromGet = Array.isArray(f.addons) ? f.addons : null;
 
   let shootDate = '';
   if (date) {
@@ -9969,15 +9974,46 @@ function buildInvoiceHTML(booking) {
     lines.push({ desc: 'Large property fee (property over 3,000 sq ft)', sub: '', sub2: '', ref: '', amount: sqftFee });
   }
 
-  if (addonsRaw) {
-    const addonList = addonsRaw.split(',').map(a => a.trim()).filter(Boolean);
-    addonList.forEach((a, i) => {
+  if (structuredAddonsFromGet && structuredAddonsFromGet.length > 0) {
+    // Best case — structured addon array from get-booking/airtable-proxy
+    structuredAddonsFromGet.forEach(a => {
       lines.push({
-        desc: `${a} (add-on)`,
+        desc: a.name || a,
         sub: '', sub2: '', ref: '',
-        amount: i === addonList.length - 1 && addonsPrice > 0 ? addonsPrice : (addonList.length === 1 ? addonsPrice : null)
+        amount: typeof a.price === 'number' ? a.price : null
       });
     });
+  } else if (addonsRaw) {
+    // Try to parse structured addon data first (multiline Airtable format: "Name (+£20.00)")
+    const addonLines = addonsRaw.split('\n').map(s => s.trim()).filter(Boolean);
+    const structuredAddons = addonLines.map(line => {
+      const match = line.match(/^(.+?)\s*\(\+£([\d.]+)\)$/);
+      if (match) return { name: match[1].trim(), price: parseFloat(match[2]) };
+      // Plain name with no price — try to split by comma as fallback
+      return { name: line.replace(/\s*\(\+£[\d.]+\)$/, '').trim(), price: null };
+    }).filter(a => a.name);
+
+    if (structuredAddons.length > 0 && structuredAddons.some(a => a.price !== null)) {
+      // Use structured data — each addon has its own price
+      structuredAddons.forEach(a => {
+        lines.push({
+          desc: a.name,
+          sub: '', sub2: '', ref: '',
+          amount: a.price !== null ? a.price : 0
+        });
+      });
+    } else {
+      // Fallback — comma separated names, split addonsPrice evenly
+      const addonList = addonsRaw.split(',').map(a => a.trim()).filter(Boolean);
+      const priceEach = addonList.length > 0 && addonsPrice > 0 ? addonsPrice / addonList.length : 0;
+      addonList.forEach(a => {
+        lines.push({
+          desc: a,
+          sub: '', sub2: '', ref: '',
+          amount: priceEach > 0 ? priceEach : null
+        });
+      });
+    }
   }
 
   const linesHTML = lines.map(l => `
