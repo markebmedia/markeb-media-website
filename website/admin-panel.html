@@ -5286,13 +5286,30 @@ function viewBookingById(bookingId) {
     </div>
     
     <div class="detail-item">
-      <span class="detail-label">Booking Status</span>
-      <span class="detail-value">
-        <span class="status-badge status-${(fields['Booking Status'] || '').toLowerCase()}">
-          ${fields['Booking Status'] || 'Booked'}
-        </span>
-      </span>
-    </div>
+  <span class="detail-label">Booking Status</span>
+  <span class="detail-value">
+    <span class="status-badge status-${(fields['Booking Status'] || '').toLowerCase()}">
+      ${fields['Booking Status'] || 'Booked'}
+    </span>
+  </span>
+</div>
+
+${fields['Client Notes'] ? `
+<div class="detail-item">
+  <span class="detail-label">Client Notes</span>
+  <span class="detail-value" style="text-align: left; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 10px 14px; display: block; line-height: 1.6; color: #92400e; white-space: pre-wrap;">
+    ${fields['Client Notes']}
+  </span>
+</div>` : ''}
+
+${fields['Access Type'] ? `
+<div class="detail-item">
+  <span class="detail-label">Access</span>
+  <span class="detail-value">
+    ${fields['Access Type']}
+    ${fields['Key Pickup Location'] ? `<br><small style="color:#64748b;">${fields['Key Pickup Location']}</small>` : ''}
+  </span>
+</div>` : ''}
     
     <div style="margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
       <div class="action-buttons-grid">
