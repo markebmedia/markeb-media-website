@@ -10240,7 +10240,6 @@ function buildInvoiceHTML(booking) {
   const ref = f['Booking Reference'] || booking.id.slice(-6).toUpperCase();
   const invoiceNum = `INV-MM${ref}`;
   const today = new Date();
-  const due = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
   const fmt = d => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
   const isPaid = (f['Payment Status'] || '').toLowerCase() === 'paid';

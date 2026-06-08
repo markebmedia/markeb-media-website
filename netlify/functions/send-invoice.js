@@ -20,34 +20,38 @@ function getEmailLayout(content) {
     .header h1 { color: #FDF3E2; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
     .header-accent { width: 40px; height: 3px; background: #B46100; margin: 14px auto 0; border-radius: 2px; }
     .inv-badge { display: inline-block; background: #B46100; color: #FDF3E2; font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 4px; letter-spacing: 0.1em; text-transform: uppercase; margin-top: 14px; }
-    .content { padding: 40px 30px; }
-    .content h2 { color: #3F4D1B; font-size: 22px; font-weight: 700; margin: 0 0 8px; }
-    .content p { color: #3F4D1B; margin: 0 0 14px; }
-    .inv-meta { background: #f7ead5; border: 2px solid #e8d9be; border-radius: 12px; padding: 20px 24px; margin: 24px 0; }
-    .inv-meta-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e8d9be; font-size: 14px; }
+    .content { padding: 32px 20px; }
+    .content h2 { color: #3F4D1B; font-size: 20px; font-weight: 700; margin: 0 0 8px; }
+    .content p { color: #3F4D1B; margin: 0 0 14px; font-size: 15px; }
+    .inv-meta { background: #f7ead5; border: 2px solid #e8d9be; border-radius: 12px; padding: 16px; margin: 24px 0; }
+    .inv-meta-row { display: block; padding: 10px 0; border-bottom: 1px solid #e8d9be; font-size: 14px; }
     .inv-meta-row:last-child { border-bottom: none; }
-    .inv-meta-label { color: #6b7c2e; font-weight: 600; }
-    .inv-meta-value { color: #3F4D1B; font-weight: 600; text-align: right; }
+    .inv-meta-label { display: block; color: #6b7c2e; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+    .inv-meta-value { display: block; color: #3F4D1B; font-weight: 600; }
     .inv-table-wrap { margin: 24px 0; border: 2px solid #e8d9be; border-radius: 12px; overflow: hidden; }
-    table.inv-lines { width: 100%; border-collapse: collapse; }
-    table.inv-lines th { background: #f0e8d5; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7c2e; padding: 10px 16px; text-align: left; border-bottom: 2px solid #e8d9be; }
-    table.inv-lines th:last-child { text-align: right; }
-    table.inv-lines td { padding: 12px 16px; font-size: 14px; color: #3F4D1B; border-bottom: 1px solid #e8d9be; vertical-align: top; }
-    table.inv-lines td:last-child { text-align: right; font-family: monospace; white-space: nowrap; }
+    table.inv-lines { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    table.inv-lines th { background: #f0e8d5; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7c2e; padding: 10px 12px; text-align: left; border-bottom: 2px solid #e8d9be; }
+    table.inv-lines th:last-child { text-align: right; width: 90px; }
+    table.inv-lines th:nth-child(2) { display: none; }
+    table.inv-lines td { padding: 12px 12px; font-size: 14px; color: #3F4D1B; border-bottom: 1px solid #e8d9be; vertical-align: top; word-break: break-word; }
+    table.inv-lines td:last-child { text-align: right; font-family: monospace; white-space: nowrap; width: 90px; }
+    table.inv-lines td:nth-child(2) { display: none; }
     table.inv-lines tr:last-child td { border-bottom: none; }
     .inv-sub { font-size: 11px; color: #8a6e44; margin-top: 3px; }
     .discount-row td { color: #10b981; }
-    .totals-section { background: #f0e8d5; border-top: 2px solid #e8d9be; padding: 16px 20px; }
+    .totals-section { background: #f0e8d5; border-top: 2px solid #e8d9be; padding: 14px 16px; }
     .total-line { display: flex; justify-content: space-between; font-size: 14px; color: #6b7c2e; padding: 3px 0; }
-    .total-line.grand { font-size: 18px; font-weight: 700; color: #3F4D1B; border-top: 2px solid #d4b896; padding-top: 10px; margin-top: 8px; }
+    .total-line.grand { font-size: 17px; font-weight: 700; color: #3F4D1B; border-top: 2px solid #d4b896; padding-top: 10px; margin-top: 8px; }
     .total-line.grand .tv { color: #B46100; font-family: monospace; }
     .tv { font-family: monospace; }
-    .bank-box { background: #f7ead5; border: 2px solid #e8d9be; border-radius: 12px; padding: 20px 24px; margin: 24px 0; }
+    .bank-box { background: #f7ead5; border: 2px solid #e8d9be; border-radius: 12px; padding: 16px; margin: 24px 0; }
     .bank-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #6b7c2e; margin-bottom: 14px; }
-    .bank-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; }
-    .bk-label { font-size: 11px; color: #8a6e44; margin-bottom: 2px; }
-    .bk-val { font-size: 14px; font-weight: 700; color: #3F4D1B; font-family: monospace; }
-    .paid-banner { background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 18px 22px; margin: 24px 0; display: flex; align-items: center; gap: 14px; }
+    .bank-grid { display: block; }
+    .bank-item { padding: 8px 0; border-bottom: 1px solid #e8d9be; }
+    .bank-item:last-child { border-bottom: none; }
+    .bk-label { font-size: 11px; color: #8a6e44; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .bk-val { font-size: 15px; font-weight: 700; color: #3F4D1B; font-family: monospace; }
+    .paid-banner { background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 18px 16px; margin: 24px 0; display: flex; align-items: center; gap: 14px; }
     .paid-icon { font-size: 32px; flex-shrink: 0; }
     .paid-text-title { font-size: 15px; font-weight: 700; color: #065f46; margin-bottom: 3px; }
     .paid-text-sub { font-size: 13px; color: #047857; }
@@ -56,7 +60,7 @@ function getEmailLayout(content) {
     .status-pending { background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.4); color: #92400e; }
     .button { display: inline-block; background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%); color: #FDF3E2 !important; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-weight: 600; margin: 20px 0; font-size: 15px; }
     .alert-info { background: #fff8ee; border: 2px solid #B46100; border-radius: 8px; padding: 16px; margin: 16px 0; font-size: 14px; color: #8a4a00; }
-    .footer { background-color: #3F4D1B; padding: 30px; text-align: center; color: rgba(253,243,226,0.7); font-size: 14px; }
+    .footer { background-color: #3F4D1B; padding: 24px 20px; text-align: center; color: rgba(253,243,226,0.7); font-size: 13px; }
     .footer strong { color: #FDF3E2; }
     .footer a { color: #B46100; text-decoration: none; }
     .footer-divider { width: 32px; height: 2px; background: #B46100; margin: 16px auto; border-radius: 1px; }
@@ -99,7 +103,6 @@ exports.handler = async (event) => {
     }
 
     const today = new Date();
-    const due = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000);
     const fmt = d => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
     const finalPrice = parseFloat(f.finalPrice || 0);
@@ -131,10 +134,10 @@ exports.handler = async (event) => {
       <div class="bank-box">
         <div class="bank-title">Bank Transfer Details</div>
         <div class="bank-grid">
-          <div><div class="bk-label">Account name</div><div class="bk-val">Markeb Media Ltd</div></div>
-          <div><div class="bk-label">Sort code</div><div class="bk-val">04-00-03</div></div>
-          <div><div class="bk-label">Account number</div><div class="bk-val">57382906</div></div>
-          <div><div class="bk-label">Payment reference</div><div class="bk-val">${invoiceNum}</div></div>
+          <div class="bank-item"><div class="bk-label">Account name</div><div class="bk-val">Markeb Media Ltd</div></div>
+          <div class="bank-item"><div class="bk-label">Sort code</div><div class="bk-val">04-00-03</div></div>
+          <div class="bank-item"><div class="bk-label">Account number</div><div class="bk-val">57382906</div></div>
+          <div class="bank-item"><div class="bk-label">Payment reference</div><div class="bk-val">${invoiceNum}</div></div>
         </div>
       </div>
       <div class="alert-info">
@@ -154,7 +157,7 @@ exports.handler = async (event) => {
       <p>Hi ${f.clientName},</p>
       <p>${isPaid
         ? 'Please find your paid invoice below for your recent booking with Markeb Media.'
-        : 'Please find your invoice below. Payment is due within 14 days — bank transfer details are included.'
+        : 'Please find your invoice below. Payment is due on receipt — bank transfer details are included.'
       }</p>
 
       <div class="inv-meta">
@@ -168,7 +171,7 @@ exports.handler = async (event) => {
         </div>
         <div class="inv-meta-row">
           <span class="inv-meta-label">Due date</span>
-          <span class="inv-meta-value">${isPaid ? 'Settled' : fmt(due)}</span>
+          <span class="inv-meta-value">${isPaid ? 'Settled' : 'Due on receipt'}</span>
         </div>
         <div class="inv-meta-row">
           <span class="inv-meta-label">Status</span>
@@ -206,10 +209,10 @@ exports.handler = async (event) => {
       ${bankSection}
 
       <div style="text-align:center;margin:28px 0;">
-        <a href="https://markebmedia.com/admin/admin-panel.html" style="display:inline-block;background:linear-gradient(135deg,#3F4D1B 0%,#2d3813 100%);color:#FDF3E2;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0.01em;">
+        <a href="https://markebmedia.com/.netlify/functions/view-invoice?ref=${invoiceNum}" style="display:inline-block;background:linear-gradient(135deg,#3F4D1B 0%,#2d3813 100%);color:#FDF3E2;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0.01em;">
           View &amp; Print Invoice
         </a>
-        <div style="margin-top:10px;font-size:12px;color:#8a6e44;">Opens the invoice — use your browser's Print or Save as PDF option</div>
+        <div style="margin-top:10px;font-size:12px;color:#8a6e44;">Opens your invoice — use your browser's Print or Save as PDF option</div>
       </div>
 
       <p>If you have any questions about this invoice, please reply to this email or contact us at <a href="mailto:commercial@markebmedia.com" style="color:#B46100;">commercial@markebmedia.com</a>.</p>
