@@ -96,7 +96,7 @@ exports.handler = async (event) => {
 
   try {
     const body = JSON.parse(event.body);
-    const { booking: f, invoiceNum, isPaid } = body;
+    const { booking: f, invoiceNum, isPaid, failedPayment, failedReason } = body;
 
     if (!f || !f.clientEmail || !invoiceNum) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Missing required fields' }) };
@@ -153,10 +153,16 @@ exports.handler = async (event) => {
       </div>`;
 
     const content = `
-      <h2>Your Invoice from Markeb Media</h2>
+      <h2>${failedPayment ? 'Payment Unsuccessful — Invoice Enclosed' : 'Your Invoice from Markeb Media'}</h2>
       <p>Hi ${f.clientName},</p>
+      ${failedPayment ? `
+      <div style="background:#fff8ee;border:2px solid #B46100;border-radius:10px;padding:18px 22px;margin:0 0 20px;">
+        <p style="margin:0 0 8px;color:#8a4a00;font-size:15px;font-weight:700;">⚠️ We were unable to process your payment</p>
+        <p style="margin:0;color:#8a4a00;font-size:14px;line-height:1.6;">${failedReason || 'Your card could not be charged.'} Your booking is still reserved — please settle the invoice below to confirm your shoot.</p>
+      </div>` : ''}
       <p>${isPaid
         ? 'Please find your paid invoice below for your recent booking with Markeb Media.'
+        : failedPayment ? 'Your invoice is enclosed below. Please pay by bank transfer using the details provided, or log in to your dashboard to update your card.'
         : 'Please find your invoice below. Payment is due on receipt — bank transfer details are included.'
       }</p>
 

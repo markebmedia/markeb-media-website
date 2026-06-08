@@ -6,6 +6,73 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Airtable = require('airtable');
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
+async function sendFailedPaymentInvoice(fields, reason) {
+  const ref = fields['Booking Reference'] || '';
+  const invoiceNum = `INV-MM${ref}`;
+  const finalPrice = parseFloat(fields['Final Price'] || 0);
+  const exVAT = parseFloat((finalPrice / 1.2).toFixed(2));
+  const basePrice = parseFloat(fields['Base Price'] || 0);
+  const bedroomFee = parseFloat(fields['Extra Bedroom Fee'] || 0);
+  const sqftFee = parseFloat(fields['Square Footage Fee'] || 0);
+  const addonsRaw = fields['Add-Ons'] || fields['Add-ons'] || '';
+  const bedrooms = parseInt(fields['Bedrooms'] || 0);
+  const address = fields['Property Address'] || '';
+  const postcode = fields['Postcode'] || '';
+  const date = fields['Date'] || '';
+  const time = fields['Time'] || '';
+
+  let shootDate = '';
+  if (date) {
+    const [y, m, d2] = date.split('-').map(Number);
+    shootDate = new Date(y, m - 1, d2).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  const lineItems = [];
+  lineItems.push({
+    desc: fields['Service'] || '',
+    sub: `Shoot date: ${shootDate}${time ? ' at ' + time : ''}${bedrooms ? ' · ' + bedrooms + ' bedrooms' : ''}`,
+    sub2: address ? `${address}${postcode ? ', ' + postcode : ''}` : '',
+    ref: ref,
+    amount: basePrice > 0 ? basePrice : exVAT
+  });
+  if (bedroomFee > 0) {
+    lineItems.push({ desc: `Extra bedrooms (${Math.max(0, bedrooms - 4)} × £25)`, sub: '', sub2: '', ref: '', amount: bedroomFee });
+  }
+  if (sqftFee > 0) {
+    lineItems.push({ desc: 'Large property fee (property over 3,000 sq ft)', sub: '', sub2: '', ref: '', amount: sqftFee });
+  }
+  if (addonsRaw) {
+    addonsRaw.split(',').map(a => a.trim()).filter(Boolean).forEach(a => {
+      lineItems.push({ desc: a, sub: '', sub2: '', ref: '', amount: null });
+    });
+  }
+
+  const response = await fetch('https://markebmedia.com/.netlify/functions/send-invoice', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      invoiceNum,
+      isPaid: false,
+      failedPayment: true,
+      failedReason: reason,
+      booking: {
+        clientName: fields['Client Name'],
+        clientEmail: fields['Client Email'],
+        finalPrice,
+        discountCode: fields['Discount Code'] || '',
+        discountAmount: parseFloat(fields['Discount Amount'] || 0),
+        lineItems
+      }
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error('send-invoice call failed: ' + response.status);
+  }
+
+  console.log('✅ Failed payment invoice email sent to', fields['Client Email']);
+}
+
 exports.handler = async (event, context) => {
   console.log('=== Charge Card Function ===');
   
@@ -371,6 +438,14 @@ if (process.env.RESEND_API_KEY) {
     console.error('❌ Error charging card:', error);
 
     if (error.type === 'StripeCardError') {
+      try {
+        const failedBooking = await base('Bookings').find(JSON.parse(event.body).bookingId).catch(() => null);
+        if (failedBooking) {
+          await sendFailedPaymentInvoice(failedBooking.fields, error.message);
+        }
+      } catch (emailErr) {
+        console.error('⚠️ Failed payment invoice email error:', emailErr);
+      }
       return {
         statusCode: 400,
         headers,
@@ -378,19 +453,27 @@ if (process.env.RESEND_API_KEY) {
           success: false,
           error: 'Card payment failed',
           message: error.message,
-          userMessage: 'The card payment failed. Please send a payment link instead or contact the customer.'
+          userMessage: 'The card payment failed. An invoice has been sent to the customer.'
         })
       };
     }
 
     if (error.type === 'StripeAuthenticationError') {
+      try {
+        const failedBooking = await base('Bookings').find(JSON.parse(event.body).bookingId).catch(() => null);
+        if (failedBooking) {
+          await sendFailedPaymentInvoice(failedBooking.fields, 'Your card requires additional verification to complete payment. Please update your payment details via your dashboard.');
+        }
+      } catch (emailErr) {
+        console.error('⚠️ Failed payment invoice email error:', emailErr);
+      }
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({
           success: false,
           error: 'Card requires authentication',
-          userMessage: 'This card requires 3D Secure verification. Please send a payment link instead.'
+          userMessage: 'This card requires 3D Secure verification. An invoice has been sent to the customer.'
         })
       };
     }
