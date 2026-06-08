@@ -439,7 +439,12 @@ if (process.env.RESEND_API_KEY) {
 
     if (error.type === 'StripeCardError') {
       try {
-        const failedBooking = await base('Bookings').find(JSON.parse(event.body).bookingId).catch(() => null);
+        const parsedBody = JSON.parse(event.body);
+        await base('Bookings').update(parsedBody.bookingId, {
+          'Payment Status': 'Pending',
+          'Stripe Payment Intent ID': ''
+        });
+        const failedBooking = await base('Bookings').find(parsedBody.bookingId).catch(() => null);
         if (failedBooking) {
           await sendFailedPaymentInvoice(failedBooking.fields, error.message);
         }
@@ -460,7 +465,12 @@ if (process.env.RESEND_API_KEY) {
 
     if (error.type === 'StripeAuthenticationError') {
       try {
-        const failedBooking = await base('Bookings').find(JSON.parse(event.body).bookingId).catch(() => null);
+        const parsedBody = JSON.parse(event.body);
+        await base('Bookings').update(parsedBody.bookingId, {
+          'Payment Status': 'Pending',
+          'Stripe Payment Intent ID': ''
+        });
+        const failedBooking = await base('Bookings').find(parsedBody.bookingId).catch(() => null);
         if (failedBooking) {
           await sendFailedPaymentInvoice(failedBooking.fields, 'Your card requires additional verification to complete payment. Please update your payment details via your dashboard.');
         }
