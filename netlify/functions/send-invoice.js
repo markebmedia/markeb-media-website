@@ -158,7 +158,7 @@ exports.handler = async (event) => {
       ${failedPayment ? `
       <div style="background:#fff8ee;border:2px solid #B46100;border-radius:10px;padding:18px 22px;margin:0 0 20px;">
         <p style="margin:0 0 8px;color:#8a4a00;font-size:15px;font-weight:700;">⚠️ We were unable to process your payment</p>
-        <p style="margin:0;color:#8a4a00;font-size:14px;line-height:1.6;">${failedReason || 'Your card could not be charged.'} Your booking is still reserved — please settle the invoice below to confirm your shoot.</p>
+        <p style="margin:0;color:#8a4a00;font-size:14px;line-height:1.6;">${failedReason || 'Your card could not be charged.'} Please settle the invoice below.</p>
       </div>` : ''}
       <p>${isPaid
         ? 'Please find your paid invoice below for your recent booking with Markeb Media.'

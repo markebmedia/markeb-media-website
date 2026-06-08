@@ -472,7 +472,7 @@ if (process.env.RESEND_API_KEY) {
         });
         const failedBooking = await base('Bookings').find(parsedBody.bookingId).catch(() => null);
         if (failedBooking) {
-          await sendFailedPaymentInvoice(failedBooking.fields, 'Your card requires additional verification to complete payment. Please update your payment details via your dashboard.');
+          await sendFailedPaymentInvoice(failedBooking.fields, 'Your card requires additional verification to complete payment.');
         }
       } catch (emailErr) {
         console.error('⚠️ Failed payment invoice email error:', emailErr);
