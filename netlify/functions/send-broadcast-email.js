@@ -33,7 +33,7 @@ function getEmailLayout(content, userEmail = '') {
       background-color: #FDF3E2;
     }
     .header {
-      background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%);
+      background-color: #3F4D1B;
       padding: 40px 20px;
       text-align: center;
     }
@@ -82,7 +82,7 @@ function getEmailLayout(content, userEmail = '') {
     }
     .button {
       display: inline-block;
-      background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+      background-color: #B46100;
       color: #FDF3E2 !important;
       padding: 14px 32px;
       border-radius: 10px;
@@ -135,7 +135,7 @@ function getEmailLayout(content, userEmail = '') {
       color: #3F4D1B;
     }
     .date-badge {
-      background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
+      background-color: #B46100;
       color: #FDF3E2;
       padding: 4px 12px;
       border-radius: 12px;
