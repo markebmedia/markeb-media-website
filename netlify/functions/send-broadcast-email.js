@@ -489,6 +489,31 @@ async function fetchAvailableDatesForUser(user) {
   return results.filter(Boolean);
 }
 
+function generateOfferContent(user) {
+  const firstName = (user.name || 'there').split(' ')[0];
+  return `
+    <div style="background-color:#B46100;border-radius:12px;padding:32px 24px;text-align:center;margin-bottom:24px;">
+      <p style="color:#FDF3E2;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin:0 0 12px;">Limited Time Offer</p>
+      <h2 style="color:#FDF3E2;font-size:32px;font-weight:800;margin:0 0 12px;line-height:1.2;">1 shoot. 2nd one free.</h2>
+      <p style="color:#FDF3E2;font-size:16px;margin:0;opacity:0.9;">Book your first shoot with Markeb Media and we'll give you your second one, the same value, completely free.</p>
+    </div>
+
+    <p>Hi ${firstName},</p>
+
+    <p>We're running a one-time offer for our clients. Book your first shoot and your second shoot — same value, same quality — is on us.</p>
+
+    <p>No catch. No small print. Just book, shoot, and we'll honour the second one automatically.</p>
+
+    <center>
+      <a href="https://markebmedia.com/login" class="button">Book Your First Shoot</a>
+    </center>
+
+    <p style="font-size:14px;color:#64748b;margin-top:20px;">Any questions, just reply to this email and we'll sort it.</p>
+
+    <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+  `;
+}
+
 async function generateAvailabilityContent(user) {
   const availableDates = await fetchAvailableDatesForUser(user);
   if (availableDates === null) return null;
@@ -739,7 +764,9 @@ exports.handler = async (event, context) => {
       const batchResults = await Promise.all(batch.map(async (user) => {
         try {
           let emailContent = content;
-          if (templateType === 'availability') {
+          if (templateType === 'offer') {
+            emailContent = generateOfferContent(user);
+          } else if (templateType === 'availability') {
             emailContent = await generateAvailabilityContent(user);
           } else if (isHtml) {
             // Replace [Name] only — leave the rest of the HTML untouched
