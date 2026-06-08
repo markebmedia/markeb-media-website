@@ -3,7 +3,10 @@ const Airtable = require('airtable');
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
 exports.handler = async (event) => {
-  const ref = (event.queryStringParameters?.ref || '').trim().toUpperCase();
+  const rawRef = event.queryStringParameters?.ref 
+    || (event.path || '').split('/invoice/')[1] 
+    || '';
+  const ref = rawRef.trim().toUpperCase();
 
   if (!ref) {
     return errorPage('Missing invoice reference', 'Please provide a valid invoice reference in the URL.');
