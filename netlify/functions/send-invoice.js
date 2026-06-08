@@ -215,7 +215,7 @@ exports.handler = async (event) => {
       ${bankSection}
 
       <div style="text-align:center;margin:28px 0;">
-        <a href="https://markebmedia.com/.netlify/functions/view-invoice?ref=${invoiceNum}" style="display:inline-block;background:linear-gradient(135deg,#3F4D1B 0%,#2d3813 100%);color:#FDF3E2;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0.01em;">
+        <a href="https://markebmedia.com/invoice/${invoiceNum}" style="display:inline-block;background:linear-gradient(135deg,#3F4D1B 0%,#2d3813 100%);color:#FDF3E2;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0.01em;">
           View &amp; Print Invoice
         </a>
         <div style="margin-top:10px;font-size:12px;color:#8a6e44;">Opens your invoice — use your browser's Print or Save as PDF option</div>

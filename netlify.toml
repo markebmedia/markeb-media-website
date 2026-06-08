@@ -45,6 +45,11 @@
     Basic-Auth = "markeb:Markebmedia230301"
 
 [[redirects]]
+  from = "/invoice/:ref"
+  to = "/.netlify/functions/view-invoice?ref=:ref"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
