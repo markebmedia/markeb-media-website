@@ -112,7 +112,6 @@ exports.handler = async (event, context) => {
       availableSlots = generateAllTimeSlots();
       availableSlots = applyBlockedTimes(availableSlots, blockedTimes);
       availableSlots = applyDurationConstraints(availableSlots, bookingDuration, []);
-      availableSlots = applyMiddayRule(availableSlots);
 
       return {
         statusCode: 200,
@@ -133,9 +132,6 @@ exports.handler = async (event, context) => {
     
     // ✅ Apply blocked times on top of booking conflicts
     availableSlots = applyBlockedTimes(availableSlots, blockedTimes);
-
-    // ✅ Apply midday rule last so it has the full picture
-    availableSlots = applyMiddayRule(availableSlots);
 
     return {
       statusCode: 200,
@@ -180,44 +176,6 @@ exports.handler = async (event, context) => {
     };
   }
 };
-
-// ── MIDDAY RULE ──────────────────────────────────────────────────────────────
-// Gap slots (12:00–13:45) are only shown once the morning session (09:00–10:45) OR the
-// afternoon session (14:00–15:00) is already filled (no available slots left).
-function applyMiddayRule(slots) {
-  const morningSlots = slots.filter(s => {
-    const m = timeToMinutes(s.time);
-    return m >= timeToMinutes('09:00') && m <= timeToMinutes('10:45');
-  });
-
-  const afternoonSlots = slots.filter(s => {
-    const m = timeToMinutes(s.time);
-    return m >= timeToMinutes('14:00') && m <= timeToMinutes('15:00');
-  });
-
-  const gapSlots = slots.filter(s => {
-    const m = timeToMinutes(s.time);
-    return m >= timeToMinutes('12:00') && m <= timeToMinutes('13:45');
-  });
-
-  const morningFull   = morningSlots.every(s => !s.available);
-  const afternoonFull = afternoonSlots.every(s => !s.available);
-
-  if (!morningFull && !afternoonFull) {
-    console.log('Midday rule: morning and afternoon both have space — hiding all gap slots (12:00–13:45)');
-    gapSlots.forEach(slot => {
-      if (slot.available) {
-        slot.available = false;
-        slot.reason = 'Available once morning or afternoon slots are filled';
-      }
-    });
-  } else {
-    console.log(`Midday rule: ${morningFull ? 'morning' : 'afternoon'} is full — gap slots (12:00–13:45) unlocked`);
-  }
-
-  return slots;
-}
-// ────────────────────────────────────────────────────────────────────────────
 
 // ✅ Fetch blocked times from Airtable
 async function fetchBlockedTimes(region, selectedDate) {
