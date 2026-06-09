@@ -10138,6 +10138,27 @@ function filterInvoiceClients() {
   renderInvoiceClientList(filtered);
 }
 
+function getInvoiceSentLog() {
+  try { return JSON.parse(localStorage.getItem('invoiceSentLog') || '{}'); }
+  catch { return {}; }
+}
+
+function wasInvoiceSent(invoiceNum) {
+  return getInvoiceSentLog()[invoiceNum] || null;
+}
+
+function formatSentTime(isoString) {
+  const d = new Date(isoString);
+  const mins = Math.floor((Date.now() - d) / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d ago`;
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 function openInvoicePanel(client) {
   if (typeof client === 'string') client = JSON.parse(client);
 
@@ -10164,23 +10185,36 @@ function openInvoicePanel(client) {
       ? new Date(inv.issuedDate + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
       : '—';
     const isPaid = inv.status === 'Paid';
+    const ref = inv.bookingRef || inv.invoiceNum;
+    const invNum = `INV-MM${ref}`;
+    const sentRecord = wasInvoiceSent(invNum);
+    const sentBadge = sentRecord
+      ? `<div style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;background:#d1fae5;color:#065f46;">
+          <i data-lucide="send" style="width:10px;height:10px;"></i>
+          Sent ${formatSentTime(sentRecord.timestamp)} · ${sentRecord.clientName}
+         </div>`
+      : `<div style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;background:#f1f5f9;color:#94a3b8;">
+          <i data-lucide="mail" style="width:10px;height:10px;"></i>
+          Not yet sent
+         </div>`;
     return `
-      <div onclick="openInvoiceFromPanel('${inv.bookingId}')" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:2px solid #e2e8f0;border-radius:10px;margin-bottom:10px;cursor:pointer;background:#fff;"
+      <div onclick="openInvoiceFromPanel('${inv.bookingId}')" style="display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border:2px solid #e2e8f0;border-radius:10px;margin-bottom:10px;cursor:pointer;background:#fff;"
         onmouseover="this.style.borderColor='#B46100';this.style.background='#fffbf5'"
         onmouseout="this.style.borderColor='#e2e8f0';this.style.background='#fff'">
-        <div style="width:40px;height:40px;background:${isPaid ? '#d1fae5' : '#fef3c7'};border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <div style="width:40px;height:40px;background:${isPaid ? '#d1fae5' : '#fef3c7'};border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
           <i data-lucide="${isPaid ? 'check-circle' : 'clock'}" style="width:18px;height:18px;color:${isPaid ? '#10b981' : '#f59e0b'};"></i>
         </div>
         <div style="flex:1;min-width:0;">
-          <div style="font-weight:700;font-size:13px;color:#0f172a;font-family:monospace;">${inv.invoiceNum}</div>
+          <div style="font-weight:700;font-size:13px;color:#0f172a;font-family:monospace;">${invNum}</div>
           <div style="font-size:12px;color:#64748b;margin-top:2px;">${inv.bookingRef}</div>
           <div style="font-size:11px;color:#94a3b8;margin-top:1px;">${dateFmt}</div>
+          ${sentBadge}
         </div>
         <div style="text-align:right;flex-shrink:0;">
           <div style="font-weight:700;font-size:14px;color:#0f172a;font-family:monospace;">£${inv.amount.toFixed(2)}</div>
           <span style="display:inline-block;margin-top:4px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;${isPaid ? 'background:#d1fae5;color:#065f46;' : 'background:#fef3c7;color:#92400e;'}">${inv.status}</span>
         </div>
-        <i data-lucide="chevron-right" style="width:16px;height:16px;color:#cbd5e1;flex-shrink:0;"></i>
+        <i data-lucide="chevron-right" style="width:16px;height:16px;color:#cbd5e1;flex-shrink:0;margin-top:12px;"></i>
       </div>
     `;
   }).join('');
@@ -10749,6 +10783,14 @@ async function emailInvoice(bookingId, btn, overrides = {}) {
     const data = await response.json();
 
     if (data.success) {
+      const sentLog = getInvoiceSentLog();
+      sentLog[invoiceNum] = {
+        timestamp: new Date().toISOString(),
+        clientName: overrides.overrideName || f['Client Name'],
+        clientEmail: overrides.primaryEmail || f['Client Email'],
+        amount: finalPrice
+      };
+      localStorage.setItem('invoiceSentLog', JSON.stringify(sentLog));
       alert(`✅ Invoice ${invoiceNum} emailed to ${f['Client Email']}!`);
       await recordInvoiceToAirtable(booking, invoiceNum, isPaid);
       closeInvoiceModal();
