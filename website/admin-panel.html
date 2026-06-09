@@ -10664,7 +10664,20 @@ function closeInvoiceModal() {
 function openInvoiceTab(bookingId) {
   const booking = allBookings.find(b => b.id === bookingId);
   if (!booking) return;
+
+  const overrideName = document.getElementById('invoiceClientName')?.value.trim();
+  const overrideEmail = document.getElementById('invoicePrimaryEmail')?.value.trim();
+
+  const originalName = booking.fields['Client Name'];
+  const originalEmail = booking.fields['Client Email'];
+  if (overrideName) booking.fields['Client Name'] = overrideName;
+  if (overrideEmail) booking.fields['Client Email'] = overrideEmail;
+
   const html = buildInvoiceHTML(booking);
+
+  booking.fields['Client Name'] = originalName;
+  booking.fields['Client Email'] = originalEmail;
+
   const win = window.open('', '_blank');
   if (!win) { alert('Pop-up blocked — please allow pop-ups for this page.'); return; }
   win.document.write(html);
