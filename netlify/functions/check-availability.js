@@ -43,14 +43,42 @@ exports.handler = async (event, context) => {
     const bookingDuration = duration || 90;
     console.log(`Checking availability for: postcode=${postcode}, region=${region}, date=${selectedDate}, duration=${bookingDuration}min`);
 
-    // Check if the selected date is within 24 hours
-    const selectedDateObj = new Date(selectedDate + 'T00:00:00');
+    // ── DATE GATE ────────────────────────────────────────────────────────────
+    // Next-day bookings allowed if request arrives before 5pm today.
+    // All other bookings require more than 24 hours notice.
     const now = new Date();
-    const hoursDifference = (selectedDateObj - now) / (1000 * 60 * 60);
 
-    // Block if date is within 24 hours from now
-    if (hoursDifference < 24) {
-      console.log(`Date is within 24 hours (${hoursDifference.toFixed(1)} hours) - blocking all slots`);
+    const todayMidnight = new Date();
+    todayMidnight.setHours(0, 0, 0, 0);
+
+    const tomorrowMidnight = new Date(todayMidnight);
+    tomorrowMidnight.setDate(todayMidnight.getDate() + 1);
+
+    const selectedMidnight = new Date(selectedDate + 'T00:00:00');
+    const isNextDay = selectedMidnight.getTime() === tomorrowMidnight.getTime();
+    const currentHour = now.getHours();
+
+    let blockAllSlots = false;
+    let blockReason = '';
+
+    if (isNextDay) {
+      if (currentHour >= 18) {
+        blockAllSlots = true;
+        blockReason = 'Next-day bookings must be made before 5pm';
+        console.log('Next-day booking request after 5pm — blocking all slots');
+      } else {
+        console.log(`Next-day booking request at ${currentHour}:xx — permitted (before 5pm)`);
+      }
+    } else {
+      const hoursDifference = (selectedMidnight - now) / (1000 * 60 * 60);
+      if (hoursDifference < 24) {
+        blockAllSlots = true;
+        blockReason = 'Bookings require at least 24 hours notice';
+        console.log(`Date is within 24 hours (${hoursDifference.toFixed(1)} hours) — blocking all slots`);
+      }
+    }
+
+    if (blockAllSlots) {
       return {
         statusCode: 200,
         headers: {
@@ -60,11 +88,13 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({
           availableSlots: generateAllTimeSlots().map(slot => ({
             ...slot,
-            available: false
+            available: false,
+            reason: blockReason
           }))
         })
       };
     }
+    // ────────────────────────────────────────────────────────────────────────
 
     // ✅ Fetch blocked times for this region and date
     const blockedTimes = await fetchBlockedTimes(region, selectedDate);
@@ -82,7 +112,8 @@ exports.handler = async (event, context) => {
       availableSlots = generateAllTimeSlots();
       availableSlots = applyBlockedTimes(availableSlots, blockedTimes);
       availableSlots = applyDurationConstraints(availableSlots, bookingDuration, []);
-      
+      availableSlots = applyMiddayRule(availableSlots);
+
       return {
         statusCode: 200,
         headers: {
@@ -102,6 +133,9 @@ exports.handler = async (event, context) => {
     
     // ✅ Apply blocked times on top of booking conflicts
     availableSlots = applyBlockedTimes(availableSlots, blockedTimes);
+
+    // ✅ Apply midday rule last so it has the full picture
+    availableSlots = applyMiddayRule(availableSlots);
 
     return {
       statusCode: 200,
@@ -146,6 +180,44 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+// ── MIDDAY RULE ──────────────────────────────────────────────────────────────
+// Gap slots (12:00–13:45) are only shown once the morning session (09:00–10:45) OR the
+// afternoon session (14:00–15:00) is already filled (no available slots left).
+function applyMiddayRule(slots) {
+  const morningSlots = slots.filter(s => {
+    const m = timeToMinutes(s.time);
+    return m >= timeToMinutes('09:00') && m <= timeToMinutes('10:45');
+  });
+
+  const afternoonSlots = slots.filter(s => {
+    const m = timeToMinutes(s.time);
+    return m >= timeToMinutes('14:00') && m <= timeToMinutes('15:00');
+  });
+
+  const gapSlots = slots.filter(s => {
+    const m = timeToMinutes(s.time);
+    return m >= timeToMinutes('12:00') && m <= timeToMinutes('13:45');
+  });
+
+  const morningFull   = morningSlots.every(s => !s.available);
+  const afternoonFull = afternoonSlots.every(s => !s.available);
+
+  if (!morningFull && !afternoonFull) {
+    console.log('Midday rule: morning and afternoon both have space — hiding all gap slots (12:00–13:45)');
+    gapSlots.forEach(slot => {
+      if (slot.available) {
+        slot.available = false;
+        slot.reason = 'Available once morning or afternoon slots are filled';
+      }
+    });
+  } else {
+    console.log(`Midday rule: ${morningFull ? 'morning' : 'afternoon'} is full — gap slots (12:00–13:45) unlocked`);
+  }
+
+  return slots;
+}
+// ────────────────────────────────────────────────────────────────────────────
 
 // ✅ Fetch blocked times from Airtable
 async function fetchBlockedTimes(region, selectedDate) {
@@ -228,7 +300,7 @@ function applyDurationConstraints(slots, bookingDuration, existingBookings) {
   console.log(`\nApplying duration constraints (${bookingDuration} min booking):`);
   
   const fixedBufferMinutes = 45;
-  const endOfDayMinutes = timeToMinutes('15:30'); // Last possible end time
+  const endOfDayMinutes = timeToMinutes('16:30'); // Last booking starts 15:00, max 90min + 45min buffer
   
   slots.forEach(slot => {
     if (!slot.available) return; // Skip already blocked slots
@@ -237,9 +309,17 @@ function applyDurationConstraints(slots, bookingDuration, existingBookings) {
     const slotEndMinutes = slotStartMinutes + bookingDuration;
     const slotEndWithBuffer = slotEndMinutes + fixedBufferMinutes;
     
+    // Block slots past the last bookable start time
+    if (slotStartMinutes > timeToMinutes('15:00')) {
+      console.log(`  ❌ ${slot.time}: Past last bookable slot (15:00)`);
+      slot.available = false;
+      slot.reason = 'Past last available booking time';
+      return;
+    }
+
     // Check if booking would run past end of day
     if (slotEndMinutes > endOfDayMinutes) {
-      console.log(`  ❌ ${slot.time}: Would finish at ${minutesToTime(slotEndMinutes)} (past 3:30 PM)`);
+      console.log(`  ❌ ${slot.time}: Would finish at ${minutesToTime(slotEndMinutes)} (past 4:30 PM)`);
       slot.available = false;
       slot.reason = 'Booking would run past available hours';
       return;
@@ -336,8 +416,8 @@ function generateAllTimeSlots() {
   const slots = [];
   
   for (let hour = 9; hour <= 15; hour++) {
-    for (let minute of [0, 30]) {
-      if (hour === 15 && minute === 30) break; // Stop at 3:00 PM (last slot is 15:00)
+    for (let minute of [0, 15, 30, 45]) {
+      if (hour === 15 && minute === 15) break; // Stop at 15:00 (last slot is 15:00)
       
       const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
       slots.push({
