@@ -309,6 +309,9 @@ exports.handler = async (event, context) => {
         // Square footage
         'Square Footage': bookingData.squareFootage || undefined,
         'Square Footage Fee': bookingData.squareFootageFee || 0,
+        'EPC Answers': bookingData.epcAnswers && Object.keys(bookingData.epcAnswers).some(k => bookingData.epcAnswers[k])
+          ? JSON.stringify(bookingData.epcAnswers)
+          : undefined,
         
         'Booking Status': bookingStatus,
         'Payment Status': paymentStatus,
@@ -421,6 +424,7 @@ exports.handler = async (event, context) => {
   keyPickupLocation: bookingData.keyPickupLocation || '',
   localPlaces: bookingData.localPlaces || [],
   brandingAnswers: bookingData.brandingAnswers || {},
+  epcAnswers: bookingData.epcAnswers || {},
   addons: bookingData.addons || []
 };
 

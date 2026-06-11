@@ -294,6 +294,26 @@ exports.handler = async (event, context) => {
         ...(metadata.keyPickupLocation && { 'Key Pickup Location': metadata.keyPickupLocation }),
         'Square Footage': metadata.squareFootage ? parseInt(metadata.squareFootage) : undefined,
         'Square Footage Fee': metadata.squareFootageFee ? parseFloat(metadata.squareFootageFee) : 0,
+        ...(metadata.epcAnswers && metadata.epcAnswers !== '{}' && (() => {
+          try {
+            const epc = JSON.parse(metadata.epcAnswers);
+            return {
+              'EPC Property Age': epc.propertyAge || undefined,
+              'EPC Extension Age': epc.extensionAge || undefined,
+              'EPC Loft Conversion': epc.loftConversion || undefined,
+              'EPC Solar Panels': epc.solarPanels || undefined
+            };
+          } catch { return {}; }
+        })()),
+        ...(metadata.localPlaces && metadata.localPlaces !== '[]' && (() => {
+          try {
+            const places = JSON.parse(metadata.localPlaces);
+            return { 'Local Area Places': places.join('\n') };
+          } catch { return {}; }
+        })()),
+        ...(metadata.brandingAnswers && metadata.brandingAnswers !== '{}' && {
+          'Branding Answers': metadata.brandingAnswers
+        }),
         
         'Booking Status': 'Confirmed',
         'Payment Status': 'Paid',
@@ -379,6 +399,15 @@ exports.handler = async (event, context) => {
             accessType: metadata.accessType || '',
             keyPickupLocation: metadata.keyPickupLocation || '',
             squareFootage: metadata.squareFootage ? parseInt(metadata.squareFootage) : null,
+            localPlaces: (() => {
+              try { return JSON.parse(metadata.localPlaces || '[]'); } catch { return []; }
+            })(),
+            brandingAnswers: (() => {
+              try { return JSON.parse(metadata.brandingAnswers || '{}'); } catch { return {}; }
+            })(),
+            epcAnswers: (() => {
+              try { return JSON.parse(metadata.epcAnswers || '{}'); } catch { return {}; }
+            })(),
             addons: addons
           };
           

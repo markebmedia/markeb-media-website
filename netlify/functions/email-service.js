@@ -144,6 +144,44 @@ function getBrandingAnswersSection(booking) {
   `;
 }
 
+// ✅ Format EPC Answers (internal email only — for forwarding to EPC partner)
+function getEpcAnswersSection(booking) {
+  const epc = booking.epcAnswers;
+  if (!epc || !Object.values(epc).some(v => v)) return '';
+
+  return `
+    <h3>⚡ EPC Information</h3>
+    <div class="booking-details">
+      ${epc.propertyAge ? `
+      <div class="detail-row">
+        <span class="detail-label">Age of Property</span>
+        <span class="detail-value">${epc.propertyAge}</span>
+      </div>` : ''}
+      ${epc.extensionAge ? `
+      <div class="detail-row">
+        <span class="detail-label">Age of Extensions</span>
+        <span class="detail-value">${epc.extensionAge}</span>
+      </div>` : ''}
+      ${epc.loftConversion ? `
+      <div class="detail-row">
+        <span class="detail-label">Loft Conversion</span>
+        <span class="detail-value">${epc.loftConversion}</span>
+      </div>` : ''}
+      ${epc.solarPanels ? `
+      <div class="detail-row">
+        <span class="detail-label">Solar Panels</span>
+        <span class="detail-value">
+          ${epc.solarPanels}
+          ${epc.solarPanels === 'Yes' ? '<br><span style="font-size:12px;color:#92400e;background:#fef3c7;border:1px solid #f59e0b;padding:2px 8px;border-radius:4px;font-weight:600;">⚠️ MCS Certificate Required</span>' : ''}
+        </span>
+      </div>` : ''}
+    </div>
+    <div style="background:#eff6ff;border:1px solid #3b82f6;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#1e40af;">
+      <strong>📋 Forward to EPC partner:</strong> All details above should be passed to your EPC assessor before the visit.
+    </div>
+  `;
+}
+
 // Email Layout Wrapper
 function getEmailLayout(content) {
   return `
@@ -533,6 +571,10 @@ async function sendBookingConfirmation(booking) {
           <span class="detail-value">${booking.paymentStatus}</span>
         </div>
       </div>
+
+      ${getEpcAnswersSection(booking)}
+      ${getBrandingAnswersSection(booking)}
+      ${getLocalAreaPlacesSection(booking)}
 
       <div class="alert alert-info">
         <strong>📧 Customer email sent:</strong> Yes<br>

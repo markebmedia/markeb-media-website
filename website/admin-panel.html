@@ -1990,6 +1990,91 @@ body {
         </div>
       </div>
 
+      <!-- EPC Questions Section (admin) -->
+      <div id="adminEpcSection" style="display: none; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 16px; padding: 28px; margin-bottom: 24px;">
+        <div style="margin-bottom: 20px;">
+          <div style="display: inline-flex; align-items: center; gap: 8px; background: #1e40af; color: #fff; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 14px; text-transform: uppercase;">
+            ⚡ EPC Information
+          </div>
+          <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 8px;">EPC Details</h3>
+          <p style="font-size: 14px; color: #64748b; line-height: 1.6;">Passed directly to our EPC partner. Complete on behalf of the client where known.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Age of the property</label>
+            <select id="adminEpcPropertyAge" class="form-input">
+              <option value="">-- Select approximate build period --</option>
+              <option value="Pre-1900">Pre-1900</option>
+              <option value="1900–1929">1900–1929</option>
+              <option value="1930–1949">1930–1949</option>
+              <option value="1950–1966">1950–1966</option>
+              <option value="1967–1975">1967–1975</option>
+              <option value="1976–1982">1976–1982</option>
+              <option value="1983–1990">1983–1990</option>
+              <option value="1991–1995">1991–1995</option>
+              <option value="1996–2002">1996–2002</option>
+              <option value="2003–2006">2003–2006</option>
+              <option value="2007–2011">2007–2011</option>
+              <option value="2012 onwards">2012 onwards</option>
+              <option value="Unknown">Unknown</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Age of any extensions <span style="font-weight: 400; color: #94a3b8;">— if applicable</span></label>
+            <select id="adminEpcExtensionAge" class="form-input">
+              <option value="">-- No extension / Not applicable --</option>
+              <option value="Pre-1900">Pre-1900</option>
+              <option value="1900–1929">1900–1929</option>
+              <option value="1930–1949">1930–1949</option>
+              <option value="1950–1966">1950–1966</option>
+              <option value="1967–1975">1967–1975</option>
+              <option value="1976–1982">1976–1982</option>
+              <option value="1983–1990">1983–1990</option>
+              <option value="1991–1995">1991–1995</option>
+              <option value="1996–2002">1996–2002</option>
+              <option value="2003–2006">2003–2006</option>
+              <option value="2007–2011">2007–2011</option>
+              <option value="2012 onwards">2012 onwards</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Is there a loft conversion?</label>
+            <div style="display: flex; gap: 12px; margin-top: 4px;">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; padding: 12px 20px; flex: 1;">
+                <input type="radio" name="adminEpcLoft" value="Yes" style="width: 18px; height: 18px; accent-color: #3b82f6;">
+                <span style="font-size: 15px; font-weight: 600; color: #1e293b;">Yes</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; padding: 12px 20px; flex: 1;">
+                <input type="radio" name="adminEpcLoft" value="No" style="width: 18px; height: 18px; accent-color: #3b82f6;">
+                <span style="font-size: 15px; font-weight: 600; color: #1e293b;">No</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Are there solar panels?</label>
+            <div style="display: flex; gap: 12px; margin-top: 4px;">
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; padding: 12px 20px; flex: 1;">
+                <input type="radio" name="adminEpcSolar" value="Yes" onchange="document.getElementById('adminEpcMcsNotice').style.display='block'" style="width: 18px; height: 18px; accent-color: #3b82f6;">
+                <span style="font-size: 15px; font-weight: 600; color: #1e293b;">Yes</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; padding: 12px 20px; flex: 1;">
+                <input type="radio" name="adminEpcSolar" value="No" onchange="document.getElementById('adminEpcMcsNotice').style.display='none'" style="width: 18px; height: 18px; accent-color: #3b82f6;">
+                <span style="font-size: 15px; font-weight: 600; color: #1e293b;">No</span>
+              </label>
+            </div>
+          </div>
+          <div id="adminEpcMcsNotice" style="display: none; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 16px;">
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+              <span style="font-size: 22px; flex-shrink: 0;">☀️</span>
+              <div>
+                <div style="font-size: 14px; font-weight: 700; color: #92400e; margin-bottom: 4px;">MCS Certificate Required</div>
+                <div style="font-size: 13px; color: #92400e; line-height: 1.6;">Properties with solar panels require a valid MCS certificate for the EPC assessment. Please ensure this is available on the day of the visit.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Submit Buttons -->
       <div class="button-group" style="margin-top: 24px;">
         <button type="button" class="btn btn-secondary" onclick="resetBookingForm()" style="flex: 1;">
@@ -3464,7 +3549,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 500.00,
       duration: 150,
       isPropertyService: true,
-      availableAddons: ['add-branded-outro']
+      availableAddons: ['add-branded-outro', 'epc-standard', 'epc-large']
     },
     {
       id: 'silver-package',
@@ -3472,7 +3557,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 219.00,
       duration: 90,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
     },
     {
       id: 'bronze-package',
@@ -3480,7 +3565,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 169.00,
       duration: 90,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
     },
     {
       id: 'all-in-one-drone',
@@ -3488,7 +3573,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 179.00,
       duration: 45,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
     },
     {
       id: 'property-video',
@@ -3496,7 +3581,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 129.00,
       duration: 60,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
     },
     {
       id: 'property-photo',
@@ -3504,7 +3589,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 99.00,
       duration: 45,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
     },
     {
       id: 'drone-video',
@@ -3512,7 +3597,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 109.00,
       duration: 20,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
     },
     {
       id: 'drone-photo',
@@ -3520,7 +3605,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 109.00,
       duration: 20,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours', 'local-area-highlights']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
     }
   ],
   south: [
@@ -3554,7 +3639,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 500.00,
       duration: 150,
       isPropertyService: true,
-      availableAddons: ['add-branded-outro']
+      availableAddons: ['add-branded-outro', 'epc-standard', 'epc-large']
     },
     {
       id: 'silver-package',
@@ -3562,7 +3647,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 219.00,
       duration: 90,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
     },
     {
       id: 'bronze-package',
@@ -3570,7 +3655,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 169.00,
       duration: 90,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
     },
     {
       id: 'all-in-one-drone',
@@ -3578,7 +3663,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 179.00,
       duration: 45,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
     },
     {
       id: 'property-video',
@@ -3586,7 +3671,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 129.00,
       duration: 60,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
     },
     {
       id: 'property-photo',
@@ -3594,7 +3679,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 99.00,
       duration: 45,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
     },
     {
       id: 'drone-video',
@@ -3602,7 +3687,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 109.00,
       duration: 20,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
     },
     {
       id: 'drone-photo',
@@ -3610,7 +3695,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       price: 109.00,
       duration: 20,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours', 'local-area-highlights']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
     }
   ]
 };
@@ -3675,6 +3760,19 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
         name: 'Local Area Highlights',
         price: 100.00,
         description: 'Showcase the lifestyle around the property — nearby cafes, parks, green spaces, transport links and local amenities captured on shoot day'
+      },
+      'epc-standard': {
+        id: 'epc-standard',
+        name: 'EPC (Up to 4 Bedrooms)',
+        price: 70.00,
+        description: 'Energy Performance Certificate for properties up to 4 bedrooms'
+      },
+      'epc-large': {
+        id: 'epc-large',
+        name: 'EPC (5+ Bedrooms)',
+        price: 70.00,
+        description: 'Energy Performance Certificate — £70 base + £10 per bedroom above 4',
+        dynamicPrice: true
       }
     };
 
@@ -4032,9 +4130,19 @@ function handleAdminAccessTypeChange() {
       // Show/hide addons section
       if (availableAddons.length > 0) {
         const addonContainer = document.getElementById('bookingAddonCheckboxes');
+        // Recalculate large EPC price from current bedroom count before rendering
+        const currentBeds = bookingFormData.bedrooms || 4;
+        const extraBedsForEpc = currentBeds > 4 ? currentBeds - 4 : 0;
+        ADDONS_CATALOG['epc-large'].price = 70 + (extraBedsForEpc * 10);
+        ADDONS_CATALOG['epc-large'].name = `EPC (5+ Bedrooms) — £${ADDONS_CATALOG['epc-large'].price.toFixed(0)}`;
+
         addonContainer.innerHTML = availableAddons.map(addonId => {
           const addon = ADDONS_CATALOG[addonId];
           if (!addon) return '';
+
+          // Show only the relevant EPC option based on bedroom count
+          if (addonId === 'epc-standard' && currentBeds > 4) return '';
+          if (addonId === 'epc-large' && currentBeds <= 4) return '';
           
           return `
             <label style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #fff; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer;">
@@ -4068,6 +4176,14 @@ function handleAdminAccessTypeChange() {
     }
 
     function toggleBookingAddon(addonId) {
+      // EPC add-ons are mutually exclusive
+      if (addonId === 'epc-standard') {
+        bookingFormData.selectedAddons = bookingFormData.selectedAddons.filter(id => id !== 'epc-large');
+      }
+      if (addonId === 'epc-large') {
+        bookingFormData.selectedAddons = bookingFormData.selectedAddons.filter(id => id !== 'epc-standard');
+      }
+
       const index = bookingFormData.selectedAddons.indexOf(addonId);
       if (index > -1) {
         bookingFormData.selectedAddons.splice(index, 1);
@@ -4076,12 +4192,50 @@ function handleAdminAccessTypeChange() {
       }
       calculateBookingPrice();
       updateAdminLocalAreaVisibility();
+      updateAdminEpcVisibility();
+    }
+
+    function updateAdminEpcVisibility() {
+      const section = document.getElementById('adminEpcSection');
+      if (!section) return;
+      const hasEpc = bookingFormData.selectedAddons.includes('epc-standard') ||
+                     bookingFormData.selectedAddons.includes('epc-large');
+      section.style.display = hasEpc ? 'block' : 'none';
+      if (!hasEpc) {
+        const ageEl = document.getElementById('adminEpcPropertyAge');
+        const extEl = document.getElementById('adminEpcExtensionAge');
+        const mcsEl = document.getElementById('adminEpcMcsNotice');
+        if (ageEl) ageEl.value = '';
+        if (extEl) extEl.value = '';
+        if (mcsEl) mcsEl.style.display = 'none';
+        document.querySelectorAll('input[name="adminEpcLoft"]').forEach(r => r.checked = false);
+        document.querySelectorAll('input[name="adminEpcSolar"]').forEach(r => r.checked = false);
+      }
+    }
+
+    function getAdminEpcAnswers() {
+      return {
+        propertyAge: document.getElementById('adminEpcPropertyAge')?.value || '',
+        extensionAge: document.getElementById('adminEpcExtensionAge')?.value || '',
+        loftConversion: document.querySelector('input[name="adminEpcLoft"]:checked')?.value || '',
+        solarPanels: document.querySelector('input[name="adminEpcSolar"]:checked')?.value || ''
+      };
     }
 
     function adjustBookingBedrooms(change) {
       bookingFormData.bedrooms = Math.max(1, Math.min(15, bookingFormData.bedrooms + change));
       document.getElementById('bookingBedroomCount').textContent = bookingFormData.bedrooms;
+
+      // Remove any EPC addon that's no longer valid for this bedroom count
+      if (bookingFormData.bedrooms <= 4) {
+        bookingFormData.selectedAddons = bookingFormData.selectedAddons.filter(id => id !== 'epc-large');
+      } else {
+        bookingFormData.selectedAddons = bookingFormData.selectedAddons.filter(id => id !== 'epc-standard');
+      }
+
       calculateBookingPrice();
+      // Re-render addons so EPC switches and price updates live
+      if (document.getElementById('bookingService').value) updateBookingPrice();
     }
 
     function calculateBookingPrice() {
@@ -4322,6 +4476,7 @@ function resetBookingForm() {
   bookingFormData.squareFootageFee = 0;
   bookingFormData.extraDuration = 0;
   document.getElementById('bookingAddonsSection').style.display = 'none';
+  updateAdminEpcVisibility();
   document.getElementById('availabilityResults').style.display = 'none';
   const discountMsg = document.getElementById('discountMessage');
   if (discountMsg) discountMsg.innerHTML = '';
@@ -4456,6 +4611,7 @@ if (!mediaSpecialist) {
     brandingAnswers: getAdminBrandingAnswers(),
     squareFootage: bookingFormData.squareFootage || '',
     squareFootageFee: bookingFormData.squareFootageFee || 0,
+    epcAnswers: getAdminEpcAnswers(),
     
     date: document.getElementById('bookingDate').value,
     time: document.getElementById('bookingTime').value,

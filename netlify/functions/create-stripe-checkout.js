@@ -121,6 +121,13 @@ exports.handler = async (event, context) => {
         keyPickupLocation: bookingData.keyPickupLocation || '',
         squareFootage: bookingData.squareFootage ? bookingData.squareFootage.toString() : '',
         squareFootageFee: bookingData.squareFootageFee ? bookingData.squareFootageFee.toString() : '0',
+        epcAnswers: bookingData.epcAnswers ? JSON.stringify(bookingData.epcAnswers) : '',
+        localPlaces: bookingData.localPlaces && bookingData.localPlaces.length > 0
+          ? JSON.stringify(bookingData.localPlaces)
+          : '[]',
+        brandingAnswers: bookingData.brandingAnswers && Object.keys(bookingData.brandingAnswers).length > 0
+          ? JSON.stringify(bookingData.brandingAnswers)
+          : '{}',
 
         // Add-ons
         addons: JSON.stringify(bookingData.addons || []),
