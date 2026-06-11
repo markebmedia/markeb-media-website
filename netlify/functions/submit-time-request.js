@@ -80,7 +80,7 @@ exports.handler = async (event) => {
               ${notes ? `<tr><td style="padding:12px 0; color:#6b7c2e; font-weight:600; vertical-align:top;">Notes</td><td style="padding:12px 0; color:#1e293b;">${notes}</td></tr>` : ''}
             </table>
             <div style="margin-top:24px; text-align:center;">
-              <a href="https://markebmedia.com/internal/admin.html#time-requests" 
+              <a href="https://markebmedia.com/website/admin-panel.html#time-requests" 
                  style="display:inline-block; background:linear-gradient(135deg,#B46100,#8a4a00); color:#FDF3E2; padding:14px 32px; border-radius:10px; text-decoration:none; font-weight:700; font-size:15px;">
                 Review in Admin Panel
               </a>
