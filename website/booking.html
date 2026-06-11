@@ -902,6 +902,153 @@ width: 100%;
           </div>
         </div>
 
+        <!-- Time Request Section -->
+<div id="timeRequestSection" style="margin-bottom: 24px;">
+  <button 
+    type="button" 
+    id="timeRequestToggle"
+    onclick="toggleTimeRequest()"
+    style="
+      width: 100%; 
+      background: transparent; 
+      border: 2px dashed #cbd5e1; 
+      border-radius: 12px; 
+      padding: 16px 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'Mukta', sans-serif;
+      transition: all 0.2s ease;
+    "
+    onmouseover="this.style.borderColor='#B46100'; this.style.background='#fff8ee';"
+    onmouseout="if(!document.getElementById('timeRequestForm').classList.contains('open')){this.style.borderColor='#cbd5e1'; this.style.background='transparent';}"
+  >
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-size: 20px;">🕐</span>
+      <div style="text-align: left;">
+        <div style="font-size: 15px; font-weight: 700; color: #1e293b;">Can't find a suitable time?</div>
+        <div style="font-size: 13px; color: #64748b; margin-top: 2px;">Request a specific date and time — we'll confirm within 24 hours</div>
+      </div>
+    </div>
+    <span id="timeRequestChevron" style="font-size: 18px; color: #94a3b8; transition: transform 0.2s ease;">›</span>
+  </button>
+
+  <div id="timeRequestForm" style="display: none; overflow: hidden;">
+    <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; padding: 28px;">
+      
+      <div style="background: #fff8ee; border: 2px solid #B46100; border-radius: 10px; padding: 14px 16px; margin-bottom: 24px; font-size: 13px; color: #8a4a00; line-height: 1.6;">
+        <strong>How this works:</strong> Submit your preferred date and time below. We'll review it and get back to you within 24 hours. If we can accommodate you, we'll book it in and send a confirmation. If not, we'll suggest the nearest available alternatives.
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Preferred Date *</label>
+          <input 
+            type="date" 
+            id="reqDate" 
+            class="form-input"
+            style="cursor: pointer;"
+          />
+          <div class="error-message" id="reqDateError">Please select a preferred date</div>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Preferred Time *</label>
+          <select id="reqTime" class="form-input" style="cursor: pointer;">
+            <option value="">-- Select a time --</option>
+            <option value="08:00">08:00</option>
+            <option value="08:30">08:30</option>
+            <option value="09:00">09:00</option>
+            <option value="09:30">09:30</option>
+            <option value="10:00">10:00</option>
+            <option value="10:30">10:30</option>
+            <option value="11:00">11:00</option>
+            <option value="11:30">11:30</option>
+            <option value="12:00">12:00</option>
+            <option value="12:30">12:30</option>
+            <option value="13:00">13:00</option>
+            <option value="13:30">13:30</option>
+            <option value="14:00">14:00</option>
+            <option value="14:30">14:30</option>
+            <option value="15:00">15:00</option>
+            <option value="15:30">15:30</option>
+            <option value="16:00">16:00</option>
+          </select>
+          <div class="error-message" id="reqTimeError">Please select a preferred time</div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Your Name *</label>
+          <input 
+            type="text" 
+            id="reqName" 
+            class="form-input" 
+            placeholder="e.g. John Smith"
+          />
+          <div class="error-message" id="reqNameError">Please enter your name</div>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Phone Number *</label>
+          <input 
+            type="tel" 
+            id="reqPhone" 
+            class="form-input" 
+            placeholder="e.g. 07700 900123"
+          />
+          <div class="error-message" id="reqPhoneError">Please enter a valid UK phone number</div>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label class="form-label">Email Address *</label>
+        <input 
+          type="email" 
+          id="reqEmail" 
+          class="form-input" 
+          placeholder="e.g. john@yourestate.com"
+        />
+        <div class="error-message" id="reqEmailError">Please enter a valid email address</div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 24px;">
+        <label class="form-label">Any additional notes <span style="font-weight: 400; color: #94a3b8;">— optional</span></label>
+        <textarea 
+          id="reqNotes" 
+          class="form-input" 
+          placeholder="e.g. I need a morning slot due to access arrangements..."
+          rows="3"
+          style="resize: vertical; min-height: 80px;"
+        ></textarea>
+      </div>
+
+      <div id="timeRequestSuccess" style="display: none; background: #f0fdf4; border: 2px solid #10b981; border-radius: 10px; padding: 20px; text-align: center;">
+        <div style="font-size: 32px; margin-bottom: 8px;">✅</div>
+        <div style="font-size: 16px; font-weight: 700; color: #065f46; margin-bottom: 6px;">Request Submitted</div>
+        <div style="font-size: 14px; color: #047857; line-height: 1.6;">
+          We've received your request and will be in touch within 24 hours.<br>
+          Keep an eye on your inbox at <strong id="reqEmailConfirm"></strong>
+        </div>
+      </div>
+
+      <div id="timeRequestFormContent">
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          id="submitTimeRequestBtn"
+          onclick="submitTimeRequest()"
+          style="width: 100%;"
+        >
+          <div class="loading-spinner"></div>
+          <span>Submit Time Request</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
         <div class="button-group">
           <button type="button" class="btn btn-secondary" onclick="goToStep(2)" style="flex: 1;">
             Back
@@ -3969,6 +4116,104 @@ function updatePriceWithDiscount() {
   document.getElementById('summaryExVat').textContent = `£${discountedExVat.toFixed(2)}`;
   document.getElementById('summaryVat').textContent = `£${(discountedExVat * 0.2).toFixed(2)}`;
   document.getElementById('summaryTotal').textContent = `£${bookingData.totalPrice.toFixed(2)}`;
+}
+
+// ===== TIME REQUEST SYSTEM =====
+
+function toggleTimeRequest() {
+  const form = document.getElementById('timeRequestForm');
+  const chevron = document.getElementById('timeRequestChevron');
+  const toggle = document.getElementById('timeRequestToggle');
+  const isOpen = form.classList.contains('open');
+
+  if (isOpen) {
+    form.style.display = 'none';
+    form.classList.remove('open');
+    chevron.style.transform = 'rotate(0deg)';
+    toggle.style.borderColor = '#cbd5e1';
+    toggle.style.background = 'transparent';
+    toggle.style.borderRadius = '12px';
+  } else {
+    form.style.display = 'block';
+    form.classList.add('open');
+    chevron.style.transform = 'rotate(90deg)';
+    toggle.style.borderColor = '#B46100';
+    toggle.style.background = '#fff8ee';
+    toggle.style.borderRadius = '12px 12px 0 0';
+    toggle.style.borderBottom = 'none';
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    document.getElementById('reqDate').min = tomorrow.toISOString().split('T')[0];
+
+    setTimeout(() => {
+      document.getElementById('reqDate').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  }
+}
+
+async function submitTimeRequest() {
+  ['reqDate', 'reqTime', 'reqName', 'reqPhone', 'reqEmail'].forEach(id => {
+    document.getElementById(id).classList.remove('error');
+  });
+  ['reqDateError', 'reqTimeError', 'reqNameError', 'reqPhoneError', 'reqEmailError'].forEach(id => {
+    document.getElementById(id).classList.remove('show');
+  });
+
+  const reqDate  = document.getElementById('reqDate').value;
+  const reqTime  = document.getElementById('reqTime').value;
+  const reqName  = document.getElementById('reqName').value.trim();
+  const reqPhone = document.getElementById('reqPhone').value.trim();
+  const reqEmail = document.getElementById('reqEmail').value.trim();
+  const reqNotes = document.getElementById('reqNotes').value.trim();
+
+  let hasError = false;
+
+  if (!reqDate) { document.getElementById('reqDate').classList.add('error'); document.getElementById('reqDateError').classList.add('show'); hasError = true; }
+  if (!reqTime) { document.getElementById('reqTime').classList.add('error'); document.getElementById('reqTimeError').classList.add('show'); hasError = true; }
+  if (!reqName || reqName.length < 2) { document.getElementById('reqName').classList.add('error'); document.getElementById('reqNameError').classList.add('show'); hasError = true; }
+  const phoneRegex = /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/;
+  if (!reqPhone || !phoneRegex.test(reqPhone.replace(/\s/g, ''))) { document.getElementById('reqPhone').classList.add('error'); document.getElementById('reqPhoneError').classList.add('show'); hasError = true; }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!reqEmail || !emailRegex.test(reqEmail)) { document.getElementById('reqEmail').classList.add('error'); document.getElementById('reqEmailError').classList.add('show'); hasError = true; }
+
+  if (hasError) return;
+
+  const btn = document.getElementById('submitTimeRequestBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  try {
+    const response = await fetch('/.netlify/functions/submit-time-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        requestedDate: reqDate,
+        requestedTime: reqTime,
+        clientName: reqName,
+        clientPhone: reqPhone,
+        clientEmail: reqEmail,
+        notes: reqNotes,
+        postcode: bookingData.postcode,
+        region: bookingData.region,
+        mediaSpecialist: bookingData.mediaSpecialist,
+        service: bookingData.service ? bookingData.service.name : '',
+        serviceId: bookingData.service ? bookingData.service.id : ''
+      })
+    });
+
+    if (!response.ok) throw new Error('Request failed');
+
+    document.getElementById('reqEmailConfirm').textContent = reqEmail;
+    document.getElementById('timeRequestFormContent').style.display = 'none';
+    document.getElementById('timeRequestSuccess').style.display = 'block';
+
+  } catch (error) {
+    console.error('Time request error:', error);
+    alert('Failed to submit your request. Please try again or call us directly.');
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
 }
 </script>
 </body>

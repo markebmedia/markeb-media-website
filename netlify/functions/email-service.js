@@ -1100,6 +1100,100 @@ async function sendReviewRewardEmail(clientEmail, clientName, prize) {
   });
 }
 
+// 10. Time Request — Approval
+async function sendTimeRequestApproval(f, formattedDate) {
+  const html = getEmailLayout(`
+    <h2>✅ Your Time Request is Confirmed</h2>
+    <p>Hi ${f['Client Name']},</p>
+    <p>Great news — we can accommodate your requested time. Your shoot is now in the diary.</p>
+
+    <div class="booking-details">
+      <div class="detail-row">
+        <span class="detail-label">Reference</span>
+        <span class="detail-value"><strong>${f['Request Ref']}</strong></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Date</span>
+        <span class="detail-value">${formattedDate}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Time</span>
+        <span class="detail-value"><strong>${f['Requested Time']}</strong></span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Postcode</span>
+        <span class="detail-value">${f['Postcode'] || '—'}</span>
+      </div>
+      ${f['Service'] ? `
+      <div class="detail-row">
+        <span class="detail-label">Service</span>
+        <span class="detail-value">${f['Service']}</span>
+      </div>` : ''}
+    </div>
+
+    <div class="alert alert-info">
+      <strong>What happens next?</strong><br>
+      Our team will be in touch shortly to complete the booking and collect any remaining details. You'll receive a full booking confirmation once everything is set up.
+    </div>
+
+    <p>Questions? <a href="mailto:commercial@markebmedia.com" style="color: #B46100; font-weight: 600;">commercial@markebmedia.com</a></p>
+    <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+  `);
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: f['Client Email'],
+    bcc: BCC_EMAIL,
+    subject: `✅ Time Request Approved — ${f['Request Ref']}`,
+    html
+  });
+}
+
+// 11. Time Request — Decline with alternatives
+async function sendTimeRequestDecline(f, formattedDate, alternativeDates) {
+  const altDatesHtml = alternativeDates
+    ? alternativeDates.split('\n').filter(Boolean).map(d => `
+        <div style="background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; font-size: 14px; color: #1e293b; font-weight: 600;">
+          📅 ${d.trim()}
+        </div>`).join('')
+    : '';
+
+  const html = getEmailLayout(`
+    <h2>Re: Your Time Request</h2>
+    <p>Hi ${f['Client Name']},</p>
+    <p>Thank you for your patience. Unfortunately we're unable to accommodate your requested time:</p>
+
+    <div class="alert alert-warning">
+      <strong>${formattedDate} at ${f['Requested Time']}</strong>
+    </div>
+
+    ${altDatesHtml ? `
+    <p style="font-weight: 700; color: #1e293b; margin-bottom: 12px;">Here are the nearest available alternatives:</p>
+    <div style="margin-bottom: 24px;">${altDatesHtml}</div>
+    <div class="alert alert-info">
+      To book one of these dates, simply reply to this email or get in touch and we'll get it sorted straight away.
+    </div>
+    ` : `
+    <div class="alert alert-info">
+      Please get in touch and we'll work with you to find the best available slot.
+    </div>
+    `}
+
+    <p><strong>Get in touch:</strong><br>
+    <a href="mailto:commercial@markebmedia.com" style="color: #B46100; font-weight: 600;">commercial@markebmedia.com</a><br>
+    Or reply directly to this email.</p>
+    <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+  `);
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: f['Client Email'],
+    bcc: BCC_EMAIL,
+    subject: `Re: Your Time Request — ${f['Request Ref']}`,
+    html
+  });
+}
+
 module.exports = {
   sendBookingConfirmation,
   sendPaymentConfirmation,
@@ -1109,5 +1203,7 @@ module.exports = {
   sendServiceModificationConfirmation,
   sendCardUpdateEmail,
   sendCardUpdatedConfirmation,
-  sendReviewRewardEmail
+  sendReviewRewardEmail,
+  sendTimeRequestApproval,
+  sendTimeRequestDecline
 };
