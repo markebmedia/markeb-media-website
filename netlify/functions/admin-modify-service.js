@@ -43,6 +43,8 @@ exports.handler = async (event, context) => {
       addons,
       addonsPrice,
       totalPrice,
+      squareFootage,
+      squareFootageFee,
       sendEmail = true 
     } = JSON.parse(event.body);
 
@@ -84,7 +86,7 @@ exports.handler = async (event, context) => {
     const extraBedroomFee = extraBedrooms * 25;
     const newAddonsPrice = addonsPrice || 0;
 
-    const sqftFee = fields['Square Footage Fee'] || 0;
+    const sqftFee = squareFootageFee || 0;
     const subtotalExVat = newServicePrice + extraBedroomFee + newAddonsPrice + sqftFee;
 const priceBeforeDiscount = parseFloat((subtotalExVat * 1.2).toFixed(2)); // inc VAT
 
@@ -254,8 +256,8 @@ if (hasDiscount) {
       'Previous Service': oldService,
       'Previous Price': oldFinalPrice,
       'Price Adjustment': priceDifference,
-      'Square Footage': fields['Square Footage'] || undefined,
-      'Square Footage Fee': fields['Square Footage Fee'] || 0
+      'Square Footage': (squareFootage === null || squareFootage === undefined) ? null : squareFootage,
+      'Square Footage Fee': sqftFee
     };
 
     if (hasDiscount) {

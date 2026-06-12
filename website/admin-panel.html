@@ -6247,6 +6247,14 @@ function showModifyService(bookingId) {
   const services = SERVICES_CATALOG[getCatalogKeyForRegion(booking.fields['Region'])] || SERVICES_CATALOG.south;
   
   const currentPrice = booking.fields['Final Price'] || 0;
+
+  modifyServiceData = {
+    bedrooms: booking.fields['Bedrooms'] || 4,
+    selectedAddons: [],
+    squareFootage: booking.fields['Square Footage'] || null,
+    squareFootageFee: booking.fields['Square Footage Fee'] || 0,
+    extraDuration: 0
+  };
   
   modalBody.innerHTML = `
     <div class="form-group">
@@ -6285,9 +6293,33 @@ function showModifyService(bookingId) {
       <div style="display: flex; align-items: center; gap: 16px;">
         <button type="button" class="bedroom-btn" onclick="adjustModifyBedrooms(-1)">-</button>
         <div style="flex: 1; text-align: center;">
-          <div id="modifyBedroomCount" style="font-size: 32px; font-weight: 700; color: #3b82f6;">4</div>
+          <div id="modifyBedroomCount" style="font-size: 32px; font-weight: 700; color: #3b82f6;">${booking.fields['Bedrooms'] || 4}</div>
         </div>
         <button type="button" class="bedroom-btn" onclick="adjustModifyBedrooms(1)">+</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Property Size (sq ft) <span style="font-weight: 400; color: #94a3b8;">— optional</span></label>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <input
+          type="number"
+          id="modifySqftInput"
+          class="form-input"
+          placeholder="e.g. 1200"
+          min="100"
+          max="20000"
+          style="max-width: 200px;"
+          value="${booking.fields['Square Footage'] || ''}"
+          oninput="handleModifySqftInput()"
+        />
+        <span style="font-size: 14px; color: #64748b;">sq ft</span>
+      </div>
+      <div id="modifySqftPriceNotice" style="display: none; margin-top: 10px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
+        <strong>+£125 large property fee</strong> — properties over 3,000 sq ft
+      </div>
+      <div id="modifySqftOkNotice" style="display: none; margin-top: 10px; padding: 12px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; font-size: 13px; color: #065f46;">
+        ✓ Standard size — no additional fee
       </div>
     </div>
 
@@ -6330,11 +6362,23 @@ function showModifyService(bookingId) {
   
   modal.classList.add('active');
   lucide.createIcons();
+
+  // Show the correct sq ft notice for the pre-filled value
+  if (modifyServiceData.squareFootage) {
+    if (modifyServiceData.squareFootage > 3000) {
+      document.getElementById('modifySqftPriceNotice').style.display = 'block';
+    } else {
+      document.getElementById('modifySqftOkNotice').style.display = 'block';
+    }
+  }
 }
 
 let modifyServiceData = {
   bedrooms: 4,
-  selectedAddons: []
+  selectedAddons: [],
+  squareFootage: null,
+  squareFootageFee: 0,
+  extraDuration: 0
 };
 
 function updateServicePrice() {
@@ -6402,6 +6446,35 @@ function adjustModifyBedrooms(change) {
   calculateModifyPrice();
 }
 
+function handleModifySqftInput() {
+  const input = document.getElementById('modifySqftInput');
+  const value = parseInt(input.value);
+  const priceNotice = document.getElementById('modifySqftPriceNotice');
+  const okNotice = document.getElementById('modifySqftOkNotice');
+
+  priceNotice.style.display = 'none';
+  okNotice.style.display = 'none';
+
+  if (!input.value || isNaN(value)) {
+    modifyServiceData.squareFootage = null;
+    modifyServiceData.squareFootageFee = 0;
+    calculateModifyPrice();
+    return;
+  }
+
+  modifyServiceData.squareFootage = value;
+
+  if (value > 3000) {
+    modifyServiceData.squareFootageFee = 125;
+    priceNotice.style.display = 'block';
+  } else {
+    modifyServiceData.squareFootageFee = 0;
+    okNotice.style.display = 'block';
+  }
+
+  calculateModifyPrice();
+}
+
 function calculateModifyPrice() {
   const select = document.getElementById('newService');
   const selectedOption = select.options[select.selectedIndex];
@@ -6418,7 +6491,9 @@ function calculateModifyPrice() {
     if (addon) addonsFee += addon.price;
   });
 
-  const subtotalExVat = servicePrice + bedroomFee + addonsFee;
+  const sqftFee = modifyServiceData.squareFootageFee || 0;
+
+  const subtotalExVat = servicePrice + bedroomFee + addonsFee + sqftFee;
 const totalPrice = parseFloat((subtotalExVat * 1.2).toFixed(2));
 
 document.getElementById('modifyServicePrice').textContent = `£${servicePrice.toFixed(2)}`;
@@ -6439,6 +6514,24 @@ document.getElementById('modifyTotalPrice').textContent = `£${subtotalExVat.toF
   } else {
     addonsRow.style.display = 'none';
   }
+
+  // Sq ft fee row
+  let modifySqftFeeRow = document.getElementById('modifySqftFeeRow');
+  if (!modifySqftFeeRow && sqftFee > 0) {
+    const breakdown = document.getElementById('modifyPriceBreakdown');
+    const divider = breakdown.querySelector('[style*="border-top"]');
+    modifySqftFeeRow = document.createElement('div');
+    modifySqftFeeRow.id = 'modifySqftFeeRow';
+    modifySqftFeeRow.style.cssText = 'display: flex; justify-content: space-between; margin-bottom: 12px;';
+    modifySqftFeeRow.innerHTML = `
+      <span style="color: #64748b;">Large property fee</span>
+      <span style="font-weight: 600;">£125.00</span>
+    `;
+    divider.parentNode.insertBefore(modifySqftFeeRow, divider);
+  }
+  if (modifySqftFeeRow) {
+    modifySqftFeeRow.style.display = sqftFee > 0 ? 'flex' : 'none';
+  }
 }
 
 async function confirmModifyService(bookingId) {
@@ -6453,7 +6546,7 @@ async function confirmModifyService(bookingId) {
   const serviceId = selectedOption.value;
   const serviceName = selectedOption.dataset.name;
   const servicePrice = parseFloat(selectedOption.dataset.price);
-  const serviceDuration = parseInt(selectedOption.dataset.duration);
+  const baseServiceDuration = parseInt(selectedOption.dataset.duration);
   const sendEmail = document.getElementById('modifySendEmail').checked;
 
   const extraBedrooms = Math.max(0, modifyServiceData.bedrooms - 4);
@@ -6470,7 +6563,11 @@ async function confirmModifyService(bookingId) {
     };
   });
 
-  const totalPrice = parseFloat(((servicePrice + bedroomFee + addonsFee) * 1.2).toFixed(2));
+  const sqftFee = modifyServiceData.squareFootageFee || 0;
+  const extraDuration = calculateExtraDuration(serviceId, modifyServiceData.bedrooms || 0, modifyServiceData.squareFootage || null);
+  const newServiceDuration = baseServiceDuration + extraDuration;
+
+  const totalPrice = parseFloat(((servicePrice + bedroomFee + addonsFee + sqftFee) * 1.2).toFixed(2));
 
   try {
     const response = await fetch('/.netlify/functions/admin-modify-service', {
@@ -6481,11 +6578,13 @@ async function confirmModifyService(bookingId) {
         newServiceId: serviceId,
         newServiceName: serviceName,
         newServicePrice: servicePrice,
-        newServiceDuration: serviceDuration,
+        newServiceDuration: newServiceDuration,
         bedrooms: modifyServiceData.bedrooms,
         extraBedroomFee: bedroomFee,
         addons: addonsArray,
         addonsPrice: addonsFee,
+        squareFootage: modifyServiceData.squareFootage ?? null,
+        squareFootageFee: sqftFee,
         totalPrice: totalPrice,
         sendEmail
       })
@@ -6494,9 +6593,41 @@ async function confirmModifyService(bookingId) {
     const data = await response.json();
 
     if (data.success) {
-      alert(`✅ Service Updated!\n\nNew: ${serviceName} (£${totalPrice.toFixed(2)})\n\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`);
+      // Patch the local copy so the booking card/detail view reflects the change immediately
+      const idx = allBookings.findIndex(b => b.id === bookingId);
+      if (idx !== -1) {
+        const addonsString = addonsArray.length > 0
+          ? addonsArray.map(a => `${a.name} (+£${a.price.toFixed(2)})`).join('\n')
+          : '';
+        allBookings[idx].fields = {
+          ...allBookings[idx].fields,
+          'Service': serviceName,
+          'Service ID': serviceId,
+          'Duration (mins)': newServiceDuration,
+          'Bedrooms': modifyServiceData.bedrooms,
+          'Base Price': servicePrice,
+          'Extra Bedroom Fee': bedroomFee,
+          'Add-Ons': addonsString,
+          'Add-ons Price': addonsFee,
+          'Square Footage': modifyServiceData.squareFootage || '',
+          'Square Footage Fee': sqftFee,
+          'Final Price': totalPrice,
+          'Price Ex VAT': parseFloat((totalPrice / 1.2).toFixed(2)),
+          'VAT Amount': parseFloat((totalPrice - totalPrice / 1.2).toFixed(2))
+        };
+        currentBooking = allBookings[idx];
+      }
+
+      alert(`✅ Service Updated!\n\nNew: ${serviceName} (£${totalPrice.toFixed(2)})${modifyServiceData.squareFootage ? `\nProperty size: ${modifyServiceData.squareFootage} sq ft` : ''}\n\n${data.emailSent ? '✉️ Email sent' : '🔕 Silent'}`);
       closeModal('modifyServiceModal');
-      closeModal('bookingModal');
+
+      // Refresh the booking detail card in place with the updated figures
+      if (idx !== -1) {
+        viewBookingById(bookingId);
+      } else {
+        closeModal('bookingModal');
+      }
+
       loadBookings();
       loadCalendar();
       loadDashboardStats();

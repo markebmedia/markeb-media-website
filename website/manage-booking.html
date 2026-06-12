@@ -1774,7 +1774,7 @@ if (booking.addons && booking.addons.length > 0) {
             newServiceDuration: newTotalDuration,
             bedrooms: modifyData.bedrooms,
             extraBedroomFee: extraBedroomFee,
-            squareFootage: modifyData.squareFootage || undefined,
+            squareFootage: modifyData.squareFootage ?? null,
             squareFootageFee: sqftFee,
             addons: addonsArray,
             addonsPrice: addonsPrice,
