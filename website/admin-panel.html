@@ -3166,6 +3166,7 @@ We wanted to reach out..." required></textarea>
             <option value="property-drone-video">Property Drone Videography</option>
             <option value="add-branded-outro">Add Branded Outro</option>
             <option value="local-area-highlights">Local Area Highlights</option>
+            <option value="epc">EPC Certificate</option>
           </select>
           <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
             If set, this code will discount that specific add-on rather than the base service price
@@ -3764,15 +3765,9 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
         price: 100.00,
         description: 'Showcase the lifestyle around the property — nearby cafes, parks, green spaces, transport links and local amenities captured on shoot day'
       },
-      'epc-standard': {
-        id: 'epc-standard',
-        name: 'EPC (Up to 4 Bedrooms)',
-        price: 70.00,
-        description: 'Energy Performance Certificate for properties up to 4 bedrooms'
-      },
-      'epc-large': {
-        id: 'epc-large',
-        name: 'EPC (5+ Bedrooms)',
+      'epc': {
+        id: 'epc',
+        name: 'EPC Certificate',
         price: 70.00,
         description: 'Energy Performance Certificate — £70 base + £10 per bedroom above 4',
         dynamicPrice: true
@@ -4133,20 +4128,16 @@ function handleAdminAccessTypeChange() {
       // Show/hide addons section
       if (availableAddons.length > 0) {
         const addonContainer = document.getElementById('bookingAddonCheckboxes');
-        // Recalculate large EPC price from current bedroom count before rendering
+        // Recalculate EPC price from current bedroom count before rendering
         const currentBeds = bookingFormData.bedrooms || 4;
         const extraBedsForEpc = currentBeds > 4 ? currentBeds - 4 : 0;
-        ADDONS_CATALOG['epc-large'].price = 70 + (extraBedsForEpc * 10);
-        ADDONS_CATALOG['epc-large'].name = `EPC (5+ Bedrooms) — £${ADDONS_CATALOG['epc-large'].price.toFixed(0)}`;
+        ADDONS_CATALOG['epc'].price = 70 + (extraBedsForEpc * 10);
+        ADDONS_CATALOG['epc'].name = `EPC Certificate — £${ADDONS_CATALOG['epc'].price.toFixed(0)}`;
 
         addonContainer.innerHTML = availableAddons.map(addonId => {
           const addon = ADDONS_CATALOG[addonId];
           if (!addon) return '';
 
-          // Show only the relevant EPC option based on bedroom count
-          if (addonId === 'epc-standard' && currentBeds > 4) return '';
-          if (addonId === 'epc-large' && currentBeds <= 4) return '';
-          
           return `
             <label style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #fff; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer;">
               <input 
@@ -4179,14 +4170,6 @@ function handleAdminAccessTypeChange() {
     }
 
     function toggleBookingAddon(addonId) {
-      // EPC add-ons are mutually exclusive
-      if (addonId === 'epc-standard') {
-        bookingFormData.selectedAddons = bookingFormData.selectedAddons.filter(id => id !== 'epc-large');
-      }
-      if (addonId === 'epc-large') {
-        bookingFormData.selectedAddons = bookingFormData.selectedAddons.filter(id => id !== 'epc-standard');
-      }
-
       const index = bookingFormData.selectedAddons.indexOf(addonId);
       if (index > -1) {
         bookingFormData.selectedAddons.splice(index, 1);
@@ -4201,8 +4184,7 @@ function handleAdminAccessTypeChange() {
     function updateAdminEpcVisibility() {
       const section = document.getElementById('adminEpcSection');
       if (!section) return;
-      const hasEpc = bookingFormData.selectedAddons.includes('epc-standard') ||
-                     bookingFormData.selectedAddons.includes('epc-large');
+      const hasEpc = bookingFormData.selectedAddons.includes('epc');
       section.style.display = hasEpc ? 'block' : 'none';
       if (!hasEpc) {
         const ageEl = document.getElementById('adminEpcPropertyAge');
@@ -4228,13 +4210,6 @@ function handleAdminAccessTypeChange() {
     function adjustBookingBedrooms(change) {
       bookingFormData.bedrooms = Math.max(1, Math.min(15, bookingFormData.bedrooms + change));
       document.getElementById('bookingBedroomCount').textContent = bookingFormData.bedrooms;
-
-      // Remove any EPC addon that's no longer valid for this bedroom count
-      if (bookingFormData.bedrooms <= 4) {
-        bookingFormData.selectedAddons = bookingFormData.selectedAddons.filter(id => id !== 'epc-large');
-      } else {
-        bookingFormData.selectedAddons = bookingFormData.selectedAddons.filter(id => id !== 'epc-standard');
-      }
 
       calculateBookingPrice();
       // Re-render addons so EPC switches and price updates live
@@ -6381,7 +6356,7 @@ let modifyServiceData = {
   extraDuration: 0
 };
 
-function updateServicePrice() {
+function updateServicePrice(resetAddons = true) {
   const select = document.getElementById('newService');
   const selectedOption = select.options[select.selectedIndex];
   
@@ -6398,15 +6373,20 @@ function updateServicePrice() {
   // Show add-ons if available
   if (service && service.availableAddons && service.availableAddons.length > 0) {
     const addonContainer = document.getElementById('addonCheckboxes');
+    const bedrooms = modifyServiceData.bedrooms || 4;
+
     addonContainer.innerHTML = service.availableAddons.map(addonId => {
       const addon = ADDONS_CATALOG[addonId];
       if (!addon) return '';
+
+      const isChecked = modifyServiceData.selectedAddons.includes(addon.id);
       
       return `
         <label style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #fff; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer;">
           <input 
             type="checkbox" 
             value="${addon.id}" 
+            ${isChecked ? 'checked' : ''}
             onchange="toggleModifyAddon('${addon.id}')"
             style="width: 20px; height: 20px;"
           >
@@ -6426,7 +6406,9 @@ function updateServicePrice() {
     document.getElementById('addonSection').style.display = 'none';
   }
 
-  modifyServiceData.selectedAddons = [];
+  if (resetAddons) {
+    modifyServiceData.selectedAddons = [];
+  }
   calculateModifyPrice();
 }
 
@@ -6443,7 +6425,17 @@ function toggleModifyAddon(addonId) {
 function adjustModifyBedrooms(change) {
   modifyServiceData.bedrooms = Math.max(1, Math.min(15, modifyServiceData.bedrooms + change));
   document.getElementById('modifyBedroomCount').textContent = modifyServiceData.bedrooms;
-  calculateModifyPrice();
+
+  // Recalculate EPC price based on new bedroom count
+  const extraBedsForEpc = modifyServiceData.bedrooms > 4 ? modifyServiceData.bedrooms - 4 : 0;
+  ADDONS_CATALOG['epc'].price = 70 + (extraBedsForEpc * 10);
+  ADDONS_CATALOG['epc'].name = `EPC Certificate — £${ADDONS_CATALOG['epc'].price.toFixed(0)}`;
+
+  if (document.getElementById('newService').value) {
+    updateServicePrice(false);
+  } else {
+    calculateModifyPrice();
+  }
 }
 
 function handleModifySqftInput() {
