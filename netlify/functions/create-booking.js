@@ -309,9 +309,10 @@ exports.handler = async (event, context) => {
         // Square footage
         'Square Footage': bookingData.squareFootage || undefined,
         'Square Footage Fee': bookingData.squareFootageFee || 0,
-        'EPC Answers': bookingData.epcAnswers && Object.keys(bookingData.epcAnswers).some(k => bookingData.epcAnswers[k])
-          ? JSON.stringify(bookingData.epcAnswers)
-          : undefined,
+        ...(bookingData.epcAnswers && bookingData.epcAnswers.propertyAge && { 'EPC Property Age': bookingData.epcAnswers.propertyAge }),
+        ...(bookingData.epcAnswers && bookingData.epcAnswers.extensionAge && { 'EPC Extension Age': bookingData.epcAnswers.extensionAge }),
+        ...(bookingData.epcAnswers && bookingData.epcAnswers.loftConversion && { 'EPC Loft Conversion': bookingData.epcAnswers.loftConversion }),
+        ...(bookingData.epcAnswers && bookingData.epcAnswers.solarPanels && { 'EPC Solar Panels': bookingData.epcAnswers.solarPanels }),
         
         'Booking Status': bookingStatus,
         'Payment Status': paymentStatus,

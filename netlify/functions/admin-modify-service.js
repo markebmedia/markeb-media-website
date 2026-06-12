@@ -254,7 +254,7 @@ if (hasDiscount) {
       'Previous Service': oldService,
       'Previous Price': oldFinalPrice,
       'Price Adjustment': priceDifference,
-      'Square Footage': fields['Square Footage'] || '',
+      'Square Footage': fields['Square Footage'] || undefined,
       'Square Footage Fee': fields['Square Footage Fee'] || 0
     };
 

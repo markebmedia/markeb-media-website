@@ -106,9 +106,12 @@ exports.handler = async (event, context) => {
       'Price Ex VAT':         parseFloat((newFinalPrice / 1.2).toFixed(2)),
       'VAT Amount':           parseFloat((newFinalPrice - newFinalPrice / 1.2).toFixed(2)),
       'Final Price':          newFinalPrice,
-      'EPC Answers':          epcAnswers ? JSON.stringify(epcAnswers) : '',
-      'Branding Answers':     brandingAnswers ? JSON.stringify(brandingAnswers) : '',
-      'Local Places':         localPlaces ? JSON.stringify(localPlaces) : '',
+      ...(epcAnswers && epcAnswers.propertyAge && { 'EPC Property Age': epcAnswers.propertyAge }),
+      ...(epcAnswers && epcAnswers.extensionAge && { 'EPC Extension Age': epcAnswers.extensionAge }),
+      ...(epcAnswers && epcAnswers.loftConversion && { 'EPC Loft Conversion': epcAnswers.loftConversion }),
+      ...(epcAnswers && epcAnswers.solarPanels && { 'EPC Solar Panels': epcAnswers.solarPanels }),
+      ...(brandingAnswers && Object.keys(brandingAnswers).length > 0 && { 'Branding Answers': JSON.stringify(brandingAnswers) }),
+      ...(localPlaces && localPlaces.length > 0 && { 'Local Area Places': localPlaces.join('\n') }),
       'Service Modified':     true,
       'Service Modified Date': new Date().toISOString()
     };
