@@ -176,6 +176,7 @@ exports.handler = async (event, context) => {
         const bccRecipients = ['commercial@markebmedia.com'];
         
         const SPECIALIST_EMAILS = {
+          'Jodie':      'Jodie.Hamshaw@markebmedia.com',
           'James Jago': 'James.Jago@markebmedia.com',
           'Andrii':     'Andrii.Hutovych@markebmedia.com'
         };

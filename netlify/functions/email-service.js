@@ -506,6 +506,7 @@ async function sendBookingConfirmation(booking) {
   // ── SPECIALIST EMAIL ROUTING ─────────────────────────────────────────────
   // Add a new entry here when hiring a new specialist.
   const SPECIALIST_EMAILS = {
+    'Jodie':      'Jodie.Hamshaw@markebmedia.com',
     'James Jago': 'James.Jago@markebmedia.com',
     'Andrii':     'Andrii.Hutovych@markebmedia.com'
   };
@@ -871,6 +872,7 @@ async function sendReminderEmail(booking) {
   const reminderBcc = [BCC_EMAIL];
 
   const SPECIALIST_EMAILS = {
+    'Jodie':      'Jodie.Hamshaw@markebmedia.com',
     'James Jago': 'James.Jago@markebmedia.com',
     'Andrii':     'Andrii.Hutovych@markebmedia.com'
   };

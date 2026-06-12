@@ -555,6 +555,7 @@ async function sendCancellationConfirmation(metadata, session, cancellationFee, 
     const refundAmount = parseFloat(metadata.originalTotalPrice) - cancellationFee;
 
     const SPECIALIST_EMAILS = {
+      'Jodie':      'Jodie.Hamshaw@markebmedia.com',
       'James Jago': 'James.Jago@markebmedia.com',
       'Andrii':     'Andrii.Hutovych@markebmedia.com'
     };

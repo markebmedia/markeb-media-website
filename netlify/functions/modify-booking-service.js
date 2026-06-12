@@ -5,6 +5,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
 const SPECIALIST_EMAILS = {
+  'Jodie':      'Jodie.Hamshaw@markebmedia.com',
   'James Jago': 'James.Jago@markebmedia.com',
   'Andrii':     'Andrii.Hutovych@markebmedia.com'
 };
@@ -35,6 +36,12 @@ exports.handler = async (event, context) => {
       addons,
       addonsPrice,
       totalPrice,
+      squareFootage,
+      squareFootageFee,
+      extraDuration,
+      epcAnswers,
+      brandingAnswers,
+      localPlaces,
       sendEmail
     } = JSON.parse(event.body);
 
@@ -74,16 +81,24 @@ exports.handler = async (event, context) => {
       ? addons.map(a => `${a.name} (+£${parseFloat(a.price).toFixed(2)})`).join('\n')
       : '';
 
+    const addonsDuration = addons && addons.length > 0
+      ? addons.reduce((sum, a) => sum + (parseInt(a.duration) || 0), 0)
+      : 0;
+
     // ── Update Bookings table ────────────────────────────────────────────────
+    const totalDuration = (newServiceDuration || 0) + (addonsDuration || 0) + (extraDuration || 0);
+
     const updateFields = {
       'Service':              newServiceName,
       'Service ID':           newServiceId,
-      'Duration (mins)':      newServiceDuration,
+      'Duration (mins)':      totalDuration,
       'Base Price':           newServicePrice,
       'Bedrooms':             bedrooms || 0,
       'Extra Bedroom Fee':    extraBedroomFee || 0,
       'Add-Ons':              addonsText,
       'Add-Ons Price':        addonsPrice || 0,
+      'Square Footage':       squareFootage || '',
+      'Square Footage Fee':   squareFootageFee || 0,
       'Total Price':          totalPrice,
       'Price Before Discount': priceBeforeDiscount,
       'Discount Code':        existingDiscountCode,
@@ -91,6 +106,9 @@ exports.handler = async (event, context) => {
       'Price Ex VAT':         parseFloat((newFinalPrice / 1.2).toFixed(2)),
       'VAT Amount':           parseFloat((newFinalPrice - newFinalPrice / 1.2).toFixed(2)),
       'Final Price':          newFinalPrice,
+      'EPC Answers':          epcAnswers ? JSON.stringify(epcAnswers) : '',
+      'Branding Answers':     brandingAnswers ? JSON.stringify(brandingAnswers) : '',
+      'Local Places':         localPlaces ? JSON.stringify(localPlaces) : '',
       'Service Modified':     true,
       'Service Modified Date': new Date().toISOString()
     };

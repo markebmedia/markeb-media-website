@@ -8,6 +8,7 @@ const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process
 // ── SPECIALIST EMAIL ROUTING ─────────────────────────────────────────────────
 // Add a new entry here when hiring a new specialist.
 const SPECIALIST_EMAILS = {
+  'Jodie':      'Jodie.Hamshaw@markebmedia.com',
   'James Jago': 'James.Jago@markebmedia.com',
   'Andrii':     'Andrii.Hutovych@markebmedia.com'
 };
@@ -83,7 +84,8 @@ exports.handler = async (event, context) => {
     const extraBedroomFee = extraBedrooms * 25;
     const newAddonsPrice = addonsPrice || 0;
 
-    const subtotalExVat = newServicePrice + extraBedroomFee + newAddonsPrice;
+    const sqftFee = fields['Square Footage Fee'] || 0;
+    const subtotalExVat = newServicePrice + extraBedroomFee + newAddonsPrice + sqftFee;
 const priceBeforeDiscount = parseFloat((subtotalExVat * 1.2).toFixed(2)); // inc VAT
 
 // Apply discount if one exists
@@ -113,9 +115,21 @@ if (hasDiscount) {
 
     // Prepare add-ons string
     let addonsString = '';
+    let addonsDuration = 0;
     if (addons && Array.isArray(addons) && addons.length > 0) {
       addonsString = addons.map(a => `${a.name} (+£${a.price.toFixed(2)})`).join('\n');
+      addonsDuration = addons.reduce((sum, a) => sum + (parseInt(a.duration) || 0), 0);
     }
+
+    const extraBedroomDuration = extraBedrooms * 5;
+    const sqft = fields['Square Footage'] || null;
+    let extraSqftDuration = 0;
+    if (sqft) {
+      if (sqft >= 5000) extraSqftDuration = 20;
+      else if (sqft >= 4000) extraSqftDuration = 15;
+      else if (sqft > 3000) extraSqftDuration = 10;
+    }
+    const totalDuration = (newServiceDuration || fields['Duration (mins)'] || 0) + addonsDuration + extraBedroomDuration + extraSqftDuration;
 
     const isPaidBooking = fields['Payment Status'] === 'Paid';
     let paymentAction = 'none';
@@ -225,7 +239,7 @@ if (hasDiscount) {
     const updateFields = {
       'Service': newServiceName,
       'Service ID': newServiceId,
-      'Duration (mins)': newServiceDuration || fields['Duration (mins)'],
+      'Duration (mins)': totalDuration,
       'Bedrooms': actualBedrooms,
       'Base Price': newServicePrice,
       'Extra Bedroom Fee': extraBedroomFee,
@@ -240,7 +254,7 @@ if (hasDiscount) {
       'Previous Service': oldService,
       'Previous Price': oldFinalPrice,
       'Price Adjustment': priceDifference,
-      'Square Footage': fields['Square Footage'] || undefined,
+      'Square Footage': fields['Square Footage'] || '',
       'Square Footage Fee': fields['Square Footage Fee'] || 0
     };
 
@@ -358,14 +372,16 @@ async function sendServiceModificationEmail(data) {
     bookingRef,
     date,
     time,
-    service,
     propertyAddress,
-    cancellationReason,
-    cancellationCharge,
-    refundAmount,
-    refundProcessed,
-    totalPrice,
-    mediaSpecialist
+    mediaSpecialist,
+    oldService,
+    newService,
+    oldPrice,
+    newPrice,
+    priceDifference,
+    paymentAction,
+    discountCode,
+    discountAmount
   } = data;
 
   let paymentMessage = '';

@@ -2,7 +2,7 @@
 // ── SPECIALIST ROSTER ────────────────────────────────────────────────────────
 // To reassign a region: change the name value on that line only.
 const SPECIALIST_REGIONS = {
-  'north':      'James Jago',
+  'north':      'Jodie',
   'north-west': 'James Jago',
   'north-east': 'James Jago',
   'west':       'James Jago',

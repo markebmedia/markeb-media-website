@@ -2262,6 +2262,7 @@ body {
     <select class="filter-select" id="blockSpecialistFilter" onchange="loadBlockedTimes()">
       <option value="">All Specialists</option>
       <option value="James Jago">James Jago</option>
+      <option value="Jodie">Jodie</option>
       <option value="Andrii">Andrii</option>
     </select>
 
@@ -3384,11 +3385,13 @@ function toLocalDateString(date) {
 // ── SPECIALIST CONFIG ─────────────────────────────────────────────────────────
 // Edit ONLY this when hiring or reshuffling regions.
 const SPECIALIST_CONFIG = {
-  'James Jago': ['north', 'north-west', 'north-east', 'west'],
+  'Jodie':      ['north'],
+  'James Jago': ['north-west', 'north-east', 'west'],
   'Andrii':     ['east', 'south', 'south-east', 'south-west']
 };
 
 const SPECIALIST_CATALOG_KEY = {
+  'Jodie':      'north',
   'James Jago': 'north',
   'Andrii':     'south'
 };
@@ -5863,6 +5866,7 @@ ${date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'lo
             <select id="quickBlockSpecialist" class="form-input" required>
               <option value="">-- Select Specialist --</option>
               <option value="James Jago">James Jago</option>
+              <option value="Jodie">Jodie</option>
               <option value="Andrii">Andrii</option>
             </select>
           </div>

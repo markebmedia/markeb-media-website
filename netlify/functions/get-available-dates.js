@@ -9,7 +9,7 @@ const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process
 
 // ── SPECIALIST ROSTER ────────────────────────────────────────────────────────
 const SPECIALIST_REGIONS = {
-  'north':      'James Jago',
+  'north':      'Jodie',
   'north-west': 'James Jago',
   'north-east': 'James Jago',
   'west':       'James Jago',

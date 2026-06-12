@@ -6,7 +6,7 @@ const fetch = require('node-fetch');
 // To reassign a region: change the name value on that line only.
 // To add a new person: add their region keys here with their name.
 const SPECIALIST_REGIONS = {
-  'north':      'James Jago',
+  'north':      'Jodie',
   'north-west': 'James Jago',
   'north-east': 'James Jago',
   'west':       'James Jago',

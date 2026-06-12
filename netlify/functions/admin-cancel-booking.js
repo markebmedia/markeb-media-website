@@ -8,6 +8,7 @@ const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process
 // ── SPECIALIST EMAIL ROUTING ─────────────────────────────────────────────────
 // Add a new entry here when hiring a new specialist.
 const SPECIALIST_EMAILS = {
+  'Jodie':      'Jodie.Hamshaw@markebmedia.com',
   'James Jago': 'James.Jago@markebmedia.com',
   'Andrii':     'Andrii.Hutovych@markebmedia.com'
 };
