@@ -97,7 +97,7 @@ exports.handler = async (event, context) => {
       'Extra Bedroom Fee':    extraBedroomFee || 0,
       'Add-Ons':              addonsText,
       'Add-Ons Price':        addonsPrice || 0,
-      'Square Footage':       squareFootage || '',
+      'Square Footage':       squareFootage || undefined,
       'Square Footage Fee':   squareFootageFee || 0,
       'Total Price':          totalPrice,
       'Price Before Discount': priceBeforeDiscount,
