@@ -651,6 +651,30 @@ body {
           </div>
         </div>
 
+        <!-- Square Footage Section -->
+        <div class="form-group" style="margin-bottom: 28px;">
+          <label class="form-label">Property Size (sq ft) <span style="font-weight: 400; color: #94a3b8;">— optional</span></label>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <input 
+              type="number" 
+              id="modifySquareFootageInput" 
+              class="form-input" 
+              placeholder="e.g. 1200"
+              min="100"
+              max="20000"
+              style="max-width: 200px; margin-bottom: 0;"
+              oninput="handleModifySquareFootageInput()"
+            />
+            <span style="font-size: 14px; color: #64748b;">sq ft</span>
+          </div>
+          <div id="modifySqftPriceNotice" style="display: none; margin-top: 10px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
+            <strong>+£125 + VAT large property fee</strong> — properties over 3,000 sq ft require additional shoot time
+          </div>
+          <div id="modifySqftOkNotice" style="display: none; margin-top: 10px; padding: 12px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; font-size: 13px; color: #065f46;">
+            ✓ Standard size — no additional fee
+          </div>
+        </div>
+
         <!-- Add-Ons Section -->
         <div id="modifyAddonsSection" style="display: none; margin-bottom: 28px;">
           <h3 style="font-size: 20px; font-weight: 700; color: #1e293b; margin-bottom: 12px;">
@@ -779,7 +803,8 @@ body {
     let modifyData = {
       bedrooms: 4,
       selectedAddons: [],
-      selectedService: null
+      selectedService: null,
+      squareFootage: null
     };
     let rescheduleCalendarDate = new Date();
     let rescheduleSelectedDate = null;
@@ -1436,18 +1461,23 @@ if (booking.addons && booking.addons.length > 0) {
       modifyData = {
         bedrooms: bookingData.bedrooms || 4,
         selectedAddons: [],
-        selectedService: null
+        selectedService: null,
+        squareFootage: bookingData.squareFootage || null
       };
       
       document.getElementById('modifyBedroomCount').textContent = modifyData.bedrooms;
       document.getElementById('modifyCurrentPrice').textContent = `£${bookingData.finalPrice.toFixed(2)}`;
+
+      const modifySqftInput = document.getElementById('modifySquareFootageInput');
+      if (modifySqftInput) modifySqftInput.value = modifyData.squareFootage || '';
+      updateModifySqftNotice();
       
       renderModifyServices();
     }
 
     function hideModifyServiceForm() {
       document.getElementById('modifyServiceForm').classList.add('hidden');
-      modifyData = { bedrooms: 4, selectedAddons: [], selectedService: null };
+      modifyData = { bedrooms: 4, selectedAddons: [], selectedService: null, squareFootage: null };
       document.getElementById('confirmModifyBtn').disabled = true;
     }
 
@@ -1608,6 +1638,40 @@ if (booking.addons && booking.addons.length > 0) {
       calculateModifyPrice();
     }
 
+    function updateModifySqftNotice() {
+      const priceNotice = document.getElementById('modifySqftPriceNotice');
+      const okNotice = document.getElementById('modifySqftOkNotice');
+      if (!priceNotice || !okNotice) return;
+
+      if (!modifyData.squareFootage) {
+        priceNotice.style.display = 'none';
+        okNotice.style.display = 'none';
+        return;
+      }
+
+      if (modifyData.squareFootage > 3000) {
+        priceNotice.style.display = 'block';
+        okNotice.style.display = 'none';
+      } else {
+        priceNotice.style.display = 'none';
+        okNotice.style.display = 'block';
+      }
+    }
+
+    function handleModifySquareFootageInput() {
+      const input = document.getElementById('modifySquareFootageInput');
+      const value = parseInt(input.value);
+
+      if (!input.value || isNaN(value)) {
+        modifyData.squareFootage = null;
+      } else {
+        modifyData.squareFootage = value;
+      }
+
+      updateModifySqftNotice();
+      calculateModifyPrice();
+    }
+
     function calculateModifyPrice() {
       if (!modifyData.selectedService) {
         document.getElementById('confirmModifyBtn').disabled = true;
@@ -1624,7 +1688,7 @@ if (booking.addons && booking.addons.length > 0) {
         if (addon) addonsPrice += addon.price;
       });
 
-      const sqftFee = bookingData.squareFootage > 3000 ? 125 : 0;
+      const sqftFee = modifyData.squareFootage > 3000 ? 125 : 0;
       const newExVat = basePrice + extraBedroomFee + addonsPrice + sqftFee;
       const newTotalPrice = newExVat * 1.2;
       const currentPrice = bookingData.finalPrice;
@@ -1681,7 +1745,11 @@ if (booking.addons && booking.addons.length > 0) {
         };
       });
 
-      const newTotalPrice = (service.price + extraBedroomFee + addonsPrice) * 1.2;
+      const sqftFee = modifyData.squareFootage > 3000 ? 125 : 0;
+      const extraDuration = calculateExtraDuration(service.id, modifyData.bedrooms, modifyData.squareFootage);
+      const newTotalDuration = service.duration + extraDuration;
+
+      const newTotalPrice = (service.price + extraBedroomFee + addonsPrice + sqftFee) * 1.2;
       const priceDifference = newTotalPrice - bookingData.totalPrice;
 
       if (!confirm(`Modify service to ${service.name}?\n\nPrice difference: ${priceDifference >= 0 ? '+' : ''}£${priceDifference.toFixed(2)}`)) {
@@ -1703,9 +1771,11 @@ if (booking.addons && booking.addons.length > 0) {
             newServiceId: service.id,
             newServiceName: service.name,
             newServicePrice: service.price,
-            newServiceDuration: service.duration,
+            newServiceDuration: newTotalDuration,
             bedrooms: modifyData.bedrooms,
             extraBedroomFee: extraBedroomFee,
+            squareFootage: modifyData.squareFootage || '',
+            squareFootageFee: sqftFee,
             addons: addonsArray,
             addonsPrice: addonsPrice,
             totalPrice: newTotalPrice
