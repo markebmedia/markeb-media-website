@@ -1622,6 +1622,18 @@ body {
     </div>
   </div>
 
+  <div class="nav-section">
+    <div class="nav-section-title">BDM</div>
+    <div class="nav-item" onclick="showSection('prospect-finder')">
+      <i data-lucide="search" class="nav-icon"></i>
+      Prospect Finder
+    </div>
+    <div class="nav-item" onclick="showSection('pipeline')">
+      <i data-lucide="bar-chart-2" class="nav-icon"></i>
+      Pipeline
+    </div>
+  </div>
+
   <div class="nav-section" style="margin-top: auto; padding-top: 24px; border-top: 2px solid #e2e8f0;">
     <div class="nav-item" onclick="adminLogout()" style="color: #ef4444;">
       <i data-lucide="log-out" class="nav-icon" style="width: 20px; height: 20px;"></i>
@@ -2852,6 +2864,130 @@ We wanted to reach out..." required></textarea>
 
 </div>
 <!-- END EMAIL BROADCAST SECTION -->
+
+  <!-- ===== PROSPECT FINDER SECTION ===== -->
+<div class="admin-section" id="prospect-finder">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h2 style="font-size:24px;font-weight:700;margin-bottom:4px;">Prospect Finder</h2>
+      <p style="color:#64748b;font-size:14px;">Find and verify estate agent emails using Hunter.io</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="font-size:13px;color:#64748b;">Credits remaining:</span>
+      <span id="hunterCreditsValue" style="font-size:18px;font-weight:700;color:#B46100;">—</span>
+      <button class="btn btn-secondary btn-small" onclick="loadHunterCredits()">Refresh</button>
+    </div>
+  </div>
+
+  <!-- Tab Nav -->
+  <div style="display:flex;gap:4px;background:#f1f5f9;padding:4px;border-radius:10px;margin-bottom:24px;width:fit-content;">
+    <button id="ptab-domain" onclick="switchProspectTab('domain')" style="padding:8px 18px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:#B46100;box-shadow:0 2px 4px rgba(0,0,0,0.1);font-family:'Inter',sans-serif;">Domain Search</button>
+    <button id="ptab-finder" onclick="switchProspectTab('finder')" style="padding:8px 18px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#64748b;font-family:'Inter',sans-serif;">Email Finder</button>
+    <button id="ptab-verify" onclick="switchProspectTab('verify')" style="padding:8px 18px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#64748b;font-family:'Inter',sans-serif;">Email Verifier</button>
+    <button id="ptab-saved" onclick="switchProspectTab('saved')" style="padding:8px 18px;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#64748b;font-family:'Inter',sans-serif;">Saved Prospects</button>
+  </div>
+
+  <!-- Domain Search Tab -->
+  <div id="ptab-domain-content" class="calendar-container">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">Find all emails at a domain</h3>
+    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+      <input type="text" id="hunterDomain" class="form-input" placeholder="e.g. savills.com" style="flex:1;min-width:200px;">
+      <select id="hunterLimit" class="filter-select">
+        <option value="10">10 results</option>
+        <option value="25">25 results</option>
+        <option value="50">50 results</option>
+        <option value="100">100 results</option>
+      </select>
+      <button class="btn btn-primary" onclick="runDomainSearch()">Search</button>
+    </div>
+    <div id="domainSearchResults"></div>
+  </div>
+
+  <!-- Email Finder Tab -->
+  <div id="ptab-finder-content" class="calendar-container" style="display:none;">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">Find a specific person's email</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+      <input type="text" id="hunterFirstName" class="form-input" placeholder="First name">
+      <input type="text" id="hunterLastName" class="form-input" placeholder="Last name">
+      <input type="text" id="hunterFinderDomain" class="form-input" placeholder="Domain (e.g. savills.com)">
+      <button class="btn btn-primary" onclick="runEmailFinder()">Find Email</button>
+    </div>
+    <div id="emailFinderResults"></div>
+  </div>
+
+  <!-- Email Verifier Tab -->
+  <div id="ptab-verify-content" class="calendar-container" style="display:none;">
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">Verify an email address</h3>
+    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+      <input type="text" id="hunterVerifyEmail" class="form-input" placeholder="e.g. john.smith@savills.com" style="flex:1;min-width:240px;">
+      <button class="btn btn-primary" onclick="runEmailVerify()">Verify</button>
+    </div>
+    <div id="emailVerifyResults"></div>
+  </div>
+
+  <!-- Saved Prospects Tab -->
+  <div id="ptab-saved-content" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+      <h3 style="font-size:16px;font-weight:700;">Saved Prospects</h3>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary btn-small" onclick="exportProspectsCSV()">Export CSV</button>
+        <button class="btn btn-danger btn-small" onclick="clearAllProspects()">Clear All</button>
+      </div>
+    </div>
+    <div class="filters-bar" style="margin-bottom:16px;">
+      <input type="text" id="prospectSearch" class="filter-input" placeholder="Search prospects..." oninput="renderSavedProspects()">
+      <select id="prospectStatusFilter" class="filter-select" onchange="renderSavedProspects()">
+        <option value="">All Stages</option>
+        <option value="New">New</option>
+        <option value="Contacted">Contacted</option>
+        <option value="Responded">Responded</option>
+        <option value="Meeting Booked">Meeting Booked</option>
+        <option value="Proposal Sent">Proposal Sent</option>
+        <option value="Won">Won</option>
+        <option value="Lost">Lost</option>
+      </select>
+    </div>
+    <div id="savedProspectsContainer"></div>
+  </div>
+</div>
+<!-- ===== END PROSPECT FINDER SECTION ===== -->
+
+<!-- Pipeline Section -->
+<div class="admin-section" id="pipeline">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h2 style="font-size:24px;font-weight:700;margin-bottom:4px;">Pipeline</h2>
+      <p style="color:#64748b;font-size:14px;">Track prospects through your sales process</p>
+    </div>
+    <button class="btn btn-primary" onclick="showSection('prospect-finder');switchProspectTab('saved')">
+      <i data-lucide="plus-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>
+      Add Prospects
+    </button>
+  </div>
+  <div class="stats-grid" style="margin-bottom:24px;">
+    <div class="stat-card"><div class="stat-value" id="pipelineTotal">0</div><div class="stat-label">Total Prospects</div></div>
+    <div class="stat-card"><div class="stat-value" id="pipelineContacted">0</div><div class="stat-label">Contacted</div></div>
+    <div class="stat-card"><div class="stat-value" id="pipelineMeeting">0</div><div class="stat-label">Meetings Booked</div></div>
+    <div class="stat-card"><div class="stat-value" id="pipelineWon">0</div><div class="stat-label">Won</div></div>
+  </div>
+  <div class="filters-bar" style="margin-bottom:20px;">
+    <input type="text" id="pipelineSearch" class="filter-input" placeholder="Search by name, company, email..." oninput="renderPipeline()">
+    <select id="pipelineStageFilter" class="filter-select" onchange="renderPipeline()">
+      <option value="">All Stages</option>
+      <option value="New">New</option>
+      <option value="Contacted">Contacted</option>
+      <option value="Responded">Responded</option>
+      <option value="Meeting Booked">Meeting Booked</option>
+      <option value="Proposal Sent">Proposal Sent</option>
+      <option value="Won">Won</option>
+      <option value="Lost">Lost</option>
+    </select>
+    <button class="btn btn-danger btn-small" onclick="clearAllPipelineProspects()">
+      <i data-lucide="trash-2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Clear All
+    </button>
+  </div>
+  <div id="pipelineContainer" class="calendar-container"></div>
+</div>
 
   <!-- Find Booking Modal -->
 <div class="modal" id="findBookingModal" onclick="closeModal('findBookingModal')">
@@ -11364,6 +11500,457 @@ async function emailInvoice(bookingId, btn, overrides = {}) {
     if (btn) { btn.disabled = false; btn.textContent = 'Email Invoice'; }
   }
 }
+
+// ===== PROSPECT FINDER & PIPELINE =====
+
+const PIPELINE_STAGES = ['New', 'Contacted', 'Responded', 'Meeting Booked', 'Proposal Sent', 'Won', 'Lost'];
+
+const STAGE_COLORS = {
+  'New':            { bg: '#f1f5f9', color: '#475569', border: '#e2e8f0' },
+  'Contacted':      { bg: '#dbeafe', color: '#1e40af', border: '#93c5fd' },
+  'Responded':      { bg: '#fef3c7', color: '#92400e', border: '#fcd34d' },
+  'Meeting Booked': { bg: '#ede9fe', color: '#5b21b6', border: '#c4b5fd' },
+  'Proposal Sent':  { bg: '#fff3e0', color: '#b45309', border: '#fcd34d' },
+  'Won':            { bg: '#d1fae5', color: '#065f46', border: '#6ee7b7' },
+  'Lost':           { bg: '#fee2e2', color: '#991b1b', border: '#fca5a5' }
+};
+
+function getProspects() {
+  try { return JSON.parse(localStorage.getItem('bdm_prospects') || '[]'); }
+  catch { return []; }
+}
+
+function saveProspects(prospects) {
+  localStorage.setItem('bdm_prospects', JSON.stringify(prospects));
+}
+
+function saveProspect(prospect) {
+  const prospects = getProspects();
+  const existing = prospects.findIndex(p => p.email === prospect.email);
+  if (existing > -1) {
+    if (!confirm(`${prospect.email} is already saved. Update their record?`)) return;
+    prospects[existing] = { ...prospects[existing], ...prospect, updatedAt: new Date().toISOString() };
+  } else {
+    prospects.unshift({
+      ...prospect,
+      id: 'p_' + Date.now(),
+      stage: 'New',
+      notes: '',
+      savedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+  }
+  saveProspects(prospects);
+  showAdminToast(`✅ ${prospect.name || prospect.email} saved to pipeline`);
+  renderSavedProspects();
+  renderPipeline();
+  updatePipelineStats();
+}
+
+function saveProspectSilent(prospect) {
+  const prospects = getProspects();
+  if (prospects.find(p => p.email === prospect.email)) return;
+  prospects.unshift({
+    ...prospect,
+    id: 'p_' + Date.now() + Math.random(),
+    stage: 'New',
+    notes: '',
+    savedAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  });
+  saveProspects(prospects);
+}
+
+function deleteProspect(id) {
+  if (!confirm('Remove this prospect from the pipeline?')) return;
+  saveProspects(getProspects().filter(p => p.id !== id));
+  renderSavedProspects();
+  renderPipeline();
+  updatePipelineStats();
+}
+
+function updateProspectStage(id, stage) {
+  const prospects = getProspects();
+  const idx = prospects.findIndex(p => p.id === id);
+  if (idx > -1) {
+    prospects[idx].stage = stage;
+    prospects[idx].updatedAt = new Date().toISOString();
+    saveProspects(prospects);
+    renderSavedProspects();
+    renderPipeline();
+    updatePipelineStats();
+  }
+}
+
+function updateProspectNotes(id, notes) {
+  const prospects = getProspects();
+  const idx = prospects.findIndex(p => p.id === id);
+  if (idx > -1) {
+    prospects[idx].notes = notes;
+    prospects[idx].updatedAt = new Date().toISOString();
+    saveProspects(prospects);
+  }
+}
+
+function clearAllProspects() {
+  if (!confirm('Clear ALL saved prospects? This cannot be undone.')) return;
+  localStorage.removeItem('bdm_prospects');
+  renderSavedProspects();
+  renderPipeline();
+  updatePipelineStats();
+}
+
+function clearAllPipelineProspects() { clearAllProspects(); }
+
+function switchProspectTab(tab) {
+  ['domain', 'finder', 'verify', 'saved'].forEach(t => {
+    const content = document.getElementById(`ptab-${t}-content`);
+    const btn = document.getElementById(`ptab-${t}`);
+    if (content) content.style.display = t === tab ? 'block' : 'none';
+    if (btn) {
+      btn.style.background    = t === tab ? '#fff' : 'transparent';
+      btn.style.color         = t === tab ? '#B46100' : '#64748b';
+      btn.style.boxShadow     = t === tab ? '0 2px 4px rgba(0,0,0,0.1)' : 'none';
+    }
+  });
+  if (tab === 'saved') renderSavedProspects();
+}
+
+async function loadHunterCredits() {
+  const el = document.getElementById('hunterCreditsValue');
+  if (el) el.textContent = '…';
+  try {
+    const res = await fetch('/.netlify/functions/hunter-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'credits' })
+    });
+    const data = await res.json();
+    const remaining = data?.data?.data?.requests?.searches?.available ?? '—';
+    if (el) el.textContent = remaining;
+  } catch { if (el) el.textContent = '—'; }
+}
+
+async function runDomainSearch() {
+  const domain  = (document.getElementById('hunterDomain')?.value || '').trim();
+  const limit   = parseInt(document.getElementById('hunterLimit')?.value || '10');
+  const results = document.getElementById('domainSearchResults');
+  if (!domain) { alert('Please enter a domain'); return; }
+  results.innerHTML = '<div style="text-align:center;padding:30px;"><div class="spinner"></div></div>';
+  try {
+    const res  = await fetch('/.netlify/functions/hunter-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'domain-search', domain, limit })
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error);
+    renderDomainResults(json.data.data, domain);
+    loadHunterCredits();
+  } catch (err) {
+    results.innerHTML = `<div class="warning-box">❌ ${err.message}</div>`;
+  }
+}
+
+function renderDomainResults(data, domain) {
+  const results = document.getElementById('domainSearchResults');
+  const emails  = data?.emails || [];
+  const org     = data?.organization || domain;
+  const total   = data?.meta?.results || emails.length;
+
+  if (emails.length === 0) {
+    results.innerHTML = `<div class="info-box">No email addresses found for <strong>${domain}</strong>.</div>`;
+    return;
+  }
+
+  const confidenceColor = c => c >= 80 ? '#10b981' : c >= 50 ? '#f59e0b' : '#ef4444';
+
+  let html = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+      <div>
+        <strong style="font-size:16px;">${org}</strong>
+        <span style="color:#64748b;font-size:13px;margin-left:8px;">${total} result${total !== 1 ? 's' : ''} for ${domain}</span>
+      </div>
+      <button class="btn btn-secondary btn-small" onclick="saveAllDomainResults(${JSON.stringify(emails).replace(/"/g,'&quot;')}, '${org}', '${domain}')">
+        Save All to Pipeline
+      </button>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Email</th><th>Job Title</th><th>Confidence</th><th>LinkedIn</th><th>Actions</th></tr></thead>
+      <tbody>`;
+
+  emails.forEach(e => {
+    const name     = [e.first_name, e.last_name].filter(Boolean).join(' ') || '—';
+    const title    = e.position || '—';
+    const linkedin = e.linkedin || '';
+    const conf     = e.confidence || 0;
+    html += `
+      <tr>
+        <td data-label="Name"><strong>${name}</strong></td>
+        <td data-label="Email" style="font-family:monospace;font-size:12px;">${e.value}</td>
+        <td data-label="Job Title">${title}</td>
+        <td data-label="Confidence"><span style="color:${confidenceColor(conf)};font-weight:600;">${conf}%</span></td>
+        <td data-label="LinkedIn">${linkedin ? `<a href="${linkedin}" target="_blank" style="color:#B46100;font-size:12px;">View</a>` : '—'}</td>
+        <td data-label="Actions">
+          <button class="btn btn-primary btn-small" onclick='saveProspect(${JSON.stringify({name,email:e.value,company:org,domain,jobTitle:title,linkedin,phone:e.phone_number||'',confidence:conf,source:"domain-search"}).replace(/'/g,"&#39;")})'>Save</button>
+        </td>
+      </tr>`;
+  });
+
+  html += '</tbody></table>';
+  results.innerHTML = html;
+  lucide.createIcons();
+}
+
+function saveAllDomainResults(emails, org, domain) {
+  if (!confirm(`Save all ${emails.length} contacts to your pipeline?`)) return;
+  emails.forEach(e => {
+    const name = [e.first_name, e.last_name].filter(Boolean).join(' ') || '';
+    saveProspectSilent({ name, email: e.value, company: org, domain, jobTitle: e.position || '', linkedin: e.linkedin || '', phone: e.phone_number || '', confidence: e.confidence || 0, source: 'domain-search' });
+  });
+  showAdminToast(`✅ ${emails.length} prospects saved to pipeline`);
+  renderSavedProspects();
+  renderPipeline();
+  updatePipelineStats();
+}
+
+async function runEmailFinder() {
+  const firstName = (document.getElementById('hunterFirstName')?.value || '').trim();
+  const lastName  = (document.getElementById('hunterLastName')?.value || '').trim();
+  const domain    = (document.getElementById('hunterFinderDomain')?.value || '').trim();
+  const results   = document.getElementById('emailFinderResults');
+  if (!firstName || !lastName || !domain) { alert('Please enter first name, last name and domain'); return; }
+  results.innerHTML = '<div style="text-align:center;padding:30px;"><div class="spinner"></div></div>';
+  try {
+    const res  = await fetch('/.netlify/functions/hunter-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'email-finder', firstName, lastName, domain })
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error);
+    renderFinderResult(json.data.data, domain);
+    loadHunterCredits();
+  } catch (err) {
+    results.innerHTML = `<div class="warning-box">❌ ${err.message}</div>`;
+  }
+}
+
+function renderFinderResult(data, domain) {
+  const results = document.getElementById('emailFinderResults');
+  if (!data?.email) { results.innerHTML = `<div class="info-box">No email found.</div>`; return; }
+  const name    = [data.first_name, data.last_name].filter(Boolean).join(' ');
+  const conf    = data.score || 0;
+  const confCol = conf >= 80 ? '#10b981' : conf >= 50 ? '#f59e0b' : '#ef4444';
+  results.innerHTML = `
+    <div class="success-box" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:4px;">${data.email}</div>
+        <div style="font-size:13px;color:#064e3b;">${name} · ${data.position || 'Unknown title'} · ${domain}</div>
+        <div style="margin-top:6px;"><span style="color:${confCol};font-weight:700;">${conf}% confidence</span>${data.linkedin ? ` · <a href="${data.linkedin}" target="_blank" style="color:#B46100;font-size:12px;">LinkedIn</a>` : ''}</div>
+      </div>
+      <button class="btn btn-primary" onclick='saveProspect(${JSON.stringify({name,email:data.email,company:data.organization||domain,domain,jobTitle:data.position||'',linkedin:data.linkedin||'',phone:data.phone_number||'',confidence:conf,source:"email-finder"}).replace(/'/g,"&#39;")})'>Save to Pipeline</button>
+    </div>`;
+  lucide.createIcons();
+}
+
+async function runEmailVerify() {
+  const email   = (document.getElementById('hunterVerifyEmail')?.value || '').trim();
+  const results = document.getElementById('emailVerifyResults');
+  if (!email) { alert('Please enter an email address'); return; }
+  results.innerHTML = '<div style="text-align:center;padding:30px;"><div class="spinner"></div></div>';
+  try {
+    const res  = await fetch('/.netlify/functions/hunter-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'email-verify', email })
+    });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error);
+    renderVerifyResult(json.data.data);
+    loadHunterCredits();
+  } catch (err) {
+    results.innerHTML = `<div class="warning-box">❌ ${err.message}</div>`;
+  }
+}
+
+function renderVerifyResult(data) {
+  const results = document.getElementById('emailVerifyResults');
+  if (!data) { results.innerHTML = `<div class="warning-box">No result returned.</div>`; return; }
+  const statusColors = {
+    'deliverable':   { bg: '#d1fae5', color: '#065f46', label: '✅ Deliverable' },
+    'undeliverable': { bg: '#fee2e2', color: '#991b1b', label: '❌ Undeliverable' },
+    'risky':         { bg: '#fef3c7', color: '#92400e', label: '⚠️ Risky' },
+    'unknown':       { bg: '#f1f5f9', color: '#475569', label: '❓ Unknown' }
+  };
+  const s = statusColors[data.status] || statusColors['unknown'];
+  const score = data.score || 0;
+  const name = [data.first_name, data.last_name].filter(Boolean).join(' ');
+  results.innerHTML = `
+    <div style="background:${s.bg};border-radius:12px;padding:20px 24px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:12px;">
+        <div>
+          <div style="font-size:18px;font-weight:700;color:${s.color};margin-bottom:4px;">${data.email}</div>
+          <div style="font-size:22px;font-weight:700;color:${s.color};">${s.label}</div>
+          ${name ? `<div style="font-size:13px;margin-top:4px;color:${s.color};">${name}${data.position ? ' · ' + data.position : ''}</div>` : ''}
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:32px;font-weight:700;color:${s.color};">${score}<span style="font-size:16px;">/100</span></div>
+          <div style="font-size:12px;color:${s.color};">confidence score</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:16px;">
+        ${[['Format valid',data.regexp],['MX records',data.mx_records],['SMTP check',data.smtp_server],['Not disposable',!data.disposable],['Not catch-all',!data.catch_all],['Not webmail',!data.webmail]].map(([label,pass])=>`<div style="background:rgba(255,255,255,0.5);border-radius:8px;padding:8px 12px;"><div style="font-size:12px;color:${s.color};">${pass?'✓':'✗'} ${label}</div></div>`).join('')}
+      </div>
+    </div>
+    ${data.status==='deliverable'?`<button class="btn btn-primary" onclick='saveProspect(${JSON.stringify({name,email:data.email,company:data.organization||'',domain:data.email.split('@')[1]||'',jobTitle:data.position||'',linkedin:'',phone:'',confidence:score,source:"email-verify"}).replace(/'/g,"&#39;")})'>Save to Pipeline</button>`:''}`;
+  lucide.createIcons();
+}
+
+function renderSavedProspects() {
+  const container = document.getElementById('savedProspectsContainer');
+  if (!container) return;
+  const search = (document.getElementById('prospectSearch')?.value || '').toLowerCase();
+  const stage  = document.getElementById('prospectStatusFilter')?.value || '';
+  let prospects = getProspects();
+  if (search)  prospects = prospects.filter(p => (p.name||'').toLowerCase().includes(search)||(p.email||'').toLowerCase().includes(search)||(p.company||'').toLowerCase().includes(search));
+  if (stage)   prospects = prospects.filter(p => p.stage === stage);
+
+  if (prospects.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:60px;color:#94a3b8;"><p>No prospects saved yet. Use Domain Search or Email Finder to find contacts.</p></div>`;
+    return;
+  }
+
+  let html = `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th>LinkedIn</th><th>Stage</th><th>Notes</th><th>Actions</th></tr></thead><tbody>`;
+  prospects.forEach(p => {
+    const sc = STAGE_COLORS[p.stage] || STAGE_COLORS['New'];
+    html += `
+      <tr>
+        <td data-label="Name"><strong>${p.name||'—'}</strong></td>
+        <td data-label="Email" style="font-family:monospace;font-size:12px;">${p.email}</td>
+        <td data-label="Company">${p.company||'—'}</td>
+        <td data-label="Job Title">${p.jobTitle||'—'}</td>
+        <td data-label="LinkedIn">${p.linkedin?`<a href="${p.linkedin}" target="_blank" style="color:#B46100;font-size:12px;">View</a>`:'—'}</td>
+        <td data-label="Stage">
+          <select onchange="updateProspectStage('${p.id}', this.value)" style="padding:4px 8px;border:2px solid ${sc.border};border-radius:8px;font-size:12px;font-weight:600;background:${sc.bg};color:${sc.color};font-family:'Inter',sans-serif;cursor:pointer;">
+            ${PIPELINE_STAGES.map(s=>`<option value="${s}" ${p.stage===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </td>
+        <td data-label="Notes">
+          <input type="text" value="${(p.notes||'').replace(/"/g,'&quot;')}" onblur="updateProspectNotes('${p.id}', this.value)" placeholder="Add note..." style="width:100%;padding:4px 8px;border:2px solid #e2e8f0;border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;">
+        </td>
+        <td data-label="Actions">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <a href="mailto:${p.email}" class="btn btn-primary btn-small">Email</a>
+            <button class="btn btn-danger btn-small" onclick="deleteProspect('${p.id}')">Remove</button>
+          </div>
+        </td>
+      </tr>`;
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+  lucide.createIcons();
+}
+
+function exportProspectsCSV() {
+  const prospects = getProspects();
+  if (prospects.length === 0) { alert('No prospects to export'); return; }
+  const headers = ['Name','Email','Company','Domain','Job Title','LinkedIn','Phone','Stage','Notes','Confidence','Source','Saved At'];
+  const rows = prospects.map(p => [p.name,p.email,p.company,p.domain,p.jobTitle,p.linkedin,p.phone,p.stage,p.notes,p.confidence,p.source,p.savedAt].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`));
+  const csv  = [headers.join(','),...rows.map(r=>r.join(','))].join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=`prospects_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function updatePipelineStats() {
+  const prospects = getProspects();
+  const el = id => document.getElementById(id);
+  if (el('pipelineTotal'))     el('pipelineTotal').textContent     = prospects.length;
+  if (el('pipelineContacted')) el('pipelineContacted').textContent = prospects.filter(p=>p.stage==='Contacted').length;
+  if (el('pipelineMeeting'))   el('pipelineMeeting').textContent   = prospects.filter(p=>p.stage==='Meeting Booked').length;
+  if (el('pipelineWon'))       el('pipelineWon').textContent       = prospects.filter(p=>p.stage==='Won').length;
+}
+
+function renderPipeline() {
+  const container = document.getElementById('pipelineContainer');
+  if (!container) return;
+  const search = (document.getElementById('pipelineSearch')?.value || '').toLowerCase();
+  const stage  = document.getElementById('pipelineStageFilter')?.value || '';
+  let prospects = getProspects();
+  if (search) prospects = prospects.filter(p=>(p.name||'').toLowerCase().includes(search)||(p.email||'').toLowerCase().includes(search)||(p.company||'').toLowerCase().includes(search));
+  if (stage)  prospects = prospects.filter(p=>p.stage===stage);
+  updatePipelineStats();
+
+  if (prospects.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:60px;color:#94a3b8;"><p>No prospects in pipeline yet.</p><button class="btn btn-primary" style="margin-top:16px;" onclick="showSection('prospect-finder')">Find Prospects</button></div>`;
+    return;
+  }
+
+  const grouped = {};
+  PIPELINE_STAGES.forEach(s => { grouped[s] = []; });
+  prospects.forEach(p => { if (grouped[p.stage]) grouped[p.stage].push(p); });
+
+  let html = '';
+  PIPELINE_STAGES.forEach(stageName => {
+    const items = grouped[stageName];
+    const sc = STAGE_COLORS[stageName];
+    html += `
+      <div style="margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <div style="background:${sc.bg};border:2px solid ${sc.border};border-radius:8px;padding:4px 14px;font-size:13px;font-weight:700;color:${sc.color};">${stageName}</div>
+          <span style="font-size:13px;color:#64748b;font-weight:600;">${items.length} prospect${items.length!==1?'s':''}</span>
+        </div>`;
+    if (items.length === 0) {
+      html += `<div style="padding:16px;background:#f8fafc;border:2px dashed #e2e8f0;border-radius:10px;text-align:center;color:#94a3b8;font-size:13px;">No prospects at this stage</div>`;
+    } else {
+      html += `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th>Notes</th><th>Move Stage</th><th>Actions</th></tr></thead><tbody>`;
+      items.forEach(p => {
+        html += `
+          <tr>
+            <td data-label="Name"><strong>${p.name||'—'}</strong></td>
+            <td data-label="Email" style="font-family:monospace;font-size:12px;">${p.email}</td>
+            <td data-label="Company">${p.company||'—'}</td>
+            <td data-label="Job Title">${p.jobTitle||'—'}</td>
+            <td data-label="Notes"><input type="text" value="${(p.notes||'').replace(/"/g,'&quot;')}" onblur="updateProspectNotes('${p.id}',this.value)" placeholder="Add note..." style="width:100%;padding:4px 8px;border:2px solid #e2e8f0;border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;"></td>
+            <td data-label="Move Stage">
+              <select onchange="updateProspectStage('${p.id}',this.value)" style="padding:4px 8px;border:2px solid ${sc.border};border-radius:8px;font-size:12px;font-weight:600;background:${sc.bg};color:${sc.color};font-family:'Inter',sans-serif;cursor:pointer;">
+                ${PIPELINE_STAGES.map(s=>`<option value="${s}" ${p.stage===s?'selected':''}>${s}</option>`).join('')}
+              </select>
+            </td>
+            <td data-label="Actions">
+              <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                <a href="mailto:${p.email}" class="btn btn-primary btn-small">Email</a>
+                <button class="btn btn-danger btn-small" onclick="deleteProspect('${p.id}')">Remove</button>
+              </div>
+            </td>
+          </tr>`;
+      });
+      html += '</tbody></table>';
+    }
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+  lucide.createIcons();
+}
+
+// Hook pipeline into showSection
+const _origShowSectionPipeline = showSection;
+showSection = function(sectionId) {
+  _origShowSectionPipeline(sectionId);
+  if (sectionId === 'pipeline') {
+    renderPipeline();
+    updatePipelineStats();
+  }
+};
+
+// Load Hunter credits on page load
+document.addEventListener('DOMContentLoaded', function() {
+  loadHunterCredits();
+});
 
 </script>
 </body>
