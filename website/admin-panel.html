@@ -3914,6 +3914,7 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
     let currentView = 'month';
     let currentDate = new Date();
     let allBookings = [];
+    let allClientBookings = [];
     let allCustomers = [];
     let currentBooking = null;
 
@@ -6788,6 +6789,7 @@ async function confirmModifyService(bookingId) {
 
         if (bookingsData.success) {
           allBookings = bookingsData.bookings;
+          allClientBookings = bookingsData.bookings;
         }
 
         if (data.success) {
@@ -6866,7 +6868,7 @@ async function confirmModifyService(bookingId) {
         const allowReserve = customer.fields['Allow Reserve Without Payment'] === true;
         const emailNotifications = customer.fields['Email Notifications Enabled'] === true;
         
-        const hasBooked = allBookings.some(b => 
+        const hasBooked = allClientBookings.some(b => 
           b.fields['Client Email']?.toLowerCase() === customer.fields['Email']?.toLowerCase() &&
           b.fields['Booking Status'] !== 'Cancelled'
         );
@@ -11945,6 +11947,14 @@ showSection = function(sectionId) {
     renderPipeline();
     updatePipelineStats();
   }
+};
+
+// Reload All Clients data every time that tab is opened, so the
+// "has booked" flag is never left stale by Calendar/Bookings views
+const _origShowSectionClients = showSection;
+showSection = function(sectionId) {
+  _origShowSectionClients(sectionId);
+  if (sectionId === 'customers') loadCustomers();
 };
 
 // Load Hunter credits on page load
