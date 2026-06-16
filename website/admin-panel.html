@@ -4097,6 +4097,7 @@ const UK_REGIONS = [
       loadDiscountCodes();
       loadBlockedTimes();
       loadTimeRequests();
+      loadProspects();
 
       // Populate time options
       const timeSelect = document.getElementById('bookingTime');
@@ -11517,86 +11518,224 @@ const STAGE_COLORS = {
   'Lost':           { bg: '#fee2e2', color: '#991b1b', border: '#fca5a5' }
 };
 
-function getProspects() {
-  try { return JSON.parse(localStorage.getItem('bdm_prospects') || '[]'); }
-  catch { return []; }
-}
+let allProspects = [];
 
-function saveProspects(prospects) {
-  localStorage.setItem('bdm_prospects', JSON.stringify(prospects));
-}
-
-function saveProspect(prospect) {
-  const prospects = getProspects();
-  const existing = prospects.findIndex(p => p.email === prospect.email);
-  if (existing > -1) {
-    if (!confirm(`${prospect.email} is already saved. Update their record?`)) return;
-    prospects[existing] = { ...prospects[existing], ...prospect, updatedAt: new Date().toISOString() };
-  } else {
-    prospects.unshift({
-      ...prospect,
-      id: 'p_' + Date.now(),
-      stage: 'New',
-      notes: '',
-      savedAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+async function loadProspects() {
+  try {
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'GET',
+        table: 'Prospects',
+        sort: [{ field: 'Saved Date', direction: 'desc' }]
+      })
     });
+    const data = await response.json();
+    allProspects = (data.records || []).map(r => ({
+      id: r.id,
+      name: r.fields['Name'] || '',
+      email: r.fields['Email'] || '',
+      company: r.fields['Company'] || '',
+      domain: r.fields['Domain'] || '',
+      jobTitle: r.fields['Job Title'] || '',
+      linkedin: r.fields['LinkedIn'] || '',
+      phone: r.fields['Phone'] || '',
+      confidence: r.fields['Confidence'] || 0,
+      source: r.fields['Source'] || '',
+      stage: r.fields['Stage'] || 'New',
+      notes: r.fields['Notes'] || '',
+      savedAt: r.fields['Saved Date'] || '',
+      updatedAt: r.fields['Updated Date'] || ''
+    }));
+  } catch (error) {
+    console.error('Error loading prospects:', error);
+    allProspects = [];
   }
-  saveProspects(prospects);
+}
+
+async function saveProspect(prospect) {
+  const existing = allProspects.find(p => p.email === prospect.email);
+  try {
+    if (existing) {
+      if (!confirm(`${prospect.email} is already saved. Update their record?`)) return;
+      await fetch('/.netlify/functions/airtable-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          method: 'PATCH',
+          table: 'Prospects',
+          recordId: existing.id,
+          body: {
+            fields: {
+              'Name': prospect.name || existing.name,
+              'Company': prospect.company || existing.company,
+              'Domain': prospect.domain || existing.domain,
+              'Job Title': prospect.jobTitle || existing.jobTitle,
+              'LinkedIn': prospect.linkedin || existing.linkedin,
+              'Phone': prospect.phone || existing.phone,
+              'Confidence': prospect.confidence || existing.confidence,
+              'Source': prospect.source || existing.source,
+              'Updated Date': new Date().toISOString().split('T')[0]
+            }
+          }
+        })
+      });
+    } else {
+      const response = await fetch('/.netlify/functions/airtable-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          method: 'POST',
+          table: 'Prospects',
+          body: {
+            fields: {
+              'Name': prospect.name || '',
+              'Email': prospect.email,
+              'Company': prospect.company || '',
+              'Domain': prospect.domain || '',
+              'Job Title': prospect.jobTitle || '',
+              'LinkedIn': prospect.linkedin || '',
+              'Phone': prospect.phone || '',
+              'Confidence': prospect.confidence || 0,
+              'Source': prospect.source || '',
+              'Stage': 'New',
+              'Notes': '',
+              'Saved Date': new Date().toISOString().split('T')[0],
+              'Updated Date': new Date().toISOString().split('T')[0]
+            }
+          }
+        })
+      });
+      const data = await response.json();
+      if (!data.id) throw new Error('Airtable did not confirm the save');
+    }
+  } catch (error) {
+    console.error('Error saving prospect:', error);
+    alert('❌ Failed to save prospect to Airtable');
+    return;
+  }
+
   showAdminToast(`✅ ${prospect.name || prospect.email} saved to pipeline`);
+  await loadProspects();
   renderSavedProspects();
   renderPipeline();
   updatePipelineStats();
 }
 
-function saveProspectSilent(prospect) {
-  const prospects = getProspects();
-  if (prospects.find(p => p.email === prospect.email)) return;
-  prospects.unshift({
-    ...prospect,
-    id: 'p_' + Date.now() + Math.random(),
-    stage: 'New',
-    notes: '',
-    savedAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  });
-  saveProspects(prospects);
+async function saveProspectSilent(prospect) {
+  if (allProspects.find(p => p.email === prospect.email)) return;
+  try {
+    await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'POST',
+        table: 'Prospects',
+        body: {
+          fields: {
+            'Name': prospect.name || '',
+            'Email': prospect.email,
+            'Company': prospect.company || '',
+            'Domain': prospect.domain || '',
+            'Job Title': prospect.jobTitle || '',
+            'LinkedIn': prospect.linkedin || '',
+            'Phone': prospect.phone || '',
+            'Confidence': prospect.confidence || 0,
+            'Source': prospect.source || '',
+            'Stage': 'New',
+            'Notes': '',
+            'Saved Date': new Date().toISOString().split('T')[0],
+            'Updated Date': new Date().toISOString().split('T')[0]
+          }
+        }
+      })
+    });
+  } catch (error) {
+    console.error('Error saving prospect silently:', error);
+  }
 }
 
-function deleteProspect(id) {
+async function deleteProspect(id) {
   if (!confirm('Remove this prospect from the pipeline?')) return;
-  saveProspects(getProspects().filter(p => p.id !== id));
+  try {
+    await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ method: 'DELETE', table: 'Prospects', recordId: id })
+    });
+  } catch (error) {
+    console.error('Error deleting prospect:', error);
+    alert('❌ Failed to delete prospect');
+    return;
+  }
+  await loadProspects();
   renderSavedProspects();
   renderPipeline();
   updatePipelineStats();
 }
 
-function updateProspectStage(id, stage) {
-  const prospects = getProspects();
-  const idx = prospects.findIndex(p => p.id === id);
+async function updateProspectStage(id, stage) {
+  try {
+    await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'PATCH',
+        table: 'Prospects',
+        recordId: id,
+        body: { fields: { 'Stage': stage, 'Updated Date': new Date().toISOString().split('T')[0] } }
+      })
+    });
+  } catch (error) {
+    console.error('Error updating stage:', error);
+    alert('❌ Failed to update stage');
+    return;
+  }
+  const idx = allProspects.findIndex(p => p.id === id);
   if (idx > -1) {
-    prospects[idx].stage = stage;
-    prospects[idx].updatedAt = new Date().toISOString();
-    saveProspects(prospects);
-    renderSavedProspects();
-    renderPipeline();
-    updatePipelineStats();
+    allProspects[idx].stage = stage;
+    allProspects[idx].updatedAt = new Date().toISOString().split('T')[0];
+  }
+  renderSavedProspects();
+  renderPipeline();
+  updatePipelineStats();
+}
+
+async function updateProspectNotes(id, notes) {
+  const idx = allProspects.findIndex(p => p.id === id);
+  if (idx > -1) {
+    allProspects[idx].notes = notes;
+    allProspects[idx].updatedAt = new Date().toISOString().split('T')[0];
+  }
+  try {
+    await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'PATCH',
+        table: 'Prospects',
+        recordId: id,
+        body: { fields: { 'Notes': notes, 'Updated Date': new Date().toISOString().split('T')[0] } }
+      })
+    });
+  } catch (error) {
+    console.error('Error updating notes:', error);
   }
 }
 
-function updateProspectNotes(id, notes) {
-  const prospects = getProspects();
-  const idx = prospects.findIndex(p => p.id === id);
-  if (idx > -1) {
-    prospects[idx].notes = notes;
-    prospects[idx].updatedAt = new Date().toISOString();
-    saveProspects(prospects);
-  }
-}
-
-function clearAllProspects() {
+async function clearAllProspects() {
   if (!confirm('Clear ALL saved prospects? This cannot be undone.')) return;
-  localStorage.removeItem('bdm_prospects');
+  try {
+    await Promise.all(allProspects.map(p => fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ method: 'DELETE', table: 'Prospects', recordId: p.id })
+    })));
+  } catch (error) {
+    console.error('Error clearing prospects:', error);
+  }
+  allProspects = [];
   renderSavedProspects();
   renderPipeline();
   updatePipelineStats();
@@ -11615,7 +11754,9 @@ function switchProspectTab(tab) {
       btn.style.boxShadow     = t === tab ? '0 2px 4px rgba(0,0,0,0.1)' : 'none';
     }
   });
-  if (tab === 'saved') renderSavedProspects();
+  if (tab === 'saved') {
+    loadProspects().then(() => renderSavedProspects());
+  }
 }
 
 async function loadHunterCredits() {
@@ -11704,13 +11845,14 @@ function renderDomainResults(data, domain) {
   lucide.createIcons();
 }
 
-function saveAllDomainResults(emails, org, domain) {
+async function saveAllDomainResults(emails, org, domain) {
   if (!confirm(`Save all ${emails.length} contacts to your pipeline?`)) return;
-  emails.forEach(e => {
+  await Promise.all(emails.map(e => {
     const name = [e.first_name, e.last_name].filter(Boolean).join(' ') || '';
-    saveProspectSilent({ name, email: e.value, company: org, domain, jobTitle: e.position || '', linkedin: e.linkedin || '', phone: e.phone_number || '', confidence: e.confidence || 0, source: 'domain-search' });
-  });
+    return saveProspectSilent({ name, email: e.value, company: org, domain, jobTitle: e.position || '', linkedin: e.linkedin || '', phone: e.phone_number || '', confidence: e.confidence || 0, source: 'domain-search' });
+  }));
   showAdminToast(`✅ ${emails.length} prospects saved to pipeline`);
+  await loadProspects();
   renderSavedProspects();
   renderPipeline();
   updatePipelineStats();
@@ -11814,7 +11956,7 @@ function renderSavedProspects() {
   if (!container) return;
   const search = (document.getElementById('prospectSearch')?.value || '').toLowerCase();
   const stage  = document.getElementById('prospectStatusFilter')?.value || '';
-  let prospects = getProspects();
+  let prospects = [...allProspects];
   if (search)  prospects = prospects.filter(p => (p.name||'').toLowerCase().includes(search)||(p.email||'').toLowerCase().includes(search)||(p.company||'').toLowerCase().includes(search));
   if (stage)   prospects = prospects.filter(p => p.stage === stage);
 
@@ -11855,7 +11997,7 @@ function renderSavedProspects() {
 }
 
 function exportProspectsCSV() {
-  const prospects = getProspects();
+  const prospects = [...allProspects];
   if (prospects.length === 0) { alert('No prospects to export'); return; }
   const headers = ['Name','Email','Company','Domain','Job Title','LinkedIn','Phone','Stage','Notes','Confidence','Source','Saved At'];
   const rows = prospects.map(p => [p.name,p.email,p.company,p.domain,p.jobTitle,p.linkedin,p.phone,p.stage,p.notes,p.confidence,p.source,p.savedAt].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`));
@@ -11868,7 +12010,7 @@ function exportProspectsCSV() {
 }
 
 function updatePipelineStats() {
-  const prospects = getProspects();
+  const prospects = [...allProspects];
   const el = id => document.getElementById(id);
   if (el('pipelineTotal'))     el('pipelineTotal').textContent     = prospects.length;
   if (el('pipelineContacted')) el('pipelineContacted').textContent = prospects.filter(p=>p.stage==='Contacted').length;
@@ -11881,7 +12023,7 @@ function renderPipeline() {
   if (!container) return;
   const search = (document.getElementById('pipelineSearch')?.value || '').toLowerCase();
   const stage  = document.getElementById('pipelineStageFilter')?.value || '';
-  let prospects = getProspects();
+  let prospects = [...allProspects];
   if (search) prospects = prospects.filter(p=>(p.name||'').toLowerCase().includes(search)||(p.email||'').toLowerCase().includes(search)||(p.company||'').toLowerCase().includes(search));
   if (stage)  prospects = prospects.filter(p=>p.stage===stage);
   updatePipelineStats();
@@ -11944,8 +12086,10 @@ const _origShowSectionPipeline = showSection;
 showSection = function(sectionId) {
   _origShowSectionPipeline(sectionId);
   if (sectionId === 'pipeline') {
-    renderPipeline();
-    updatePipelineStats();
+    loadProspects().then(() => {
+      renderPipeline();
+      updatePipelineStats();
+    });
   }
 };
 
