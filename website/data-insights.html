@@ -2276,6 +2276,7 @@ function renderPerformanceSection() {
 
   const metrics = [
     { key:'signups',      label:'Dashboard Sign-Ups',           sub:'All signups in period',         icon:'<i data-lucide="user-round" style="width:14px;height:14px;vertical-align:-3px;"></i>',     css:'signups',       curr:currSignups.length,                                                              prev:prevSignups.length,                                                               fmt:v=>v.toString(),                         targetKey:'signups'      },
+    { key:'grossRevenue', label:'Gross Revenue',                    sub:'Shoots delivered this period (incl. VAT)', icon:'<i data-lucide="pound-sterling" style="width:14px;height:14px;vertical-align:-3px;"></i>', css:'gross-revenue', curr:currFulfil.bookings.filter(b=>b.bookingStatus!=='Cancelled').reduce((s,b)=>s+(parseFloat(b.finalPrice)||0),0), prev:prevFulfil.bookings.filter(b=>b.bookingStatus!=='Cancelled').reduce((s,b)=>s+(parseFloat(b.finalPrice)||0),0), fmt:v=>'£'+Math.round(v).toLocaleString(), targetKey:'grossRevenue' },
     { key:'revenue',      label:'Net Revenue',                      sub:'Shoots delivered this period',   icon:'<i data-lucide="pound-sterling" style="width:14px;height:14px;vertical-align:-3px;"></i>', css:'revenue',       curr:calcRevenue(currFulfil.bookings),                                                  prev:calcRevenue(prevFulfil.bookings),                                                  fmt:v=>'£'+Math.round(v).toLocaleString(), targetKey:'revenue'      },
     { key:'newBookings',  label:'Bookings By New Clients',          sub:'Shoots delivered for new clients',      icon:'<i data-lucide="user-plus" style="width:14px;height:14px;vertical-align:-3px;"></i>',      css:'new-booking',   curr:splitNewVsExisting(currFulfil.bookings, windows.current[0]).newB.filter(b=>b.bookingStatus!=='Cancelled').length,   prev:splitNewVsExisting(prevFulfil.bookings, windows.previous[0]).newB.filter(b=>b.bookingStatus!=='Cancelled').length,   fmt:v=>v.toString(),  targetKey:'newBookings'  },
     { key:'existBookings',label:'Bookings By Existing Clients',     sub:'Shoots delivered for existing clients', icon:'<i data-lucide="repeat" style="width:14px;height:14px;vertical-align:-3px;"></i>',         css:'exist-booking', curr:splitNewVsExisting(currFulfil.bookings, windows.current[0]).exB.filter(b=>b.bookingStatus!=='Cancelled').length,    prev:splitNewVsExisting(prevFulfil.bookings, windows.previous[0]).exB.filter(b=>b.bookingStatus!=='Cancelled').length,    fmt:v=>v.toString(),  targetKey:'existBookings'},
@@ -2288,14 +2289,16 @@ function renderPerformanceSection() {
     const T   = buildTargets();
     const yr  = getCurrentYear();
     const key = 'y' + yr;
-    const monthly = T.monthly[metricKey][key];
+    const monthly = metricKey === 'grossRevenue'
+      ? T.monthly.revenue[key] * 1.2
+      : T.monthly[metricKey][key];
     if (currentPeriod === 'mom')  return monthly;
     if (currentPeriod === 'qoq') return monthly * 3;
     if (currentPeriod === '6m')  return monthly * 6;
     return monthly * 12;
   }
 
- const colourMap = { signups:'#3b82f6', revenue:'#10b981', 'new-booking':'#8b5cf6', 'exist-booking':'#f59e0b', 'total-booking':'#06b6d4' };
+ const colourMap = { signups:'#3b82f6', 'gross-revenue':'#0d9488', revenue:'#10b981', 'new-booking':'#8b5cf6', 'exist-booking':'#f59e0b', 'total-booking':'#06b6d4' };
 
   const kpiCards = metrics.map(m => {
     const col     = colourMap[m.css] || '#3b82f6';
@@ -2319,6 +2322,7 @@ function renderPerformanceSection() {
 
   document.getElementById('kpiGrid').innerHTML =
     kpiCards.find(c => c.key === 'signups').html +
+    kpiCards.find(c => c.key === 'grossRevenue').html +
     kpiCards.find(c => c.key === 'revenue').html +
     `<div style="grid-column:span 2;border:2px solid #e2e8f0;border-radius:14px;padding:16px;background:#f8fafc;">
       <p style="font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;text-align:center;">How many bookings came from new clients vs existing clients</p>
