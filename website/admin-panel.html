@@ -11515,6 +11515,11 @@ const STAGE_COLORS = {
 
 let allProspects = [];
 
+function getKnownOwners() {
+  const owners = new Set(allProspects.map(p => p.owner).filter(Boolean));
+  return Array.from(owners).sort();
+}
+
 async function loadProspects() {
   try {
     const response = await fetch('/.netlify/functions/airtable-proxy', {
@@ -11539,6 +11544,7 @@ async function loadProspects() {
       confidence: r.fields['Confidence'] || 0,
       source: r.fields['Source'] || '',
       stage: r.fields['Stage'] || 'New',
+      owner: r.fields['Owner'] || '',
       notes: r.fields['Notes'] || '',
       savedAt: r.fields['Saved Date'] || '',
       updatedAt: r.fields['Updated Date'] || ''
@@ -11695,6 +11701,41 @@ async function updateProspectStage(id, stage) {
   renderSavedProspects();
   renderPipeline();
   updatePipelineStats();
+}
+
+function promptNewOwner(id, selectEl) {
+  const name = prompt('Enter the new owner\'s name:');
+  if (!name || !name.trim()) {
+    selectEl.value = '';
+    return;
+  }
+  updateProspectOwner(id, name.trim());
+}
+
+async function updateProspectOwner(id, ownerName) {
+  try {
+    await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'PATCH',
+        table: 'Prospects',
+        recordId: id,
+        body: { fields: { 'Owner': ownerName, 'Updated Date': new Date().toISOString().split('T')[0] } }
+      })
+    });
+  } catch (error) {
+    console.error('Error updating owner:', error);
+    alert('❌ Failed to update owner');
+    return;
+  }
+  const idx = allProspects.findIndex(p => p.id === id);
+  if (idx > -1) {
+    allProspects[idx].owner = ownerName;
+    allProspects[idx].updatedAt = new Date().toISOString().split('T')[0];
+  }
+  renderSavedProspects();
+  renderPipeline();
 }
 
 async function updateProspectNotes(id, notes) {
@@ -11946,6 +11987,16 @@ function renderVerifyResult(data) {
   lucide.createIcons();
 }
 
+function getDuplicateProspectEmails() {
+  const counts = {};
+  allProspects.forEach(p => {
+    const email = (p.email || '').toLowerCase().trim();
+    if (!email) return;
+    counts[email] = (counts[email] || 0) + 1;
+  });
+  return new Set(Object.keys(counts).filter(email => counts[email] > 1));
+}
+
 function renderSavedProspects() {
   const container = document.getElementById('savedProspectsContainer');
   if (!container) return;
@@ -11960,16 +12011,29 @@ function renderSavedProspects() {
     return;
   }
 
-  let html = `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th>LinkedIn</th><th>Stage</th><th>Notes</th><th>Actions</th></tr></thead><tbody>`;
+  const duplicateEmails = getDuplicateProspectEmails();
+  const knownOwners = getKnownOwners();
+  let html = `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th>LinkedIn</th><th>Owner</th><th>Stage</th><th>Notes</th><th>Actions</th></tr></thead><tbody>`;
   prospects.forEach(p => {
     const sc = STAGE_COLORS[p.stage] || STAGE_COLORS['New'];
+    const isDupe = duplicateEmails.has((p.email||'').toLowerCase().trim());
     html += `
-      <tr>
+      <tr style="${isDupe ? 'background:#fef2f2;border-left:4px solid #ef4444;' : ''}">
         <td data-label="Name"><strong>${p.name||'—'}</strong></td>
-        <td data-label="Email" style="font-family:monospace;font-size:12px;">${p.email}</td>
+        <td data-label="Email" style="font-family:monospace;font-size:12px;${isDupe ? 'color:#ef4444;font-weight:700;' : ''}">
+          ${p.email}
+          ${isDupe ? '<span style="display:inline-block;margin-left:6px;padding:1px 7px;background:#ef4444;color:#fff;border-radius:8px;font-size:10px;font-weight:700;vertical-align:middle;">DUPLICATE</span>' : ''}
+        </td>
         <td data-label="Company">${p.company||'—'}</td>
         <td data-label="Job Title">${p.jobTitle||'—'}</td>
         <td data-label="LinkedIn">${p.linkedin?`<a href="${p.linkedin}" target="_blank" style="color:#B46100;font-size:12px;">View</a>`:'—'}</td>
+        <td data-label="Owner">
+          <select onchange="this.value==='__new__' ? promptNewOwner('${p.id}', this) : updateProspectOwner('${p.id}', this.value)" style="padding:4px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:600;background:#fff;color:#0f172a;font-family:'Inter',sans-serif;cursor:pointer;min-width:130px;">
+            <option value="">-- Select Owner --</option>
+            ${knownOwners.map(o => `<option value="${o}" ${p.owner===o?'selected':''}>${o}</option>`).join('')}
+            <option value="__new__">+ Add new name...</option>
+          </select>
+        </td>
         <td data-label="Stage">
           <select onchange="updateProspectStage('${p.id}', this.value)" style="padding:4px 8px;border:2px solid ${sc.border};border-radius:8px;font-size:12px;font-weight:600;background:${sc.bg};color:${sc.color};font-family:'Inter',sans-serif;cursor:pointer;">
             ${PIPELINE_STAGES.map(s=>`<option value="${s}" ${p.stage===s?'selected':''}>${s}</option>`).join('')}
@@ -12045,14 +12109,27 @@ function renderPipeline() {
     if (items.length === 0) {
       html += `<div style="padding:16px;background:#f8fafc;border:2px dashed #e2e8f0;border-radius:10px;text-align:center;color:#94a3b8;font-size:13px;">No prospects at this stage</div>`;
     } else {
-      html += `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th>Notes</th><th>Move Stage</th><th>Actions</th></tr></thead><tbody>`;
+      html += `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th>Owner</th><th>Notes</th><th>Move Stage</th><th>Actions</th></tr></thead><tbody>`;
+      const duplicateEmailsForStage = getDuplicateProspectEmails();
+      const knownOwnersForStage = getKnownOwners();
       items.forEach(p => {
+        const isDupe = duplicateEmailsForStage.has((p.email||'').toLowerCase().trim());
         html += `
-          <tr>
+          <tr style="${isDupe ? 'background:#fef2f2;border-left:4px solid #ef4444;' : ''}">
             <td data-label="Name"><strong>${p.name||'—'}</strong></td>
-            <td data-label="Email" style="font-family:monospace;font-size:12px;">${p.email}</td>
+            <td data-label="Email" style="font-family:monospace;font-size:12px;${isDupe ? 'color:#ef4444;font-weight:700;' : ''}">
+              ${p.email}
+              ${isDupe ? '<span style="display:inline-block;margin-left:6px;padding:1px 7px;background:#ef4444;color:#fff;border-radius:8px;font-size:10px;font-weight:700;vertical-align:middle;">DUPLICATE</span>' : ''}
+            </td>
             <td data-label="Company">${p.company||'—'}</td>
             <td data-label="Job Title">${p.jobTitle||'—'}</td>
+            <td data-label="Owner">
+              <select onchange="this.value==='__new__' ? promptNewOwner('${p.id}', this) : updateProspectOwner('${p.id}', this.value)" style="padding:4px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:600;background:#fff;color:#0f172a;font-family:'Inter',sans-serif;cursor:pointer;min-width:130px;">
+                <option value="">-- Select Owner --</option>
+                ${knownOwnersForStage.map(o => `<option value="${o}" ${p.owner===o?'selected':''}>${o}</option>`).join('')}
+                <option value="__new__">+ Add new name...</option>
+              </select>
+            </td>
             <td data-label="Notes"><input type="text" value="${(p.notes||'').replace(/"/g,'&quot;')}" onblur="updateProspectNotes('${p.id}',this.value)" placeholder="Add note..." style="width:100%;padding:4px 8px;border:2px solid #e2e8f0;border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;"></td>
             <td data-label="Move Stage">
               <select onchange="updateProspectStage('${p.id}',this.value)" style="padding:4px 8px;border:2px solid ${sc.border};border-radius:8px;font-size:12px;font-weight:600;background:${sc.bg};color:${sc.color};font-family:'Inter',sans-serif;cursor:pointer;">

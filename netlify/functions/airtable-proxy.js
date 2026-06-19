@@ -20,11 +20,10 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { method, url, table, recordId, body, filterFormula } = JSON.parse(event.body);
-    let finalUrl;
-    
-    // Build URL from table name
-    if (table) {
+const { method, url, table, recordId, body, filterFormula } = JSON.parse(event.body);
+let finalUrl;
+// Build URL from table name
+if (table) {
       // Convert spaces to underscores for env var lookup
       const envVarName = `AIRTABLE_${table.toUpperCase().replace(/\s+/g, '_')}_TABL`;
       const tableId = process.env[envVarName];
