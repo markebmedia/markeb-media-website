@@ -122,12 +122,12 @@
         .mq::before { left:0; background:linear-gradient(to right,#fff,transparent); }
         .mq::after { right:0; background:linear-gradient(to left,#fff,transparent); }
         .mq-ey { text-align:center; font-family:'Cormorant Garamond',serif; font-style:italic; font-size:14px; color:var(--ink-soft); letter-spacing:.1em; margin-bottom:24px; }
-        .mq-track { display:flex; width:max-content; animation:msc 30s linear infinite; }
+        .mq-track { display:flex; width:max-content; animation:msc 55s linear infinite; }
         .mq-track:hover { animation-play-state:paused; }
-        @keyframes msc { from{transform:translateX(0)}to{transform:translateX(-50%)} }
-        @keyframes mscr { from{transform:translateX(-50%)}to{transform:translateX(0)} }
-        .mq-track-rev { animation:mscr 30s linear infinite; }
-        .mq-item { display:flex; align-items:center; padding:0 52px; opacity:.35; transition:opacity .3s; }
+        @keyframes msc { from{transform:translateX(0)}to{transform:translateX(-33.333%)} }
+        @keyframes mscr { from{transform:translateX(-33.333%)}to{transform:translateX(0)} }
+        .mq-track-rev { animation:mscr 55s linear infinite; }
+        .mq-item { display:flex; align-items:center; padding:0 40px; opacity:.35; transition:opacity .3s; }
         .mq-item:hover { opacity:.72; }
 
         /* Why */
