@@ -1488,9 +1488,15 @@ body {
   }
 }
 
-  #savedProspectsContainer .data-table,
+  #savedProspectsContainer,
+#pipelineContainer {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#savedProspectsContainer .data-table,
 #pipelineContainer .data-table {
-  min-width: unset !important;
+  min-width: 900px;
 }
 
 /* ===== BDM MOBILE CARD STYLES ===== */
