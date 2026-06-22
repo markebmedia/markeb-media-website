@@ -47,6 +47,7 @@ export async function handler(event) {
       customerName:   f['Customer Name'] || null,
       serviceType:    f['Service Type'] || null,
       deliveryLink:   f['Delivery Link'] || null,
+vimeoLink:      f['Vimeo Link'] || null,
       projectAddress: f['Project Address'] || null,
       source
     };

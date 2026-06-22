@@ -34,7 +34,7 @@ exports.handler = async (event, context) => {
     const payload = JSON.parse(event.body);
     
     // Extract data from Airtable webhook payload
-    const { status, customerName, trackingCode, deliveryLink, email, projectAddress } = payload;
+    const { status, customerName, trackingCode, deliveryLink, vimeoLink, email, projectAddress } = payload;
 
     if (!status || !customerName || !trackingCode || !email) {
       return {
@@ -64,14 +64,14 @@ exports.handler = async (event, context) => {
         break;
 
       case 'Ready for Delivery':
-        if (!deliveryLink) {
-          return {
-            statusCode: 400,
-            headers,
-            body: JSON.stringify({ error: 'Delivery link required for Ready for Delivery status' })
-          };
-        }
-        await sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, projectAddress, email);
+        if (!deliveryLink && !vimeoLink) {
+  return {
+    statusCode: 400,
+    headers,
+    body: JSON.stringify({ error: 'Delivery link or Vimeo link required for Ready for Delivery status' })
+  };
+}
+        await sendReadyForDeliveryEmail(customerName, trackingCode, vimeoLink || deliveryLink, projectAddress, email, !!vimeoLink);
         emailSent = true;
         break;
 
@@ -335,7 +335,7 @@ async function sendQualityControlEmail(customerName, trackingCode, projectAddres
 }
 
 // 3. Ready for Delivery Status Email
-async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, projectAddress, email) {
+async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, projectAddress, email, isVimeo = false) {
   const content = `
     <h2>🎉 Your Content is Now Ready!</h2>
     <p>Hi ${customerName},</p>
@@ -343,8 +343,9 @@ async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLin
     <p>Your content for <strong>${projectAddress}</strong> is now ready! 🎉</p>
 
     <div class="alert alert-success">
-      <strong>📥 Download Link:</strong><br>
+      <strong>${isVimeo ? '🎬 Your Video Link:' : '📥 Download Link:'}</strong><br>
       <a href="${deliveryLink}" style="color: #3F4D1B; font-weight: 700; font-size: 15px; word-break: break-all;">${deliveryLink}</a>
+      ${isVimeo ? '<br><span style="font-size:13px;color:#3F4D1B;margin-top:6px;display:block;">Paste this link directly into your website or Loop to embed your video.</span>' : ''}
     </div>
 
     <div class="alert alert-info">
