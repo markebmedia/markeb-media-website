@@ -1,5 +1,4 @@
 // netlify/functions/airtable-proxy.js
-// Proxy for Airtable API calls from admin panel
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -20,42 +19,48 @@ exports.handler = async (event, context) => {
   }
 
   try {
-const { method, url, table, recordId, body, filterFormula } = JSON.parse(event.body);
-let finalUrl;
-// Build URL from table name
-if (table) {
-      // Convert spaces to underscores for env var lookup
+    const { method, url, table, recordId, body, filterFormula, sort } = JSON.parse(event.body);
+
+    let finalUrl;
+
+    if (table) {
       const envVarName = `AIRTABLE_${table.toUpperCase().replace(/\s+/g, '_')}_TABL`;
       const tableId = process.env[envVarName];
-      
+
       if (!tableId) {
         console.error(`Table configuration not found: ${envVarName}`);
         return {
           statusCode: 500,
           headers,
-          body: JSON.stringify({ 
-            success: false, 
+          body: JSON.stringify({
+            success: false,
             error: `Table configuration not found: ${envVarName}`,
             hint: `Please add ${envVarName} to your Netlify environment variables`
           })
         };
       }
-      
+
       const baseUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${tableId}`;
-      
+
       if (recordId) {
         finalUrl = `${baseUrl}/${recordId}`;
-      } else if (filterFormula) {
-        finalUrl = `${baseUrl}?filterByFormula=${encodeURIComponent(filterFormula)}`;
       } else {
-        finalUrl = baseUrl;
+        // Build query string
+        const params = new URLSearchParams();
+        if (filterFormula) params.set('filterByFormula', filterFormula);
+        if (sort && Array.isArray(sort)) {
+          sort.forEach((s, i) => {
+            params.set(`sort[${i}][field]`, s.field);
+            if (s.direction) params.set(`sort[${i}][direction]`, s.direction);
+          });
+        }
+        finalUrl = params.toString() ? `${baseUrl}?${params}` : baseUrl;
       }
     } else {
-      // Fallback: use provided URL (for backward compatibility)
       finalUrl = url;
     }
 
-    const options = {
+    const fetchOptions = {
       method: method,
       headers: {
         'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
@@ -64,10 +69,39 @@ if (table) {
     };
 
     if (body) {
-      options.body = JSON.stringify(body);
+      fetchOptions.body = JSON.stringify(body);
     }
 
-    const response = await fetch(finalUrl, options);
+    // For GET requests without a specific record, paginate through all results
+    if (method === 'GET' && !recordId) {
+      let allRecords = [];
+      let offset = null;
+
+      do {
+        const pageUrl = offset ? `${finalUrl}${finalUrl.includes('?') ? '&' : '?'}offset=${offset}` : finalUrl;
+        const response = await fetch(pageUrl, fetchOptions);
+        const data = await response.json();
+
+        if (!response.ok) {
+          return { statusCode: response.status, headers, body: JSON.stringify(data) };
+        }
+
+        if (data.records) {
+          allRecords = allRecords.concat(data.records);
+        }
+
+        offset = data.offset || null;
+      } while (offset);
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({ records: allRecords })
+      };
+    }
+
+    // For all other requests (POST, PATCH, DELETE, GET single record) — single fetch
+    const response = await fetch(finalUrl, fetchOptions);
     const data = await response.json();
 
     return {

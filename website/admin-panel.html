@@ -12163,6 +12163,10 @@ const _origShowSectionPipeline = showSection;
 showSection = function(sectionId) {
   _origShowSectionPipeline(sectionId);
   if (sectionId === 'pipeline') {
+    document.getElementById('pipelineTotal').textContent = '…';
+    document.getElementById('pipelineContacted').textContent = '…';
+    document.getElementById('pipelineMeeting').textContent = '…';
+    document.getElementById('pipelineWon').textContent = '…';
     loadProspects().then(() => {
       renderPipeline();
       updatePipelineStats();
