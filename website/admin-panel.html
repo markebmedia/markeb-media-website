@@ -12216,7 +12216,7 @@ function renderSavedProspects() {
 
   const duplicateEmails = getDuplicateProspectEmails();
   const knownOwners = getKnownOwners();
-  let html = `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th>LinkedIn</th><th>Owner</th><th>Stage</th><th>Notes</th><th>Actions</th></tr></thead><tbody>`;
+  let html = `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th>LinkedIn</th><th style="min-width:180px;">Owner</th><th>Stage</th><th style="min-width:220px;">Notes</th><th>Actions</th></tr></thead><tbody>`;
   prospects.forEach(p => {
     const sc = STAGE_COLORS[p.stage] || STAGE_COLORS['New'];
     const isDupe = duplicateEmails.has((p.email||'').toLowerCase().trim());
@@ -12231,7 +12231,7 @@ function renderSavedProspects() {
         <td data-label="Job Title">${p.jobTitle||'—'}</td>
         <td data-label="LinkedIn">${p.linkedin?`<a href="${p.linkedin}" target="_blank" style="color:#B46100;font-size:12px;">View</a>`:'—'}</td>
         <td data-label="Owner">
-          <select onchange="this.value==='__new__' ? promptNewOwner('${p.id}', this) : updateProspectOwner('${p.id}', this.value)" style="padding:4px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:600;background:#fff;color:#0f172a;font-family:'Inter',sans-serif;cursor:pointer;width:100%;">
+          <select onchange="this.value==='__new__' ? promptNewOwner('${p.id}', this) : updateProspectOwner('${p.id}', this.value)" style="padding:4px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:600;background:#fff;color:#0f172a;font-family:'Inter',sans-serif;cursor:pointer;width:100%;min-width:160px;">
             <option value="">-- Select Owner --</option>
             ${knownOwners.map(o => `<option value="${o}" ${p.owner===o?'selected':''}>${o}</option>`).join('')}
             <option value="__new__">+ Add new name...</option>
@@ -12243,7 +12243,7 @@ function renderSavedProspects() {
           </select>
         </td>
         <td data-label="Notes">
-          <input type="text" value="${(p.notes||'').replace(/"/g,'&quot;')}" onblur="updateProspectNotes('${p.id}', this.value)" placeholder="Add note..." style="width:100%;padding:8px 10px;border:2px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;">
+          <input type="text" value="${(p.notes||'').replace(/"/g,'&quot;')}" onblur="updateProspectNotes('${p.id}', this.value)" placeholder="Add note..." style="width:100%;min-width:200px;padding:8px 10px;border:2px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;">
         </td>
         <td data-label="Actions">
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -12314,7 +12314,7 @@ function renderPipeline() {
     if (items.length === 0) {
       html += `<div style="padding:16px;background:#f8fafc;border:2px dashed #e2e8f0;border-radius:10px;text-align:center;color:#94a3b8;font-size:13px;">No prospects at this stage</div>`;
     } else {
-      html += `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th>Owner</th><th>Notes</th><th>Move Stage</th><th>Actions</th></tr></thead><tbody>`;
+      html += `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th style="min-width:180px;">Owner</th><th style="min-width:220px;">Notes</th><th>Move Stage</th><th>Actions</th></tr></thead><tbody>`;
       const duplicateEmailsForStage = getDuplicateProspectEmails();
       const knownOwnersForStage = getKnownOwners();
       items.forEach(p => {
@@ -12335,7 +12335,7 @@ function renderPipeline() {
                 <option value="__new__">+ Add new name...</option>
               </select>
             </td>
-            <td data-label="Notes"><input type="text" value="${(p.notes||'').replace(/"/g,'&quot;')}" onblur="updateProspectNotes('${p.id}',this.value)" placeholder="Add note..." style="width:100%;padding:8px 10px;border:2px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;"></td>
+            <td data-label="Notes"><input type="text" value="${(p.notes||'').replace(/"/g,'&quot;')}" onblur="updateProspectNotes('${p.id}',this.value)" placeholder="Add note..." style="width:100%;min-width:200px;padding:8px 10px;border:2px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;"></td>
             <td data-label="Move Stage">
               <select onchange="updateProspectStage('${p.id}',this.value)" style="padding:4px 8px;border:2px solid ${sc.border};border-radius:8px;font-size:13px;font-weight:600;background:${sc.bg};color:${sc.color};font-family:'Inter',sans-serif;cursor:pointer;width:100%;">
                 ${PIPELINE_STAGES.map(s=>`<option value="${s}" ${p.stage===s?'selected':''}>${s}</option>`).join('')}
