@@ -1839,10 +1839,21 @@ body {
         </div>
         <div class="form-group">
           <label class="form-label">Time *</label>
-          <select id="bookingTime" class="form-input" required onchange="checkAdminAvailability()">
-            <option value="">-- Select Time --</option>
-            ${generateTimeOptions()}
-          </select>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <select id="bookingTime" class="form-input" onchange="handleAdminTimeSelect()" style="flex: 1;">
+              <option value="">-- Select Time --</option>
+            </select>
+            <span style="color: #94a3b8; font-size: 13px; font-weight: 600; flex-shrink: 0;">or</span>
+            <input 
+              type="text" 
+              id="bookingTimeCustom" 
+              class="form-input" 
+              placeholder="e.g. 07:30, 18:45"
+              style="flex: 1; max-width: 140px;"
+              oninput="handleAdminTimeInput()"
+            />
+          </div>
+          <div style="font-size: 12px; color: #64748b; margin-top: 4px;">Select from the list or type any time in HH:MM format</div>
         </div>
       </div>
 
@@ -4178,6 +4189,27 @@ function handleSpecialistChange() {
   customInput.style.display = select.value === 'other' ? 'block' : 'none';
 }
 
+function handleAdminTimeSelect() {
+  const select = document.getElementById('bookingTime');
+  const customInput = document.getElementById('bookingTimeCustom');
+  if (select.value) customInput.value = '';
+  checkAdminAvailability();
+}
+
+function handleAdminTimeInput() {
+  const customInput = document.getElementById('bookingTimeCustom');
+  const select = document.getElementById('bookingTime');
+  const val = customInput.value.trim();
+  const valid = /^([01]\d|2[0-3]):([0-5]\d)$/.test(val);
+  if (val) {
+    select.value = '';
+    customInput.style.borderColor = valid ? '#10b981' : '#f59e0b';
+  } else {
+    customInput.style.borderColor = '';
+  }
+  if (valid) checkAdminAvailability();
+}
+
 function handleAdminAccessTypeChange() {
   const accessType = document.getElementById('bookingAccessType').value;
   const keyPickupSection = document.getElementById('adminKeyPickupSection');
@@ -4588,6 +4620,8 @@ function resetBookingForm() {
   bookingFormData.extraDuration = 0;
   document.getElementById('bookingAddonsSection').style.display = 'none';
   updateAdminEpcVisibility();
+  const customTimeInput = document.getElementById('bookingTimeCustom');
+  if (customTimeInput) { customTimeInput.value = ''; customTimeInput.style.borderColor = ''; }
   document.getElementById('availabilityResults').style.display = 'none';
   const discountMsg = document.getElementById('discountMessage');
   if (discountMsg) discountMsg.innerHTML = '';
@@ -4725,7 +4759,7 @@ if (!mediaSpecialist) {
     epcAnswers: getAdminEpcAnswers(),
     
     date: document.getElementById('bookingDate').value,
-    time: document.getElementById('bookingTime').value,
+    time: document.getElementById('bookingTime').value || document.getElementById('bookingTimeCustom')?.value.trim(),
     
     // Discount fields
   discountCode: bookingFormData.discountCode || '',
