@@ -1488,6 +1488,161 @@ body {
   }
 }
 
+  /* ===== BDM MOBILE CARD STYLES ===== */
+@media (max-width: 768px) {
+
+  #savedProspectsContainer .data-table,
+  #pipelineContainer .data-table {
+    min-width: unset;
+    table-layout: auto;
+  }
+
+  #savedProspectsContainer .data-table thead,
+  #pipelineContainer .data-table thead {
+    display: none;
+  }
+
+  #savedProspectsContainer .data-table,
+  #savedProspectsContainer .data-table tbody,
+  #savedProspectsContainer .data-table tr,
+  #savedProspectsContainer .data-table td,
+  #pipelineContainer .data-table,
+  #pipelineContainer .data-table tbody,
+  #pipelineContainer .data-table tr,
+  #pipelineContainer .data-table td {
+    display: block;
+    width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+
+  #savedProspectsContainer .data-table tr,
+  #pipelineContainer .data-table tr {
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  #savedProspectsContainer .data-table tr:hover,
+  #pipelineContainer .data-table tr:hover {
+    border-color: #ffcc80;
+    background: #fffbf5;
+  }
+
+  #savedProspectsContainer .data-table td,
+  #pipelineContainer .data-table td {
+    padding: 10px 0;
+    border: none;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  #savedProspectsContainer .data-table td:last-child,
+  #pipelineContainer .data-table td:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  #savedProspectsContainer .data-table td::before,
+  #pipelineContainer .data-table td::before {
+    content: attr(data-label);
+    position: static;
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    width: 100%;
+    padding: 0;
+  }
+
+  #savedProspectsContainer .data-table td[data-label="Actions"],
+  #pipelineContainer .data-table td[data-label="Actions"] {
+    padding-top: 14px;
+    border-top: 2px solid #e2e8f0;
+    border-bottom: none;
+    margin-top: 4px;
+  }
+
+  #savedProspectsContainer .data-table td[data-label="Actions"] > div,
+  #pipelineContainer .data-table td[data-label="Actions"] > div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  #savedProspectsContainer .data-table td[data-label="Actions"] .btn,
+  #pipelineContainer .data-table td[data-label="Actions"] .btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 13px;
+    padding: 11px 16px;
+  }
+
+  /* Stage select and owner select full width on mobile */
+  #savedProspectsContainer select,
+  #pipelineContainer select {
+    width: 100%;
+    min-width: unset;
+    font-size: 15px;
+    padding: 10px 12px;
+  }
+
+  /* Notes input full width */
+  #savedProspectsContainer input[type="text"],
+  #pipelineContainer input[type="text"] {
+    width: 100%;
+    font-size: 15px;
+    padding: 10px 12px;
+  }
+
+  /* Hunter search tabs wrap */
+  #prospect-finder > div:nth-child(2) {
+    flex-wrap: wrap;
+  }
+
+  /* Hunter input rows stack */
+  #ptab-domain-content > div,
+  #ptab-finder-content > div,
+  #ptab-verify-content > div {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  #savedProspectsContainer .data-table tr,
+  #pipelineContainer .data-table tr {
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+  }
+
+  #savedProspectsContainer .data-table td,
+  #pipelineContainer .data-table td {
+    padding: 8px 0;
+    font-size: 13px;
+  }
+
+  #savedProspectsContainer .data-table td::before,
+  #pipelineContainer .data-table td::before {
+    font-size: 9px;
+  }
+
+  #savedProspectsContainer .data-table td[data-label="Actions"] .btn,
+  #pipelineContainer .data-table td[data-label="Actions"] .btn {
+    font-size: 12px;
+    padding: 10px 14px;
+    min-height: 42px;
+  }
+}
+/* ===== END BDM MOBILE CARD STYLES ===== */
+
   </style>
 </head>
 <body>
@@ -12065,19 +12220,19 @@ function renderSavedProspects() {
         <td data-label="Job Title">${p.jobTitle||'—'}</td>
         <td data-label="LinkedIn">${p.linkedin?`<a href="${p.linkedin}" target="_blank" style="color:#B46100;font-size:12px;">View</a>`:'—'}</td>
         <td data-label="Owner">
-          <select onchange="this.value==='__new__' ? promptNewOwner('${p.id}', this) : updateProspectOwner('${p.id}', this.value)" style="padding:4px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:600;background:#fff;color:#0f172a;font-family:'Inter',sans-serif;cursor:pointer;min-width:130px;">
+          <select onchange="this.value==='__new__' ? promptNewOwner('${p.id}', this) : updateProspectOwner('${p.id}', this.value)" style="padding:4px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:600;background:#fff;color:#0f172a;font-family:'Inter',sans-serif;cursor:pointer;width:100%;">
             <option value="">-- Select Owner --</option>
             ${knownOwners.map(o => `<option value="${o}" ${p.owner===o?'selected':''}>${o}</option>`).join('')}
             <option value="__new__">+ Add new name...</option>
           </select>
         </td>
         <td data-label="Stage">
-          <select onchange="updateProspectStage('${p.id}', this.value)" style="padding:4px 8px;border:2px solid ${sc.border};border-radius:8px;font-size:12px;font-weight:600;background:${sc.bg};color:${sc.color};font-family:'Inter',sans-serif;cursor:pointer;">
+          <select onchange="updateProspectStage('${p.id}', this.value)" style="padding:4px 8px;border:2px solid ${sc.border};border-radius:8px;font-size:13px;font-weight:600;background:${sc.bg};color:${sc.color};font-family:'Inter',sans-serif;cursor:pointer;width:100%;">
             ${PIPELINE_STAGES.map(s=>`<option value="${s}" ${p.stage===s?'selected':''}>${s}</option>`).join('')}
           </select>
         </td>
         <td data-label="Notes">
-          <input type="text" value="${(p.notes||'').replace(/"/g,'&quot;')}" onblur="updateProspectNotes('${p.id}', this.value)" placeholder="Add note..." style="width:100%;padding:4px 8px;border:2px solid #e2e8f0;border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;">
+          <input type="text" value="${(p.notes||'').replace(/"/g,'&quot;')}" onblur="updateProspectNotes('${p.id}', this.value)" placeholder="Add note..." style="width:100%;padding:8px 10px;border:2px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;">
         </td>
         <td data-label="Actions">
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -12088,7 +12243,7 @@ function renderSavedProspects() {
       </tr>`;
   });
   html += '</tbody></table>';
-  container.innerHTML = html;
+  container.innerHTML = `<div id="savedProspectsContainer">${html}</div>`;
   lucide.createIcons();
   const countEl = document.getElementById('ptab-saved');
   if (countEl) countEl.textContent = `Saved Prospects (${allProspects.length})`;
@@ -12163,15 +12318,15 @@ function renderPipeline() {
             <td data-label="Company">${p.company||'—'}</td>
             <td data-label="Job Title">${p.jobTitle||'—'}</td>
             <td data-label="Owner">
-              <select onchange="this.value==='__new__' ? promptNewOwner('${p.id}', this) : updateProspectOwner('${p.id}', this.value)" style="padding:4px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:600;background:#fff;color:#0f172a;font-family:'Inter',sans-serif;cursor:pointer;min-width:130px;">
+              <select onchange="this.value==='__new__' ? promptNewOwner('${p.id}', this) : updateProspectOwner('${p.id}', this.value)" style="padding:4px 8px;border:2px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:600;background:#fff;color:#0f172a;font-family:'Inter',sans-serif;cursor:pointer;width:100%;">
                 <option value="">-- Select Owner --</option>
                 ${knownOwnersForStage.map(o => `<option value="${o}" ${p.owner===o?'selected':''}>${o}</option>`).join('')}
                 <option value="__new__">+ Add new name...</option>
               </select>
             </td>
-            <td data-label="Notes"><input type="text" value="${(p.notes||'').replace(/"/g,'&quot;')}" onblur="updateProspectNotes('${p.id}',this.value)" placeholder="Add note..." style="width:100%;padding:4px 8px;border:2px solid #e2e8f0;border-radius:6px;font-size:12px;font-family:'Inter',sans-serif;"></td>
+            <td data-label="Notes"><input type="text" value="${(p.notes||'').replace(/"/g,'&quot;')}" onblur="updateProspectNotes('${p.id}',this.value)" placeholder="Add note..." style="width:100%;padding:8px 10px;border:2px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'Inter',sans-serif;"></td>
             <td data-label="Move Stage">
-              <select onchange="updateProspectStage('${p.id}',this.value)" style="padding:4px 8px;border:2px solid ${sc.border};border-radius:8px;font-size:12px;font-weight:600;background:${sc.bg};color:${sc.color};font-family:'Inter',sans-serif;cursor:pointer;">
+              <select onchange="updateProspectStage('${p.id}',this.value)" style="padding:4px 8px;border:2px solid ${sc.border};border-radius:8px;font-size:13px;font-weight:600;background:${sc.bg};color:${sc.color};font-family:'Inter',sans-serif;cursor:pointer;width:100%;">
                 ${PIPELINE_STAGES.map(s=>`<option value="${s}" ${p.stage===s?'selected':''}>${s}</option>`).join('')}
               </select>
             </td>
