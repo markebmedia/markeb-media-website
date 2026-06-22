@@ -1488,7 +1488,12 @@ body {
   }
 }
 
-  /* ===== BDM MOBILE CARD STYLES ===== */
+  #savedProspectsContainer .data-table,
+#pipelineContainer .data-table {
+  min-width: unset !important;
+}
+
+/* ===== BDM MOBILE CARD STYLES ===== */
 @media (max-width: 768px) {
 
   #savedProspectsContainer .data-table,
@@ -12243,7 +12248,7 @@ function renderSavedProspects() {
       </tr>`;
   });
   html += '</tbody></table>';
-  container.innerHTML = `<div id="savedProspectsContainer">${html}</div>`;
+  container.innerHTML = html;
   lucide.createIcons();
   const countEl = document.getElementById('ptab-saved');
   if (countEl) countEl.textContent = `Saved Prospects (${allProspects.length})`;
