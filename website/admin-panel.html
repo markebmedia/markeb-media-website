@@ -11791,7 +11791,10 @@ function switchProspectTab(tab) {
     }
   });
   if (tab === 'saved') {
-    loadProspects().then(() => renderSavedProspects());
+    loadProspects().then(() => {
+      renderSavedProspects();
+      updatePipelineStats();
+    });
   }
 }
 
@@ -12053,6 +12056,8 @@ function renderSavedProspects() {
   html += '</tbody></table>';
   container.innerHTML = html;
   lucide.createIcons();
+  const countEl = document.getElementById('ptab-saved');
+  if (countEl) countEl.textContent = `Saved Prospects (${allProspects.length})`;
 }
 
 function exportProspectsCSV() {
@@ -12160,6 +12165,12 @@ showSection = function(sectionId) {
   if (sectionId === 'pipeline') {
     loadProspects().then(() => {
       renderPipeline();
+      updatePipelineStats();
+    });
+  }
+  if (sectionId === 'prospect-finder') {
+    loadProspects().then(() => {
+      renderSavedProspects();
       updatePipelineStats();
     });
   }
