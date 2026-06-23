@@ -71,7 +71,7 @@ exports.handler = async (event, context) => {
     body: JSON.stringify({ error: 'Delivery link or Vimeo link required for Ready for Delivery status' })
   };
 }
-        await sendReadyForDeliveryEmail(customerName, trackingCode, vimeoLink || deliveryLink, projectAddress, email, !!vimeoLink);
+        await sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, vimeoLink, projectAddress, email);
         emailSent = true;
         break;
 
@@ -335,18 +335,28 @@ async function sendQualityControlEmail(customerName, trackingCode, projectAddres
 }
 
 // 3. Ready for Delivery Status Email
-async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, projectAddress, email, isVimeo = false) {
+async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, vimeoLink, projectAddress, email) {
+  const videoBlock = vimeoLink ? `
+    <div class="alert alert-success">
+      <strong>🎬 Your Video Link:</strong><br>
+      <a href="${vimeoLink}" style="color: #3F4D1B; font-weight: 700; font-size: 15px; word-break: break-all;">${vimeoLink}</a>
+      <br><span style="font-size:13px;color:#3F4D1B;margin-top:6px;display:block;">Paste this link directly into your website or Loop to embed your video.</span>
+    </div>` : '';
+
+  const downloadBlock = deliveryLink ? `
+    <div class="alert alert-success">
+      <strong>📥 Download Link:</strong><br>
+      <a href="${deliveryLink}" style="color: #3F4D1B; font-weight: 700; font-size: 15px; word-break: break-all;">${deliveryLink}</a>
+    </div>` : '';
+
   const content = `
     <h2>🎉 Your Content is Now Ready!</h2>
     <p>Hi ${customerName},</p>
 
     <p>Your content for <strong>${projectAddress}</strong> is now ready! 🎉</p>
 
-    <div class="alert alert-success">
-      <strong>${isVimeo ? '🎬 Your Video Link:' : '📥 Download Link:'}</strong><br>
-      <a href="${deliveryLink}" style="color: #3F4D1B; font-weight: 700; font-size: 15px; word-break: break-all;">${deliveryLink}</a>
-      ${isVimeo ? '<br><span style="font-size:13px;color:#3F4D1B;margin-top:6px;display:block;">Paste this link directly into your website or Loop to embed your video.</span>' : ''}
-    </div>
+    ${videoBlock}
+    ${downloadBlock}
 
     <div class="alert alert-info">
       <strong>📍 Tracking Code:</strong><br>
