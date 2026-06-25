@@ -10878,17 +10878,18 @@ async function loadInvoices() {
     const bookingsData = await bookingsRes.json();
 
     const airtableInvoices = (invoicesData.records || []).map(r => ({
-      id: r.id,
-      invoiceNum: r.fields['Invoice Number'] || '',
-      bookingId: r.fields['Booking ID'] || '',
-      bookingRef: r.fields['Booking Reference'] || '',
-      clientName: r.fields['Client Name'] || '',
-      clientEmail: (r.fields['Client Email'] || '').toLowerCase(),
-      amount: parseFloat(r.fields['Amount'] || 0),
-      status: r.fields['Status'] || 'Unpaid',
-      issuedDate: r.fields['Issued Date'] || '',
-      source: 'airtable'
-    }));
+  id: r.id,
+  invoiceNum: r.fields['Invoice Number'] || '',
+  bookingId: r.fields['Booking ID'] || '',
+  bookingRef: r.fields['Booking Reference'] || '',
+  clientName: r.fields['Client Name'] || '',
+  clientEmail: (r.fields['Client Email'] || '').toLowerCase(),
+  amount: parseFloat(r.fields['Amount'] || 0),
+  status: r.fields['Status'] || 'Unpaid',
+  issuedDate: r.fields['Issued Date'] || '',
+  sentDate: r.fields['Sent Date'] || '',
+  source: 'airtable'
+}));
 
     const existingBookingIds = new Set(airtableInvoices.map(i => i.bookingId));
     const derivedInvoices = [];
@@ -11064,11 +11065,15 @@ function openInvoicePanel(client) {
     const isPaid = inv.status === 'Paid';
     const ref = inv.bookingRef || inv.invoiceNum;
     const invNum = `INV-MM${ref}`;
-    const sentRecord = wasInvoiceSent(invNum);
-    const sentBadge = sentRecord
+    const airtableInvoice = allInvoicesData.find(i =>
+      i.invoiceNum === invNum ||
+      i.bookingRef === inv.bookingRef ||
+      i.bookingId === inv.bookingId
+    );
+    const sentBadge = airtableInvoice?.sentDate
       ? `<div style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;background:#d1fae5;color:#065f46;">
           <i data-lucide="send" style="width:10px;height:10px;"></i>
-          Sent ${formatSentTime(sentRecord.timestamp)} · ${sentRecord.clientName}
+          Sent ${new Date(airtableInvoice.sentDate + 'T12:00:00').toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'})}
          </div>`
       : `<div style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:600;background:#f1f5f9;color:#94a3b8;">
           <i data-lucide="mail" style="width:10px;height:10px;"></i>
@@ -11093,12 +11098,98 @@ function openInvoicePanel(client) {
         </div>
         <i data-lucide="chevron-right" style="width:16px;height:16px;color:#cbd5e1;flex-shrink:0;margin-top:12px;"></i>
       </div>
+      <div style="display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #f1f5f9;">
+        <button onclick="event.stopPropagation();showInvoiceModal('${inv.bookingId}')" style="flex:1;padding:8px 12px;background:#3F4D1B;color:#FDF3E2;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">
+          <i data-lucide="file-text" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>Send Invoice
+        </button>
+        ${!isPaid ? `
+        <button onclick="event.stopPropagation();sendPaymentReminder('${inv.bookingId}', '${invNum}', this)" style="flex:1;padding:8px 12px;background:#ef4444;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">
+          <i data-lucide="bell" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>Chase Payment
+        </button>` : ''}
+      </div>
     `;
   }).join('');
 
   document.getElementById('invoiceClientPanel').style.display = 'block';
   document.getElementById('invoicePanelOverlay').style.display = 'block';
   lucide.createIcons();
+}
+
+async function sendPaymentReminder(bookingId, invoiceNum, btn) {
+  const booking = allBookings.find(b => b.id === bookingId);
+  if (!booking) { alert('Booking not found'); return; }
+  const f = booking.fields;
+  if (!confirm(`Send payment reminder to ${f['Client Name']} (${f['Client Email']})?\n\nInvoice: ${invoiceNum}\nAmount: £${parseFloat(f['Final Price'] || 0).toFixed(2)}`)) return;
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+
+  try {
+    const ref = f['Booking Reference'] || bookingId.slice(-6).toUpperCase();
+    const finalPrice = parseFloat(f['Final Price'] || 0);
+    const exVAT = parseFloat((finalPrice / 1.2).toFixed(2));
+    const bedroomFee = parseFloat(f['Extra Bedroom Fee'] || 0);
+    const sqftFee = parseFloat(f['Square Footage Fee'] || 0);
+    const addonsRaw = f['Add-Ons'] || f['Add-ons'] || '';
+    const bedrooms = parseInt(f['Bedrooms'] || 0);
+    const basePrice = parseFloat(f['Base Price'] || 0);
+    const address = f['Property Address'] || '';
+    const postcode = f['Postcode'] || '';
+    const date = f['Date'] || '';
+    const time = f['Time'] || '';
+
+    let shootDate = '';
+    if (date) {
+      const [y, m, d2] = date.split('-').map(Number);
+      shootDate = new Date(y, m - 1, d2).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    const lineItems = [{
+      desc: f['Service'] || '',
+      sub: `Shoot date: ${shootDate}${time ? ' at ' + time : ''}${bedrooms ? ' · ' + bedrooms + ' bedrooms' : ''}`,
+      sub2: address ? `${address}${postcode ? ', ' + postcode : ''}` : '',
+      ref: ref,
+      amount: basePrice > 0 ? basePrice : exVAT
+    }];
+    if (bedroomFee > 0) lineItems.push({ desc: `Extra bedrooms`, sub: '', sub2: '', ref: '', amount: bedroomFee });
+    if (sqftFee > 0) lineItems.push({ desc: 'Large property fee', sub: '', sub2: '', ref: '', amount: sqftFee });
+    if (addonsRaw) {
+      addonsRaw.split(',').map(a => a.trim()).filter(Boolean).forEach(a => {
+        lineItems.push({ desc: a, sub: '', sub2: '', ref: '', amount: null });
+      });
+    }
+
+    const response = await fetch('/.netlify/functions/send-invoice', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        invoiceNum,
+        isPaid: false,
+        isReminder: true,
+        booking: {
+          clientName: f['Client Name'],
+          clientEmail: f['Client Email'],
+          extraRecipients: [],
+          finalPrice,
+          discountCode: f['Discount Code'] || '',
+          discountAmount: parseFloat(f['Discount Amount'] || 0),
+          lineItems
+        }
+      })
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      await recordInvoiceToAirtable(booking, invoiceNum, false);
+      showAdminToast(`✅ Payment reminder sent to ${f['Client Email']}`);
+      if (btn) { btn.textContent = '✓ Sent'; btn.style.background = '#10b981'; }
+    } else {
+      alert(`❌ Failed: ${data.error}`);
+      if (btn) { btn.disabled = false; btn.textContent = 'Chase Payment'; }
+    }
+  } catch (err) {
+    alert('❌ Error: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Chase Payment'; }
+  }
 }
 
 function closeInvoicePanel() {
@@ -11119,28 +11210,66 @@ function openInvoiceFromPanel(bookingId) {
 async function recordInvoiceToAirtable(booking, invoiceNum, isPaid) {
   try {
     const f = booking.fields;
-    await fetch('/.netlify/functions/airtable-proxy', {
+    const today = new Date().toISOString().split('T')[0];
+
+    // Check if already exists
+    const checkRes = await fetch('/.netlify/functions/airtable-proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        method: 'POST',
+        method: 'GET',
         table: 'Invoices',
-        body: {
-          fields: {
-            'Invoice Number': invoiceNum,
-            'Booking ID': booking.id,
-            'Booking Reference': f['Booking Reference'] || '',
-            'Client Name': f['Client Name'] || '',
-            'Client Email': f['Client Email'] || '',
-            'Amount': parseFloat(f['Final Price'] || 0),
-            'Status': isPaid ? 'Paid' : 'Unpaid',
-            'Issued Date': new Date().toISOString().split('T')[0]
-          }
-        }
+        filterFormula: `{Invoice Number} = "${invoiceNum}"`
       })
     });
+    const checkData = await checkRes.json();
+    const existing = checkData.records?.[0];
+
+    if (existing) {
+      await fetch('/.netlify/functions/airtable-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          method: 'PATCH',
+          table: 'Invoices',
+          recordId: existing.id,
+          body: {
+            fields: {
+              'Status': isPaid ? 'Paid' : 'Unpaid',
+              'Sent Date': today
+            }
+          }
+        })
+      });
+    } else {
+      await fetch('/.netlify/functions/airtable-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          method: 'POST',
+          table: 'Invoices',
+          body: {
+            fields: {
+              'Invoice Number': invoiceNum,
+              'Booking ID': booking.id,
+              'Booking Reference': f['Booking Reference'] || '',
+              'Client Name': f['Client Name'] || '',
+              'Client Email': f['Client Email'] || '',
+              'Amount': parseFloat(f['Final Price'] || 0),
+              'Status': isPaid ? 'Paid' : 'Unpaid',
+              'Issued Date': today,
+              'Sent Date': today
+            }
+          }
+        })
+      });
+    }
+
+    // Refresh so panel reflects change immediately
+    await loadInvoices();
+
   } catch (err) {
-    console.warn('Could not record invoice to Airtable:', err);
+    console.error('Failed to record invoice to Airtable:', err);
   }
 }
 
@@ -11673,14 +11802,6 @@ async function emailInvoice(bookingId, btn, overrides = {}) {
     const data = await response.json();
 
     if (data.success) {
-      const sentLog = getInvoiceSentLog();
-      sentLog[invoiceNum] = {
-        timestamp: new Date().toISOString(),
-        clientName: overrides.overrideName || f['Client Name'],
-        clientEmail: overrides.primaryEmail || f['Client Email'],
-        amount: finalPrice
-      };
-      localStorage.setItem('invoiceSentLog', JSON.stringify(sentLog));
       alert(`✅ Invoice ${invoiceNum} emailed to ${f['Client Email']}!`);
       await recordInvoiceToAirtable(booking, invoiceNum, isPaid);
       closeInvoiceModal();

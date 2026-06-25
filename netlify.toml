@@ -13,6 +13,9 @@
 
 [functions."scheduled-reengagement"]
   schedule = "0 9 * * *"
+  
+[functions."chase-overdue-invoices"]
+  schedule = "0 8 * * *"
 
 [[headers]]
   for = "/website/admin-panel.html"
@@ -53,3 +56,4 @@
   from = "/*"
   to = "/index.html"
   status = 200
+

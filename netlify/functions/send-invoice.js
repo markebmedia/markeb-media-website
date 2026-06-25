@@ -162,7 +162,10 @@ exports.handler = async (event) => {
       </div>` : ''}
       <p>${isPaid
         ? 'Please find your paid invoice below for your recent booking with Markeb Media.'
-        : failedPayment ? 'Your invoice is enclosed below. Please pay by bank transfer using the details provided, or log in to your dashboard to update your card.'
+        : body.isReminder
+        ? 'This is a friendly reminder that the invoice below remains outstanding. Please arrange payment at your earliest convenience using the bank details provided.'
+        : failedPayment
+        ? 'Your invoice is enclosed below. Please pay by bank transfer using the details provided, or log in to your dashboard to update your card.'
         : 'Please find your invoice below. Payment is due on receipt — bank transfer details are included.'
       }</p>
 
@@ -229,6 +232,10 @@ exports.handler = async (event) => {
 
     const subject = isPaid
       ? `Invoice ${invoiceNum} — Markeb Media (Paid)`
+      : body.isReminder
+      ? `⏰ Payment Reminder — Invoice ${invoiceNum} — Markeb Media`
+      : failedPayment
+      ? `Invoice ${invoiceNum} — Markeb Media · Payment Failed`
       : `Invoice ${invoiceNum} — Markeb Media · Payment Due`;
 
     const bccList = [BCC_EMAIL];

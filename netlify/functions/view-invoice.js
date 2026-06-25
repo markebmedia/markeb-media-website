@@ -1,10 +1,15 @@
-const Airtable = require('airtable');
+// netlify/functions/view-invoice.js
+// Renders the invoice page with Pay Now button (Apple Pay / Google Pay / card)
+// Stripe Payment Element handles all payment methods automatically
 
+const Airtable = require('airtable');
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
+const STRIPE_PUBLIC_KEY = process.env.STRIPE_PUBLIC_KEY;
+
 exports.handler = async (event) => {
-  const rawRef = event.queryStringParameters?.ref 
-    || (event.path || '').split('/invoice/')[1] 
+  const rawRef = event.queryStringParameters?.ref
+    || (event.path || '').split('/invoice/')[1]
     || '';
   const ref = rawRef.trim().toUpperCase();
 
@@ -13,16 +18,11 @@ exports.handler = async (event) => {
   }
 
   try {
-    // Strip INV-MM prefix to get the booking reference
     const bookingRef = ref.startsWith('INV-MM') ? ref.slice(6) : ref;
     const invoiceNum = ref.startsWith('INV-MM') ? ref : `INV-MM${ref}`;
 
-    // Look up booking by Booking Reference field
     const records = await base('Bookings')
-      .select({
-        filterByFormula: `{Booking Reference} = "${bookingRef}"`,
-        maxRecords: 1
-      })
+      .select({ filterByFormula: `{Booking Reference} = "${bookingRef}"`, maxRecords: 1 })
       .firstPage();
 
     if (!records || records.length === 0) {
@@ -58,7 +58,6 @@ function errorPage(title, message) {
   <style>
     body { font-family: 'Inter', sans-serif; background: #f7ead5; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
     .box { background: #FDF3E2; border-radius: 16px; padding: 48px 40px; max-width: 480px; width: 100%; text-align: center; box-shadow: 0 8px 40px rgba(61,48,18,0.15); }
-    .icon { font-size: 48px; margin-bottom: 16px; }
     h1 { color: #3F4D1B; font-size: 22px; margin: 0 0 12px; }
     p { color: #6b4f2a; font-size: 15px; line-height: 1.6; margin: 0; }
     a { color: #B46100; }
@@ -66,7 +65,7 @@ function errorPage(title, message) {
 </head>
 <body>
   <div class="box">
-    <div class="icon">📄</div>
+    <div style="font-size:48px;margin-bottom:16px;">📄</div>
     <h1>${title}</h1>
     <p>${message}</p>
   </div>
@@ -116,7 +115,6 @@ function buildInvoiceHTML(booking, invoiceNum) {
 
   // Build line items
   const lines = [];
-
   lines.push({
     desc: f['Service'] || '',
     sub: `Shoot date: ${shootDate}${time ? ' at ' + time : ''}${bedrooms ? ' · ' + bedrooms + ' bedrooms' : ''}`,
@@ -129,11 +127,9 @@ function buildInvoiceHTML(booking, invoiceNum) {
     const extraBeds = Math.max(0, bedrooms - 4);
     lines.push({ desc: `Extra bedrooms (${extraBeds} × £25)`, sub: '', sub2: '', ref: '', amount: bedroomFee });
   }
-
   if (sqftFee > 0) {
     lines.push({ desc: 'Large property fee (property over 3,000 sq ft)', sub: '', sub2: '', ref: '', amount: sqftFee });
   }
-
   if (addonsRaw) {
     const addonLines = addonsRaw.split('\n').map(s => s.trim()).filter(Boolean);
     const structured = addonLines.map(line => {
@@ -173,9 +169,177 @@ function buildInvoiceHTML(booking, invoiceNum) {
     </tr>` : '';
 
   const paidStampHTML = isPaid ? `
-    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-18deg);border:5px solid rgba(16,185,129,0.35);border-radius:12px;padding:10px 28px;pointer-events:none;">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-18deg);border:5px solid rgba(16,185,129,0.35);border-radius:12px;padding:10px 28px;pointer-events:none;z-index:1;">
       <div style="font-size:44px;font-weight:800;color:rgba(16,185,129,0.35);letter-spacing:0.1em;white-space:nowrap;">PAID</div>
     </div>` : '';
+
+  // Pay Now section — only shown if unpaid
+  const payNowSection = !isPaid ? `
+    <!-- Pay Now -->
+    <div id="pay-now-section" style="margin-bottom:28px;">
+      <div style="background:linear-gradient(135deg,#3F4D1B 0%,#2d3813 100%);border-radius:14px;padding:24px;margin-bottom:0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:rgba(253,243,226,0.65);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Pay Now</div>
+            <div style="font-size:22px;font-weight:700;color:#FDF3E2;font-family:monospace;">£${finalPrice.toFixed(2)}</div>
+            <div style="font-size:12px;color:rgba(253,243,226,0.5);margin-top:2px;">inc. VAT · ${invoiceNum}</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Apple_Pay_logo.svg/120px-Apple_Pay_logo.svg.png" alt="Apple Pay" style="height:22px;opacity:0.85;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/120px-Google_Pay_Logo.svg.png" alt="Google Pay" style="height:22px;opacity:0.85;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/120px-Visa_Inc._logo.svg.png" alt="Visa" style="height:14px;opacity:0.85;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/120px-Mastercard-logo.svg.png" alt="Mastercard" style="height:22px;opacity:0.85;">
+          </div>
+        </div>
+
+        <!-- Payment Element mounts here -->
+        <div id="payment-element-wrap" style="display:none;">
+          <div id="payment-element" style="margin-bottom:16px;"></div>
+          <div id="payment-error" style="display:none;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:8px;padding:12px 14px;font-size:13px;color:#fca5a5;margin-bottom:14px;"></div>
+          <button id="pay-submit-btn" style="width:100%;padding:14px;background:#B46100;color:#FDF3E2;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.01em;">
+            Pay £${finalPrice.toFixed(2)} Now
+          </button>
+          <button id="pay-cancel-btn" onclick="cancelPay()" style="width:100%;padding:10px;background:transparent;color:rgba(253,243,226,0.5);border:none;font-size:13px;cursor:pointer;margin-top:8px;font-family:'Inter',sans-serif;">
+            Cancel
+          </button>
+        </div>
+
+        <!-- Initial pay button -->
+        <div id="pay-trigger-wrap">
+          <button id="pay-trigger-btn" onclick="initPayment()" style="width:100%;padding:14px;background:#B46100;color:#FDF3E2;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.01em;">
+            Pay Now
+          </button>
+          <div style="text-align:center;margin-top:10px;font-size:12px;color:rgba(253,243,226,0.45);">
+            🔒 Secured by Stripe · Apple Pay · Google Pay · Card
+          </div>
+        </div>
+
+        <!-- Loading state -->
+        <div id="pay-loading" style="display:none;text-align:center;padding:20px 0;">
+          <div style="width:28px;height:28px;border:3px solid rgba(253,243,226,0.2);border-top:3px solid #FDF3E2;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px;"></div>
+          <div style="font-size:13px;color:rgba(253,243,226,0.6);">Loading payment...</div>
+        </div>
+
+        <!-- Success state -->
+        <div id="pay-success" style="display:none;text-align:center;padding:20px 0;">
+          <div style="font-size:40px;margin-bottom:10px;">✅</div>
+          <div style="font-size:16px;font-weight:700;color:#FDF3E2;margin-bottom:6px;">Payment received!</div>
+          <div style="font-size:13px;color:rgba(253,243,226,0.7);">A confirmation email is on its way to ${clientEmail}</div>
+        </div>
+
+      </div>
+    </div>
+
+    <style>
+      @keyframes spin { to { transform: rotate(360deg); } }
+      #payment-element .StripeElement { background: #fff; }
+    </style>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+      const STRIPE_PK = '${STRIPE_PUBLIC_KEY}';
+      const INVOICE_NUM = '${invoiceNum}';
+      let stripe, elements;
+
+      async function initPayment() {
+        document.getElementById('pay-trigger-wrap').style.display = 'none';
+        document.getElementById('pay-loading').style.display = 'block';
+
+        try {
+          const res = await fetch('/.netlify/functions/create-invoice-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ invoiceNum: INVOICE_NUM })
+          });
+          const data = await res.json();
+
+          if (!data.success || !data.clientSecret) {
+            throw new Error(data.error || 'Failed to initialise payment');
+          }
+
+          stripe = Stripe(STRIPE_PK);
+          elements = stripe.elements({
+            clientSecret: data.clientSecret,
+            appearance: {
+              theme: 'stripe',
+              variables: {
+                colorPrimary: '#B46100',
+                colorBackground: '#ffffff',
+                colorText: '#2d1f00',
+                colorDanger: '#ef4444',
+                fontFamily: 'Inter, system-ui, sans-serif',
+                borderRadius: '8px'
+              }
+            }
+          });
+
+          const paymentElement = elements.create('payment', {
+            layout: 'tabs'
+          });
+          paymentElement.mount('#payment-element');
+
+          document.getElementById('pay-loading').style.display = 'none';
+          document.getElementById('payment-element-wrap').style.display = 'block';
+
+          document.getElementById('pay-submit-btn').addEventListener('click', submitPayment);
+
+        } catch (err) {
+          document.getElementById('pay-loading').style.display = 'none';
+          document.getElementById('pay-trigger-wrap').style.display = 'block';
+          alert('Could not load payment form: ' + err.message);
+        }
+      }
+
+      async function submitPayment() {
+        const btn = document.getElementById('pay-submit-btn');
+        const errorEl = document.getElementById('payment-error');
+        btn.disabled = true;
+        btn.textContent = 'Processing...';
+        errorEl.style.display = 'none';
+
+        const { error } = await stripe.confirmPayment({
+          elements,
+          confirmParams: {
+            return_url: window.location.href + '?paid=1'
+          },
+          redirect: 'if_required'
+        });
+
+        if (error) {
+          errorEl.textContent = error.message;
+          errorEl.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'Pay £${finalPrice.toFixed(2)} Now';
+        } else {
+          // Payment succeeded without redirect (e.g. card, Apple Pay, Google Pay)
+          document.getElementById('payment-element-wrap').style.display = 'none';
+          document.getElementById('pay-success').style.display = 'block';
+          // Update status pill
+          const pill = document.getElementById('status-pill');
+          if (pill) {
+            pill.textContent = '✅ Paid';
+            pill.style.cssText = 'background:rgba(16,185,129,0.2);border:1px solid rgba(16,185,129,0.4);color:#10b981;display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;margin-top:12px;';
+          }
+        }
+      }
+
+      function cancelPay() {
+        document.getElementById('payment-element-wrap').style.display = 'none';
+        document.getElementById('pay-trigger-wrap').style.display = 'block';
+      }
+
+      // Handle return from 3DS redirect
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('paid') === '1') {
+        document.addEventListener('DOMContentLoaded', () => {
+          const section = document.getElementById('pay-trigger-wrap');
+          const success = document.getElementById('pay-success');
+          if (section) section.style.display = 'none';
+          if (success) success.style.display = 'block';
+        });
+      }
+    </script>
+  ` : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -196,7 +360,6 @@ body{font-family:'Inter',sans-serif;background:#f7ead5;color:#2d1f00;min-height:
 .head-right{text-align:right;flex-shrink:0;}
 .inv-num{font-size:22px;font-weight:700;color:#FDF3E2;font-family:monospace;letter-spacing:0.02em;}
 .inv-meta{font-size:12px;color:rgba(253,243,226,0.6);margin-top:8px;line-height:1.9;}
-.status-pill{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;margin-top:12px;}
 .body{padding:36px 40px;position:relative;}
 .parties{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:32px;}
 .party-label{font-size:10px;font-weight:700;color:#8a6e44;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;}
@@ -231,6 +394,7 @@ table.lines th:last-child{text-align:right;}
   body{background:#FDF3E2;padding:0;}
   .page{box-shadow:none;border-radius:0;max-width:100%;}
   .print-bar{display:none!important;}
+  #pay-now-section{display:none!important;}
 }
 </style>
 </head>
@@ -254,12 +418,13 @@ table.lines th:last-child{text-align:right;}
         Issued: ${fmt(today)}<br>
         Due on receipt
       </div>
-      <div class="status-pill" style="${statusPillStyle}">${statusLabel}</div>
+      <span id="status-pill" style="${statusPillStyle}display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;margin-top:12px;">${statusLabel}</span>
     </div>
   </div>
 
   <div class="body">
     ${paidStampHTML}
+
     <div class="parties">
       <div>
         <div class="party-label">From</div>
@@ -299,9 +464,11 @@ table.lines th:last-child{text-align:right;}
       <div class="total-row grand"><span>Total ${isPaid ? 'paid' : 'due'}</span><span class="tv">£${finalPrice.toFixed(2)}</span></div>
     </div>
 
+    ${payNowSection}
+
     ${!isPaid ? `
     <div class="bank-box">
-      <div class="bank-title">Bank Transfer Details</div>
+      <div class="bank-title">Or pay by Bank Transfer</div>
       <div class="bank-grid">
         <div><div class="bk-label">Account name</div><div class="bk-val">Markeb Media Ltd</div></div>
         <div><div class="bk-label">Sort code</div><div class="bk-val">04-00-03</div></div>
