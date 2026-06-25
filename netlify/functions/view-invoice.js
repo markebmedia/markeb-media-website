@@ -297,7 +297,9 @@ function buildInvoiceHTML(booking, invoiceNum) {
         btn.textContent = 'Processing...';
         errorEl.style.display = 'none';
 
-        const { error } = await stripe.confirmPayment({
+        let confirmResult;
+        try {
+          confirmResult = await stripe.confirmPayment({
           elements,
           confirmParams: {
             return_url: window.location.href + '?paid=1'
@@ -305,6 +307,14 @@ function buildInvoiceHTML(booking, invoiceNum) {
           redirect: 'if_required'
         });
 
+        } catch (e) {
+          errorEl.textContent = 'Payment error: ' + e.message;
+          errorEl.style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = 'Pay £${finalPrice.toFixed(2)} Now';
+          return;
+        }
+        const { error } = confirmResult || {};
         if (error) {
           errorEl.textContent = error.message;
           errorEl.style.display = 'block';
