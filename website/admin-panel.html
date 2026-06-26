@@ -11179,7 +11179,10 @@ async function sendPaymentReminder(bookingId, invoiceNum, btn) {
 
     const data = await response.json();
     if (data.success) {
-      await recordInvoiceToAirtable(booking, invoiceNum, false);
+      await recordInvoiceToAirtable(booking, invoiceNum, false, {
+  name: f['Client Name'],
+  email: f['Client Email']
+});
       showAdminToast(`✅ Payment reminder sent to ${f['Client Email']}`);
       if (btn) { btn.textContent = '✓ Sent'; btn.style.background = '#10b981'; }
     } else {
@@ -11207,11 +11210,19 @@ function openInvoiceFromPanel(bookingId) {
   win.document.close();
 }
 
-async function recordInvoiceToAirtable(booking, invoiceNum, isPaid) {
+async function recordInvoiceToAirtable(booking, invoiceNum, isPaid, sentTo = {}) {
   try {
     const f = booking.fields;
     const today = new Date().toISOString().split('T')[0];
     const bookingRef = f['Booking Reference'] || '';
+
+    // Always use original booking client details — never the override
+    const originalClientName  = f['Client Name']  || '';
+    const originalClientEmail = f['Client Email'] || '';
+
+    // Who it was actually sent to (may differ)
+    const sentToName  = sentTo.name  || originalClientName;
+    const sentToEmail = sentTo.email || originalClientEmail;
 
     // Check if already exists by Booking Reference
     const checkRes = await fetch('/.netlify/functions/airtable-proxy', {
@@ -11227,6 +11238,7 @@ async function recordInvoiceToAirtable(booking, invoiceNum, isPaid) {
     const existing = checkData.records?.[0];
 
     if (existing) {
+      // Only update sent details and status — never touch original client name/email
       await fetch('/.netlify/functions/airtable-proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -11237,7 +11249,9 @@ async function recordInvoiceToAirtable(booking, invoiceNum, isPaid) {
           body: {
             fields: {
               'Status': isPaid ? 'Paid' : 'Unpaid',
-              'Sent Date': today
+              'Sent Date': today,
+              'Sent To Name': sentToName,
+              'Sent To Email': sentToEmail
             }
           }
         })
@@ -11255,8 +11269,10 @@ async function recordInvoiceToAirtable(booking, invoiceNum, isPaid) {
               'Invoice Number': invoiceNum,
               'Booking ID': booking.id,
               'Booking Reference': bookingRef,
-              'Client Name': f['Client Name'] || '',
-              'Client Email': f['Client Email'] || '',
+              'Client Name': originalClientName,
+              'Client Email': originalClientEmail,
+              'Sent To Name': sentToName,
+              'Sent To Email': sentToEmail,
               'Amount': parseFloat(f['Final Price'] || 0),
               'Status': isPaid ? 'Paid' : 'Unpaid',
               'Issued Date': today,
@@ -11805,7 +11821,10 @@ async function emailInvoice(bookingId, btn, overrides = {}) {
 
     if (data.success) {
       alert(`✅ Invoice ${invoiceNum} emailed to ${f['Client Email']}!`);
-      await recordInvoiceToAirtable(booking, invoiceNum, isPaid);
+      await recordInvoiceToAirtable(booking, invoiceNum, isPaid, {
+  name: overrides.overrideName || f['Client Name'],
+  email: overrides.primaryEmail || f['Client Email']
+});
       closeInvoiceModal();
     } else {
       alert(`❌ Failed to send: ${data.error || 'Unknown error'}`);
