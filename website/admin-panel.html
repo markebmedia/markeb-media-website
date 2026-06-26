@@ -11211,15 +11211,16 @@ async function recordInvoiceToAirtable(booking, invoiceNum, isPaid) {
   try {
     const f = booking.fields;
     const today = new Date().toISOString().split('T')[0];
+    const bookingRef = f['Booking Reference'] || '';
 
-    // Check if already exists
+    // Check if already exists by Booking Reference
     const checkRes = await fetch('/.netlify/functions/airtable-proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         method: 'GET',
         table: 'Invoices',
-        filterFormula: `{Invoice Number} = "${invoiceNum}"`
+        filterFormula: `{Booking Reference} = "${bookingRef}"`
       })
     });
     const checkData = await checkRes.json();
@@ -11250,9 +11251,10 @@ async function recordInvoiceToAirtable(booking, invoiceNum, isPaid) {
           table: 'Invoices',
           body: {
             fields: {
+              'Name': bookingRef,
               'Invoice Number': invoiceNum,
               'Booking ID': booking.id,
-              'Booking Reference': f['Booking Reference'] || '',
+              'Booking Reference': bookingRef,
               'Client Name': f['Client Name'] || '',
               'Client Email': f['Client Email'] || '',
               'Amount': parseFloat(f['Final Price'] || 0),
