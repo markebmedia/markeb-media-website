@@ -11265,7 +11265,6 @@ async function recordInvoiceToAirtable(booking, invoiceNum, isPaid, sentTo = {})
           table: 'Invoices',
           body: {
             fields: {
-              'Name': bookingRef,
               'Invoice Number': invoiceNum,
               'Booking ID': booking.id,
               'Booking Reference': bookingRef,
