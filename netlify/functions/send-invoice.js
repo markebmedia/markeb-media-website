@@ -132,7 +132,7 @@ exports.handler = async (event) => {
 
     const bankSection = !isPaid ? `
       <div class="bank-box">
-        <div class="bank-title">Bank Transfer Details</div>
+        <div class="bank-title">Or pay by Bank Transfer</div>
         <div class="bank-grid">
           <div class="bank-item"><div class="bk-label">Account name</div><div class="bk-val">Markeb Media Ltd</div></div>
           <div class="bank-item"><div class="bk-label">Sort code</div><div class="bk-val">04-00-03</div></div>
@@ -166,7 +166,7 @@ exports.handler = async (event) => {
         ? 'This is a friendly reminder that the invoice below remains outstanding. Please arrange payment at your earliest convenience using the bank details provided.'
         : failedPayment
         ? 'Your invoice is enclosed below. Please pay by bank transfer using the details provided, or log in to your dashboard to update your card.'
-        : 'Please find your invoice below. Payment is due on receipt — bank transfer details are included.'
+        : 'Please find your invoice below. You can pay instantly online using the button below — Apple Pay, Google Pay, and all major cards are accepted.'
       }</p>
 
       <div class="inv-meta">
@@ -217,12 +217,52 @@ exports.handler = async (event) => {
 
       ${bankSection}
 
+      ${!isPaid ? `
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#3F4D1B;border-radius:12px;margin:24px 0;">
+        <tr>
+          <td align="center" style="padding:24px 20px 8px;">
+            <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:rgba(253,243,226,0.7);text-transform:uppercase;letter-spacing:0.08em;font-family:Arial,sans-serif;">Pay Now</p>
+            <p style="margin:0;font-size:28px;font-weight:700;color:#FDF3E2;font-family:monospace;">£${finalPrice.toFixed(2)}</p>
+            <p style="margin:4px 0 0;font-size:12px;color:rgba(253,243,226,0.5);font-family:Arial,sans-serif;">inc. VAT · ${invoiceNum}</p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:4px 20px 8px;">
+            <p style="margin:0 0 6px;font-size:12px;color:rgba(253,243,226,0.6);font-family:Arial,sans-serif;">Pay securely with Apple Pay · Google Pay · Visa · Mastercard</p>
+          </td>
+        </tr>
+        <tr>
+          <td align="center" style="padding:4px 20px 20px;">
+            <!--[if mso]>
+            <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+              href="https://markebmedia.com/invoice/${invoiceNum}" style="height:52px;v-text-anchor:middle;width:260px;" arcsize="15%"
+              strokecolor="#B46100" fillcolor="#B46100">
+              <w:anchorlock/>
+              <center style="color:#FDF3E2;font-family:Arial,sans-serif;font-size:16px;font-weight:700;">View Invoice &amp; Pay Now</center>
+            </v:roundrect>
+            <![endif]-->
+            <!--[if !mso]><!-->
+            <a href="https://markebmedia.com/invoice/${invoiceNum}" style="display:inline-block;background:#B46100;color:#FDF3E2;padding:15px 36px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px;font-family:Arial,sans-serif;">View Invoice &amp; Pay Now</a>
+            <!--<![endif]-->
+            <p style="margin:10px 0 0;font-size:11px;color:rgba(253,243,226,0.45);font-family:Arial,sans-serif;">🔒 Secured by Stripe</p>
+          </td>
+        </tr>
+      </table>
+      ` : `
       <div style="text-align:center;margin:28px 0;">
-        <a href="https://markebmedia.com/invoice/${invoiceNum}" style="display:inline-block;background:linear-gradient(135deg,#3F4D1B 0%,#2d3813 100%);color:#FDF3E2;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0.01em;">
-          View &amp; Print Invoice
-        </a>
-        <div style="margin-top:10px;font-size:12px;color:#8a6e44;">Opens your invoice — use your browser's Print or Save as PDF option</div>
+        <!--[if mso]>
+        <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+          href="https://markebmedia.com/invoice/${invoiceNum}" style="height:52px;v-text-anchor:middle;width:260px;" arcsize="15%"
+          strokecolor="#3F4D1B" fillcolor="#3F4D1B">
+          <w:anchorlock/>
+          <center style="color:#FDF3E2;font-family:Arial,sans-serif;font-size:16px;font-weight:700;">View &amp; Print Paid Invoice</center>
+        </v:roundrect>
+        <![endif]-->
+        <!--[if !mso]><!-->
+        <a href="https://markebmedia.com/invoice/${invoiceNum}" style="display:inline-block;background:#3F4D1B;color:#FDF3E2;padding:15px 36px;border-radius:10px;text-decoration:none;font-weight:700;font-size:16px;font-family:Arial,sans-serif;">View &amp; Print Paid Invoice</a>
+        <!--<![endif]-->
       </div>
+      `}
 
       <p>If you have any questions about this invoice, please reply to this email or contact us at <a href="mailto:commercial@markebmedia.com" style="color:#B46100;">commercial@markebmedia.com</a>.</p>
       <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
@@ -236,7 +276,7 @@ exports.handler = async (event) => {
       ? `⏰ Payment Reminder — Invoice ${invoiceNum} — Markeb Media`
       : failedPayment
       ? `Invoice ${invoiceNum} — Markeb Media · Payment Failed`
-      : `Invoice ${invoiceNum} — Markeb Media · Payment Due`;
+      : `Invoice ${invoiceNum} — Markeb Media · Pay Now`;
 
     const bccList = [BCC_EMAIL];
     if (f.extraRecipients && f.extraRecipients.length > 0) {
