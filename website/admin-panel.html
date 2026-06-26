@@ -10882,8 +10882,10 @@ async function loadInvoices() {
   invoiceNum: r.fields['Invoice Number'] || '',
   bookingId: r.fields['Booking ID'] || '',
   bookingRef: r.fields['Booking Reference'] || '',
-  clientName: r.fields['Client Name'] || '',
-  clientEmail: (r.fields['Client Email'] || '').toLowerCase(),
+  clientName: r.fields['Client Name'] || '',           // original client — never sent to name
+  clientEmail: (r.fields['Client Email'] || '').toLowerCase(), // original client — never sent to email
+  sentToName: r.fields['Sent To Name'] || '',          // who it was actually sent to
+  sentToEmail: (r.fields['Sent To Email'] || '').toLowerCase(), // who it was actually sent to
   amount: parseFloat(r.fields['Amount'] || 0),
   status: r.fields['Status'] || 'Unpaid',
   issuedDate: r.fields['Issued Date'] || '',
@@ -10929,9 +10931,18 @@ async function loadInvoices() {
 function groupInvoicesByClient(invoices) {
   const map = {};
   invoices.forEach(inv => {
+    // Always group by original client email — never sent to email
     const key = inv.clientEmail || inv.clientName;
     if (!map[key]) {
-      map[key] = { clientName: inv.clientName, clientEmail: inv.clientEmail, invoices: [], totalAmount: 0, paidAmount: 0, unpaidAmount: 0, lastDate: '' };
+      map[key] = { 
+        clientName: inv.clientName,   // original client name — never changes
+        clientEmail: inv.clientEmail, // original client email — never changes
+        invoices: [], 
+        totalAmount: 0, 
+        paidAmount: 0, 
+        unpaidAmount: 0, 
+        lastDate: '' 
+      };
     }
     map[key].invoices.push(inv);
     map[key].totalAmount += inv.amount;
