@@ -251,9 +251,12 @@ exports.handler = async (event, context) => {
       
       const sqftFeeWebhook = parseFloat(metadata.squareFootageFee || 0);
       const finalPriceExVat = parseFloat((totalPrice / 1.2).toFixed(2));
+      const baseServicePrice = parseFloat(metadata.basePrice || 0);
 
       let basePrice;
-      if (discountAmount > 0 && priceBeforeDiscount > 0) {
+      if (baseServicePrice > 0) {
+        basePrice = baseServicePrice;
+      } else if (discountAmount > 0 && priceBeforeDiscount > 0) {
         basePrice = parseFloat((priceBeforeDiscount - extraBedroomFee - addonsPrice - sqftFeeWebhook).toFixed(2));
       } else {
         basePrice = parseFloat((finalPriceExVat - extraBedroomFee - addonsPrice - sqftFeeWebhook).toFixed(2));

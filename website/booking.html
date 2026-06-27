@@ -3892,6 +3892,7 @@ async function createBooking() {
     duration: bookingData.service.duration + (bookingData.addonsDuration || 0) + (bookingData.extraDuration || 0),
     bedrooms: bookingData.bedrooms,
     basePrice: bookingData.basePrice,
+    baseServicePrice: bookingData.basePrice,
     extraBedroomFee: bookingData.extraBedroomFee,
     addons: bookingData.selectedAddons.map(id => ({
       id: id,
