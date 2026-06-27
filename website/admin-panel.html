@@ -11160,9 +11160,11 @@ async function sendPaymentReminder(bookingId, invoiceNum, btn) {
       sub2: address ? `${address}${postcode ? ', ' + postcode : ''}` : '',
       ref: ref,
       amount: (() => {
-      if (basePrice > 0) return basePrice;
       const fees = bedroomFee + sqftFee + addonsPrice - discountAmount;
       const derived = parseFloat((exVAT - fees).toFixed(2));
+      // If basePrice looks correct (close to derived), use it
+      // If basePrice matches finalPrice (inc. VAT) it was stored wrong — use derived instead
+      if (basePrice > 0 && Math.abs(basePrice - finalPrice) > 0.5) return basePrice;
       return derived > 0 ? derived : exVAT;
     })()
     }];
