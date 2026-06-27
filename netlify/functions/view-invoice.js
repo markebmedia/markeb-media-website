@@ -119,7 +119,7 @@ function buildInvoiceHTML(booking, invoiceNum) {
     sub: `Shoot date: ${shootDate}${time ? ' at ' + time : ''}${bedrooms ? ' · ' + bedrooms + ' bedrooms' : ''}`,
     sub2: address ? `${address}${postcode ? ', ' + postcode : ''}` : '',
     ref: ref,
-    amount: exVAT
+    amount: parseFloat((parseFloat(f['Price Before Discount'] || finalPrice) / 1.2).toFixed(2))
   });
 
   if (bedroomFee > 0) {
@@ -164,7 +164,7 @@ function buildInvoiceHTML(booking, invoiceNum) {
       <td colspan="2" style="padding:12px 16px;border-bottom:1px solid #e8d5b5;">
         <div style="color:#10b981;font-size:14px;font-weight:500;">Discount — ${discountCode}</div>
       </td>
-      <td style="padding:12px 16px;text-align:right;border-bottom:1px solid #e8d5b5;font-family:monospace;font-size:13px;color:#10b981;white-space:nowrap;">−£${discountAmount.toFixed(2)}</td>
+      <td style="padding:12px 16px;text-align:right;border-bottom:1px solid #e8d5b5;font-family:monospace;font-size:13px;color:#10b981;white-space:nowrap;">−£${parseFloat(discountAmount / 1.2).toFixed(2)}</td>
     </tr>` : '';
 
   const paidStampHTML = isPaid ? `
