@@ -83,9 +83,8 @@ function buildInvoiceHTML(booking, invoiceNum) {
 
   const isPaid = (f['Payment Status'] || '').toLowerCase() === 'paid';
   const finalPrice = parseFloat(f['Final Price'] || 0);
-  const exVAT = parseFloat((finalPrice / 1.2).toFixed(2));
-  const vatAmount = parseFloat((finalPrice - exVAT).toFixed(2));
-  const basePrice = parseFloat(f['Base Price'] || 0);
+  const exVAT = parseFloat(f['Price Ex VAT'] || (finalPrice / 1.2).toFixed(2));
+  const vatAmount = parseFloat(f['VAT Amount'] || (finalPrice - exVAT).toFixed(2));
   const bedroomFee = parseFloat(f['Extra Bedroom Fee'] || 0);
   const sqftFee = parseFloat(f['Square Footage Fee'] || 0);
   const addonsRaw = f['Add-Ons'] || f['Add-ons'] || '';
@@ -120,7 +119,7 @@ function buildInvoiceHTML(booking, invoiceNum) {
     sub: `Shoot date: ${shootDate}${time ? ' at ' + time : ''}${bedrooms ? ' · ' + bedrooms + ' bedrooms' : ''}`,
     sub2: address ? `${address}${postcode ? ', ' + postcode : ''}` : '',
     ref: ref,
-    amount: basePrice > 0 ? basePrice : exVAT
+    amount: exVAT
   });
 
   if (bedroomFee > 0) {
