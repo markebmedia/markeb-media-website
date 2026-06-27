@@ -249,11 +249,14 @@ exports.handler = async (event, context) => {
       const extraBedrooms = Math.max(0, bedrooms - 4);
       const extraBedroomFee = extraBedrooms * 25;
       
+      const sqftFeeWebhook = parseFloat(metadata.squareFootageFee || 0);
+      const finalPriceExVat = parseFloat((totalPrice / 1.2).toFixed(2));
+
       let basePrice;
       if (discountAmount > 0 && priceBeforeDiscount > 0) {
-        basePrice = priceBeforeDiscount - extraBedroomFee - addonsPrice;
+        basePrice = parseFloat((priceBeforeDiscount - extraBedroomFee - addonsPrice - sqftFeeWebhook).toFixed(2));
       } else {
-        basePrice = totalPrice - extraBedroomFee - addonsPrice;
+        basePrice = parseFloat((finalPriceExVat - extraBedroomFee - addonsPrice - sqftFeeWebhook).toFixed(2));
       }
 
       const capitalizedRegion = metadata.region || 'Unknown';

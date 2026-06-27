@@ -11159,7 +11159,12 @@ async function sendPaymentReminder(bookingId, invoiceNum, btn) {
       sub: `Shoot date: ${shootDate}${time ? ' at ' + time : ''}${bedrooms ? ' · ' + bedrooms + ' bedrooms' : ''}`,
       sub2: address ? `${address}${postcode ? ', ' + postcode : ''}` : '',
       ref: ref,
-      amount: basePrice > 0 ? basePrice : exVAT
+      amount: (() => {
+      if (basePrice > 0) return basePrice;
+      const fees = bedroomFee + sqftFee + addonsPrice - discountAmount;
+      const derived = parseFloat((exVAT - fees).toFixed(2));
+      return derived > 0 ? derived : exVAT;
+    })()
     }];
     if (bedroomFee > 0) lineItems.push({ desc: `Extra bedrooms`, sub: '', sub2: '', ref: '', amount: bedroomFee });
     if (sqftFee > 0) lineItems.push({ desc: 'Large property fee', sub: '', sub2: '', ref: '', amount: sqftFee });
