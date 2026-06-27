@@ -11742,15 +11742,16 @@ async function emailInvoiceFromModal(bookingId, btn) {
   const originalName = booking.fields['Client Name'];
   const originalEmail = booking.fields['Client Email'];
 
-  if (overrideName) booking.fields['Client Name'] = overrideName;
-  if (primaryEmail) booking.fields['Client Email'] = primaryEmail;
-
-  // Build extra recipient list for BCC-style sending
   booking._extraEmailRecipients = extraEmails;
 
-  await emailInvoice(bookingId, btn, { extraRecipients: extraEmails, overrideName, primaryEmail });
+  await emailInvoice(bookingId, btn, {
+    extraRecipients: extraEmails,
+    overrideName,
+    primaryEmail,
+    originalClientName: originalName,
+    originalClientEmail: originalEmail
+  });
 
-  // Restore originals
   booking.fields['Client Name'] = originalName;
   booking.fields['Client Email'] = originalEmail;
   delete booking._extraEmailRecipients;
