@@ -138,13 +138,16 @@ exports.handler = async (event, context) => {
       if (metadata.bookingId) {
         console.log('Updating existing booking:', metadata.bookingId);
         
+        const paidTotal = session.amount_total / 100;
         await base('Bookings').update(metadata.bookingId, {
           'Payment Status': 'Paid',
           'Booking Status': 'Confirmed',
           'Stripe Session ID': session.id,
           'Stripe Payment Intent ID': session.payment_intent,
           'Payment Date': new Date().toISOString(),
-          'Amount Paid': session.amount_total / 100
+          'Amount Paid': paidTotal,
+          'Price Ex VAT': parseFloat((paidTotal / 1.2).toFixed(2)),
+          'VAT Amount': parseFloat((paidTotal - paidTotal / 1.2).toFixed(2))
         });
         
         console.log('✅ Booking updated to Paid');

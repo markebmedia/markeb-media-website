@@ -119,7 +119,7 @@ function buildInvoiceHTML(booking, invoiceNum) {
     sub: `Shoot date: ${shootDate}${time ? ' at ' + time : ''}${bedrooms ? ' · ' + bedrooms + ' bedrooms' : ''}`,
     sub2: address ? `${address}${postcode ? ', ' + postcode : ''}` : '',
     ref: ref,
-    amount: parseFloat((parseFloat(f['Price Before Discount'] || finalPrice) / 1.2).toFixed(2))
+    amount: exVAT
   });
 
   if (bedroomFee > 0) {
