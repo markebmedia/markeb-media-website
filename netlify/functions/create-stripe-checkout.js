@@ -129,6 +129,8 @@ exports.handler = async (event, context) => {
           ? JSON.stringify(bookingData.brandingAnswers)
           : '{}',
 
+        basePrice: bookingData.basePrice ? bookingData.basePrice.toString() : '0',
+
         // Add-ons
         addons: JSON.stringify(bookingData.addons || []),
         
