@@ -44,7 +44,16 @@ exports.handler = async (event) => {
     return { statusCode: 200, body: JSON.stringify({ received: true, ignored: true }) };
   }
 
-  const { invoiceNum, bookingRef, bookingId, clientEmail, clientName } = metadata;
+  const { invoiceNum, bookingRef, bookingId } = metadata;
+
+    // Use Sent To Name/Email from Invoices table, fall back to metadata
+    const invoiceRecordCheck = await base('Invoices')
+      .select({ filterByFormula: `{Invoice Number} = "${invoiceNum}"`, maxRecords: 1 })
+      .firstPage();
+
+    const invoiceFields = invoiceRecordCheck?.[0]?.fields || {};
+    const clientEmail = invoiceFields['Sent To Email'] || metadata.clientEmail;
+    const clientName  = invoiceFields['Sent To Name']  || metadata.clientName;
   const amountPaid = paymentIntent.amount / 100;
 
   console.log(`Processing invoice payment: ${invoiceNum} — £${amountPaid} — ${clientEmail}`);
