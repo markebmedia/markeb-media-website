@@ -2858,7 +2858,16 @@ function renderAerialPicker(serviceCardEl) {
           <div style="font-size: 16px; font-weight: 700; color: #B46100; flex-shrink: 0;">£109 <span style="font-size: 12px; font-weight: 400; color: #94a3b8;">+ VAT</span></div>
         </div>
       </div>
-      <div id="aerialUpgradeNotice" style="display: none; margin-bottom: 14px;">
+      <div id="aerialSavingHint" style="display: ${aerialSelections.photo || aerialSelections.video ? 'none' : 'block'}; margin-bottom: 14px;">
+        <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 20px;">💡</span>
+          <div>
+            <div style="font-size: 14px; font-weight: 700; color: #065f46; margin-bottom: 2px;">Select both and save £39</div>
+            <div style="font-size: 13px; color: #047857;">Photo + video bundles automatically into All In One Drone at £179 instead of £218</div>
+          </div>
+        </div>
+      </div>
+      <div id="aerialUpgradeNotice" style="display: ${aerialSelections.photo && aerialSelections.video ? 'block' : 'none'}; margin-bottom: 14px;">
         <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 12px;">
           <span style="font-size: 22px;">🎉</span>
           <div>
