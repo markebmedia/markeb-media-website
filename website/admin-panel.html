@@ -11653,12 +11653,12 @@ async function showInvoiceModal(bookingId) {
 
           <div style="margin-bottom:12px;">
             <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;">Client name on invoice</label>
-            <input id="invoiceClientName" type="text" value="${(f['Client Name'] || '').replace(/'/g, '&#39;')}" class="form-input" style="font-size:14px;padding:9px 12px;" placeholder="Client name" />
+            <input id="invoiceClientName" type="text" value="${(() => { const inv = allInvoicesData.find(i => i.bookingId === bookingId); return ((inv?.sentToName) || f['Client Name'] || '').replace(/'/g, '&#39;'); })()}" class="form-input" style="font-size:14px;padding:9px 12px;" placeholder="Client name" />
           </div>
 
           <div style="margin-bottom:12px;">
             <label style="display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;">Send to (primary)</label>
-            <input id="invoicePrimaryEmail" type="email" value="${f['Client Email'] || ''}" class="form-input" style="font-size:14px;padding:9px 12px;" placeholder="primary@email.com" />
+            <input id="invoicePrimaryEmail" type="email" value="${(() => { const inv = allInvoicesData.find(i => i.bookingId === bookingId); return inv?.sentToEmail || f['Client Email'] || ''; })()}" class="form-input" style="font-size:14px;padding:9px 12px;" placeholder="primary@email.com" />
           </div>
 
           <div>

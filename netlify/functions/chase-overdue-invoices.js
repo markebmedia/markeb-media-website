@@ -206,8 +206,8 @@ export default async function handler() {
   for (const record of invoices) {
     const f = record.fields;
     const invoiceNum  = f['Invoice Number'] || '';
-    const clientName  = f['Client Name']    || '';
-    const clientEmail = f['Client Email']   || '';
+    const clientName  = f['Sent To Name']  || f['Client Name']  || '';
+    const clientEmail = f['Sent To Email'] || f['Client Email'] || '';
     const amount      = parseFloat(f['Amount'] || 0);
     const bookingRef  = f['Booking Reference'] || '';
     const service     = f['Service'] || '';
