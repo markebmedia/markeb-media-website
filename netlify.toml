@@ -53,6 +53,11 @@
   status = 200
 
 [[redirects]]
+  from = "/creator-network"
+  to = "/internal/creator-network.html"
+  status = 301
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creator Network — Markeb Media</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --pine:    #3F4D1B;
+      --pine-dk: #2e3813;
+      --burnt:   #B46100;
+      --burnt-dk:#8a4a00;
+      --cream:   #FDF3E2;
+      --cream-dk:#f0e3c8;
+      --sand:    #e8d5b5;
+      --ink:     #2d1f00;
+      --muted:   #8a6e44;
+      --light:   #f7ead5;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--light);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--pine);
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-wrap {
+      background: var(--cream);
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-wrap img {
+      height: 44px;
+      width: auto;
+      display: block;
+    }
+
+    .header-wordmark {
+      color: var(--cream);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .header-tag {
+      background: var(--burnt);
+      color: var(--cream);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 4px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--pine);
+      padding: 56px 40px 64px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--burnt), transparent);
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--burnt);
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 6vw, 58px);
+      font-weight: 600;
+      color: var(--cream);
+      line-height: 1.1;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    .hero p {
+      font-size: 15px;
+      color: rgba(253, 243, 226, 0.7);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--burnt);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--sand);
+    }
+
+    /* ── RATE GROUP ── */
+    .rate-group {
+      background: var(--cream);
+      border: 1.5px solid var(--sand);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .rate-group-header {
+      background: var(--pine);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .rate-group-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(253, 243, 226, 0.12);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .rate-group-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--cream);
+      letter-spacing: 0.01em;
+    }
+
+    /* ── RATE ROWS ── */
+    .rate-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--cream-dk);
+      gap: 16px;
+    }
+
+    .rate-row:last-child {
+      border-bottom: none;
+    }
+
+    .rate-row:hover {
+      background: var(--light);
+    }
+
+    .rate-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .rate-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .rate-amount {
+      font-family: 'Inter', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--burnt);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── ADDON ROW ── */
+    .addon-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      gap: 16px;
+    }
+
+    .addon-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .addon-amount {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--burnt);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── INFO BOX ── */
+    .info-box {
+      background: var(--cream);
+      border: 1.5px solid var(--sand);
+      border-left: 4px solid var(--pine);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: var(--ink);
+      line-height: 1.7;
+    }
+
+    .info-box strong {
+      color: var(--pine);
+    }
+
+    /* ── CONTACT SECTION ── */
+    .contact-section {
+      background: var(--pine);
+      border-radius: 14px;
+      padding: 32px 36px;
+      margin-top: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .contact-section p {
+      color: rgba(253, 243, 226, 0.75);
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 400px;
+    }
+
+    .contact-section strong {
+      color: var(--cream);
+      display: block;
+      font-size: 17px;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .contact-link {
+      display: inline-block;
+      background: var(--burnt);
+      color: var(--cream);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+      transition: background 0.2s;
+    }
+
+    .contact-link:hover {
+      background: var(--burnt-dk);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--pine-dk);
+      padding: 24px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    footer p {
+      font-size: 12px;
+      color: rgba(253, 243, 226, 0.45);
+      line-height: 1.6;
+    }
+
+    /* ── PRINT ── */
+    .print-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--cream-dk);
+      border: 1.5px solid var(--sand);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+      margin-bottom: 32px;
+    }
+
+    .print-btn:hover {
+      background: var(--sand);
+    }
+
+    @media print {
+      .print-btn, .no-print { display: none !important; }
+      body { background: #fff; }
+      .rate-group { break-inside: avoid; }
+      header { padding: 20px; }
+      .hero { padding: 32px 20px; }
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 20px; flex-direction: column; align-items: flex-start; }
+      .hero { padding: 40px 20px 48px; }
+      main { padding: 32px 16px 60px; }
+      .rate-row, .addon-row { padding: 14px 16px; }
+      .rate-group-header { padding: 14px 16px; }
+      footer { padding: 20px; flex-direction: column; align-items: flex-start; }
+      .contact-section { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <div class="logo-wrap">
+        <img src="/public/images/Markeb Media Logo (2).png" alt="Markeb Media" />
+      </div>
+    </div>
+    <span class="header-tag">Creator Network</span>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <span class="hero-eyebrow">Internal Rate Card</span>
+    <h1>What we pay<br>our creators</h1>
+    <p>Clear, consistent rates for every job type. These are the fees Markeb Media pays to creators working on our behalf across the UK.</p>
+  </div>
+
+  <!-- MAIN -->
+  <main>
+
+    <button class="print-btn no-print" onclick="window.print()">
+      🖨 Print / Save PDF
+    </button>
+
+    <div class="info-box">
+      <strong>How it works</strong><br>
+      Rates are per shoot, paid within 14 days of job completion and invoice submission. All amounts are exclusive of VAT. If you are VAT registered, please add VAT to your invoice at the standard rate.
+    </div>
+
+    <!-- PHOTOGRAPHY -->
+    <div class="section-label">Photography</div>
+    <div class="rate-group">
+      <div class="rate-group-header">
+        <div class="rate-group-icon">📸</div>
+        <div class="rate-group-title">Property Photography</div>
+      </div>
+      <div class="rate-row">
+        <div>
+          <div class="rate-label">Studio / 1 Bedroom</div>
+          <div class="rate-sub">Photo only</div>
+        </div>
+        <div class="rate-amount">£35</div>
+      </div>
+      <div class="rate-row">
+        <div>
+          <div class="rate-label">2–3 Bedrooms</div>
+          <div class="rate-sub">Photo only</div>
+        </div>
+        <div class="rate-amount">£40</div>
+      </div>
+      <div class="rate-row">
+        <div>
+          <div class="rate-label">4 Bedrooms</div>
+          <div class="rate-sub">Photo only</div>
+        </div>
+        <div class="rate-amount">£45</div>
+      </div>
+    </div>
+
+    <!-- VIDEOGRAPHY -->
+    <div class="section-label">Videography</div>
+    <div class="rate-group">
+      <div class="rate-group-header">
+        <div class="rate-group-icon">🎬</div>
+        <div class="rate-group-title">Property Videography</div>
+      </div>
+      <div class="rate-row">
+        <div>
+          <div class="rate-label">Studio / 1 Bedroom</div>
+          <div class="rate-sub">Video only</div>
+        </div>
+        <div class="rate-amount">£45</div>
+      </div>
+      <div class="rate-row">
+        <div>
+          <div class="rate-label">2–3 Bedrooms</div>
+          <div class="rate-sub">Video only</div>
+        </div>
+        <div class="rate-amount">£55</div>
+      </div>
+      <div class="rate-row">
+        <div>
+          <div class="rate-label">4 Bedrooms</div>
+          <div class="rate-sub">Video only</div>
+        </div>
+        <div class="rate-amount">£60</div>
+      </div>
+    </div>
+
+    <!-- COMBINED -->
+    <div class="section-label">Photo & Video Combined</div>
+    <div class="rate-group">
+      <div class="rate-group-header">
+        <div class="rate-group-icon">🎯</div>
+        <div class="rate-group-title">Photo & Video Package</div>
+      </div>
+      <div class="rate-row">
+        <div>
+          <div class="rate-label">Studio / 1 Bedroom</div>
+          <div class="rate-sub">Photo and video</div>
+        </div>
+        <div class="rate-amount">£80</div>
+      </div>
+      <div class="rate-row">
+        <div>
+          <div class="rate-label">2–3 Bedrooms</div>
+          <div class="rate-sub">Photo and video</div>
+        </div>
+        <div class="rate-amount">£95</div>
+      </div>
+      <div class="rate-row">
+        <div>
+          <div class="rate-label">4 Bedrooms</div>
+          <div class="rate-sub">Photo and video</div>
+        </div>
+        <div class="rate-amount">£105</div>
+      </div>
+    </div>
+
+    <!-- DRONE -->
+    <div class="section-label">Aerial</div>
+    <div class="rate-group">
+      <div class="rate-group-header">
+        <div class="rate-group-icon">🚁</div>
+        <div class="rate-group-title">Drone</div>
+      </div>
+      <div class="addon-row">
+        <div class="addon-label">Drone only</div>
+        <div class="addon-amount">£50</div>
+      </div>
+    </div>
+
+    <!-- FLOOR PLANS -->
+    <div class="section-label">Add-ons</div>
+    <div class="rate-group">
+      <div class="rate-group-header">
+        <div class="rate-group-icon">📐</div>
+        <div class="rate-group-title">Add-on Services</div>
+      </div>
+      <div class="addon-row">
+        <div class="addon-label">Floor Plans</div>
+        <div class="addon-amount">£10</div>
+      </div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="contact-section">
+      <div>
+        <strong>Questions about your rate?</strong>
+        <p>Get in touch with the Markeb Media team and we'll get back to you as soon as possible.</p>
+      </div>
+      <a href="mailto:commercial@markebmedia.com" class="contact-link">
+        Get in Touch
+      </a>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>
+      Markeb Media Ltd · Company No. 15919272 · VAT No. 498 4447 31<br>
+      Spaces Pennine 5, 20–22 Hawley Street, Sheffield, S1 2EA
+    </p>
+    <p>Creator Network — Internal Rate Card</p>
+  </footer>
+
+</body>
+</html>
