@@ -520,6 +520,67 @@ width: 100%;
       background: #f8fafc;
     }
 
+    .aerial-picker {
+      overflow: hidden;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .aerial-option {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #fff;
+      user-select: none;
+    }
+
+    .aerial-option:hover {
+      border-color: #B46100;
+      background: #fff8ee;
+    }
+
+    .aerial-option.selected {
+      border-color: #B46100;
+      background: #fff8ee;
+    }
+
+    .aerial-checkbox {
+      width: 22px;
+      height: 22px;
+      border: 2.5px solid #e2e8f0;
+      border-radius: 6px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      font-size: 13px;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .aerial-option.selected .aerial-checkbox {
+      background: #B46100;
+      border-color: #B46100;
+    }
+
+    .aerial-upgrade-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
     .payment-option {
       background: #fff;
       border: 3px solid #e2e8f0;
@@ -2005,11 +2066,11 @@ width: 100%;
       availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
     },
     {
-      id: 'all-in-one-drone',
-      name: 'All In One Drone',
-      price: 179.00,
-      duration: 45,
-      description: '10 aerial photos and a 30-second drone video with classic editing included for your property marketing.',
+      id: 'aerial-content',
+      name: 'Aerial Content',
+      price: 109.00,
+      duration: 20,
+      description: 'Stunning aerial photography and/or videography of your property. Choose photo, video, or both — selecting both automatically upgrades you to our All In One Drone package and saves you £39.',
       isPropertyService: true,
       availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
     },
@@ -2030,24 +2091,6 @@ width: 100%;
       description: 'Up to 30 magazine-quality images that make your property irresistible to potential buyers.',
       isPropertyService: true,
       availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
-    },
-    {
-      id: 'drone-video',
-      name: 'Property Drone Videography',
-      price: 109.00,
-      duration: 20,
-      description: 'Up to 30-second cinematic aerial showcase with classic editing included.',
-      isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
-    },
-    {
-      id: 'drone-photo',
-      name: 'Property Drone Photography',
-      price: 109.00,
-      duration: 20,
-      description: 'Up to 10 stunning aerial photographs.',
-      isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
     }
   ],
   south: [
@@ -2080,11 +2123,11 @@ width: 100%;
       availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
     },
     {
-      id: 'all-in-one-drone',
-      name: 'All In One Drone',
-      price: 179.00,
-      duration: 45,
-      description: '10 aerial photos and a 30-second drone video with classic editing included for your property marketing.',
+      id: 'aerial-content',
+      name: 'Aerial Content',
+      price: 109.00,
+      duration: 20,
+      description: 'Stunning aerial photography and/or videography of your property. Choose photo, video, or both — selecting both automatically upgrades you to our All In One Drone package and saves you £39.',
       isPropertyService: true,
       availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
     },
@@ -2105,24 +2148,6 @@ width: 100%;
       description: 'Up to 30 magazine-quality images that make your property irresistible to potential buyers.',
       isPropertyService: true,
       availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
-    },
-    {
-      id: 'drone-video',
-      name: 'Property Drone Videography',
-      price: 109.00,
-      duration: 20,
-      description: 'Up to 30-second cinematic aerial showcase with classic editing included.',
-      isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
-    },
-    {
-      id: 'drone-photo',
-      name: 'Property Drone Photography',
-      price: 109.00,
-      duration: 20,
-      description: 'Up to 10 stunning aerial photographs.',
-      isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
     }
   ]
 };
@@ -2770,6 +2795,23 @@ function handleAccessTypeChange() {
 
       document.getElementById('continueToCalendarBtn').disabled = false;
 
+      // Show aerial picker if aerial content selected
+      if (serviceId === 'aerial-content') {
+        aerialSelections = { photo: false, video: false };
+        const card = document.querySelector('[data-service-id="aerial-content"]');
+        if (card) renderAerialPicker(card);
+        // Don't enable continue until a sub-option is chosen
+        document.getElementById('continueToCalendarBtn').disabled = true;
+      } else {
+        // Remove aerial picker if switching away
+        const existingPicker = document.getElementById('aerialPicker');
+        if (existingPicker) {
+          existingPicker.remove();
+          const aerialCard = document.querySelector('[data-service-id="aerial-content"]');
+          if (aerialCard) aerialCard.style.borderRadius = '12px';
+        }
+      }
+
       // Show branding expandable panel if branding service selected
       renderBrandingExpandable(serviceId);
 
@@ -2781,6 +2823,131 @@ function handleAccessTypeChange() {
         maybeShowOfferPopup('service:gold-package');
       }
     }
+
+// ===== AERIAL CONTENT PICKER =====
+
+let aerialSelections = { photo: false, video: false };
+
+function renderAerialPicker(serviceCardEl) {
+  const existing = document.getElementById('aerialPicker');
+  if (existing) existing.remove();
+
+  const picker = document.createElement('div');
+  picker.id = 'aerialPicker';
+  picker.className = 'aerial-picker';
+  picker.innerHTML = `
+    <div style="background: #f8fafc; border: 2px solid #B46100; border-top: none; border-radius: 0 0 12px 12px; padding: 20px 20px 24px;">
+      <p style="font-size: 13px; color: #64748b; margin-bottom: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
+        What would you like captured?
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px;">
+        <div class="aerial-option ${aerialSelections.photo ? 'selected' : ''}" onclick="toggleAerialOption('photo')">
+          <div class="aerial-checkbox">${aerialSelections.photo ? '✓' : ''}</div>
+          <div style="flex: 1;">
+            <div style="font-size: 15px; font-weight: 700; color: #1e293b;">Aerial Photography</div>
+            <div style="font-size: 13px; color: #64748b; margin-top: 2px;">Up to 10 stunning aerial photographs</div>
+          </div>
+          <div style="font-size: 16px; font-weight: 700; color: #B46100; flex-shrink: 0;">£109 <span style="font-size: 12px; font-weight: 400; color: #94a3b8;">+ VAT</span></div>
+        </div>
+        <div class="aerial-option ${aerialSelections.video ? 'selected' : ''}" onclick="toggleAerialOption('video')">
+          <div class="aerial-checkbox">${aerialSelections.video ? '✓' : ''}</div>
+          <div style="flex: 1;">
+            <div style="font-size: 15px; font-weight: 700; color: #1e293b;">Aerial Videography</div>
+            <div style="font-size: 13px; color: #64748b; margin-top: 2px;">Up to 30-second cinematic aerial showcase</div>
+          </div>
+          <div style="font-size: 16px; font-weight: 700; color: #B46100; flex-shrink: 0;">£109 <span style="font-size: 12px; font-weight: 400; color: #94a3b8;">+ VAT</span></div>
+        </div>
+      </div>
+      <div id="aerialUpgradeNotice" style="display: none; margin-bottom: 14px;">
+        <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 22px;">🎉</span>
+          <div>
+            <div style="font-size: 14px; font-weight: 700; color: #065f46; margin-bottom: 2px;">Auto-upgraded to All In One Drone — saving you £39!</div>
+            <div style="font-size: 13px; color: #047857;">Both photo and video bundled at £179 instead of £218</div>
+          </div>
+        </div>
+      </div>
+      <div id="aerialSelectionError" style="display: none; color: #ef4444; font-size: 13px; margin-bottom: 10px;">Please select at least one option to continue.</div>
+    </div>
+  `;
+
+  serviceCardEl.style.borderRadius = '12px 12px 0 0';
+  serviceCardEl.insertAdjacentElement('afterend', picker);
+}
+
+function toggleAerialOption(type) {
+  aerialSelections[type] = !aerialSelections[type];
+  applyAerialSelection();
+}
+
+function applyAerialSelection() {
+  const both = aerialSelections.photo && aerialSelections.video;
+  const photoOnly = aerialSelections.photo && !aerialSelections.video;
+  const videoOnly = !aerialSelections.photo && aerialSelections.video;
+  const neither = !aerialSelections.photo && !aerialSelections.video;
+
+  const upgradeNotice = document.getElementById('aerialUpgradeNotice');
+  const continueBtn = document.getElementById('continueToCalendarBtn');
+
+  if (both) {
+    // Upgrade to all-in-one-drone
+    const services = SERVICES[getCatalogKeyForRegion(bookingData.region)] || SERVICES.south;
+    const allInOne = {
+      id: 'all-in-one-drone',
+      name: 'All In One Drone',
+      price: 179.00,
+      duration: 45,
+      description: '10 aerial photos and a 30-second drone video with classic editing included.',
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+    };
+    bookingData.service = allInOne;
+    bookingData.basePrice = 179.00;
+    upgradeNotice.style.display = 'block';
+    continueBtn.disabled = false;
+  } else if (photoOnly) {
+    bookingData.service = {
+      id: 'drone-photo',
+      name: 'Aerial Photography',
+      price: 109.00,
+      duration: 20,
+      description: 'Up to 10 stunning aerial photographs.',
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
+    };
+    bookingData.basePrice = 109.00;
+    upgradeNotice.style.display = 'none';
+    continueBtn.disabled = false;
+  } else if (videoOnly) {
+    bookingData.service = {
+      id: 'drone-video',
+      name: 'Aerial Videography',
+      price: 109.00,
+      duration: 20,
+      description: 'Up to 30-second cinematic aerial showcase with classic editing included.',
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+    };
+    bookingData.basePrice = 109.00;
+    upgradeNotice.style.display = 'none';
+    continueBtn.disabled = false;
+  } else {
+    // Nothing selected — keep aerial-content card selected but disable continue
+    bookingData.service = null;
+    upgradeNotice.style.display = 'none';
+    continueBtn.disabled = true;
+  }
+
+  // Re-render the picker to reflect checked state
+  const card = document.querySelector('[data-service-id="aerial-content"]');
+  if (card) renderAerialPicker(card);
+
+  if (!neither) {
+    bookingData.selectedAddons = [];
+    renderAddons();
+    calculatePrice();
+  }
+}
 
 // ===== BRANDING EXPANDABLE PANEL =====
 
