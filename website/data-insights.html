@@ -852,12 +852,10 @@ body {
 
   <!-- Top KPI bar -->
   <div class="stats-overview" id="pipelineKPIs" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));">
-    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plTotalLeads">-</div><div class="stat-label">Total Leads</div></div>
-    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plSignedUp">-</div><div class="stat-label">Dashboard Sign-Ups</div></div>
-    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plSignUpRate">-</div><div class="stat-label">Sign-Up Conversion</div></div>
-    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plClosedWon">-</div><div class="stat-label">Closed Won</div></div>
-    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plPipelineValue">-</div><div class="stat-label">Open Pipeline Value</div></div>
-    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plAvgDeal">-</div><div class="stat-label">Avg Deal Value</div></div>
+    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plTotalLeads">-</div><div class="stat-label">Total Prospects</div></div>
+    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plSignedUp">-</div><div class="stat-label">Contacted</div></div>
+    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plSignUpRate">-</div><div class="stat-label">Contact Rate</div></div>
+    <div class="stat-card pipeline-stat"><div class="stat-value green" id="plClosedWon">-</div><div class="stat-label">Won</div></div>
   </div>
 
   <!-- Period toggle + activity chart -->
@@ -865,9 +863,9 @@ body {
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
       <div>
         <h3 style="font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;">
-  <i data-lucide="activity" style="width:18px;height:18px;"></i> Outbound Activity — Leads Added (Outreach)
+  <i data-lucide="activity" style="width:18px;height:18px;"></i> Outreach Activity — Prospects Contacted
 </h3>
-<p style="font-size:13px;color:#64748b;margin-top:3px;">Tracks when leads were created in the pipeline · <strong style="color:#0f172a;">Target: 400/day · 2,000/week · 8,000/month (200/day per BDM × 2 BDMs)</strong> · <span style="color:#10b981;font-weight:600;">Sign-Up target: 30/day · 150/week · 600/month (15/day per BDM)</span></p>
+<p style="font-size:13px;color:#64748b;margin-top:3px;">Tracks when prospects were marked as contacted in the pipeline.</p>
       </div>
       <div style="display:flex;gap:6px;background:#f1f5f9;border-radius:10px;padding:4px;border:1px solid #e2e8f0;">
         <button class="pipe-period-btn active" id="ppWeek"   onclick="setPipePeriod('week')">Weekly</button>
@@ -1771,7 +1769,11 @@ async function loadMapData() {
     const [usersRes, bookingsRes, pipelineRes] = await Promise.all([
   fetch('/.netlify/functions/admin-users'),
   fetch('/.netlify/functions/get-all-bookings'),
-  fetch('/.netlify/functions/get-pipeline')
+  fetch('/.netlify/functions/airtable-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ method: 'GET', table: 'Prospects', sort: [{ field: 'Saved Date', direction: 'desc' }] })
+  })
 ]);
     if (!usersRes.ok)    throw new Error('Failed to load user data');
     if (!bookingsRes.ok) throw new Error('Failed to load booking data');
@@ -1784,7 +1786,20 @@ async function loadMapData() {
     bookingData         = bData.bookings   || [];
     filteredBookingData = [...bookingData];
     const pData = await pipelineRes.json();
-pipelineData = pData.records || [];
+pipelineData = (pData.records || []).map(r => ({
+  id: r.id,
+  name: r.fields['Name'] || '',
+  email: r.fields['Email'] || '',
+  company: r.fields['Company'] || '',
+  jobTitle: r.fields['Job Title'] || '',
+  stage: r.fields['Stage'] || 'New',
+  owner: r.fields['Owner'] || '',
+  notes: r.fields['Notes'] || '',
+  confidence: r.fields['Confidence'] || 0,
+  source: r.fields['Source'] || '',
+  savedDate: r.fields['Saved Date'] || '',
+  updatedDate: r.fields['Updated Date'] || ''
+}));
 
     buildRegionCounts();
     updateClientStats();
@@ -2960,13 +2975,13 @@ c.lastBooking = dates[dates.length - 1] || null;
 
 // ── STAGE CONFIG ──
 const PIPELINE_STAGES = [
-  { name: 'Lead',               col: '#94a3b8' },
-  { name: 'Meeting Booked',     col: '#3b82f6' },
-  { name: 'Proposal Sent',      col: '#8b5cf6' },
-  { name: 'Negotiation',        col: '#f59e0b' },
-  { name: 'Dashboard Sign Up',  col: '#10b981' },
-  { name: 'Closed Won',  col: '#059669' },
-  { name: 'Closed Lost', col: '#ef4444' }
+  { name: 'New',              col: '#94a3b8' },
+  { name: 'Contacted',        col: '#3b82f6' },
+  { name: 'Responded',        col: '#f59e0b' },
+  { name: 'Meeting Booked',   col: '#8b5cf6' },
+  { name: 'Proposal Sent',    col: '#06b6d4' },
+  { name: 'Won',              col: '#059669' },
+  { name: 'Lost',             col: '#ef4444' }
 ];
 
 function stagePill(stage) {
@@ -2985,30 +3000,21 @@ function setPipePeriod(p) {
 
 function renderPipelineSection() {
   const total      = pipelineData.length;
-  const signedUp   = pipelineData.filter(r => r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed Won').length;
-  const closedWon  = pipelineData.filter(r => r.salesStage === 'Closed Won').length;
-  const signUpRate = total > 0 ? ((signedUp / total) * 100).toFixed(1) : '0.0';
-
-  const openStages = ['Lead','Meeting Booked','Proposal Sent','Negotiation'];
-  const openValue  = pipelineData
-    .filter(r => openStages.includes(r.salesStage))
-    .reduce((s, r) => s + r.dealValue, 0);
-
-  const dealsWithValue = pipelineData.filter(r => r.dealValue > 0);
-  const avgDeal = dealsWithValue.length > 0
-    ? dealsWithValue.reduce((s,r) => s + r.dealValue, 0) / dealsWithValue.length : 0;
+  const contacted  = pipelineData.filter(r => r.stage !== 'New').length;
+  const won        = pipelineData.filter(r => r.stage === 'Won').length;
+  const contactRate = total > 0 ? ((contacted / total) * 100).toFixed(1) : '0.0';
 
   document.getElementById('plTotalLeads').textContent    = total;
-  document.getElementById('plSignedUp').textContent      = signedUp;
-  document.getElementById('plSignUpRate').textContent    = signUpRate + '%';
-  document.getElementById('plClosedWon').textContent     = closedWon;
-  document.getElementById('plPipelineValue').textContent = '£' + Math.round(openValue).toLocaleString();
-  document.getElementById('plAvgDeal').textContent       = avgDeal > 0 ? '£' + Math.round(avgDeal).toLocaleString() : '—';
+  document.getElementById('plSignedUp').textContent      = contacted;
+  document.getElementById('plSignUpRate').textContent    = contactRate + '%';
+  document.getElementById('plClosedWon').textContent     = won;
+  document.getElementById('plPipelineValue').textContent = '—';
+  document.getElementById('plAvgDeal').textContent       = '—';
 
-  document.getElementById('plBigSignUpRate').textContent = signUpRate + '%';
-  document.getElementById('plSignUpBar').style.width     = Math.min(parseFloat(signUpRate), 100) + '%';
+  document.getElementById('plBigSignUpRate').textContent = contactRate + '%';
+  document.getElementById('plSignUpBar').style.width     = Math.min(parseFloat(contactRate), 100) + '%';
   document.getElementById('plSignUpBarSub').textContent  =
-    `${signedUp} of ${total} leads have reached Dashboard Sign Up or beyond`;
+    `${contacted} of ${total} prospects have been contacted or progressed`;
 
   renderPipelineFunnel();
   renderBDMLeaderboard();
@@ -3024,11 +3030,11 @@ function renderPipelineFunnel() {
   const stageCounts = {};
   PIPELINE_STAGES.forEach(s => stageCounts[s.name] = 0);
   pipelineData.forEach(r => {
-    if (stageCounts.hasOwnProperty(r.salesStage)) stageCounts[r.salesStage]++;
+    if (stageCounts.hasOwnProperty(r.stage)) stageCounts[r.stage]++;
   });
 
-  // Ordered funnel (exclude Closed-Lost from main funnel bar)
-  const funnelOrder = ['Lead','Meeting Booked','Proposal Sent','Negotiation','Dashboard Sign Up','Closed Won'];
+  // Ordered funnel (exclude Lost from main funnel bar)
+  const funnelOrder = ['New','Contacted','Responded','Meeting Booked','Proposal Sent','Won'];
   const maxCount = Math.max(...funnelOrder.map(s => stageCounts[s]), 1);
 
   document.getElementById('pipelineFunnel').innerHTML = [
@@ -3045,14 +3051,14 @@ function renderPipelineFunnel() {
         <div class="funnel-stage-pct">${pct}%</div>
       </div>`;
     }),
-    // Closed-Lost separate
+    // Lost separate
     (() => {
-      const count = stageCounts['Closed Lost'] || 0;
+      const count = stageCounts['Lost'] || 0;
       const pct   = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
       const barW  = ((count / maxCount) * 100).toFixed(1);
       return `<div class="funnel-stage" style="margin-top:12px;border-color:#ef444433;">
         <div class="funnel-stage-dot" style="background:#ef4444;"></div>
-        <div class="funnel-stage-name" style="color:#ef4444;">Closed Lost</div>
+        <div class="funnel-stage-name" style="color:#ef4444;">Lost</div>
         <div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width:${barW}%;background:#ef4444;"></div></div>
         <div class="funnel-stage-count" style="color:#ef4444;">${count}</div>
         <div class="funnel-stage-pct">${pct}%</div>
@@ -3062,15 +3068,15 @@ function renderPipelineFunnel() {
 }
 
 function renderBDMLeaderboard() {
-  // Group by BDM
+  // Group by Owner
   const bdmMap = {};
   pipelineData.forEach(r => {
-    const name = r.bdm || 'Unassigned';
+    const name = r.owner || 'Unassigned';
     if (!bdmMap[name]) bdmMap[name] = { name, total:0, signedUp:0, closedWon:0, stages:{} };
     bdmMap[name].total++;
-    if (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed Won') bdmMap[name].signedUp++;
-    if (r.salesStage === 'Closed Won') bdmMap[name].closedWon++;
-    bdmMap[name].stages[r.salesStage] = (bdmMap[name].stages[r.salesStage] || 0) + 1;
+    if (r.stage !== 'New') bdmMap[name].signedUp++;
+    if (r.stage === 'Won') bdmMap[name].closedWon++;
+    bdmMap[name].stages[r.stage] = (bdmMap[name].stages[r.stage] || 0) + 1;
   });
 
   const sorted = Object.values(bdmMap).sort((a,b) => b.signedUp - a.signedUp);
@@ -3253,22 +3259,21 @@ function renderPipelineChart() {
     }
   }
 
-  // Count leads added per bucket (using createdTime)
+  // Count prospects contacted per bucket (using updatedDate as the contact-date proxy)
   const leadsAdded   = buckets.map(b =>
     pipelineData.filter(r => {
-      if (!r.createdTime) return false;
-      const d = new Date(r.createdTime);
+      if (r.stage !== 'Contacted' || !r.updatedDate) return false;
+      const d = new Date(r.updatedDate);
       return d >= b.start && d <= b.end;
     }).length
   );
 
-  // Count sign-ups per bucket (using dashboardSignUpDate)
+  // Count Won per bucket (using updatedDate)
   const signUps = buckets.map(b =>
     pipelineData.filter(r => {
-      if (!r.dashboardSignUpDate) return false;
-      const d = new Date(r.dashboardSignUpDate);
-      return (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed Won')
-        && d >= b.start && d <= b.end;
+      if (r.stage !== 'Won' || !r.updatedDate) return false;
+      const d = new Date(r.updatedDate);
+      return d >= b.start && d <= b.end;
     }).length
   );
 
@@ -3341,7 +3346,7 @@ const MONTHLY_TARGET = 4000 * BDM_COUNT;
       labels,
       datasets: [
         {
-          label: 'Leads Added (Outreach)',
+          label: 'Contacted',
           data: leadsAdded,
           backgroundColor: '#3b82f620',
           borderColor: '#3b82f6',
@@ -3350,7 +3355,7 @@ const MONTHLY_TARGET = 4000 * BDM_COUNT;
           order: 2
         },
         {
-          label: 'Dashboard Sign-Ups',
+          label: 'Won',
           data: signUps,
           backgroundColor: '#10b98120',
           borderColor: '#10b981',
