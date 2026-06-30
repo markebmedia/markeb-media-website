@@ -1789,6 +1789,7 @@ pipelineData = (pData.records || []).map(r => ({
     renderDetailPanel();
     renderIntelligence();
     renderPerformanceSection();
+    if (currentMainTab === 'pipeline') renderPipelineSection();
 
   } catch (err) {
     console.error('Error loading map data:', err);
@@ -1874,7 +1875,7 @@ document.getElementById('pipelineSection').style.display    = isPipe ? 'block' :
 } else if (isPerf) {
   if (clientData.length || bookingData.length) renderPerformanceSection();
 } else if (isPipe) {
-  if (pipelineData.length) renderPipelineSection();
+  renderPipelineSection();
 }
   lucide.createIcons();
 }
