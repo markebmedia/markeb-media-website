@@ -878,48 +878,13 @@ body {
     <canvas id="pipelineChart" style="max-height:320px;"></canvas>
   </div>
 
-  <!-- Funnel + BDM leaderboard side by side -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
-
-    <!-- Funnel -->
-    <div class="map-section">
-      <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-        <i data-lucide="filter" style="width:18px;height:18px;"></i> Pipeline Funnel
-      </h3>
-      <p style="font-size:13px;color:#64748b;margin-bottom:20px;">All-time drop-off between each stage</p>
-      <div id="pipelineFunnel"></div>
-
-      <!-- Sign-up conversion rate bar -->
-      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px;margin-top:20px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <span style="font-size:13px;font-weight:600;color:#475569;">Lead → Dashboard Sign-Up Rate</span>
-          <span style="font-size:24px;font-weight:800;color:#10b981;" id="plBigSignUpRate">-</span>
-        </div>
-        <div style="background:#dcfce7;border-radius:6px;height:12px;overflow:hidden;">
-          <div id="plSignUpBar" style="height:100%;border-radius:6px;background:linear-gradient(90deg,#10b981,#3b82f6);transition:width 1.2s ease;width:0%;"></div>
-        </div>
-        <div style="font-size:11px;color:#475569;margin-top:6px;" id="plSignUpBarSub">Loading...</div>
-      </div>
-    </div>
-
-    <!-- BDM Leaderboard -->
-    <div class="map-section" style="max-height:700px;overflow-y:auto;">
-      <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-        <i data-lucide="trophy" style="width:18px;height:18px;"></i> BDM Leaderboard
-      </h3>
-      <p style="font-size:13px;color:#64748b;margin-bottom:20px;">Ranked by Dashboard Sign-Ups generated</p>
-      <div id="bdmLeaderboard"></div>
-    </div>
-
-  </div>
-
-  <!-- Source win rate -->
-  <div class="map-section" style="margin-bottom:24px;">
+  <!-- BDM Leaderboard -->
+  <div class="map-section" style="margin-bottom:24px;max-height:700px;overflow-y:auto;">
     <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-      <i data-lucide="pie-chart" style="width:18px;height:18px;"></i> Win Rate by Source
+      <i data-lucide="trophy" style="width:18px;height:18px;"></i> BDM Leaderboard
     </h3>
-    <p style="font-size:13px;color:#64748b;margin-bottom:20px;">How prospects found via Domain Search, Email Finder, and Email Verify convert through to Won</p>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;" id="leadSourceGrid"></div>
+    <p style="font-size:13px;color:#64748b;margin-bottom:20px;">Ranked by Dashboard Sign-Ups generated</p>
+    <div id="bdmLeaderboard"></div>
   </div>
 
   <!-- Stale prospects -->
@@ -2990,59 +2955,10 @@ function renderPipelineSection() {
   document.getElementById('plPipelineValue').textContent = '—';
   document.getElementById('plAvgDeal').textContent       = '—';
 
-  document.getElementById('plBigSignUpRate').textContent = contactRate + '%';
-  document.getElementById('plSignUpBar').style.width     = Math.min(parseFloat(contactRate), 100) + '%';
-  document.getElementById('plSignUpBarSub').textContent  =
-    `${contacted} of ${total} prospects have been contacted or progressed`;
-
-  renderPipelineFunnel();
   renderBDMLeaderboard();
-  renderSourceWinRate();
   renderStaleProspects();
   renderPipelineChart();
   lucide.createIcons();
-}
-
-function renderPipelineFunnel() {
-  const total = pipelineData.length;
-  const stageCounts = {};
-  PIPELINE_STAGES.forEach(s => stageCounts[s.name] = 0);
-  pipelineData.forEach(r => {
-    if (stageCounts.hasOwnProperty(r.stage)) stageCounts[r.stage]++;
-  });
-
-  // Ordered funnel (exclude Lost from main funnel bar)
-  const funnelOrder = ['New','Contacted','Responded','Meeting Booked','Proposal Sent','Won'];
-  const maxCount = Math.max(...funnelOrder.map(s => stageCounts[s]), 1);
-
-  document.getElementById('pipelineFunnel').innerHTML = [
-    ...funnelOrder.map(stageName => {
-      const s     = PIPELINE_STAGES.find(x => x.name === stageName);
-      const count = stageCounts[stageName] || 0;
-      const pct   = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
-      const barW  = ((count / maxCount) * 100).toFixed(1);
-      return `<div class="funnel-stage">
-        <div class="funnel-stage-dot" style="background:${s.col};"></div>
-        <div class="funnel-stage-name">${stageName}</div>
-        <div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width:${barW}%;background:${s.col};"></div></div>
-        <div class="funnel-stage-count" style="color:${s.col};">${count}</div>
-        <div class="funnel-stage-pct">${pct}%</div>
-      </div>`;
-    }),
-    // Lost separate
-    (() => {
-      const count = stageCounts['Lost'] || 0;
-      const pct   = total > 0 ? ((count / total) * 100).toFixed(1) : '0.0';
-      const barW  = ((count / maxCount) * 100).toFixed(1);
-      return `<div class="funnel-stage" style="margin-top:12px;border-color:#ef444433;">
-        <div class="funnel-stage-dot" style="background:#ef4444;"></div>
-        <div class="funnel-stage-name" style="color:#ef4444;">Lost</div>
-        <div class="funnel-bar-bg"><div class="funnel-bar-fill" style="width:${barW}%;background:#ef4444;"></div></div>
-        <div class="funnel-stage-count" style="color:#ef4444;">${count}</div>
-        <div class="funnel-stage-pct">${pct}%</div>
-      </div>`;
-    })()
-  ].join('');
 }
 
 function renderBDMLeaderboard() {
@@ -3095,49 +3011,6 @@ function renderBDMLeaderboard() {
           <div style="display:flex;flex-wrap:wrap;gap:4px;">${stagePills}</div>
         </div>`;
       }).join('');
-}
-
-function renderSourceWinRate() {
-  const sourceMap = {};
-  pipelineData.forEach(r => {
-    const source = r.source || 'Unknown';
-    if (!sourceMap[source]) sourceMap[source] = { total:0, won:0 };
-    sourceMap[source].total++;
-    if (r.stage === 'Won') sourceMap[source].won++;
-  });
-
-  const sourceLabels = {
-    'domain-search': 'Domain Search',
-    'email-finder':  'Email Finder',
-    'email-verify':  'Email Verify',
-    'Unknown':       'Unknown / Manual'
-  };
-
-  const sorted = Object.entries(sourceMap).sort((a,b) => b[1].total - a[1].total);
-  const colours = ['#3b82f6','#10b981','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899'];
-
-  const el = document.getElementById('leadSourceGrid');
-  if (!el) return;
-
-  if (sorted.length === 0) {
-    el.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;grid-column:1/-1;">No prospects with a recorded source yet</div>';
-    return;
-  }
-
-  el.innerHTML = sorted.map(([src, d], i) => {
-    const rate = d.total > 0 ? ((d.won / d.total) * 100).toFixed(1) : '0.0';
-    const col  = colours[i % colours.length];
-    const label = sourceLabels[src] || src;
-    return `<div style="background:#fff;border:1px solid ${col}33;border-radius:12px;padding:16px;border-top:3px solid ${col};">
-      <div style="font-size:12px;font-weight:700;color:${col};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">${label}</div>
-      <div style="font-size:28px;font-weight:800;color:#0f172a;margin-bottom:4px;">${d.total}</div>
-      <div style="font-size:11px;color:#64748b;">prospects · <strong style="color:#059669;">${d.won} won</strong></div>
-      <div style="background:#f1f5f9;border-radius:4px;height:6px;overflow:hidden;margin-top:10px;">
-        <div style="width:${Math.min(parseFloat(rate),100)}%;height:100%;background:${col};border-radius:4px;transition:width 1s ease;"></div>
-      </div>
-      <div style="font-size:10px;color:#64748b;margin-top:4px;">${rate}% win rate</div>
-    </div>`;
-  }).join('');
 }
 
 function renderStaleProspects() {
