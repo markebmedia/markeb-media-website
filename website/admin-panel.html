@@ -1943,7 +1943,7 @@ body {
           <span style="font-size: 14px; color: #64748b;">sq ft</span>
         </div>
         <div id="adminSqftPriceNotice" style="display: none; margin-top: 10px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
-          <strong id="adminSqftFeeText">+£125 large property fee</strong> — properties over 3,000 sq ft
+          <strong id="adminSqftFeeText">+£125 large property fee</strong> — <span id="adminSqftThresholdText">properties over 3,000 sq ft</span>
         </div>
         <div id="adminSqftOkNotice" style="display: none; margin-top: 10px; padding: 12px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; font-size: 13px; color: #065f46;">
           ✓ Standard size — no additional fee
@@ -6626,7 +6626,7 @@ function showModifyService(bookingId) {
         <span style="font-size: 14px; color: #64748b;">sq ft</span>
       </div>
       <div id="modifySqftPriceNotice" style="display: none; margin-top: 10px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
-        <strong id="modifySqftFeeText">+£125 large property fee</strong> — properties over 3,000 sq ft
+        <strong id="modifySqftFeeText">+£125 large property fee</strong> — <span id="modifySqftThresholdText">properties over 3,000 sq ft</span>
       </div>
       <div id="modifySqftOkNotice" style="display: none; margin-top: 10px; padding: 12px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; font-size: 13px; color: #065f46;">
         ✓ Standard size — no additional fee
@@ -6678,9 +6678,11 @@ function showModifyService(bookingId) {
     const sqft = modifyServiceData.squareFootage;
     if (sqft > 6000) {
       document.getElementById('modifySqftFeeText').textContent = '+£250 large property fee';
+      document.getElementById('modifySqftThresholdText').textContent = 'properties over 6,000 sq ft';
       document.getElementById('modifySqftPriceNotice').style.display = 'block';
     } else if (sqft > 3000) {
       document.getElementById('modifySqftFeeText').textContent = '+£125 large property fee';
+      document.getElementById('modifySqftThresholdText').textContent = 'properties over 3,000 sq ft';
       document.getElementById('modifySqftPriceNotice').style.display = 'block';
     } else {
       document.getElementById('modifySqftOkNotice').style.display = 'block';
@@ -6784,6 +6786,7 @@ function handleModifySqftInput() {
   const priceNotice = document.getElementById('modifySqftPriceNotice');
   const okNotice = document.getElementById('modifySqftOkNotice');
   const feeText = document.getElementById('modifySqftFeeText');
+  const thresholdText = document.getElementById('modifySqftThresholdText');
 
   priceNotice.style.display = 'none';
   okNotice.style.display = 'none';
@@ -6800,9 +6803,11 @@ function handleModifySqftInput() {
 
   if (value > 6000) {
     feeText.textContent = '+£250 large property fee';
+    thresholdText.textContent = 'properties over 6,000 sq ft';
     priceNotice.style.display = 'block';
   } else if (value > 3000) {
     feeText.textContent = '+£125 large property fee';
+    thresholdText.textContent = 'properties over 3,000 sq ft';
     priceNotice.style.display = 'block';
   } else {
     okNotice.style.display = 'block';
@@ -10353,6 +10358,7 @@ function handleAdminSqftInput() {
   const priceNotice = document.getElementById('adminSqftPriceNotice');
   const okNotice = document.getElementById('adminSqftOkNotice');
   const feeText = document.getElementById('adminSqftFeeText');
+  const thresholdText = document.getElementById('adminSqftThresholdText');
 
   priceNotice.style.display = 'none';
   okNotice.style.display = 'none';
@@ -10369,9 +10375,11 @@ function handleAdminSqftInput() {
 
   if (value > 6000) {
     feeText.textContent = '+£250 large property fee';
+    thresholdText.textContent = 'properties over 6,000 sq ft';
     priceNotice.style.display = 'block';
   } else if (value > 3000) {
     feeText.textContent = '+£125 large property fee';
+    thresholdText.textContent = 'properties over 3,000 sq ft';
     priceNotice.style.display = 'block';
   } else {
     okNotice.style.display = 'block';
@@ -11394,7 +11402,10 @@ function buildInvoiceHTML(booking) {
   }
 
   if (sqftFee > 0) {
-    lines.push({ desc: 'Large property fee (property over 3,000 sq ft)', sub: '', sub2: '', ref: '', amount: sqftFee });
+    const sqftFeeDesc = sqftFee >= 250
+      ? 'Large property fee (property over 6,000 sq ft)'
+      : 'Large property fee (property over 3,000 sq ft)';
+    lines.push({ desc: sqftFeeDesc, sub: '', sub2: '', ref: '', amount: sqftFee });
   }
 
   if (structuredAddonsFromGet && structuredAddonsFromGet.length > 0) {
