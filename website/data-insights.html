@@ -913,44 +913,22 @@ body {
 
   </div>
 
-  <!-- Lead source breakdown -->
+  <!-- Source win rate -->
   <div class="map-section" style="margin-bottom:24px;">
-    <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:20px;display:flex;align-items:center;gap:8px;">
-      <i data-lucide="pie-chart" style="width:18px;height:18px;"></i> Outbound vs Inbound Breakdown
+    <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+      <i data-lucide="pie-chart" style="width:18px;height:18px;"></i> Win Rate by Source
     </h3>
+    <p style="font-size:13px;color:#64748b;margin-bottom:20px;">How prospects found via Domain Search, Email Finder, and Email Verify convert through to Won</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;" id="leadSourceGrid"></div>
   </div>
 
-  <!-- Channel breakdown -->
+  <!-- Stale prospects -->
   <div class="map-section" style="margin-bottom:24px;">
-    <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:20px;display:flex;align-items:center;gap:8px;">
-      <i data-lucide="radio" style="width:18px;height:18px;"></i> Communication Channel Breakdown
+    <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+      <i data-lucide="alarm-clock" style="width:18px;height:18px;"></i> Stale Prospects
     </h3>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" id="channelBreakdownGrid"></div>
-  </div>
-
-  <!-- Recent sign-ups table -->
-  <div class="map-section">
-    <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:20px;display:flex;align-items:center;gap:8px;">
-      <i data-lucide="user-check" style="width:18px;height:18px;"></i> Recent Dashboard Sign-Ups
-    </h3>
-    <div style="overflow-x:auto;">
-      <table class="comp-table" id="signUpTable">
-        <thead>
-          <tr>
-            <th>Lead Name</th>
-            <th>Agency / Company</th>
-            <th>Location</th>
-            <th>BDM</th>
-            <th>Direction</th>
-            <th>Channel</th>
-            <th>Sign-Up Date</th>
-            <th>Deal Value</th>
-          </tr>
-        </thead>
-        <tbody id="signUpTableBody"></tbody>
-      </table>
-    </div>
+    <p style="font-size:13px;color:#64748b;margin-bottom:20px;">Sitting in Contacted, Responded, Meeting Booked, or Proposal Sent with no update in 14+ days</p>
+    <div id="staleProspectsGrid"></div>
   </div>
 
 </div><!-- end #pipelineSection -->
@@ -3018,9 +2996,8 @@ function renderPipelineSection() {
 
   renderPipelineFunnel();
   renderBDMLeaderboard();
-  renderLeadSources();
-  renderRecentSignUps();
-  renderChannelBreakdown();
+  renderSourceWinRate();
+  renderStaleProspects();
   renderPipelineChart();
   lucide.createIcons();
 }
@@ -3119,100 +3096,94 @@ function renderBDMLeaderboard() {
       }).join('');
 }
 
-function renderLeadSources() {
+function renderSourceWinRate() {
   const sourceMap = {};
   pipelineData.forEach(r => {
-    // Primary split: Outbound vs Inbound
-    const direction = r.outboundOrInbound || 'Unknown';
-    if (!sourceMap[direction]) sourceMap[direction] = { total:0, signedUp:0 };
-    sourceMap[direction].total++;
-    if (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed Won') sourceMap[direction].signedUp++;
+    const source = r.source || 'Unknown';
+    if (!sourceMap[source]) sourceMap[source] = { total:0, won:0 };
+    sourceMap[source].total++;
+    if (r.stage === 'Won') sourceMap[source].won++;
   });
+
+  const sourceLabels = {
+    'domain-search': 'Domain Search',
+    'email-finder':  'Email Finder',
+    'email-verify':  'Email Verify',
+    'Unknown':       'Unknown / Manual'
+  };
 
   const sorted = Object.entries(sourceMap).sort((a,b) => b[1].total - a[1].total);
   const colours = ['#3b82f6','#10b981','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899'];
 
-  document.getElementById('leadSourceGrid').innerHTML = sorted.map(([src, d], i) => {
-    const rate = d.total > 0 ? ((d.signedUp / d.total) * 100).toFixed(1) : '0.0';
+  const el = document.getElementById('leadSourceGrid');
+  if (!el) return;
+
+  if (sorted.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;grid-column:1/-1;">No prospects with a recorded source yet</div>';
+    return;
+  }
+
+  el.innerHTML = sorted.map(([src, d], i) => {
+    const rate = d.total > 0 ? ((d.won / d.total) * 100).toFixed(1) : '0.0';
     const col  = colours[i % colours.length];
+    const label = sourceLabels[src] || src;
     return `<div style="background:#fff;border:1px solid ${col}33;border-radius:12px;padding:16px;border-top:3px solid ${col};">
-      <div style="font-size:12px;font-weight:700;color:${col};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">${src}</div>
+      <div style="font-size:12px;font-weight:700;color:${col};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">${label}</div>
       <div style="font-size:28px;font-weight:800;color:#0f172a;margin-bottom:4px;">${d.total}</div>
-      <div style="font-size:11px;color:#64748b;">leads · <strong style="color:#10b981;">${d.signedUp} signed up</strong></div>
+      <div style="font-size:11px;color:#64748b;">prospects · <strong style="color:#059669;">${d.won} won</strong></div>
       <div style="background:#f1f5f9;border-radius:4px;height:6px;overflow:hidden;margin-top:10px;">
         <div style="width:${Math.min(parseFloat(rate),100)}%;height:100%;background:${col};border-radius:4px;transition:width 1s ease;"></div>
       </div>
-      <div style="font-size:10px;color:#64748b;margin-top:4px;">${rate}% sign-up rate</div>
+      <div style="font-size:10px;color:#64748b;margin-top:4px;">${rate}% win rate</div>
     </div>`;
   }).join('');
 }
 
-function renderRecentSignUps() {
-  const signedUp = pipelineData
-    .filter(r => (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed Won') && r.dashboardSignUpDate)
-    .sort((a,b) => new Date(b.dashboardSignUpDate) - new Date(a.dashboardSignUpDate))
-    .slice(0, 20);
+function renderStaleProspects() {
+  const el = document.getElementById('staleProspectsGrid');
+  if (!el) return;
 
-  document.getElementById('signUpTableBody').innerHTML = signedUp.length === 0
-    ? `<tr><td colspan="6" style="text-align:center;padding:30px;color:#64748b;">No sign-up dates recorded yet</td></tr>`
-    : signedUp.map(r => `<tr>
-        <td class="metric-name">${r.leadName || '—'}</td>
-        <td>${r.agencyCompany || '—'}</td>
-        <td>${r.location || '—'}</td>
-        <td>${r.bdm || '—'}</td>
-        <td>${r.outboundOrInbound || '—'}</td>
-        <td>${r.outboundOrInbound === 'Outbound' ? (r.outboundChannel || '—') : (r.inboundChannel || '—')}</td>
-        <td>${formatDate(r.dashboardSignUpDate)}</td>
-        <td>${r.dealValue > 0 ? '£' + Math.round(r.dealValue).toLocaleString() : '—'}</td>
-      </tr>`).join('');
-}
+  const activeStages = ['Contacted', 'Responded', 'Meeting Booked', 'Proposal Sent'];
+  const now = new Date();
+  const STALE_DAYS = 14;
 
-function renderChannelBreakdown() {
-  const outboundMap = {};
-  const inboundMap  = {};
+  const stale = pipelineData
+    .filter(r => activeStages.includes(r.stage) && r.updatedDate)
+    .map(r => {
+      const days = Math.floor((now - new Date(r.updatedDate)) / (1000 * 60 * 60 * 24));
+      return { ...r, daysStale: days };
+    })
+    .filter(r => r.daysStale >= STALE_DAYS)
+    .sort((a, b) => b.daysStale - a.daysStale);
 
-  pipelineData.forEach(r => {
-    const isOut = r.outboundOrInbound === 'Outbound';
-    const ch    = isOut ? (r.outboundChannel || 'Unknown') : (r.inboundChannel || 'Unknown');
-    if (!ch || ch === 'N/A') return;
-    const map   = isOut ? outboundMap : inboundMap;
-    if (!map[ch]) map[ch] = { total:0, signedUp:0 };
-    map[ch].total++;
-    if (r.salesStage === 'Dashboard Sign Up' || r.salesStage === 'Closed Won') map[ch].signedUp++;
-  });
-
-  const colours = ['#3b82f6','#10b981','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899','#84cc16'];
-
-  function buildGrid(map, label, baseCol) {
-    const sorted = Object.entries(map).sort((a,b) => b[1].total - a[1].total);
-    if (sorted.length === 0) return `<div style="color:#64748b;font-size:13px;">No ${label} data</div>`;
-    return `
-      <div>
-        <div style="font-size:13px;font-weight:700;color:${baseCol};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">${label} Channels</div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          ${sorted.map(([ch, d], i) => {
-            const rate = d.total > 0 ? ((d.signedUp / d.total) * 100).toFixed(1) : '0.0';
-            const col  = colours[i % colours.length];
-            const barW = Math.round((d.total / sorted[0][1].total) * 100);
-            return `<div style="background:#fff;border:1px solid ${col}33;border-radius:10px;padding:12px 14px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                <span style="font-size:12px;font-weight:700;color:#0f172a;">${ch}</span>
-                <span style="font-size:11px;color:#64748b;">${d.signedUp} sign-ups · <strong style="color:#10b981;">${rate}%</strong></span>
-              </div>
-              <div style="background:#f1f5f9;border-radius:4px;height:8px;overflow:hidden;">
-                <div style="width:${barW}%;height:100%;background:${col};border-radius:4px;transition:width 1s ease;"></div>
-              </div>
-              <div style="font-size:11px;color:#64748b;margin-top:4px;">${d.total} leads</div>
-            </div>`;
-          }).join('')}
-        </div>
-      </div>`;
+  if (stale.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:#64748b;font-size:13px;">No stale prospects — everything in active stages has been touched within 14 days.</div>';
+    return;
   }
 
-  const el = document.getElementById('channelBreakdownGrid');
-  if (el) {
-    el.innerHTML = buildGrid(outboundMap, 'Outbound', '#3b82f6') + buildGrid(inboundMap, 'Inbound', '#10b981');
-  }
+  const sc = {
+    'Contacted':      '#3b82f6',
+    'Responded':      '#f59e0b',
+    'Meeting Booked': '#8b5cf6',
+    'Proposal Sent':  '#06b6d4'
+  };
+
+  el.innerHTML = stale.map(r => {
+    const col = sc[r.stage] || '#94a3b8';
+    const urgency = r.daysStale >= 30 ? '#ef4444' : r.daysStale >= 21 ? '#f59e0b' : '#94a3b8';
+    return `<div style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #e2e8f0;border-left:4px solid ${urgency};border-radius:10px;padding:12px 16px;margin-bottom:8px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:180px;">
+        <div style="font-weight:700;color:#0f172a;font-size:14px;">${r.name || r.email}</div>
+        ${r.company ? `<div style="font-size:12px;color:#64748b;margin-top:2px;">${r.company}</div>` : ''}
+      </div>
+      <span style="background:${col}20;color:${col};border:1px solid ${col}44;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700;">${r.stage}</span>
+      <div style="text-align:center;min-width:80px;">
+        <div style="font-size:18px;font-weight:800;color:${urgency};">${r.daysStale}</div>
+        <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;">days stale</div>
+      </div>
+      <div style="text-align:right;min-width:100px;font-size:12px;color:#64748b;">${r.owner || 'Unassigned'}</div>
+    </div>`;
+  }).join('');
 }
 
 function renderPipelineChart() {
