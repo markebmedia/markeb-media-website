@@ -873,7 +873,7 @@ width: 100%;
             <span style="font-size: 14px; color: #64748b;">sq ft</span>
           </div>
           <div id="sqftPriceNotice" style="display: none; margin-top: 10px; padding: 12px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; font-size: 13px; color: #92400e;">
-            <strong>+£125 + VAT large property fee</strong> — properties over 3,000 sq ft require additional shoot time
+            <strong id="sqftFeeText">+£125 + VAT large property fee</strong> — properties over 3,000 sq ft require additional shoot time
           </div>
           <div id="sqftOkNotice" style="display: none; margin-top: 10px; padding: 12px; background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; font-size: 13px; color: #065f46;">
             ✓ Standard size — no additional fee
@@ -3404,12 +3404,14 @@ function renderOfferPopup(offerId) {
         sqftFeeRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;';
         sqftFeeRow.innerHTML = `
           <span style="font-size: 14px; color: #64748b;">Large property fee</span>
-          <span style="font-size: 14px; font-weight: 600; color: #1e293b;">£125.00</span>
+          <span style="font-size: 14px; font-weight: 600; color: #1e293b;" id="sqftFeeAmount">£${sqftFee.toFixed(2)}</span>
         `;
         divider.parentNode.insertBefore(sqftFeeRow, divider);
       }
       if (sqftFeeRow) {
         sqftFeeRow.style.display = sqftFee > 0 ? 'flex' : 'none';
+        const sqftFeeAmountEl = document.getElementById('sqftFeeAmount');
+        if (sqftFeeAmountEl) sqftFeeAmountEl.textContent = `£${sqftFee.toFixed(2)}`;
       }
 
       document.getElementById('summaryExVat').textContent = `£${displaySubtotal.toFixed(2)}`;
@@ -4457,11 +4459,19 @@ function calculateExtraDuration(serviceId, bedrooms, squareFootage) {
 }
 
 // Handle Square Footage Input
+function getSqftFee(value) {
+  if (!value) return 0;
+  if (value > 6000) return 250;
+  if (value > 3000) return 125;
+  return 0;
+}
+
 function handleSquareFootageInput() {
   const input = document.getElementById('squareFootageInput');
   const value = parseInt(input.value);
   const sqftPriceNotice = document.getElementById('sqftPriceNotice');
   const sqftOkNotice = document.getElementById('sqftOkNotice');
+  const sqftFeeText = document.getElementById('sqftFeeText');
 
   sqftPriceNotice.style.display = 'none';
   sqftOkNotice.style.display = 'none';
@@ -4474,12 +4484,15 @@ function handleSquareFootageInput() {
   }
 
   bookingData.squareFootage = value;
+  bookingData.squareFootageFee = getSqftFee(value);
 
-  if (value > 3000) {
-    bookingData.squareFootageFee = 125;
+  if (value > 6000) {
+    sqftFeeText.textContent = '+£250 + VAT large property fee';
+    sqftPriceNotice.style.display = 'block';
+  } else if (value > 3000) {
+    sqftFeeText.textContent = '+£125 + VAT large property fee';
     sqftPriceNotice.style.display = 'block';
   } else {
-    bookingData.squareFootageFee = 0;
     sqftOkNotice.style.display = 'block';
   }
 
