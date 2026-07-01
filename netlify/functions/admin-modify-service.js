@@ -237,6 +237,15 @@ if (hasDiscount) {
       }
     }
 
+    // ✅ Clear stale Local Area Places if the new service/addons no longer include it
+    const hasLocalAreaHighlights =
+      newServiceId === 'gold-package' ||
+      (addons || []).some(a => a.id === 'local-area-highlights' || a.name === 'Local Area Highlights');
+
+    if (!hasLocalAreaHighlights && fields['Local Area Places']) {
+      console.log('⚠️ Local Area Highlights no longer applicable — clearing stale places data');
+    }
+
     // Update booking in Airtable
     const updateFields = {
       'Service': newServiceName,
@@ -247,6 +256,7 @@ if (hasDiscount) {
       'Extra Bedroom Fee': extraBedroomFee,
       'Add-Ons': addonsString,
       'Add-Ons Price': newAddonsPrice,
+      'Local Area Places': hasLocalAreaHighlights ? fields['Local Area Places'] : '',
       'Price Before Discount': priceBeforeDiscount,
       'Price Ex VAT': parseFloat((finalPrice / 1.2).toFixed(2)),
       'VAT Amount': parseFloat((finalPrice - finalPrice / 1.2).toFixed(2)),

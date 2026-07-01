@@ -30,6 +30,23 @@ function formatServiceWithAddons(service, addons) {
   return `${service}<br><span style="font-size: 13px; color: #9a7a4a;">Add-ons: ${addonNames}</span>`;
 }
 
+// ✅ Bulletproof CTA button — renders correctly in Outlook desktop (VML fallback,
+// since Outlook's Word rendering engine ignores CSS gradients and border-radius
+// on <a> tags, which was leaving the button text invisible: cream text on a
+// transparent/white background instead of the intended solid brand colour)
+function getButtonHtml(url, text, width = 260) {
+  return `
+<!--[if mso]>
+<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${url}" style="height:48px;v-text-anchor:middle;width:${width}px;" arcsize="18%" strokecolor="#B46100" fillcolor="#B46100">
+<w:anchorlock/>
+<center style="color:#FDF3E2;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;">${text}</center>
+</v:roundrect>
+<![endif]-->
+<!--[if !mso]><!-->
+<a href="${url}" target="_blank" style="background-color:#B46100;border-radius:10px;color:#FDF3E2;display:inline-block;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;line-height:48px;text-align:center;text-decoration:none;width:${width}px;letter-spacing:0.01em;-webkit-text-size-adjust:none;mso-hide:all;">${text}</a>
+<!--<![endif]-->`;
+}
+
 // ✅ Format Access Type Information
 function getAccessTypeSection(booking) {
   if (!booking.accessType) return '';
@@ -70,7 +87,11 @@ function getAccessTypeSection(booking) {
 
 // ✅ Format Local Area Places
 function getLocalAreaPlacesSection(booking) {
-  if (!booking.localPlaces || booking.localPlaces.length === 0) return '';
+  const hasLocalAreaHighlights =
+    booking.serviceId === 'gold-package' ||
+    (booking.addons || []).some(a => a.id === 'local-area-highlights' || a.name === 'Local Area Highlights');
+
+  if (!hasLocalAreaHighlights || !booking.localPlaces || booking.localPlaces.length === 0) return '';
 
   const placesList = booking.localPlaces
     .map((place, i) => `<li style="margin-bottom: 6px;"><strong>${i + 1}.</strong> ${place}</li>`)
@@ -287,6 +308,7 @@ function getEmailLayout(content) {
     }
     .button {
       display: inline-block;
+      background-color: #B46100;
       background: linear-gradient(135deg, #B46100 0%, #8a4a00 100%);
       color: #FDF3E2 !important;
       padding: 14px 32px;
@@ -455,7 +477,7 @@ async function sendBookingConfirmation(booking) {
     ` : ''}
 
     <center>
-      <a href="${manageUrl}" class="button">Manage Your Booking</a>
+      ${getButtonHtml(manageUrl, 'Manage Your Booking')}
     </center>
 
     ${getBrandingAnswersSection(booking)}
@@ -645,7 +667,7 @@ async function sendPaymentConfirmation(booking) {
     </div>
 
     <center>
-      <a href="${manageUrl}" class="button">Manage Your Booking</a>
+      ${getButtonHtml(manageUrl, 'Manage Your Booking')}
     </center>
 
     <div class="alert alert-info">
@@ -724,7 +746,7 @@ async function sendRescheduleConfirmation(booking, oldDate, oldTime) {
     </div>
 
     <center>
-      <a href="${manageUrl}" class="button">Manage Your Booking</a>
+      ${getButtonHtml(manageUrl, 'Manage Your Booking')}
     </center>
 
     <p>See you on ${formatDate(booking.date)}!</p>
@@ -954,7 +976,7 @@ async function sendServiceModificationConfirmation(booking, oldService, oldPrice
     </div>
 
     <center>
-      <a href="${manageUrl}" class="button">Manage Your Booking</a>
+      ${getButtonHtml(manageUrl, 'Manage Your Booking')}
     </center>
 
     <p>If you have any questions about this change, please don't hesitate to contact us.</p>
@@ -1000,7 +1022,7 @@ async function sendCardUpdateEmail(booking) {
     </div>
 
     <center>
-      <a href="${booking.updateLink}" class="button">Update My Payment Details</a>
+      ${getButtonHtml(booking.updateLink, 'Update My Payment Details', 300)}
     </center>
 
     <div class="alert alert-success">
@@ -1126,7 +1148,7 @@ async function sendReviewRewardEmail(clientEmail, clientName, prize) {
     </div>
 
     <center>
-      <a href="https://markebmedia.com/website/booking.html" class="button">Book Your Next Shoot</a>
+      ${getButtonHtml('https://markebmedia.com/website/booking.html', 'Book Your Next Shoot', 280)}
     </center>
 
     <p>Thank you again for your support — reviews like yours help us grow and keep delivering the best property media in the UK.</p>

@@ -111,7 +111,16 @@ exports.handler = async (event, context) => {
       ...(epcAnswers && epcAnswers.loftConversion && { 'EPC Loft Conversion': epcAnswers.loftConversion }),
       ...(epcAnswers && epcAnswers.solarPanels && { 'EPC Solar Panels': epcAnswers.solarPanels }),
       ...(brandingAnswers && Object.keys(brandingAnswers).length > 0 && { 'Branding Answers': JSON.stringify(brandingAnswers) }),
-      ...(localPlaces && localPlaces.length > 0 && { 'Local Area Places': localPlaces.join('\n') }),
+      // ✅ Explicitly set (not just conditionally add) Local Area Places — if the
+      // new service/addons no longer include Local Area Highlights, this clears
+      // any stale places left over from a previous service on this booking.
+      'Local Area Places': (() => {
+        const hasLocalAreaHighlights =
+          newServiceId === 'gold-package' ||
+          (addons || []).some(a => a.id === 'local-area-highlights' || a.name === 'Local Area Highlights');
+        if (!hasLocalAreaHighlights) return '';
+        return (localPlaces && localPlaces.length > 0) ? localPlaces.join('\n') : (f['Local Area Places'] || '');
+      })(),
       'Service Modified':     true,
       'Service Modified Date': new Date().toISOString()
     };

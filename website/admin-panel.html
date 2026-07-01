@@ -10302,14 +10302,13 @@ function getAdminBrandingAnswers() {
   return answers;
 }
 
-function updateAdminLocalAreaVisibility() {
-  const section = document.getElementById('adminLocalAreaSection');
-  if (!section) return;
-  const serviceSelect = document.getElementById('bookingService');
-  const serviceId = serviceSelect?.value || '';
-  const isGold = serviceId === 'gold-package';
-  const hasLocalAddon = bookingFormData.selectedAddons.includes('local-area-highlights');
-  section.style.display = (isGold || hasLocalAddon) ? 'block' : 'none';
+function getAdminLocalPlaces() {
+  const places = [];
+  for (let i = 1; i <= 5; i++) {
+    const val = (document.getElementById(`adminLocalPlace${i}`)?.value || '').trim();
+    if (val) places.push(val);
+  }
+  return places;
 }
 
 function getAdminLocalPlaces() {

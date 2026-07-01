@@ -146,6 +146,18 @@ exports.handler = async (event, context) => {
 
     console.log(`Final status - Payment: ${paymentStatus}, Booking: ${bookingStatus}`);
 
+    // ✅ Guard against stale/leftover localPlaces data reaching Airtable —
+    // only persist it if Local Area Highlights was actually part of the booking
+    const hasLocalAreaHighlights =
+      bookingData.serviceId === 'gold-package' ||
+      (bookingData.addons || []).some(a => a.id === 'local-area-highlights' || a.name === 'Local Area Highlights');
+
+    const safeLocalPlaces = hasLocalAreaHighlights ? (bookingData.localPlaces || []) : [];
+
+    if (!hasLocalAreaHighlights && bookingData.localPlaces && bookingData.localPlaces.length > 0) {
+      console.warn('⚠️ localPlaces received without Local Area Highlights selected — discarding stale data:', bookingData.localPlaces);
+    }
+
     // Prepare add-ons data
     const addonsText = bookingData.addons && bookingData.addons.length > 0
       ? bookingData.addons.map(a => `${a.name} (+£${a.price.toFixed(2)})`).join('\n')
@@ -299,8 +311,8 @@ exports.handler = async (event, context) => {
         'Key Pickup Location': bookingData.keyPickupLocation || undefined,
         
         // Local Area Highlights places
-        'Local Area Places': bookingData.localPlaces && bookingData.localPlaces.length > 0
-          ? bookingData.localPlaces.join('\n')
+        'Local Area Places': safeLocalPlaces.length > 0
+          ? safeLocalPlaces.join('\n')
           : undefined,
         'Branding Answers': bookingData.brandingAnswers && Object.keys(bookingData.brandingAnswers).length > 0
           ? JSON.stringify(bookingData.brandingAnswers)
@@ -423,7 +435,7 @@ exports.handler = async (event, context) => {
   region: bookingData.region,
   accessType: bookingData.accessType || '',
   keyPickupLocation: bookingData.keyPickupLocation || '',
-  localPlaces: bookingData.localPlaces || [],
+  localPlaces: safeLocalPlaces,
   brandingAnswers: bookingData.brandingAnswers || {},
   epcAnswers: bookingData.epcAnswers || {},
   addons: bookingData.addons || []

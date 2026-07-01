@@ -3238,6 +3238,7 @@ function renderOfferPopup(offerId) {
       updateEpcLargePrice();
       renderAddons();
       updateEpcQuestionsVisibility();
+      updateLocalAreaHighlightsVisibility();
       calculatePrice();
     }
 
@@ -4278,7 +4279,23 @@ function updateLocalAreaHighlightsVisibility() {
   const service = bookingData.service;
   const isGold = service && service.id === 'gold-package';
   const hasLocalAreaAddon = bookingData.selectedAddons && bookingData.selectedAddons.includes('local-area-highlights');
-  section.style.display = (isGold || hasLocalAreaAddon) ? 'block' : 'none';
+  const shouldShow = isGold || hasLocalAreaAddon;
+
+  section.style.display = shouldShow ? 'block' : 'none';
+
+  // Wipe any previously typed places when the section is hidden so stale
+  // data can't survive into the booking payload / confirmation emails.
+  if (!shouldShow) {
+    for (let i = 1; i <= 5; i++) {
+      const input = document.getElementById(`localPlace${i}`);
+      if (input) input.value = '';
+    }
+    bookingData.localPlaces = [];
+    const errorMsg = document.getElementById('localPlacesError');
+    const firstInput = document.getElementById('localPlace1');
+    if (errorMsg) errorMsg.classList.remove('show');
+    if (firstInput) firstInput.classList.remove('error');
+  }
 }
 
 // Collect local places and store on bookingData

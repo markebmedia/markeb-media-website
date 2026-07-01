@@ -24,6 +24,18 @@ exports.handler = async (event, context) => {
 
   try {
     const bookingData = JSON.parse(event.body);
+
+    // ✅ Guard against stale/leftover localPlaces data reaching Stripe metadata —
+    // only pass it through if Local Area Highlights was actually part of the booking
+    const hasLocalAreaHighlights =
+      bookingData.serviceId === 'gold-package' ||
+      (bookingData.addons || []).some(a => a.id === 'local-area-highlights' || a.name === 'Local Area Highlights');
+
+    const safeLocalPlaces = hasLocalAreaHighlights ? (bookingData.localPlaces || []) : [];
+
+    if (!hasLocalAreaHighlights && bookingData.localPlaces && bookingData.localPlaces.length > 0) {
+      console.warn('⚠️ localPlaces received without Local Area Highlights selected — discarding stale data:', bookingData.localPlaces);
+    }
     
     console.log('Creating Stripe checkout for:', {
       service: bookingData.service,
@@ -122,8 +134,8 @@ exports.handler = async (event, context) => {
         squareFootage: bookingData.squareFootage ? bookingData.squareFootage.toString() : '',
         squareFootageFee: bookingData.squareFootageFee ? bookingData.squareFootageFee.toString() : '0',
         epcAnswers: bookingData.epcAnswers ? JSON.stringify(bookingData.epcAnswers) : '',
-        localPlaces: bookingData.localPlaces && bookingData.localPlaces.length > 0
-          ? JSON.stringify(bookingData.localPlaces)
+        localPlaces: safeLocalPlaces.length > 0
+          ? JSON.stringify(safeLocalPlaces)
           : '[]',
         brandingAnswers: bookingData.brandingAnswers && Object.keys(bookingData.brandingAnswers).length > 0
           ? JSON.stringify(bookingData.brandingAnswers)

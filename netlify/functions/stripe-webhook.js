@@ -237,6 +237,21 @@ exports.handler = async (event, context) => {
       }
 
       const addons = JSON.parse(metadata.addons || '[]');
+
+      // ✅ Guard against stale/leftover localPlaces data reaching Airtable —
+      // only persist it if Local Area Highlights was actually part of the booking
+      const hasLocalAreaHighlights =
+        metadata.serviceId === 'gold-package' ||
+        addons.some(a => a.id === 'local-area-highlights' || a.name === 'Local Area Highlights');
+
+      const safeLocalPlaces = hasLocalAreaHighlights
+        ? (() => { try { return JSON.parse(metadata.localPlaces || '[]'); } catch { return []; } })()
+        : [];
+
+      if (!hasLocalAreaHighlights && metadata.localPlaces && metadata.localPlaces !== '[]') {
+        console.warn('⚠️ localPlaces received without Local Area Highlights selected — discarding stale data:', metadata.localPlaces);
+      }
+
       const addonsText = addons.length > 0
         ? addons.map(a => `${a.name} (+£${parseFloat(a.price).toFixed(2)})`).join('\n')
         : '';
@@ -304,12 +319,9 @@ exports.handler = async (event, context) => {
             };
           } catch { return {}; }
         })()),
-        ...(metadata.localPlaces && metadata.localPlaces !== '[]' && (() => {
-          try {
-            const places = JSON.parse(metadata.localPlaces);
-            return { 'Local Area Places': places.join('\n') };
-          } catch { return {}; }
-        })()),
+        ...(safeLocalPlaces.length > 0 && {
+          'Local Area Places': safeLocalPlaces.join('\n')
+        }),
         ...(metadata.brandingAnswers && metadata.brandingAnswers !== '{}' && {
           'Branding Answers': metadata.brandingAnswers
         }),
@@ -398,9 +410,7 @@ exports.handler = async (event, context) => {
             accessType: metadata.accessType || '',
             keyPickupLocation: metadata.keyPickupLocation || '',
             squareFootage: metadata.squareFootage ? parseInt(metadata.squareFootage) : null,
-            localPlaces: (() => {
-              try { return JSON.parse(metadata.localPlaces || '[]'); } catch { return []; }
-            })(),
+            localPlaces: safeLocalPlaces,
             brandingAnswers: (() => {
               try { return JSON.parse(metadata.brandingAnswers || '{}'); } catch { return {}; }
             })(),
