@@ -63,6 +63,7 @@ function buildEmail(firstName, regionLabel) {
   <!--[if mso]>
   <noscript><xml><o:OfficeDocumentSettings>
     <o:PixelsPerInch>96</o:PixelsPerInch>
+    <o:AllowPNG/>
   </o:OfficeDocumentSettings></xml></noscript>
   <![endif]-->
   <style>
@@ -91,24 +92,24 @@ function buildEmail(firstName, regionLabel) {
 
         <!-- HEADER -->
         <tr>
-          <td align="center"
-            style="background:linear-gradient(135deg,#3F4D1B 0%,#2d3813 100%);padding:36px 30px 28px;">
+          <td align="center" bgcolor="#3F4D1B"
+            style="background-color:#3F4D1B;padding:36px 30px 28px;">
             <img src="${LOGO_URL}" alt="Markeb Media"
               style="max-width:150px;width:100%;height:auto;display:block;margin:0 auto 14px;">
-            <p style="margin:0;color:rgba(253,243,226,0.7);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;">
+            <p style="margin:0;color:#FDF3E2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;">
               Client Dashboard Update
             </p>
-            <div style="width:36px;height:3px;background:#B46100;margin:12px auto 0;border-radius:2px;"></div>
+            <div style="width:36px;height:3px;background-color:#B46100;margin:12px auto 0;font-size:0;line-height:0;">&nbsp;</div>
           </td>
         </tr>
 
         <!-- HERO -->
         <tr>
-          <td style="background:linear-gradient(135deg,#B46100 0%,#8a4a00 100%);padding:44px 36px 40px;">
+          <td bgcolor="#B46100" style="background-color:#B46100;padding:44px 36px 40px;">
             <h1 style="margin:0 0 12px;color:#FDF3E2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:30px;font-weight:800;line-height:1.2;letter-spacing:-0.02em;">
               A lot's happened since<br>you last logged in, ${firstName}.
             </h1>
-            <p style="margin:0;color:rgba(253,243,226,0.88);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.6;">
+            <p style="margin:0;color:#FDF3E2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.6;">
              Agents in your network are already using their dashboard every week. They're tracking shoots, building brochures and selling properties faster than ever. Here's everything that's been waiting for you.
             </p>
           </td>
@@ -132,7 +133,9 @@ function buildEmail(firstName, regionLabel) {
         <!-- DIVIDER -->
         <tr>
           <td style="padding:28px 36px 0;">
-            <div style="height:3px;background:linear-gradient(90deg,#B46100 0%,rgba(180,97,0,0.15) 100%);border-radius:2px;"></div>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr><td height="3" bgcolor="#B46100" style="background-color:#B46100;font-size:0;line-height:0;">&nbsp;</td></tr>
+            </table>
           </td>
         </tr>
 
@@ -142,9 +145,9 @@ function buildEmail(firstName, regionLabel) {
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td valign="top" width="52">
-                  <div style="width:44px;height:44px;background:linear-gradient(135deg,#B46100 0%,#8a4a00 100%);border-radius:12px;text-align:center;line-height:44px;font-size:22px;">
-                    📦
-                  </div>
+                  <table role="presentation" width="44" height="44" cellpadding="0" cellspacing="0" border="0">
+                    <tr><td width="44" height="44" bgcolor="#B46100" align="center" valign="middle" style="background-color:#B46100;font-size:22px;line-height:44px;">📦</td></tr>
+                  </table>
                 </td>
                 <td valign="top" style="padding-left:14px;">
                   <h2 style="margin:0 0 6px;color:#B46100;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:17px;font-weight:800;letter-spacing:-0.01em;">
@@ -165,9 +168,9 @@ function buildEmail(firstName, regionLabel) {
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td valign="top" width="52">
-                  <div style="width:44px;height:44px;background:linear-gradient(135deg,#B46100 0%,#8a4a00 100%);border-radius:12px;text-align:center;line-height:44px;font-size:22px;">
-                    ✏️
-                  </div>
+                  <table role="presentation" width="44" height="44" cellpadding="0" cellspacing="0" border="0">
+                    <tr><td width="44" height="44" bgcolor="#B46100" align="center" valign="middle" style="background-color:#B46100;font-size:22px;line-height:44px;">✏️</td></tr>
+                  </table>
                 </td>
                 <td valign="top" style="padding-left:14px;">
                   <h2 style="margin:0 0 6px;color:#B46100;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:17px;font-weight:800;letter-spacing:-0.01em;">
@@ -188,9 +191,9 @@ function buildEmail(firstName, regionLabel) {
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td valign="top" width="52">
-                  <div style="width:44px;height:44px;background:linear-gradient(135deg,#B46100 0%,#8a4a00 100%);border-radius:12px;text-align:center;line-height:44px;font-size:22px;">
-                    📄
-                  </div>
+                  <table role="presentation" width="44" height="44" cellpadding="0" cellspacing="0" border="0">
+                    <tr><td width="44" height="44" bgcolor="#B46100" align="center" valign="middle" style="background-color:#B46100;font-size:22px;line-height:44px;">📄</td></tr>
+                  </table>
                 </td>
                 <td valign="top" style="padding-left:14px;">
                   <h2 style="margin:0 0 6px;color:#B46100;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:17px;font-weight:800;letter-spacing:-0.01em;">
@@ -211,9 +214,9 @@ function buildEmail(firstName, regionLabel) {
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td valign="top" width="52">
-                  <div style="width:44px;height:44px;background:linear-gradient(135deg,#B46100 0%,#8a4a00 100%);border-radius:12px;text-align:center;line-height:44px;font-size:22px;">
-                    🤖
-                  </div>
+                  <table role="presentation" width="44" height="44" cellpadding="0" cellspacing="0" border="0">
+                    <tr><td width="44" height="44" bgcolor="#B46100" align="center" valign="middle" style="background-color:#B46100;font-size:22px;line-height:44px;">🤖</td></tr>
+                  </table>
                 </td>
                 <td valign="top" style="padding-left:14px;">
                   <h2 style="margin:0 0 6px;color:#B46100;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:17px;font-weight:800;letter-spacing:-0.01em;">
@@ -234,9 +237,9 @@ function buildEmail(firstName, regionLabel) {
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td valign="top" width="52">
-                  <div style="width:44px;height:44px;background:linear-gradient(135deg,#B46100 0%,#8a4a00 100%);border-radius:12px;text-align:center;line-height:44px;font-size:22px;">
-                    📅
-                  </div>
+                  <table role="presentation" width="44" height="44" cellpadding="0" cellspacing="0" border="0">
+                    <tr><td width="44" height="44" bgcolor="#B46100" align="center" valign="middle" style="background-color:#B46100;font-size:22px;line-height:44px;">📅</td></tr>
+                  </table>
                 </td>
                 <td valign="top" style="padding-left:14px;">
                   <h2 style="margin:0 0 6px;color:#B46100;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:17px;font-weight:800;letter-spacing:-0.01em;">
@@ -254,7 +257,9 @@ function buildEmail(firstName, regionLabel) {
         <!-- DIVIDER -->
         <tr>
           <td style="padding:28px 36px 0;">
-            <div style="height:3px;background:linear-gradient(90deg,#B46100 0%,rgba(180,97,0,0.15) 100%);border-radius:2px;"></div>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr><td height="3" bgcolor="#B46100" style="background-color:#B46100;font-size:0;line-height:0;">&nbsp;</td></tr>
+            </table>
           </td>
         </tr>
 
@@ -263,14 +268,14 @@ function buildEmail(firstName, regionLabel) {
           <td class="pad-mobile" style="padding:28px 36px 0;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td style="background:linear-gradient(135deg,#3F4D1B 0%,#2d3813 100%);border-radius:14px;padding:28px 28px 24px;">
+                <td bgcolor="#3F4D1B" style="background-color:#3F4D1B;padding:28px 28px 24px;">
                   <h2 style="margin:0 0 10px;color:#FDF3E2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:19px;font-weight:800;letter-spacing:-0.01em;">
                     📍 We're growing in ${regionLabel}
                   </h2>
-                  <p style="margin:0 0 14px;color:rgba(253,243,226,0.88);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;line-height:1.7;">
+                  <p style="margin:0 0 14px;color:#FDF3E2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;line-height:1.7;">
                     Agents you know are already shooting with us. Because we work with agents across your network, we already know the standard expected, the quality required and the turnaround that keeps your clients happy.
                   </p>
-                  <p style="margin:0;color:rgba(253,243,226,0.88);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;line-height:1.7;">
+                  <p style="margin:0;color:#FDF3E2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:14px;line-height:1.7;">
                     As the network grows, so does the value of being a dashboard member. Exclusive pricing, priority availability and a team that already knows your standards.
                   </p>
                 </td>
@@ -285,10 +290,24 @@ function buildEmail(firstName, regionLabel) {
             <p style="margin:0 0 20px;color:#3F4D1B;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:15px;line-height:1.7;">
               Log back in and take two minutes to explore what's new. Your specialist is ready whenever you are.
             </p>
-            <a href="${DASH_URL}"
-              style="display:inline-block;background:linear-gradient(135deg,#B46100 0%,#8a4a00 100%);color:#FDF3E2;text-decoration:none;padding:15px 38px;border-radius:10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-weight:800;font-size:15px;letter-spacing:0.01em;margin-bottom:12px;">
-              Log in to my dashboard →
-            </a>
+            <!--[if mso]>
+            <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${DASH_URL}" style="height:48px;v-text-anchor:middle;width:280px;" arcsize="18%" strokecolor="#B46100" fillcolor="#B46100">
+              <w:anchorlock/>
+              <center style="color:#FDF3E2;font-family:Arial,sans-serif;font-size:15px;font-weight:bold;">Log in to my dashboard &#8594;</center>
+            </v:roundrect>
+            <![endif]-->
+            <!--[if !mso]><!-->
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
+              <tr>
+                <td bgcolor="#B46100" style="background-color:#B46100;border-radius:10px;">
+                  <a href="${DASH_URL}"
+                    style="display:inline-block;color:#FDF3E2;text-decoration:none;padding:15px 38px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-weight:800;font-size:15px;letter-spacing:0.01em;">
+                    Log in to my dashboard &#8594;
+                  </a>
+                </td>
+              </tr>
+            </table>
+            <!--<![endif]-->
             <br>
             <a href="${BOOK_URL}"
               style="display:inline-block;color:#B46100;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-weight:700;font-size:13px;border-bottom:2px solid #B46100;padding-bottom:2px;">
@@ -311,12 +330,14 @@ function buildEmail(firstName, regionLabel) {
 
         <!-- FOOTER -->
         <tr>
-          <td style="background:#3F4D1B;padding:28px 36px;text-align:center;">
-            <div style="width:32px;height:2px;background:#B46100;margin:0 auto 16px;border-radius:1px;"></div>
-            <p style="margin:0 0 4px;color:rgba(253,243,226,0.9);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:700;">
+          <td bgcolor="#3F4D1B" style="background-color:#3F4D1B;padding:28px 36px;text-align:center;">
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center">
+              <tr><td width="32" height="2" bgcolor="#B46100" style="background-color:#B46100;font-size:0;line-height:0;">&nbsp;</td></tr>
+            </table>
+            <p style="margin:16px 0 4px;color:#FDF3E2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;font-weight:700;">
               Markeb Media Ltd
             </p>
-            <p style="margin:0 0 4px;color:rgba(253,243,226,0.55);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;">
+            <p style="margin:0 0 4px;color:#c9c2ab;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:12px;">
               Pennine Five, 20 to 22 Hawley Street, Sheffield S1 2EA
             </p>
             <p style="margin:0 0 16px;">
@@ -325,7 +346,7 @@ function buildEmail(firstName, regionLabel) {
                 commercial@markebmedia.com
               </a>
             </p>
-            <p style="margin:0;color:rgba(253,243,226,0.25);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:11px;">
+            <p style="margin:0;color:#7d7660;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:11px;">
               You're receiving this because you have an account at markebmedia.com
             </p>
           </td>
