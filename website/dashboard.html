@@ -5148,7 +5148,6 @@ async function loadRecentBookings() {
 
   function closeReviewModal() {
     document.getElementById('review-reward-overlay').style.display = 'none';
-    sessionStorage.setItem('reviewPopupShown', 'true');
   }
 
   function rrmShowStep(id) {
@@ -5371,7 +5370,6 @@ async function loadRecentBookings() {
 
   async function checkReviewRewardPopup() {
     try {
-      if (sessionStorage.getItem('reviewPopupShown')) return;
       const email = window.AirtableAPI?.getCurrentUser?.()?.email || localStorage.getItem('user_email');
       if (!email) return;
       const res = await fetch('/.netlify/functions/claim-review-reward', {
