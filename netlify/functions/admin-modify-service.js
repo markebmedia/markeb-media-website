@@ -4,6 +4,7 @@ const Airtable = require('airtable');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+const { sendEpcPartnerNotification } = require('./email-service');
 
 // ── SPECIALIST EMAIL ROUTING ─────────────────────────────────────────────────
 // Add a new entry here when hiring a new specialist.
@@ -12,6 +13,8 @@ const SPECIALIST_EMAILS = {
   'James Jago': 'James.Jago@markebmedia.com',
   'Andrii':     'Andrii.Hutovych@markebmedia.com'
 };
+
+const EPC_PARTNER_REGIONS = ['west', 'north-west', 'north'];
 
 exports.handler = async (event, context) => {
   const headers = {
@@ -45,6 +48,7 @@ exports.handler = async (event, context) => {
       totalPrice,
       squareFootage,
       squareFootageFee,
+      epcAnswers,
       sendEmail = true 
     } = JSON.parse(event.body);
 
@@ -267,7 +271,11 @@ if (hasDiscount) {
       'Previous Price': oldFinalPrice,
       'Price Adjustment': priceDifference,
       'Square Footage': (squareFootage === null || squareFootage === undefined) ? null : squareFootage,
-      'Square Footage Fee': sqftFee
+      'Square Footage Fee': sqftFee,
+      ...(epcAnswers && epcAnswers.propertyAge && { 'EPC Property Age': epcAnswers.propertyAge }),
+      ...(epcAnswers && epcAnswers.extensionAge && { 'EPC Extension Age': epcAnswers.extensionAge }),
+      ...(epcAnswers && epcAnswers.loftConversion && { 'EPC Loft Conversion': epcAnswers.loftConversion }),
+      ...(epcAnswers && epcAnswers.solarPanels && { 'EPC Solar Panels': epcAnswers.solarPanels })
     };
 
     if (hasDiscount) {
@@ -277,6 +285,35 @@ if (hasDiscount) {
     await base('Bookings').update(bookingId, updateFields);
 
     console.log(`✅ Service modified for booking ${fields['Booking Reference']}`);
+
+    // ── Notify EPC partner if this modification added/kept an EPC add-on ────
+    try {
+      const hasEpc = (addons || []).some(a => (a.id || '').toLowerCase().startsWith('epc'));
+      const bookingRegion = (fields['Region'] || '').toLowerCase();
+
+      if (hasEpc && EPC_PARTNER_REGIONS.includes(bookingRegion)) {
+        await sendEpcPartnerNotification({
+          bookingRef: fields['Booking Reference'],
+          date: fields['Date'],
+          time: fields['Time'],
+          propertyAddress: fields['Property Address'],
+          postcode: fields['Postcode'],
+          accessType: fields['Access Type'] || '',
+          keyPickupLocation: fields['Key Pickup Location'] || '',
+          region: bookingRegion,
+          addons: addons || [],
+          epcAnswers: epcAnswers || {
+            propertyAge: fields['EPC Property Age'] || '',
+            extensionAge: fields['EPC Extension Age'] || '',
+            loftConversion: fields['EPC Loft Conversion'] || '',
+            solarPanels: fields['EPC Solar Panels'] || ''
+          }
+        });
+        console.log('✅ EPC partner notified after modification');
+      }
+    } catch (epcEmailError) {
+      console.error('⚠️ EPC partner notification failed:', epcEmailError);
+    }
 
     // ✅ NEW: Update Active Bookings record to match
     try {

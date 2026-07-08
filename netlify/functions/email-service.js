@@ -5,6 +5,9 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL = 'Markeb Media <commercial@markebmedia.com>';
 const BCC_EMAIL = 'commercial@markebmedia.com';
+const EPC_PARTNER_NAME = 'Nathan Davenport';
+const EPC_PARTNER_EMAIL = 'Nathand1255@mail.com';
+const EPC_PARTNER_REGIONS = ['west', 'north-west', 'north'];
 const SITE_URL = 'https://markebmedia.com';
 const LOGO_URL = 'https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png';
 const MANAGE_BOOKING_PATH = '/manage-booking';
@@ -163,6 +166,19 @@ function getBrandingAnswersSection(booking) {
       ${rows}
     </div>
   `;
+}
+
+// Detect whether this booking includes an EPC add-on (covers both admin 'epc'
+// id and website 'epc-standard' / 'epc-large' ids)
+function hasEpcAddon(booking) {
+  return (booking.addons || []).some(a =>
+    (a.id || '').toLowerCase().startsWith('epc')
+  );
+}
+
+// Nathan only covers West, North West, and North
+function isEpcPartnerRegion(booking) {
+  return EPC_PARTNER_REGIONS.includes((booking.region || '').toLowerCase());
 }
 
 // ✅ Format EPC Answers (internal email only — for forwarding to EPC partner)
@@ -545,6 +561,10 @@ async function sendBookingConfirmation(booking) {
     html: emailHtml
   });
 
+  if (hasEpcAddon(booking) && isEpcPartnerRegion(booking)) {
+    await sendEpcPartnerNotification(booking);
+  }
+
   if (isAdminBooking) {
     const internalContent = `
       <h2>🔔 New Admin Booking Created</h2>
@@ -614,6 +634,69 @@ async function sendBookingConfirmation(booking) {
       html: internalEmailHtml
     });
   }
+}
+
+// EPC Partner Notification — address and EPC answers only, no pricing
+async function sendEpcPartnerNotification(booking) {
+  const epc = booking.epcAnswers || {};
+
+  const content = `
+    <h2>⚡ New EPC Visit Scheduled</h2>
+    <p>Hi ${EPC_PARTNER_NAME},</p>
+    <p>A new booking has been made that includes an EPC certificate. Details below.</p>
+
+    <div class="booking-details">
+      <div class="detail-row">
+        <span class="detail-label">Booking Reference</span>
+        <span class="detail-value">${booking.bookingRef}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Date &amp; Time</span>
+        <span class="detail-value">${formatDate(booking.date)} at ${booking.time}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Property Address</span>
+        <span class="detail-value">${booking.propertyAddress}${booking.postcode ? `, ${booking.postcode}` : ''}</span>
+      </div>
+      ${getAccessTypeSection(booking)}
+      ${epc.propertyAge ? `
+      <div class="detail-row">
+        <span class="detail-label">Age of Property</span>
+        <span class="detail-value">${epc.propertyAge}</span>
+      </div>` : ''}
+      ${epc.extensionAge ? `
+      <div class="detail-row">
+        <span class="detail-label">Age of Extensions</span>
+        <span class="detail-value">${epc.extensionAge}</span>
+      </div>` : ''}
+      ${epc.loftConversion ? `
+      <div class="detail-row">
+        <span class="detail-label">Loft Conversion</span>
+        <span class="detail-value">${epc.loftConversion}</span>
+      </div>` : ''}
+      ${epc.solarPanels ? `
+      <div class="detail-row">
+        <span class="detail-label">Solar Panels</span>
+        <span class="detail-value">
+          ${epc.solarPanels}
+          ${epc.solarPanels === 'Yes' ? '<br><span style="font-size:12px;color:#92400e;background:#fef3c7;border:1px solid #f59e0b;padding:2px 8px;border-radius:4px;font-weight:600;">⚠️ MCS Certificate Required</span>' : ''}
+        </span>
+      </div>` : ''}
+    </div>
+
+    <p>Please make arrangements to visit the property at the scheduled time above.</p>
+    <p>Best regards,<br><strong>Markeb Media</strong></p>
+  `;
+
+  const emailHtml = getEmailLayout(content);
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: EPC_PARTNER_EMAIL,
+    bcc: BCC_EMAIL,
+    subject: `EPC Visit Scheduled — ${booking.bookingRef}`,
+    html: emailHtml
+  });
 }
 
 // 2. Payment Confirmation
@@ -1271,5 +1354,6 @@ module.exports = {
   sendCardUpdatedConfirmation,
   sendReviewRewardEmail,
   sendTimeRequestApproval,
-  sendTimeRequestDecline
+  sendTimeRequestDecline,
+  sendEpcPartnerNotification
 };

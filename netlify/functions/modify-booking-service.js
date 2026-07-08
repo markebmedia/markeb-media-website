@@ -1,6 +1,7 @@
 // netlify/functions/modify-booking-service.js
 const Airtable = require('airtable');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { sendEpcPartnerNotification } = require('./email-service');
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
@@ -127,6 +128,36 @@ exports.handler = async (event, context) => {
 
     await base('Bookings').update(bookingId, updateFields);
     console.log('✅ Bookings table updated');
+
+    // ── Notify EPC partner if this modification added/kept an EPC add-on ────
+    const EPC_PARTNER_REGIONS = ['west', 'north-west', 'north'];
+    const hasEpc = (addons || []).some(a => (a.id || '').toLowerCase().startsWith('epc'));
+    const bookingRegion = (f['Region'] || '').toLowerCase();
+
+    if (hasEpc && EPC_PARTNER_REGIONS.includes(bookingRegion)) {
+      try {
+        await sendEpcPartnerNotification({
+          bookingRef,
+          date: f['Date'],
+          time: f['Time'],
+          propertyAddress: f['Property Address'],
+          postcode: f['Postcode'],
+          accessType: f['Access Type'] || '',
+          keyPickupLocation: f['Key Pickup Location'] || '',
+          region: bookingRegion,
+          addons: addons || [],
+          epcAnswers: epcAnswers || {
+            propertyAge: f['EPC Property Age'] || '',
+            extensionAge: f['EPC Extension Age'] || '',
+            loftConversion: f['EPC Loft Conversion'] || '',
+            solarPanels: f['EPC Solar Panels'] || ''
+          }
+        });
+        console.log('✅ EPC partner notified after modification');
+      } catch (epcEmailError) {
+        console.error('⚠️ EPC partner notification failed:', epcEmailError);
+      }
+    }
 
     // ── Sync Active Bookings table ───────────────────────────────────────────
     try {
