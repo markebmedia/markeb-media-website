@@ -12476,6 +12476,23 @@ function updatePipelineStats() {
   if (el('pipelineWon'))       el('pipelineWon').textContent       = prospects.filter(p=>p.stage==='Won').length;
 }
 
+let pipelineCollapsedStages = new Set();
+
+function togglePipelineStage(stageKey) {
+  const body = document.getElementById(`pipeline-body-${stageKey}`);
+  const chevron = document.getElementById(`pipeline-chevron-${stageKey}`);
+  if (!body) return;
+  if (pipelineCollapsedStages.has(stageKey)) {
+    pipelineCollapsedStages.delete(stageKey);
+    body.style.display = '';
+    if (chevron) chevron.style.transform = 'rotate(0deg)';
+  } else {
+    pipelineCollapsedStages.add(stageKey);
+    body.style.display = 'none';
+    if (chevron) chevron.style.transform = 'rotate(-90deg)';
+  }
+}
+
 function renderPipeline() {
   const container = document.getElementById('pipelineContainer');
   if (!container) return;
@@ -12499,16 +12516,21 @@ function renderPipeline() {
   PIPELINE_STAGES.forEach(stageName => {
     const items = grouped[stageName];
     const sc = STAGE_COLORS[stageName];
+    const stageKey = stageName.replace(/\s+/g, '-');
+    const isCollapsed = pipelineCollapsedStages.has(stageKey);
+
     html += `
       <div style="margin-bottom:24px;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <div style="background:${sc.bg};border:2px solid ${sc.border};border-radius:8px;padding:4px 14px;font-size:13px;font-weight:700;color:${sc.color};">${stageName}</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;cursor:pointer;" onclick="togglePipelineStage('${stageKey}')">
+          <div style="background:${sc.bg};border:2px solid ${sc.border};border-radius:8px;padding:4px 14px;font-size:13px;font-weight:700;color:${sc.color};width:160px;text-align:center;flex-shrink:0;">${stageName}</div>
           <span style="font-size:13px;color:#64748b;font-weight:600;">${items.length} prospect${items.length!==1?'s':''}</span>
-        </div>`;
+          <i data-lucide="chevron-down" id="pipeline-chevron-${stageKey}" style="width:16px;height:16px;color:#94a3b8;margin-left:auto;transition:transform 0.2s ease;transform:rotate(${isCollapsed ? '-90deg' : '0deg'});"></i>
+        </div>
+        <div id="pipeline-body-${stageKey}" style="display:${isCollapsed ? 'none' : 'block'};">`;
     if (items.length === 0) {
       html += `<div style="padding:16px;background:#f8fafc;border:2px dashed #e2e8f0;border-radius:10px;text-align:center;color:#94a3b8;font-size:13px;">No prospects at this stage</div>`;
     } else {
-      html += `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th style="min-width:180px;">Owner</th><th style="min-width:220px;">Notes</th><th>Move Stage</th><th>Actions</th></tr></thead><tbody>`;
+      html += `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th style="min-width:180px;">Owner</th><th style="min-width:220px;">Notes</th><th style="width:160px;">Move Stage</th><th>Actions</th></tr></thead><tbody>`;
       const duplicateEmailsForStage = getDuplicateProspectEmails();
       const knownOwnersForStage = getKnownOwners();
       items.forEach(p => {
@@ -12545,7 +12567,7 @@ function renderPipeline() {
       });
       html += '</tbody></table>';
     }
-    html += '</div>';
+    html += '</div></div>';
   });
 
   container.innerHTML = html;
