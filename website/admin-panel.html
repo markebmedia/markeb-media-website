@@ -4512,6 +4512,25 @@ function handleAdminAccessTypeChange() {
       updateAdminEpcVisibility();
     }
 
+    function updateAdminLocalAreaVisibility() {
+      const section = document.getElementById('adminLocalAreaSection');
+      if (!section) return;
+      const serviceSelect = document.getElementById('bookingService');
+      const serviceId = serviceSelect ? serviceSelect.value : '';
+      const isGold = serviceId === 'gold-package';
+      const hasLocalAreaAddon = bookingFormData.selectedAddons.includes('local-area-highlights');
+      const shouldShow = isGold || hasLocalAreaAddon;
+
+      section.style.display = shouldShow ? 'block' : 'none';
+
+      if (!shouldShow) {
+        for (let i = 1; i <= 5; i++) {
+          const input = document.getElementById(`adminLocalPlace${i}`);
+          if (input) input.value = '';
+        }
+      }
+    }
+
     function updateAdminEpcVisibility() {
       const section = document.getElementById('adminEpcSection');
       if (!section) return;
