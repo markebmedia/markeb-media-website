@@ -6563,7 +6563,13 @@ function showModifyService(bookingId) {
     selectedAddons: [],
     squareFootage: booking.fields['Square Footage'] || null,
     squareFootageFee: booking.fields['Square Footage Fee'] || 0,
-    extraDuration: 0
+    extraDuration: 0,
+    epcAnswers: {
+      propertyAge: booking.fields['EPC Property Age'] || '',
+      extensionAge: booking.fields['EPC Extension Age'] || '',
+      loftConversion: booking.fields['EPC Loft Conversion'] || '',
+      solarPanels: booking.fields['EPC Solar Panels'] || ''
+    }
   };
   
   modalBody.innerHTML = `
@@ -6633,6 +6639,85 @@ function showModifyService(bookingId) {
       </div>
     </div>
 
+    <div id="modifyEpcSection" style="display: none; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 16px; padding: 24px; margin: 24px 0;">
+      <div style="margin-bottom: 16px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: #1e40af; color: #fff; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 12px; text-transform: uppercase;">
+          ⚡ EPC Information
+        </div>
+        <h3 style="font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 4px;">EPC Details</h3>
+        <p style="font-size: 13px; color: #64748b;">Passed directly to our EPC partner. Complete on behalf of the client where known.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Age of the property</label>
+          <select id="modifyEpcPropertyAge" class="form-input" onchange="updateModifyEpcAnswers()">
+            <option value="">-- Select approximate build period --</option>
+            <option value="Pre-1900">Pre-1900</option>
+            <option value="1900–1929">1900–1929</option>
+            <option value="1930–1949">1930–1949</option>
+            <option value="1950–1966">1950–1966</option>
+            <option value="1967–1975">1967–1975</option>
+            <option value="1976–1982">1976–1982</option>
+            <option value="1983–1990">1983–1990</option>
+            <option value="1991–1995">1991–1995</option>
+            <option value="1996–2002">1996–2002</option>
+            <option value="2003–2006">2003–2006</option>
+            <option value="2007–2011">2007–2011</option>
+            <option value="2012 onwards">2012 onwards</option>
+            <option value="Unknown">Unknown</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Age of any extensions <span style="font-weight: 400; color: #94a3b8;">— if applicable</span></label>
+          <select id="modifyEpcExtensionAge" class="form-input" onchange="updateModifyEpcAnswers()">
+            <option value="">-- No extension / Not applicable --</option>
+            <option value="Pre-1900">Pre-1900</option>
+            <option value="1900–1929">1900–1929</option>
+            <option value="1930–1949">1930–1949</option>
+            <option value="1950–1966">1950–1966</option>
+            <option value="1967–1975">1967–1975</option>
+            <option value="1976–1982">1976–1982</option>
+            <option value="1983–1990">1983–1990</option>
+            <option value="1991–1995">1991–1995</option>
+            <option value="1996–2002">1996–2002</option>
+            <option value="2003–2006">2003–2006</option>
+            <option value="2007–2011">2007–2011</option>
+            <option value="2012 onwards">2012 onwards</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Is there a loft conversion?</label>
+          <div style="display: flex; gap: 12px; margin-top: 4px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; padding: 10px 18px; flex: 1;">
+              <input type="radio" name="modifyEpcLoft" value="Yes" onchange="updateModifyEpcAnswers()" style="width: 18px; height: 18px; accent-color: #3b82f6;">
+              <span style="font-size: 14px; font-weight: 600; color: #1e293b;">Yes</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; padding: 10px 18px; flex: 1;">
+              <input type="radio" name="modifyEpcLoft" value="No" onchange="updateModifyEpcAnswers()" style="width: 18px; height: 18px; accent-color: #3b82f6;">
+              <span style="font-size: 14px; font-weight: 600; color: #1e293b;">No</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label">Are there solar panels?</label>
+          <div style="display: flex; gap: 12px; margin-top: 4px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; padding: 10px 18px; flex: 1;">
+              <input type="radio" name="modifyEpcSolar" value="Yes" onchange="document.getElementById('modifyEpcMcsNotice').style.display='block';updateModifyEpcAnswers()" style="width: 18px; height: 18px; accent-color: #3b82f6;">
+              <span style="font-size: 14px; font-weight: 600; color: #1e293b;">Yes</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; padding: 10px 18px; flex: 1;">
+              <input type="radio" name="modifyEpcSolar" value="No" onchange="document.getElementById('modifyEpcMcsNotice').style.display='none';updateModifyEpcAnswers()" style="width: 18px; height: 18px; accent-color: #3b82f6;">
+              <span style="font-size: 14px; font-weight: 600; color: #1e293b;">No</span>
+            </label>
+          </div>
+        </div>
+        <div id="modifyEpcMcsNotice" style="display: none; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px; padding: 12px;">
+          <div style="font-size: 13px; font-weight: 700; color: #92400e; margin-bottom: 2px;">☀️ MCS Certificate Required</div>
+          <div style="font-size: 12px; color: #92400e;">Properties with solar panels require a valid MCS certificate for the EPC assessment.</div>
+        </div>
+      </div>
+    </div>
+
     <div id="modifyPriceBreakdown" style="background: #f8fafc; border-radius: 12px; padding: 20px; margin: 24px 0;">
       <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
         <span style="color: #64748b;">Service</span>
@@ -6695,7 +6780,8 @@ let modifyServiceData = {
   selectedAddons: [],
   squareFootage: null,
   squareFootageFee: 0,
-  extraDuration: 0
+  extraDuration: 0,
+  epcAnswers: {}
 };
 
 function updateServicePrice(resetAddons = true) {
@@ -6751,6 +6837,7 @@ function updateServicePrice(resetAddons = true) {
   if (resetAddons) {
     modifyServiceData.selectedAddons = [];
   }
+  updateModifyEpcVisibility();
   calculateModifyPrice();
 }
 
@@ -6761,7 +6848,44 @@ function toggleModifyAddon(addonId) {
   } else {
     modifyServiceData.selectedAddons.push(addonId);
   }
+  updateModifyEpcVisibility();
   calculateModifyPrice();
+}
+
+function updateModifyEpcVisibility() {
+  const section = document.getElementById('modifyEpcSection');
+  if (!section) return;
+  const hasEpc = modifyServiceData.selectedAddons.includes('epc');
+  section.style.display = hasEpc ? 'block' : 'none';
+
+  if (hasEpc) {
+    const a = modifyServiceData.epcAnswers || {};
+    const ageEl = document.getElementById('modifyEpcPropertyAge');
+    const extEl = document.getElementById('modifyEpcExtensionAge');
+    if (ageEl) ageEl.value = a.propertyAge || '';
+    if (extEl) extEl.value = a.extensionAge || '';
+    if (a.loftConversion) {
+      const loftRadio = document.querySelector(`input[name="modifyEpcLoft"][value="${a.loftConversion}"]`);
+      if (loftRadio) loftRadio.checked = true;
+    }
+    if (a.solarPanels) {
+      const solarRadio = document.querySelector(`input[name="modifyEpcSolar"][value="${a.solarPanels}"]`);
+      if (solarRadio) solarRadio.checked = true;
+      const mcsNotice = document.getElementById('modifyEpcMcsNotice');
+      if (mcsNotice) mcsNotice.style.display = a.solarPanels === 'Yes' ? 'block' : 'none';
+    }
+  } else {
+    modifyServiceData.epcAnswers = {};
+  }
+}
+
+function updateModifyEpcAnswers() {
+  modifyServiceData.epcAnswers = {
+    propertyAge: document.getElementById('modifyEpcPropertyAge')?.value || '',
+    extensionAge: document.getElementById('modifyEpcExtensionAge')?.value || '',
+    loftConversion: document.querySelector('input[name="modifyEpcLoft"]:checked')?.value || '',
+    solarPanels: document.querySelector('input[name="modifyEpcSolar"]:checked')?.value || ''
+  };
 }
 
 function adjustModifyBedrooms(change) {
@@ -6928,6 +7052,7 @@ async function confirmModifyService(bookingId) {
         addonsPrice: addonsFee,
         squareFootage: modifyServiceData.squareFootage ?? null,
         squareFootageFee: sqftFee,
+        epcAnswers: modifyServiceData.epcAnswers || {},
         totalPrice: totalPrice,
         sendEmail
       })
