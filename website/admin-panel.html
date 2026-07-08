@@ -12530,7 +12530,18 @@ function renderPipeline() {
     if (items.length === 0) {
       html += `<div style="padding:16px;background:#f8fafc;border:2px dashed #e2e8f0;border-radius:10px;text-align:center;color:#94a3b8;font-size:13px;">No prospects at this stage</div>`;
     } else {
-      html += `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th style="min-width:180px;">Owner</th><th style="min-width:220px;">Notes</th><th style="width:160px;">Move Stage</th><th>Actions</th></tr></thead><tbody>`;
+      html += `<table class="data-table" style="table-layout:fixed;width:100%;">
+        <colgroup>
+          <col style="width:12%;">
+          <col style="width:16%;">
+          <col style="width:12%;">
+          <col style="width:12%;">
+          <col style="width:14%;">
+          <col style="width:18%;">
+          <col style="width:160px;">
+          <col style="width:120px;">
+        </colgroup>
+        <thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th>Owner</th><th>Notes</th><th>Move Stage</th><th>Actions</th></tr></thead><tbody>`;
       const duplicateEmailsForStage = getDuplicateProspectEmails();
       const knownOwnersForStage = getKnownOwners();
       items.forEach(p => {
