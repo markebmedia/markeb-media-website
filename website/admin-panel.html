@@ -1499,6 +1499,29 @@ body {
   min-width: 900px;
 }
 
+/* Fix overlapping text in Pipeline & Saved Prospects tables */
+#pipelineContainer .data-table td,
+#savedProspectsContainer .data-table td {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  overflow: hidden;
+  vertical-align: top;
+  line-height: 1.4;
+}
+
+#pipelineContainer .data-table td[data-label="Email"],
+#savedProspectsContainer .data-table td[data-label="Email"] {
+  font-size: 11px;
+  word-break: break-all;
+}
+
+#pipelineContainer .data-table select,
+#savedProspectsContainer .data-table select {
+  max-width: 100%;
+  font-size: 12px;
+}
+
 /* ===== BDM MOBILE CARD STYLES ===== */
 @media (max-width: 768px) {
 
