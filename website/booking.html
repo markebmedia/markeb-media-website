@@ -1887,6 +1887,7 @@ width: 100%;
     let bookingData = {
       postcode: '',
       propertyAddress: '',
+
       region: '', // ✅ FIXED: lowercase for consistency
       mediaSpecialist: '',
       selectedDate: null,
@@ -1989,6 +1990,14 @@ width: 100%;
     description: 'Showcase the lifestyle around the property — nearby cafes, parks, green spaces, transport links and local amenities captured on shoot day',
     appliesToVideo: true
   },
+  'matterport-tour': {
+    id: 'matterport-tour',
+    name: 'Matterport Virtual Tour',
+    price: 250.00,
+    duration: 90,
+    description: 'An immersive 3D walkthrough tour of the property, letting buyers explore every room online before booking a viewing',
+    appliesToVideo: false
+  },
   'epc-standard': {
     id: 'epc-standard',
     name: 'EPC (Up to 4 Bedrooms)',
@@ -2038,13 +2047,22 @@ width: 100%;
       availableAddons: []
     },
     {
+      id: 'platinum-package',
+      name: 'Platinum Package',
+      price: 369.00,
+      duration: 240,
+      description: 'Everything in our Silver Package, plus a Matterport Virtual Tour included — giving buyers a fully immersive 3D walkthrough of the property online.',
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+    },
+    {
       id: 'gold-package',
       name: 'Gold Package',
       price: 500.00,
       duration: 150,
       description: 'Everything in our Silver Package with Elevate Your Edit, Property Speed Tour, Local Area Highlights and a Plus Floor Plan included — the complete package for high-end listings.',
       isPropertyService: true,
-      availableAddons: ['add-branded-outro', 'epc-standard', 'epc-large']
+      availableAddons: ['add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
     },
     {
       id: 'silver-package',
@@ -2054,7 +2072,7 @@ width: 100%;
       description: 'Everything in our Bronze Package, plus full videography and drone shots with classic editing included for complete property marketing.',
       popular: true,
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
     },
     {
       id: 'bronze-package',
@@ -2063,7 +2081,7 @@ width: 100%;
       duration: 90,
       description: 'Up to 30 interior and exterior photos, plus drone shots included. Professional photography.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights', 'matterport-tour', 'epc-standard', 'epc-large']
     },
     {
       id: 'aerial-content',
@@ -2072,7 +2090,7 @@ width: 100%;
       duration: 20,
       description: 'Stunning aerial photography and/or videography of your property. Choose photo, video, or both — selecting both automatically upgrades you to our All In One Drone package and saves you £39.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
     },
     {
       id: 'property-video',
@@ -2081,7 +2099,7 @@ width: 100%;
       duration: 60,
       description: 'Shot in 4K with classic editing included (color grading & smooth transitions) to captivate viewers and drive enquiries.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
     },
     {
       id: 'property-photo',
@@ -2089,6 +2107,15 @@ width: 100%;
       price: 99.00,
       duration: 45,
       description: 'Up to 30 magazine-quality images that make your property irresistible to potential buyers.',
+      isPropertyService: true,
+      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'matterport-tour', 'epc-standard', 'epc-large']
+    },
+    {
+      id: 'matterport-virtual-tour',
+      name: 'Matterport Virtual Tour',
+      price: 250.00,
+      duration: 90,
+      description: 'A fully immersive 3D walkthrough tour of the property, letting buyers explore every room online before they visit in person.',
       isPropertyService: true,
       availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
     }
@@ -2901,6 +2928,7 @@ function applyAerialSelection() {
   if (both) {
     // Upgrade to all-in-one-drone
     const services = SERVICES[getCatalogKeyForRegion(bookingData.region)] || SERVICES.south;
+    const isNorthCatalog = getCatalogKeyForRegion(bookingData.region) === 'north';
     const allInOne = {
       id: 'all-in-one-drone',
       name: 'All In One Drone',
@@ -2908,13 +2936,16 @@ function applyAerialSelection() {
       duration: 45,
       description: '10 aerial photos and a 30-second drone video with classic editing included.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+      availableAddons: isNorthCatalog
+        ? ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
+        : ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
     };
     bookingData.service = allInOne;
     bookingData.basePrice = 179.00;
     upgradeNotice.style.display = 'block';
     continueBtn.disabled = false;
   } else if (photoOnly) {
+    const isNorthCatalog = getCatalogKeyForRegion(bookingData.region) === 'north';
     bookingData.service = {
       id: 'drone-photo',
       name: 'Aerial Photography',
@@ -2922,12 +2953,15 @@ function applyAerialSelection() {
       duration: 20,
       description: 'Up to 10 stunning aerial photographs.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
+      availableAddons: isNorthCatalog
+        ? ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights', 'matterport-tour', 'epc-standard', 'epc-large']
+        : ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
     };
     bookingData.basePrice = 109.00;
     upgradeNotice.style.display = 'none';
     continueBtn.disabled = false;
   } else if (videoOnly) {
+    const isNorthCatalog = getCatalogKeyForRegion(bookingData.region) === 'north';
     bookingData.service = {
       id: 'drone-video',
       name: 'Aerial Videography',
@@ -2935,7 +2969,9 @@ function applyAerialSelection() {
       duration: 20,
       description: 'Up to 30-second cinematic aerial showcase with classic editing included.',
       isPropertyService: true,
-      availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+      availableAddons: isNorthCatalog
+        ? ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
+        : ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
     };
     bookingData.basePrice = 109.00;
     upgradeNotice.style.display = 'none';

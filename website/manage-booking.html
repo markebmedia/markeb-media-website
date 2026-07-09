@@ -966,20 +966,28 @@ body {
           availableAddons: []
         },
         {
+          id: 'platinum-package',
+          name: 'Platinum Package',
+          price: 369.00,
+          duration: 240,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+        },
+        {
           id: 'gold-package',
           name: 'Gold Package',
           price: 500.00,
           duration: 150,
           isPropertyService: true,
-          availableAddons: ['add-branded-outro', 'epc-standard', 'epc-large']
+          availableAddons: ['add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
         },
         {
           id: 'silver-package',
           name: 'Silver Package',
           price: 219.00,
-          duration: 90,
+          duration: 150,
           isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
         },
         {
           id: 'bronze-package',
@@ -987,7 +995,7 @@ body {
           price: 169.00,
           duration: 90,
           isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights', 'matterport-tour', 'epc-standard', 'epc-large']
         },
         {
           id: 'all-in-one-drone',
@@ -995,7 +1003,7 @@ body {
           price: 179.00,
           duration: 45,
           isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
         },
         {
           id: 'property-video',
@@ -1003,7 +1011,7 @@ body {
           price: 129.00,
           duration: 60,
           isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
         },
         {
           id: 'property-photo',
@@ -1011,7 +1019,7 @@ body {
           price: 99.00,
           duration: 45,
           isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'matterport-tour', 'epc-standard', 'epc-large']
         },
         {
           id: 'drone-video',
@@ -1019,7 +1027,7 @@ body {
           price: 109.00,
           duration: 20,
           isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
         },
         {
           id: 'drone-photo',
@@ -1027,7 +1035,15 @@ body {
           price: 109.00,
           duration: 20,
           isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'matterport-tour', 'epc-standard', 'epc-large']
+        },
+        {
+          id: 'matterport-virtual-tour',
+          name: 'Matterport Virtual Tour',
+          price: 250.00,
+          duration: 90,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
         }
       ],
       south: [
@@ -1043,7 +1059,7 @@ body {
           id: 'silver-package',
           name: 'Silver Package',
           price: 219.00,
-          duration: 90,
+          duration: 150,
           isPropertyService: true,
           availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
         },
@@ -1103,73 +1119,105 @@ body {
         id: 'standard-floor-plan',
         name: 'Standard Floor Plan',
         price: 20.00,
-        description: '2D floor plan to help buyers visualize the property layout'
+        duration: 0,
+        description: '2D floor plan to help buyers visualize the property layout',
+        appliesToVideo: false
       },
       'plus-floor-plan': {
         id: 'plus-floor-plan',
         name: 'Plus Floor Plan',
         price: 30.00,
-        description: 'Enhanced 2D floor plan with measurements and room labels'
+        duration: 0,
+        description: 'Enhanced 2D floor plan with measurements and room labels',
+        appliesToVideo: false
       },
       'floor-plan-3d': {
         id: 'floor-plan-3d',
         name: 'Floor Plan Bundle',
         price: 83.33,
-        description: 'Immersive 3D floor plan — includes 2D & 3D floor plan at no extra cost.'
+        duration: 0,
+        description: 'Immersive 3D floor plan — includes 2D & 3D floor plan at no extra cost.',
+        appliesToVideo: false
       },
       'elevate-edit': {
         id: 'elevate-edit',
         name: 'Elevate Your Edit',
         price: 62.50,
-        description: 'Transform your video with premium editing including dynamic transitions, bold captions, spotlight features'
+        duration: 0,
+        description: 'Transform your video with premium editing including dynamic transitions, bold captions, spotlight features',
+        appliesToVideo: true
       },
       'property-drone-photo': {
         id: 'property-drone-photo',
         name: 'Property Drone Photography',
         price: 109.00,
-        description: 'Up to 10 stunning aerial photographs'
+        duration: 15,
+        description: 'Up to 10 stunning aerial photographs',
+        appliesToVideo: false
       },
       'property-drone-video': {
         id: 'property-drone-video',
         name: 'Property Drone Videography',
         price: 109.00,
-        description: 'Up to 30-second cinematic aerial showcase'
+        duration: 15,
+        description: 'Up to 30-second cinematic aerial showcase',
+        appliesToVideo: true
       },
       'property-video': {
         id: 'property-video',
         name: 'Property Videography',
         price: 129.00,
-        description: 'Shot in 4K to captivate viewers and drive enquiries'
+        duration: 60,
+        description: 'Shot in 4K to captivate viewers and drive enquiries',
+        appliesToVideo: true
       },
       'property-speed-tours': {
         id: 'property-speed-tours',
         name: 'Property Speed Tours',
         price: 50.00,
-        description: 'Quick walkthrough video tour of the property'
+        duration: 0,
+        description: 'Quick walkthrough video tour of the property',
+        appliesToVideo: true
       },
       'add-branded-outro': {
         id: 'add-branded-outro',
         name: 'Add Branded Outro To Video',
         price: 0.00,
-        description: 'Add your branded outro to any video content'
+        duration: 0,
+        description: 'Add your branded outro to any video content',
+        appliesToVideo: true
       },
       'local-area-highlights': {
         id: 'local-area-highlights',
         name: 'Local Area Highlights',
         price: 100.00,
-        description: 'Showcase the lifestyle around the property — nearby cafes, parks, green spaces, transport links and local amenities captured on shoot day'
+        duration: 30,
+        description: 'Showcase the lifestyle around the property — nearby cafes, parks, green spaces, transport links and local amenities captured on shoot day',
+        appliesToVideo: true
+      },
+      'matterport-tour': {
+        id: 'matterport-tour',
+        name: 'Matterport Virtual Tour',
+        price: 250.00,
+        duration: 90,
+        description: 'An immersive 3D walkthrough tour of the property, letting buyers explore every room online before booking a viewing',
+        appliesToVideo: false
       },
       'epc-standard': {
         id: 'epc-standard',
         name: 'EPC (Up to 4 Bedrooms)',
         price: 70.00,
-        description: 'Energy Performance Certificate for properties up to 4 bedrooms'
+        duration: 0,
+        description: 'Energy Performance Certificate for properties up to 4 bedrooms',
+        appliesToVideo: false
       },
       'epc-large': {
         id: 'epc-large',
         name: 'EPC (5+ Bedrooms)',
         price: 70.00,
+        duration: 0,
         description: 'Energy Performance Certificate — £70 base + £10 per bedroom above 4',
+        appliesToVideo: false,
         dynamicPrice: true
       }
     };
@@ -1451,12 +1499,21 @@ if (booking.addons && booking.addons.length > 0) {
           }
         }
 
+        // ✅ Include duration of the booking's existing add-ons
+        let addonsDuration = 0;
+        if (Array.isArray(bookingData.addons)) {
+          bookingData.addons.forEach(a => {
+            const addon = ADDONS[a.id];
+            if (addon) addonsDuration += addon.duration;
+          });
+        }
+
         const extraDuration = calculateExtraDuration(
           serviceId,
           bookingData.bedrooms || 0,
           bookingData.squareFootage || null
         );
-        const totalDuration = serviceDuration + extraDuration;
+        const totalDuration = serviceDuration + addonsDuration + extraDuration;
         
 
         const response = await fetch('/.netlify/functions/check-availability', {
@@ -1982,8 +2039,16 @@ if (booking.addons && booking.addons.length > 0) {
       });
 
       const sqftFee = modifyData.squareFootage > 3000 ? 125 : 0;
+
+      // ✅ Include duration of the newly selected add-ons
+      let addonsDuration = 0;
+      modifyData.selectedAddons.forEach(addonId => {
+        const addon = ADDONS[addonId];
+        if (addon) addonsDuration += addon.duration;
+      });
+
       const extraDuration = calculateExtraDuration(service.id, modifyData.bedrooms, modifyData.squareFootage);
-      const newTotalDuration = service.duration + extraDuration;
+      const newTotalDuration = service.duration + addonsDuration + extraDuration;
 
       const newTotalPrice = (service.price + extraBedroomFee + addonsPrice + sqftFee) * 1.2;
       const priceDifference = newTotalPrice - bookingData.totalPrice;

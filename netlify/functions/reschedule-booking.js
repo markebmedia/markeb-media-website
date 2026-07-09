@@ -101,12 +101,14 @@ exports.handler = async (event, context) => {
     console.log(`Using existing booking data: postcode=${postcode}, region=${region}`);
 
     // Check availability
+    const bookingDuration = fields['Duration (mins)'] || 90;
     const availabilityCheck = await checkAvailabilityForReschedule(
       postcode, 
       region, 
       newDate, 
       newTime,
-      booking.id
+      booking.id,
+      bookingDuration
     );
 
     if (!availabilityCheck.available) {
@@ -199,7 +201,7 @@ exports.handler = async (event, context) => {
 };
 
 // Check availability using SAME logic as check-availability.js
-async function checkAvailabilityForReschedule(postcode, region, selectedDate, requestedTime, excludeBookingId) {
+async function checkAvailabilityForReschedule(postcode, region, selectedDate, requestedTime, excludeBookingId, requestedDuration) {
   try {
     // Check 24-hour notice
     const selectedDateObj = new Date(selectedDate + 'T00:00:00');
@@ -243,6 +245,20 @@ async function checkAvailabilityForReschedule(postcode, region, selectedDate, re
     }
 
     // Step 2: Check if requested time conflicts with buffers
+    const requestedDurationMinutes = requestedDuration || 90;
+    const requestedEndMinutes = requestedTimeMinutes + requestedDurationMinutes;
+    const requestedEndWithBuffer = requestedEndMinutes + fixedBufferMinutes;
+
+    // ✅ Block if the new (potentially longer) shoot would run past end of day
+    const endOfDayMinutes = timeToMinutes('16:30');
+    if (requestedEndMinutes > endOfDayMinutes) {
+      return {
+        available: false,
+        reason: 'Booking duration would run past available hours',
+        availableSlots: await calculateAvailableSlots(postcode, bookings)
+      };
+    }
+
     for (const booking of bookings) {
       const bookingStartMinutes = timeToMinutes(booking.startTime);
       const bookingEndMinutes = bookingStartMinutes + booking.duration;
@@ -255,6 +271,15 @@ async function checkAvailabilityForReschedule(postcode, region, selectedDate, re
         return {
           available: false,
           reason: `Conflicts with booking at ${booking.startTime}`,
+          availableSlots: await calculateAvailableSlots(postcode, bookings)
+        };
+      }
+
+      // ✅ NEW: Check if THIS booking's own duration would run forward into the next booking's buffer
+      if (requestedEndWithBuffer > bufferStartMinutes && requestedTimeMinutes < bookingStartMinutes) {
+        return {
+          available: false,
+          reason: `Your shoot duration (${requestedDurationMinutes} mins) would overlap with the booking at ${booking.startTime}`,
           availableSlots: await calculateAvailableSlots(postcode, bookings)
         };
       }

@@ -89,6 +89,25 @@ exports.handler = async (event, context) => {
     // ── Update Bookings table ────────────────────────────────────────────────
     const totalDuration = (newServiceDuration || 0) + (addonsDuration || 0) + (extraDuration || 0);
 
+    // ── Verify the new duration doesn't create a conflict with other bookings ──
+    try {
+      const specialistName = f['Media Specialist'];
+      const otherBookings = await fetchOtherBookingsForSpecialistOnDate(specialistName, f['Date'], bookingId);
+      const overlapCheck = checkDurationOverlap(f['Time'], totalDuration, otherBookings);
+
+      if (overlapCheck.conflict) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            error: `The new service duration (${totalDuration} mins) would now conflict with another booking at ${overlapCheck.withBooking}. Please reschedule this booking to a different time before applying this service change.`
+          })
+        };
+      }
+    } catch (availabilityError) {
+      console.error('⚠️ Availability check during modification failed (proceeding anyway):', availabilityError);
+    }
+
     const updateFields = {
       'Service':              newServiceName,
       'Service ID':           newServiceId,
@@ -399,3 +418,56 @@ exports.handler = async (event, context) => {
     };
   }
 };
+
+// ── Availability helpers (mirrors check-availability.js buffer logic) ────────
+
+async function fetchOtherBookingsForSpecialistOnDate(specialistName, date, excludeBookingId) {
+  const filterFormula = `AND(
+    {Media Specialist} = '${specialistName}',
+    IS_SAME({Date}, '${date}', 'day'),
+    OR(
+      {Booking Status} = 'Booked',
+      {Booking Status} = 'Reserved',
+      {Booking Status} = 'Confirmed'
+    ),
+    RECORD_ID() != '${excludeBookingId}'
+  )`;
+
+  const records = await base('Bookings')
+    .select({
+      filterByFormula: filterFormula,
+      sort: [{ field: 'Time', direction: 'asc' }]
+    })
+    .firstPage();
+
+  return records.map(record => ({
+    startTime: record.fields['Time'],
+    duration: record.fields['Duration (mins)'] || 90
+  }));
+}
+
+function checkDurationOverlap(startTime, duration, otherBookings) {
+  const fixedBufferMinutes = 45;
+  const requestedStart = timeToMinutes(startTime);
+  const requestedEnd = requestedStart + duration;
+  const requestedEndWithBuffer = requestedEnd + fixedBufferMinutes;
+
+  for (const booking of otherBookings) {
+    const bookingStart = timeToMinutes(booking.startTime);
+    const bookingEnd = bookingStart + booking.duration;
+    const bufferStart = bookingStart - fixedBufferMinutes;
+    const bufferEnd = bookingEnd + fixedBufferMinutes;
+
+    if (requestedStart < bufferEnd && requestedEndWithBuffer > bufferStart) {
+      return { conflict: true, withBooking: booking.startTime };
+    }
+  }
+
+  return { conflict: false };
+}
+
+function timeToMinutes(timeString) {
+  if (!timeString) return 0;
+  const [hours, minutes] = timeString.split(':').map(Number);
+  return hours * 60 + minutes;
+}
