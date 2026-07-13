@@ -1776,6 +1776,10 @@ body {
       <i data-lucide="users" class="nav-icon" style="width: 20px; height: 20px;"></i>
       All Clients
     </div>
+    <div class="nav-item" onclick="showSection('retainer-clients')">
+      <i data-lucide="repeat" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      Retainer Clients
+    </div>
   </div>
 
   <div class="nav-section">
@@ -2417,7 +2421,44 @@ body {
       </div>
     </div>
 
-  <!-- Invoices Section -->
+  <!-- Retainer Clients Section -->
+<div class="admin-section" id="retainer-clients">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h2 style="font-size:24px;font-weight:700;margin-bottom:4px;">Retainer Clients</h2>
+      <p style="color:#64748b;font-size:14px;">Manage clients on retainer packages — services, pricing, contracts</p>
+    </div>
+    <button class="btn btn-primary" onclick="showRetainerModal()">
+      <i data-lucide="plus-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Add Retainer
+    </button>
+  </div>
+
+  <div class="stats-grid" style="margin-bottom:24px;">
+    <div class="stat-card"><div class="stat-value" id="retainerTotalCount">0</div><div class="stat-label">Active Retainers</div></div>
+    <div class="stat-card"><div class="stat-value" id="retainerMonthlyValue">£0</div><div class="stat-label">Total Monthly Value (inc VAT)</div></div>
+    <div class="stat-card"><div class="stat-value" id="retainerPendingSig">0</div><div class="stat-label">Pending Signature</div></div>
+  </div>
+
+  <div class="filters-bar">
+    <input type="text" class="filter-input" id="retainerSearch" placeholder="Search by client name or email..." oninput="renderRetainerClients()">
+    <select class="filter-select" id="retainerStatusFilter" onchange="renderRetainerClients()">
+      <option value="">All Status</option>
+      <option value="Active">Active</option>
+      <option value="Pending Signature">Pending Signature</option>
+      <option value="Expired">Expired</option>
+      <option value="Cancelled">Cancelled</option>
+    </select>
+    <button class="btn btn-primary" onclick="loadRetainerClients()">
+      <i data-lucide="refresh-cw" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Refresh
+    </button>
+  </div>
+
+  <div class="calendar-container" id="retainerClientsContainer">
+    <div style="text-align:center;padding:40px;"><div class="spinner"></div></div>
+  </div>
+</div>
+
+    <!-- Invoices Section -->
 <div class="admin-section" id="invoices">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
     <div>
@@ -3276,6 +3317,101 @@ We wanted to reach out..." required></textarea>
     </div>
     <div class="modal-body" id="modifyServiceModalBody">
       <!-- Content populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<!-- Retainer Client Modal -->
+<div class="modal" id="retainerModal" onclick="closeModal('retainerModal')">
+  <div class="modal-dialog" style="max-width:720px;" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 id="retainerModalTitle">Add Retainer Client</h3>
+      <button class="modal-close" onclick="closeModal('retainerModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="retainerForm" onsubmit="saveRetainer(event)">
+
+        <div class="form-group">
+          <label class="form-label">Client (must be signed into dashboard) *</label>
+          <input type="text" id="retainerClientInput" class="form-input" list="retainerClientsList" placeholder="Type name or email..." onchange="handleRetainerClientSelect()" required>
+          <datalist id="retainerClientsList"></datalist>
+          <div style="font-size:12px;color:#64748b;margin-top:4px;">Only clients who have signed into their dashboard appear here</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Client Name</label>
+            <input type="text" id="retainerClientName" class="form-input" readonly>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Client Email</label>
+            <input type="email" id="retainerClientEmail" class="form-input" readonly>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Services Included *</label>
+          <div id="retainerServiceCheckboxes" style="display:flex;flex-direction:column;gap:10px;max-height:340px;overflow-y:auto;border:2px solid #e2e8f0;border-radius:10px;padding:14px;"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Monthly Price Breakdown (inc VAT) *</label>
+          <div style="font-size:12px;color:#64748b;margin-bottom:8px;">Enter the actual agreed monthly price for each ticked service — this is manual, not auto-calculated from the rate card.</div>
+          <div id="retainerPriceInputs" style="display:flex;flex-direction:column;gap:10px;"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:2px solid #e2e8f0;">
+            <span style="font-weight:700;font-size:16px;">Total Monthly Price (inc VAT)</span>
+            <span id="retainerTotalDisplay" style="font-weight:700;font-size:22px;color:#B46100;">£0.00</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Contract Length *</label>
+            <select id="retainerContractLength" class="form-input" required>
+              <option value="">-- Select --</option>
+              <option value="3">3 Months</option>
+              <option value="6">6 Months</option>
+              <option value="12">12 Months</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Start Date *</label>
+            <input type="date" id="retainerStartDate" class="form-input" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Status *</label>
+          <select id="retainerStatus" class="form-input" required>
+            <option value="Pending Signature">Pending Signature</option>
+            <option value="Active">Active</option>
+            <option value="Expired">Expired</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">DocuSign Contract Link</label>
+          <input type="url" id="retainerDocuSignLink" class="form-input" placeholder="https://docusign.com/...">
+          <div style="font-size:12px;color:#64748b;margin-top:4px;">Paste the DocuSign envelope/signing link once sent</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Dropbox Contract Link</label>
+          <input type="url" id="retainerDropboxLink" class="form-input" placeholder="https://dropbox.com/...">
+          <div style="font-size:12px;color:#64748b;margin-top:4px;">Signed contract copy stored in Dropbox — saved against this client</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Internal Notes</label>
+          <textarea id="retainerNotes" class="form-input" rows="3" placeholder="Any additional notes..."></textarea>
+        </div>
+
+        <div class="button-group" style="margin-top:24px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('retainerModal')" style="flex:1;">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveRetainerBtn" style="flex:2;">Save Retainer</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -8632,6 +8768,317 @@ async function deleteBlockedTime(recordId, date) {
     alert('❌ Failed to remove time block: ' + error.message);
   }
 }
+
+// ===== RETAINER CLIENTS =====
+
+const RETAINER_SERVICES_LIST = [
+  ...SERVICES_CATALOG.north.map(s => ({ id: s.id, name: s.name })),
+  ...Object.values(ADDONS_CATALOG).map(a => ({ id: a.id, name: a.name }))
+].filter((s, i, arr) => arr.findIndex(x => x.id === s.id) === i);
+
+let allRetainerClients = [];
+let retainerSelectedServices = [];
+let currentRetainerId = null;
+
+async function loadRetainerClients() {
+  const container = document.getElementById('retainerClientsContainer');
+  container.innerHTML = '<div style="text-align:center;padding:40px;"><div class="spinner"></div></div>';
+  try {
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ method: 'GET', table: 'Retainer Clients', sort: [{ field: 'Start Date', direction: 'desc' }] })
+    });
+    const data = await response.json();
+    allRetainerClients = data.records || [];
+    renderRetainerClients();
+    updateRetainerStats();
+  } catch (error) {
+    console.error('Error loading retainer clients:', error);
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;">Error loading retainer clients — check the "Retainer Clients" table exists in Airtable</div>';
+  }
+}
+
+function updateRetainerStats() {
+  const active = allRetainerClients.filter(r => r.fields['Status'] === 'Active');
+  const pending = allRetainerClients.filter(r => r.fields['Status'] === 'Pending Signature');
+  const totalValue = active.reduce((sum, r) => sum + parseFloat(r.fields['Total Monthly Price'] || 0), 0);
+  document.getElementById('retainerTotalCount').textContent = active.length;
+  document.getElementById('retainerMonthlyValue').textContent = `£${totalValue.toFixed(2)}`;
+  document.getElementById('retainerPendingSig').textContent = pending.length;
+}
+
+function renderRetainerClients() {
+  const container = document.getElementById('retainerClientsContainer');
+  const search = (document.getElementById('retainerSearch')?.value || '').toLowerCase();
+  const statusFilter = document.getElementById('retainerStatusFilter')?.value || '';
+
+  let filtered = [...allRetainerClients];
+  if (search) filtered = filtered.filter(r => (r.fields['Client Name']||'').toLowerCase().includes(search) || (r.fields['Client Email']||'').toLowerCase().includes(search));
+  if (statusFilter) filtered = filtered.filter(r => r.fields['Status'] === statusFilter);
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:60px;color:#94a3b8;">No retainer clients found. Click "Add Retainer" to create one.</div>';
+    return;
+  }
+
+  const statusColors = {
+    'Active': { bg:'#d1fae5', color:'#065f46' },
+    'Pending Signature': { bg:'#fef3c7', color:'#92400e' },
+    'Expired': { bg:'#fee2e2', color:'#991b1b' },
+    'Cancelled': { bg:'#f1f5f9', color:'#64748b' }
+  };
+
+  let html = `<table class="data-table"><thead><tr>
+    <th>Client</th><th>Services</th><th>Monthly Price</th><th>Contract</th><th>Status</th><th>Contract Files</th><th>Actions</th>
+  </tr></thead><tbody>`;
+
+  filtered.forEach(r => {
+    const f = r.fields;
+    const sc = statusColors[f['Status']] || statusColors['Pending Signature'];
+    const services = (f['Services'] || '').split(',').map(s => s.trim()).filter(Boolean);
+    const startDate = f['Start Date'] ? new Date(f['Start Date'] + 'T12:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
+
+    html += `
+      <tr>
+        <td data-label="Client">
+          <div style="font-weight:700;">${f['Client Name']}</div>
+          <div style="font-size:12px;color:#64748b;">${f['Client Email']}</div>
+        </td>
+        <td data-label="Services">
+          ${services.slice(0,3).map(s => `<span style="display:inline-block;background:#fff3e0;color:#7a3e00;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin:2px 2px 0 0;">${s}</span>`).join('')}
+          ${services.length > 3 ? `<span style="font-size:11px;color:#94a3b8;">+${services.length - 3} more</span>` : ''}
+        </td>
+        <td data-label="Monthly Price"><strong>£${parseFloat(f['Total Monthly Price']||0).toFixed(2)}</strong><div style="font-size:11px;color:#94a3b8;">inc VAT</div></td>
+        <td data-label="Contract">${f['Contract Length (Months)']||'—'} months<br><span style="font-size:12px;color:#64748b;">from ${startDate}</span></td>
+        <td data-label="Status"><span class="status-badge" style="background:${sc.bg};color:${sc.color};">${f['Status']}</span></td>
+        <td data-label="Contract Files">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            ${f['DocuSign Link'] ? `<a href="${f['DocuSign Link']}" target="_blank" class="btn btn-secondary btn-small">DocuSign</a>` : '<span style="font-size:11px;color:#94a3b8;">No DocuSign link</span>'}
+            ${f['Dropbox Contract Link'] ? `<a href="${f['Dropbox Contract Link']}" target="_blank" class="btn btn-secondary btn-small">Dropbox File</a>` : '<span style="font-size:11px;color:#94a3b8;">No Dropbox file</span>'}
+          </div>
+        </td>
+        <td data-label="Actions">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-small" onclick="editRetainer('${r.id}')">Edit</button>
+            <button class="btn btn-danger btn-small" onclick="deleteRetainer('${r.id}', '${f['Client Name']}')">Delete</button>
+          </div>
+        </td>
+      </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+  lucide.createIcons();
+}
+
+function populateRetainerClientsList() {
+  const datalist = document.getElementById('retainerClientsList');
+  if (!datalist) return;
+  datalist.innerHTML = '';
+  allCustomers.forEach(c => {
+    const option = document.createElement('option');
+    option.value = `${c.fields['Name']} (${c.fields['Email']})`;
+    datalist.appendChild(option);
+  });
+}
+
+function handleRetainerClientSelect() {
+  const value = document.getElementById('retainerClientInput').value;
+  const customer = allCustomers.find(c => value.includes(c.fields['Email']));
+  if (customer) {
+    document.getElementById('retainerClientName').value = customer.fields['Name'];
+    document.getElementById('retainerClientEmail').value = customer.fields['Email'];
+  } else {
+    document.getElementById('retainerClientName').value = '';
+    document.getElementById('retainerClientEmail').value = '';
+  }
+}
+
+function populateRetainerServiceCheckboxes(selected = [], prices = {}) {
+  const container = document.getElementById('retainerServiceCheckboxes');
+  container.innerHTML = RETAINER_SERVICES_LIST.map(s => `
+    <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:2px solid #e2e8f0;border-radius:8px;cursor:pointer;">
+      <input type="checkbox" value="${s.id}" ${selected.includes(s.id) ? 'checked' : ''} onchange="toggleRetainerService('${s.id}', '${s.name.replace(/'/g,"&#39;")}')">
+      <span style="font-size:13px;font-weight:600;">${s.name}</span>
+    </label>
+  `).join('');
+  retainerSelectedServices = selected.map(id => {
+    const s = RETAINER_SERVICES_LIST.find(x => x.id === id);
+    return { id, name: s ? s.name : id, price: prices[id] || 0 };
+  });
+  renderRetainerPriceInputs();
+}
+
+function toggleRetainerService(id, name) {
+  const idx = retainerSelectedServices.findIndex(s => s.id === id);
+  if (idx > -1) {
+    retainerSelectedServices.splice(idx, 1);
+  } else {
+    retainerSelectedServices.push({ id, name, price: 0 });
+  }
+  renderRetainerPriceInputs();
+}
+
+function renderRetainerPriceInputs() {
+  const container = document.getElementById('retainerPriceInputs');
+  if (retainerSelectedServices.length === 0) {
+    container.innerHTML = '<div style="font-size:13px;color:#94a3b8;">Tick services above to set their monthly price</div>';
+  } else {
+    container.innerHTML = retainerSelectedServices.map(s => `
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <span style="font-size:14px;color:#334155;flex:1;">${s.name}</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:14px;color:#64748b;">£</span>
+          <input type="number" min="0" step="0.01" value="${s.price}" style="width:110px;padding:8px 10px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;" oninput="updateRetainerServicePrice('${s.id}', this.value)">
+        </div>
+      </div>
+    `).join('');
+  }
+  updateRetainerTotal();
+}
+
+function updateRetainerServicePrice(id, value) {
+  const s = retainerSelectedServices.find(s => s.id === id);
+  if (s) s.price = parseFloat(value) || 0;
+  updateRetainerTotal();
+}
+
+function updateRetainerTotal() {
+  const total = retainerSelectedServices.reduce((sum, s) => sum + (s.price || 0), 0);
+  document.getElementById('retainerTotalDisplay').textContent = `£${total.toFixed(2)}`;
+}
+
+function showRetainerModal(recordId = null) {
+  currentRetainerId = recordId;
+  document.getElementById('retainerForm').reset();
+  populateRetainerClientsList();
+
+  if (recordId) {
+    const record = allRetainerClients.find(r => r.id === recordId);
+    if (!record) return;
+    const f = record.fields;
+    document.getElementById('retainerModalTitle').textContent = 'Edit Retainer Client';
+    document.getElementById('retainerClientInput').value = `${f['Client Name']} (${f['Client Email']})`;
+    document.getElementById('retainerClientName').value = f['Client Name'] || '';
+    document.getElementById('retainerClientEmail').value = f['Client Email'] || '';
+    document.getElementById('retainerContractLength').value = f['Contract Length (Months)'] || '';
+    document.getElementById('retainerStartDate').value = f['Start Date'] || '';
+    document.getElementById('retainerStatus').value = f['Status'] || 'Pending Signature';
+    document.getElementById('retainerDocuSignLink').value = f['DocuSign Link'] || '';
+    document.getElementById('retainerDropboxLink').value = f['Dropbox Contract Link'] || '';
+    document.getElementById('retainerNotes').value = f['Notes'] || '';
+
+    let servicePrices = {};
+    try { servicePrices = JSON.parse(f['Service Prices JSON'] || '{}'); } catch { servicePrices = {}; }
+    populateRetainerServiceCheckboxes(Object.keys(servicePrices), servicePrices);
+  } else {
+    document.getElementById('retainerModalTitle').textContent = 'Add Retainer Client';
+    document.getElementById('retainerStartDate').value = toLocalDateString(new Date());
+    populateRetainerServiceCheckboxes([], {});
+  }
+
+  document.getElementById('retainerModal').classList.add('active');
+}
+
+function editRetainer(id) {
+  showRetainerModal(id);
+}
+
+async function deleteRetainer(id, name) {
+  if (!confirm(`Delete the retainer record for ${name}? This cannot be undone.`)) return;
+  try {
+    await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ method: 'DELETE', table: 'Retainer Clients', recordId: id })
+    });
+    showAdminToast(`Retainer for ${name} deleted`);
+    loadRetainerClients();
+  } catch (error) {
+    alert('❌ Failed to delete retainer record');
+  }
+}
+
+async function saveRetainer(event) {
+  event.preventDefault();
+
+  const clientName = document.getElementById('retainerClientName').value;
+  const clientEmail = document.getElementById('retainerClientEmail').value;
+
+  if (!clientEmail) {
+    alert('Please select a valid client who is signed into the dashboard');
+    return;
+  }
+  if (retainerSelectedServices.length === 0) {
+    alert('Please tick at least one service');
+    return;
+  }
+
+  const contractLength = document.getElementById('retainerContractLength').value;
+  const startDate = document.getElementById('retainerStartDate').value;
+  const status = document.getElementById('retainerStatus').value;
+  const docusignLink = document.getElementById('retainerDocuSignLink').value.trim();
+  const dropboxLink = document.getElementById('retainerDropboxLink').value.trim();
+  const notes = document.getElementById('retainerNotes').value.trim();
+
+  const servicePricesObj = {};
+  retainerSelectedServices.forEach(s => { servicePricesObj[s.id] = s.price; });
+  const totalMonthly = retainerSelectedServices.reduce((sum, s) => sum + (s.price || 0), 0);
+  const servicesNames = retainerSelectedServices.map(s => s.name).join(', ');
+
+  const customer = allCustomers.find(c => c.fields['Email']?.toLowerCase() === clientEmail.toLowerCase());
+
+  const fields = {
+    'Client Name': clientName,
+    'Client Email': clientEmail,
+    'Client Record ID': customer ? customer.id : '',
+    'Services': servicesNames,
+    'Service Prices JSON': JSON.stringify(servicePricesObj),
+    'Total Monthly Price': totalMonthly,
+    'Contract Length (Months)': parseInt(contractLength),
+    'Start Date': startDate,
+    'Status': status,
+    'DocuSign Link': docusignLink,
+    'Dropbox Contract Link': dropboxLink,
+    'Notes': notes
+  };
+
+  const btn = document.getElementById('saveRetainerBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  try {
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: currentRetainerId ? 'PATCH' : 'POST',
+        table: 'Retainer Clients',
+        recordId: currentRetainerId || undefined,
+        body: { fields }
+      })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error?.message || 'Failed to save');
+
+    showAdminToast(`✅ Retainer ${currentRetainerId ? 'updated' : 'created'} for ${clientName}`);
+    closeModal('retainerModal');
+    loadRetainerClients();
+  } catch (error) {
+    console.error('Error saving retainer:', error);
+    alert('❌ Failed to save retainer: ' + error.message);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Save Retainer';
+}
+
+const _origShowSectionRetainer = showSection;
+showSection = function(sectionId) {
+  _origShowSectionRetainer(sectionId);
+  if (sectionId === 'retainer-clients') loadRetainerClients();
+};
 
 // Initialize all Lucide icons
 document.addEventListener('DOMContentLoaded', function() {
