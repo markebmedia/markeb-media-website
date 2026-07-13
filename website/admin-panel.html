@@ -3350,18 +3350,22 @@ We wanted to reach out..." required></textarea>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Services Included *</label>
+          <label class="form-label">Services Included <span style="font-weight:400;color:#94a3b8;">— optional</span></label>
           <div id="retainerServiceCheckboxes" style="display:flex;flex-direction:column;gap:10px;max-height:340px;overflow-y:auto;border:2px solid #e2e8f0;border-radius:10px;padding:14px;"></div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Monthly Price Breakdown (inc VAT) *</label>
-          <div style="font-size:12px;color:#64748b;margin-bottom:8px;">Enter the actual agreed monthly price for each ticked service — this is manual, not auto-calculated from the rate card.</div>
+          <label class="form-label">Monthly Price Breakdown (inc VAT) <span style="font-weight:400;color:#94a3b8;">— optional</span></label>
+          <div style="font-size:12px;color:#64748b;margin-bottom:8px;">Tick services above and enter a price for each to build up the total automatically — or skip this entirely and just type the agreed total price below.</div>
           <div id="retainerPriceInputs" style="display:flex;flex-direction:column;gap:10px;"></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:14px;border-top:2px solid #e2e8f0;">
-            <span style="font-weight:700;font-size:16px;">Total Monthly Price (inc VAT)</span>
-            <span id="retainerTotalDisplay" style="font-weight:700;font-size:22px;color:#B46100;">£0.00</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:14px;padding-top:14px;border-top:2px solid #e2e8f0;flex-wrap:wrap;">
+            <span style="font-weight:700;font-size:16px;">Total Monthly Price (inc VAT) *</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:18px;color:#64748b;font-weight:700;">£</span>
+              <input type="number" id="retainerTotalInput" min="0" step="0.01" required style="width:140px;padding:10px 12px;border:2px solid #B46100;border-radius:8px;font-size:20px;font-weight:700;color:#B46100;text-align:right;" oninput="handleRetainerTotalInput()" placeholder="0.00">
+            </div>
           </div>
+          <div id="retainerTotalHint" style="font-size:11px;color:#94a3b8;margin-top:6px;text-align:right;">Tick services above to auto-calculate, or type the agreed total directly</div>
         </div>
 
         <div class="form-row">
@@ -8779,6 +8783,7 @@ const RETAINER_SERVICES_LIST = [
 let allRetainerClients = [];
 let retainerSelectedServices = [];
 let currentRetainerId = null;
+let retainerTotalManualOverride = false;
 
 async function loadRetainerClients() {
   const container = document.getElementById('retainerClientsContainer');
@@ -8917,13 +8922,14 @@ function toggleRetainerService(id, name) {
   } else {
     retainerSelectedServices.push({ id, name, price: 0 });
   }
+  retainerTotalManualOverride = false;
   renderRetainerPriceInputs();
 }
 
 function renderRetainerPriceInputs() {
   const container = document.getElementById('retainerPriceInputs');
   if (retainerSelectedServices.length === 0) {
-    container.innerHTML = '<div style="font-size:13px;color:#94a3b8;">Tick services above to set their monthly price</div>';
+    container.innerHTML = '<div style="font-size:13px;color:#94a3b8;">Tick services above to set their monthly price, or just enter a total below</div>';
   } else {
     container.innerHTML = retainerSelectedServices.map(s => `
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
@@ -8941,18 +8947,35 @@ function renderRetainerPriceInputs() {
 function updateRetainerServicePrice(id, value) {
   const s = retainerSelectedServices.find(s => s.id === id);
   if (s) s.price = parseFloat(value) || 0;
+  retainerTotalManualOverride = false;
   updateRetainerTotal();
 }
 
 function updateRetainerTotal() {
-  const total = retainerSelectedServices.reduce((sum, s) => sum + (s.price || 0), 0);
-  document.getElementById('retainerTotalDisplay').textContent = `£${total.toFixed(2)}`;
+  const sum = retainerSelectedServices.reduce((total, s) => total + (s.price || 0), 0);
+  const input = document.getElementById('retainerTotalInput');
+  const hint = document.getElementById('retainerTotalHint');
+  if (!input) return;
+  if (!retainerTotalManualOverride) {
+    input.value = sum > 0 ? sum.toFixed(2) : '';
+    if (hint) hint.textContent = retainerSelectedServices.length > 0
+      ? 'Auto-calculated from the ticked services above — edit this box directly to override'
+      : 'Tick services above to auto-calculate, or type the agreed total directly';
+  } else {
+    if (hint) hint.textContent = 'Manually entered — changing a service price above will recalculate this automatically';
+  }
+}
+
+function handleRetainerTotalInput() {
+  retainerTotalManualOverride = true;
+  updateRetainerTotal();
 }
 
 function showRetainerModal(recordId = null) {
   currentRetainerId = recordId;
   document.getElementById('retainerForm').reset();
   populateRetainerClientsList();
+  retainerTotalManualOverride = false;
 
   if (recordId) {
     const record = allRetainerClients.find(r => r.id === recordId);
@@ -8972,6 +8995,12 @@ function showRetainerModal(recordId = null) {
     let servicePrices = {};
     try { servicePrices = JSON.parse(f['Service Prices JSON'] || '{}'); } catch { servicePrices = {}; }
     populateRetainerServiceCheckboxes(Object.keys(servicePrices), servicePrices);
+
+    const savedTotal = parseFloat(f['Total Monthly Price'] || 0);
+    const sumFromServices = Object.values(servicePrices).reduce((s, v) => s + (parseFloat(v) || 0), 0);
+    retainerTotalManualOverride = Object.keys(servicePrices).length === 0 || Math.abs(savedTotal - sumFromServices) > 0.01;
+    document.getElementById('retainerTotalInput').value = savedTotal > 0 ? savedTotal.toFixed(2) : '';
+    updateRetainerTotal();
   } else {
     document.getElementById('retainerModalTitle').textContent = 'Add Retainer Client';
     document.getElementById('retainerStartDate').value = toLocalDateString(new Date());
@@ -9010,8 +9039,13 @@ async function saveRetainer(event) {
     alert('Please select a valid client who is signed into the dashboard');
     return;
   }
-  if (retainerSelectedServices.length === 0) {
-    alert('Please tick at least one service');
+
+  const totalInput = document.getElementById('retainerTotalInput');
+  const totalMonthly = parseFloat(totalInput.value) || 0;
+
+  if (totalMonthly <= 0) {
+    alert('Please enter a total monthly price — either tick services and set their prices, or type the total directly');
+    totalInput.focus();
     return;
   }
 
@@ -9024,7 +9058,6 @@ async function saveRetainer(event) {
 
   const servicePricesObj = {};
   retainerSelectedServices.forEach(s => { servicePricesObj[s.id] = s.price; });
-  const totalMonthly = retainerSelectedServices.reduce((sum, s) => sum + (s.price || 0), 0);
   const servicesNames = retainerSelectedServices.map(s => s.name).join(', ');
 
   const customer = allCustomers.find(c => c.fields['Email']?.toLowerCase() === clientEmail.toLowerCase());
