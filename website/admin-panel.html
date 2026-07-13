@@ -8844,8 +8844,9 @@ function renderRetainerClients() {
     const services = (f['Services'] || '').split(',').map(s => s.trim()).filter(Boolean);
     const startDate = f['Start Date'] ? new Date(f['Start Date'] + 'T12:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
     const expiryRaw = f['Expiry Date'];
-    const expiryDateStr = expiryRaw ? new Date(expiryRaw + 'T12:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
-    const daysToExpiry = expiryRaw ? Math.ceil((new Date(expiryRaw + 'T12:00:00') - new Date()) / (1000*60*60*24)) : null;
+    const expiryDateObj = expiryRaw ? new Date(expiryRaw) : null;
+    const expiryDateStr = (expiryDateObj && !isNaN(expiryDateObj)) ? expiryDateObj.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
+    const daysToExpiry = (expiryDateObj && !isNaN(expiryDateObj)) ? Math.ceil((expiryDateObj - new Date()) / (1000*60*60*24)) : null;
     const expirySoon = f['Status'] === 'Active' && daysToExpiry !== null && daysToExpiry <= 30 && daysToExpiry > 0;
 
     html += `
