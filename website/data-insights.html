@@ -955,6 +955,7 @@ let currentPeriod    = 'mom';
 let pipelineData = [];
 let currentPipePeriod = 'week';
 let pipelineChartInstance = null;
+let retainerData = [];
 
 const REVENUE_TARGETS = { y1: 360000, y2: 500000, y3: 1000000 }; // y1 = £30,000/mo × 12
 const MONTHLY_TARGET = 30000;
@@ -964,6 +965,51 @@ function getCurrentYear() {
   if (yr <= 2026) return 1;
   if (yr === 2027) return 2;
   return 3;
+}
+
+// ===== RETAINER REVENUE HELPERS =====
+// A retainer only counts as billable revenue for a given calendar month when
+// BOTH conditions are true: Status field is "Active" AND that month falls
+// within [Start Date, Start Date + Contract Length Months). This means once
+// the contracted term has elapsed the retainer stops contributing to
+// financial data automatically, even if the Status field hasn't been
+// manually updated yet.
+function isRetainerActiveInMonth(retainer, year, month) {
+  if (!retainer || retainer.status !== 'Active') return false;
+  if (!retainer.startDate || !retainer.contractMonths) return false;
+  const [sy, sm] = retainer.startDate.split('-').map(Number);
+  if (!sy || !sm) return false;
+  const startMonthIndex = sy * 12 + (sm - 1);
+  const checkMonthIndex = year * 12 + month;
+  const endMonthIndexExclusive = startMonthIndex + parseInt(retainer.contractMonths, 10);
+  return checkMonthIndex >= startMonthIndex && checkMonthIndex < endMonthIndexExclusive;
+}
+
+function getRetainerRevenueForMonth(year, month) {
+  return retainerData
+    .filter(r => isRetainerActiveInMonth(r, year, month))
+    .reduce((sum, r) => sum + (parseFloat(r.totalMonthlyPrice) || 0), 0);
+}
+
+function getRetainerRevenueThisMonth() {
+  const now = new Date();
+  return getRetainerRevenueForMonth(now.getFullYear(), now.getMonth());
+}
+
+// Sums retainer revenue (inc VAT) for every calendar month touched by the
+// given date window — matches how retainers bill (fixed per calendar month).
+function getRetainerRevenueForWindow(startDate, endDate) {
+  if (!startDate || !endDate) return 0;
+  let total = 0;
+  const cursor = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+  const end    = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+  let guard = 0;
+  while (cursor <= end && guard < 240) {
+    total += getRetainerRevenueForMonth(cursor.getFullYear(), cursor.getMonth());
+    cursor.setMonth(cursor.getMonth() + 1);
+    guard++;
+  }
+  return total;
 }
 
 function calcLiveATV() {
@@ -1344,11 +1390,13 @@ function calcInsightCards() {
     if (priorEmailsSeen.has(email)) repeatRev += val;
     else newRev += val;
   });
-  const totalThisMonthRev = newRev + repeatRev;
-  const newPct    = totalThisMonthRev > 0 ? Math.round((newRev / totalThisMonthRev) * 100) : 0;
-  const repeatPct = 100 - newPct;
+  const retainerRevThisMonthExVat = getRetainerRevenueThisMonth() / 1.2;
+  const totalThisMonthRev = newRev + repeatRev + retainerRevThisMonthExVat;
+  const bookingRevOnly = newRev + repeatRev;
+  const newPct      = bookingRevOnly > 0 ? Math.round((newRev / bookingRevOnly) * 100) : 0;
+  const repeatPct   = bookingRevOnly > 0 ? 100 - newPct : 0;
   const revSplitSub = totalThisMonthRev > 0
-    ? `<strong style="color:#3b82f6;">${fmtMoney(newRev)} new</strong> · <strong style="color:#10b981;">${fmtMoney(repeatRev)} repeat</strong> — ${newPct}% / ${repeatPct}% split`
+    ? `<strong style="color:#3b82f6;">${fmtMoney(newRev)} new</strong> · <strong style="color:#10b981;">${fmtMoney(repeatRev)} repeat</strong>${retainerRevThisMonthExVat > 0 ? ` · <strong style="color:#8b5cf6;">${fmtMoney(retainerRevThisMonthExVat)} retainers</strong>` : ''}${bookingRevOnly > 0 ? ` — ${newPct}% / ${repeatPct}% booking split` : ''}`
     : 'No bookings this month yet';
 
   // ── 4. DAYS TO NEXT MILESTONE ──
@@ -1709,13 +1757,18 @@ function initDateFilters() {
 
 async function loadMapData() {
   try {
-    const [usersRes, bookingsRes, pipelineRes] = await Promise.all([
+    const [usersRes, bookingsRes, pipelineRes, retainerRes] = await Promise.all([
   fetch('/.netlify/functions/admin-users'),
   fetch('/.netlify/functions/get-all-bookings'),
   fetch('/.netlify/functions/airtable-proxy', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ method: 'GET', table: 'Prospects', sort: [{ field: 'Saved Date', direction: 'desc' }] })
+  }),
+  fetch('/.netlify/functions/airtable-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ method: 'GET', table: 'Retainer Clients' })
   })
 ]);
     if (!usersRes.ok)    throw new Error('Failed to load user data');
@@ -1743,6 +1796,18 @@ pipelineData = (pData.records || []).map(r => ({
   savedDate: r.fields['Saved Date'] || '',
   updatedDate: r.fields['Updated Date'] || ''
 }));
+
+    const retData = await retainerRes.json();
+    retainerData = (retData.records || []).map(r => ({
+      id: r.id,
+      clientName: r.fields['Client Name'] || '',
+      clientEmail: (r.fields['Client Email'] || '').toLowerCase(),
+      services: r.fields['Services'] || '',
+      totalMonthlyPrice: parseFloat(r.fields['Total Monthly Price'] || 0),
+      contractMonths: parseInt(r.fields['Contract Length (Months)'] || 0, 10),
+      startDate: r.fields['Start Date'] || '',
+      status: r.fields['Status'] || ''
+    }));
 
     buildRegionCounts();
     updateClientStats();
@@ -1790,10 +1855,13 @@ function updateBookingStats() {
   const ago30    = new Date(); ago30.setDate(ago30.getDate() - 30);
   const recent30 = active.filter(b => b.date && new Date(b.date) >= ago30).length;
   const revenue  = active.reduce((s, b) => s + (parseFloat(b.priceExVAT) || 0), 0);
+  const retainerThisMonth = getRetainerRevenueThisMonth();
   document.getElementById('totalBookings').textContent     = active.length;
   document.getElementById('confirmedBookings').textContent = active.filter(b => b.bookingStatus === 'Confirmed').length;
   document.getElementById('reservedBookings').textContent  = active.filter(b => b.bookingStatus === 'Reserved').length;
-  document.getElementById('totalRevenue').textContent      = '£' + Math.round(revenue).toLocaleString();
+  document.getElementById('totalRevenue').textContent      = '£' + Math.round(revenue + retainerThisMonth).toLocaleString();
+  const totalRevenueCard = document.getElementById('totalRevenue')?.closest('.stat-card');
+  if (totalRevenueCard) totalRevenueCard.title = retainerThisMonth > 0 ? `Includes £${Math.round(retainerThisMonth).toLocaleString()} from active retainers this month` : 'Booking revenue only — no active retainers this month';
   document.getElementById('bookingGrowth').textContent     = '+' + recent30;
 }
 
@@ -2235,8 +2303,8 @@ function renderPerformanceSection() {
 
   const metrics = [
     { key:'signups',      label:'Dashboard Sign-Ups',           sub:'All signups in period',         icon:'<i data-lucide="user-round" style="width:14px;height:14px;vertical-align:-3px;"></i>',     css:'signups',       curr:currSignups.length,                                                              prev:prevSignups.length,                                                               fmt:v=>v.toString(),                         targetKey:'signups'      },
-    { key:'grossRevenue', label:'Gross Revenue',                    sub:'Shoots delivered this period (incl. VAT)', icon:'<i data-lucide="pound-sterling" style="width:14px;height:14px;vertical-align:-3px;"></i>', css:'gross-revenue', curr:currFulfil.bookings.filter(b=>b.bookingStatus!=='Cancelled').reduce((s,b)=>s+(parseFloat(b.finalPrice)||0),0), prev:prevFulfil.bookings.filter(b=>b.bookingStatus!=='Cancelled').reduce((s,b)=>s+(parseFloat(b.finalPrice)||0),0), fmt:v=>'£'+Math.round(v).toLocaleString(), targetKey:'grossRevenue' },
-    { key:'revenue',      label:'Net Revenue',                      sub:'Shoots delivered this period',   icon:'<i data-lucide="pound-sterling" style="width:14px;height:14px;vertical-align:-3px;"></i>', css:'revenue',       curr:calcRevenue(currFulfil.bookings),                                                  prev:calcRevenue(prevFulfil.bookings),                                                  fmt:v=>'£'+Math.round(v).toLocaleString(), targetKey:'revenue'      },
+    { key:'grossRevenue', label:'Gross Revenue',                    sub:'Shoots delivered + active retainers this period (incl. VAT)', icon:'<i data-lucide="pound-sterling" style="width:14px;height:14px;vertical-align:-3px;"></i>', css:'gross-revenue', curr:currFulfil.bookings.filter(b=>b.bookingStatus!=='Cancelled').reduce((s,b)=>s+(parseFloat(b.finalPrice)||0),0) + getRetainerRevenueForWindow(windows.current[0], windows.current[1]), prev:prevFulfil.bookings.filter(b=>b.bookingStatus!=='Cancelled').reduce((s,b)=>s+(parseFloat(b.finalPrice)||0),0) + getRetainerRevenueForWindow(windows.previous[0], windows.previous[1]), fmt:v=>'£'+Math.round(v).toLocaleString(), targetKey:'grossRevenue' },
+    { key:'revenue',      label:'Net Revenue',                      sub:'Shoots delivered + active retainers this period',   icon:'<i data-lucide="pound-sterling" style="width:14px;height:14px;vertical-align:-3px;"></i>', css:'revenue',       curr:calcRevenue(currFulfil.bookings) + (getRetainerRevenueForWindow(windows.current[0], windows.current[1]) / 1.2),                                                  prev:calcRevenue(prevFulfil.bookings) + (getRetainerRevenueForWindow(windows.previous[0], windows.previous[1]) / 1.2),                                                  fmt:v=>'£'+Math.round(v).toLocaleString(), targetKey:'revenue'      },
     { key:'newBookings',  label:'Bookings By New Clients',          sub:'Shoots delivered for new clients',      icon:'<i data-lucide="user-plus" style="width:14px;height:14px;vertical-align:-3px;"></i>',      css:'new-booking',   curr:splitNewVsExisting(currFulfil.bookings, windows.current[0]).newB.filter(b=>b.bookingStatus!=='Cancelled').length,   prev:splitNewVsExisting(prevFulfil.bookings, windows.previous[0]).newB.filter(b=>b.bookingStatus!=='Cancelled').length,   fmt:v=>v.toString(),  targetKey:'newBookings'  },
     { key:'existBookings',label:'Bookings By Existing Clients',     sub:'Shoots delivered for existing clients', icon:'<i data-lucide="repeat" style="width:14px;height:14px;vertical-align:-3px;"></i>',         css:'exist-booking', curr:splitNewVsExisting(currFulfil.bookings, windows.current[0]).exB.filter(b=>b.bookingStatus!=='Cancelled').length,    prev:splitNewVsExisting(prevFulfil.bookings, windows.previous[0]).exB.filter(b=>b.bookingStatus!=='Cancelled').length,    fmt:v=>v.toString(),  targetKey:'existBookings'},
     { key:'newBookingsWon',   label:'New Client Acquisitions',      sub:'First-ever bookings from never-booked clients',      icon:'<i data-lucide="user-plus" style="width:14px;height:14px;vertical-align:-3px;"></i>',  css:'new-booking',   curr:live.firstTimeBookersThisMonth.size,   prev:calcLiveMonthlyAverages().avgMonthlyNewClientBookings,   fmt:v=>Math.round(v).toString(), targetKey:'newBookings'  },
@@ -2381,9 +2449,12 @@ function renderRoadmap() {
   const totalRevenue = bookingData.filter(b => b.bookingStatus !== 'Cancelled').reduce((s,b) => s + (parseFloat(b.priceExVAT) || 0), 0);
 
   function revenueForYear(yr) {
-    return bookingData
+    const bookingRev = bookingData
       .filter(b => b.bookingStatus !== 'Cancelled' && b.date && new Date(b.date).getFullYear() === yr)
       .reduce((s, b) => s + (parseFloat(b.priceExVAT) || 0), 0);
+    let retainerRev = 0;
+    for (let m = 0; m < 12; m++) retainerRev += getRetainerRevenueForMonth(yr, m);
+    return bookingRev + (retainerRev / 1.2);
   }
 
   const rev2026 = revenueForYear(2026);
@@ -2616,8 +2687,9 @@ function renderRoadmap() {
   const liveBooked  = live.clientsWhoBooked;
 
   // Current monthly LTV model
-  // Monthly Revenue = Clients × BPAM × ATV
-  const currentMonthlyRev = liveBooked * liveBPAM * liveATV2;
+  // Monthly Revenue = Clients × BPAM × ATV, plus active retainer MRR (ex VAT)
+  const retainerMRRExVat = getRetainerRevenueThisMonth() / 1.2;
+  const currentMonthlyRev = (liveBooked * liveBPAM * liveATV2) + retainerMRRExVat;
 
   // What each lever needs to be to hit £30,000/mo (holding others constant)
   const neededATV_lever      = liveBPAM > 0 && liveBooked > 0 ? sensTargetRev / (liveBooked * liveBPAM) : null;
@@ -3477,6 +3549,29 @@ function renderRunRateChart() {
 
       dailyWon[ctIndex] += val;
     });
+
+    // Spread active retainer revenue (ex VAT) evenly across the days of each
+    // calendar month it's billable for, so it flows into the same cumulative
+    // "won" line as booking revenue without needing a discrete transaction.
+    if (metric === 'revenue') {
+      const cursor = new Date(periodStart);
+      while (cursor <= periodEnd) {
+        const y = cursor.getFullYear(), m = cursor.getMonth();
+        const monthRev = getRetainerRevenueForMonth(y, m) / 1.2;
+        if (monthRev > 0) {
+          const daysInThisMonth = new Date(y, m + 1, 0).getDate();
+          const perDay = monthRev / daysInThisMonth;
+          for (let d = 1; d <= daysInThisMonth; d++) {
+            const dayDate = new Date(y, m, d);
+            if (dayDate < periodStart || dayDate > periodEnd) continue;
+            const idx = Math.round((dayDate - periodStart) / (1000 * 60 * 60 * 24));
+            if (idx >= 0 && idx < totalDays) dailyWon[idx] += perDay;
+          }
+        }
+        cursor.setMonth(cursor.getMonth() + 1);
+        cursor.setDate(1);
+      }
+    }
   }
 
   // Cumulative won — solid line up to today, null for future
