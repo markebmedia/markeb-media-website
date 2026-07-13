@@ -17,6 +17,9 @@
 [functions."chase-overdue-invoices"]
   schedule = "0 8 * * *"
 
+[functions."expire-retainers"]
+  schedule = "0 8 * * *"
+  
 [[headers]]
   for = "/website/admin-panel.html"
   [headers.values]
