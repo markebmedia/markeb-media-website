@@ -91,7 +91,7 @@ function getAccessTypeSection(booking) {
 // ✅ Format Local Area Places
 function getLocalAreaPlacesSection(booking) {
   const hasLocalAreaHighlights =
-    booking.serviceId === 'gold-package' ||
+    booking.serviceId === 'platinum-package' ||
     (booking.addons || []).some(a => a.id === 'local-area-highlights' || a.name === 'Local Area Highlights');
 
   if (!hasLocalAreaHighlights || !booking.localPlaces || booking.localPlaces.length === 0) return '';

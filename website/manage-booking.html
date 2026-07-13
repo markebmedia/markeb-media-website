@@ -1859,7 +1859,7 @@ if (booking.addons && booking.addons.length > 0) {
       const section = document.getElementById('modifyLocalAreaSection');
       if (!section) return;
       const service = modifyData.selectedService;
-      const isGold = service && service.id === 'gold-package';
+      const isGold = service && service.id === 'platinum-package';
       const hasLocalAreaAddon = modifyData.selectedAddons && modifyData.selectedAddons.includes('local-area-highlights');
       const shouldShow = isGold || hasLocalAreaAddon;
 

@@ -4715,7 +4715,7 @@ function handleAdminAccessTypeChange() {
       if (!section) return;
       const serviceSelect = document.getElementById('bookingService');
       const serviceId = serviceSelect ? serviceSelect.value : '';
-      const isGold = serviceId === 'gold-package';
+      const isGold = serviceId === 'platinum-package';
       const hasLocalAreaAddon = bookingFormData.selectedAddons.includes('local-area-highlights');
       const shouldShow = isGold || hasLocalAreaAddon;
 

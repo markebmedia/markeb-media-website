@@ -4310,10 +4310,10 @@ function validateBrandingQuestions() {
 
 // Show or hide Local Area Highlights section based on service
 function updateLocalAreaHighlightsVisibility() {
-  const section = document.getElementById('localAreaHighlightsSection');
-  if (!section) return;
-  const service = bookingData.service;
-  const isGold = service && service.id === 'gold-package';
+      const section = document.getElementById('localAreaHighlightsSection');
+      if (!section) return;
+      const service = bookingData.service;
+      const isGold = service && service.id === 'platinum-package';
   const hasLocalAreaAddon = bookingData.selectedAddons && bookingData.selectedAddons.includes('local-area-highlights');
   const shouldShow = isGold || hasLocalAreaAddon;
 

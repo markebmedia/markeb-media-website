@@ -243,7 +243,7 @@ if (hasDiscount) {
 
     // ✅ Clear stale Local Area Places if the new service/addons no longer include it
     const hasLocalAreaHighlights =
-      newServiceId === 'gold-package' ||
+      newServiceId === 'platinum-package' ||
       (addons || []).some(a => a.id === 'local-area-highlights' || a.name === 'Local Area Highlights');
 
     if (!hasLocalAreaHighlights && fields['Local Area Places']) {

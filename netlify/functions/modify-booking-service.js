@@ -136,7 +136,7 @@ exports.handler = async (event, context) => {
       // any stale places left over from a previous service on this booking.
       'Local Area Places': (() => {
         const hasLocalAreaHighlights =
-          newServiceId === 'gold-package' ||
+          newServiceId === 'platinum-package' ||
           (addons || []).some(a => a.id === 'local-area-highlights' || a.name === 'Local Area Highlights');
         if (!hasLocalAreaHighlights) return '';
         return (localPlaces && localPlaces.length > 0) ? localPlaces.join('\n') : (f['Local Area Places'] || '');

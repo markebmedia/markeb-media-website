@@ -149,7 +149,7 @@ exports.handler = async (event, context) => {
     // ✅ Guard against stale/leftover localPlaces data reaching Airtable —
     // only persist it if Local Area Highlights was actually part of the booking
     const hasLocalAreaHighlights =
-      bookingData.serviceId === 'gold-package' ||
+      bookingData.serviceId === 'platinum-package' ||
       (bookingData.addons || []).some(a => a.id === 'local-area-highlights' || a.name === 'Local Area Highlights');
 
     const safeLocalPlaces = hasLocalAreaHighlights ? (bookingData.localPlaces || []) : [];
