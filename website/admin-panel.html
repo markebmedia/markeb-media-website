@@ -8631,11 +8631,10 @@ async function loadReviewRewards() {
   container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
 
   try {
-    if (allCustomers.length === 0) {
-      const response = await fetch('/.netlify/functions/admin-users');
-      const data = await response.json();
-      if (data.success) allCustomers = data.users;
-    }
+    // Always fetch fresh — never rely on a potentially stale allCustomers cache from another tab
+    const response = await fetch('/.netlify/functions/admin-users');
+    const data = await response.json();
+    if (data.success) allCustomers = data.users;
 
     allReviewRewardUsers = allCustomers.filter(c => c.fields['Google Review Reward Eligible'] === true);
 
