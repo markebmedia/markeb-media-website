@@ -748,6 +748,15 @@ body {
       </div>
     </div>
 
+    <div id="monthNavRow" style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:20px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 16px;">
+      <button class="btn btn-secondary" style="padding:8px 14px;" onclick="navigatePerfMonth(-1)">‹ Prev Month</button>
+      <div style="font-size:15px;font-weight:700;color:#0f172a;min-width:170px;text-align:center;" id="perfMonthLabel">Loading...</div>
+      <button class="btn btn-secondary" style="padding:8px 14px;" onclick="navigatePerfMonth(1)" id="perfNextMonthBtn">Next Month ›</button>
+      <button class="btn btn-primary" style="padding:8px 14px;margin-left:8px;" onclick="resetPerfMonth()">
+        <i data-lucide="calendar-days" style="width:14px;height:14px;"></i> Jump to Today
+      </button>
+    </div>
+
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:12px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;">
   <i data-lucide="package" style="width:18px;height:18px;color:#64748b;flex-shrink:0;"></i>
   <div>
@@ -952,6 +961,7 @@ let currentDataSource = 'clients';
 let currentViewMode  = 'markers';
 let currentMainTab   = 'clients';
 let currentPeriod    = 'mom';
+let perfSelectedMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 let pipelineData = [];
 let currentPipePeriod = 'week';
 let pipelineChartInstance = null;
@@ -2207,13 +2217,46 @@ function setPeriod(period) {
   renderPerformanceSection();
 }
 
+function navigatePerfMonth(direction) {
+  const newMonth = new Date(perfSelectedMonth.getFullYear(), perfSelectedMonth.getMonth() + direction, 1);
+  const currentRealMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  if (newMonth > currentRealMonth) return; // never navigate into the future
+  perfSelectedMonth = newMonth;
+  renderPerformanceSection();
+}
+
+function resetPerfMonth() {
+  perfSelectedMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  renderPerformanceSection();
+}
+
+function updatePerfMonthNavUI() {
+  const nav = document.getElementById('monthNavRow');
+  if (!nav) return;
+  nav.style.display = currentPeriod === 'mom' ? 'flex' : 'none';
+
+  const label = document.getElementById('perfMonthLabel');
+  if (label) label.textContent = perfSelectedMonth.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
+
+  const nextBtn = document.getElementById('perfNextMonthBtn');
+  if (nextBtn) {
+    const currentRealMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const atCurrent = perfSelectedMonth.getTime() === currentRealMonth.getTime();
+    nextBtn.disabled = atCurrent;
+    nextBtn.style.opacity = atCurrent ? '0.4' : '1';
+    nextBtn.style.cursor = atCurrent ? 'not-allowed' : 'pointer';
+  }
+}
+
 function getPeriodWindows() {
   const now = new Date();
   if (currentPeriod === 'mom') {
-    const s1 = new Date(now.getFullYear(), now.getMonth(), 1);
-    const e1 = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-    const s2 = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const e2 = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59);
+    const refYear  = perfSelectedMonth.getFullYear();
+    const refMonth = perfSelectedMonth.getMonth();
+    const s1 = new Date(refYear, refMonth, 1);
+    const e1 = new Date(refYear, refMonth + 1, 0, 23, 59, 59);
+    const s2 = new Date(refYear, refMonth - 1, 1);
+    const e2 = new Date(refYear, refMonth, 0, 23, 59, 59);
     const label1 = s1.toLocaleString('en-GB', {month:'long', year:'numeric'});
     const label2 = s2.toLocaleString('en-GB', {month:'long', year:'numeric'});
     return { current: [s1,e1], previous: [s2,e2], label1, label2, periodLabel: 'Month vs Month — ' + label1 + ' vs ' + label2 };
@@ -2287,6 +2330,7 @@ function calcRevenue(bookings) {
 }
 
 function renderPerformanceSection() {
+  updatePerfMonthNavUI();
   const windows = getPeriodWindows();
   document.getElementById('perfPeriodLabel').textContent = windows.periodLabel;
 
@@ -3512,7 +3556,7 @@ function renderRunRateChart() {
   const metric = currentRunRateMetric;
 
   const totalDays = Math.round((periodEnd - periodStart) / (1000 * 60 * 60 * 24));
-  const elapsedDays = Math.max(1, Math.round((now - periodStart) / (1000 * 60 * 60 * 24)));
+  const elapsedDays = Math.max(1, Math.min(totalDays, Math.round((now - periodStart) / (1000 * 60 * 60 * 24))));
 
   const dailyWon = Array(totalDays).fill(0);
 
