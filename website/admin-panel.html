@@ -8690,8 +8690,8 @@ function renderReviewRewardsTable() {
     );
   }
 
-  if (statusFilter === 'spun') filtered = filtered.filter(c => c.fields['Review Reward Spun'] === true);
-  if (statusFilter === 'pending') filtered = filtered.filter(c => c.fields['Review Reward Spun'] !== true);
+  if (statusFilter === 'spun') filtered = filtered.filter(c => c.fields['Google Review Reward Eligible'] === true && c.fields['Review Reward Spun'] === true);
+  if (statusFilter === 'pending') filtered = filtered.filter(c => c.fields['Google Review Reward Eligible'] === true && c.fields['Review Reward Spun'] !== true);
 
   if (filtered.length === 0) {
     container.innerHTML = '<div style="text-align: center; padding: 60px; color: #94a3b8;">No matching records</div>';
