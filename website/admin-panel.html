@@ -3640,9 +3640,11 @@ We wanted to reach out..." required></textarea>
             <option value="matterport-tour">Matterport Virtual Tour</option>
             <option value="epc">EPC Certificate</option>
           </select>
-          <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
-            If set, this code will discount that specific add-on rather than the base service price
-          </div>
+          <div class="form-help">If set, the customer must have this add-on selected to use the code</div>
+          <label style="display: flex; align-items: center; gap: 8px; margin-top: 10px;">
+            <input type="checkbox" id="addonOnlyDiscount">
+            <span>Discount applies only to this add-on's price (not the full total)</span>
+          </label>
         </div>
 
         <!-- Notes -->
@@ -4923,18 +4925,27 @@ async function applyAdminDiscount() {
       }
 
       // data.finalPrice and data.discountAmount come back ex-VAT from validate-discount-code
-      const discountedExVat = data.finalPrice;
+      let finalDiscountAmount = data.discountAmount;
+
+      if (data.addonOnlyDiscount && data.addonDiscountTarget) {
+        const addonPrice = ADDONS_CATALOG[data.addonDiscountTarget]?.price || 0;
+        finalDiscountAmount = data.discountType === 'Percentage'
+          ? (addonPrice * data.discountValue) / 100
+          : Math.min(data.discountValue, addonPrice);
+      }
+
+      const discountedExVat = parseFloat((priceBeforeDiscount - finalDiscountAmount).toFixed(2));
       const discountedIncVat = parseFloat((discountedExVat * 1.2).toFixed(2));
 
       bookingFormData.discountCode = code;
-      bookingFormData.discountAmount = data.discountAmount;
+      bookingFormData.discountAmount = finalDiscountAmount;
       bookingFormData.priceBeforeDiscount = priceBeforeDiscount;
       // Store inc-VAT as the final charge amount
       bookingFormData.totalPrice = discountedIncVat;
 
       messageDiv.innerHTML = `
         <span style="color: #10b981;">
-          ✅ Code "${code}" applied! Saving £${data.discountAmount.toFixed(2)} (ex VAT) — new total £${discountedExVat.toFixed(2)} ex VAT / £${discountedIncVat.toFixed(2)} inc. VAT
+          ✅ Code "${code}" applied! Saving £${finalDiscountAmount.toFixed(2)} (ex VAT) — new total £${discountedExVat.toFixed(2)} ex VAT / £${discountedIncVat.toFixed(2)} inc. VAT
         </span>
       `;
 
@@ -8428,6 +8439,7 @@ async function saveDiscountCode(event) {
     if (notes) fields['Notes'] = notes;
     const addonTarget = document.getElementById('addonDiscountTarget').value;
     if (addonTarget) fields['Addon Discount Target'] = addonTarget;
+    fields['Addon Only Discount'] = document.getElementById('addonOnlyDiscount').checked;
     if (selectedRegions.length > 0) fields['Applicable Regions'] = selectedRegions;
     if (selectedServices.length > 0) fields['Applicable Services'] = selectedServices;
 
@@ -8495,6 +8507,7 @@ function editDiscountCode(codeId) {
   document.getElementById('maxUses').value = fields['Max Uses'] || '';
   document.getElementById('minPurchase').value = fields['Min Purchase'] || '';
   document.getElementById('addonDiscountTarget').value = fields['Addon Discount Target'] || '';
+  document.getElementById('addonOnlyDiscount').checked = fields['Addon Only Discount'] || false;
   document.getElementById('discountNotes').value = fields['Notes'] || '';
   
   updateDiscountValueLabel();

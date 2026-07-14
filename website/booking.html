@@ -4429,20 +4429,31 @@ async function applyDiscountCode() {
         originalPrice: data.originalPrice,
         finalPrice: data.finalPrice,
         recordId: data.recordId,
-        addonDiscountTarget: data.addonDiscountTarget || null
+        addonDiscountTarget: data.addonDiscountTarget || null,
+        addonOnlyDiscount: data.addonOnlyDiscount || false
       };
-      
+
+      const subtotalWithAddons = bookingData.basePrice + (bookingData.extraBedroomFee || 0) + (bookingData.squareFootageFee || 0) + (bookingData.addonsPrice || 0);
+      let finalDiscountAmount = data.discountAmount;
+
+      if (data.addonOnlyDiscount && data.addonDiscountTarget) {
+        const addonPrice = ADDONS[data.addonDiscountTarget]?.price || 0;
+        finalDiscountAmount = data.discountType === 'Percentage'
+          ? (addonPrice * data.discountValue) / 100
+          : Math.min(data.discountValue, addonPrice);
+        appliedDiscount.discountAmount = finalDiscountAmount;
+      }
+
       // Update booking data
       bookingData.discountCode = data.code;
-      bookingData.discountAmount = data.discountAmount;
-      const subtotalWithAddons = bookingData.basePrice + (bookingData.extraBedroomFee || 0) + (bookingData.squareFootageFee || 0) + (bookingData.addonsPrice || 0);
+      bookingData.discountAmount = finalDiscountAmount;
       bookingData.priceBeforeDiscount = subtotalWithAddons * 1.2;
-      bookingData.totalPrice = (subtotalWithAddons - data.discountAmount) * 1.2;
+      bookingData.totalPrice = (subtotalWithAddons - finalDiscountAmount) * 1.2;
       
       // Show success message
       const discountText = data.discountType === 'Percentage' 
-        ? `${data.discountValue}% off (-£${data.discountAmount.toFixed(2)})`
-        : `£${data.discountAmount.toFixed(2)} off`;
+        ? `${data.discountValue}% off (-£${finalDiscountAmount.toFixed(2)})`
+        : `£${finalDiscountAmount.toFixed(2)} off`;
       
       document.getElementById('discountSuccessText').textContent = discountText;
       successMsg.style.display = 'block';
