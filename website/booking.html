@@ -3271,6 +3271,17 @@ function renderOfferPopup(offerId) {
         bookingData.selectedAddons.push(addonId);
       }
 
+      // If a discount is already applied, clear it since the discountable
+      // total (which now includes add-ons) has changed — avoids a stale amount
+      if (appliedDiscount) {
+        removeDiscountCode();
+        const errorMsg = document.getElementById('discountCodeError');
+        if (errorMsg) {
+          errorMsg.textContent = 'Your add-ons changed, so your discount code was removed. Please re-apply it.';
+          errorMsg.classList.add('show');
+        }
+      }
+
       updateEpcLargePrice();
       renderAddons();
       updateEpcQuestionsVisibility();
@@ -3377,7 +3388,7 @@ function renderOfferPopup(offerId) {
       bookingData.addonsPrice = addonsPrice;
       bookingData.addonsDuration = addonsDuration;
 
-      // Keep discount locked to original service/bedroom/sqft — addons never discounted
+      // Discount applies across service/bedroom/sqft/add-ons
       if (appliedDiscount) {
         bookingData.priceBeforeDiscount = subtotal * 1.2;
         bookingData.totalPrice = (subtotal - appliedDiscount.discountAmount) * 1.2;
@@ -4378,8 +4389,8 @@ async function applyDiscountCode() {
   
   try {
     const clientEmail = document.getElementById('clientEmail').value.trim();
-    // Discount applies to service/bedroom/sqft only — addons always full price
-    const discountablePrice = bookingData.basePrice + (bookingData.extraBedroomFee || 0) + (bookingData.squareFootageFee || 0);
+    // Discount applies to service/bedroom/sqft/add-ons
+    const discountablePrice = bookingData.basePrice + (bookingData.extraBedroomFee || 0) + (bookingData.squareFootageFee || 0) + (bookingData.addonsPrice || 0);
     const response = await fetch('/.netlify/functions/validate-discount-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

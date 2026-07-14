@@ -3637,6 +3637,7 @@ We wanted to reach out..." required></textarea>
             <option value="property-drone-video">Property Drone Videography</option>
             <option value="add-branded-outro">Add Branded Outro</option>
             <option value="local-area-highlights">Local Area Highlights</option>
+            <option value="matterport-tour">Matterport Virtual Tour</option>
             <option value="epc">EPC Certificate</option>
           </select>
           <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
@@ -4878,8 +4879,9 @@ async function applyAdminDiscount() {
 
   const serviceId = selectedOption.value;
   const region = document.getElementById('bookingRegion').value;
+  const clientEmail = document.getElementById('bookingClientEmail').value.trim();
 
-  // Calculate current price BEFORE discount
+  // Calculate current price BEFORE discount — service/bedroom/sqft/add-ons, matching booking.html
   const servicePrice = parseFloat(selectedOption.dataset.price);
   const isPropertyService = selectedOption.dataset.property === 'true';
   const extraBedrooms = isPropertyService ? Math.max(0, bookingFormData.bedrooms - 4) : 0;
@@ -4889,7 +4891,8 @@ async function applyAdminDiscount() {
     const addon = ADDONS_CATALOG[addonId];
     if (addon) addonsFee += addon.price;
   });
-  const priceBeforeDiscount = servicePrice + bedroomFee + addonsFee;
+  const sqftFee = bookingFormData.squareFootageFee || 0;
+  const priceBeforeDiscount = servicePrice + bedroomFee + addonsFee + sqftFee;
 
   messageDiv.innerHTML = '<span style="color: #3b82f6;">⏳ Validating code...</span>';
 
@@ -4901,13 +4904,28 @@ async function applyAdminDiscount() {
         code,
         serviceId,
         region,
-        totalPrice: priceBeforeDiscount
+        totalPrice: priceBeforeDiscount,
+        clientEmail: clientEmail
       })
     });
 
     const data = await response.json();
 
     if (data.success) {
+      // If this code targets a specific addon, recalculate against addon price only
+      if (data.addonDiscountTarget) {
+        const targetAddonId = data.addonDiscountTarget;
+        if (!bookingFormData.selectedAddons.includes(targetAddonId)) {
+          messageDiv.innerHTML = `<span style="color: #ef4444;">❌ This code requires the ${ADDONS_CATALOG[targetAddonId]?.name || targetAddonId} add-on to be selected first</span>`;
+          return;
+        }
+        const addonPrice = ADDONS_CATALOG[targetAddonId]?.price || 0;
+        data.discountAmount = data.discountType === 'Percentage'
+          ? (addonPrice * data.discountValue) / 100
+          : Math.min(data.discountValue, addonPrice);
+        data.finalPrice = Math.max(0, priceBeforeDiscount - data.discountAmount);
+      }
+
       // data.finalPrice and data.discountAmount come back ex-VAT from validate-discount-code
       const discountedExVat = data.finalPrice;
       const discountedIncVat = parseFloat((discountedExVat * 1.2).toFixed(2));
@@ -8146,6 +8164,7 @@ const ALL_SERVICE_IDS = [
   'complete-branding',
   'branding-video',
   'branding-photo',
+  'platinum-package',
   'gold-package',
   'silver-package',
   'bronze-package',
@@ -8304,6 +8323,7 @@ function populateServiceCheckboxes() {
     'complete-branding': 'Complete Branding Package',
     'branding-video': 'Branding Video',
     'branding-photo': 'Branding Photo',
+    'platinum-package': 'Platinum Package',
     'gold-package': 'Gold Package',
     'silver-package': 'Silver Package',
     'bronze-package': 'Bronze Package',
