@@ -4912,18 +4912,14 @@ async function applyAdminDiscount() {
     const data = await response.json();
 
     if (data.success) {
-      // If this code targets a specific addon, recalculate against addon price only
+      // If this code targets a specific addon, it must be selected to use the code —
+      // but the discount amount always applies across the full total (service + bedroom + sqft + add-ons)
       if (data.addonDiscountTarget) {
         const targetAddonId = data.addonDiscountTarget;
         if (!bookingFormData.selectedAddons.includes(targetAddonId)) {
           messageDiv.innerHTML = `<span style="color: #ef4444;">❌ This code requires the ${ADDONS_CATALOG[targetAddonId]?.name || targetAddonId} add-on to be selected first</span>`;
           return;
         }
-        const addonPrice = ADDONS_CATALOG[targetAddonId]?.price || 0;
-        data.discountAmount = data.discountType === 'Percentage'
-          ? (addonPrice * data.discountValue) / 100
-          : Math.min(data.discountValue, addonPrice);
-        data.finalPrice = Math.max(0, priceBeforeDiscount - data.discountAmount);
       }
 
       // data.finalPrice and data.discountAmount come back ex-VAT from validate-discount-code
@@ -8172,7 +8168,8 @@ const ALL_SERVICE_IDS = [
   'property-video',
   'property-photo',
   'drone-video',
-  'drone-photo'
+  'drone-photo',
+  'matterport-tour'
 ];
 
 // Load Discount Codes
@@ -8331,7 +8328,8 @@ function populateServiceCheckboxes() {
     'property-video': 'Property Video',
     'property-photo': 'Property Photo',
     'drone-video': 'Drone Video',
-    'drone-photo': 'Drone Photo'
+    'drone-photo': 'Drone Photo',
+    'matterport-tour': 'Matterport Virtual Tour'
   };
   
   container.innerHTML = ALL_SERVICE_IDS.map(serviceId => `
