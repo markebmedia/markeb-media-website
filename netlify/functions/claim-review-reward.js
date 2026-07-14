@@ -38,22 +38,23 @@ exports.handler = async (event) => {
 
     // Check only — used on dashboard load
     if (checkOnly) {
-      return { statusCode: 200, headers, body: JSON.stringify({ eligible, alreadySpun, prize: existingPrize }) };
+return { statusCode: 200, headers, body: JSON.stringify({ eligible, alreadySpun, prize: existingPrize, wonDate: fields['Review Reward Won Date'] || null }) };
     }
 
     if (!eligible) return { statusCode: 403, headers, body: JSON.stringify({ error: 'Not eligible' }) };
 
     // Already spun — return existing prize
     if (alreadySpun && existingPrize) {
-      return { statusCode: 200, headers, body: JSON.stringify({ alreadySpun: true, prize: existingPrize, ...PRIZE_CODES[existingPrize] }) };
+return { statusCode: 200, headers, body: JSON.stringify({ alreadySpun: true, prize: existingPrize, wonDate: fields['Review Reward Won Date'] || null, ...PRIZE_CODES[existingPrize] }) };
     }
 
     // Record the win
     const won = prize || Object.keys(PRIZE_CODES)[Math.floor(Math.random() * 3)];
 
     await base('Markeb Media Users').update(user.id, {
-      'Review Reward Spun': true,
-      'Review Reward Prize': won
+'Review Reward Spun': true,
+'Review Reward Prize': won,
+'Review Reward Won Date': new Date().toISOString()
     });
 
     // Send reward email

@@ -1771,6 +1771,14 @@ body {
   </div>
 
   <div class="nav-section">
+    <div class="nav-section-title">Reviews</div>
+    <div class="nav-item" onclick="showSection('review-rewards')">
+      <i data-lucide="star" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      Review Rewards
+    </div>
+  </div>
+
+  <div class="nav-section">
     <div class="nav-section-title">Clients</div>
     <div class="nav-item" onclick="showSection('customers')">
       <i data-lucide="users" class="nav-icon" style="width: 20px; height: 20px;"></i>
@@ -2346,6 +2354,46 @@ body {
 </div>
 </div>
 </div>
+
+    <!-- Review Rewards Section -->
+    <div class="admin-section" id="review-rewards">
+      <div style="margin-bottom: 24px;">
+        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Review Rewards</h2>
+        <p style="color: #64748b; font-size: 14px;">Google review spin-wheel — eligibility, redemptions, and prizes won</p>
+      </div>
+
+      <div class="stats-grid" style="margin-bottom: 24px;">
+        <div class="stat-card"><div class="stat-value" id="reviewEligibleCount">-</div><div class="stat-label">Eligible to Spin</div></div>
+        <div class="stat-card"><div class="stat-value" id="reviewSpunCount">-</div><div class="stat-label">Total Spun</div></div>
+        <div class="stat-card"><div class="stat-value" id="reviewPendingCount">-</div><div class="stat-label">Eligible, Not Yet Spun</div></div>
+        <div class="stat-card"><div class="stat-value" id="reviewRedemptionRate">-</div><div class="stat-label">Redemption Rate</div></div>
+      </div>
+
+      <div class="calendar-container" style="margin-bottom: 24px;">
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 16px;">Prize Breakdown</h3>
+        <div id="reviewPrizeBreakdown" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+          <div style="text-align: center; padding: 20px; color: #94a3b8;">Loading...</div>
+        </div>
+      </div>
+
+      <div class="filters-bar">
+        <input type="text" class="filter-input" id="reviewRewardSearch" placeholder="Search by name, email, company..." oninput="renderReviewRewardsTable()">
+        <select class="filter-select" id="reviewRewardStatusFilter" onchange="renderReviewRewardsTable()">
+          <option value="">All</option>
+          <option value="spun">Spun (redeemed)</option>
+          <option value="pending">Eligible — not yet spun</option>
+        </select>
+        <button class="btn btn-primary" onclick="loadReviewRewards()">
+          <i data-lucide="refresh-cw" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Refresh
+        </button>
+      </div>
+
+      <div class="calendar-container" id="reviewRewardsContainer">
+        <div style="text-align: center; padding: 40px;">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
 
     <!-- Calendar Section -->
     <div class="admin-section" id="calendar">
@@ -8568,6 +8616,147 @@ async function deleteDiscountCode(codeId, codeName) {
     alert('❌ Failed to delete discount code: ' + error.message);
   }
 }
+
+// ===== REVIEW REWARDS =====
+
+let allReviewRewardUsers = [];
+const PRIZE_LABELS = {
+  'floor_plan': 'Free Floor Plan',
+  'speed_tour': 'Free Speed Tour',
+  'discount_10': '10% Off'
+};
+
+async function loadReviewRewards() {
+  const container = document.getElementById('reviewRewardsContainer');
+  container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>';
+
+  try {
+    if (allCustomers.length === 0) {
+      const response = await fetch('/.netlify/functions/admin-users');
+      const data = await response.json();
+      if (data.success) allCustomers = data.users;
+    }
+
+    allReviewRewardUsers = allCustomers.filter(c => c.fields['Google Review Reward Eligible'] === true);
+
+    updateReviewRewardStats();
+    renderReviewRewardsTable();
+
+  } catch (error) {
+    console.error('Error loading review rewards:', error);
+    container.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Error loading review rewards</div>';
+  }
+}
+
+function updateReviewRewardStats() {
+  const eligible = allReviewRewardUsers.length;
+  const spun = allReviewRewardUsers.filter(c => c.fields['Review Reward Spun'] === true).length;
+  const pending = eligible - spun;
+  const rate = eligible > 0 ? Math.round((spun / eligible) * 100) : 0;
+
+  document.getElementById('reviewEligibleCount').textContent = eligible;
+  document.getElementById('reviewSpunCount').textContent = spun;
+  document.getElementById('reviewPendingCount').textContent = pending;
+  document.getElementById('reviewRedemptionRate').textContent = `${rate}%`;
+
+  const prizeCounts = { floor_plan: 0, speed_tour: 0, discount_10: 0 };
+  allReviewRewardUsers.forEach(c => {
+    const prize = c.fields['Review Reward Prize'];
+    if (prize && prizeCounts.hasOwnProperty(prize)) prizeCounts[prize]++;
+  });
+
+  const breakdownEl = document.getElementById('reviewPrizeBreakdown');
+  const prizeColors = { floor_plan: '#3b82f6', speed_tour: '#10b981', discount_10: '#f59e0b' };
+  breakdownEl.innerHTML = Object.keys(prizeCounts).map(key => `
+    <div style="text-align: center; padding: 20px; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px;">
+      <div style="font-size: 28px; font-weight: 700; color: ${prizeColors[key]};">${prizeCounts[key]}</div>
+      <div style="font-size: 13px; color: #64748b; font-weight: 600; margin-top: 6px;">${PRIZE_LABELS[key]}</div>
+    </div>
+  `).join('');
+}
+
+function renderReviewRewardsTable() {
+  const container = document.getElementById('reviewRewardsContainer');
+  const search = (document.getElementById('reviewRewardSearch')?.value || '').toLowerCase();
+  const statusFilter = document.getElementById('reviewRewardStatusFilter')?.value || '';
+
+  let filtered = [...allReviewRewardUsers];
+
+  if (search) {
+    filtered = filtered.filter(c =>
+      (c.fields['Name'] || '').toLowerCase().includes(search) ||
+      (c.fields['Email'] || '').toLowerCase().includes(search) ||
+      (c.fields['Company'] || '').toLowerCase().includes(search)
+    );
+  }
+
+  if (statusFilter === 'spun') filtered = filtered.filter(c => c.fields['Review Reward Spun'] === true);
+  if (statusFilter === 'pending') filtered = filtered.filter(c => c.fields['Review Reward Spun'] !== true);
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="text-align: center; padding: 60px; color: #94a3b8;">No matching records</div>';
+    return;
+  }
+
+  // Sort by won date, most recent first, unspun at the bottom
+  filtered.sort((a, b) => {
+    const dateA = a.fields['Review Reward Won Date'] || '';
+    const dateB = b.fields['Review Reward Won Date'] || '';
+    return dateB.localeCompare(dateA);
+  });
+
+  let html = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Company</th>
+          <th>Status</th>
+          <th>Prize Won</th>
+          <th>Date Won</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  filtered.forEach(c => {
+    const f = c.fields;
+    const spun = f['Review Reward Spun'] === true;
+    const prize = f['Review Reward Prize'];
+    const wonDate = f['Review Reward Won Date'];
+    const wonDateFormatted = wonDate
+      ? new Date(wonDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+      : '—';
+
+    html += `
+      <tr>
+        <td data-label="Client">
+          <strong>${f['Name']}</strong><br>
+          <small style="color: #64748b;">${f['Email']}</small>
+        </td>
+        <td data-label="Company">${f['Company'] || '-'}</td>
+        <td data-label="Status">
+          <span class="status-badge" style="background: ${spun ? '#d1fae5' : '#fef3c7'}; color: ${spun ? '#065f46' : '#92400e'};">
+            ${spun ? 'Redeemed' : 'Awaiting Spin'}
+          </span>
+        </td>
+        <td data-label="Prize Won">
+          ${prize ? `<strong style="color: #B46100;">${PRIZE_LABELS[prize] || prize}</strong>` : '—'}
+        </td>
+        <td data-label="Date Won">${wonDateFormatted}</td>
+      </tr>
+    `;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+const _origShowSectionReviewRewards = showSection;
+showSection = function(sectionId) {
+  _origShowSectionReviewRewards(sectionId);
+  if (sectionId === 'review-rewards') loadReviewRewards();
+};
 
 // ===== BLOCKED TIMES MANAGEMENT =====
 
