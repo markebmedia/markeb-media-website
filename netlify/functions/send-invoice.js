@@ -190,7 +190,7 @@ exports.handler = async (event) => {
         </div>
         <div class="inv-meta-row">
           <span class="inv-meta-label">Billed to</span>
-          <span class="inv-meta-value">${f.clientName}<br><span style="font-size:12px;color:#8a6e44;">${f.clientEmail}</span></span>
+          <span class="inv-meta-value">${f.clientName}<br><span style="font-size:12px;color:#8a6e44;">${f.clientEmail}</span>${f.billingAddress ? `<br><span style="font-size:12px;color:#8a6e44;">${f.billingAddress}</span>` : ''}</span>
         </div>
       </div>
 
