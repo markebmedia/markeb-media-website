@@ -8994,9 +8994,30 @@ async function deleteBlockedTime(recordId, date) {
 
 // ===== RETAINER CLIENTS =====
 
+const DEVELOPER_PACKAGE_SERVICES = [
+  { id: 'dev-strategy-planning', name: 'Strategy & Planning' },
+  { id: 'dev-branding-development', name: 'Branding & Development' },
+  { id: 'dev-photography', name: 'Photography (Developer Package)' },
+  { id: 'dev-videography', name: 'Videography (Developer Package)' },
+  { id: 'dev-drone', name: 'Drone (Developer Package)' },
+  { id: 'dev-social-content-marketing', name: 'Social Media & Content Marketing' }
+];
+
+const DEVELOPER_PACKAGE_ADDONS = [
+  { id: 'dev-cgi-visuals', name: 'CGI Visuals' },
+  { id: 'dev-print-materials', name: 'Print Materials' },
+  { id: 'dev-digital-presence', name: 'Digital Presence' },
+  { id: 'dev-property-portals', name: 'Property Portals & Platforms' },
+  { id: 'dev-paid-advertising', name: 'Paid Advertising' },
+  { id: 'dev-email-marketing', name: 'Email Marketing' },
+  { id: 'dev-onsite-show-home', name: 'On-Site & Show Home' },
+  { id: 'dev-lead-generation', name: 'Lead Generation' },
+  { id: 'dev-launch-events', name: 'Launch Events' }
+];
+
 const RETAINER_SERVICES_LIST = [
-  ...SERVICES_CATALOG.north.map(s => ({ id: s.id, name: s.name })),
-  ...Object.values(ADDONS_CATALOG).map(a => ({ id: a.id, name: a.name }))
+  ...DEVELOPER_PACKAGE_SERVICES,
+  ...DEVELOPER_PACKAGE_ADDONS
 ].filter((s, i, arr) => arr.findIndex(x => x.id === s.id) === i);
 
 let allRetainerClients = [];
