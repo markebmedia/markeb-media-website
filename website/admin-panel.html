@@ -3399,7 +3399,7 @@ We wanted to reach out..." required></textarea>
 
         <div class="form-group">
           <label class="form-label">Services Included <span style="font-weight:400;color:#94a3b8;">— optional</span></label>
-          <div id="retainerServiceCheckboxes" style="display:flex;flex-direction:column;gap:10px;max-height:340px;overflow-y:auto;border:2px solid #e2e8f0;border-radius:10px;padding:14px;"></div>
+          <div id="retainerServiceCheckboxes" style="display:flex;flex-direction:column;gap:10px;max-height:340px;overflow-y:auto;overflow-x:hidden;border:2px solid #e2e8f0;border-radius:10px;padding:14px;box-sizing:border-box;width:100%;"></div>
         </div>
 
         <div class="form-group">
@@ -9152,9 +9152,9 @@ function handleRetainerClientSelect() {
 function populateRetainerServiceCheckboxes(selected = [], prices = {}) {
   const container = document.getElementById('retainerServiceCheckboxes');
   container.innerHTML = RETAINER_SERVICES_LIST.map(s => `
-    <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:2px solid #e2e8f0;border-radius:8px;cursor:pointer;">
-      <input type="checkbox" value="${s.id}" ${selected.includes(s.id) ? 'checked' : ''} onchange="toggleRetainerService('${s.id}', '${s.name.replace(/'/g,"&#39;")}')">
-      <span style="font-size:13px;font-weight:600;">${s.name}</span>
+    <label style="display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border:2px solid #e2e8f0;border-radius:8px;cursor:pointer;width:100%;box-sizing:border-box;min-width:0;">
+      <input type="checkbox" value="${s.id}" ${selected.includes(s.id) ? 'checked' : ''} onchange="toggleRetainerService('${s.id}', '${s.name.replace(/'/g,"&#39;")}')" style="flex-shrink:0;margin-top:2px;">
+      <span style="font-size:13px;font-weight:600;word-break:break-word;min-width:0;">${s.name}</span>
     </label>
   `).join('');
   retainerSelectedServices = selected.map(id => {
