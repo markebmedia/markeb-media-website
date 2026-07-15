@@ -9099,10 +9099,15 @@ function renderRetainerClients() {
           <div style="font-size:12px;color:#64748b;">${f['Client Email']}</div>
         </td>
         <td data-label="Services" style="white-space:normal;overflow-wrap:break-word;vertical-align:top;padding-top:14px;">
-          <div style="display:flex;flex-wrap:wrap;gap:6px;max-width:100%;align-items:center;">
+          <div class="services-tags-collapsed" id="services-collapsed-${r.id}" style="display:flex;flex-wrap:wrap;gap:6px;max-width:100%;align-items:center;">
             ${services.slice(0,3).map(s => `<span style="display:inline-block;background:#fff3e0;color:#7a3e00;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap;">${s}</span>`).join('')}
-            ${services.length > 3 ? `<span style="font-size:11px;color:#94a3b8;white-space:nowrap;font-weight:600;">+${services.length - 3} more</span>` : ''}
+            ${services.length > 3 ? `<span onclick="toggleRetainerServices('${r.id}')" style="font-size:11px;color:#B46100;white-space:nowrap;font-weight:700;cursor:pointer;text-decoration:underline;">+${services.length - 3} more</span>` : ''}
           </div>
+          ${services.length > 3 ? `
+          <div class="services-tags-expanded" id="services-expanded-${r.id}" style="display:none;flex-wrap:wrap;gap:6px;max-width:100%;align-items:center;">
+            ${services.map(s => `<span style="display:inline-block;background:#fff3e0;color:#7a3e00;padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap;">${s}</span>`).join('')}
+            <span onclick="toggleRetainerServices('${r.id}')" style="font-size:11px;color:#B46100;white-space:nowrap;font-weight:700;cursor:pointer;text-decoration:underline;">show less</span>
+          </div>` : ''}
         </td>
         <td data-label="Monthly Price"><strong>£${parseFloat(f['Total Monthly Price']||0).toFixed(2)}</strong><div style="font-size:11px;color:#94a3b8;">inc VAT</div></td>
         <td data-label="Contract">
@@ -9129,6 +9134,15 @@ function renderRetainerClients() {
   html += '</tbody></table>';
   container.innerHTML = html + '</div>';
   lucide.createIcons();
+}
+
+function toggleRetainerServices(recordId) {
+  const collapsed = document.getElementById(`services-collapsed-${recordId}`);
+  const expanded = document.getElementById(`services-expanded-${recordId}`);
+  if (!collapsed || !expanded) return;
+  const isExpanded = expanded.style.display !== 'none';
+  collapsed.style.display = isExpanded ? 'flex' : 'none';
+  expanded.style.display = isExpanded ? 'none' : 'flex';
 }
 
 function populateRetainerClientsList() {
