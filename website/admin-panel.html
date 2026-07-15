@@ -9074,7 +9074,10 @@ function renderRetainerClients() {
     'Cancelled': { bg:'#f1f5f9', color:'#64748b' }
   };
 
-  let html = `<table class="data-table"><thead><tr>
+  let html = `<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+  <table class="data-table" style="table-layout:fixed;min-width:1100px;"><colgroup>
+    <col style="width:200px;"><col style="width:340px;"><col style="width:130px;"><col style="width:180px;"><col style="width:120px;"><col style="width:150px;"><col style="width:140px;">
+  </colgroup><thead><tr>
     <th>Client</th><th>Services</th><th>Monthly Price</th><th>Contract</th><th>Status</th><th>Contract Files</th><th>Actions</th>
   </tr></thead><tbody>`;
 
@@ -9095,9 +9098,11 @@ function renderRetainerClients() {
           <div style="font-weight:700;">${f['Client Name']}</div>
           <div style="font-size:12px;color:#64748b;">${f['Client Email']}</div>
         </td>
-        <td data-label="Services">
-          ${services.slice(0,3).map(s => `<span style="display:inline-block;background:#fff3e0;color:#7a3e00;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin:2px 2px 0 0;">${s}</span>`).join('')}
-          ${services.length > 3 ? `<span style="font-size:11px;color:#94a3b8;">+${services.length - 3} more</span>` : ''}
+        <td data-label="Services" style="white-space:normal;overflow-wrap:break-word;">
+          <div style="display:flex;flex-wrap:wrap;gap:4px;max-width:100%;">
+            ${services.slice(0,3).map(s => `<span style="display:inline-block;background:#fff3e0;color:#7a3e00;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap;">${s}</span>`).join('')}
+            ${services.length > 3 ? `<span style="font-size:11px;color:#94a3b8;white-space:nowrap;">+${services.length - 3} more</span>` : ''}
+          </div>
         </td>
         <td data-label="Monthly Price"><strong>£${parseFloat(f['Total Monthly Price']||0).toFixed(2)}</strong><div style="font-size:11px;color:#94a3b8;">inc VAT</div></td>
         <td data-label="Contract">
@@ -9122,7 +9127,7 @@ function renderRetainerClients() {
   });
 
   html += '</tbody></table>';
-  container.innerHTML = html;
+  container.innerHTML = html + '</div>';
   lucide.createIcons();
 }
 
