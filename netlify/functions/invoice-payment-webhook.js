@@ -39,7 +39,8 @@ exports.handler = async (event) => {
   const metadata = paymentIntent.metadata || {};
 
   // Only process invoice payments (not card-on-file charges from charge-card.js)
-  if (metadata.source !== 'invoice-pay-now') {
+  const validSources = ['invoice-pay-now', 'invoice-pay-now-manual'];
+  if (!validSources.includes(metadata.source)) {
     console.log('Skipping — not an invoice-pay-now payment');
     return { statusCode: 200, body: JSON.stringify({ received: true, ignored: true }) };
   }
