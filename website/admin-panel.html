@@ -3320,6 +3320,15 @@ We wanted to reach out..." required></textarea>
         <option value="Lost">Lost</option>
       </select>
     </div>
+    <div class="bulk-enroll-bar" style="display:none;justify-content:space-between;align-items:center;margin-bottom:16px;padding:12px 16px;background:#f5f3ff;border:2px solid #7c3aed;border-radius:10px;flex-wrap:wrap;gap:12px;">
+      <div style="font-size:14px;font-weight:600;color:#5b21b6;">
+        <span class="selected-enroll-count">0</span> prospect(s) selected
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary btn-small" onclick="deselectAllProspectsForEnroll()">Clear Selection</button>
+        <button class="btn btn-primary btn-small" style="background:#7c3aed;border-color:#7c3aed;" onclick="showBulkEnrollModal()">Enroll Selected</button>
+      </div>
+    </div>
     <div id="savedProspectsContainer"></div>
   </div>
 </div>
@@ -3336,6 +3345,15 @@ We wanted to reach out..." required></textarea>
       <i data-lucide="plus-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>
       Add Prospects
     </button>
+  </div>
+  <div class="bulk-enroll-bar" style="display:none;justify-content:space-between;align-items:center;margin-bottom:24px;padding:12px 16px;background:#f5f3ff;border:2px solid #7c3aed;border-radius:10px;flex-wrap:wrap;gap:12px;">
+    <div style="font-size:14px;font-weight:600;color:#5b21b6;">
+      <span class="selected-enroll-count">0</span> prospect(s) selected
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-secondary btn-small" onclick="deselectAllProspectsForEnroll()">Clear Selection</button>
+      <button class="btn btn-primary btn-small" style="background:#7c3aed;border-color:#7c3aed;" onclick="showBulkEnrollModal()">Enroll Selected</button>
+    </div>
   </div>
   <div class="stats-grid" style="margin-bottom:24px;">
     <div class="stat-card"><div class="stat-value" id="pipelineTotal">0</div><div class="stat-label">Total Prospects</div></div>
@@ -3431,6 +3449,29 @@ We wanted to reach out..." required></textarea>
       <div class="button-group" style="margin-top:24px;">
         <button type="button" class="btn btn-secondary" onclick="closeModal('enrollModal')" style="flex:1;">Cancel</button>
         <button type="button" class="btn btn-primary" onclick="confirmEnroll()" style="flex:2;">Enroll</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Enroll Modal -->
+<div class="modal" id="bulkEnrollModal" onclick="closeModal('bulkEnrollModal')">
+  <div class="modal-dialog" style="max-width:480px;" onclick="event.stopPropagation()">
+    <div class="modal-header" style="background:linear-gradient(135deg,#7c3aed,#5b21b6);">
+      <h3>Enroll <span id="bulkEnrollModalCount">0</span> Prospects</h3>
+      <button class="modal-close" onclick="closeModal('bulkEnrollModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="warning-box" style="margin-bottom:20px;">
+        Prospects already actively enrolled in the selected sequence will be skipped automatically — no duplicates.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sequence *</label>
+        <select id="bulkEnrollSequenceSelect" class="form-input"></select>
+      </div>
+      <div class="button-group" style="margin-top:24px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('bulkEnrollModal')" style="flex:1;">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirmBulkEnrollBtn" onclick="confirmBulkEnroll()" style="flex:2;background:#7c3aed;border-color:#7c3aed;">Enroll All Selected</button>
       </div>
     </div>
   </div>
@@ -13923,12 +13964,15 @@ function renderSavedProspects() {
 
   const duplicateEmails = getDuplicateProspectEmails();
   const knownOwners = getKnownOwners();
-  let html = `<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th>LinkedIn</th><th style="min-width:180px;">Owner</th><th>Stage</th><th style="min-width:220px;">Notes</th><th>Actions</th></tr></thead><tbody>`;
+  window.__savedProspectVisibleIds = prospects.map(p => p.id);
+  const allVisibleSelected = prospects.length > 0 && prospects.every(p => selectedProspectIds.has(p.id));
+  let html = `<table class="data-table"><thead><tr><th style="width:36px;"><input type="checkbox" ${allVisibleSelected ? 'checked' : ''} onchange="toggleSelectAllVisible(this.checked, window.__savedProspectVisibleIds)" style="width:16px;height:16px;cursor:pointer;"></th><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th>LinkedIn</th><th style="min-width:180px;">Owner</th><th>Stage</th><th style="min-width:220px;">Notes</th><th>Actions</th></tr></thead><tbody>`;
   prospects.forEach(p => {
     const sc = STAGE_COLORS[p.stage] || STAGE_COLORS['New'];
     const isDupe = duplicateEmails.has((p.email||'').toLowerCase().trim());
     html += `
       <tr style="${isDupe ? 'background:#fef2f2;border-left:4px solid #ef4444;' : ''}">
+        <td data-label="Select"><input type="checkbox" ${selectedProspectIds.has(p.id) ? 'checked' : ''} onchange="toggleProspectSelection('${p.id}', this.checked)" style="width:16px;height:16px;cursor:pointer;"></td>
         <td data-label="Name"><strong>${p.name||'—'}</strong></td>
         <td data-label="Email" style="font-family:monospace;font-size:12px;${isDupe ? 'color:#ef4444;font-weight:700;' : ''}">
           ${p.email}
@@ -14044,8 +14088,11 @@ function renderPipeline() {
     if (items.length === 0) {
       html += `<div style="padding:16px;background:#f8fafc;border:2px dashed #e2e8f0;border-radius:10px;text-align:center;color:#94a3b8;font-size:13px;">No prospects at this stage</div>`;
     } else {
+      window[`__pipelineStageIds_${stageKey}`] = items.map(p => p.id);
+      const allStageSelected = items.length > 0 && items.every(p => selectedProspectIds.has(p.id));
       html += `<table class="data-table" style="table-layout:fixed;width:100%;">
         <colgroup>
+          <col style="width:36px;">
           <col style="width:12%;">
           <col style="width:16%;">
           <col style="width:12%;">
@@ -14055,13 +14102,14 @@ function renderPipeline() {
           <col style="width:160px;">
           <col style="width:120px;">
         </colgroup>
-        <thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th>Owner</th><th>Notes</th><th>Move Stage</th><th>Actions</th></tr></thead><tbody>`;
+        <thead><tr><th><input type="checkbox" ${allStageSelected ? 'checked' : ''} onchange="toggleSelectAllVisible(this.checked, window.__pipelineStageIds_${stageKey})" style="width:16px;height:16px;cursor:pointer;"></th><th>Name</th><th>Email</th><th>Company</th><th>Job Title</th><th>Owner</th><th>Notes</th><th>Move Stage</th><th>Actions</th></tr></thead><tbody>`;
       const duplicateEmailsForStage = getDuplicateProspectEmails();
       const knownOwnersForStage = getKnownOwners();
       items.forEach(p => {
         const isDupe = duplicateEmailsForStage.has((p.email||'').toLowerCase().trim());
         html += `
           <tr style="${isDupe ? 'background:#fef2f2;border-left:4px solid #ef4444;' : ''}">
+            <td data-label="Select"><input type="checkbox" ${selectedProspectIds.has(p.id) ? 'checked' : ''} onchange="toggleProspectSelection('${p.id}', this.checked)" style="width:16px;height:16px;cursor:pointer;"></td>
             <td data-label="Name"><strong>${p.name||'—'}</strong></td>
             <td data-label="Email" style="font-family:monospace;font-size:12px;${isDupe ? 'color:#ef4444;font-weight:700;' : ''}">
               ${p.email}
@@ -14358,6 +14406,132 @@ showSection = function(sectionId) {
   _origShowSectionClients(sectionId);
   if (sectionId === 'customers') loadCustomers();
 };
+
+// ===== BULK ENROLLMENT =====
+
+let selectedProspectIds = new Set();
+
+function toggleProspectSelection(id, checked) {
+  if (checked) selectedProspectIds.add(id);
+  else selectedProspectIds.delete(id);
+  updateBulkEnrollBars();
+}
+
+function toggleSelectAllVisible(checked, ids) {
+  if (!ids) return;
+  if (checked) ids.forEach(id => selectedProspectIds.add(id));
+  else ids.forEach(id => selectedProspectIds.delete(id));
+  updateBulkEnrollBars();
+  if (document.getElementById('savedProspectsContainer')) renderSavedProspects();
+  if (document.getElementById('pipelineContainer')) renderPipeline();
+}
+
+function deselectAllProspectsForEnroll() {
+  selectedProspectIds.clear();
+  updateBulkEnrollBars();
+  if (document.getElementById('savedProspectsContainer')) renderSavedProspects();
+  if (document.getElementById('pipelineContainer')) renderPipeline();
+}
+
+function updateBulkEnrollBars() {
+  const count = selectedProspectIds.size;
+  document.querySelectorAll('.selected-enroll-count').forEach(el => el.textContent = count);
+  document.querySelectorAll('.bulk-enroll-bar').forEach(bar => {
+    bar.style.display = count > 0 ? 'flex' : 'none';
+  });
+}
+
+function showBulkEnrollModal() {
+  if (selectedProspectIds.size === 0) { alert('Please select at least one prospect'); return; }
+  document.getElementById('bulkEnrollModalCount').textContent = selectedProspectIds.size;
+  const select = document.getElementById('bulkEnrollSequenceSelect');
+  const activeSeqs = allSequences.filter(s => s.fields['Active'] === true);
+  select.innerHTML = activeSeqs.length
+    ? activeSeqs.map(s => `<option value="${s.id}">${s.fields['Name']}</option>`).join('')
+    : '<option value="">No active sequences — create one first</option>';
+  document.getElementById('bulkEnrollModal').classList.add('active');
+}
+
+async function confirmBulkEnroll() {
+  const sequenceId = document.getElementById('bulkEnrollSequenceSelect').value;
+  if (!sequenceId) { alert('Please select a sequence'); return; }
+
+  const seq = allSequences.find(s => s.id === sequenceId);
+  let steps = [];
+  try { steps = JSON.parse(seq.fields['Steps JSON'] || '[]'); } catch { steps = []; }
+  if (steps.length === 0) { alert('This sequence has no steps'); return; }
+
+  const btn = document.getElementById('confirmBulkEnrollBtn');
+  btn.disabled = true;
+  btn.textContent = 'Enrolling...';
+
+  const today = toLocalDateString(new Date());
+  const firstStepDate = toLocalDateString(new Date(Date.now() + steps[0].day * 24 * 60 * 60 * 1000));
+
+  // Check for existing active enrollments in this sequence to avoid duplicates
+  let existingEnrollments = [];
+  try {
+    const res = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'GET',
+        table: 'Sequence Enrollments',
+        filterFormula: `AND({Sequence ID} = '${sequenceId}', {Status} = 'Active')`
+      })
+    });
+    const data = await res.json();
+    existingEnrollments = data.records || [];
+  } catch (e) { /* non-fatal — proceeds without dedup if this lookup fails */ }
+
+  const alreadyEnrolledIds = new Set(existingEnrollments.flatMap(e => e.fields['Prospect'] || []));
+  const targetIds = Array.from(selectedProspectIds).filter(id => !alreadyEnrolledIds.has(id));
+  const skipped = selectedProspectIds.size - targetIds.length;
+
+  let enrolled = 0, failed = 0;
+  const BATCH_SIZE = 5;
+
+  for (let i = 0; i < targetIds.length; i += BATCH_SIZE) {
+    const batch = targetIds.slice(i, i + BATCH_SIZE);
+    await Promise.all(batch.map(async (prospectId) => {
+      try {
+        await fetch('/.netlify/functions/airtable-proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            method: 'POST',
+            table: 'Sequence Enrollments',
+            body: {
+              fields: {
+                'Prospect': [prospectId],
+                'Sequence ID': sequenceId,
+                'Sequence Name': seq.fields['Name'],
+                'Current Step': 0,
+                'Status': 'Active',
+                'Enrolled Date': today,
+                'Next Send Date': firstStepDate
+              }
+            }
+          })
+        });
+        enrolled++;
+      } catch (e) {
+        failed++;
+      }
+    }));
+    if (i + BATCH_SIZE < targetIds.length) await new Promise(r => setTimeout(r, 500));
+  }
+
+  showAdminToast(`✅ Enrolled ${enrolled} prospect${enrolled !== 1 ? 's' : ''}${skipped ? ` — ${skipped} already active, skipped` : ''}${failed ? ` — ${failed} failed` : ''}`);
+  closeModal('bulkEnrollModal');
+  selectedProspectIds.clear();
+  updateBulkEnrollBars();
+  if (document.getElementById('savedProspectsContainer')) renderSavedProspects();
+  if (document.getElementById('pipelineContainer')) renderPipeline();
+
+  btn.disabled = false;
+  btn.textContent = 'Enroll All Selected';
+}
 
 // Load Hunter credits on page load
 document.addEventListener('DOMContentLoaded', function() {
