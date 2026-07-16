@@ -1048,12 +1048,44 @@ body {
       ],
       south: [
         {
-          id: 'gold-package',
-          name: 'Gold Package',
+          id: 'complete-branding',
+          name: 'Personal Branding Package — Complete Photo & Video',
+          price: 745.00,
+          duration: 300,
+          isPropertyService: false,
+          availableAddons: ['elevate-edit', 'add-branded-outro']
+        },
+        {
+          id: 'branding-video',
+          name: 'Personal Branding — Videography Session',
+          price: 445.00,
+          duration: 180,
+          isPropertyService: false,
+          availableAddons: ['elevate-edit', 'add-branded-outro']
+        },
+        {
+          id: 'branding-photo',
+          name: 'Personal Branding — Photography Session (10 Signature Shots)',
+          price: 345.00,
+          duration: 120,
+          isPropertyService: false,
+          availableAddons: []
+        },
+        {
+          id: 'platinum-package',
+          name: 'Platinum Package',
           price: 500.00,
           duration: 150,
           isPropertyService: true,
-          availableAddons: ['add-branded-outro', 'epc-standard', 'epc-large']
+          availableAddons: ['add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
+        },
+        {
+          id: 'gold-package',
+          name: 'Gold Package',
+          price: 369.00,
+          duration: 240,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
         },
         {
           id: 'silver-package',
@@ -1061,7 +1093,7 @@ body {
           price: 219.00,
           duration: 150,
           isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
         },
         {
           id: 'bronze-package',
@@ -1069,7 +1101,7 @@ body {
           price: 169.00,
           duration: 90,
           isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-speed-tours', 'local-area-highlights', 'matterport-tour', 'epc-standard', 'epc-large']
         },
         {
           id: 'all-in-one-drone',
@@ -1077,7 +1109,7 @@ body {
           price: 179.00,
           duration: 45,
           isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
         },
         {
           id: 'property-video',
@@ -1085,7 +1117,7 @@ body {
           price: 129.00,
           duration: 60,
           isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
         },
         {
           id: 'property-photo',
@@ -1093,7 +1125,7 @@ body {
           price: 99.00,
           duration: 45,
           isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'matterport-tour', 'epc-standard', 'epc-large']
         },
         {
           id: 'drone-video',
@@ -1101,7 +1133,7 @@ body {
           price: 109.00,
           duration: 20,
           isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'epc-standard', 'epc-large']
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'elevate-edit', 'property-video', 'property-drone-photo', 'property-speed-tours', 'local-area-highlights', 'add-branded-outro', 'matterport-tour', 'epc-standard', 'epc-large']
         },
         {
           id: 'drone-photo',
@@ -1109,7 +1141,15 @@ body {
           price: 109.00,
           duration: 20,
           isPropertyService: true,
-          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'matterport-tour', 'epc-standard', 'epc-large']
+        },
+        {
+          id: 'matterport-virtual-tour',
+          name: 'Matterport Virtual Tour',
+          price: 250.00,
+          duration: 90,
+          isPropertyService: true,
+          availableAddons: ['standard-floor-plan', 'plus-floor-plan', 'floor-plan-3d', 'property-video', 'property-drone-photo', 'property-drone-video', 'property-speed-tours', 'local-area-highlights', 'epc-standard', 'epc-large']
         }
       ]
     };
