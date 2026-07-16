@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Office and Business Standards | Markeb Media</title>
+<link href="https://fonts.googleapis.com/css2?family=Mukta:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Mukta', sans-serif;
+    background: #f8fafc;
+    color: #1e293b;
+    padding: 48px 20px;
+    line-height: 1.6;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .page-header {
+    margin-bottom: 40px;
+  }
+
+  .page-header .eyebrow {
+    display: inline-block;
+    background: #B46100;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  .page-header h1 {
+    font-size: 34px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 10px;
+  }
+
+  .page-header p {
+    font-size: 15px;
+    color: #64748b;
+  }
+
+  .policy-card {
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+  }
+
+  .policy-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .policy-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #fff8ee;
+    border: 2px solid #B46100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .policy-card-header h2 {
+    font-size: 19px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  .policy-card p {
+    font-size: 14.5px;
+    color: #334155;
+    margin-bottom: 12px;
+  }
+
+  .policy-card p:last-child { margin-bottom: 0; }
+
+  .policy-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 12px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .policy-card ul:last-child { margin-bottom: 0; }
+
+  .policy-card li {
+    font-size: 14.5px;
+    color: #334155;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .policy-card li::before {
+    content: '✓';
+    color: #B46100;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .hours-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 4px 0 16px 0;
+  }
+
+  .hours-option {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .hours-option .time {
+    font-size: 17px;
+    font-weight: 700;
+    color: #B46100;
+  }
+
+  .hours-option .label {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 2px;
+  }
+
+  .whose-job {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f0fdf4;
+    border: 1px solid #10b981;
+    color: #065f46;
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-top: 4px;
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 13px;
+    color: #94a3b8;
+    margin-top: 32px;
+  }
+
+  .toc {
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+
+  .toc h3 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #94a3b8;
+    margin-bottom: 14px;
+  }
+
+  .toc ol {
+    columns: 2;
+    column-gap: 24px;
+    padding-left: 18px;
+    font-size: 14px;
+    color: #1e293b;
+  }
+
+  .toc li { margin-bottom: 8px; break-inside: avoid; }
+  .toc a { color: #1e293b; text-decoration: none; }
+  .toc a:hover { color: #B46100; }
+
+  .policy-card p strong,
+  .policy-card li strong { color: #1e293b; }
+
+  .sub-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #B46100;
+    margin: 18px 0 8px 0;
+  }
+
+  .sub-label:first-of-type { margin-top: 4px; }
+
+  .example-box {
+    background: #f8fafc;
+    border-left: 3px solid #B46100;
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    font-size: 13.5px;
+    color: #475569;
+    margin: 8px 0 16px 0;
+  }
+
+  .example-box:last-child { margin-bottom: 0; }
+
+  .consequence-box {
+    background: #fef2f2;
+    border: 2px solid #ef4444;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-top: 16px;
+  }
+
+  .consequence-box .title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #991b1b;
+    margin-bottom: 6px;
+  }
+
+  .consequence-box p {
+    font-size: 13.5px;
+    color: #7f1d1d;
+    margin-bottom: 0;
+  }
+
+  .version-footer {
+    text-align: center;
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 8px;
+  }
+
+  @media (max-width: 640px) {
+    .policy-card { padding: 24px 20px; }
+    .hours-grid { grid-template-columns: 1fr; }
+    .page-header h1 { font-size: 26px; }
+    .toc ol { columns: 1; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="page-header">
+      <span class="eyebrow">Internal, Team Reference</span>
+      <h1>Office and Business Standards</h1>
+      <p>Pennine Five, 20 to 22 Hawley Street, Sheffield S1 2EA. How we run the office day to day. Applies to everyone working from or out of the office.</p>
+    </div>
+
+    <div class="toc">
+      <h3>On this page</h3>
+      <ol>
+        <li><a href="#leaving">Leaving the Office</a></li>
+        <li><a href="#hours">Core Working Hours</a></li>
+        <li><a href="#absence">Sickness & Absence</a></li>
+        <li><a href="#content">Content Turnaround</a></li>
+        <li><a href="#tidy">Keeping the Office Tidy</a></li>
+        <li><a href="#kit">Equipment & Kit Care</a></li>
+        <li><a href="#security">Security & Access</a></li>
+        <li><a href="#data">Client Data & Confidentiality</a></li>
+        <li><a href="#driving">Driving & Site Safety</a></li>
+        <li><a href="#visitors">Client Visitors</a></li>
+        <li><a href="#consequences">If This Isn't Followed</a></li>
+      </ol>
+    </div>
+
+    <!-- Leaving the Office -->
+    <div class="policy-card" id="leaving">
+      <div class="policy-card-header">
+        <div class="policy-icon">🚪</div>
+        <h2>Leaving the Office</h2>
+      </div>
+      <p>Never leave the office without telling someone or clarifying where you're going, whether that's five minutes or the rest of the day.</p>
+
+      <span class="sub-label">How to tell someone</span>
+      <p>A quick message in Teams or the team WhatsApp is enough. It doesn't need to be a conversation. Say what you're doing and roughly when you'll be back. A verbal "heads up" to whoever's in the room doesn't count on its own if no one actually hears it, so put it in writing too.</p>
+      <div class="example-box">e.g. "Popping to the bank, back in 20" / "Heading straight to a shoot from here, back around 3" / "Leaving early today, done for the day at 2:30"</div>
+
+      <span class="sub-label">What this covers</span>
+      <ul>
+        <li>Short breaks, lunch, errands, and early finishes, not just full days out</li>
+        <li>Heading straight to or from a shoot without coming back to the office</li>
+        <li>Working from home or anywhere other than the office on a given day</li>
+      </ul>
+
+      <span class="sub-label">Locking up</span>
+      <p>If you're the last one out, make sure the office door is properly shut and secured behind you, and windows are closed before you leave. If you're not sure whether you're last, check before you go.</p>
+    </div>
+
+    <!-- Core Working Hours -->
+    <div class="policy-card" id="hours">
+      <div class="policy-card-header">
+        <div class="policy-icon">🕘</div>
+        <h2>Core Working Hours</h2>
+      </div>
+      <p>Pick one of the three 8 hour windows below and stick to that same window every working day, so the team always knows when to expect you. If your circumstances change and you need to switch windows, agree it with management first rather than changing day to day.</p>
+      <div class="hours-grid">
+        <div class="hours-option">
+          <div class="time">8:00 to 4:00</div>
+          <div class="label">Early start</div>
+        </div>
+        <div class="hours-option">
+          <div class="time">8:30 to 4:30</div>
+          <div class="label">Mid start</div>
+        </div>
+        <div class="hours-option">
+          <div class="time">9:00 to 5:00</div>
+          <div class="label">Standard start</div>
+        </div>
+      </div>
+
+      <span class="sub-label">Lunch break</span>
+      <p>These windows already include your lunch break. An 8:00 to 4:00 day is 8 hours in total, lunch included, not 8 hours on top of a break. Take it when it makes sense around shoots and meetings, but you're still expected back at your desk (or on site) within the window.</p>
+
+      <span class="sub-label">Running late</span>
+      <p>If you're going to be late starting your window for any reason, message the team as early as you can, ideally before the time you'd normally start. Persistent lateness without warning is a conversation with management, not something that just slides.</p>
+
+      <span class="sub-label">Shoots and travel</span>
+      <p>Shoots, client meetings, and travel outside these hours are a normal part of the role and aren't a breach of this policy. This section is about the baseline in office window on days without early or late commitments.</p>
+    </div>
+
+    <!-- Sickness & Absence -->
+    <div class="policy-card" id="absence">
+      <div class="policy-card-header">
+        <div class="policy-icon">🤒</div>
+        <h2>Sickness & Absence</h2>
+      </div>
+      <p>If you're not going to make it in, whether that's sickness, an emergency, or otherwise, let management know directly, as early as possible and before your usual start time. A message to the general team chat isn't enough on its own for a full day absence; someone with visibility of the day's bookings needs to know so shoots can be covered or moved.</p>
+      <ul>
+        <li>Sickness: message directly before your start time where possible</li>
+        <li>Planned time off: agree it in advance, not on the day</li>
+        <li>If you're booked on a shoot that day, flag this clearly so it can be reassigned or rescheduled</li>
+      </ul>
+    </div>
+
+    <!-- Content Turnaround -->
+    <div class="policy-card" id="content">
+      <div class="policy-card-header">
+        <div class="policy-icon">🎬</div>
+        <h2>Content Turnaround</h2>
+      </div>
+      <p>All content from a shoot must be sent to the editors on the <strong>same calendar day as the shoot</strong>, not "before you personally finish for the day," and not pushed to the next morning.</p>
+
+      <span class="sub-label">Deadline</span>
+      <p>Content should be sent as soon as reasonably possible after the shoot wraps, and no later than the end of your working day. If a shoot finishes very close to end of day, get it uploaded that evening rather than leaving it overnight.</p>
+
+      <span class="sub-label">How it's sent</span>
+      <p>Use WeTransfer or Dropbox to upload content, as set up per client, not personal devices, personal cloud storage, or messaging apps. If you're unsure which method applies to a job, check before the shoot, not after.</p>
+
+      <span class="sub-label">If something goes wrong</span>
+      <p>If you can't upload on the day, whether that's no signal on site or a technical fault, message management <strong>the same day</strong> to flag it, rather than staying quiet and sending it late. Flagged delays are understood; unflagged ones aren't.</p>
+    </div>
+
+    <!-- Office Tidiness -->
+    <div class="policy-card" id="tidy">
+      <div class="policy-card-header">
+        <div class="policy-icon">🧹</div>
+        <h2>Keeping the Office Tidy</h2>
+      </div>
+      <p>The office should be kept clean and tidy throughout the day, not just tidied up at the end of it.</p>
+      <ul>
+        <li>Clear your own desk and any shared spaces (kitchen, meeting area) straight after you use them</li>
+        <li>Wash up and put away any dishes, mugs, or kitchen equipment you use, don't leave it for someone else</li>
+        <li>Empty a bin as soon as it's full to the rim, rather than waiting for it to overflow, don't leave it for "someone else" to notice first</li>
+      </ul>
+      <div class="whose-job">👥 Whose job is it? Everyone's. Anyone in the office can and should do this, regardless of role or seniority</div>
+    </div>
+
+    <!-- Equipment & Kit Care -->
+    <div class="policy-card" id="kit">
+      <div class="policy-card-header">
+        <div class="policy-icon">📷</div>
+        <h2>Equipment & Kit Care</h2>
+      </div>
+      <p>Cameras, drones, laptops, and other kit are shared company property and need to be looked after so the next person isn't let down.</p>
+      <ul>
+        <li>Batteries are charged and put back on charge after use, not left flat for the next shoot</li>
+        <li>Memory cards are cleared and content backed up before being reused</li>
+        <li>Kit is returned to its proper storage place after every shoot, not left in cars or at home overnight</li>
+        <li>Any damage, faults, or near misses (including with the drone) are reported to management immediately, not after the next job reveals it</li>
+      </ul>
+    </div>
+
+    <!-- Security & Access -->
+    <div class="policy-card" id="security">
+      <div class="policy-card-header">
+        <div class="policy-icon">🔐</div>
+        <h2>Security & Access</h2>
+      </div>
+      <p>Access cards and door codes are not to be shared outside the team or lent to anyone without checking with management first. Report a lost or missing access card the same day it happens.</p>
+      <p>The office should never be left open and unattended, even briefly. If you're stepping out and someone else isn't clearly staying, make sure the door is properly shut behind you.</p>
+    </div>
+
+    <!-- Client Data & Confidentiality -->
+    <div class="policy-card" id="data">
+      <div class="policy-card-header">
+        <div class="policy-icon">🔒</div>
+        <h2>Client Data & Confidentiality</h2>
+      </div>
+      <p>Client details, property access information, and unreleased content are confidential. This includes property addresses, key codes, and anything in Airtable or a client's dashboard.</p>
+      <ul>
+        <li>Don't discuss client jobs, prices, or personal details outside the team or on personal social media</li>
+        <li>Don't share raw or unedited content with anyone outside the company before it's been through the proper delivery process</li>
+        <li>Lock your laptop screen when you step away from your desk</li>
+      </ul>
+    </div>
+
+    <!-- Driving & Site Safety -->
+    <div class="policy-card" id="driving">
+      <div class="policy-card-header">
+        <div class="policy-icon">🚗</div>
+        <h2>Driving & Site Safety</h2>
+      </div>
+      <p>You're responsible for driving safely and legally between shoots, including having valid insurance, licence, and MOT for any vehicle used for work.</p>
+      <ul>
+        <li>No phone use while driving, including for satnav changes; set your route before you set off</li>
+        <li>Drone flights follow CAA rules at all times, no exceptions for a "better shot"</li>
+        <li>If a property or site feels unsafe to enter or shoot (access issues, aggressive dogs, hazards, anything that doesn't feel right), leave and call the office rather than pushing through it</li>
+      </ul>
+    </div>
+
+    <!-- Client Visitors -->
+    <div class="policy-card" id="visitors">
+      <div class="policy-card-header">
+        <div class="policy-icon">🤝</div>
+        <h2>Client Visitors</h2>
+      </div>
+      <p>If a client or visitor is coming into the office, whoever arranged the visit is responsible for making sure the space is presentable beforehand. This sits on top of, not instead of, the general tidiness expectations above. Give the team a heads up in good time so everyone can help if needed.</p>
+    </div>
+
+    <!-- Consequences -->
+    <div class="policy-card" id="consequences">
+      <div class="policy-card-header">
+        <div class="policy-icon">⚠️</div>
+        <h2>If This Isn't Followed</h2>
+      </div>
+      <p>Most of this comes down to communication and consideration for the rest of the team. A quiet reminder is usually all that's needed the first time something slips.</p>
+      <div class="consequence-box">
+        <div class="title">Repeated or ignored breaches</div>
+        <p>Where something keeps happening after it's been raised, whether that's persistent lateness, repeated late content delivery, ignoring the tidiness expectations, or leaving without telling anyone, it becomes a direct conversation with management, and may be treated as a performance or conduct issue.</p>
+      </div>
+    </div>
+
+    <p class="footer-note">Markeb Media Ltd · Internal use only</p>
+    <p class="version-footer">Last updated: 16 July 2026 · Questions about this policy go to management</p>
+
+  </div>
+
+</body>
+</html>
