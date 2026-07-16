@@ -19,6 +19,9 @@
 
 [functions."expire-retainers"]
   schedule = "0 8 * * *"
+
+[functions."send-sequence-emails-background"]
+  schedule = "0 9 * * *"
   
 [[headers]]
   for = "/website/admin-panel.html"

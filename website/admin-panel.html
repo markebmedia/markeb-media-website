@@ -1833,6 +1833,10 @@ body {
       <i data-lucide="bar-chart-2" class="nav-icon"></i>
       Pipeline
     </div>
+    <div class="nav-item" onclick="showSection('sequences')">
+      <i data-lucide="mail" class="nav-icon"></i>
+      Sequences
+    </div>
   </div>
 
   <div class="nav-section" style="margin-top: auto; padding-top: 24px; border-top: 2px solid #e2e8f0;">
@@ -3356,6 +3360,80 @@ We wanted to reach out..." required></textarea>
     </button>
   </div>
   <div id="pipelineContainer" class="calendar-container"></div>
+</div>
+
+<!-- Email Sequences Section -->
+<div class="admin-section" id="sequences">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h2 style="font-size:24px;font-weight:700;margin-bottom:4px;">Email Sequences</h2>
+      <p style="color:#64748b;font-size:14px;">Build drip sequences and enroll prospects — sends go out in batches of 5</p>
+    </div>
+    <button class="btn btn-primary" onclick="showSequenceModal()">
+      <i data-lucide="plus-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> New Sequence
+    </button>
+  </div>
+
+  <div class="calendar-container" id="sequencesContainer">
+    <div style="text-align:center;padding:40px;"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- Sequence Builder Modal -->
+<div class="modal" id="sequenceModal" onclick="closeModal('sequenceModal')">
+  <div class="modal-dialog" style="max-width:720px;" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 id="sequenceModalTitle">New Sequence</h3>
+      <button class="modal-close" onclick="closeModal('sequenceModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Sequence Name *</label>
+        <input type="text" id="seqName" class="form-input" placeholder="e.g. Estate Agent Cold Outreach">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select id="seqActive" class="form-input">
+          <option value="true">Active</option>
+          <option value="false">Paused</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Steps</label>
+        <div id="seqStepsContainer" style="display:flex;flex-direction:column;gap:16px;"></div>
+        <button type="button" class="btn btn-secondary btn-small" onclick="addSequenceStep()" style="margin-top:12px;">
+          <i data-lucide="plus" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Add Step
+        </button>
+      </div>
+
+      <div class="button-group" style="margin-top:24px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('sequenceModal')" style="flex:1;">Cancel</button>
+        <button type="button" class="btn btn-primary" id="saveSequenceBtn" onclick="saveSequence()" style="flex:2;">Save Sequence</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Enroll Modal -->
+<div class="modal" id="enrollModal" onclick="closeModal('enrollModal')">
+  <div class="modal-dialog" style="max-width:480px;" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Enroll in Sequence</h3>
+      <button class="modal-close" onclick="closeModal('enrollModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="enrollProspectInfo" style="padding:12px;background:#f8fafc;border-radius:8px;margin-bottom:20px;font-size:14px;"></div>
+      <div class="form-group">
+        <label class="form-label">Sequence *</label>
+        <select id="enrollSequenceSelect" class="form-input"></select>
+      </div>
+      <div class="button-group" style="margin-top:24px;">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('enrollModal')" style="flex:1;">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="confirmEnroll()" style="flex:2;">Enroll</button>
+      </div>
+    </div>
+  </div>
 </div>
 
   <!-- Find Booking Modal -->
@@ -13877,6 +13955,7 @@ function renderSavedProspects() {
         <td data-label="Actions">
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
             <a href="mailto:${p.email}" class="btn btn-primary btn-small">Email</a>
+            <button class="btn btn-small" style="background:#7c3aed;color:#fff;" onclick="showEnrollModal('${p.id}')">Enroll</button>
             <button class="btn btn-danger btn-small" onclick="deleteProspect('${p.id}')">Remove</button>
           </div>
         </td>
@@ -14006,6 +14085,7 @@ function renderPipeline() {
             <td data-label="Actions">
               <div style="display:flex;gap:6px;flex-wrap:wrap;">
                 <a href="mailto:${p.email}" class="btn btn-primary btn-small">Email</a>
+                <button class="btn btn-small" style="background:#7c3aed;color:#fff;" onclick="showEnrollModal('${p.id}')">Enroll</button>
                 <button class="btn btn-danger btn-small" onclick="deleteProspect('${p.id}')">Remove</button>
               </div>
             </td>
@@ -14042,6 +14122,235 @@ showSection = function(sectionId) {
   }
 };
 
+// ===== EMAIL SEQUENCES =====
+
+let allSequences = [];
+let currentSequenceId = null;
+let enrollTargetProspect = null;
+
+async function loadSequences() {
+  try {
+    const res = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ method: 'GET', table: 'Email Sequences' })
+    });
+    const data = await res.json();
+    allSequences = data.records || [];
+    if (document.getElementById('sequencesContainer')) renderSequences();
+  } catch (e) {
+    console.error('Error loading sequences:', e);
+  }
+}
+
+async function renderSequences() {
+  const container = document.getElementById('sequencesContainer');
+  if (!container) return;
+
+  if (allSequences.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:60px;color:#94a3b8;">No sequences yet. Click "New Sequence" to build your first drip.</div>';
+    return;
+  }
+
+  let enrollments = [];
+  try {
+    const res = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ method: 'GET', table: 'Sequence Enrollments' })
+    });
+    const data = await res.json();
+    enrollments = data.records || [];
+  } catch (e) { /* non-fatal */ }
+
+  let html = '<table class="data-table"><thead><tr><th>Name</th><th>Steps</th><th>Status</th><th>Active Enrollments</th><th>Actions</th></tr></thead><tbody>';
+
+  allSequences.forEach(seq => {
+    let steps = [];
+    try { steps = JSON.parse(seq.fields['Steps JSON'] || '[]'); } catch { steps = []; }
+    const active = seq.fields['Active'] === true;
+    const activeCount = enrollments.filter(e => e.fields['Sequence ID'] === seq.id && e.fields['Status'] === 'Active').length;
+
+    html += `
+      <tr>
+        <td data-label="Name"><strong>${seq.fields['Name']}</strong></td>
+        <td data-label="Steps">${steps.length} step${steps.length !== 1 ? 's' : ''} over ${steps.length ? steps[steps.length-1].day : 0} days</td>
+        <td data-label="Status"><span class="status-badge status-${active ? 'active' : 'inactive'}">${active ? 'Active' : 'Paused'}</span></td>
+        <td data-label="Active Enrollments">${activeCount}</td>
+        <td data-label="Actions">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-small" onclick="editSequence('${seq.id}')">Edit</button>
+            <button class="btn btn-danger btn-small" onclick="deleteSequence('${seq.id}', '${seq.fields['Name']}')">Delete</button>
+          </div>
+        </td>
+      </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+  lucide.createIcons();
+}
+
+function showSequenceModal() {
+  currentSequenceId = null;
+  document.getElementById('sequenceModalTitle').textContent = 'New Sequence';
+  document.getElementById('seqName').value = '';
+  document.getElementById('seqActive').value = 'true';
+  document.getElementById('seqStepsContainer').innerHTML = '';
+  addSequenceStep();
+  document.getElementById('sequenceModal').classList.add('active');
+}
+
+function editSequence(id) {
+  const seq = allSequences.find(s => s.id === id);
+  if (!seq) return;
+  currentSequenceId = id;
+  document.getElementById('sequenceModalTitle').textContent = 'Edit Sequence';
+  document.getElementById('seqName').value = seq.fields['Name'] || '';
+  document.getElementById('seqActive').value = seq.fields['Active'] === true ? 'true' : 'false';
+
+  let steps = [];
+  try { steps = JSON.parse(seq.fields['Steps JSON'] || '[]'); } catch { steps = []; }
+  document.getElementById('seqStepsContainer').innerHTML = '';
+  if (steps.length === 0) { addSequenceStep(); }
+  else steps.forEach(s => addSequenceStep(s));
+
+  document.getElementById('sequenceModal').classList.add('active');
+}
+
+function addSequenceStep(existing = null) {
+  const container = document.getElementById('seqStepsContainer');
+  const idx = container.children.length;
+  const div = document.createElement('div');
+  div.className = 'seq-step-row';
+  div.style.cssText = 'border:2px solid #e2e8f0;border-radius:10px;padding:16px;position:relative;';
+  div.innerHTML = `
+    <button type="button" onclick="this.parentElement.remove()" style="position:absolute;top:10px;right:10px;background:#fee2e2;color:#991b1b;border:none;border-radius:6px;width:24px;height:24px;cursor:pointer;font-weight:700;">✕</button>
+    <div style="display:flex;gap:12px;margin-bottom:10px;align-items:center;">
+      <label style="font-size:13px;font-weight:600;color:#64748b;">Send on day</label>
+      <input type="number" class="form-input seq-step-day" min="0" style="max-width:90px;" value="${existing?.day ?? idx * 3}">
+      <span style="font-size:12px;color:#94a3b8;">(0 = day of enrollment)</span>
+    </div>
+    <input type="text" class="form-input seq-step-subject" placeholder="Subject line — %name% works here too" style="margin-bottom:10px;" value="${(existing?.subject || '').replace(/"/g,'&quot;')}">
+    <textarea class="form-input seq-step-body" rows="4" placeholder="Email body — use %name% for their first name, %company% and %email% also available" style="resize:vertical;">${existing?.body || ''}</textarea>
+  `;
+  container.appendChild(div);
+}
+
+async function saveSequence() {
+  const name = document.getElementById('seqName').value.trim();
+  const active = document.getElementById('seqActive').value === 'true';
+  if (!name) { alert('Please enter a sequence name'); return; }
+
+  const rows = document.querySelectorAll('#seqStepsContainer .seq-step-row');
+  const steps = Array.from(rows).map(row => ({
+    day: parseInt(row.querySelector('.seq-step-day').value) || 0,
+    subject: row.querySelector('.seq-step-subject').value.trim(),
+    body: row.querySelector('.seq-step-body').value
+  })).filter(s => s.subject).sort((a, b) => a.day - b.day);
+
+  if (steps.length === 0) { alert('Please add at least one step with a subject line'); return; }
+
+  const btn = document.getElementById('saveSequenceBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  try {
+    await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: currentSequenceId ? 'PATCH' : 'POST',
+        table: 'Email Sequences',
+        recordId: currentSequenceId || undefined,
+        body: { fields: { 'Name': name, 'Active': active, 'Steps JSON': JSON.stringify(steps) } }
+      })
+    });
+    showAdminToast(`✅ Sequence "${name}" saved`);
+    closeModal('sequenceModal');
+    loadSequences();
+  } catch (e) {
+    alert('❌ Failed to save sequence: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Sequence';
+  }
+}
+
+async function deleteSequence(id, name) {
+  if (!confirm(`Delete sequence "${name}"? Existing enrollments will keep running against a missing sequence and stall — pause it first if it's in use.`)) return;
+  await fetch('/.netlify/functions/airtable-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ method: 'DELETE', table: 'Email Sequences', recordId: id })
+  });
+  loadSequences();
+}
+
+function showEnrollModal(prospectId) {
+  const p = allProspects.find(x => x.id === prospectId);
+  if (!p) return;
+  enrollTargetProspect = p;
+
+  document.getElementById('enrollProspectInfo').innerHTML = `
+    <strong>${p.name || p.email}</strong><br>
+    <span style="color:#64748b;">${p.email}${p.company ? ' · ' + p.company : ''}</span>
+  `;
+
+  const select = document.getElementById('enrollSequenceSelect');
+  const activeSeqs = allSequences.filter(s => s.fields['Active'] === true);
+  select.innerHTML = activeSeqs.length
+    ? activeSeqs.map(s => `<option value="${s.id}">${s.fields['Name']}</option>`).join('')
+    : '<option value="">No active sequences — create one first</option>';
+
+  document.getElementById('enrollModal').classList.add('active');
+}
+
+async function confirmEnroll() {
+  const sequenceId = document.getElementById('enrollSequenceSelect').value;
+  if (!sequenceId || !enrollTargetProspect) { alert('Please select a sequence'); return; }
+
+  const seq = allSequences.find(s => s.id === sequenceId);
+  let steps = [];
+  try { steps = JSON.parse(seq.fields['Steps JSON'] || '[]'); } catch { steps = []; }
+  if (steps.length === 0) { alert('This sequence has no steps'); return; }
+
+  const today = toLocalDateString(new Date());
+  const firstStepDate = toLocalDateString(new Date(Date.now() + steps[0].day * 24 * 60 * 60 * 1000));
+
+  try {
+    await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'POST',
+        table: 'Sequence Enrollments',
+        body: {
+          fields: {
+            'Prospect': [enrollTargetProspect.id],
+            'Sequence ID': sequenceId,
+            'Sequence Name': seq.fields['Name'],
+            'Current Step': 0,
+            'Status': 'Active',
+            'Enrolled Date': today,
+            'Next Send Date': firstStepDate
+          }
+        }
+      })
+    });
+    showAdminToast(`✅ ${enrollTargetProspect.name || enrollTargetProspect.email} enrolled in "${seq.fields['Name']}"`);
+    closeModal('enrollModal');
+  } catch (e) {
+    alert('❌ Failed to enroll: ' + e.message);
+  }
+}
+
+const _origShowSectionSequences = showSection;
+showSection = function(sectionId) {
+  _origShowSectionSequences(sectionId);
+  if (sectionId === 'sequences') loadSequences();
+};
+
 // Reload All Clients data every time that tab is opened, so the
 // "has booked" flag is never left stale by Calendar/Bookings views
 const _origShowSectionClients = showSection;
@@ -14053,6 +14362,7 @@ showSection = function(sectionId) {
 // Load Hunter credits on page load
 document.addEventListener('DOMContentLoaded', function() {
   loadHunterCredits();
+  loadSequences();
 });
 
 </script>

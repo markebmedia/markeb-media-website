@@ -5,6 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL = 'Markeb Media <commercial@markebmedia.com>';
 const BCC_EMAIL = 'commercial@markebmedia.com';
+const SEQUENCE_CC_EMAIL = 'christian.worrell@markebmedia.com';
 const EPC_PARTNER_NAME = 'Nathan Davenport';
 const EPC_PARTNER_EMAIL = 'Nathand1255@mail.com';
 const EPC_PARTNER_REGIONS = ['west', 'north-west', 'north'];
@@ -1343,6 +1344,20 @@ async function sendTimeRequestDecline(f, formattedDate, alternativeDates) {
   });
 }
 
+// 12. Generic Email (used by the drip sequence sender — subject/body already merged)
+async function sendGenericEmail({ to, subject, html }) {
+  const wrappedHtml = html.includes('<html') ? html : getEmailLayout(html);
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to,
+    cc: SEQUENCE_CC_EMAIL,
+    bcc: BCC_EMAIL,
+    subject,
+    html: wrappedHtml
+  });
+}
+
 module.exports = {
   sendBookingConfirmation,
   sendPaymentConfirmation,
@@ -1355,5 +1370,6 @@ module.exports = {
   sendReviewRewardEmail,
   sendTimeRequestApproval,
   sendTimeRequestDecline,
-  sendEpcPartnerNotification
+  sendEpcPartnerNotification,
+  sendGenericEmail
 };
