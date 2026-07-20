@@ -1072,7 +1072,7 @@ width: 100%;
             type="tel" 
             id="reqPhone" 
             class="form-input" 
-            placeholder="e.g. 07700 900123"
+            placeholder="e.g. 07700 900123 or 0114 123 4567"
           />
           <div class="error-message" id="reqPhoneError">Please enter a valid UK phone number</div>
         </div>
@@ -1738,6 +1738,12 @@ width: 100%;
 
     function toLocalDateString(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+function isValidUKPhone(phone) {
+  const cleaned = phone.replace(/[\s\-\(\)]/g, '');
+  const normalized = cleaned.replace(/^\+44/, '0').replace(/^0044/, '0');
+  return /^0\d{9,10}$/.test(normalized);
 }
 
     function initializeStripeCard() {
@@ -3883,8 +3889,7 @@ async function completeBooking() {
   }
 
   // Validate phone
-  const phoneRegex = /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/;
-  if (!phone || !phoneRegex.test(phone.replace(/\s/g, ''))) {
+  if (!phone || !isValidUKPhone(phone)) {
     document.getElementById('clientPhone').classList.add('error');
     document.getElementById('phoneError').classList.add('show');
     hasError = true;
@@ -4695,8 +4700,7 @@ async function submitTimeRequest() {
   if (!reqDate) { document.getElementById('reqDate').classList.add('error'); document.getElementById('reqDateError').classList.add('show'); hasError = true; }
   if (!reqTime) { document.getElementById('reqTime').classList.add('error'); document.getElementById('reqTimeError').classList.add('show'); hasError = true; }
   if (!reqName || reqName.length < 2) { document.getElementById('reqName').classList.add('error'); document.getElementById('reqNameError').classList.add('show'); hasError = true; }
-  const phoneRegex = /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/;
-  if (!reqPhone || !phoneRegex.test(reqPhone.replace(/\s/g, ''))) { document.getElementById('reqPhone').classList.add('error'); document.getElementById('reqPhoneError').classList.add('show'); hasError = true; }
+  if (!reqPhone || !isValidUKPhone(reqPhone)) { document.getElementById('reqPhone').classList.add('error'); document.getElementById('reqPhoneError').classList.add('show'); hasError = true; }
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!reqEmail || !emailRegex.test(reqEmail)) { document.getElementById('reqEmail').classList.add('error'); document.getElementById('reqEmailError').classList.add('show'); hasError = true; }
 
