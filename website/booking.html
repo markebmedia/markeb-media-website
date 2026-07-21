@@ -1896,6 +1896,7 @@ function isValidUKPhone(phone) {
 
       region: '', // ✅ FIXED: lowercase for consistency
       mediaSpecialist: '',
+      specialistServices: null, // null = unrestricted (in-house); array = creator's allowed services
       selectedDate: null,
       selectedTime: null,
       service: null,
@@ -1913,6 +1914,73 @@ function isValidUKPhone(phone) {
     };
 
     let currentCalendarDate = new Date();
+
+    // Maps service/addon IDs to the Creator Network "Services" label that
+    // permits them. Anything NOT in these maps is considered ungated —
+    // available to any specialist, in-house or freelance (floor plans,
+    // Elevate Your Edit, speed tours, branded outro, local area highlights).
+    const SERVICE_CAPABILITY_MAP = {
+      'complete-branding': 'Personal Branding — Complete',
+      'branding-video': 'Personal Branding — Video',
+      'branding-photo': 'Personal Branding — Photo',
+      'platinum-package': 'Platinum Package',
+      'gold-package': 'Gold Package',
+      'silver-package': 'Silver Package',
+      'bronze-package': 'Bronze Package',
+      'aerial-content': 'Aerial Content',
+      'drone-photo': 'Aerial Content',
+      'drone-video': 'Aerial Content',
+      'all-in-one-drone': 'Aerial Content',
+      'property-video': 'Property Videography',
+      'property-photo': 'Property Photography',
+      'matterport-virtual-tour': 'Matterport Virtual Tour'
+    };
+
+    const ADDON_CAPABILITY_MAP = {
+      'property-drone-photo': 'Aerial Content',
+      'property-drone-video': 'Aerial Content',
+      'matterport-tour': 'Matterport Virtual Tour',
+      'epc-standard': 'EPC (Up to 4 Bedrooms)',
+      'epc-large': 'EPC (5+ Bedrooms)',
+      'property-video': 'Property Videography'
+    };
+
+    // bookingData.specialistServices: null = unrestricted (in-house or no
+    // creator data yet); array = restricted to exactly what this creator covers.
+    function filterServicesByCreatorCapability(services) {
+      if (!bookingData.specialistServices) return services;
+      return services.filter(service => {
+        const requiredCapability = SERVICE_CAPABILITY_MAP[service.id];
+        if (!requiredCapability) return true;
+        return bookingData.specialistServices.includes(requiredCapability);
+      });
+    }
+
+    function filterAddonIdsByCreatorCapability(addonIds) {
+      if (!bookingData.specialistServices) return addonIds;
+      return addonIds.filter(addonId => {
+        const requiredCapability = ADDON_CAPABILITY_MAP[addonId];
+        if (!requiredCapability) return true;
+        return bookingData.specialistServices.includes(requiredCapability);
+      });
+    }
+
+    // If the assigned specialist changes after a service was already picked
+    // (e.g. Step 3 falls back to a different creator with less coverage),
+    // clear the selection if it's no longer something they can deliver.
+    function revalidateSelectedService() {
+      if (!bookingData.service) return;
+      const services = SERVICES[getCatalogKeyForRegion(bookingData.region)] || SERVICES.south;
+      const stillAllowed = filterServicesByCreatorCapability(services).some(s => s.id === bookingData.service.id);
+      if (!stillAllowed) {
+        bookingData.service = null;
+        bookingData.selectedAddons = [];
+        document.getElementById('priceBreakdown').style.display = 'none';
+        document.getElementById('addonsSection').style.display = 'none';
+        document.getElementById('continueToCalendarBtn').disabled = true;
+        alert('The specialist available for your selected date doesn\'t offer the previously chosen service. Please choose a different service.');
+      }
+    }
 
     // Add-Ons Catalog
     const ADDONS = {
@@ -2427,6 +2495,7 @@ function handleAddressSelection() {
     // ✅ Check for a Creator Network override BEFORE showing the specialist
     // name, so the person sees the correct name from the very first screen —
     // not just once they reach Step 3's availability check.
+    bookingData.specialistServices = null; // default: in-house, unrestricted
     if (result.isServiceable) {
       try {
         const creatorCheck = await fetch('/.netlify/functions/creator-network', {
@@ -2438,6 +2507,7 @@ function handleAddressSelection() {
         if (creatorData.success && creatorData.specialistName) {
           bookingData.mediaSpecialist = creatorData.specialistName;
           result.mediaSpecialist.name = creatorData.specialistName;
+          bookingData.specialistServices = creatorData.specialistServices || [];
         }
       } catch (creatorLookupError) {
         console.warn('Creator Network lookup failed — showing in-house specialist:', creatorLookupError);
@@ -2486,6 +2556,7 @@ function handleAddressSelection() {
     bookingData.mediaSpecialist = result.mediaSpecialist?.name || '';
 
     if (result.isServiceable) {
+      bookingData.specialistServices = null;
       try {
         const creatorCheck = await fetch('/.netlify/functions/creator-network', {
           method: 'POST',
@@ -2496,6 +2567,7 @@ function handleAddressSelection() {
         if (creatorData.success && creatorData.specialistName) {
           bookingData.mediaSpecialist = creatorData.specialistName;
           result.mediaSpecialist.name = creatorData.specialistName;
+          bookingData.specialistServices = creatorData.specialistServices || [];
         }
       } catch (creatorLookupError) {
         console.warn('Creator Network lookup failed — showing in-house specialist:', creatorLookupError);
@@ -2800,10 +2872,15 @@ function handleAccessTypeChange() {
     // Render Services
     function renderServices() {
       const services = SERVICES[getCatalogKeyForRegion(bookingData.region)] || SERVICES.south;
+      const filteredServices = filterServicesByCreatorCapability(services);
       const container = document.getElementById('serviceCards');
 
+      if (filteredServices.length === 0) {
+        container.innerHTML = '<div style="padding:24px;text-align:center;color:#94a3b8;background:#f8fafc;border-radius:12px;">No services are currently available from your assigned specialist for this area. Please contact us to discuss options.</div>';
+        return;
+      }
 
-      const servicesHTML = services.map(service => `
+      const servicesHTML = filteredServices.map(service => `
         <div class="service-card ${service.popular ? 'popular' : ''}" data-service-id="${service.id}" onclick="selectService('${service.id}')">
           ${service.popular ? '<div class="popular-badge">Most Popular</div>' : ''}
           <div style="flex: 1;">
@@ -3285,8 +3362,14 @@ function renderOfferPopup(offerId) {
         return;
       }
 
+      const allowedAddonIds = filterAddonIdsByCreatorCapability(service.availableAddons);
+      if (allowedAddonIds.length === 0) {
+        document.getElementById('addonsSection').style.display = 'none';
+        return;
+      }
+
       const container = document.getElementById('addonsGrid');
-      const addonsHTML = service.availableAddons.map(addonId => {
+      const addonsHTML = allowedAddonIds.map(addonId => {
         const addon = ADDONS[addonId];
         if (!addon) return '';
 
@@ -3712,12 +3795,25 @@ async function loadAvailableTimeSlots(dateString) {
     // instead of Jodie, if Jodie has no free slots that day).
     if (data.assignedSpecialist) {
       bookingData.mediaSpecialist = data.assignedSpecialist;
+      // Reset first — assignedSpecialistServices only comes back when the
+      // resolved specialist is an actual Creator Network match. If today's
+      // resolution fell back to in-house, this correctly lifts any
+      // restriction that was set at Step 1.
+      bookingData.specialistServices = data.assignedSpecialistServices || null;
 
       const specialistNameEl = document.getElementById('mediaSpecialistName');
       if (specialistNameEl) specialistNameEl.textContent = data.assignedSpecialist;
 
       const summarySpecialistEl = document.getElementById('summaryMediaSpecialist');
       if (summarySpecialistEl) summarySpecialistEl.textContent = data.assignedSpecialist;
+
+      // The specialist may have changed since Step 2 was rendered — re-check
+      // the previously selected service is still something they can deliver.
+      revalidateSelectedService();
+      if (currentStep >= 2) {
+        renderServices();
+        if (bookingData.service) renderAddons();
+      }
     }
 
     renderTimeSlots(data.availableSlots);

@@ -16,6 +16,10 @@ const SPECIALIST_REGIONS = {
   'south-west': ['Andrii']
 };
 
+// Maps specialist name → their Services array, populated fresh each request
+// so the response can tell the frontend which services this creator covers.
+let creatorServicesCache = {};
+
 // ── CREATOR NETWORK OVERRIDE ──────────────────────────────────────────────
 // If any Active creator has an Active region assignment for this region,
 // they fully replace the in-house specialist(s) — this is a deliberate
@@ -42,7 +46,9 @@ async function getCreatorNetworkOverride(regionKey) {
 
       const creatorRecord = await base('Creator Network').find(linkedIds[0]);
       if (creatorRecord.fields['Status'] === 'Active') {
-        creatorNames.push(creatorRecord.fields['Name']);
+        const name = creatorRecord.fields['Name'];
+        creatorNames.push(name);
+        creatorServicesCache[name] = creatorRecord.fields['Services'] || [];
       }
     }
 
@@ -94,6 +100,7 @@ exports.handler = async (event, context) => {
 
     // ✅ Default duration to 90 minutes if not provided
     const bookingDuration = duration || 90;
+    creatorServicesCache = {}; // reset per-invocation — avoids stale data on warm lambda reuse
     console.log(`Checking availability for: postcode=${postcode}, region=${region}, date=${selectedDate}, duration=${bookingDuration}min`);
 
     // ── DATE GATE ────────────────────────────────────────────────────────────
@@ -236,6 +243,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         availableSlots: finalSlots,
         assignedSpecialist: chosenSpecialist,
+        assignedSpecialistServices: creatorServicesCache[chosenSpecialist] || null,
         existingBookings: finalBookings.length,
         blockedTimesCount: finalBlockedTimes.length,
         region: region,

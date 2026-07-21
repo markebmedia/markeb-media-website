@@ -265,7 +265,11 @@ async function getActiveSpecialistForRegion(headers, { region }) {
         return {
           statusCode: 200,
           headers,
-          body: JSON.stringify({ success: true, specialistName: creatorRecord.fields['Name'] })
+          body: JSON.stringify({
+            success: true,
+            specialistName: creatorRecord.fields['Name'],
+            specialistServices: creatorRecord.fields['Services'] || []
+          })
         };
       }
     }
@@ -273,7 +277,7 @@ async function getActiveSpecialistForRegion(headers, { region }) {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ success: true, specialistName: null })
+      body: JSON.stringify({ success: true, specialistName: null, specialistServices: null })
     };
 
   } catch (error) {
@@ -281,7 +285,7 @@ async function getActiveSpecialistForRegion(headers, { region }) {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ success: true, specialistName: null })
+      body: JSON.stringify({ success: true, specialistName: null, specialistServices: null })
     };
   }
 }
