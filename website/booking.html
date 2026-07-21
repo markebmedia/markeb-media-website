@@ -2424,6 +2424,25 @@ function handleAddressSelection() {
     bookingData.region = result.region;
     bookingData.mediaSpecialist = result.mediaSpecialist.name;
 
+    // ✅ Check for a Creator Network override BEFORE showing the specialist
+    // name, so the person sees the correct name from the very first screen —
+    // not just once they reach Step 3's availability check.
+    if (result.isServiceable) {
+      try {
+        const creatorCheck = await fetch('/.netlify/functions/creator-network', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'get-active-specialist-for-region', region: result.region })
+        });
+        const creatorData = await creatorCheck.json();
+        if (creatorData.success && creatorData.specialistName) {
+          bookingData.mediaSpecialist = creatorData.specialistName;
+          result.mediaSpecialist.name = creatorData.specialistName;
+        }
+      } catch (creatorLookupError) {
+        console.warn('Creator Network lookup failed — showing in-house specialist:', creatorLookupError);
+      }
+    }
 
     if (result.isServiceable) {
       const regionBadge = document.getElementById('regionBadge');
@@ -2467,6 +2486,21 @@ function handleAddressSelection() {
     bookingData.mediaSpecialist = result.mediaSpecialist?.name || '';
 
     if (result.isServiceable) {
+      try {
+        const creatorCheck = await fetch('/.netlify/functions/creator-network', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'get-active-specialist-for-region', region: result.region })
+        });
+        const creatorData = await creatorCheck.json();
+        if (creatorData.success && creatorData.specialistName) {
+          bookingData.mediaSpecialist = creatorData.specialistName;
+          result.mediaSpecialist.name = creatorData.specialistName;
+        }
+      } catch (creatorLookupError) {
+        console.warn('Creator Network lookup failed — showing in-house specialist:', creatorLookupError);
+      }
+
       const regionBadge = document.getElementById('regionBadge');
       regionBadge.className = `region-badge ${result.region}`;
       regionBadge.textContent = REGION_DISPLAY[result.region] || result.region.toUpperCase();

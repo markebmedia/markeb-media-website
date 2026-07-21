@@ -19,8 +19,50 @@ const SPECIALIST_REGIONS = {
   'south-west': ['Andrii']
 };
 
-function getSpecialistsForRegion(regionKey) {
-  return SPECIALIST_REGIONS[(regionKey || '').toLowerCase()] || [];
+// ── CREATOR NETWORK OVERRIDE ──────────────────────────────────────────────
+// Mirrors check-availability.js — if any Active creator is assigned to this
+// region, they fully replace the in-house list. In-house is a fallback only
+// for regions with zero creator assignments.
+async function getCreatorNetworkOverride(regionKey) {
+  try {
+    const assignments = await base('Creator Region Assignments')
+      .select({
+        filterByFormula: `AND({Region} = '${regionKey}', {Active} = TRUE())`,
+        sort: [{ field: 'Priority', direction: 'asc' }]
+      })
+      .all();
+
+    if (assignments.length === 0) return null;
+
+    const creatorNames = [];
+    for (const record of assignments) {
+      const linkedIds = record.fields['Creator'] || [];
+      if (linkedIds.length === 0) continue;
+
+      const creatorRecord = await base('Creator Network').find(linkedIds[0]);
+      if (creatorRecord.fields['Status'] === 'Active') {
+        creatorNames.push(creatorRecord.fields['Name']);
+      }
+    }
+
+    return creatorNames.length > 0 ? creatorNames : null;
+
+  } catch (err) {
+    console.error('Error checking Creator Network override — falling back to in-house:', err);
+    return null;
+  }
+}
+
+async function getSpecialistsForRegion(regionKey) {
+  const key = (regionKey || '').toLowerCase();
+
+  const creatorOverride = await getCreatorNetworkOverride(key);
+  if (creatorOverride) {
+    console.log(`[get-available-dates] Region ${key}: using Creator Network override — ${creatorOverride.join(', ')}`);
+    return creatorOverride;
+  }
+
+  return SPECIALIST_REGIONS[key] || [];
 }
 
 exports.handler = async (event, context) => {
@@ -53,7 +95,7 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const candidateSpecialists = getSpecialistsForRegion(region);
+    const candidateSpecialists = await getSpecialistsForRegion(region);
     if (candidateSpecialists.length === 0) {
       return {
         statusCode: 400,

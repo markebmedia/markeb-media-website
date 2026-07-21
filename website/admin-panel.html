@@ -1824,6 +1824,14 @@ body {
   </div>
 
   <div class="nav-section">
+    <div class="nav-section-title">Team</div>
+    <div class="nav-item" onclick="showSection('creator-network')">
+      <i data-lucide="users-round" class="nav-icon"></i>
+      Creator Network
+    </div>
+  </div>
+
+  <div class="nav-section">
     <div class="nav-section-title">BDM</div>
     <div class="nav-item" onclick="showSection('prospect-finder')">
       <i data-lucide="search" class="nav-icon"></i>
@@ -2473,7 +2481,47 @@ body {
       </div>
     </div>
 
-  <!-- Retainer Clients Section -->
+  <!-- Creator Network Section -->
+<div class="admin-section" id="creator-network">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h2 style="font-size:24px;font-weight:700;margin-bottom:4px;">Creator Network</h2>
+      <p style="color:#64748b;font-size:14px;">Freelance media specialists — assign regions, set priority order, and manage without touching Airtable directly</p>
+    </div>
+    <button class="btn btn-primary" onclick="showCreatorModal()">
+      <i data-lucide="plus-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Add Creator
+    </button>
+  </div>
+
+  <div class="stats-grid" style="margin-bottom:24px;">
+    <div class="stat-card"><div class="stat-value" id="creatorActiveCount">0</div><div class="stat-label">Active Creators</div></div>
+    <div class="stat-card"><div class="stat-value" id="creatorRegionsCoveredCount">0</div><div class="stat-label">Regions Covered</div></div>
+    <div class="stat-card"><div class="stat-value" id="creatorOverrideCount">0</div><div class="stat-label">Regions Overriding In-House</div></div>
+  </div>
+
+  <div class="info-box" style="margin-bottom:24px;">
+    <i data-lucide="info" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:6px;"></i>
+    When a creator has an <strong>Active</strong> region assignment, they fully replace your in-house specialist for that region — priority order decides who gets tried first, second, etc. Removing all active assignments for a region automatically falls back to your in-house team.
+  </div>
+
+  <div class="filters-bar">
+    <input type="text" class="filter-input" id="creatorSearch" placeholder="Search by name, email, region..." oninput="renderCreatorNetwork()">
+    <select class="filter-select" id="creatorStatusFilter" onchange="renderCreatorNetwork()">
+      <option value="">All Status</option>
+      <option value="Active">Active</option>
+      <option value="Inactive">Inactive</option>
+    </select>
+    <button class="btn btn-primary" onclick="loadCreatorNetwork()">
+      <i data-lucide="refresh-cw" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Refresh
+    </button>
+  </div>
+
+  <div class="calendar-container" id="creatorNetworkContainer">
+    <div style="text-align:center;padding:40px;"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- Retainer Clients Section -->
 <div class="admin-section" id="retainer-clients">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
     <div>
@@ -3569,6 +3617,81 @@ We wanted to reach out..." required></textarea>
     </div>
     <div class="modal-body" id="modifyServiceModalBody">
       <!-- Content populated by JavaScript -->
+    </div>
+  </div>
+</div>
+
+<!-- Creator Modal -->
+<div class="modal" id="creatorModal" onclick="closeModal('creatorModal')">
+  <div class="modal-dialog" style="max-width:720px;" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 id="creatorModalTitle">Add Creator</h3>
+      <button class="modal-close" onclick="closeModal('creatorModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="creatorForm" onsubmit="saveCreator(event)">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="creatorName" class="form-input" required placeholder="e.g. Sam Whitfield">
+            <div style="font-size:12px;color:#64748b;margin-top:4px;">This exact name is what appears as Media Specialist on bookings</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status *</label>
+            <select id="creatorStatus" class="form-input" required>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" id="creatorEmail" class="form-input" placeholder="e.g. sam@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="tel" id="creatorPhone" class="form-input" placeholder="e.g. 07700 900123">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Services They Can Do</label>
+          <div id="creatorServiceCheckboxes" style="display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;overflow-x:hidden;border:2px solid #e2e8f0;border-radius:10px;padding:14px;box-sizing:border-box;width:100%;"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Region Assignments</label>
+          <div style="font-size:12px;color:#64748b;margin-bottom:10px;">Add a row per region this creator covers. Priority 1 is tried first — if two creators share a region, the lower priority number wins first refusal. Untick Active to pause a region without deleting it.</div>
+          <div id="creatorRegionRows" style="display:flex;flex-direction:column;gap:10px;"></div>
+          <button type="button" class="btn btn-secondary btn-small" onclick="addCreatorRegionRow()" style="margin-top:10px;">
+            <i data-lucide="plus" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Add Region
+          </button>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Contract Start</label>
+            <input type="date" id="creatorContractStart" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contract End</label>
+            <input type="date" id="creatorContractEnd" class="form-input">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Day Rate / Notes</label>
+          <textarea id="creatorNotes" class="form-input" rows="3" placeholder="e.g. £250/day, invoices monthly, prefers north postcodes only"></textarea>
+        </div>
+
+        <div class="button-group" style="margin-top:24px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('creatorModal')" style="flex:1;">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveCreatorBtn" style="flex:2;">Save Creator</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -9195,6 +9318,321 @@ async function deleteBlockedTime(recordId, date) {
     alert('❌ Failed to remove time block: ' + error.message);
   }
 }
+
+// ===== CREATOR NETWORK =====
+
+const CREATOR_SERVICES_LIST = [
+  'Bronze Package', 'Silver Package', 'Gold Package', 'Platinum Package',
+  'Aerial Content', 'Property Videography', 'Property Photography',
+  'Matterport Virtual Tour', 'EPC (Up to 4 Bedrooms)', 'EPC (5+ Bedrooms)',
+  'Personal Branding — Complete', 'Personal Branding — Video', 'Personal Branding — Photo'
+];
+
+const CREATOR_REGION_OPTIONS = ['north', 'north-west', 'north-east', 'west', 'east', 'south', 'south-east', 'south-west'];
+
+let allCreatorRoster = [];
+let currentCreatorId = null;
+let creatorRegionRowCount = 0;
+
+async function loadCreatorNetwork() {
+  const container = document.getElementById('creatorNetworkContainer');
+  container.innerHTML = '<div style="text-align:center;padding:40px;"><div class="spinner"></div></div>';
+
+  try {
+    const response = await fetch('/.netlify/functions/creator-network', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'get-full-roster' })
+    });
+    const data = await response.json();
+
+    if (!data.success) throw new Error(data.error || 'Failed to load roster');
+
+    allCreatorRoster = data.roster;
+    renderCreatorNetwork();
+    updateCreatorNetworkStats();
+
+  } catch (error) {
+    console.error('Error loading creator network:', error);
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;">Error loading Creator Network — check the "Creator Network" and "Creator Region Assignments" tables exist in Airtable</div>';
+  }
+}
+
+function updateCreatorNetworkStats() {
+  const active = allCreatorRoster.filter(c => c.status === 'Active');
+  document.getElementById('creatorActiveCount').textContent = active.length;
+
+  const regionsWithActiveAssignment = new Set();
+  allCreatorRoster.forEach(c => {
+    if (c.status !== 'Active') return;
+    c.assignments.forEach(a => { if (a.active) regionsWithActiveAssignment.add(a.region); });
+  });
+
+  document.getElementById('creatorRegionsCoveredCount').textContent = regionsWithActiveAssignment.size;
+  document.getElementById('creatorOverrideCount').textContent = regionsWithActiveAssignment.size;
+}
+
+function renderCreatorNetwork() {
+  const container = document.getElementById('creatorNetworkContainer');
+  const search = (document.getElementById('creatorSearch')?.value || '').toLowerCase();
+  const statusFilter = document.getElementById('creatorStatusFilter')?.value || '';
+
+  let filtered = [...allCreatorRoster];
+
+  if (statusFilter) filtered = filtered.filter(c => c.status === statusFilter);
+  if (search) {
+    filtered = filtered.filter(c =>
+      c.name.toLowerCase().includes(search) ||
+      c.email.toLowerCase().includes(search) ||
+      c.assignments.some(a => a.region.includes(search))
+    );
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:60px;color:#94a3b8;">No creators found. Click "Add Creator" to onboard your first freelancer.</div>';
+    return;
+  }
+
+  let html = `<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+  <table class="data-table" style="min-width:1100px;">
+    <thead><tr>
+      <th>Creator</th><th>Status</th><th>Regions &amp; Priority</th><th>Services</th><th>Actions</th>
+    </tr></thead><tbody>`;
+
+  filtered.forEach(c => {
+    const statusColor = c.status === 'Active' ? { bg: '#d1fae5', color: '#065f46' } : { bg: '#fee2e2', color: '#991b1b' };
+    const regionBadges = c.assignments.length > 0
+      ? c.assignments.map(a => `
+          <span style="display:inline-flex;align-items:center;gap:4px;background:${a.active ? '#fff3e0' : '#f1f5f9'};color:${a.active ? '#7a3e00' : '#94a3b8'};padding:3px 10px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap;margin:2px;">
+            ${a.region} <strong>#${a.priority}</strong>${!a.active ? ' (paused)' : ''}
+          </span>`).join('')
+      : '<span style="font-size:12px;color:#94a3b8;">No regions assigned</span>';
+
+    const serviceBadges = c.services.length > 0
+      ? c.services.slice(0, 3).map(s => `<span style="display:inline-block;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin:2px;">${s}</span>`).join('') +
+        (c.services.length > 3 ? `<span style="font-size:11px;color:#94a3b8;">+${c.services.length - 3} more</span>` : '')
+      : '<span style="font-size:12px;color:#94a3b8;">None set</span>';
+
+    html += `
+      <tr>
+        <td data-label="Creator">
+          <div style="font-weight:700;">${c.name}</div>
+          <div style="font-size:12px;color:#64748b;">${c.email || 'No email'}</div>
+        </td>
+        <td data-label="Status"><span class="status-badge" style="background:${statusColor.bg};color:${statusColor.color};">${c.status}</span></td>
+        <td data-label="Regions" style="max-width:280px;white-space:normal;">${regionBadges}</td>
+        <td data-label="Services" style="max-width:220px;white-space:normal;">${serviceBadges}</td>
+        <td data-label="Actions">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-small" onclick="editCreator('${c.id}')">Edit</button>
+            <button class="btn btn-danger btn-small" onclick="deleteCreatorRecord('${c.id}', '${c.name.replace(/'/g, "&#39;")}')">Delete</button>
+          </div>
+        </td>
+      </tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
+  lucide.createIcons();
+}
+
+function showCreatorModal(creatorId = null) {
+  currentCreatorId = creatorId;
+  document.getElementById('creatorForm').reset();
+  document.getElementById('creatorRegionRows').innerHTML = '';
+  creatorRegionRowCount = 0;
+  populateCreatorServiceCheckboxes([]);
+
+  if (creatorId) {
+    const creator = allCreatorRoster.find(c => c.id === creatorId);
+    if (!creator) return;
+
+    document.getElementById('creatorModalTitle').textContent = 'Edit Creator';
+    document.getElementById('creatorName').value = creator.name;
+    document.getElementById('creatorEmail').value = creator.email;
+    document.getElementById('creatorPhone').value = creator.phone;
+    document.getElementById('creatorStatus').value = creator.status;
+    document.getElementById('creatorContractStart').value = creator.contractStart || '';
+    document.getElementById('creatorContractEnd').value = creator.contractEnd || '';
+    document.getElementById('creatorNotes').value = creator.notes || '';
+
+    populateCreatorServiceCheckboxes(creator.services);
+
+    if (creator.assignments.length > 0) {
+      creator.assignments.forEach(a => addCreatorRegionRow(a));
+    }
+  } else {
+    document.getElementById('creatorModalTitle').textContent = 'Add Creator';
+  }
+
+  document.getElementById('creatorModal').classList.add('active');
+}
+
+function editCreator(creatorId) {
+  showCreatorModal(creatorId);
+}
+
+function populateCreatorServiceCheckboxes(selected = []) {
+  const container = document.getElementById('creatorServiceCheckboxes');
+  container.innerHTML = CREATOR_SERVICES_LIST.map(service => `
+    <label style="display:flex;align-items:center;gap:10px;padding:6px 8px;cursor:pointer;">
+      <input type="checkbox" value="${service}" class="creator-service-checkbox" ${selected.includes(service) ? 'checked' : ''} style="width:16px;height:16px;flex-shrink:0;">
+      <span style="font-size:13px;font-weight:500;">${service}</span>
+    </label>
+  `).join('');
+}
+
+function addCreatorRegionRow(existing = null) {
+  creatorRegionRowCount++;
+  const rowId = creatorRegionRowCount;
+  const container = document.getElementById('creatorRegionRows');
+  const row = document.createElement('div');
+  row.id = `creatorRegionRow-${rowId}`;
+  row.style.cssText = 'display:flex;gap:10px;align-items:center;background:#f8fafc;border:2px solid #e2e8f0;border-radius:10px;padding:10px 12px;';
+  row.innerHTML = `
+    <input type="hidden" class="creator-region-assignment-id" value="${existing?.id || ''}">
+    <select class="form-input creator-region-select" style="flex:2;margin:0;">
+      ${CREATOR_REGION_OPTIONS.map(r => `<option value="${r}" ${existing?.region === r ? 'selected' : ''}>${r}</option>`).join('')}
+    </select>
+    <div style="display:flex;align-items:center;gap:6px;flex:1;">
+      <span style="font-size:12px;color:#64748b;white-space:nowrap;">Priority</span>
+      <input type="number" class="form-input creator-priority-input" min="1" value="${existing?.priority || 1}" style="margin:0;max-width:70px;">
+    </div>
+    <label style="display:flex;align-items:center;gap:6px;flex-shrink:0;cursor:pointer;">
+      <input type="checkbox" class="creator-region-active" ${existing ? (existing.active ? 'checked' : '') : 'checked'} style="width:16px;height:16px;">
+      <span style="font-size:12px;font-weight:600;color:#64748b;">Active</span>
+    </label>
+    <button type="button" onclick="document.getElementById('creatorRegionRow-${rowId}').remove()" style="background:#fee2e2;color:#991b1b;border:none;border-radius:6px;width:26px;height:26px;flex-shrink:0;cursor:pointer;font-weight:700;">✕</button>
+  `;
+  container.appendChild(row);
+}
+
+async function saveCreator(event) {
+  event.preventDefault();
+
+  const name = document.getElementById('creatorName').value.trim();
+  if (!name) { alert('Please enter a name'); return; }
+
+  const fields = {
+    'Name': name,
+    'Email': document.getElementById('creatorEmail').value.trim(),
+    'Phone': document.getElementById('creatorPhone').value.trim(),
+    'Status': document.getElementById('creatorStatus').value,
+    'Services': Array.from(document.querySelectorAll('.creator-service-checkbox:checked')).map(cb => cb.value),
+    'Day Rate / Notes': document.getElementById('creatorNotes').value.trim(),
+    'Contract Start': document.getElementById('creatorContractStart').value || undefined,
+    'Contract End': document.getElementById('creatorContractEnd').value || undefined
+  };
+
+  const btn = document.getElementById('saveCreatorBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  try {
+    let creatorId = currentCreatorId;
+
+    if (currentCreatorId) {
+      const res = await fetch('/.netlify/functions/creator-network', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'update-creator', recordId: currentCreatorId, fields })
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+    } else {
+      const res = await fetch('/.netlify/functions/creator-network', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'create-creator', fields })
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error);
+      creatorId = data.creator.id;
+    }
+
+    // Sync region assignment rows: update existing, create new, delete removed
+    const existingCreator = allCreatorRoster.find(c => c.id === currentCreatorId);
+    const existingAssignmentIds = existingCreator ? existingCreator.assignments.map(a => a.id) : [];
+    const rows = document.querySelectorAll('#creatorRegionRows > div');
+    const keptAssignmentIds = [];
+
+    for (const row of rows) {
+      const assignmentId = row.querySelector('.creator-region-assignment-id').value;
+      const region = row.querySelector('.creator-region-select').value;
+      const priority = parseInt(row.querySelector('.creator-priority-input').value) || 1;
+      const active = row.querySelector('.creator-region-active').checked;
+
+      if (assignmentId) {
+        keptAssignmentIds.push(assignmentId);
+        await fetch('/.netlify/functions/creator-network', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'update-assignment',
+            recordId: assignmentId,
+            fields: { 'Region': region, 'Priority': priority, 'Active': active }
+          })
+        });
+      } else {
+        await fetch('/.netlify/functions/creator-network', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'create-assignment',
+            fields: { 'Creator': [creatorId], 'Region': region, 'Priority': priority, 'Active': active }
+          })
+        });
+      }
+    }
+
+    // Delete any assignment rows that were removed from the form
+    const removedIds = existingAssignmentIds.filter(id => !keptAssignmentIds.includes(id));
+    for (const id of removedIds) {
+      await fetch('/.netlify/functions/creator-network', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete-assignment', recordId: id })
+      });
+    }
+
+    showAdminToast(`✅ ${name} saved to Creator Network`);
+    closeModal('creatorModal');
+    loadCreatorNetwork();
+
+  } catch (error) {
+    console.error('Error saving creator:', error);
+    alert('❌ Failed to save creator: ' + error.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Creator';
+  }
+}
+
+async function deleteCreatorRecord(creatorId, name) {
+  if (!confirm(`Delete ${name} from the Creator Network?\n\nThis will also remove all their region assignments — any regions they covered will fall back to your in-house specialists immediately. This cannot be undone.`)) return;
+
+  try {
+    const res = await fetch('/.netlify/functions/creator-network', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete-creator', recordId: creatorId })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    showAdminToast(`✅ ${name} removed from Creator Network`);
+    loadCreatorNetwork();
+  } catch (error) {
+    console.error('Error deleting creator:', error);
+    alert('❌ Failed to delete creator: ' + error.message);
+  }
+}
+
+const _origShowSectionCreatorNetwork = showSection;
+showSection = function(sectionId) {
+  _origShowSectionCreatorNetwork(sectionId);
+  if (sectionId === 'creator-network') loadCreatorNetwork();
+};
 
 // ===== RETAINER CLIENTS =====
 

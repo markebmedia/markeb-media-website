@@ -26,7 +26,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { bookingRef, newDate, newTime, clientEmail } = JSON.parse(event.body);
+    const { bookingRef, newDate, newTime, clientEmail, newMediaSpecialist } = JSON.parse(event.body);
 
     if (!bookingRef || !newDate || !newTime || !clientEmail) {
       return {
@@ -128,8 +128,10 @@ exports.handler = async (event, context) => {
     const originalDate = fields['Date'];
     const originalTime = fields['Time'];
 
-    // Update booking
-    await base('Bookings').update(booking.id, {
+    // Update booking — include the freshly-resolved Media Specialist if the
+    // frontend passed one, since Creator Network overrides or in-house
+    // fallback can change who's actually assigned for the new date/region.
+    const bookingUpdateFields = {
       'Date': newDate,
       'Time': newTime,
       'Rescheduled': true,
@@ -137,7 +139,13 @@ exports.handler = async (event, context) => {
       'Original Date': originalDate,
       'Original Time': originalTime,
       'Reschedule Date': new Date().toISOString().split('T')[0]
-    });
+    };
+
+    if (newMediaSpecialist) {
+      bookingUpdateFields['Media Specialist'] = newMediaSpecialist;
+    }
+
+    await base('Bookings').update(booking.id, bookingUpdateFields);
 
     console.log(`✅ Booking ${bookingRef} rescheduled successfully`);
 
@@ -293,10 +301,35 @@ async function checkAvailabilityForReschedule(postcode, region, selectedDate, re
   }
 }
 
-// ✅ FIXED: Fetch bookings (excluding current booking being rescheduled)
-async function fetchBookingsForRegion(region, selectedDate, excludeBookingId) {
+// ✅ Fetch bookings, checking against whichever specialist actually owns this
+// region for this date — Creator Network assignment first, in-house fallback
+// second. Mirrors the resolution order in check-availability.js so reschedule
+// conflict-checking never disagrees with the booking widget's own logic.
+async function getSpecialistNameForRegion(regionKey) {
+  const key = (regionKey || '').toLowerCase();
+
+  try {
+    const assignments = await base('Creator Region Assignments')
+      .select({
+        filterByFormula: `AND({Region} = '${key}', {Active} = TRUE())`,
+        sort: [{ field: 'Priority', direction: 'asc' }]
+      })
+      .all();
+
+    for (const record of assignments) {
+      const linkedIds = record.fields['Creator'] || [];
+      if (linkedIds.length === 0) continue;
+      const creatorRecord = await base('Creator Network').find(linkedIds[0]);
+      if (creatorRecord.fields['Status'] === 'Active') {
+        return creatorRecord.fields['Name'];
+      }
+    }
+  } catch (err) {
+    console.error('Error checking Creator Network override during reschedule — falling back to in-house:', err);
+  }
+
   const SPECIALIST_REGIONS = {
-    'north':      'James Jago',
+    'north':      'Jodie',
     'north-west': 'James Jago',
     'north-east': 'James Jago',
     'west':       'James Jago',
@@ -306,7 +339,11 @@ async function fetchBookingsForRegion(region, selectedDate, excludeBookingId) {
     'south-west': 'Andrii'
   };
 
-  const specialistName = SPECIALIST_REGIONS[(region || '').toLowerCase()] || region;
+  return SPECIALIST_REGIONS[key] || regionKey;
+}
+
+async function fetchBookingsForRegion(region, selectedDate, excludeBookingId) {
+  const specialistName = await getSpecialistNameForRegion(region);
 
   const filterFormula = excludeBookingId
     ? `AND(
@@ -425,6 +462,7 @@ async function sendRescheduleEmail(fields, newDate, newTime, originalDate, origi
   });
 
   const SPECIALIST_EMAILS = {
+    'Jodie':      'Jodie.Hamshaw@markebmedia.com',
     'James Jago': 'James.Jago@markebmedia.com',
     'Andrii':     'Andrii.Hutovych@markebmedia.com'
   };
@@ -433,6 +471,21 @@ async function sendRescheduleEmail(fields, newDate, newTime, originalDate, origi
   if (fields['Media Specialist'] && SPECIALIST_EMAILS[fields['Media Specialist']]) {
     bccRecipients.push(SPECIALIST_EMAILS[fields['Media Specialist']]);
     console.log(`✓ BCC: Adding ${fields['Media Specialist']}`);
+  } else if (fields['Media Specialist']) {
+    try {
+      const records = await base('Creator Network')
+        .select({
+          filterByFormula: `AND({Name} = '${fields['Media Specialist'].replace(/'/g, "\\'")}', {Status} = 'Active')`,
+          maxRecords: 1
+        })
+        .firstPage();
+      if (records.length > 0 && records[0].fields['Email']) {
+        bccRecipients.push(records[0].fields['Email']);
+        console.log(`✓ BCC: Adding creator ${fields['Media Specialist']}`);
+      }
+    } catch (err) {
+      console.error('Error looking up creator email for reschedule BCC:', err);
+    }
   }
 
   await resend.emails.send({

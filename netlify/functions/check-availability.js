@@ -16,14 +16,60 @@ const SPECIALIST_REGIONS = {
   'south-west': ['Andrii']
 };
 
-function getSpecialistsForRegion(regionKey) {
-  return SPECIALIST_REGIONS[(regionKey || '').toLowerCase()] || [];
+// ── CREATOR NETWORK OVERRIDE ──────────────────────────────────────────────
+// If any Active creator has an Active region assignment for this region,
+// they fully replace the in-house specialist(s) — this is a deliberate
+// override, not an additional fallback layer. In-house only applies when
+// zero creators are assigned to a region.
+async function getCreatorNetworkOverride(regionKey) {
+  try {
+    const Airtable = require('airtable');
+    const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+
+    const assignments = await base('Creator Region Assignments')
+      .select({
+        filterByFormula: `AND({Region} = '${regionKey}', {Active} = TRUE())`,
+        sort: [{ field: 'Priority', direction: 'asc' }]
+      })
+      .all();
+
+    if (assignments.length === 0) return null;
+
+    const creatorNames = [];
+    for (const record of assignments) {
+      const linkedIds = record.fields['Creator'] || [];
+      if (linkedIds.length === 0) continue;
+
+      const creatorRecord = await base('Creator Network').find(linkedIds[0]);
+      if (creatorRecord.fields['Status'] === 'Active') {
+        creatorNames.push(creatorRecord.fields['Name']);
+      }
+    }
+
+    return creatorNames.length > 0 ? creatorNames : null;
+
+  } catch (err) {
+    console.error('Error checking Creator Network override — falling back to in-house:', err);
+    return null;
+  }
+}
+
+async function getSpecialistsForRegion(regionKey) {
+  const key = (regionKey || '').toLowerCase();
+
+  const creatorOverride = await getCreatorNetworkOverride(key);
+  if (creatorOverride) {
+    console.log(`Region ${key}: using Creator Network override — ${creatorOverride.join(', ')}`);
+    return creatorOverride;
+  }
+
+  return SPECIALIST_REGIONS[key] || [];
 }
 
 // Backwards-compatible helper — returns the primary (first) specialist only.
 // Used anywhere that still expects a single name.
-function getSpecialistName(regionKey) {
-  const list = getSpecialistsForRegion(regionKey);
+async function getSpecialistName(regionKey) {
+  const list = await getSpecialistsForRegion(regionKey);
   return list.length > 0 ? list[0] : null;
 }
 
@@ -105,7 +151,7 @@ exports.handler = async (event, context) => {
 
     // ✅ Try each specialist assigned to this region, in priority order,
     // and use the first one who has at least one available slot that day.
-    const candidateSpecialists = getSpecialistsForRegion(region);
+    const candidateSpecialists = await getSpecialistsForRegion(region);
 
     if (candidateSpecialists.length === 0) {
       return {

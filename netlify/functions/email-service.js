@@ -3,6 +3,33 @@
 const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const Airtable = require('airtable');
+const airtableBase = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+
+// Looks up a Creator Network record by exact Name match and returns their
+// email if found and Active. Returns null for in-house specialists (who
+// aren't in this table) or unmatched/inactive names — callers should fall
+// back to the static SPECIALIST_EMAILS map in that case.
+async function getCreatorEmailByName(specialistName) {
+  if (!specialistName) return null;
+  try {
+    const records = await airtableBase('Creator Network')
+      .select({
+        filterByFormula: `AND({Name} = '${specialistName.replace(/'/g, "\\'")}', {Status} = 'Active')`,
+        maxRecords: 1
+      })
+      .firstPage();
+
+    if (records.length > 0 && records[0].fields['Email']) {
+      return records[0].fields['Email'];
+    }
+    return null;
+  } catch (err) {
+    console.error('Error looking up creator email for BCC routing:', err);
+    return null;
+  }
+}
+
 const FROM_EMAIL = 'Markeb Media <commercial@markebmedia.com>';
 const BCC_EMAIL = 'commercial@markebmedia.com';
 const SEQUENCE_CC_EMAIL = 'christian.worrell@markebmedia.com';
@@ -543,7 +570,7 @@ async function sendBookingConfirmation(booking) {
   }
   
   // ── SPECIALIST EMAIL ROUTING ─────────────────────────────────────────────
-  // Add a new entry here when hiring a new specialist.
+  // In-house team — add a new entry here when hiring a new in-house specialist.
   const SPECIALIST_EMAILS = {
     'Jodie':      'Jodie.Hamshaw@markebmedia.com',
     'James Jago': 'James.Jago@markebmedia.com',
@@ -552,6 +579,11 @@ async function sendBookingConfirmation(booking) {
 
   if (booking.mediaSpecialist && SPECIALIST_EMAILS[booking.mediaSpecialist]) {
     bccRecipients.push(SPECIALIST_EMAILS[booking.mediaSpecialist]);
+  } else if (booking.mediaSpecialist) {
+    // Not an in-house name — check the Creator Network table, since
+    // freelancers need to be BCC'd on their own bookings too.
+    const creatorEmail = await getCreatorEmailByName(booking.mediaSpecialist);
+    if (creatorEmail) bccRecipients.push(creatorEmail);
   }
 
   await resend.emails.send({
@@ -985,6 +1017,9 @@ async function sendReminderEmail(booking) {
 
   if (booking.mediaSpecialist && SPECIALIST_EMAILS[booking.mediaSpecialist]) {
     reminderBcc.push(SPECIALIST_EMAILS[booking.mediaSpecialist]);
+  } else if (booking.mediaSpecialist) {
+    const creatorEmail = await getCreatorEmailByName(booking.mediaSpecialist);
+    if (creatorEmail) reminderBcc.push(creatorEmail);
   }
 
   await resend.emails.send({

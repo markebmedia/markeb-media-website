@@ -937,6 +937,7 @@ body {
     let rescheduleCalendarDate = new Date();
     let rescheduleSelectedDate = null;
     let rescheduleSelectedTime = null;
+    let rescheduleAssignedSpecialist = null;
 
     // ===== SERVICE & ADDON CATALOGS =====
     const SERVICES = {
@@ -1574,6 +1575,13 @@ if (booking.addons && booking.addons.length > 0) {
 
         const data = await response.json();
 
+        // ✅ Capture whichever specialist was actually matched for this new
+        // date/region — may differ from the original if a Creator Network
+        // assignment now overrides the in-house specialist here.
+        if (data.assignedSpecialist) {
+          rescheduleAssignedSpecialist = data.assignedSpecialist;
+        }
+
         renderRescheduleTimeSlots(data.availableSlots);
 
       } catch (error) {
@@ -1657,7 +1665,8 @@ if (booking.addons && booking.addons.length > 0) {
             bookingRef: bookingData.bookingRef,
             newDate: rescheduleSelectedDate,
             newTime: rescheduleSelectedTime,
-            clientEmail: bookingData.clientEmail
+            clientEmail: bookingData.clientEmail,
+            newMediaSpecialist: rescheduleAssignedSpecialist || undefined
           })
         });
 
