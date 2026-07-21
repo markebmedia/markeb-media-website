@@ -6,18 +6,25 @@ const fetch = require('node-fetch');
 // To reassign a region: change the name value on that line only.
 // To add a new person: add their region keys here with their name.
 const SPECIALIST_REGIONS = {
-  'north':      'Jodie',
-  'north-west': 'James Jago',
-  'north-east': 'James Jago',
-  'west':       'James Jago',
-  'east':       'Andrii',
-  'south':      'Andrii',
-  'south-east': 'Andrii',
-  'south-west': 'Andrii'
+  'north':      ['Jodie', 'James Jago'],
+  'north-west': ['James Jago'],
+  'north-east': ['James Jago'],
+  'west':       ['James Jago'],
+  'east':       ['Andrii'],
+  'south':      ['Andrii'],
+  'south-east': ['Andrii'],
+  'south-west': ['Andrii']
 };
 
+function getSpecialistsForRegion(regionKey) {
+  return SPECIALIST_REGIONS[(regionKey || '').toLowerCase()] || [];
+}
+
+// Backwards-compatible helper — returns the primary (first) specialist only.
+// Used anywhere that still expects a single name.
 function getSpecialistName(regionKey) {
-  return SPECIALIST_REGIONS[regionKey.toLowerCase()] || null;
+  const list = getSpecialistsForRegion(regionKey);
+  return list.length > 0 ? list[0] : null;
 }
 
 exports.handler = async (event, context) => {
@@ -96,22 +103,69 @@ exports.handler = async (event, context) => {
     }
     // ────────────────────────────────────────────────────────────────────────
 
-    // ✅ Fetch blocked times for this region and date
-    const blockedTimes = await fetchBlockedTimes(region, selectedDate);
-    console.log(`Found ${blockedTimes.length} blocked time(s) for this date/region`);
+    // ✅ Try each specialist assigned to this region, in priority order,
+    // and use the first one who has at least one available slot that day.
+    const candidateSpecialists = getSpecialistsForRegion(region);
 
-    // Fetch existing bookings from Airtable for this region and date
-    const bookings = await fetchBookingsForRegion(region, selectedDate);
-    console.log(`Found ${bookings.length} existing bookings for this date/region`);
+    if (candidateSpecialists.length === 0) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
+        body: JSON.stringify({ error: `No specialist found for region: ${region}` })
+      };
+    }
 
-    // ✅ If blocked times exist, apply them first
-    let availableSlots;
-    
-    if (bookings.length === 0) {
-      // No bookings - just check blocked times and duration
-      availableSlots = generateAllTimeSlots();
-      availableSlots = applyBlockedTimes(availableSlots, blockedTimes);
-      availableSlots = applyDurationConstraints(availableSlots, bookingDuration, []);
+    let chosenSpecialist = null;
+    let finalSlots = null;
+    let finalBookings = [];
+    let finalBlockedTimes = [];
+
+    for (const specialistName of candidateSpecialists) {
+      console.log(`\n=== Trying specialist: ${specialistName} ===`);
+
+      const blockedTimes = await fetchBlockedTimes(specialistName, selectedDate);
+      console.log(`Found ${blockedTimes.length} blocked time(s) for ${specialistName} on this date`);
+
+      const bookings = await fetchBookingsForSpecialist(specialistName, selectedDate);
+      console.log(`Found ${bookings.length} existing bookings for ${specialistName} on this date`);
+
+      let slots;
+
+      if (bookings.length === 0) {
+        slots = generateAllTimeSlots();
+        slots = applyBlockedTimes(slots, blockedTimes);
+        slots = applyDurationConstraints(slots, bookingDuration, []);
+      } else {
+        slots = await calculateAvailableSlots(postcode, bookings, isAdmin, bookingDuration);
+        slots = applyBlockedTimes(slots, blockedTimes);
+      }
+
+      const hasAvailability = slots.some(s => s.available);
+
+      if (hasAvailability) {
+        console.log(`✓ ${specialistName} has availability — using this specialist`);
+        chosenSpecialist = specialistName;
+        finalSlots = slots;
+        finalBookings = bookings;
+        finalBlockedTimes = blockedTimes;
+        break;
+      }
+
+      console.log(`✗ ${specialistName} has no availability on this date — trying next fallback if any`);
+    }
+
+    // If nobody in the fallback chain has availability, return the last
+    // checked specialist's (fully blocked) slots so the UI can show why.
+    if (!chosenSpecialist) {
+      console.log(`No specialist in [${candidateSpecialists.join(', ')}] has availability on ${selectedDate}`);
+      const lastResortSlots = generateAllTimeSlots().map(slot => ({
+        ...slot,
+        available: false,
+        reason: 'No specialist available for this region on this date'
+      }));
 
       return {
         statusCode: 200,
@@ -120,18 +174,12 @@ exports.handler = async (event, context) => {
           'Access-Control-Allow-Origin': '*'
         },
         body: JSON.stringify({
-          availableSlots: availableSlots,
-          message: blockedTimes.length > 0 ? 'Some slots blocked by admin' : 'All slots available - no existing bookings',
-          blockedTimesCount: blockedTimes.length
+          availableSlots: lastResortSlots,
+          region: region,
+          candidatesChecked: candidateSpecialists
         })
       };
     }
-
-    // Calculate available time slots based on existing bookings and drive times
-    availableSlots = await calculateAvailableSlots(postcode, bookings, isAdmin, bookingDuration);
-    
-    // ✅ Apply blocked times on top of booking conflicts
-    availableSlots = applyBlockedTimes(availableSlots, blockedTimes);
 
     return {
       statusCode: 200,
@@ -140,19 +188,21 @@ exports.handler = async (event, context) => {
         'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
-        availableSlots: availableSlots,
-        existingBookings: bookings.length,
-        blockedTimesCount: blockedTimes.length,
+        availableSlots: finalSlots,
+        assignedSpecialist: chosenSpecialist,
+        existingBookings: finalBookings.length,
+        blockedTimesCount: finalBlockedTimes.length,
         region: region,
+        candidatesChecked: candidateSpecialists,
         debug: {
           selectedDate,
           requestedDuration: bookingDuration,
-          bookingDetails: bookings.map(b => ({
+          bookingDetails: finalBookings.map(b => ({
             time: b.startTime,
             postcode: b.postcode,
             duration: b.duration
           })),
-          blockedTimes: blockedTimes.map(bt => ({
+          blockedTimes: finalBlockedTimes.map(bt => ({
             startTime: bt.startTime,
             endTime: bt.endTime,
             reason: bt.reason
@@ -177,20 +227,18 @@ exports.handler = async (event, context) => {
   }
 };
 
-// ✅ Fetch blocked times from Airtable
-async function fetchBlockedTimes(region, selectedDate) {
+// ✅ Fetch blocked times from Airtable for a specific specialist by name
+async function fetchBlockedTimes(specialistName, selectedDate) {
   try {
     const Airtable = require('airtable');
     const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-    const specialistNameBT = getSpecialistName(region);
-
     console.log(`Querying Blocked Times with:`);
     console.log(`  - Date: ${selectedDate}`);
-    console.log(`  - Region: ${region} → Specialist: ${specialistNameBT}`);
+    console.log(`  - Specialist: ${specialistName}`);
 
     const filterFormula = `AND(
-      FIND('${specialistNameBT}', {Media Specialist}),
+      FIND('${specialistName}', {Media Specialist}),
       IS_SAME({Date}, '${selectedDate}', 'day')
     )`;
     
@@ -301,17 +349,15 @@ function applyDurationConstraints(slots, bookingDuration, existingBookings) {
   return slots;
 }
 
-// Fetch bookings from Airtable for specific region and date
-async function fetchBookingsForRegion(region, selectedDate) {
+// Fetch bookings from Airtable for a specific specialist by name
+async function fetchBookingsForSpecialist(specialistName, selectedDate) {
   try {
     const Airtable = require('airtable');
     const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
 
-    const specialistName = getSpecialistName(region);
-
     console.log(`Querying Airtable with:`);
     console.log(`  - Date: ${selectedDate}`);
-    console.log(`  - Region: ${region} → Specialist: ${specialistName}`);
+    console.log(`  - Specialist: ${specialistName}`);
 
     const filterFormula = `AND(
   FIND('${specialistName}', {Media Specialist}),

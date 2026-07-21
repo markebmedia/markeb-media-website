@@ -9,18 +9,18 @@ const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process
 
 // ── SPECIALIST ROSTER ────────────────────────────────────────────────────────
 const SPECIALIST_REGIONS = {
-  'north':      'Jodie',
-  'north-west': 'James Jago',
-  'north-east': 'James Jago',
-  'west':       'James Jago',
-  'east':       'Andrii',
-  'south':      'Andrii',
-  'south-east': 'Andrii',
-  'south-west': 'Andrii'
+  'north':      ['Jodie', 'James Jago'],
+  'north-west': ['James Jago'],
+  'north-east': ['James Jago'],
+  'west':       ['James Jago'],
+  'east':       ['Andrii'],
+  'south':      ['Andrii'],
+  'south-east': ['Andrii'],
+  'south-west': ['Andrii']
 };
 
-function getSpecialistName(regionKey) {
-  return SPECIALIST_REGIONS[(regionKey || '').toLowerCase()] || null;
+function getSpecialistsForRegion(regionKey) {
+  return SPECIALIST_REGIONS[(regionKey || '').toLowerCase()] || [];
 }
 
 exports.handler = async (event, context) => {
@@ -53,8 +53,8 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const specialistName = getSpecialistName(region);
-    if (!specialistName) {
+    const candidateSpecialists = getSpecialistsForRegion(region);
+    if (candidateSpecialists.length === 0) {
       return {
         statusCode: 400,
         headers,
@@ -98,104 +98,120 @@ exports.handler = async (event, context) => {
     const monthStart = `${year}-${String(month + 1).padStart(2, '0')}-01`;
     const monthEnd = `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
 
-    console.log(`[get-available-dates] Region: ${region} → ${specialistName}, ${monthStart} to ${monthEnd}, postcode: ${postcode || 'none'}`);
+    console.log(`[get-available-dates] Region: ${region} → candidates: ${candidateSpecialists.join(', ')}, ${monthStart} to ${monthEnd}, postcode: ${postcode || 'none'}`);
 
-    // Fetch bookings and blocked times for this region/month in parallel
-    const [bookingRecords, blockedRecords] = await Promise.all([
-      base('Bookings')
-        .select({
-          filterByFormula: `AND(
-            FIND('${specialistName}', {Media Specialist}),
-            IS_SAME({Date}, '${monthStart}', 'month'),
-            OR(
-              {Booking Status} = 'Booked',
-              {Booking Status} = 'Reserved',
-              {Booking Status} = 'Confirmed'
-            )
-          )`,
-          fields: ['Date', 'Time', 'Duration (mins)', 'Media Specialist', 'Booking Status', 'Postcode', 'Property Address']
-        })
-        .all(),
+    // Fetch bookings and blocked times for ALL candidate specialists in this
+    // region/month, in parallel, keyed per specialist so we can evaluate
+    // each one's availability independently per day.
+    const perSpecialistData = {};
 
-      base('Blocked Times')
-        .select({
-          filterByFormula: `AND(
-            FIND('${specialistName}', {Media Specialist}),
-            IS_SAME({Date}, '${monthStart}', 'month')
-          )`,
-          fields: ['Date', 'Start Time', 'End Time', 'Media Specialist']
-        })
-        .all()
-    ]);
+    await Promise.all(candidateSpecialists.map(async (specialistName) => {
+      const [bookingRecords, blockedRecords] = await Promise.all([
+        base('Bookings')
+          .select({
+            filterByFormula: `AND(
+              FIND('${specialistName}', {Media Specialist}),
+              IS_SAME({Date}, '${monthStart}', 'month'),
+              OR(
+                {Booking Status} = 'Booked',
+                {Booking Status} = 'Reserved',
+                {Booking Status} = 'Confirmed'
+              )
+            )`,
+            fields: ['Date', 'Time', 'Duration (mins)', 'Media Specialist', 'Booking Status', 'Postcode', 'Property Address']
+          })
+          .all(),
 
-    console.log(`[get-available-dates] Found ${bookingRecords.length} bookings, ${blockedRecords.length} blocked times`);
+        base('Blocked Times')
+          .select({
+            filterByFormula: `AND(
+              FIND('${specialistName}', {Media Specialist}),
+              IS_SAME({Date}, '${monthStart}', 'month')
+            )`,
+            fields: ['Date', 'Start Time', 'End Time', 'Media Specialist']
+          })
+          .all()
+      ]);
 
-    // Group bookings by date
-    const bookingsByDate = {};
-    bookingRecords.forEach(record => {
-      const date = record.fields['Date']?.split('T')[0];
-      if (!date) return;
-      if (!bookingsByDate[date]) bookingsByDate[date] = [];
-      const bookingPostcode = record.fields['Postcode'] || extractPostcode(record.fields['Property Address'] || '');
-      bookingsByDate[date].push({
-        startTime: record.fields['Time'],
-        duration: record.fields['Duration (mins)'] || 90,
-        postcode: bookingPostcode
+      console.log(`[get-available-dates] ${specialistName}: ${bookingRecords.length} bookings, ${blockedRecords.length} blocked times`);
+
+      const bookingsByDate = {};
+      bookingRecords.forEach(record => {
+        const date = record.fields['Date']?.split('T')[0];
+        if (!date) return;
+        if (!bookingsByDate[date]) bookingsByDate[date] = [];
+        const bookingPostcode = record.fields['Postcode'] || extractPostcode(record.fields['Property Address'] || '');
+        bookingsByDate[date].push({
+          startTime: record.fields['Time'],
+          duration: record.fields['Duration (mins)'] || 90,
+          postcode: bookingPostcode
+        });
       });
-    });
 
-    // Group blocked times by date
-    const blockedByDate = {};
-    blockedRecords.forEach(record => {
-      const date = record.fields['Date']?.split('T')[0];
-      if (!date) return;
-      if (!blockedByDate[date]) blockedByDate[date] = [];
-      blockedByDate[date].push({
-        startTime: record.fields['Start Time'],
-        endTime: record.fields['End Time']
+      const blockedByDate = {};
+      blockedRecords.forEach(record => {
+        const date = record.fields['Date']?.split('T')[0];
+        if (!date) return;
+        if (!blockedByDate[date]) blockedByDate[date] = [];
+        blockedByDate[date].push({
+          startTime: record.fields['Start Time'],
+          endTime: record.fields['End Time']
+        });
       });
-    });
 
-    // For each valid weekday, check if at least one slot is available
+      perSpecialistData[specialistName] = { bookingsByDate, blockedByDate };
+    }));
+
+    // For each valid weekday, a day counts as available if ANY candidate
+    // specialist (checked in priority order) has at least one free slot.
     const availableDates = [];
     const maxDriveMinutes = 45;
 
     for (const dateString of weekdays) {
-      const bookings = bookingsByDate[dateString] || [];
-      const blockedTimes = blockedByDate[dateString] || [];
+      let dayIsAvailable = false;
 
-      // ✅ Distance check — if client postcode provided and day has bookings
-      if (postcode && bookings.length > 0) {
-        let tooFar = false;
+      for (const specialistName of candidateSpecialists) {
+        const { bookingsByDate, blockedByDate } = perSpecialistData[specialistName];
+        const bookings = bookingsByDate[dateString] || [];
+        const blockedTimes = blockedByDate[dateString] || [];
 
-        for (const booking of bookings) {
-          if (!booking.postcode) continue;
+        // ✅ Distance check — if client postcode provided and this specialist has bookings that day
+        if (postcode && bookings.length > 0) {
+          let tooFar = false;
 
-          try {
-            const driveTime = await getDriveTime(postcode, booking.postcode);
-            console.log(`[get-available-dates] ${dateString}: drive time ${postcode} → ${booking.postcode} = ${driveTime} mins`);
+          for (const booking of bookings) {
+            if (!booking.postcode) continue;
 
-            if (driveTime > maxDriveMinutes) {
-              console.log(`[get-available-dates] ${dateString}: too far (${driveTime} mins) — greying out`);
-              tooFar = true;
-              break;
+            try {
+              const driveTime = await getDriveTime(postcode, booking.postcode);
+              console.log(`[get-available-dates] ${dateString} (${specialistName}): drive time ${postcode} → ${booking.postcode} = ${driveTime} mins`);
+
+              if (driveTime > maxDriveMinutes) {
+                console.log(`[get-available-dates] ${dateString} (${specialistName}): too far (${driveTime} mins)`);
+                tooFar = true;
+                break;
+              }
+            } catch (error) {
+              console.error(`[get-available-dates] Drive time check failed for ${dateString} (${specialistName}):`, error.message);
             }
-          } catch (error) {
-            // If drive time check fails, don't block the day — let check-availability handle it
-            console.error(`[get-available-dates] Drive time check failed for ${dateString}:`, error.message);
           }
+
+          if (tooFar) continue; // This specialist is too far that day — try next candidate
         }
 
-        if (tooFar) continue; // Skip this day — grey it out
+        // Time slot check for this specialist
+        let slots = generateAllTimeSlots();
+        slots = applyBlockedTimes(slots, blockedTimes);
+        slots = applyBookingBuffers(slots, bookings);
+
+        const hasAvailable = slots.some(s => s.available);
+        if (hasAvailable) {
+          dayIsAvailable = true;
+          break; // Found a specialist with availability — no need to check further candidates
+        }
       }
 
-      // Time slot check
-      let slots = generateAllTimeSlots();
-      slots = applyBlockedTimes(slots, blockedTimes);
-      slots = applyBookingBuffers(slots, bookings);
-
-      const hasAvailable = slots.some(s => s.available);
-      if (hasAvailable) {
+      if (dayIsAvailable) {
         availableDates.push(dateString);
       }
     }
@@ -208,6 +224,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         availableDates,
         region: region,
+        candidatesChecked: candidateSpecialists,
         month: `${year}-${String(month + 1).padStart(2, '0')}`
       })
     };

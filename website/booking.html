@@ -1788,7 +1788,7 @@ function isValidUKPhone(phone) {
     // Move a region: cut from one name, paste to another. Nothing else changes.
     const SPECIALIST_CONFIG = {
       'Jodie':      ['north'],
-      'James Jago': ['north-west', 'north-east', 'west'],
+      'James Jago': ['north', 'north-west', 'north-east', 'west'],
       'Andrii':     ['east', 'south', 'south-east', 'south-west']
     };
 
@@ -3671,7 +3671,20 @@ async function loadAvailableTimeSlots(dateString) {
     }
 
     const data = await response.json();
-    
+
+    // ✅ Use whichever specialist was actually matched for this date/region.
+    // The fallback system in check-availability may assign a different
+    // person than the one shown at the postcode-check step (e.g. James Jago
+    // instead of Jodie, if Jodie has no free slots that day).
+    if (data.assignedSpecialist) {
+      bookingData.mediaSpecialist = data.assignedSpecialist;
+
+      const specialistNameEl = document.getElementById('mediaSpecialistName');
+      if (specialistNameEl) specialistNameEl.textContent = data.assignedSpecialist;
+
+      const summarySpecialistEl = document.getElementById('summaryMediaSpecialist');
+      if (summarySpecialistEl) summarySpecialistEl.textContent = data.assignedSpecialist;
+    }
 
     renderTimeSlots(data.availableSlots);
   } catch (error) {
