@@ -1890,6 +1890,24 @@ function isValidUKPhone(phone) {
     }
 
     let currentStep = 1;
+
+    // ===== FUNNEL TRACKING =====
+    const funnelSessionId = (() => {
+      let id = sessionStorage.getItem('funnelSessionId');
+      if (!id) {
+        id = 'fn_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+        sessionStorage.setItem('funnelSessionId', id);
+      }
+      return id;
+    })();
+
+    function trackFunnel(fields) {
+      fetch('/.netlify/functions/track-booking-funnel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: funnelSessionId, fields })
+      }).catch(() => {});
+    }
     let bookingData = {
       postcode: '',
       propertyAddress: '',
@@ -2514,6 +2532,14 @@ function handleAddressSelection() {
       }
     }
 
+    trackFunnel({
+      'Postcode': bookingData.postcode,
+      'Region': result.region,
+      'Serviceable': result.isServiceable,
+      'Assigned Specialist': result.mediaSpecialist,
+      'Furthest Step': 1
+    });
+
     if (result.isServiceable) {
       const regionBadge = document.getElementById('regionBadge');
       regionBadge.className = `region-badge ${result.region}`;
@@ -2959,6 +2985,12 @@ function handleAccessTypeChange() {
       bookingData.basePrice = service.price;
       bookingData.selectedAddons = [];
       bookingData.squareFootageFee = 0;
+
+      trackFunnel({
+        'Service Selected': service.name,
+        'Service ID': service.id,
+        'Furthest Step': 2
+      });
 
       // Clear any applied discount — codes are validated per service
       removeDiscountCode();
@@ -3866,6 +3898,12 @@ async function loadAvailableTimeSlots(dateString) {
     function selectTimeSlot(time) {
       bookingData.selectedTime = time;
 
+      trackFunnel({
+        'Selected Date': bookingData.selectedDate,
+        'Selected Time': time,
+        'Furthest Step': 3
+      });
+
       document.querySelectorAll('.time-slot').forEach(slot => {
         slot.classList.remove('selected');
       });
@@ -3901,7 +3939,16 @@ document.addEventListener('DOMContentLoaded', function() {
   if (emailField) {
     emailField.addEventListener('blur', async function() {
       const email = this.value.trim();
-      
+
+      if (email && email.includes('@')) {
+        trackFunnel({
+          'Client Name': document.getElementById('clientName')?.value.trim() || '',
+          'Client Email': email,
+          'Client Phone': document.getElementById('clientPhone')?.value.trim() || '',
+          'Furthest Step': 4
+        });
+      }
+
       if (!email || !email.includes('@')) {
         return;
       }
@@ -4359,7 +4406,13 @@ async function createBooking() {
 
       const result = await response.json();
       console.log('Booking created:', result);
-      
+
+      trackFunnel({
+        'Status': 'Completed',
+        'Booking Reference': result.bookingRef,
+        'Furthest Step': 5
+      });
+
       window.location.href = `/booking-success?ref=${result.bookingRef}&email=${encodeURIComponent(bookingData.clientEmail)}`;
     }
 
@@ -4464,6 +4517,19 @@ async function createBooking() {
           }
         });
       }
+    });
+
+    // ===== ABANDONMENT TRACKING =====
+    window.addEventListener('beforeunload', () => {
+      if (!bookingData.postcode) return;
+      const payload = JSON.stringify({
+        sessionId: funnelSessionId,
+        fields: { 'Status': 'Abandoned' }
+      });
+      navigator.sendBeacon(
+        '/.netlify/functions/track-booking-funnel',
+        new Blob([payload], { type: 'application/json' })
+      );
     });
 
     // Discount code state
