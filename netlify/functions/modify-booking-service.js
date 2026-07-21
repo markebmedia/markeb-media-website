@@ -290,6 +290,22 @@ exports.handler = async (event, context) => {
         const specialist = f['Media Specialist'];
         if (specialist && SPECIALIST_EMAILS[specialist]) {
           bccRecipients.push(SPECIALIST_EMAILS[specialist]);
+          console.log(`✓ BCC: Adding ${specialist}`);
+        } else if (specialist) {
+          try {
+            const creatorRecords = await base('Creator Network')
+              .select({
+                filterByFormula: `AND({Name} = '${specialist.replace(/'/g, "\\'")}', {Status} = 'Active')`,
+                maxRecords: 1
+              })
+              .firstPage();
+            if (creatorRecords.length > 0 && creatorRecords[0].fields['Email']) {
+              bccRecipients.push(creatorRecords[0].fields['Email']);
+              console.log(`✓ BCC: Adding creator ${specialist}`);
+            }
+          } catch (err) {
+            console.error('Error looking up creator email for modify-service BCC:', err);
+          }
         }
 
         const addonsEmailRows = addons && addons.length > 0

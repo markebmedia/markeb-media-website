@@ -2699,9 +2699,6 @@ body {
   <div class="filters-bar">
     <select class="filter-select" id="blockSpecialistFilter" onchange="loadBlockedTimes()">
       <option value="">All Specialists</option>
-      <option value="James Jago">James Jago</option>
-      <option value="Jodie">Jodie</option>
-      <option value="Andrii">Andrii</option>
     </select>
 
     <button class="btn btn-primary" onclick="loadBlockedTimes()">
@@ -4128,8 +4125,6 @@ We wanted to reach out..." required></textarea>
           <label class="form-label" for="blockSpecialist">Media Specialist *</label>
           <select id="blockSpecialist" class="form-input" required>
             <option value="">-- Select Specialist --</option>
-            <option value="James Jago">James Jago</option>
-            <option value="Andrii">Andrii</option>
           </select>
         </div>
 
@@ -4269,6 +4264,51 @@ function getCatalogKeyForRegion(regionKey) {
   return (specialist && SPECIALIST_CATALOG_KEY[specialist]) || 'south';
 }
 
+let ACTIVE_CREATORS_CACHE = [];
+
+async function loadActiveCreatorsForDropdowns() {
+  try {
+    const res = await fetch('/.netlify/functions/creator-network', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'get-full-roster' })
+    });
+    const data = await res.json();
+    if (data.success) {
+      ACTIVE_CREATORS_CACHE = data.roster.filter(c => c.status === 'Active' && c.name);
+    }
+  } catch (e) {
+    console.error('Could not load creators for dropdowns:', e);
+  }
+  return ACTIVE_CREATORS_CACHE;
+}
+
+function generateBlockSpecialistOptions(includeAllOption = false) {
+  let html = includeAllOption ? '<option value="">All Specialists</option>' : '<option value="">-- Select Specialist --</option>';
+  html += '<optgroup label="In-House">';
+  Object.keys(SPECIALIST_CONFIG).forEach(name => {
+    html += `<option value="${name}">${name}</option>`;
+  });
+  html += '</optgroup>';
+
+  if (ACTIVE_CREATORS_CACHE.length > 0) {
+    html += '<optgroup label="Creator Network">';
+    ACTIVE_CREATORS_CACHE.forEach(c => {
+      html += `<option value="${c.name}">${c.name}</option>`;
+    });
+    html += '</optgroup>';
+  }
+
+  return html;
+}
+
+function populateBlockSpecialistDropdowns() {
+  const filterEl = document.getElementById('blockSpecialistFilter');
+  const modalEl = document.getElementById('blockSpecialist');
+  if (filterEl) filterEl.innerHTML = generateBlockSpecialistOptions(true);
+  if (modalEl) modalEl.innerHTML = generateBlockSpecialistOptions(false);
+}
+
 function generateRegionOptions(includeAll = true) {
   let html = includeAll
     ? '<option value="">All Regions</option>'
@@ -4285,10 +4325,22 @@ function generateRegionOptions(includeAll = true) {
 
 function generateSpecialistOptions() {
   let html = '<option value="">-- Select Specialist --</option>';
+  html += '<optgroup label="In-House">';
   Object.keys(SPECIALIST_CONFIG).forEach(name => {
     const regions = SPECIALIST_CONFIG[name].map(r => REGION_DISPLAY[r]).join(', ');
     html += `<option value="${name}">${name} (${regions})</option>`;
   });
+  html += '</optgroup>';
+
+  if (ACTIVE_CREATORS_CACHE.length > 0) {
+    html += '<optgroup label="Creator Network">';
+    ACTIVE_CREATORS_CACHE.forEach(c => {
+      const regions = (c.assignments || []).filter(a => a.active).map(a => a.region).join(', ');
+      html += `<option value="${c.name}">${c.name}${regions ? ' (' + regions + ')' : ''}</option>`;
+    });
+    html += '</optgroup>';
+  }
+
   html += '<option value="other">Other / Enter manually...</option>';
   return html;
 }
@@ -4828,7 +4880,7 @@ const UK_REGIONS = [
 ].sort();
 
     // Initialize
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
 
       // Populate all region/specialist dropdowns from SPECIALIST_CONFIG
       document.getElementById('bookingRegion').innerHTML = generateRegionOptions(false);
@@ -4836,6 +4888,11 @@ const UK_REGIONS = [
       document.getElementById('calendarRegion').innerHTML = generateRegionOptions(true);
       // blockSpecialistFilter and blockSpecialist are now static HTML — no population needed
       // Quick block modal is dynamically created so populated in showQuickBlockModal
+
+      // Load active Creator Network members, then re-render the specialist dropdowns to include them
+      await loadActiveCreatorsForDropdowns();
+      document.getElementById('bookingSpecialist').innerHTML = generateSpecialistOptions();
+      populateBlockSpecialistDropdowns();
 
       loadDashboardStats();
       loadCalendar();
@@ -6797,10 +6854,7 @@ ${date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'lo
           <div class="form-group">
             <label class="form-label" for="quickBlockSpecialist">Media Specialist *</label>
             <select id="quickBlockSpecialist" class="form-input" required>
-              <option value="">-- Select Specialist --</option>
-              <option value="James Jago">James Jago</option>
-              <option value="Jodie">Jodie</option>
-              <option value="Andrii">Andrii</option>
+              ${generateBlockSpecialistOptions(false)}
             </select>
           </div>
           <div class="form-row">
