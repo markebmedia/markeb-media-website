@@ -2598,7 +2598,17 @@ function handleAddressSelection() {
       } catch (creatorLookupError) {
         console.warn('Creator Network lookup failed — showing in-house specialist:', creatorLookupError);
       }
+    }
 
+    trackFunnel({
+      'Postcode': bookingData.postcode,
+      'Region': result.region,
+      'Serviceable': result.isServiceable,
+      'Assigned Specialist': bookingData.mediaSpecialist,
+      'Furthest Step': 1
+    });
+
+    if (result.isServiceable) {
       const regionBadge = document.getElementById('regionBadge');
       regionBadge.className = `region-badge ${result.region}`;
       regionBadge.textContent = REGION_DISPLAY[result.region] || result.region.toUpperCase();
