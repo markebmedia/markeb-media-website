@@ -920,7 +920,7 @@ width: 100%;
           <button type="button" class="btn btn-secondary" onclick="goToStep(1)" style="flex: 1;">
             Back
           </button>
-          <button type="button" class="btn btn-primary" id="continueToCalendarBtn" onclick="goToStep(3)" style="flex: 2;" disabled>
+          <button type="button" class="btn btn-primary" id="continueToCalendarBtn" onclick="continueToStep3()" style="flex: 2;" disabled>
             <span>Continue to Date Selection</span>
           </button>
         </div>
@@ -1130,7 +1130,7 @@ width: 100%;
           <button type="button" class="btn btn-secondary" onclick="goToStep(2)" style="flex: 1;">
             Back
           </button>
-          <button type="button" class="btn btn-primary" id="continueToDetailsBtn" onclick="goToStep(4)" style="flex: 2;" disabled>
+          <button type="button" class="btn btn-primary" id="continueToDetailsBtn" onclick="continueToStep4()" style="flex: 2;" disabled>
             <span>Continue to Details</span>
           </button>
         </div>
@@ -1890,6 +1890,7 @@ function isValidUKPhone(phone) {
     }
 
     let currentStep = 1;
+    let bookingCompleted = false;
 
     // ===== FUNNEL TRACKING =====
     const funnelSessionId = (() => {
@@ -1907,6 +1908,34 @@ function isValidUKPhone(phone) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId: funnelSessionId, fields })
       }).catch(() => {});
+    }
+
+    // Fires on every "Continue" click, sending whatever context is known so
+    // far — not just on milestone actions like selecting a service. This
+    // means Furthest Step (and everything else) gets logged even if a
+    // milestone-specific trackFunnel() call was missed or failed silently.
+    function trackContinueClick(toStep) {
+      const fields = { 'Furthest Step': toStep };
+      if (bookingData.postcode) fields['Postcode'] = bookingData.postcode;
+      if (bookingData.region) fields['Region'] = bookingData.region;
+      if (bookingData.mediaSpecialist) fields['Assigned Specialist'] = bookingData.mediaSpecialist;
+      if (bookingData.service) {
+        fields['Service Selected'] = bookingData.service.name;
+        fields['Service ID'] = bookingData.service.id;
+      }
+      if (bookingData.selectedDate) fields['Selected Date'] = bookingData.selectedDate;
+      if (bookingData.selectedTime) fields['Selected Time'] = bookingData.selectedTime;
+      trackFunnel(fields);
+    }
+
+    function continueToStep3() {
+      trackContinueClick(3);
+      goToStep(3);
+    }
+
+    function continueToStep4() {
+      trackContinueClick(4);
+      goToStep(4);
     }
     let bookingData = {
       postcode: '',
@@ -2680,6 +2709,7 @@ function handleAddressSelection() {
         bookingData.propertyAddress = address;
       }
 
+      trackContinueClick(2);
       goToStep(2);
     }
     // Navigate to Step
@@ -4423,6 +4453,8 @@ async function createBooking() {
         'Furthest Step': 5
       });
 
+      bookingCompleted = true;
+
       window.location.href = `/booking-success?ref=${result.bookingRef}&email=${encodeURIComponent(bookingData.clientEmail)}`;
     }
 
@@ -4531,7 +4563,7 @@ async function createBooking() {
 
     // ===== ABANDONMENT TRACKING =====
     window.addEventListener('beforeunload', () => {
-      if (!bookingData.postcode) return;
+      if (!bookingData.postcode || bookingCompleted) return;
       const payload = JSON.stringify({
         sessionId: funnelSessionId,
         fields: { 'Status': 'Abandoned' }
