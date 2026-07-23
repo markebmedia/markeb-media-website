@@ -1677,6 +1677,97 @@ body {
 }
 /* ===== END BDM MOBILE CARD STYLES ===== */
 
+/* ===== BULK INVOICING RESPONSIVE STYLES ===== */
+
+#bulk-invoicing .form-row {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+#bulkInvoiceTableWrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#bulkInvoiceTable {
+  min-width: 900px;
+}
+
+/* iPad / tablet: keep table scrollable rather than collapsing yet */
+@media (max-width: 1024px) and (min-width: 769px) {
+  #bulkInvoiceTable { min-width: 800px; }
+  #bulk-invoicing .form-row { grid-template-columns: 1fr 1fr; }
+}
+
+/* Mobile: convert to stacked cards, same pattern as other admin tables */
+@media (max-width: 768px) {
+  #bulk-invoicing .form-row { grid-template-columns: 1fr; }
+
+  #bulkInvoiceTableWrap { overflow-x: unset; }
+
+  #bulkInvoiceTable {
+    min-width: unset;
+    table-layout: auto;
+  }
+
+  #bulkInvoiceTable thead { display: none; }
+
+  #bulkInvoiceTable,
+  #bulkInvoiceTable tbody,
+  #bulkInvoiceTable tr,
+  #bulkInvoiceTable td {
+    display: block;
+    width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+
+  #bulkInvoiceTable tr {
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  #bulkInvoiceTable td {
+    padding: 10px 0;
+    border: none;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  #bulkInvoiceTable td:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  #bulkInvoiceTable td::before {
+    content: attr(data-label);
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+
+  #bulkInvoiceTable td[data-label="Select"] {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+  #bulkInvoiceTable td[data-label="Select"]::before {
+    content: "Include this booking";
+  }
+}
+
+@media (max-width: 480px) {
+  #bulkInvoiceTable tr { padding: 12px; margin-bottom: 12px; }
+  #bulkInvoiceTable td { padding: 8px 0; font-size: 13px; }
+}
+
   </style>
 </head>
 <body>
@@ -13337,6 +13428,29 @@ function populateBulkInvoiceMonths() {
   if (currentValue) select.value = currentValue;
 }
 
+// Parses the "Add-Ons" field into a clean {name, price} list.
+// Shared by the invoice line-item builder and the results-table add-ons display,
+// so both always agree on what add-ons a booking actually has.
+function parseAddonsList(addonsRaw, addonsPrice) {
+  if (!addonsRaw) return [];
+
+  const addonLines = addonsRaw.split('\n').map(s => s.trim()).filter(Boolean);
+  const structuredAddons = addonLines.map(line => {
+    const match = line.match(/^(.+?)\s*\(\+£([\d.]+)\)$/);
+    if (match) return { name: match[1].trim(), price: parseFloat(match[2]) };
+    return { name: line.replace(/\s*\(\+£[\d.]+\)$/, '').trim(), price: null };
+  }).filter(a => a.name);
+
+  if (structuredAddons.length > 0 && structuredAddons.some(a => a.price !== null)) {
+    return structuredAddons.map(a => ({ name: a.name, price: a.price !== null ? a.price : 0 }));
+  }
+
+  // Fallback — comma separated names with no per-item price, split evenly
+  const addonList = addonsRaw.split(',').map(a => a.trim()).filter(Boolean);
+  const priceEach = addonList.length > 0 && addonsPrice > 0 ? addonsPrice / addonList.length : 0;
+  return addonList.map(name => ({ name, price: priceEach || 0 }));
+}
+
 // Builds the same per-fee breakdown used by your existing invoice generator,
 // but prefixes each line with the property address so multiple properties
 // stay distinguishable on one combined invoice.
@@ -13367,27 +13481,9 @@ function getBookingLineItems(booking) {
   if (bedroomFee > 0) lines.push({ desc: `Extra bedrooms — ${fullAddress}`, amount: bedroomFee });
   if (sqftFee > 0) lines.push({ desc: `Large property fee — ${fullAddress}`, amount: sqftFee });
 
-  if (addonsRaw) {
-    // Parse structured "Name (+£20.00)" format first — same logic used by the single-booking invoice —
-    // so each add-on carries its real individual price rather than an even split of the total.
-    const addonLines = addonsRaw.split('\n').map(s => s.trim()).filter(Boolean);
-    const structuredAddons = addonLines.map(line => {
-      const match = line.match(/^(.+?)\s*\(\+£([\d.]+)\)$/);
-      if (match) return { name: match[1].trim(), price: parseFloat(match[2]) };
-      return { name: line.replace(/\s*\(\+£[\d.]+\)$/, '').trim(), price: null };
-    }).filter(a => a.name);
+  const parsedAddons = parseAddonsList(addonsRaw, addonsPrice);
+  parsedAddons.forEach(a => lines.push({ desc: `${a.name} — ${fullAddress}`, amount: a.price }));
 
-    if (structuredAddons.length > 0 && structuredAddons.some(a => a.price !== null)) {
-      structuredAddons.forEach(a => {
-        lines.push({ desc: `${a.name} — ${fullAddress}`, amount: a.price !== null ? a.price : 0 });
-      });
-    } else {
-      // Fallback if the field wasn't in the expected format — split evenly as before
-      const addonList = addonsRaw.split(',').map(a => a.trim()).filter(Boolean);
-      const priceEach = addonList.length > 0 && addonsPrice > 0 ? addonsPrice / addonList.length : 0;
-      addonList.forEach(a => lines.push({ desc: `${a} — ${fullAddress}`, amount: priceEach || 0 }));
-    }
-  }
   return lines;
 }
 
@@ -13435,6 +13531,10 @@ async function loadBulkInvoiceBookings() {
       date: b.fields['Date'] || '',
       amount: parseFloat(b.fields['Final Price'] || 0) / 1.2,
       selected: true,
+      addons: parseAddonsList(
+        b.fields['Add-Ons'] || b.fields['Add-ons'] || '',
+        parseFloat(b.fields['Add-ons Price'] || b.fields['Addons Price'] || 0)
+      ),
       lineItems: getBookingLineItems(b)
     }));
 
@@ -13455,7 +13555,7 @@ function renderBulkInvoiceResults(clientName, clientEmail) {
   }
 
   let html = `
-    <div class="calendar-container">
+    <div class="calendar-container" id="bulkInvoiceTableWrap">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
         <div style="font-weight:700;font-size:15px;">${clientName} <span style="color:#64748b;font-weight:400;font-size:13px;">(${clientEmail})</span></div>
         <div style="display:flex;gap:8px;">
@@ -13463,13 +13563,17 @@ function renderBulkInvoiceResults(clientName, clientEmail) {
           <button class="btn btn-secondary btn-small" onclick="toggleAllBulkInvoiceBookings(false)">Deselect All</button>
         </div>
       </div>
-      <table class="data-table">
-        <thead><tr><th style="width:36px;"></th><th>Reference</th><th>Date</th><th>Service</th><th>Property</th><th>Amount (ex VAT)</th></tr></thead>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <table class="data-table" id="bulkInvoiceTable">
+        <thead><tr><th style="width:36px;"></th><th>Reference</th><th>Date</th><th>Service</th><th>Property</th><th>Add-ons</th><th>Amount (ex VAT)</th></tr></thead>
         <tbody>
   `;
 
   bulkInvoiceBookingsData.forEach((b, idx) => {
     const dateFmt = b.date ? new Date(b.date + 'T12:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
+    const addonsBadges = (b.addons && b.addons.length > 0)
+      ? b.addons.map(a => `<span style="display:inline-block;background:#dbeafe;color:#1e40af;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;margin:2px 4px 2px 0;white-space:nowrap;">${a.name}${a.price > 0 ? ` (+£${a.price.toFixed(2)})` : ''}</span>`).join('')
+      : '<span style="font-size:12px;color:#94a3b8;">None</span>';
     html += `
       <tr>
         <td data-label="Select"><input type="checkbox" ${b.selected ? 'checked' : ''} onchange="toggleBulkInvoiceBooking(${idx}, this.checked)" style="width:16px;height:16px;cursor:pointer;"></td>
@@ -13477,11 +13581,12 @@ function renderBulkInvoiceResults(clientName, clientEmail) {
         <td data-label="Date">${dateFmt}</td>
         <td data-label="Service">${b.service}</td>
         <td data-label="Property">${b.address}</td>
+        <td data-label="Add-ons" style="white-space:normal;max-width:220px;">${addonsBadges}</td>
         <td data-label="Amount"><strong>£${b.amount.toFixed(2)}</strong></td>
       </tr>`;
   });
 
-  html += '</tbody></table>';
+  html += '</tbody></table></div>';
 
   const selectedTotal = bulkInvoiceBookingsData.filter(b => b.selected).reduce((s,b) => s + b.amount, 0);
   const selectedCount = bulkInvoiceBookingsData.filter(b => b.selected).length;
