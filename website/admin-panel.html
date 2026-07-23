@@ -10606,11 +10606,13 @@ async function confirmEditPrice() {
   // Derive Price Ex VAT and VAT Amount from the new Final Price so all three stay in sync
   const newPriceExVat = parseFloat((newPrice / 1.2).toFixed(2));
   const newVatAmount = parseFloat((newPrice - newPriceExVat).toFixed(2));
+  const isFreeShoot = newPrice === 0;
 
   if (!confirm(
     `Update price for ${booking.fields['Client Name']}?\n\n` +
     `Old: £${oldPrice.toFixed(2)}\n` +
     `New: £${newPrice.toFixed(2)} (£${newPriceExVat.toFixed(2)} ex VAT + £${newVatAmount.toFixed(2)} VAT)\n` +
+    (isFreeShoot ? `\n⚠️ Setting to £0 — this will be treated as a free/reshoot booking and Price Before Discount will also be zeroed out.\n` : '') +
     (hasCard ? `\nStripe will charge £${newPrice.toFixed(2)} when you hit Charge Card` : '\nNo card on file') +
     (reason ? `\nReason: ${reason}` : '')
   )) return;
@@ -10625,6 +10627,7 @@ async function confirmEditPrice() {
       'Price Ex VAT': newPriceExVat,
       'VAT Amount': newVatAmount
     };
+    if (isFreeShoot) updateFields['Price Before Discount'] = 0;
     if (reason) updateFields['Admin Notes'] = `Price manually set to £${newPrice.toFixed(2)}: ${reason}`;
 
     const response = await fetch('/.netlify/functions/airtable-proxy', {
@@ -10646,6 +10649,7 @@ async function confirmEditPrice() {
       allBookings[idx].fields['Final Price'] = newPrice;
       allBookings[idx].fields['Price Ex VAT'] = newPriceExVat;
       allBookings[idx].fields['VAT Amount'] = newVatAmount;
+      if (isFreeShoot) allBookings[idx].fields['Price Before Discount'] = 0;
     }
 
     alert(`Price updated to £${newPrice.toFixed(2)}!${hasCard ? '\n\nCharge Card will now use this amount.' : ''}`);
