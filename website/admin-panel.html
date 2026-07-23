@@ -2605,6 +2605,10 @@ body {
         <select id="bulkInvClientSelect" class="form-input">
           <option value="">-- Select Client --</option>
         </select>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer;font-size:12px;color:#64748b;">
+          <input type="checkbox" id="bulkInvShowAllClients" onchange="populateBulkInvoiceClientsList()">
+          Show all clients (not just those marked for bulk invoicing)
+        </label>
       </div>
       <div class="form-group">
         <label class="form-label">Month *</label>
@@ -7908,6 +7912,7 @@ async function confirmModifyService(bookingId) {
               <th>Last Login</th>
               <th>Skip Payment</th>
           <th>Review Reward</th>
+          <th>Bulk Invoice</th>
           <th>Actions</th>
             </tr>
           </thead>
@@ -7985,6 +7990,16 @@ async function confirmModifyService(bookingId) {
                 <span class="toggle-slider"></span>
               </label>
               ${customer.fields['Review Reward Spun'] ? `<div style="font-size:11px;color:#10b981;margin-top:4px;font-weight:600;">✓ Spun — ${customer.fields['Review Reward Prize'] || 'prize set'}</div>` : ''}
+            </td>
+            <td data-label="Bulk Invoice">
+              <label class="toggle-switch">
+                <input 
+                  type="checkbox" 
+                  ${customer.fields['Bulk Invoice Client'] ? 'checked' : ''} 
+                  onchange='toggleBulkInvoiceClient("${customer.id}", this.checked)'
+                >
+                <span class="toggle-slider"></span>
+              </label>
             </td>
             <td data-label="Actions">
               <div style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -8168,6 +8183,35 @@ async function confirmModifyService(bookingId) {
   } catch (error) {
     console.error('Error toggling review reward:', error);
     alert('Error updating review reward eligibility');
+    event.target.checked = !enabled;
+  }
+}
+
+async function toggleBulkInvoiceClient(recordId, enabled) {
+  try {
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'PATCH',
+        table: 'Markeb Media Users',
+        recordId: recordId,
+        body: { fields: { 'Bulk Invoice Client': enabled } }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update bulk invoice client flag');
+    }
+
+    const customer = allCustomers.find(c => c.id === recordId);
+    if (customer) {
+      customer.fields['Bulk Invoice Client'] = enabled;
+    }
+
+  } catch (error) {
+    console.error('Error toggling bulk invoice client:', error);
+    alert('Error updating bulk invoice client flag');
     event.target.checked = !enabled;
   }
 }
@@ -13235,6 +13279,7 @@ async function populateBulkInvoiceClientsList() {
   const select = document.getElementById('bulkInvClientSelect');
   if (!select) return;
   const currentValue = select.value;
+  const showAll = document.getElementById('bulkInvShowAllClients')?.checked;
 
   select.innerHTML = '<option value="">Loading clients...</option>';
   select.disabled = true;
@@ -13247,12 +13292,21 @@ async function populateBulkInvoiceClientsList() {
     if (data.success && data.users) {
       allCustomers = data.users; // keep the shared cache in sync too
 
-      const sorted = [...data.users].sort((a, b) =>
+      let list = [...data.users];
+      if (!showAll) {
+        list = list.filter(c => c.fields['Bulk Invoice Client'] === true);
+      }
+
+      const sorted = list.sort((a, b) =>
         (a.fields['Name'] || '').localeCompare(b.fields['Name'] || '')
       );
 
-      select.innerHTML = '<option value="">-- Select Client --</option>' +
-        sorted.map(c => `<option value="${c.fields['Email']}">${c.fields['Name']}${c.fields['Company'] ? ' — ' + c.fields['Company'] : ''} (${c.fields['Email']})</option>`).join('');
+      if (sorted.length === 0 && !showAll) {
+        select.innerHTML = '<option value="">No clients marked yet — tick "Show all clients" or mark clients in the All Clients tab</option>';
+      } else {
+        select.innerHTML = '<option value="">-- Select Client --</option>' +
+          sorted.map(c => `<option value="${c.fields['Email']}">${c.fields['Name']}${c.fields['Company'] ? ' — ' + c.fields['Company'] : ''} (${c.fields['Email']})</option>`).join('');
+      }
 
       if (currentValue) select.value = currentValue;
     } else {
@@ -13312,10 +13366,27 @@ function getBookingLineItems(booking) {
   lines.push({ desc: `${service} — ${fullAddress || 'no address on file'}`, amount: serviceAmount });
   if (bedroomFee > 0) lines.push({ desc: `Extra bedrooms — ${fullAddress}`, amount: bedroomFee });
   if (sqftFee > 0) lines.push({ desc: `Large property fee — ${fullAddress}`, amount: sqftFee });
+
   if (addonsRaw) {
-    const addonList = addonsRaw.split(',').map(a => a.trim()).filter(Boolean);
-    const priceEach = addonList.length > 0 && addonsPrice > 0 ? addonsPrice / addonList.length : 0;
-    addonList.forEach(a => lines.push({ desc: `${a} — ${fullAddress}`, amount: priceEach || 0 }));
+    // Parse structured "Name (+£20.00)" format first — same logic used by the single-booking invoice —
+    // so each add-on carries its real individual price rather than an even split of the total.
+    const addonLines = addonsRaw.split('\n').map(s => s.trim()).filter(Boolean);
+    const structuredAddons = addonLines.map(line => {
+      const match = line.match(/^(.+?)\s*\(\+£([\d.]+)\)$/);
+      if (match) return { name: match[1].trim(), price: parseFloat(match[2]) };
+      return { name: line.replace(/\s*\(\+£[\d.]+\)$/, '').trim(), price: null };
+    }).filter(a => a.name);
+
+    if (structuredAddons.length > 0 && structuredAddons.some(a => a.price !== null)) {
+      structuredAddons.forEach(a => {
+        lines.push({ desc: `${a.name} — ${fullAddress}`, amount: a.price !== null ? a.price : 0 });
+      });
+    } else {
+      // Fallback if the field wasn't in the expected format — split evenly as before
+      const addonList = addonsRaw.split(',').map(a => a.trim()).filter(Boolean);
+      const priceEach = addonList.length > 0 && addonsPrice > 0 ? addonsPrice / addonList.length : 0;
+      addonList.forEach(a => lines.push({ desc: `${a} — ${fullAddress}`, amount: priceEach || 0 }));
+    }
   }
   return lines;
 }
