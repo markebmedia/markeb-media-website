@@ -1796,6 +1796,10 @@ body {
       <i data-lucide="receipt" class="nav-icon" style="width: 20px; height: 20px;"></i>
       Invoices
     </div>
+    <div class="nav-item" onclick="showSection('bulk-invoicing')">
+      <i data-lucide="layers" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      Bulk Invoicing
+    </div>
   </div>
 
   <div class="nav-section">
@@ -2585,6 +2589,33 @@ body {
   <div id="invoicesContainer">
     <div style="text-align:center;padding:40px;"><div class="spinner"></div></div>
   </div>
+</div>
+
+<!-- Bulk Invoicing Section -->
+<div class="admin-section" id="bulk-invoicing">
+  <div style="margin-bottom:24px;">
+    <h2 style="font-size:24px;font-weight:700;margin-bottom:8px;">Bulk Invoicing</h2>
+    <p style="color:#64748b;font-size:14px;">Combine all of a client's shoots for a month into one invoice — one line per property, one total.</p>
+  </div>
+
+  <div class="calendar-container" style="margin-bottom:24px;">
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Client *</label>
+        <input type="text" id="bulkInvClientInput" class="form-input" list="bulkInvClientsList" placeholder="Type name or email...">
+        <datalist id="bulkInvClientsList"></datalist>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Month *</label>
+        <input type="month" id="bulkInvMonth" class="form-input">
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="loadBulkInvoiceBookings()">
+      <i data-lucide="search" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Load Bookings & Services
+    </button>
+  </div>
+
+  <div id="bulkInvoiceResultsContainer"></div>
 </div>
 
 <!-- Invoice Client Detail Panel -->
@@ -13192,6 +13223,227 @@ async function submitManualInvoice(event) {
     lucide.createIcons();
   }
 }
+
+// ===== BULK INVOICING =====
+
+let bulkInvoiceBookingsData = [];
+
+function populateBulkInvoiceClientsList() {
+  const datalist = document.getElementById('bulkInvClientsList');
+  if (!datalist) return;
+  datalist.innerHTML = '';
+  (allCustomers || []).forEach(c => {
+    const option = document.createElement('option');
+    option.value = `${c.fields['Name']} (${c.fields['Email']})`;
+    datalist.appendChild(option);
+  });
+}
+
+// Builds the same per-fee breakdown used by your existing invoice generator,
+// but prefixes each line with the property address so multiple properties
+// stay distinguishable on one combined invoice.
+function getBookingLineItems(booking) {
+  const f = booking.fields;
+  const address = f['Property Address'] || '';
+  const postcode = f['Postcode'] || '';
+  const fullAddress = `${address}${postcode ? ', ' + postcode : ''}`;
+  const service = f['Service'] || '';
+  const finalPrice = parseFloat(f['Final Price'] || 0);
+  const exVAT = parseFloat((finalPrice / 1.2).toFixed(2));
+  const basePrice = parseFloat(f['Base Price'] || 0);
+  const bedroomFee = parseFloat(f['Extra Bedroom Fee'] || 0);
+  const sqftFee = parseFloat(f['Square Footage Fee'] || 0);
+  const addonsPrice = parseFloat(f['Add-ons Price'] || f['Addons Price'] || 0);
+  const addonsRaw = f['Add-Ons'] || f['Add-ons'] || '';
+  const discountAmount = parseFloat(f['Discount Amount'] || 0);
+
+  const lines = [];
+  const otherFeesTotal = bedroomFee + sqftFee + addonsPrice;
+  let serviceAmount = basePrice > 0 && Math.abs(basePrice - finalPrice) > 0.5
+    ? basePrice
+    : parseFloat((exVAT - otherFeesTotal).toFixed(2));
+  serviceAmount = parseFloat((serviceAmount - discountAmount).toFixed(2));
+  if (serviceAmount < 0) serviceAmount = 0;
+
+  lines.push({ desc: `${service} — ${fullAddress || 'no address on file'}`, amount: serviceAmount });
+  if (bedroomFee > 0) lines.push({ desc: `Extra bedrooms — ${fullAddress}`, amount: bedroomFee });
+  if (sqftFee > 0) lines.push({ desc: `Large property fee — ${fullAddress}`, amount: sqftFee });
+  if (addonsRaw) {
+    const addonList = addonsRaw.split(',').map(a => a.trim()).filter(Boolean);
+    const priceEach = addonList.length > 0 && addonsPrice > 0 ? addonsPrice / addonList.length : 0;
+    addonList.forEach(a => lines.push({ desc: `${a} — ${fullAddress}`, amount: priceEach || 0 }));
+  }
+  return lines;
+}
+
+async function loadBulkInvoiceBookings() {
+  const clientValue = document.getElementById('bulkInvClientInput').value.trim();
+  const monthValue = document.getElementById('bulkInvMonth').value;
+  const container = document.getElementById('bulkInvoiceResultsContainer');
+
+  if (!clientValue) { alert('Please select a client'); return; }
+  if (!monthValue) { alert('Please select a month'); return; }
+
+  const client = (allCustomers || []).find(c => clientValue.includes(c.fields['Email']));
+  const clientEmail = client ? client.fields['Email'] : clientValue;
+  const clientName = client ? client.fields['Name'] : clientValue;
+
+  const [year, month] = monthValue.split('-').map(Number);
+  const startDate = `${year}-${String(month).padStart(2,'0')}-01`;
+  const lastDay = new Date(year, month, 0).getDate();
+  const endDate = `${year}-${String(month).padStart(2,'0')}-${String(lastDay).padStart(2,'0')}`;
+
+  container.innerHTML = '<div style="text-align:center;padding:40px;"><div class="spinner"></div></div>';
+
+  try {
+    const response = await fetch('/.netlify/functions/admin-bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    const data = await response.json();
+    if (!data.success) throw new Error('Failed to load bookings');
+
+    const matched = data.bookings.filter(b => {
+      const f = b.fields;
+      return (f['Client Email'] || '').toLowerCase() === clientEmail.toLowerCase() &&
+             f['Booking Status'] !== 'Cancelled' &&
+             (f['Date'] || '') >= startDate && (f['Date'] || '') <= endDate;
+    });
+
+    matched.forEach(b => { if (!allBookings.find(x => x.id === b.id)) allBookings.push(b); });
+
+    bulkInvoiceBookingsData = matched.map(b => ({
+      id: b.id,
+      ref: b.fields['Booking Reference'] || b.id.slice(-6).toUpperCase(),
+      service: b.fields['Service'] || '',
+      address: b.fields['Property Address'] || '',
+      date: b.fields['Date'] || '',
+      amount: parseFloat(b.fields['Final Price'] || 0) / 1.2,
+      selected: true,
+      lineItems: getBookingLineItems(b)
+    }));
+
+    renderBulkInvoiceResults(clientName, clientEmail);
+
+  } catch (error) {
+    console.error('Error loading bulk invoice bookings:', error);
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;">Error loading bookings</div>';
+  }
+}
+
+function renderBulkInvoiceResults(clientName, clientEmail) {
+  const container = document.getElementById('bulkInvoiceResultsContainer');
+
+  if (bulkInvoiceBookingsData.length === 0) {
+    container.innerHTML = '<div class="calendar-container" style="text-align:center;padding:60px;color:#94a3b8;">No active bookings found for this client in the selected month</div>';
+    return;
+  }
+
+  let html = `
+    <div class="calendar-container">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+        <div style="font-weight:700;font-size:15px;">${clientName} <span style="color:#64748b;font-weight:400;font-size:13px;">(${clientEmail})</span></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary btn-small" onclick="toggleAllBulkInvoiceBookings(true)">Select All</button>
+          <button class="btn btn-secondary btn-small" onclick="toggleAllBulkInvoiceBookings(false)">Deselect All</button>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead><tr><th style="width:36px;"></th><th>Reference</th><th>Date</th><th>Service</th><th>Property</th><th>Amount (ex VAT)</th></tr></thead>
+        <tbody>
+  `;
+
+  bulkInvoiceBookingsData.forEach((b, idx) => {
+    const dateFmt = b.date ? new Date(b.date + 'T12:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
+    html += `
+      <tr>
+        <td data-label="Select"><input type="checkbox" ${b.selected ? 'checked' : ''} onchange="toggleBulkInvoiceBooking(${idx}, this.checked)" style="width:16px;height:16px;cursor:pointer;"></td>
+        <td data-label="Reference" style="font-family:monospace;font-size:12px;">${b.ref}</td>
+        <td data-label="Date">${dateFmt}</td>
+        <td data-label="Service">${b.service}</td>
+        <td data-label="Property">${b.address}</td>
+        <td data-label="Amount"><strong>£${b.amount.toFixed(2)}</strong></td>
+      </tr>`;
+  });
+
+  html += '</tbody></table>';
+
+  const selectedTotal = bulkInvoiceBookingsData.filter(b => b.selected).reduce((s,b) => s + b.amount, 0);
+  const selectedCount = bulkInvoiceBookingsData.filter(b => b.selected).length;
+
+  html += `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:20px;border-top:2px solid #e2e8f0;flex-wrap:wrap;gap:12px;">
+        <div style="font-size:14px;color:#64748b;">${selectedCount} booking${selectedCount !== 1 ? 's' : ''} selected · Subtotal ex VAT: <strong style="color:#0f172a;">£${selectedTotal.toFixed(2)}</strong> · Inc VAT: <strong style="color:#B46100;">£${(selectedTotal*1.2).toFixed(2)}</strong></div>
+        <button class="btn btn-primary" onclick="generateBulkInvoiceFromSelected('${clientName.replace(/'/g,"&#39;")}', '${clientEmail}')">
+          <i data-lucide="file-plus" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Generate Combined Invoice
+        </button>
+      </div>
+    </div>
+  `;
+
+  container.innerHTML = html;
+  lucide.createIcons();
+}
+
+function toggleBulkInvoiceBooking(idx, checked) {
+  bulkInvoiceBookingsData[idx].selected = checked;
+  const clientValue = document.getElementById('bulkInvClientInput').value.trim();
+  const client = (allCustomers || []).find(c => clientValue.includes(c.fields['Email']));
+  renderBulkInvoiceResults(client ? client.fields['Name'] : clientValue, client ? client.fields['Email'] : clientValue);
+}
+
+function toggleAllBulkInvoiceBookings(state) {
+  bulkInvoiceBookingsData.forEach(b => b.selected = state);
+  const clientValue = document.getElementById('bulkInvClientInput').value.trim();
+  const client = (allCustomers || []).find(c => clientValue.includes(c.fields['Email']));
+  renderBulkInvoiceResults(client ? client.fields['Name'] : clientValue, client ? client.fields['Email'] : clientValue);
+}
+
+// Reuses your existing Manual Invoice modal — same branding, same send-invoice
+// call, same Airtable recording — just pre-filled with the combined lines.
+function generateBulkInvoiceFromSelected(clientName, clientEmail) {
+  const selected = bulkInvoiceBookingsData.filter(b => b.selected);
+  if (selected.length === 0) { alert('Please select at least one booking'); return; }
+
+  document.getElementById('manualInvoiceForm').reset();
+  document.getElementById('manInvLineItems').innerHTML = '';
+  manualInvoiceLineCount = 0;
+
+  document.getElementById('manInvClientName').value = clientName;
+  document.getElementById('manInvClientEmail').value = clientEmail;
+
+  const refs = selected.map(b => b.ref).join(', ');
+  document.getElementById('manInvNotes').value = `Bulk invoice covering: ${refs}`;
+
+  selected.forEach(b => {
+    b.lineItems.forEach(line => {
+      manualInvoiceLineCount++;
+      const id = manualInvoiceLineCount;
+      const container = document.getElementById('manInvLineItems');
+      const row = document.createElement('div');
+      row.id = `manInvLine-${id}`;
+      row.style.cssText = 'display:flex;gap:10px;align-items:flex-start;';
+      row.innerHTML = `
+        <input type="text" class="form-input man-inv-desc" placeholder="Description" style="flex:2;" oninput="calculateManualInvoiceTotal()" value="${line.desc.replace(/"/g,'&quot;')}">
+        <input type="number" class="form-input man-inv-amount" placeholder="Amount (ex VAT)" step="0.01" style="flex:1;max-width:150px;" oninput="calculateManualInvoiceTotal()" value="${line.amount.toFixed(2)}">
+        <button type="button" class="btn btn-danger btn-small" onclick="removeManualInvoiceLine(${id})" style="flex-shrink:0;margin-top:2px;">✕</button>
+      `;
+      container.appendChild(row);
+    });
+  });
+
+  calculateManualInvoiceTotal();
+  populateManualInvoiceClientsList();
+  document.getElementById('manualInvoiceModal').classList.add('active');
+  lucide.createIcons();
+}
+
+const _origShowSectionBulkInvoicing = showSection;
+showSection = function(sectionId) {
+  _origShowSectionBulkInvoicing(sectionId);
+  if (sectionId === 'bulk-invoicing') populateBulkInvoiceClientsList();
+};
 
 function buildManualInvoiceHTML(inv) {
   const today = new Date();
