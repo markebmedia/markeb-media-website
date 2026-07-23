@@ -2602,12 +2602,15 @@ body {
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">Client *</label>
-        <input type="text" id="bulkInvClientInput" class="form-input" list="bulkInvClientsList" placeholder="Type name or email...">
-        <datalist id="bulkInvClientsList"></datalist>
+        <select id="bulkInvClientSelect" class="form-input">
+          <option value="">-- Select Client --</option>
+        </select>
       </div>
       <div class="form-group">
         <label class="form-label">Month *</label>
-        <input type="month" id="bulkInvMonth" class="form-input">
+        <select id="bulkInvMonthSelect" class="form-input">
+          <option value="">-- Select Month --</option>
+        </select>
       </div>
     </div>
     <button class="btn btn-primary" onclick="loadBulkInvoiceBookings()">
@@ -13229,14 +13232,32 @@ async function submitManualInvoice(event) {
 let bulkInvoiceBookingsData = [];
 
 function populateBulkInvoiceClientsList() {
-  const datalist = document.getElementById('bulkInvClientsList');
-  if (!datalist) return;
-  datalist.innerHTML = '';
-  (allCustomers || []).forEach(c => {
-    const option = document.createElement('option');
-    option.value = `${c.fields['Name']} (${c.fields['Email']})`;
-    datalist.appendChild(option);
-  });
+  const select = document.getElementById('bulkInvClientSelect');
+  if (!select) return;
+  const currentValue = select.value;
+  const sorted = [...(allCustomers || [])].sort((a, b) =>
+    (a.fields['Name'] || '').localeCompare(b.fields['Name'] || '')
+  );
+  select.innerHTML = '<option value="">-- Select Client --</option>' +
+    sorted.map(c => `<option value="${c.fields['Email']}">${c.fields['Name']}${c.fields['Company'] ? ' — ' + c.fields['Company'] : ''} (${c.fields['Email']})</option>`).join('');
+  if (currentValue) select.value = currentValue;
+}
+
+function populateBulkInvoiceMonths() {
+  const select = document.getElementById('bulkInvMonthSelect');
+  if (!select) return;
+  const currentValue = select.value;
+  const months = [];
+  const now = new Date();
+  for (let i = -1; i <= 18; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const label = d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    months.push({ value, label });
+  }
+  select.innerHTML = '<option value="">-- Select Month --</option>' +
+    months.map(m => `<option value="${m.value}">${m.label}</option>`).join('');
+  if (currentValue) select.value = currentValue;
 }
 
 // Builds the same per-fee breakdown used by your existing invoice generator,
@@ -13277,16 +13298,15 @@ function getBookingLineItems(booking) {
 }
 
 async function loadBulkInvoiceBookings() {
-  const clientValue = document.getElementById('bulkInvClientInput').value.trim();
-  const monthValue = document.getElementById('bulkInvMonth').value;
+  const clientEmail = document.getElementById('bulkInvClientSelect').value;
+  const monthValue = document.getElementById('bulkInvMonthSelect').value;
   const container = document.getElementById('bulkInvoiceResultsContainer');
 
-  if (!clientValue) { alert('Please select a client'); return; }
+  if (!clientEmail) { alert('Please select a client'); return; }
   if (!monthValue) { alert('Please select a month'); return; }
 
-  const client = (allCustomers || []).find(c => clientValue.includes(c.fields['Email']));
-  const clientEmail = client ? client.fields['Email'] : clientValue;
-  const clientName = client ? client.fields['Name'] : clientValue;
+  const client = (allCustomers || []).find(c => c.fields['Email'] === clientEmail);
+  const clientName = client ? client.fields['Name'] : clientEmail;
 
   const [year, month] = monthValue.split('-').map(Number);
   const startDate = `${year}-${String(month).padStart(2,'0')}-01`;
@@ -13388,16 +13408,16 @@ function renderBulkInvoiceResults(clientName, clientEmail) {
 
 function toggleBulkInvoiceBooking(idx, checked) {
   bulkInvoiceBookingsData[idx].selected = checked;
-  const clientValue = document.getElementById('bulkInvClientInput').value.trim();
-  const client = (allCustomers || []).find(c => clientValue.includes(c.fields['Email']));
-  renderBulkInvoiceResults(client ? client.fields['Name'] : clientValue, client ? client.fields['Email'] : clientValue);
+  const clientEmail = document.getElementById('bulkInvClientSelect').value;
+  const client = (allCustomers || []).find(c => c.fields['Email'] === clientEmail);
+  renderBulkInvoiceResults(client ? client.fields['Name'] : clientEmail, clientEmail);
 }
 
 function toggleAllBulkInvoiceBookings(state) {
   bulkInvoiceBookingsData.forEach(b => b.selected = state);
-  const clientValue = document.getElementById('bulkInvClientInput').value.trim();
-  const client = (allCustomers || []).find(c => clientValue.includes(c.fields['Email']));
-  renderBulkInvoiceResults(client ? client.fields['Name'] : clientValue, client ? client.fields['Email'] : clientValue);
+  const clientEmail = document.getElementById('bulkInvClientSelect').value;
+  const client = (allCustomers || []).find(c => c.fields['Email'] === clientEmail);
+  renderBulkInvoiceResults(client ? client.fields['Name'] : clientEmail, clientEmail);
 }
 
 // Reuses your existing Manual Invoice modal — same branding, same send-invoice
@@ -13442,7 +13462,10 @@ function generateBulkInvoiceFromSelected(clientName, clientEmail) {
 const _origShowSectionBulkInvoicing = showSection;
 showSection = function(sectionId) {
   _origShowSectionBulkInvoicing(sectionId);
-  if (sectionId === 'bulk-invoicing') populateBulkInvoiceClientsList();
+  if (sectionId === 'bulk-invoicing') {
+    populateBulkInvoiceClientsList();
+    populateBulkInvoiceMonths();
+  }
 };
 
 function buildManualInvoiceHTML(inv) {
