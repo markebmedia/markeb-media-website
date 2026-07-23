@@ -13231,16 +13231,39 @@ async function submitManualInvoice(event) {
 
 let bulkInvoiceBookingsData = [];
 
-function populateBulkInvoiceClientsList() {
+async function populateBulkInvoiceClientsList() {
   const select = document.getElementById('bulkInvClientSelect');
   if (!select) return;
   const currentValue = select.value;
-  const sorted = [...(allCustomers || [])].sort((a, b) =>
-    (a.fields['Name'] || '').localeCompare(b.fields['Name'] || '')
-  );
-  select.innerHTML = '<option value="">-- Select Client --</option>' +
-    sorted.map(c => `<option value="${c.fields['Email']}">${c.fields['Name']}${c.fields['Company'] ? ' — ' + c.fields['Company'] : ''} (${c.fields['Email']})</option>`).join('');
-  if (currentValue) select.value = currentValue;
+
+  select.innerHTML = '<option value="">Loading clients...</option>';
+  select.disabled = true;
+
+  try {
+    // Pull directly from the same source as the All Clients section
+    const response = await fetch('/.netlify/functions/admin-users');
+    const data = await response.json();
+
+    if (data.success && data.users) {
+      allCustomers = data.users; // keep the shared cache in sync too
+
+      const sorted = [...data.users].sort((a, b) =>
+        (a.fields['Name'] || '').localeCompare(b.fields['Name'] || '')
+      );
+
+      select.innerHTML = '<option value="">-- Select Client --</option>' +
+        sorted.map(c => `<option value="${c.fields['Email']}">${c.fields['Name']}${c.fields['Company'] ? ' — ' + c.fields['Company'] : ''} (${c.fields['Email']})</option>`).join('');
+
+      if (currentValue) select.value = currentValue;
+    } else {
+      select.innerHTML = '<option value="">No clients found</option>';
+    }
+  } catch (error) {
+    console.error('Error loading clients for bulk invoicing:', error);
+    select.innerHTML = '<option value="">Error loading clients</option>';
+  } finally {
+    select.disabled = false;
+  }
 }
 
 function populateBulkInvoiceMonths() {
