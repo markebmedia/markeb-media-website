@@ -1925,6 +1925,10 @@ function isValidUKPhone(phone) {
       }
       if (bookingData.selectedDate) fields['Selected Date'] = bookingData.selectedDate;
       if (bookingData.selectedTime) fields['Selected Time'] = bookingData.selectedTime;
+      if (bookingData.totalPrice) fields['Basket Value'] = bookingData.totalPrice;
+      if (bookingData.selectedAddons && bookingData.selectedAddons.length > 0) {
+        fields['Addons Considered'] = bookingData.selectedAddons.map(id => ADDONS[id]?.name).filter(Boolean).join(', ');
+      }
       trackFunnel(fields);
     }
 
@@ -2830,7 +2834,13 @@ if (bookingData.selectedAddons && bookingData.selectedAddons.length > 0) {
     // Select Payment Option
     function selectPaymentOption(option) {
       bookingData.paymentOption = option;
-      
+
+      trackFunnel({
+        'Payment Intent': option === 'pay-now' ? 'Pay Now Selected' : 'Reserve Selected',
+        'Basket Value': bookingData.totalPrice,
+        'Furthest Step': 4
+      });
+
       document.querySelectorAll('.payment-option').forEach(opt => {
         opt.classList.remove('selected');
       });
@@ -4330,6 +4340,12 @@ async function completeBooking() {
       bookingData.cardExpiry = '';
 
       console.log('✅ SetupIntent confirmed — card pre-approved for off-session charging');
+
+      trackFunnel({
+        'Payment Intent': 'Card Entered — Not Yet Submitted',
+        'Basket Value': bookingData.totalPrice,
+        'Furthest Step': 4
+      });
 
     } catch (error) {
       console.error('Stripe SetupIntent error:', error);
