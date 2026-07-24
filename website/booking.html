@@ -3527,6 +3527,11 @@ function renderOfferPopup(offerId) {
       updateEpcQuestionsVisibility();
       updateLocalAreaHighlightsVisibility();
       calculatePrice();
+
+      trackFunnel({
+        'Basket Value': bookingData.totalPrice,
+        'Addons Considered': bookingData.selectedAddons.map(id => ADDONS[id]?.name).filter(Boolean).join(', ')
+      });
     }
 
     function updateEpcLargePrice() {
@@ -3951,6 +3956,7 @@ async function loadAvailableTimeSlots(dateString) {
       trackFunnel({
         'Selected Date': bookingData.selectedDate,
         'Selected Time': time,
+        'Basket Value': bookingData.totalPrice,
         'Furthest Step': 3
       });
 
@@ -3995,6 +4001,8 @@ document.addEventListener('DOMContentLoaded', function() {
           'Client Name': document.getElementById('clientName')?.value.trim() || '',
           'Client Email': email,
           'Client Phone': document.getElementById('clientPhone')?.value.trim() || '',
+          'Basket Value': bookingData.totalPrice,
+          'Addons Considered': bookingData.selectedAddons.map(id => ADDONS[id]?.name).filter(Boolean).join(', '),
           'Furthest Step': 4
         });
       }
@@ -4466,6 +4474,9 @@ async function createBooking() {
       trackFunnel({
         'Status': 'Completed',
         'Booking Reference': result.bookingRef,
+        'Basket Value': bookingData.totalPrice,
+        'Payment Intent': bookingData.paymentOption === 'pay-now' ? 'Pay Now Selected' : bookingData.paymentOption === 'reserve' ? 'Reserve Selected' : '',
+        'Addons Considered': bookingData.selectedAddons.map(id => ADDONS[id]?.name).filter(Boolean).join(', '),
         'Furthest Step': 5
       });
 
