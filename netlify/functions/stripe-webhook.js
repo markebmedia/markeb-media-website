@@ -346,6 +346,33 @@ exports.handler = async (event, context) => {
 
       console.log('✅ Booking created from webhook:', bookingRecord[0].id);
 
+      // ✅ NEW: Flip the Booking Funnel record to Completed now that payment
+      // has actually gone through. Without this, the beforeunload redirect to
+      // Stripe Checkout would leave the funnel session permanently marked
+      // "Abandoned" even for successful, paid bookings.
+      if (metadata.funnelSessionId) {
+        try {
+          const funnelRecords = await base('Booking Funnel')
+            .select({
+              filterByFormula: `{Session ID} = '${metadata.funnelSessionId}'`,
+              maxRecords: 1
+            })
+            .firstPage();
+
+          if (funnelRecords && funnelRecords.length > 0) {
+            await base('Booking Funnel').update(funnelRecords[0].id, {
+              'Status': 'Completed',
+              'Booking Reference': bookingRef
+            });
+            console.log(`✓ Booking Funnel session ${metadata.funnelSessionId} marked Completed`);
+          } else {
+            console.warn(`⚠️ No Booking Funnel record found for session ${metadata.funnelSessionId}`);
+          }
+        } catch (funnelError) {
+          console.error('Error updating Booking Funnel record:', funnelError);
+        }
+      }
+
       let trackingCode = '';
       
       try {

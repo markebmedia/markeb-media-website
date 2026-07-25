@@ -1,6 +1,9 @@
 // netlify/functions/create-booking.js
 // UPDATED: Now links bookings to authenticated users + sets paymentStatus correctly + handles free bookings + creates Active Bookings with Dropbox folders + SUPPORTS GUEST BOOKINGS + ACCESS TYPE
 
+const Airtable = require('airtable');
+const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE_ID);
+
 exports.handler = async (event, context) => {
   console.log('=== Create Booking Function (Updated with Auth + Active Bookings + Guest Support + Access Type) ===');
   console.log('Method:', event.httpMethod);
@@ -366,6 +369,34 @@ exports.handler = async (event, context) => {
 
     const airtableResult = await response.json();
     console.log('Booking created successfully:', bookingRef);
+
+    // ✅ NEW: Flip the Booking Funnel record to Completed now that the
+    // booking has actually been created. Without this, the beforeunload
+    // handler in booking.html can't distinguish a genuine abandonment from
+    // someone who successfully reserved/free-booked and simply navigated
+    // away afterwards.
+    if (bookingData.funnelSessionId) {
+      try {
+        const funnelRecords = await base('Booking Funnel')
+          .select({
+            filterByFormula: `{Session ID} = '${bookingData.funnelSessionId}'`,
+            maxRecords: 1
+          })
+          .firstPage();
+
+        if (funnelRecords && funnelRecords.length > 0) {
+          await base('Booking Funnel').update(funnelRecords[0].id, {
+            'Status': 'Completed',
+            'Booking Reference': bookingRef
+          });
+          console.log(`✓ Booking Funnel session ${bookingData.funnelSessionId} marked Completed`);
+        } else {
+          console.warn(`⚠️ No Booking Funnel record found for session ${bookingData.funnelSessionId}`);
+        }
+      } catch (funnelError) {
+        console.error('Error updating Booking Funnel record:', funnelError);
+      }
+    }
 
     // ✅ NEW: Create Active Booking record + Dropbox folders (QC Delivery + Raw Client)
     let trackingCode = '';

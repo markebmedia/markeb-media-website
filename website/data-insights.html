@@ -916,6 +916,7 @@ body {
     <div class="stat-card"><div class="stat-value" id="fnTotalSessions">-</div><div class="stat-label">Sessions Started</div></div>
     <div class="stat-card"><div class="stat-value" style="color:#10b981;" id="fnCompleted">-</div><div class="stat-label">Completed</div></div>
     <div class="stat-card"><div class="stat-value" style="color:#ef4444;" id="fnAbandoned">-</div><div class="stat-label">Abandoned</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#f59e0b;" id="fnRecent">-</div><div class="stat-label">Recently Active</div></div>
     <div class="stat-card"><div class="stat-value" style="color:#f59e0b;" id="fnConversionRate">-</div><div class="stat-label">Conversion Rate</div></div>
     <div class="stat-card"><div class="stat-value" style="color:#8b5cf6;" id="fnValueAtRisk">-</div><div class="stat-label">Abandoned Basket Value</div></div>
     <div class="stat-card"><div class="stat-value" style="color:#06b6d4;" id="fnAvgBasket">-</div><div class="stat-label">Avg Abandoned Basket</div></div>
@@ -3819,6 +3820,7 @@ async function loadFunnelData() {
       id: r.id,
       sessionId: r.fields['Session ID'] || '',
       postcode: r.fields['Postcode'] || '',
+      propertyAddress: r.fields['Property Address'] || '',
       region: r.fields['Region'] || '',
       serviceable: r.fields['Serviceable'] === true,
       specialist: r.fields['Assigned Specialist'] || '',
@@ -3852,11 +3854,26 @@ const FUNNEL_STAGE_LABELS = {
   5: 'Booking Completed'
 };
 
+// Sessions updated within this window are treated as "still in progress" —
+// not a genuine abandonment — since the person may simply have tabbed away
+// briefly rather than left for good.
+const FUNNEL_GRACE_PERIOD_MINUTES = 20;
+
+function getFunnelBucket(f) {
+  if (f.status === 'Completed') return 'completed';
+  if (!f.lastUpdatedAt) return 'abandoned';
+  const minsSinceUpdate = (new Date() - new Date(f.lastUpdatedAt)) / 60000;
+  if (minsSinceUpdate <= FUNNEL_GRACE_PERIOD_MINUTES) return 'recent';
+  return 'abandoned';
+}
+
 function renderFunnelSection() {
   const total = funnelData.length;
   const completed = funnelData.filter(f => f.status === 'Completed').length;
-  const abandonedList = funnelData.filter(f => f.status !== 'Completed');
+  const recentList = funnelData.filter(f => getFunnelBucket(f) === 'recent');
+  const abandonedList = funnelData.filter(f => getFunnelBucket(f) === 'abandoned');
   const abandoned = abandonedList.length;
+  const recent = recentList.length;
   const rate = total > 0 ? ((completed / total) * 100).toFixed(1) : '0.0';
 
   const valueAtRisk = abandonedList.reduce((s, f) => s + (f.basketValue || 0), 0);
@@ -3866,6 +3883,8 @@ function renderFunnelSection() {
   document.getElementById('fnTotalSessions').textContent = total;
   document.getElementById('fnCompleted').textContent = completed;
   document.getElementById('fnAbandoned').textContent = abandoned;
+  const recentEl = document.getElementById('fnRecent');
+  if (recentEl) recentEl.textContent = recent;
   document.getElementById('fnConversionRate').textContent = rate + '%';
   document.getElementById('fnValueAtRisk').textContent = '£' + Math.round(valueAtRisk).toLocaleString();
   document.getElementById('fnAvgBasket').textContent = '£' + Math.round(avgBasket).toLocaleString();
@@ -3934,11 +3953,12 @@ function renderFunnelSection() {
 
 function renderFunnelAbandoned() {
   const query = (document.getElementById('funnelSearch')?.value || '').toLowerCase();
-  let list = funnelData.filter(f => f.status !== 'Completed');
+  let list = funnelData.filter(f => getFunnelBucket(f) === 'abandoned');
 
   if (query) {
     list = list.filter(f =>
       f.postcode.toLowerCase().includes(query) ||
+      (f.propertyAddress || '').toLowerCase().includes(query) ||
       f.service.toLowerCase().includes(query) ||
       f.clientName.toLowerCase().includes(query) ||
       f.clientEmail.toLowerCase().includes(query)
@@ -3965,8 +3985,9 @@ function renderFunnelAbandoned() {
         <div style="flex:1;min-width:200px;">
           <div style="font-size:13px;font-weight:700;color:#0f172a;">${FUNNEL_STAGE_LABELS[f.furthestStep]}</div>
           <div style="font-size:12px;color:#64748b;margin-top:2px;">
-            ${f.postcode ? '📍 ' + f.postcode : ''}${f.region ? ' · ' + f.region : ''}
+            ${f.propertyAddress ? '🏠 ' + f.propertyAddress : (f.postcode ? '📍 ' + f.postcode : '')}${f.region ? ' · ' + f.region : ''}
           </div>
+          ${f.propertyAddress && f.postcode ? `<div style="font-size:11px;color:#94a3b8;margin-top:1px;">${f.postcode}</div>` : ''}
           ${f.service ? `<div style="font-size:12px;color:#64748b;margin-top:2px;">🎬 ${f.service}</div>` : ''}
           ${f.addonsConsidered ? `<div style="font-size:11px;color:#94a3b8;margin-top:2px;">📦 ${f.addonsConsidered}</div>` : ''}
         </div>

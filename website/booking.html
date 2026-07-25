@@ -1891,6 +1891,7 @@ function isValidUKPhone(phone) {
 
     let currentStep = 1;
     let bookingCompleted = false;
+    let awaitingStripeRedirect = false;
 
     // ===== FUNNEL TRACKING =====
     const funnelSessionId = (() => {
@@ -1917,6 +1918,7 @@ function isValidUKPhone(phone) {
     function trackContinueClick(toStep) {
       const fields = { 'Furthest Step': toStep };
       if (bookingData.postcode) fields['Postcode'] = bookingData.postcode;
+      if (bookingData.propertyAddress) fields['Property Address'] = bookingData.propertyAddress;
       if (bookingData.region) fields['Region'] = bookingData.region;
       if (bookingData.mediaSpecialist) fields['Assigned Specialist'] = bookingData.mediaSpecialist;
       if (bookingData.service) {
@@ -4401,6 +4403,7 @@ async function completeBooking() {
     // Create Booking
 async function createBooking() {
   const bookingPayload = {
+    funnelSessionId: funnelSessionId,
     postcode: bookingData.postcode,
     propertyAddress: bookingData.propertyAddress,
     region: bookingData.region,
@@ -4501,6 +4504,7 @@ async function createBooking() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        funnelSessionId: funnelSessionId,
         postcode: bookingData.postcode,
         propertyAddress: bookingData.propertyAddress,
         region: bookingData.region,
@@ -4548,7 +4552,15 @@ async function createBooking() {
         }
 
         const { url } = await response.json();
-        
+
+        trackFunnel({
+          'Payment Intent': 'Redirected to Stripe Checkout',
+          'Basket Value': bookingData.totalPrice,
+          'Furthest Step': 4
+        });
+
+        awaitingStripeRedirect = true;
+
         // Redirect to Stripe Checkout
         window.location.href = url;
 
@@ -4590,7 +4602,7 @@ async function createBooking() {
 
     // ===== ABANDONMENT TRACKING =====
     window.addEventListener('beforeunload', () => {
-      if (!bookingData.postcode || bookingCompleted) return;
+      if (!bookingData.postcode || bookingCompleted || awaitingStripeRedirect) return;
       const payload = JSON.stringify({
         sessionId: funnelSessionId,
         fields: { 'Status': 'Abandoned' }

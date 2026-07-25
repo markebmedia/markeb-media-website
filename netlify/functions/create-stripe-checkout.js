@@ -110,6 +110,10 @@ exports.handler = async (event, context) => {
 
         // ✅ CHANGE 3: Always include bookingRef in metadata so webhook uses the same ref
         bookingRef: isExistingBooking ? bookingData.bookingRef : newBookingRef,
+
+        // ✅ NEW: funnel tracking session ID, so the webhook can mark this
+        // Booking Funnel record as Completed once payment actually succeeds
+        funnelSessionId: bookingData.funnelSessionId || '',
         
         // Booking details
         postcode: bookingData.postcode,
