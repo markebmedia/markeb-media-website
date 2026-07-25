@@ -4079,10 +4079,17 @@ const SPECIALIST_TARGETS = {
   weeklyShoots: 15
 };
 
-// Mirrors SPECIALIST_CONFIG in booking.html — the current active roster.
-// Historical bookings may reference former specialists or one-off creators;
-// this keeps the capacity view scoped to people actively taking bookings.
-const ACTIVE_MEDIA_SPECIALISTS = ['Jodie', 'James Jago', 'Andrii'];
+// Mirrors SPECIALIST_CONFIG in booking.html exactly (name → regions covered).
+// When you hire, remove, or reshuffle specialists, update booking.html's
+// SPECIALIST_CONFIG first, then copy the same keys here — this object is
+// the same shape on purpose so the two stay easy to keep in sync by eye.
+const SPECIALIST_CONFIG = {
+  'Jodie':      ['north'],
+  'James Jago': ['north', 'north-west', 'north-east', 'west'],
+  'Andrii':     ['east', 'south', 'south-east', 'south-west']
+};
+
+const ACTIVE_MEDIA_SPECIALISTS = Object.keys(SPECIALIST_CONFIG);
 
 function computeSpecialistStats() {
   const specialists = [...ACTIVE_MEDIA_SPECIALISTS].sort();
