@@ -4079,12 +4079,13 @@ const SPECIALIST_TARGETS = {
   weeklyShoots: 15
 };
 
+// Mirrors SPECIALIST_CONFIG in booking.html — the current active roster.
+// Historical bookings may reference former specialists or one-off creators;
+// this keeps the capacity view scoped to people actively taking bookings.
+const ACTIVE_MEDIA_SPECIALISTS = ['Jodie', 'James Jago', 'Andrii'];
+
 function computeSpecialistStats() {
-  const specialistSet = new Set();
-  bookingData.forEach(b => {
-    if (b.mediaSpecialist) specialistSet.add(b.mediaSpecialist);
-  });
-  const specialists = Array.from(specialistSet).sort();
+  const specialists = [...ACTIVE_MEDIA_SPECIALISTS].sort();
 
   const parseDate = d => {
     const [y, m, day] = d.slice(0, 10).split('-').map(Number);
