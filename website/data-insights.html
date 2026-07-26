@@ -971,6 +971,34 @@ body {
     <div class="stat-card"><div class="stat-value" style="color:#ef4444;" id="specBelowCapacity">-</div><div class="stat-label">Below Capacity</div></div>
   </div>
 
+  <div class="stats-overview" id="specialistMonthlyKPIs" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));">
+    <div class="stat-card"><div class="stat-value" id="specTotalShootsMonth">-</div><div class="stat-label">Shoots This Month</div></div>
+    <div class="stat-card"><div class="stat-value" id="specTotalTargetMonth">-</div><div class="stat-label">Team Monthly Target</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#8b5cf6;" id="specTeamCapacityMonth">-</div><div class="stat-label">Team Monthly Capacity</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#10b981;" id="specAtCapacityMonth">-</div><div class="stat-label">At Full Capacity (Mo)</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:#ef4444;" id="specBelowCapacityMonth">-</div><div class="stat-label">Below Capacity (Mo)</div></div>
+  </div>
+
+  <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+    <button class="btn btn-secondary" onclick="toggleTargetEditor()" id="editTargetsBtn">
+      <i data-lucide="pencil" style="width:14px;height:14px;"></i> Edit Targets
+    </button>
+  </div>
+
+  <div id="targetEditorPanel" class="map-section" style="display:none;margin-bottom:24px;">
+    <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+      <i data-lucide="sliders-horizontal" style="width:16px;height:16px;"></i> Edit Specialist Targets
+    </h3>
+    <p style="font-size:12px;color:#64748b;margin-bottom:16px;">Weekly and monthly targets are independent — changing one does not recalculate the other. Saved to Airtable (Specialist Targets table).</p>
+    <div id="targetEditorFields" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:16px;"></div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button class="btn btn-primary" onclick="saveTargetOverrides()" id="saveTargetsBtn">
+        <i data-lucide="check" style="width:14px;height:14px;"></i> Save Targets
+      </button>
+      <span id="targetSaveStatus" style="font-size:12px;color:#64748b;"></span>
+    </div>
+  </div>
+
   <div id="specMonthNavRow" style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:20px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 16px;">
     <button class="btn btn-secondary" style="padding:8px 14px;" onclick="navigateSpecMonth(-1)">‹ Prev Month</button>
     <div style="font-size:15px;font-weight:700;color:#0f172a;min-width:170px;text-align:center;" id="specMonthLabel">Loading...</div>
@@ -986,7 +1014,11 @@ body {
         <h3 style="font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;">
           <i data-lucide="bar-chart-3" style="width:18px;height:18px;"></i> Shoots vs Target — <span id="specWeekLabel">This Week</span>
         </h3>
-        <p style="font-size:13px;color:#64748b;margin-top:3px;">Monthly targets: <strong style="color:#0f172a;">James 50 · Andrii 50 · Jodie 30</strong> (130 total) · weekly figures derived from monthly · based on scheduled shoot date, excluding cancellations</p>
+        <p style="font-size:13px;color:#64748b;margin-top:3px;" id="specChartSubtitle">Targets are editable · based on scheduled shoot date, excluding cancellations</p>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="rr-btn active" id="specChartWeekBtn" onclick="setSpecChartMode('week')">Week</button>
+        <button class="rr-btn" id="specChartMonthBtn" onclick="setSpecChartMode('month')">Month</button>
       </div>
     </div>
     <canvas id="specialistChart" style="max-height:320px;"></canvas>
@@ -1062,6 +1094,8 @@ let currentPipePeriod = 'week';
 let pipelineChartInstance = null;
 let specialistChartInstance = null;
 let specSelectedMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let specChartMode = 'week';
+let specTargetData = {}; // { 'James Jago': { recordId, weekly, monthly, breakEven } }
 let retainerData = [];
 
 const REVENUE_TARGETS = { y1: 360000, y2: 500000, y3: 1000000 }; // y1 = £30,000/mo × 12
@@ -1823,7 +1857,7 @@ function renderInsightCards() {
 document.addEventListener('DOMContentLoaded', () => {
   initMap();
   initDateFilters();
-  loadMapData();
+  loadSpecialistTargets().then(() => loadMapData());
   lucide.createIcons();
 });
 
@@ -4085,31 +4119,145 @@ function timeInFunnelColour(start, end) {
 //  MEDIA SPECIALISTS TAB
 // ══════════════════════════════════════════════════════════════
 
-// Monthly shoot targets — sums to 130 across the team.
-// James and Andrii carry the heavier load (30 for Jodie, 50 each for James/Andrii).
-const SPECIALIST_MONTHLY_TARGETS = {
-  'Jodie':      30,
-  'James Jago': 50,
-  'Andrii':     50
-};
+// Fallback defaults — used only if the Airtable fetch hasn't completed yet
+// or a specialist has no row in the Specialist Targets table.
+const SPECIALIST_FALLBACK_WEEKLY = { 'Jodie': 6.9, 'James Jago': 11.5, 'Andrii': 11.5 };
+const SPECIALIST_FALLBACK_MONTHLY = { 'Jodie': 30, 'James Jago': 50, 'Andrii': 50 };
+const SPECIALIST_FALLBACK_BREAK_EVEN = { 'James Jago': 2100, 'Andrii': 2100 };
+
+async function loadSpecialistTargets() {
+  try {
+    const res = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ method: 'GET', table: 'Specialist Targets' })
+    });
+    const data = await res.json();
+    const map = {};
+    (data.records || []).forEach(r => {
+      const name = r.fields['Specialist Name'];
+      if (!name) return;
+      map[name] = {
+        recordId: r.id,
+        weekly: r.fields['Weekly Target'],
+        monthly: r.fields['Monthly Target'],
+        breakEven: r.fields['Break Even'] || null
+      };
+    });
+    specTargetData = map;
+  } catch (err) {
+    console.error('Error loading Specialist Targets:', err);
+    specTargetData = {};
+  }
+}
 
 function getMonthlyTarget(name) {
-  return SPECIALIST_MONTHLY_TARGETS[name] || 0;
+  const row = specTargetData[name];
+  if (row && row.monthly !== undefined && row.monthly !== null) return parseFloat(row.monthly);
+  return SPECIALIST_FALLBACK_MONTHLY[name] || 0;
 }
 
-// Weekly target is derived from the monthly figure (monthly ÷ ~4.33 weeks/month)
-// so the weekly chart and monthly view always agree with one source of truth.
 function getWeeklyTarget(name) {
-  const monthly = getMonthlyTarget(name);
-  return monthly > 0 ? monthly / 4.345 : 0;
+  const row = specTargetData[name];
+  if (row && row.weekly !== undefined && row.weekly !== null) return parseFloat(row.weekly);
+  return SPECIALIST_FALLBACK_WEEKLY[name] || 0;
 }
 
-// Monthly break-even revenue for James and Andrii (ex VAT) — below this,
-// the specialist isn't yet covering their own cost base for the month.
-const SPECIALIST_BREAK_EVEN = {
-  'James Jago': 2100,
-  'Andrii':     2100
-};
+function getBreakEven(name) {
+  const row = specTargetData[name];
+  if (row && row.breakEven) return parseFloat(row.breakEven);
+  return SPECIALIST_FALLBACK_BREAK_EVEN[name] || null;
+}
+
+function toggleTargetEditor() {
+  const panel = document.getElementById('targetEditorPanel');
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) renderTargetEditor();
+}
+
+function renderTargetEditor() {
+  const container = document.getElementById('targetEditorFields');
+  if (!container) return;
+  container.innerHTML = ACTIVE_MEDIA_SPECIALISTS.map(name => {
+    const key = name.replace(/\s+/g, '_');
+    const breakEven = getBreakEven(name);
+    return `
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;">
+      <div style="font-size:13px;font-weight:700;color:#0f172a;margin-bottom:10px;">${name}</div>
+      <label style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">Weekly Target</label>
+      <input type="number" min="0" step="0.5" id="targetInput_weekly_${key}" value="${getWeeklyTarget(name).toFixed(1)}" style="width:100%;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;margin-bottom:10px;">
+      <label style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">Monthly Target</label>
+      <input type="number" min="0" step="1" id="targetInput_monthly_${key}" value="${getMonthlyTarget(name)}" style="width:100%;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;margin-bottom:10px;">
+      <label style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">Break Even (£/mo, optional)</label>
+      <input type="number" min="0" step="10" id="targetInput_breakeven_${key}" value="${breakEven !== null ? breakEven : ''}" placeholder="—" style="width:100%;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:6px;font-family:'Inter',sans-serif;font-size:13px;">
+    </div>`;
+  }).join('');
+}
+
+async function saveTargetOverrides() {
+  const btn = document.getElementById('saveTargetsBtn');
+  const status = document.getElementById('targetSaveStatus');
+  btn.disabled = true;
+  status.textContent = 'Saving...';
+
+  try {
+    for (const name of ACTIVE_MEDIA_SPECIALISTS) {
+      const key = name.replace(/\s+/g, '_');
+      const weekly = parseFloat(document.getElementById(`targetInput_weekly_${key}`).value) || 0;
+      const monthly = parseFloat(document.getElementById(`targetInput_monthly_${key}`).value) || 0;
+      const breakEvenRaw = document.getElementById(`targetInput_breakeven_${key}`).value;
+      const breakEven = breakEvenRaw !== '' ? parseFloat(breakEvenRaw) : null;
+
+      const existing = specTargetData[name];
+      const fields = {
+        'Specialist Name': name,
+        'Weekly Target': weekly,
+        'Monthly Target': monthly,
+        ...(breakEven !== null ? { 'Break Even': breakEven } : {})
+      };
+
+      if (existing && existing.recordId) {
+        // Update existing row — single-record PATCH via recordId
+        const res = await fetch('/.netlify/functions/airtable-proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            method: 'PATCH',
+            table: 'Specialist Targets',
+            recordId: existing.recordId,
+            body: { fields }
+          })
+        });
+        if (!res.ok) throw new Error(`Update failed for ${name}: ${res.status}`);
+      } else {
+        // Create new row — single-record POST, no recordId
+        const res = await fetch('/.netlify/functions/airtable-proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            method: 'POST',
+            table: 'Specialist Targets',
+            body: { fields }
+          })
+        });
+        if (!res.ok) throw new Error(`Create failed for ${name}: ${res.status}`);
+      }
+    }
+
+    await loadSpecialistTargets();
+    status.textContent = '✓ Saved';
+    document.getElementById('targetEditorPanel').style.display = 'none';
+    renderSpecialistsSection();
+  } catch (err) {
+    console.error('Error saving Specialist Targets:', err);
+    status.textContent = '⚠ Failed to save — check console';
+  } finally {
+    btn.disabled = false;
+    setTimeout(() => { status.textContent = ''; }, 3000);
+  }
+}
 
 // Mirrors SPECIALIST_CONFIG in booking.html exactly (name → regions covered).
 // When you hire, remove, or reshuffle specialists, update booking.html's
@@ -4154,7 +4302,7 @@ function computeSpecialistStats() {
     const specBookings = bookingData.filter(b => b.mediaSpecialist === name && b.bookingStatus !== 'Cancelled' && b.date);
     const monthlyTarget = getMonthlyTarget(name);
     const weeklyTarget = getWeeklyTarget(name);
-    const breakEven = SPECIALIST_BREAK_EVEN[name] || null;
+    const breakEven = getBreakEven(name);
 
     const thisWeekCount = specBookings.filter(b => {
       const d = parseDate(b.date);
@@ -4226,6 +4374,13 @@ function resetSpecMonth() {
   renderSpecialistsSection();
 }
 
+function setSpecChartMode(mode) {
+  specChartMode = mode;
+  document.getElementById('specChartWeekBtn').classList.toggle('active', mode === 'week');
+  document.getElementById('specChartMonthBtn').classList.toggle('active', mode === 'month');
+  renderSpecialistsSection();
+}
+
 function updateSpecMonthNavUI() {
   const label = document.getElementById('specMonthLabel');
   if (label) label.textContent = specSelectedMonth.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
@@ -4257,9 +4412,28 @@ function renderSpecialistsSection() {
   document.getElementById('specAtCapacity').textContent = atCapacityCount;
   document.getElementById('specBelowCapacity').textContent = belowCapacityCount;
 
+  const totalThisMonth = specialists.reduce((s, x) => s + x.thisMonthCount, 0);
+  const totalMonthlyTarget = specialists.reduce((s, x) => s + x.monthlyTarget, 0);
+  const totalMonthCapacityPct = totalMonthlyTarget > 0 ? (totalThisMonth / totalMonthlyTarget) * 100 : 0;
+  const atCapacityMonthCount = specialists.filter(x => x.monthCapacityPct >= 100).length;
+  const belowCapacityMonthCount = specialists.filter(x => x.monthCapacityPct < 100).length;
+
+  document.getElementById('specTotalShootsMonth').textContent = totalThisMonth;
+  document.getElementById('specTotalTargetMonth').textContent = totalMonthlyTarget;
+  document.getElementById('specTeamCapacityMonth').textContent = totalMonthCapacityPct.toFixed(0) + '%';
+  document.getElementById('specAtCapacityMonth').textContent = atCapacityMonthCount;
+  document.getElementById('specBelowCapacityMonth').textContent = belowCapacityMonthCount;
+
   const weekLabel = data.weekStart.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' – ' + data.weekEnd.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  const monthLabel = specSelectedMonth.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
   const weekLabelEl = document.getElementById('specWeekLabel');
-  if (weekLabelEl) weekLabelEl.textContent = weekLabel;
+  if (weekLabelEl) weekLabelEl.textContent = specChartMode === 'week' ? weekLabel : monthLabel;
+  const subtitleEl = document.getElementById('specChartSubtitle');
+  if (subtitleEl) {
+    subtitleEl.textContent = specChartMode === 'week'
+      ? 'Weekly targets shown · based on scheduled shoot date, excluding cancellations'
+      : 'Monthly targets shown · based on scheduled shoot date, excluding cancellations';
+  }
 
   const sorted = [...specialists].sort((a, b) => b.capacityPct - a.capacityPct);
 
@@ -4338,6 +4512,13 @@ function renderSpecialistsSection() {
           </div>`;
       }).join('');
 
+  const isWeekMode = specChartMode === 'week';
+  const chartActualData  = isWeekMode ? sorted.map(s => s.thisWeekCount) : sorted.map(s => s.thisMonthCount);
+  const chartTargetData  = isWeekMode ? sorted.map(s => Math.round(s.target * 10) / 10) : sorted.map(s => s.monthlyTarget);
+  const chartCapacityRef = isWeekMode ? sorted.map(s => s.capacityPct) : sorted.map(s => s.monthCapacityPct);
+  const chartActualLabel = isWeekMode ? 'Shoots This Week' : 'Shoots This Month';
+  const chartTargetLabel = isWeekMode ? 'Weekly Target' : 'Monthly Target';
+
   const ctx = document.getElementById('specialistChart').getContext('2d');
   if (specialistChartInstance) specialistChartInstance.destroy();
 
@@ -4347,16 +4528,16 @@ function renderSpecialistsSection() {
       labels: sorted.map(s => s.name),
       datasets: [
         {
-          label: 'Shoots This Week',
-          data: sorted.map(s => s.thisWeekCount),
-          backgroundColor: sorted.map(s => s.capacityPct >= 100 ? '#10b98188' : s.capacityPct >= 70 ? '#f59e0b88' : '#ef444488'),
-          borderColor: sorted.map(s => s.capacityPct >= 100 ? '#10b981' : s.capacityPct >= 70 ? '#f59e0b' : '#ef4444'),
+          label: chartActualLabel,
+          data: chartActualData,
+          backgroundColor: chartCapacityRef.map(p => p >= 100 ? '#10b98188' : p >= 70 ? '#f59e0b88' : '#ef444488'),
+          borderColor: chartCapacityRef.map(p => p >= 100 ? '#10b981' : p >= 70 ? '#f59e0b' : '#ef4444'),
           borderWidth: 2,
           borderRadius: 6
         },
         {
-          label: 'Weekly Target',
-          data: sorted.map(s => Math.round(s.target * 10) / 10),
+          label: chartTargetLabel,
+          data: chartTargetData,
           type: 'line',
           borderColor: '#3F4D1B',
           backgroundColor: 'transparent',
@@ -4374,7 +4555,7 @@ function renderSpecialistsSection() {
       },
       scales: {
         x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 12, weight: '600' }, color: '#0f172a' } },
-        y: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Inter', size: 11 }, color: '#94a3b8', stepSize: 5 }, beginAtZero: true }
+        y: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Inter', size: 11 }, color: '#94a3b8', stepSize: isWeekMode ? 5 : 10 }, beginAtZero: true }
       }
     }
   });
