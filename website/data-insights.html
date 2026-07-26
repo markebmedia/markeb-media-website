@@ -971,13 +971,22 @@ body {
     <div class="stat-card"><div class="stat-value" style="color:#ef4444;" id="specBelowCapacity">-</div><div class="stat-label">Below Capacity</div></div>
   </div>
 
+  <div id="specMonthNavRow" style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:20px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:10px 16px;">
+    <button class="btn btn-secondary" style="padding:8px 14px;" onclick="navigateSpecMonth(-1)">‹ Prev Month</button>
+    <div style="font-size:15px;font-weight:700;color:#0f172a;min-width:170px;text-align:center;" id="specMonthLabel">Loading...</div>
+    <button class="btn btn-secondary" style="padding:8px 14px;" onclick="navigateSpecMonth(1)" id="specNextMonthBtn">Next Month ›</button>
+    <button class="btn btn-primary" style="padding:8px 14px;margin-left:8px;" onclick="resetSpecMonth()">
+      <i data-lucide="calendar-days" style="width:14px;height:14px;"></i> Jump to Today
+    </button>
+  </div>
+
   <div class="map-section" style="margin-bottom:24px;">
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
       <div>
         <h3 style="font-size:18px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;">
           <i data-lucide="bar-chart-3" style="width:18px;height:18px;"></i> Shoots vs Target — <span id="specWeekLabel">This Week</span>
         </h3>
-        <p style="font-size:13px;color:#64748b;margin-top:3px;">Target: <strong style="color:#0f172a;">15 shoots per specialist per week</strong> · based on scheduled shoot date, excluding cancellations</p>
+        <p style="font-size:13px;color:#64748b;margin-top:3px;">Monthly targets: <strong style="color:#0f172a;">James 50 · Andrii 50 · Jodie 30</strong> (130 total) · weekly figures derived from monthly · based on scheduled shoot date, excluding cancellations</p>
       </div>
     </div>
     <canvas id="specialistChart" style="max-height:320px;"></canvas>
@@ -1052,6 +1061,7 @@ let pipelineData = [];
 let currentPipePeriod = 'week';
 let pipelineChartInstance = null;
 let specialistChartInstance = null;
+let specSelectedMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 let retainerData = [];
 
 const REVENUE_TARGETS = { y1: 360000, y2: 500000, y3: 1000000 }; // y1 = £30,000/mo × 12
@@ -4075,8 +4085,30 @@ function timeInFunnelColour(start, end) {
 //  MEDIA SPECIALISTS TAB
 // ══════════════════════════════════════════════════════════════
 
-const SPECIALIST_TARGETS = {
-  weeklyShoots: 15
+// Monthly shoot targets — sums to 130 across the team.
+// James and Andrii carry the heavier load (30 for Jodie, 50 each for James/Andrii).
+const SPECIALIST_MONTHLY_TARGETS = {
+  'Jodie':      30,
+  'James Jago': 50,
+  'Andrii':     50
+};
+
+function getMonthlyTarget(name) {
+  return SPECIALIST_MONTHLY_TARGETS[name] || 0;
+}
+
+// Weekly target is derived from the monthly figure (monthly ÷ ~4.33 weeks/month)
+// so the weekly chart and monthly view always agree with one source of truth.
+function getWeeklyTarget(name) {
+  const monthly = getMonthlyTarget(name);
+  return monthly > 0 ? monthly / 4.345 : 0;
+}
+
+// Monthly break-even revenue for James and Andrii (ex VAT) — below this,
+// the specialist isn't yet covering their own cost base for the month.
+const SPECIALIST_BREAK_EVEN = {
+  'James Jago': 2100,
+  'Andrii':     2100
 };
 
 // Mirrors SPECIALIST_CONFIG in booking.html exactly (name → regions covered).
@@ -4112,21 +4144,38 @@ function computeSpecialistStats() {
     weekBuckets.push({ start: wStart, end: wEnd });
   }
 
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+  // Selected month window (defaults to current month, navigable)
+  const monthStart = new Date(specSelectedMonth.getFullYear(), specSelectedMonth.getMonth(), 1);
+  const monthEnd = new Date(specSelectedMonth.getFullYear(), specSelectedMonth.getMonth() + 1, 0, 23, 59, 59);
+  const prevMonthStart = new Date(specSelectedMonth.getFullYear(), specSelectedMonth.getMonth() - 1, 1);
+  const prevMonthEnd = new Date(specSelectedMonth.getFullYear(), specSelectedMonth.getMonth(), 0, 23, 59, 59);
 
   const results = specialists.map(name => {
     const specBookings = bookingData.filter(b => b.mediaSpecialist === name && b.bookingStatus !== 'Cancelled' && b.date);
+    const monthlyTarget = getMonthlyTarget(name);
+    const weeklyTarget = getWeeklyTarget(name);
+    const breakEven = SPECIALIST_BREAK_EVEN[name] || null;
 
     const thisWeekCount = specBookings.filter(b => {
       const d = parseDate(b.date);
       return d >= weekStart && d <= weekEnd;
     }).length;
 
-    const thisMonthCount = specBookings.filter(b => {
+    const thisMonthBookings = specBookings.filter(b => {
       const d = parseDate(b.date);
       return d >= monthStart && d <= monthEnd;
-    }).length;
+    });
+    const thisMonthCount = thisMonthBookings.length;
+
+    const prevMonthBookings = specBookings.filter(b => {
+      const d = parseDate(b.date);
+      return d >= prevMonthStart && d <= prevMonthEnd;
+    });
+    const prevMonthCount = prevMonthBookings.length;
+
+    const monthDelta = prevMonthCount > 0
+      ? ((thisMonthCount - prevMonthCount) / prevMonthCount) * 100
+      : (thisMonthCount > 0 ? 100 : 0);
 
     const weeklyTrend = weekBuckets.map(wb =>
       specBookings.filter(b => { const d = parseDate(b.date); return d >= wb.start && d <= wb.end; }).length
@@ -4138,23 +4187,66 @@ function computeSpecialistStats() {
       .filter(b => { const d = parseDate(b.date); return d >= weekStart && d <= weekEnd; })
       .reduce((s, b) => s + (parseFloat(b.priceExVAT) || 0), 0);
 
-    const capacityPct = SPECIALIST_TARGETS.weeklyShoots > 0 ? (thisWeekCount / SPECIALIST_TARGETS.weeklyShoots) * 100 : 0;
+    const monthRevenue = thisMonthBookings.reduce((s, b) => s + (parseFloat(b.priceExVAT) || 0), 0);
+    const prevMonthRevenue = prevMonthBookings.reduce((s, b) => s + (parseFloat(b.priceExVAT) || 0), 0);
+    const revenueMonthDelta = prevMonthRevenue > 0
+      ? ((monthRevenue - prevMonthRevenue) / prevMonthRevenue) * 100
+      : (monthRevenue > 0 ? 100 : 0);
+
+    const capacityPct = weeklyTarget > 0 ? (thisWeekCount / weeklyTarget) * 100 : 0;
+    const monthCapacityPct = monthlyTarget > 0 ? (thisMonthCount / monthlyTarget) * 100 : 0;
+
+    const breakEvenPct = breakEven ? (monthRevenue / breakEven) * 100 : null;
+    const pastBreakEven = breakEven ? monthRevenue >= breakEven : null;
 
     return {
-      name, thisWeekCount, thisMonthCount, avgWeekly, weeklyTrend, revenue, capacityPct,
-      gap: SPECIALIST_TARGETS.weeklyShoots - thisWeekCount
+      name, target: weeklyTarget, monthlyTarget, breakEven,
+      thisWeekCount, thisMonthCount, prevMonthCount, monthDelta,
+      avgWeekly, weeklyTrend, revenue, capacityPct,
+      gap: Math.round(weeklyTarget) - thisWeekCount,
+      monthCapacityPct,
+      monthRevenue, prevMonthRevenue, revenueMonthDelta,
+      breakEvenPct, pastBreakEven
     };
   });
 
-  return { specialists: results, weekStart, weekEnd };
+  return { specialists: results, weekStart, weekEnd, monthStart, monthEnd };
+}
+
+function navigateSpecMonth(direction) {
+  const newMonth = new Date(specSelectedMonth.getFullYear(), specSelectedMonth.getMonth() + direction, 1);
+  const currentRealMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  if (newMonth > currentRealMonth) return;
+  specSelectedMonth = newMonth;
+  renderSpecialistsSection();
+}
+
+function resetSpecMonth() {
+  specSelectedMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  renderSpecialistsSection();
+}
+
+function updateSpecMonthNavUI() {
+  const label = document.getElementById('specMonthLabel');
+  if (label) label.textContent = specSelectedMonth.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
+
+  const nextBtn = document.getElementById('specNextMonthBtn');
+  if (nextBtn) {
+    const currentRealMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const atCurrent = specSelectedMonth.getTime() === currentRealMonth.getTime();
+    nextBtn.disabled = atCurrent;
+    nextBtn.style.opacity = atCurrent ? '0.4' : '1';
+    nextBtn.style.cursor = atCurrent ? 'not-allowed' : 'pointer';
+  }
 }
 
 function renderSpecialistsSection() {
+  updateSpecMonthNavUI();
   const data = computeSpecialistStats();
   const specialists = data.specialists;
 
   const totalThisWeek = specialists.reduce((s, x) => s + x.thisWeekCount, 0);
-  const totalTarget = specialists.length * SPECIALIST_TARGETS.weeklyShoots;
+  const totalTarget = specialists.reduce((s, x) => s + Math.round(x.target), 0);
   const totalCapacityPct = totalTarget > 0 ? (totalThisWeek / totalTarget) * 100 : 0;
   const atCapacityCount = specialists.filter(x => x.capacityPct >= 100).length;
   const belowCapacityCount = specialists.filter(x => x.capacityPct < 100).length;
@@ -4177,9 +4269,9 @@ function renderSpecialistsSection() {
         const pct = Math.min(s.capacityPct, 100);
         const col = s.capacityPct >= 100 ? '#10b981' : s.capacityPct >= 70 ? '#f59e0b' : '#ef4444';
         const label = s.capacityPct >= 100 ? 'Full Capacity' : s.capacityPct >= 70 ? 'Near Capacity' : 'Below Capacity';
-        const gapText = s.gap > 0 ? `${s.gap} more shoot${s.gap === 1 ? '' : 's'} needed to hit target` : `${Math.abs(s.gap)} over target this week`;
+        const gapText = s.gap > 0 ? `${s.gap} more shoot${s.gap === 1 ? '' : 's'} needed to hit weekly target` : `${Math.abs(s.gap)} over weekly target`;
 
-        const maxTrend = Math.max(...s.weeklyTrend, SPECIALIST_TARGETS.weeklyShoots, 1);
+        const maxTrend = Math.max(...s.weeklyTrend, s.target, 1);
         const trendBars = s.weeklyTrend.map((v, i) => {
           const h = Math.round((v / maxTrend) * 60);
           const isLast = i === s.weeklyTrend.length - 1;
@@ -4188,15 +4280,32 @@ function renderSpecialistsSection() {
           </div>`;
         }).join('');
 
+        const monthDeltaArrow = s.monthDelta > 0 ? '↑' : s.monthDelta < 0 ? '↓' : '—';
+        const monthDeltaCol = s.monthDelta > 0 ? '#10b981' : s.monthDelta < 0 ? '#ef4444' : '#94a3b8';
+
+        const revDeltaArrow = s.revenueMonthDelta > 0 ? '↑' : s.revenueMonthDelta < 0 ? '↓' : '—';
+        const revDeltaCol = s.revenueMonthDelta > 0 ? '#10b981' : s.revenueMonthDelta < 0 ? '#ef4444' : '#94a3b8';
+
+        const breakEvenHtml = s.breakEven ? `
+            <div style="background:${s.pastBreakEven ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)'};border:1.5px solid ${s.pastBreakEven ? '#10b981' : '#ef4444'}44;border-radius:8px;padding:10px 12px;margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;">Break-Even (£${s.breakEven.toLocaleString()}/mo)</span>
+                <span style="font-size:11px;font-weight:700;color:${s.pastBreakEven ? '#10b981' : '#ef4444'};">${s.pastBreakEven ? '✓ Surpassed' : s.breakEvenPct.toFixed(0) + '%'}</span>
+              </div>
+              <div style="background:#f8fafc;border-radius:6px;height:6px;overflow:hidden;">
+                <div style="width:${Math.min(s.breakEvenPct, 100)}%;height:100%;background:${s.pastBreakEven ? '#10b981' : '#ef4444'};border-radius:6px;transition:width 0.8s ease;"></div>
+              </div>
+            </div>` : '';
+
         return `
           <div class="bdm-card" style="border-top:3px solid ${col};">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
               <div>
                 <div style="font-size:16px;font-weight:800;color:#0f172a;">${s.name}</div>
-                <div style="font-size:11px;color:#94a3b8;margin-top:2px;">Avg ${s.avgWeekly.toFixed(1)} shoots/wk over last 8 weeks</div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:2px;">Avg ${s.avgWeekly.toFixed(1)} shoots/wk over last 8 weeks · target ${s.target.toFixed(1)}/wk</div>
               </div>
               <div style="text-align:right;">
-                <div style="font-size:26px;font-weight:800;color:${col};">${s.thisWeekCount}<span style="font-size:14px;color:#94a3b8;font-weight:600;"> / ${SPECIALIST_TARGETS.weeklyShoots}</span></div>
+                <div style="font-size:26px;font-weight:800;color:${col};">${s.thisWeekCount}<span style="font-size:14px;color:#94a3b8;font-weight:600;"> / ${s.target.toFixed(0)}</span></div>
                 <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;">shoots this week</div>
               </div>
             </div>
@@ -4209,18 +4318,22 @@ function renderSpecialistsSection() {
               <span style="font-size:11px;color:#64748b;">${gapText}</span>
             </div>
 
-            <div style="display:flex;gap:10px;margin-bottom:14px;">
+            ${breakEvenHtml}
+
+            <div style="display:flex;gap:10px;margin-bottom:8px;">
               <div style="flex:1;background:#f8fafc;border-radius:8px;padding:10px;text-align:center;">
-                <div style="font-size:18px;font-weight:800;color:#0f172a;">${s.thisMonthCount}</div>
-                <div style="font-size:9px;color:#94a3b8;font-weight:600;text-transform:uppercase;">this month</div>
+                <div style="font-size:18px;font-weight:800;color:#0f172a;">${s.thisMonthCount}<span style="font-size:12px;color:#94a3b8;font-weight:600;"> / ${s.monthlyTarget}</span></div>
+                <div style="font-size:9px;color:#94a3b8;font-weight:600;text-transform:uppercase;">shoots this month</div>
+                <div style="font-size:10px;font-weight:700;color:${monthDeltaCol};margin-top:2px;">${monthDeltaArrow} ${Math.abs(s.monthDelta).toFixed(0)}% vs last mo (${s.prevMonthCount})</div>
               </div>
               <div style="flex:1;background:#f8fafc;border-radius:8px;padding:10px;text-align:center;">
-                <div style="font-size:18px;font-weight:800;color:#10b981;">£${Math.round(s.revenue).toLocaleString()}</div>
-                <div style="font-size:9px;color:#94a3b8;font-weight:600;text-transform:uppercase;">revenue this wk</div>
+                <div style="font-size:18px;font-weight:800;color:#10b981;">£${Math.round(s.monthRevenue).toLocaleString()}</div>
+                <div style="font-size:9px;color:#94a3b8;font-weight:600;text-transform:uppercase;">revenue this month</div>
+                <div style="font-size:10px;font-weight:700;color:${revDeltaCol};margin-top:2px;">${revDeltaArrow} ${Math.abs(s.revenueMonthDelta).toFixed(0)}% vs last mo</div>
               </div>
             </div>
 
-            <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;margin-bottom:6px;">Last 8 Weeks</div>
+            <div style="font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;margin-bottom:6px;margin-top:8px;">Last 8 Weeks</div>
             <div style="display:flex;gap:3px;align-items:flex-end;">${trendBars}</div>
           </div>`;
       }).join('');
@@ -4242,14 +4355,14 @@ function renderSpecialistsSection() {
           borderRadius: 6
         },
         {
-          label: 'Weekly Target (' + SPECIALIST_TARGETS.weeklyShoots + ')',
-          data: sorted.map(() => SPECIALIST_TARGETS.weeklyShoots),
+          label: 'Weekly Target',
+          data: sorted.map(s => Math.round(s.target * 10) / 10),
           type: 'line',
           borderColor: '#3F4D1B',
           backgroundColor: 'transparent',
           borderWidth: 2,
           borderDash: [5, 4],
-          pointRadius: 0,
+          pointRadius: 4,
           fill: false
         }
       ]
@@ -4261,7 +4374,7 @@ function renderSpecialistsSection() {
       },
       scales: {
         x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 12, weight: '600' }, color: '#0f172a' } },
-        y: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Inter', size: 11 }, color: '#94a3b8', stepSize: 1 }, beginAtZero: true }
+        y: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Inter', size: 11 }, color: '#94a3b8', stepSize: 5 }, beginAtZero: true }
       }
     }
   });
