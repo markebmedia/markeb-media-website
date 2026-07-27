@@ -387,16 +387,17 @@ function applyDurationConstraints(slots, bookingDuration, existingBookings, book
       return;
     }
     
-    // Check if booking + buffer would conflict with any existing booking
+    // Check if this job + drive-time buffer would overrun into the next booking's start.
+    // The drive time is counted once here: finish this job, drive to the next one,
+    // arrive on time. It should not also be subtracted from the booking's start time.
     for (const booking of existingBookings) {
       const buffer = bookingBuffers.get(booking.id) ?? defaultBufferMinutes;
       const slotEndWithBuffer = slotEndMinutes + buffer;
       const bookingStartMinutes = timeToMinutes(booking.startTime);
-      const bookingBufferStart = bookingStartMinutes - buffer;
       
-      // If YOUR booking end + buffer would overlap with existing booking's buffer start
-      if (slotEndWithBuffer > bookingBufferStart && slotStartMinutes < bookingStartMinutes) {
-        console.log(`  ❌ ${slot.time}: Would finish at ${minutesToTime(slotEndMinutes)} + buffer (${minutesToTime(slotEndWithBuffer)}), conflicts with booking at ${booking.startTime}`);
+      // If YOUR booking end + drive time would run past when the next booking starts
+      if (slotEndWithBuffer > bookingStartMinutes && slotStartMinutes < bookingStartMinutes) {
+        console.log(`  ❌ ${slot.time}: Would finish at ${minutesToTime(slotEndMinutes)} + drive time (${minutesToTime(slotEndWithBuffer)}), conflicts with booking at ${booking.startTime}`);
         slot.available = false;
         slot.reason = `Would conflict with booking at ${booking.startTime}`;
         return;
