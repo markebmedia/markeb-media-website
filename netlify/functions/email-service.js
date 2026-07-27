@@ -1379,6 +1379,57 @@ async function sendTimeRequestDecline(f, formattedDate, alternativeDates) {
   });
 }
 
+// 12b. Abandoned Basket Reminder
+async function sendAbandonedBasketEmail(session) {
+  const bookingUrl = `${SITE_URL}/website/booking.html?resume=true`;
+
+  const content = `
+    <h2>👋 You left something in your basket</h2>
+    <p>Hi ${session.clientName},</p>
+    <p>We noticed you started booking a shoot with us but didn't quite finish — no problem, everything you selected is still saved.</p>
+
+    <div class="booking-details">
+      ${session.propertyAddress || session.postcode ? `
+      <div class="detail-row">
+        <span class="detail-label">Property</span>
+        <span class="detail-value">${session.propertyAddress || session.postcode}</span>
+      </div>` : ''}
+      ${session.service ? `
+      <div class="detail-row">
+        <span class="detail-label">Service Selected</span>
+        <span class="detail-value">${session.service}</span>
+      </div>` : ''}
+      ${session.basketValue > 0 ? `
+      <div class="detail-row">
+        <span class="detail-label">Basket Value</span>
+        <span class="detail-value"><strong>£${session.basketValue.toFixed(2)}</strong></span>
+      </div>` : ''}
+    </div>
+
+    <div class="alert alert-info">
+      <strong>⏱️ It only takes a minute to finish</strong><br>
+      Just pick a date and time that works for you and you're all set.
+    </div>
+
+    <center>
+      ${getButtonHtml(bookingUrl, 'Finish Your Booking')}
+    </center>
+
+    <p>If you had any trouble booking or have questions about pricing, just reply to this email — we're happy to help.</p>
+    <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+  `;
+
+  const emailHtml = getEmailLayout(content);
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: session.clientEmail,
+    cc: 'commercial@markebmedia.com',
+    subject: `You're one step away from booking — Markeb Media`,
+    html: emailHtml
+  });
+}
+
 // 12. Generic Email (used by the drip sequence sender — subject/body already merged)
 async function sendGenericEmail({ to, subject, html }) {
   const wrappedHtml = html.includes('<html') ? html : getEmailLayout(html);
@@ -1406,5 +1457,6 @@ module.exports = {
   sendTimeRequestApproval,
   sendTimeRequestDecline,
   sendEpcPartnerNotification,
-  sendGenericEmail
+  sendGenericEmail,
+  sendAbandonedBasketEmail
 };
