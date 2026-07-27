@@ -1918,13 +1918,40 @@ function isValidUKPhone(phone) {
     // itself doesn't run an auth check (guests can book without an account),
     // so this only fires when localStorage already has a session from
     // having been logged into the dashboard beforehand.
+    //
+    // Genuine logins store the session under 'userToken' (set by
+    // AirtableAPI.storeUserSession) — email/name must be decoded from that
+    // token via validateSessionToken(), same as dashboard.html's own
+    // getCurrentUser(). The 'user_email' / 'user_name' keys (snake_case)
+    // are ONLY ever set by the admin impersonation script in dashboard.html
+    // — checking those directly, as this code did before, silently misses
+    // every real client login.
     (function tagFunnelSessionWithAccount() {
       try {
         const isAdminSession = localStorage.getItem('admin_impersonation') === 'true';
-        if (isAdminSession) return; // don't tag admin test sessions as a real client
 
-        const accountEmail = localStorage.getItem('user_email');
-        const accountName  = localStorage.getItem('user_name');
+        let accountEmail = null;
+        let accountName  = null;
+
+        if (isAdminSession) {
+          return; // don't tag admin test/impersonation sessions as a real client
+        }
+
+        // Genuine session: decode the real token, same as AirtableAPI.getCurrentUser()
+        const token = localStorage.getItem('userToken');
+        if (token) {
+          try {
+            const tokenData = JSON.parse(atob(token));
+            const now = Date.now();
+            const notExpired = !tokenData.expires || now <= tokenData.expires;
+            if (notExpired) {
+              accountEmail = tokenData.email || null;
+              accountName  = tokenData.name  || null;
+            }
+          } catch (decodeErr) {
+            console.warn('Could not decode userToken for funnel tagging:', decodeErr);
+          }
+        }
 
         if (!accountEmail) return; // anonymous/guest visitor — nothing to tag
 

@@ -649,6 +649,14 @@
                         return;
                     }
 
+                    // ✅ Clear any stale impersonation flag from a previous admin
+                    // "view as client" session. Without this, a genuine login
+                    // right after an impersonated session incorrectly keeps
+                    // being treated as impersonation everywhere downstream
+                    // (e.g. abandoned-basket funnel tagging silently skips
+                    // real accounts because it thinks it's still an admin test).
+                    localStorage.removeItem('admin_impersonation');
+
                     // mark action for dashboard greeting
                     localStorage.setItem('auth_action','login');
                     AirtableAPI.storeUserSession(response.token, email);
@@ -687,6 +695,9 @@
             try {
                 const response = await AirtableAPI.createUser({ name, email, company, region, password });
                 if (response.success) {
+                    // ✅ Clear any stale impersonation flag — same reasoning as login
+                    localStorage.removeItem('admin_impersonation');
+
                     // mark action for dashboard greeting
                     localStorage.setItem('auth_action','signup');
                     AirtableAPI.storeUserSession(response.token, email);
