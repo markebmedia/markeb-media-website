@@ -5070,6 +5070,7 @@ async function loadRecentBookings() {
       const dateStr    = booking.shootDate
         ? new Date(booking.shootDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
         : 'Date TBC';
+      const timeStr    = booking.shootTime || booking.time || '';
 
       const dotColour = {
         'Booked':             '#B46100',
@@ -5099,7 +5100,7 @@ async function loadRecentBookings() {
           <div class="activity-title" style="${cancelled ? 'text-decoration:line-through;color:#ef4444;' : ''}">${booking.projectAddress}</div>
           <div class="activity-time" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:2px;">
             <span style="background:${dotColour}18;color:${dotColour};font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;border:1px solid ${dotColour}40;">${booking.status}</span>
-            <span>${dateStr}</span>
+            <span>${dateStr}${timeStr ? ' at ' + timeStr : ''}</span>
             ${booking.serviceType ? `<span style="color:#94a3b8;">•</span><span>${booking.serviceType}</span>` : ''}
           </div>
         </div>
