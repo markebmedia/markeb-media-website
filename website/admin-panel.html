@@ -3487,11 +3487,15 @@ We wanted to reach out..." required></textarea>
         <option value="">All Stages</option>
         <option value="New">New</option>
         <option value="Contacted">Contacted</option>
+        <option value="Follow Up 1">Follow Up 1</option>
+        <option value="Follow Up 2">Follow Up 2</option>
+        <option value="Follow Up 3">Follow Up 3</option>
         <option value="Responded">Responded</option>
         <option value="Meeting Booked">Meeting Booked</option>
         <option value="Proposal Sent">Proposal Sent</option>
         <option value="Won">Won</option>
         <option value="Lost">Lost</option>
+        <option value="Closed">Closed</option>
       </select>
     </div>
     <div class="bulk-enroll-bar" style="display:none;justify-content:space-between;align-items:center;margin-bottom:16px;padding:12px 16px;background:#f5f3ff;border:2px solid #7c3aed;border-radius:10px;flex-wrap:wrap;gap:12px;">
@@ -3532,6 +3536,7 @@ We wanted to reach out..." required></textarea>
   <div class="stats-grid" style="margin-bottom:24px;">
     <div class="stat-card"><div class="stat-value" id="pipelineTotal">0</div><div class="stat-label">Total Prospects</div></div>
     <div class="stat-card"><div class="stat-value" id="pipelineContacted">0</div><div class="stat-label">Contacted</div></div>
+    <div class="stat-card"><div class="stat-value" id="pipelineFollowUp" style="color:#B45309;">0</div><div class="stat-label">Needs Follow-Up</div></div>
     <div class="stat-card"><div class="stat-value" id="pipelineMeeting">0</div><div class="stat-label">Meetings Booked</div></div>
     <div class="stat-card"><div class="stat-value" id="pipelineWon">0</div><div class="stat-label">Won</div></div>
   </div>
@@ -3541,11 +3546,15 @@ We wanted to reach out..." required></textarea>
       <option value="">All Stages</option>
       <option value="New">New</option>
       <option value="Contacted">Contacted</option>
+      <option value="Follow Up 1">Follow Up 1</option>
+      <option value="Follow Up 2">Follow Up 2</option>
+      <option value="Follow Up 3">Follow Up 3</option>
       <option value="Responded">Responded</option>
       <option value="Meeting Booked">Meeting Booked</option>
       <option value="Proposal Sent">Proposal Sent</option>
       <option value="Won">Won</option>
       <option value="Lost">Lost</option>
+      <option value="Closed">Closed</option>
     </select>
     <button class="btn btn-danger btn-small" onclick="clearAllPipelineProspects()">
       <i data-lucide="trash-2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Clear All
@@ -14432,16 +14441,20 @@ async function emailInvoice(bookingId, btn, overrides = {}) {
 
 // ===== PROSPECT FINDER & PIPELINE =====
 
-const PIPELINE_STAGES = ['New', 'Contacted', 'Responded', 'Meeting Booked', 'Proposal Sent', 'Won', 'Lost'];
+const PIPELINE_STAGES = ['New', 'Contacted', 'Follow Up 1', 'Follow Up 2', 'Follow Up 3', 'Responded', 'Meeting Booked', 'Proposal Sent', 'Won', 'Lost', 'Closed'];
 
 const STAGE_COLORS = {
   'New':            { bg: '#f1f5f9', color: '#475569', border: '#e2e8f0' },
   'Contacted':      { bg: '#dbeafe', color: '#1e40af', border: '#93c5fd' },
+  'Follow Up 1':    { bg: '#fff3e0', color: '#b45309', border: '#fcd34d' },
+  'Follow Up 2':    { bg: '#fed7aa', color: '#9a3412', border: '#fb923c' },
+  'Follow Up 3':    { bg: '#fecaca', color: '#991b1b', border: '#f87171' },
   'Responded':      { bg: '#fef3c7', color: '#92400e', border: '#fcd34d' },
   'Meeting Booked': { bg: '#ede9fe', color: '#5b21b6', border: '#c4b5fd' },
   'Proposal Sent':  { bg: '#fff3e0', color: '#b45309', border: '#fcd34d' },
   'Won':            { bg: '#d1fae5', color: '#065f46', border: '#6ee7b7' },
-  'Lost':           { bg: '#fee2e2', color: '#991b1b', border: '#fca5a5' }
+  'Lost':           { bg: '#fee2e2', color: '#991b1b', border: '#fca5a5' },
+  'Closed':         { bg: '#e2e8f0', color: '#475569', border: '#cbd5e1' }
 };
 
 let allProspects = [];
@@ -14608,6 +14621,7 @@ async function deleteProspect(id) {
 }
 
 async function updateProspectStage(id, stage) {
+  const todayStr = new Date().toISOString().split('T')[0];
   try {
     await fetch('/.netlify/functions/airtable-proxy', {
       method: 'POST',
@@ -14616,7 +14630,7 @@ async function updateProspectStage(id, stage) {
         method: 'PATCH',
         table: 'Prospects',
         recordId: id,
-        body: { fields: { 'Stage': stage, 'Updated Date': new Date().toISOString().split('T')[0] } }
+        body: { fields: { 'Stage': stage, 'Updated Date': todayStr, 'Stage Changed Date': todayStr } }
       })
     });
   } catch (error) {
@@ -14627,7 +14641,7 @@ async function updateProspectStage(id, stage) {
   const idx = allProspects.findIndex(p => p.id === id);
   if (idx > -1) {
     allProspects[idx].stage = stage;
-    allProspects[idx].updatedAt = new Date().toISOString().split('T')[0];
+    allProspects[idx].updatedAt = todayStr;
   }
   renderSavedProspects();
   renderPipeline();
@@ -15015,6 +15029,7 @@ function updatePipelineStats() {
   if (el('pipelineContacted')) el('pipelineContacted').textContent = prospects.filter(p=>p.stage==='Contacted').length;
   if (el('pipelineMeeting'))   el('pipelineMeeting').textContent   = prospects.filter(p=>p.stage==='Meeting Booked').length;
   if (el('pipelineWon'))       el('pipelineWon').textContent       = prospects.filter(p=>p.stage==='Won').length;
+  if (el('pipelineFollowUp'))  el('pipelineFollowUp').textContent  = prospects.filter(p=>p.stage.startsWith('Follow Up')).length;
 }
 
 let pipelineCollapsedStages = new Set();

@@ -22,6 +22,8 @@
 
 [functions."send-sequence-emails-background"]
   schedule = "0 9 * * *"
+[functions."auto-progress-pipeline"]
+  schedule = "0 9 * * *"
   
 [[headers]]
   for = "/website/admin-panel.html"
