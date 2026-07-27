@@ -356,18 +356,20 @@ function applyBlockedTimes(slots, blockedTimes) {
 }
 
 // ✅ Apply duration constraints - block slots where YOUR booking would overrun
-function applyDurationConstraints(slots, bookingDuration, existingBookings) {
+// bookingBuffers: Map of booking.id -> buffer minutes (drive time + 15 min prep).
+// Falls back to 15 min (0 drive time) if a booking isn't in the map, e.g. when
+// called with an empty existingBookings array from the no-bookings branch.
+function applyDurationConstraints(slots, bookingDuration, existingBookings, bookingBuffers = new Map()) {
   console.log(`\nApplying duration constraints (${bookingDuration} min booking):`);
   
-  const fixedBufferMinutes = 45;
-  const endOfDayMinutes = timeToMinutes('16:30'); // Last booking starts 15:00, max 90min + 45min buffer
+  const setupPackMinutes = 15;
+  const endOfDayMinutes = timeToMinutes('16:30'); // Last booking starts 15:00, max 90min + buffer
   
   slots.forEach(slot => {
     if (!slot.available) return; // Skip already blocked slots
     
     const slotStartMinutes = timeToMinutes(slot.time);
     const slotEndMinutes = slotStartMinutes + bookingDuration;
-    const slotEndWithBuffer = slotEndMinutes + fixedBufferMinutes;
     
     // Block slots past the last bookable start time
     if (slotStartMinutes > timeToMinutes('15:00')) {
@@ -387,8 +389,10 @@ function applyDurationConstraints(slots, bookingDuration, existingBookings) {
     
     // Check if booking + buffer would conflict with any existing booking
     for (const booking of existingBookings) {
+      const buffer = bookingBuffers.get(booking.id) ?? setupPackMinutes;
+      const slotEndWithBuffer = slotEndMinutes + buffer;
       const bookingStartMinutes = timeToMinutes(booking.startTime);
-      const bookingBufferStart = bookingStartMinutes - fixedBufferMinutes;
+      const bookingBufferStart = bookingStartMinutes - buffer;
       
       // If YOUR booking end + buffer would overlap with existing booking's buffer start
       if (slotEndWithBuffer > bookingBufferStart && slotStartMinutes < bookingStartMinutes) {
@@ -492,14 +496,18 @@ function generateAllTimeSlots() {
 async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin, bookingDuration) {
   let allSlots = generateAllTimeSlots(); // ✅ CHANGED: const → let
   const maxDriveMinutes = 45;
-  const fixedBufferMinutes = 45;
+  const setupPackMinutes = 15; // buffer = actual drive time + this prep time
   
   console.log(`\nCalculating availability for ${existingBookings.length} existing bookings with ${bookingDuration}min duration`);
   
-  // STEP 1: Check if user's location is within 45 min drive of ALL existing bookings
+  // STEP 1: Check if user's location is within 45 min drive of ALL existing bookings,
+  // and record each booking's own buffer (drive time + 15 min prep) for STEP 2/3.
+  const bookingBuffers = new Map(); // booking.id -> buffer minutes
+
   for (const booking of existingBookings) {
     if (!booking.postcode) {
       console.log(`⚠ Skipping booking at ${booking.startTime} - no postcode available`);
+      bookingBuffers.set(booking.id, setupPackMinutes);
       continue;
     }
     
@@ -519,6 +527,11 @@ async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin, 
         
         return allSlots;
       }
+
+      const buffer = driveTime + setupPackMinutes;
+      console.log(`   → Buffer for this booking: ${buffer} min (${driveTime} min drive + ${setupPackMinutes} min prep)`);
+      bookingBuffers.set(booking.id, buffer);
+
     } catch (error) {
       console.error('❌ Error calculating drive time:', error);
       allSlots.forEach(slot => {
@@ -529,20 +542,20 @@ async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin, 
     }
   }
   
-  // STEP 2: User is within 45 min of all bookings
+  // STEP 2: User is within 45 min of all bookings — apply each booking's own buffer
   console.log('\n✓ User is within 45 min of all existing bookings');
-  console.log(`Blocking: ${fixedBufferMinutes} min before + booking + ${fixedBufferMinutes} min after:\n`);
   
   for (const booking of existingBookings) {
+    const buffer = bookingBuffers.get(booking.id) ?? setupPackMinutes;
     const bookingStartMinutes = timeToMinutes(booking.startTime);
     const bookingEndMinutes = bookingStartMinutes + booking.duration;
     
-    const bufferStartMinutes = bookingStartMinutes - fixedBufferMinutes;
-    const bufferEndMinutes = bookingEndMinutes + fixedBufferMinutes;
+    const bufferStartMinutes = bookingStartMinutes - buffer;
+    const bufferEndMinutes = bookingEndMinutes + buffer;
     
-    console.log(`  Buffer before: ${minutesToTime(bufferStartMinutes)}-${booking.startTime} (${fixedBufferMinutes} min)`);
+    console.log(`  Buffer before: ${minutesToTime(bufferStartMinutes)}-${booking.startTime} (${buffer} min)`);
     console.log(`  Booking: ${booking.startTime}-${minutesToTime(bookingEndMinutes)} (${booking.duration} min)`);
-    console.log(`  Buffer after: ${minutesToTime(bookingEndMinutes)}-${minutesToTime(bufferEndMinutes)} (${fixedBufferMinutes} min)`);
+    console.log(`  Buffer after: ${minutesToTime(bookingEndMinutes)}-${minutesToTime(bufferEndMinutes)} (${buffer} min)`);
     console.log(`  Total blocked: ${minutesToTime(bufferStartMinutes)}-${minutesToTime(bufferEndMinutes)}`);
     
     allSlots.forEach(slot => {
@@ -565,8 +578,8 @@ async function calculateAvailableSlots(userPostcode, existingBookings, isAdmin, 
     });
   }
   
-  // ✅ STEP 3: Apply duration constraints
-  allSlots = applyDurationConstraints(allSlots, bookingDuration, existingBookings);
+  // ✅ STEP 3: Apply duration constraints, passing the same per-booking buffers
+  allSlots = applyDurationConstraints(allSlots, bookingDuration, existingBookings, bookingBuffers);
   
   const availableCount = allSlots.filter(s => s.available).length;
   console.log(`\n✓ Final result: ${availableCount} available, ${allSlots.length - availableCount} blocked\n`);
