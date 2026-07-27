@@ -950,6 +950,14 @@ body {
 
   <div class="map-section" style="margin-bottom:24px;">
     <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+      <i data-lucide="clock" style="width:18px;height:18px;color:#f59e0b;"></i> Recently Active <span style="font-size:12px;font-weight:600;color:#94a3b8;">(last 20 mins — not yet counted as abandoned)</span>
+    </h3>
+    <p style="font-size:13px;color:#64748b;margin-bottom:20px;">Sessions still likely in progress · check back after 20 minutes to see if they move to Abandoned below</p>
+    <div id="funnelRecentContent"></div>
+  </div>
+
+  <div class="map-section" style="margin-bottom:24px;">
+    <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
       <i data-lucide="user-x" style="width:18px;height:18px;"></i> Abandoned Sessions
     </h3>
     <p style="font-size:13px;color:#64748b;margin-bottom:20px;">Sorted by furthest step reached · shows captured name/email where available</p>
@@ -4032,8 +4040,61 @@ function renderFunnelSection() {
           <span class="region-count">${count}</span>
         </div>`).join('');
 
+  renderFunnelRecent();
   renderFunnelAbandoned();
   lucide.createIcons();
+}
+
+function renderFunnelRecent() {
+  const list = funnelData
+    .filter(f => getFunnelBucket(f) === 'recent')
+    .sort((a, b) => new Date(b.lastUpdatedAt) - new Date(a.lastUpdatedAt));
+
+  const el = document.getElementById('funnelRecentContent');
+  if (!el) return;
+
+  if (list.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-text">No sessions active in the last 20 minutes</div></div>';
+    return;
+  }
+
+  el.innerHTML = list.map(f => {
+    const hasContact = f.clientName || f.clientEmail;
+    const stageColor = f.furthestStep >= 4 ? '#ef4444' : f.furthestStep >= 2 ? '#f59e0b' : '#94a3b8';
+    const minsSinceUpdate = Math.round((new Date() - new Date(f.lastUpdatedAt)) / 60000);
+    return `
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-left:4px solid ${stageColor};border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div style="text-align:center;min-width:70px;">
+          <div style="font-size:20px;font-weight:800;color:${stageColor};">${f.furthestStep}</div>
+          <div style="font-size:9px;color:#94a3b8;font-weight:600;text-transform:uppercase;">of 5</div>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:13px;font-weight:700;color:#0f172a;">${FUNNEL_STAGE_LABELS[f.furthestStep]}</div>
+          <div style="font-size:12px;color:#64748b;margin-top:2px;">
+            ${f.propertyAddress ? '🏠 ' + f.propertyAddress : (f.postcode ? '📍 ' + f.postcode : '')}${f.region ? ' · ' + f.region : ''}
+          </div>
+          ${f.service ? `<div style="font-size:12px;color:#64748b;margin-top:2px;">🎬 ${f.service}</div>` : ''}
+        </div>
+        ${f.basketValue > 0 ? `
+        <div style="min-width:120px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:8px 12px;">
+          <div style="font-size:16px;font-weight:800;color:#8b5cf6;">£${f.basketValue.toFixed(2)}</div>
+        </div>` : ''}
+        ${f.accountEmail ? `
+        <div style="min-width:180px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;">
+          <div style="font-size:11px;font-weight:700;color:#1d4ed8;">👤 Logged-in account</div>
+          ${f.accountName ? `<div style="font-size:12px;color:#1e3a8a;margin-top:2px;">${f.accountName}</div>` : ''}
+          <div style="font-size:11px;color:#1e3a8a;">${f.accountEmail}</div>
+        </div>` : (hasContact ? `
+        <div style="min-width:180px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:8px 12px;">
+          <div style="font-size:11px;font-weight:700;color:#991b1b;">⚠ Contact captured (typed)</div>
+          ${f.clientName ? `<div style="font-size:12px;color:#7f1d1d;margin-top:2px;">${f.clientName}</div>` : ''}
+          ${f.clientEmail ? `<div style="font-size:11px;color:#7f1d1d;">${f.clientEmail}</div>` : ''}
+        </div>` : '')}
+        <div style="text-align:right;min-width:140px;font-size:11px;color:#94a3b8;">
+          <div style="padding:2px 8px;background:#fef3c7;color:#92400e;border-radius:5px;font-weight:700;display:inline-block;">🟡 Active ${minsSinceUpdate} min ago</div>
+        </div>
+      </div>`;
+  }).join('');
 }
 
 function renderFunnelAbandoned() {
