@@ -7,6 +7,7 @@ const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
 
 const ACTIVE_TABLE    = 'Active Bookings';
 const CANCELLED_TABLE = 'Cancelled Bookings';
+const MAIN_TABLE      = 'Bookings';
 
 async function fetchAllRecords(url) {
   const records = [];
@@ -33,15 +34,17 @@ async function fetchAllRecords(url) {
 function mapActiveBooking(record) {
   const f = record.fields;
   return {
-    id:           record.id,
-    projectAddress: f['Project Address'] || 'Property booking',
-    customerName:   f['Customer Name']   || '',
-    serviceType:    f['Service Type']    || '',
-    shootDate:      f['Shoot Date']      || null,
-    shootTime:      f['Shoot Time']      || f['Time'] || '',
-    status:         f['Status']          || 'Booked',
-    trackingCode:   f['Tracking Code']   || '',
-    deliveryLink:   f['Delivery Link']   || '',
+    id:             record.id,
+    projectAddress: f['Project Address']  || 'Property booking',
+    customerName:   f['Customer Name']    || '',
+    serviceType:    f['Service Type']     || '',
+    shootDate:      f['Shoot Date']       || null,
+    shootTime:      '', // filled in later by matching against main Bookings table
+    status:         f['Status']           || 'Booked',
+    trackingCode:   f['Tracking Code']    || '',
+    bookingRef:     f['Booking ID']       || '',
+    email:          f['Email Address']    || '',
+    deliveryLink:   f['Delivery Link']    || '',
     cancelled:      false,
   };
 }
@@ -50,13 +53,15 @@ function mapCancelledBooking(record) {
   const f = record.fields;
   return {
     id:             record.id,
-    projectAddress: f['Project Address'] || 'Property booking',
-    customerName:   f['Customer Name']   || '',
-    serviceType:    f['Service Type']    || '',
-    shootDate:      f['Shoot Date']      || null,
-    shootTime:      f['Shoot Time']      || f['Time'] || '',
-    status:         f['Status']          || 'Cancelled',
-    trackingCode:   f['Tracking Code']   || '',
+    projectAddress: f['Project Address']  || 'Property booking',
+    customerName:   f['Customer Name']    || '',
+    serviceType:    f['Service Type']     || '',
+    shootDate:      f['Shoot Date']       || null,
+    shootTime:      '', // filled in later by matching against main Bookings table
+    status:         f['Status']           || 'Cancelled',
+    trackingCode:   f['Tracking Code']    || '',
+    bookingRef:     f['Booking ID']       || '',
+    email:          f['Email']            || '',
     deliveryLink:   '',
     cancelled:      true,
   };
@@ -98,14 +103,41 @@ exports.handler = async (event) => {
       `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(CANCELLED_TABLE)}` +
       `?filterByFormula=${cancelledFormula}&sort[0][field]=Shoot%20Date&sort[0][direction]=desc`;
 
-    // Fetch both in parallel
-    const [activeRecords, cancelledRecords] = await Promise.all([
+    // ── 3. Main Bookings — same client, used only to source Time ──────
+    const mainFormula = encodeURIComponent(`LOWER({Client Email}) = "${emailLower}"`);
+    const mainUrl =
+      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(MAIN_TABLE)}` +
+      `?filterByFormula=${mainFormula}`;
+
+    // Fetch all three in parallel
+    const [activeRecords, cancelledRecords, mainRecords] = await Promise.all([
       fetchAllRecords(activeUrl),
       fetchAllRecords(cancelledUrl),
+      fetchAllRecords(mainUrl),
     ]);
+
+    // Build a lookup of "email|bookingRef" -> Time from the main Bookings table
+    // (main table's "Booking Reference" matches Active/Cancelled's "Booking ID")
+    const timeByKey = {};
+    mainRecords.forEach(r => {
+      const ref   = r.fields['Booking Reference'];
+      const time  = r.fields['Time'];
+      const email = (r.fields['Client Email'] || '').toLowerCase().trim();
+      if (ref && time) {
+        timeByKey[`${email}|${ref}`] = time;
+        timeByKey[ref] = timeByKey[ref] || time;
+      }
+    });
 
     const active    = activeRecords.map(mapActiveBooking);
     const cancelled = cancelledRecords.map(mapCancelledBooking);
+
+    // Merge in the time by matching email + Booking ID/Reference
+    [...active, ...cancelled].forEach(b => {
+      if (!b.bookingRef) return;
+      const key = `${(b.email || '').toLowerCase().trim()}|${b.bookingRef}`;
+      b.shootTime = timeByKey[key] || timeByKey[b.bookingRef] || '';
+    });
 
     // Merge and sort by shoot date descending
     const all = [...active, ...cancelled].sort((a, b) => {
