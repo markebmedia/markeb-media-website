@@ -25,7 +25,7 @@ exports.handler = async (event) => {
 
     const records = await base('Booking Funnel')
       .select({
-        filterByFormula: `AND(LOWER({Client Email}) = "${userEmail.toLowerCase()}", {Status} = 'In Progress')`,
+        filterByFormula: `AND(OR(LOWER({Account Email}) = "${userEmail.toLowerCase()}", LOWER({Client Email}) = "${userEmail.toLowerCase()}"), {Status} = 'In Progress')`,
         sort: [{ field: 'Last Updated At', direction: 'desc' }],
         maxRecords: 5
       })
@@ -64,8 +64,8 @@ exports.handler = async (event) => {
 
     const f = candidate.fields;
     const session = {
-      clientName: f['Client Name'] || 'there',
-      clientEmail: f['Client Email'],
+      clientName: f['Client Name'] || f['Account Name'] || 'there',
+      clientEmail: f['Account Email'] || f['Client Email'],
       postcode: f['Postcode'] || '',
       propertyAddress: f['Property Address'] || '',
       service: f['Service Selected'] || '',

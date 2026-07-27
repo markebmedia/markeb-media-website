@@ -3912,6 +3912,10 @@ async function loadFunnelData() {
       clientName: r.fields['Client Name'] || '',
       clientEmail: r.fields['Client Email'] || '',
       clientPhone: r.fields['Client Phone'] || '',
+      accountEmail: r.fields['Account Email'] || '',
+      accountName: r.fields['Account Name'] || '',
+      emailCapturedAt: r.fields['Email Captured At'] || '',
+      reminderSentAt: r.fields['Reminder Sent At'] || '',
       furthestStep: r.fields['Furthest Step'] || 1,
       status: r.fields['Status'] || 'In Progress',
       bookingRef: r.fields['Booking Reference'] || '',
@@ -4077,16 +4081,22 @@ function renderFunnelAbandoned() {
           ${f.basketValue > 0 ? `<div style="font-size:16px;font-weight:800;color:#8b5cf6;">£${f.basketValue.toFixed(2)}</div>` : ''}
           ${f.paymentIntent ? `<div style="font-size:10px;color:#6d28d9;font-weight:700;margin-top:2px;">${f.paymentIntent}</div>` : ''}
         </div>` : ''}
-        ${hasContact ? `
+        ${f.accountEmail ? `
+        <div style="min-width:180px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px 12px;">
+          <div style="font-size:11px;font-weight:700;color:#1d4ed8;">👤 Logged-in account</div>
+          ${f.accountName ? `<div style="font-size:12px;color:#1e3a8a;margin-top:2px;">${f.accountName}</div>` : ''}
+          <div style="font-size:11px;color:#1e3a8a;">${f.accountEmail}</div>
+        </div>` : (hasContact ? `
         <div style="min-width:180px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:8px 12px;">
-          <div style="font-size:11px;font-weight:700;color:#991b1b;">⚠ Contact captured</div>
+          <div style="font-size:11px;font-weight:700;color:#991b1b;">⚠ Contact captured (typed)</div>
           ${f.clientName ? `<div style="font-size:12px;color:#7f1d1d;margin-top:2px;">${f.clientName}</div>` : ''}
           ${f.clientEmail ? `<div style="font-size:11px;color:#7f1d1d;">${f.clientEmail}</div>` : ''}
-        </div>` : ''}
+        </div>` : '')}
         <div style="text-align:right;min-width:140px;font-size:11px;color:#94a3b8;">
           <div>Started: <strong style="color:#475569;">${formatDateTime(f.startedAt)}</strong></div>
           <div style="margin-top:2px;">Last active: <strong style="color:#475569;">${formatDateTime(f.lastUpdatedAt)}</strong></div>
           <div style="margin-top:4px;padding:2px 8px;background:${timeInFunnelColour(f.startedAt, f.lastUpdatedAt)}18;color:${timeInFunnelColour(f.startedAt, f.lastUpdatedAt)};border-radius:5px;font-weight:700;display:inline-block;">${formatTimeInFunnel(f.startedAt, f.lastUpdatedAt)}</div>
+          ${f.reminderSentAt ? `<div style="margin-top:4px;padding:2px 8px;background:#f0fdf4;color:#10b981;border-radius:5px;font-weight:700;display:inline-block;">✓ Reminder sent ${formatDateTime(f.reminderSentAt)}</div>` : ''}
         </div>
       </div>`;
   }).join('');

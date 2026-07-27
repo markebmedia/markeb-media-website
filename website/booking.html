@@ -1911,6 +1911,32 @@ function isValidUKPhone(phone) {
       }).catch(() => {});
     }
 
+    // Tag this funnel session with the logged-in dashboard account, if one
+    // exists — fires once, immediately, before postcode or anything else is
+    // entered. This is how we identify who's in the funnel even if they
+    // abandon at step 1 before ever typing an email manually. Booking.html
+    // itself doesn't run an auth check (guests can book without an account),
+    // so this only fires when localStorage already has a session from
+    // having been logged into the dashboard beforehand.
+    (function tagFunnelSessionWithAccount() {
+      try {
+        const isAdminSession = localStorage.getItem('admin_impersonation') === 'true';
+        if (isAdminSession) return; // don't tag admin test sessions as a real client
+
+        const accountEmail = localStorage.getItem('user_email');
+        const accountName  = localStorage.getItem('user_name');
+
+        if (!accountEmail) return; // anonymous/guest visitor — nothing to tag
+
+        trackFunnel({
+          'Account Email': accountEmail,
+          'Account Name': accountName || ''
+        });
+      } catch (err) {
+        console.warn('Funnel account tagging failed:', err);
+      }
+    })();
+
     // Fires on every "Continue" click, sending whatever context is known so
     // far — not just on milestone actions like selecting a service. This
     // means Furthest Step (and everything else) gets logged even if a

@@ -25,20 +25,22 @@ const existing = await base('Booking Funnel')
       .select({ filterByFormula: `{Session ID} = '${sessionId}'`, maxRecords: 1 })
       .firstPage();
 
-// If the client's email only becomes known at step 5 (or later), and this
-// session had no email before now, treat that as the capture moment —
-// clock starts from when we can actually reach them, not from Started At.
+// Capture moment: whichever email becomes known FIRST — either the logged-in
+// dashboard Account Email (known instantly at session start) or the manually
+// typed Client Email (only known from step 5 onward). Account Email takes
+// priority since it's how we identify who's actually sitting in the funnel.
 const updateFields = { ...fields, 'Last Updated At': now };
 
+const emailFromFields = (fields && (fields['Account Email'] || fields['Client Email'])) || null;
+
 if (existing.length > 0) {
-      const hadEmailBefore = !!(existing[0].fields['Client Email']);
-      const nowHasEmail = !!(fields && fields['Client Email']);
-      if (!hadEmailBefore && nowHasEmail) {
+      const hadEmailBefore = !!(existing[0].fields['Account Email'] || existing[0].fields['Client Email']);
+      if (!hadEmailBefore && emailFromFields) {
         updateFields['Email Captured At'] = now;
       }
 await base('Booking Funnel').update(existing[0].id, updateFields);
     } else {
-      if (fields && fields['Client Email']) {
+      if (emailFromFields) {
         updateFields['Email Captured At'] = now;
       }
 await base('Booking Funnel').create({
