@@ -24,6 +24,8 @@
   schedule = "0 9 * * *"
 [functions."auto-progress-pipeline"]
   schedule = "0 9 * * *"
+[functions."send-abandoned-basket-reminders"]
+  schedule = "*/15 * * * *"
   
 [[headers]]
   for = "/website/admin-panel.html"
