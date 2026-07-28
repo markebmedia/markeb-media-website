@@ -3452,34 +3452,7 @@ Any media produced remains the property of Markeb Media until full payment has b
   if (id === 'payments') {
     loadPaymentsInvoices();
   }
-  if (id === 'booking') {
-    checkAbandonedBasketReminder();
   }
-}
-
-/* ===== ABANDONED BASKET REMINDER CHECK ===== */
-/* Fires silently when the client opens the Book Shoot tab. Server-side
-   function handles all eligibility logic (2hr wait, 24hr window, once-only,
-   only if In Progress) — this is just the trigger point. */
-async function checkAbandonedBasketReminder() {
-  try {
-    const isAdminSession = localStorage.getItem('admin_impersonation') === 'true';
-    const user = isAdminSession
-      ? { email: localStorage.getItem('user_email') }
-      : window.AirtableAPI?.getCurrentUser?.();
-
-    const email = user?.email || localStorage.getItem('user_email');
-    if (!email) return;
-
-    await fetch('/.netlify/functions/check-abandoned-basket', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userEmail: email })
-    });
-  } catch (err) {
-    console.warn('Abandoned basket check failed:', err);
-  }
-}
     function openCopyryta(){window.location.href='./copyryta.html';}
 
     /* 📧 Support email function */
