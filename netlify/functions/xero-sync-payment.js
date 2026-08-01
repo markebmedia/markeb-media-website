@@ -49,9 +49,10 @@ exports.handler = async (event) => {
     });
 
     await base(INVOICES_TABLE).update(invoiceRecordId, {
-      'Xero Payment Synced': true,
-      'Xero Payment Synced At': new Date().toISOString(),
-      'Status': 'Paid',
+'Xero Payment Synced': true,
+'Xero Payment Synced At': new Date().toISOString(),
+'Status': 'Paid',
+'Paid Date': new Date().toISOString().split('T')[0],
     });
 
     return { statusCode: 200, body: JSON.stringify({ success: true }) };
