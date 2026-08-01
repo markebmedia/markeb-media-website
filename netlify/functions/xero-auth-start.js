@@ -10,9 +10,10 @@ exports.handler = async (event) => {
     'openid',
     'profile',
     'email',
-    'accounting.transactions',   // create/read invoices
-    'accounting.contacts',       // create/read contacts
-    'offline_access',            // required to get a refresh_token
+    'accounting.invoices',
+    'accounting.payments',
+    'accounting.contacts',
+    'offline_access',
   ].join(' ');
 
   // Basic CSRF protection — generate and check this state value.
