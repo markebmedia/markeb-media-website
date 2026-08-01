@@ -93,10 +93,12 @@ exports.handler = async (event) => {
           'Amount': parseFloat(f['Final Price'] || 0),
           'Status': isPaid ? 'Paid' : 'Unpaid',
           'Issued Date': f['Date'] || new Date().toISOString().split('T')[0],
-          'Sent Date': f['Date'] || new Date().toISOString().split('T')[0],
+          'Service': f['Service'] || '',
+          'Shoot Date': f['Date'] || '',
           'Billing Address': `${f['Property Address'] || ''}${f['Postcode'] ? ', ' + f['Postcode'] : ''}`,
           'Is Manual': false,
-          'Notes': 'Auto-created during Xero historical backfill',
+          'Notes': 'Auto-created during Xero historical backfill — client was never actually emailed this invoice',
+          ...(isPaid ? { 'Paid Date': f['Date'] || new Date().toISOString().split('T')[0] } : {}),
         });
         invoiceRecords.push(newRecord);
         created++;
