@@ -1891,6 +1891,10 @@ body {
       <i data-lucide="layers" class="nav-icon" style="width: 20px; height: 20px;"></i>
       Bulk Invoicing
     </div>
+    <div class="nav-item" onclick="showSection('xero-connection')">
+      <i data-lucide="link" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      Xero
+    </div>
   </div>
 
   <div class="nav-section">
@@ -2714,6 +2718,17 @@ body {
   </div>
 
   <div id="bulkInvoiceResultsContainer"></div>
+</div>
+
+<!-- Xero Connection Section -->
+<div class="admin-section" id="xero-connection">
+  <div style="margin-bottom: 24px;">
+    <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Xero</h2>
+    <p style="color: #64748b; font-size: 14px;">Connect Markeb Media's Xero account so invoices and payments sync automatically.</p>
+  </div>
+  <div class="calendar-container" id="xeroStatusContainer" style="max-width: 560px;">
+    <div style="text-align: center; padding: 40px;"><div class="spinner"></div></div>
+  </div>
 </div>
 
 <!-- Invoice Client Detail Panel -->
@@ -6917,6 +6932,16 @@ async function markAsPaid(bookingId) {
     }
     
     alert('✅ Booking marked as paid!');
+
+    const invoiceRecId = await findInvoiceRecordForBooking(bookingId);
+    if (invoiceRecId) {
+      fetch('/.netlify/functions/xero-sync-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invoiceRecordId: invoiceRecId })
+      }).catch(err => console.warn('Xero payment sync failed (non-blocking):', err));
+    }
+
     loadPendingBookings();
     loadBookings();
     loadCalendar();
@@ -6944,6 +6969,16 @@ async function chargeCard(bookingId, bookingRef, amount) {
     
     if (data.success) {
       alert(`✅ Card charged successfully!\n\nBooking: ${data.bookingRef}\nAmount: £${data.amount.toFixed(2)}\n\nConfirmation email sent to customer.`);
+
+      const invoiceRecId = await findInvoiceRecordForBooking(bookingId);
+      if (invoiceRecId) {
+        fetch('/.netlify/functions/xero-sync-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ invoiceRecordId: invoiceRecId })
+        }).catch(err => console.warn('Xero payment sync failed (non-blocking):', err));
+      }
+
       loadPendingBookings();
       loadBookings();
       loadCalendar();
@@ -13147,6 +13182,8 @@ async function recordInvoiceToAirtable(booking, invoiceNum, isPaid, sentTo = {},
     const checkData = await checkRes.json();
     const existing = checkData.records?.[0];
 
+    let xeroTargetId = existing ? existing.id : null;
+
     if (existing) {
       // Only update sent details and status — never touch original client name/email
       await fetch('/.netlify/functions/airtable-proxy', {
@@ -13168,7 +13205,7 @@ async function recordInvoiceToAirtable(booking, invoiceNum, isPaid, sentTo = {},
         })
       });
     } else {
-      await fetch('/.netlify/functions/airtable-proxy', {
+      const createRes = await fetch('/.netlify/functions/airtable-proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -13192,6 +13229,18 @@ async function recordInvoiceToAirtable(booking, invoiceNum, isPaid, sentTo = {},
           }
         })
       });
+      const createData = await createRes.json();
+      xeroTargetId = createData.id || null;
+    }
+
+    // Push to Xero (non-blocking — invoice email has already been sent,
+    // don't let a Xero hiccup break the admin's flow)
+    if (xeroTargetId) {
+      fetch('/.netlify/functions/xero-push-invoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invoiceRecordId: xeroTargetId })
+      }).catch(err => console.warn('Xero push failed (non-blocking):', err));
     }
 
     // Refresh so panel reflects change immediately
@@ -13343,7 +13392,7 @@ async function submitManualInvoice(event) {
     const data = await response.json();
 
     if (data.success) {
-      await fetch('/.netlify/functions/airtable-proxy', {
+      const invoiceCreateRes = await fetch('/.netlify/functions/airtable-proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -13370,6 +13419,15 @@ async function submitManualInvoice(event) {
           }
         })
       });
+      const invoiceCreateData = await invoiceCreateRes.json();
+
+      if (invoiceCreateData.id) {
+        fetch('/.netlify/functions/xero-push-invoice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ invoiceRecordId: invoiceCreateData.id })
+        }).catch(err => console.warn('Xero push failed (non-blocking):', err));
+      }
 
       alert(`✅ Invoice ${invoiceNum} sent to ${clientEmail}!`);
       closeModal('manualInvoiceModal');
@@ -15536,6 +15594,92 @@ document.addEventListener('DOMContentLoaded', function() {
   loadHunterCredits();
   loadSequences();
 });
+
+// ===== XERO CONNECTION =====
+
+async function loadXeroStatus() {
+  const container = document.getElementById('xeroStatusContainer');
+  if (!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:40px;"><div class="spinner"></div></div>';
+
+  try {
+    const res = await fetch('/.netlify/functions/xero-connection-status');
+    const data = await res.json();
+
+    if (data.connected) {
+      container.innerHTML = `
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+          <div style="width:48px;height:48px;background:#d1fae5;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+            <i data-lucide="check-circle" style="width:24px;height:24px;color:#10b981;"></i>
+          </div>
+          <div>
+            <div style="font-weight:700;font-size:16px;color:#0f172a;">Connected to Xero</div>
+            <div style="font-size:13px;color:#64748b;">${data.tenantName || 'Xero organisation'}</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:20px;">
+          ${data.connectedAt ? 'Connected ' + new Date(data.connectedAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : ''}
+        </div>
+        <a href="/.netlify/functions/xero-auth-start" class="btn btn-secondary" style="width:100%;justify-content:center;">
+          <i data-lucide="refresh-cw" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Reconnect
+        </a>
+      `;
+    } else {
+      container.innerHTML = `
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+          <div style="width:48px;height:48px;background:#f1f5f9;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+            <i data-lucide="link-2-off" style="width:24px;height:24px;color:#94a3b8;"></i>
+          </div>
+          <div>
+            <div style="font-weight:700;font-size:16px;color:#0f172a;">Not connected</div>
+            <div style="font-size:13px;color:#64748b;">Invoices won't sync to Xero until this is connected</div>
+          </div>
+        </div>
+        <a href="/.netlify/functions/xero-auth-start" class="btn btn-primary" style="width:100%;justify-content:center;background:#13B5EA;border-color:#13B5EA;">
+          <i data-lucide="link" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Connect to Xero
+        </a>
+      `;
+    }
+    lucide.createIcons();
+  } catch (err) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;">Could not check Xero connection status</div>';
+  }
+}
+
+(function handleXeroRedirectFlags() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('xero') === 'connected') {
+    showAdminToast('✅ Xero connected successfully');
+    window.history.replaceState({}, '', window.location.pathname);
+  } else if (params.get('xero') === 'error') {
+    showAdminToast('❌ Xero connection failed: ' + (params.get('message') || 'unknown error'));
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+})();
+
+const _origShowSectionXero = showSection;
+showSection = function(sectionId) {
+  _origShowSectionXero(sectionId);
+  if (sectionId === 'xero-connection') loadXeroStatus();
+};
+
+async function findInvoiceRecordForBooking(bookingId) {
+  try {
+    const res = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'GET',
+        table: 'Invoices',
+        filterFormula: `{Booking ID} = '${bookingId}'`
+      })
+    });
+    const data = await res.json();
+    return data.records && data.records[0] ? data.records[0].id : null;
+  } catch {
+    return null;
+  }
+}
 
 </script>
 </body>

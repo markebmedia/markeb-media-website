@@ -26,6 +26,8 @@
   schedule = "0 9 * * *"
 [functions."send-abandoned-basket-reminders"]
   schedule = "*/15 * * * *"
+[functions."xero-refresh-token"]
+  schedule = "0 3 * * *"
   
 [[headers]]
   for = "/website/admin-panel.html"
