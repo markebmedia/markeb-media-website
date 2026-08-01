@@ -370,6 +370,57 @@ exports.handler = async (event, context) => {
     const airtableResult = await response.json();
     console.log('Booking created successfully:', bookingRef);
 
+    // ✅ NEW: Auto-create an Invoices record at booking time — Unpaid, Sent: false,
+    // no Sent Date, no email. This uses the same 'Invoices' table and the same
+    // Invoice Number format (INV-MM<ref>) as the admin panel's send-invoice flow,
+    // so when the invoice is later actually sent, recordInvoiceToAirtable() in
+    // admin.html finds this record by Booking Reference and updates it in place
+    // instead of creating a duplicate.
+    try {
+      const invoiceNumber = `INV-MM${bookingRef}`;
+
+      const invoiceUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/Invoices`;
+
+      const invoiceResponse = await fetch(invoiceUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          fields: {
+            'Invoice Number': invoiceNumber,
+            'Booking ID': airtableResult.id,
+            'Booking Reference': bookingRef,
+            'Client Name': bookingData.clientName,
+            'Client Email': bookingData.clientEmail,
+            'Amount': finalPrice,
+            'Status': 'Unpaid',
+            'Issued Date': new Date().toISOString().split('T')[0],
+            'Sent': false,
+            'Service': bookingData.service || '',
+            'Shoot Date': bookingData.date || '',
+            'Line Items JSON': JSON.stringify([
+              { desc: bookingData.service || '', amount: bookingData.basePrice || 0 },
+              ...(bookingData.extraBedroomFee > 0 ? [{ desc: 'Extra bedrooms', amount: bookingData.extraBedroomFee }] : []),
+              ...(bookingData.squareFootageFee > 0 ? [{ desc: 'Large property fee', amount: bookingData.squareFootageFee }] : []),
+              ...(bookingData.addons || []).map(a => ({ desc: a.name, amount: a.price }))
+            ])
+          }
+        })
+      });
+
+      if (!invoiceResponse.ok) {
+        const invoiceErrorData = await invoiceResponse.text();
+        console.error('⚠️ Invoice auto-create failed:', invoiceErrorData);
+      } else {
+        console.log(`✓ Invoice record auto-created: ${invoiceNumber} (Unpaid, Sent: false)`);
+      }
+    } catch (invoiceError) {
+      console.error('Error auto-creating Invoice record:', invoiceError);
+      // Don't fail the booking if invoice creation fails
+    }
+
     // ✅ NEW: Flip the Booking Funnel record to Completed now that the
     // booking has actually been created. Without this, the beforeunload
     // handler in booking.html can't distinguish a genuine abandonment from

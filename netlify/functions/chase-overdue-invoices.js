@@ -60,10 +60,35 @@ async function airtablePatch(table, recordId, fields) {
 
 // ── Invoice email builder (reminder variant) ──────────────────────────────────
 
-function buildReminderEmail({ invoiceNum, clientName, clientEmail, amount, bookingRef, service, shootDate }) {
+function buildReminderEmail({ invoiceNum, clientName, clientEmail, amount, bookingRef, service, shootDate, lineItems }) {
   const exVAT    = parseFloat((amount / 1.2).toFixed(2));
   const vatAmt   = parseFloat((amount - exVAT).toFixed(2));
   const dueLabel = `£${amount.toFixed(2)}`;
+
+  // Prefer the full itemised breakdown (Line Items JSON) when available —
+  // service, add-ons, bedroom/sqft fees, each with its own amount.
+  // Falls back to the old flat Service/Shoot Date summary for older invoice
+  // records created before Line Items JSON was populated on send.
+  const hasLineItems = Array.isArray(lineItems) && lineItems.length > 0;
+
+  const lineItemsRowsHtml = hasLineItems
+    ? lineItems.map(item => {
+        const desc = item.desc || item.description || '';
+        const sub  = item.sub || '';
+        const sub2 = item.sub2 || '';
+        const itemAmount = (item.amount !== null && item.amount !== undefined)
+          ? `£${parseFloat(item.amount).toFixed(2)}`
+          : '';
+        return `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:10px;">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#2d1f00;">${desc}</div>
+            ${sub ? `<div style="font-size:11px;color:#8a6e44;margin-top:2px;">${sub}</div>` : ''}
+            ${sub2 ? `<div style="font-size:11px;color:#8a6e44;">${sub2}</div>` : ''}
+          </div>
+          <div style="font-size:13px;font-family:monospace;color:#2d1f00;white-space:nowrap;">${itemAmount}</div>
+        </div>`;
+      }).join('')
+    : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -98,10 +123,16 @@ function buildReminderEmail({ invoiceNum, clientName, clientEmail, amount, booki
       <!-- Invoice summary -->
       <div style="background:#f0e3c8;border:1.5px solid #e8d5b5;border-radius:10px;padding:20px 24px;margin-bottom:28px;">
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#8a6e44;margin-bottom:14px;">Invoice Summary</div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:${hasLineItems ? '14px' : '8px'};">
           <span style="font-size:13px;color:#6b4f2a;">Invoice number</span>
           <span style="font-size:13px;font-weight:700;color:#2d1f00;font-family:monospace;">${invoiceNum}</span>
         </div>
+
+        ${hasLineItems ? `
+        <div style="border-top:1.5px solid #e8d5b5;border-bottom:1.5px solid #e8d5b5;padding:14px 0;margin-bottom:14px;">
+          ${lineItemsRowsHtml}
+        </div>
+        ` : `
         ${service ? `<div style="display:flex;justify-content:space-between;margin-bottom:8px;">
           <span style="font-size:13px;color:#6b4f2a;">Service</span>
           <span style="font-size:13px;font-weight:600;color:#2d1f00;">${service}</span>
@@ -111,6 +142,8 @@ function buildReminderEmail({ invoiceNum, clientName, clientEmail, amount, booki
           <span style="font-size:13px;font-weight:600;color:#2d1f00;">${shootDate}</span>
         </div>` : ''}
         <div style="border-top:1.5px solid #e8d5b5;margin:12px 0;"></div>
+        `}
+
         <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
           <span style="font-size:13px;color:#6b4f2a;">Subtotal (ex VAT)</span>
           <span style="font-size:13px;font-family:monospace;color:#2d1f00;">£${exVAT.toFixed(2)}</span>
@@ -182,6 +215,8 @@ export default async function handler() {
   // - Auto Chase Sent is not checked
   const filterFormula = `AND(
     {Status} = "Unpaid",
+    {Sent} = TRUE(),
+    {Included In Bulk} != TRUE(),
     {Sent Date} != "",
     {Sent Date} <= "${cutoff}",
     {Auto Chase Sent} != TRUE()
@@ -214,6 +249,16 @@ export default async function handler() {
     const shootDate   = f['Shoot Date'] || '';
     const sentDate    = f['Sent Date'] || '';
 
+    let lineItems = null;
+    if (f['Line Items JSON']) {
+      try {
+        const parsed = JSON.parse(f['Line Items JSON']);
+        if (Array.isArray(parsed) && parsed.length > 0) lineItems = parsed;
+      } catch (err) {
+        console.warn(`[chase-overdue-invoices] Failed to parse Line Items JSON for ${invoiceNum}:`, err.message);
+      }
+    }
+
     if (!clientEmail || !invoiceNum || amount <= 0) {
       console.warn(`[chase-overdue-invoices] Skipping ${record.id} — missing data`);
       results.skipped++;
@@ -225,7 +270,7 @@ export default async function handler() {
 
     // Build and send reminder email via Resend
     try {
-      const html = buildReminderEmail({ invoiceNum, clientName, clientEmail, amount, bookingRef, service, shootDate });
+      const html = buildReminderEmail({ invoiceNum, clientName, clientEmail, amount, bookingRef, service, shootDate, lineItems });
 
       const emailRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',

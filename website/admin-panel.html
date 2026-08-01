@@ -12790,7 +12790,7 @@ async function loadInvoices() {
     const invoicesData = await invoicesRes.json();
     const bookingsData = await bookingsRes.json();
 
-    const airtableInvoices = (invoicesData.records || []).map(r => ({
+    const allAirtableInvoices = (invoicesData.records || []).map(r => ({
   id: r.id,
   invoiceNum: r.fields['Invoice Number'] || '',
   bookingId: r.fields['Booking ID'] || '',
@@ -12803,13 +12803,24 @@ async function loadInvoices() {
   status: r.fields['Status'] || 'Unpaid',
   issuedDate: r.fields['Issued Date'] || '',
   sentDate: r.fields['Sent Date'] || '',
+  shootDate: r.fields['Shoot Date'] || '',
   isManual: r.fields['Is Manual'] === true,
+  isBulk: r.fields['Is Bulk'] === true,
+  includedInvoices: r.fields['Included Invoices'] || [],
+  includedInBulk: r.fields['Included In Bulk'] === true,
   lineItemsJson: r.fields['Line Items JSON'] || '',
   billingAddress: r.fields['Billing Address'] || '',
   source: 'airtable'
 }));
 
-    const existingBookingIds = new Set(airtableInvoices.map(i => i.bookingId));
+    // Individual invoices folded into a bulk wrapper are internal bookkeeping —
+    // the wrapper is what's client-facing and should count toward totals.
+    // Keep the full unfiltered set around for lookups (e.g. the cascade in
+    // markBulkInvoicePaid), but only surface non-included ones in the client list.
+    window.allInvoicesDataUnfiltered = allAirtableInvoices;
+    const airtableInvoices = allAirtableInvoices.filter(i => !i.includedInBulk);
+
+    const existingBookingIds = new Set(allAirtableInvoices.map(i => i.bookingId));
     const derivedInvoices = [];
 
     if (bookingsData.success) {
@@ -13007,6 +13018,33 @@ function openInvoicePanel(client) {
           <i data-lucide="mail" style="width:10px;height:10px;"></i>
           Not yet sent
          </div>`;
+    const bulkBreakdownHtml = inv.isBulk && Array.isArray(inv.includedInvoices) && inv.includedInvoices.length > 0
+      ? (() => {
+          const includedRecords = (window.allInvoicesDataUnfiltered || []).filter(i => inv.includedInvoices.includes(i.id));
+          const rows = includedRecords.map(r => {
+            const rawDate = r.shootDate || r.issuedDate || '';
+            let rDateFmt = '';
+            if (rawDate) {
+              try { rDateFmt = new Date(rawDate + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
+              catch { rDateFmt = rawDate; }
+            }
+            return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:12px;">
+              <span style="color:#334155;">${r.bookingRef || r.invoiceNum}${rDateFmt ? ' · ' + rDateFmt : ''}</span>
+              <span style="font-family:monospace;color:#64748b;">£${r.amount.toFixed(2)}</span>
+            </div>`;
+          }).join('');
+          return `
+            <div style="margin-top:6px;">
+              <span onclick="event.stopPropagation();toggleBulkBreakdown('${inv.id}')" style="font-size:11px;color:#B46100;font-weight:700;cursor:pointer;text-decoration:underline;">
+                Includes ${includedRecords.length} shoot${includedRecords.length !== 1 ? 's' : ''} — view breakdown
+              </span>
+              <div id="bulk-breakdown-${inv.id}" style="display:none;margin-top:8px;padding:10px 12px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;">
+                ${rows || '<div style="font-size:12px;color:#94a3b8;">No details available</div>'}
+              </div>
+            </div>`;
+        })()
+      : '';
+
     const clickAction = isManual ? `openManualInvoiceView('${inv.id}')` : `openInvoiceFromPanel('${inv.bookingId}')`;
     return `
       <div onclick="${clickAction}" style="display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border:2px solid #e2e8f0;border-radius:10px;margin-bottom:10px;cursor:pointer;background:#fff;"
@@ -13020,6 +13058,7 @@ function openInvoicePanel(client) {
           <div style="font-size:12px;color:#64748b;margin-top:2px;">${isManual ? 'Manual invoice' : inv.bookingRef}</div>
           <div style="font-size:11px;color:#94a3b8;margin-top:1px;">${dateFmt}</div>
           ${sentBadge}
+          ${bulkBreakdownHtml}
         </div>
         <div style="text-align:right;flex-shrink:0;">
           <div style="font-weight:700;font-size:14px;color:#0f172a;font-family:monospace;">£${inv.amount.toFixed(2)}</div>
@@ -13032,6 +13071,14 @@ function openInvoicePanel(client) {
         <button onclick="event.stopPropagation();resendManualInvoice('${inv.id}', this)" style="flex:1;padding:8px 12px;background:#3F4D1B;color:#FDF3E2;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">
           <i data-lucide="send" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>Resend
         </button>
+        ${inv.isBulk && !isPaid ? `
+        <button onclick="event.stopPropagation();markBulkInvoicePaid('${inv.id}', this)" style="flex:1;padding:8px 12px;background:#10b981;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">
+          <i data-lucide="check-circle" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>Mark Paid
+        </button>` : ''}
+        ${inv.id && !isPaid ? `
+        <button onclick="event.stopPropagation();deleteInvoice('${inv.id}', this)" style="flex:0 0 auto;padding:8px 12px;background:#fee2e2;color:#991b1b;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">
+          <i data-lucide="trash-2" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>Delete
+        </button>` : ''}
         ` : `
         <button onclick="event.stopPropagation();showInvoiceModal('${inv.bookingId}')" style="flex:1;padding:8px 12px;background:#3F4D1B;color:#FDF3E2;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">
           <i data-lucide="file-text" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>Send Invoice
@@ -13039,6 +13086,10 @@ function openInvoicePanel(client) {
         ${!isPaid ? `
         <button onclick="event.stopPropagation();sendPaymentReminder('${inv.bookingId}', '${invNum}', this)" style="flex:1;padding:8px 12px;background:#ef4444;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">
           <i data-lucide="bell" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>Chase Payment
+        </button>` : ''}
+        ${inv.id && !isPaid ? `
+        <button onclick="event.stopPropagation();deleteInvoice('${inv.id}', this)" style="flex:0 0 auto;padding:8px 12px;background:#fee2e2;color:#991b1b;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">
+          <i data-lucide="trash-2" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>Delete
         </button>` : ''}
         `}
       </div>
@@ -13127,7 +13178,7 @@ async function sendPaymentReminder(bookingId, invoiceNum, btn) {
       await recordInvoiceToAirtable(booking, invoiceNum, false, {
   name: f['Client Name'],
   email: f['Client Email']
-}, reminderBillingAddress);
+}, reminderBillingAddress, lineItems);
       showAdminToast(`✅ Payment reminder sent to ${f['Client Email']}`);
       if (btn) { btn.textContent = '✓ Sent'; btn.style.background = '#10b981'; }
     } else {
@@ -13155,7 +13206,7 @@ function openInvoiceFromPanel(bookingId) {
   win.document.close();
 }
 
-async function recordInvoiceToAirtable(booking, invoiceNum, isPaid, sentTo = {}, billingAddress = '') {
+async function recordInvoiceToAirtable(booking, invoiceNum, isPaid, sentTo = {}, billingAddress = '', lineItems = null) {
   try {
     const f = booking.fields;
     const today = new Date().toISOString().split('T')[0];
@@ -13184,6 +13235,8 @@ async function recordInvoiceToAirtable(booking, invoiceNum, isPaid, sentTo = {},
 
     let xeroTargetId = existing ? existing.id : null;
 
+    const lineItemsField = lineItems ? { 'Line Items JSON': JSON.stringify(lineItems) } : {};
+
     if (existing) {
       // Only update sent details and status — never touch original client name/email
       await fetch('/.netlify/functions/airtable-proxy', {
@@ -13196,10 +13249,14 @@ async function recordInvoiceToAirtable(booking, invoiceNum, isPaid, sentTo = {},
           body: {
             fields: {
               'Status': isPaid ? 'Paid' : 'Unpaid',
+              'Sent': true,
               'Sent Date': today,
               'Sent To Name': sentToName,
               'Sent To Email': sentToEmail,
-              'Billing Address': billingAddress || existing.fields['Billing Address'] || ''
+              'Billing Address': billingAddress || existing.fields['Billing Address'] || '',
+              'Service': f['Service'] || existing.fields['Service'] || '',
+              'Shoot Date': f['Date'] || existing.fields['Shoot Date'] || '',
+              ...lineItemsField
             }
           }
         })
@@ -13222,9 +13279,13 @@ async function recordInvoiceToAirtable(booking, invoiceNum, isPaid, sentTo = {},
               'Sent To Email': sentToEmail,
               'Amount': parseFloat(f['Final Price'] || 0),
               'Status': isPaid ? 'Paid' : 'Unpaid',
+              'Sent': true,
               'Issued Date': today,
               'Sent Date': today,
-              'Billing Address': billingAddress
+              'Billing Address': billingAddress,
+              'Service': f['Service'] || '',
+              'Shoot Date': f['Date'] || '',
+              ...lineItemsField
             }
           }
         })
@@ -13280,6 +13341,7 @@ function handleManualInvoiceClientSelect() {
 }
 
 function showManualInvoiceModal() {
+  bulkInvoiceLinkedRecordIds = null;
   document.getElementById('manualInvoiceForm').reset();
   document.getElementById('manInvLineItems').innerHTML = '';
   manualInvoiceLineCount = 0;
@@ -13392,6 +13454,11 @@ async function submitManualInvoice(event) {
     const data = await response.json();
 
     if (data.success) {
+      const isBulkWrapper = Array.isArray(bulkInvoiceLinkedRecordIds) && bulkInvoiceLinkedRecordIds.length > 0;
+      const bulkFields = isBulkWrapper
+        ? { 'Is Bulk': true, 'Included Invoices': bulkInvoiceLinkedRecordIds }
+        : {};
+
       const invoiceCreateRes = await fetch('/.netlify/functions/airtable-proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -13409,12 +13476,14 @@ async function submitManualInvoice(event) {
               'Sent To Email': clientEmail,
               'Amount': finalPrice,
               'Status': isPaid ? 'Paid' : 'Unpaid',
+              'Sent': true,
               'Issued Date': toLocalDateString(new Date()),
               'Sent Date': toLocalDateString(new Date()),
               'Billing Address': billingAddress,
               'Is Manual': true,
               'Line Items JSON': JSON.stringify(lineItems),
-              'Notes': notes
+              'Notes': notes,
+              ...bulkFields
             }
           }
         })
@@ -13430,6 +13499,7 @@ async function submitManualInvoice(event) {
       }
 
       alert(`✅ Invoice ${invoiceNum} sent to ${clientEmail}!`);
+      bulkInvoiceLinkedRecordIds = null;
       closeModal('manualInvoiceModal');
       loadInvoices();
     } else {
@@ -13448,6 +13518,7 @@ async function submitManualInvoice(event) {
 // ===== BULK INVOICING =====
 
 let bulkInvoiceBookingsData = [];
+let bulkInvoiceLinkedRecordIds = null;
 
 async function populateBulkInvoiceClientsList() {
   const select = document.getElementById('bulkInvClientSelect');
@@ -13568,6 +13639,190 @@ function getBookingLineItems(booking) {
   parsedAddons.forEach(a => lines.push({ desc: `${a.name} — ${fullAddress}`, amount: a.price }));
 
   return lines;
+}
+
+// Deletes an invoice record. If it's a bulk wrapper, first releases every
+// linked individual invoice (Included In Bulk → false) so they return to
+// being normal standalone invoices rather than being orphaned/hidden.
+async function deleteInvoice(invId, btn) {
+  const inv = allInvoicesData.find(i => i.id === invId) || (window.allInvoicesDataUnfiltered || []).find(i => i.id === invId);
+  if (!inv) { alert('Invoice not found'); return; }
+
+  if (inv.status === 'Paid') {
+    alert(`❌ ${inv.invoiceNum} is marked Paid and can't be deleted — this would erase the record that payment was collected.\n\nIf it was marked paid by mistake, correct the Status field directly in Airtable instead.`);
+    return;
+  }
+
+  const isBulkWrapper = inv.isBulk && Array.isArray(inv.includedInvoices) && inv.includedInvoices.length > 0;
+  const confirmMsg = isBulkWrapper
+    ? `Delete bulk invoice ${inv.invoiceNum}?\n\nThe ${inv.includedInvoices.length} individual shoot invoice${inv.includedInvoices.length !== 1 ? 's' : ''} it contains will NOT be deleted — they'll be released back to normal standalone invoices.\n\nThis cannot be undone.`
+    : `Delete invoice ${inv.invoiceNum}?\n\nThis cannot be undone.`;
+
+  if (!confirm(confirmMsg)) return;
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Deleting...'; }
+
+  try {
+    if (isBulkWrapper) {
+      for (const includedId of inv.includedInvoices) {
+        await fetch('/.netlify/functions/airtable-proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            method: 'PATCH',
+            table: 'Invoices',
+            recordId: includedId,
+            body: { fields: { 'Included In Bulk': false } }
+          })
+        });
+      }
+    }
+
+    await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'DELETE',
+        table: 'Invoices',
+        recordId: invId
+      })
+    });
+
+    showAdminToast(`✅ Invoice ${inv.invoiceNum} deleted${isBulkWrapper ? ' — linked invoices released' : ''}`);
+    closeInvoicePanel();
+    await loadInvoices();
+
+  } catch (err) {
+    console.error('Failed to delete invoice:', err);
+    alert('❌ Failed to delete: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Delete'; }
+  }
+}
+
+// Shows/hides the per-shoot breakdown under a bulk wrapper invoice in the panel
+function toggleBulkBreakdown(invoiceId) {
+  const el = document.getElementById(`bulk-breakdown-${invoiceId}`);
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// Marks a bulk wrapper invoice as Paid and automatically cascades that
+// status down to every individual invoice linked via Included Invoices.
+async function markBulkInvoicePaid(wrapperId, btn) {
+  const wrapper = allInvoicesData.find(i => i.id === wrapperId);
+  if (!wrapper) { alert('Invoice not found'); return; }
+
+  if (!confirm(`Mark ${wrapper.invoiceNum} as paid?\n\nThis will also mark all ${(wrapper.includedInvoices || []).length} individual invoices within it as paid.`)) return;
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Updating...'; }
+
+  try {
+    const today = toLocalDateString(new Date());
+
+    // Update the wrapper itself
+    await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'PATCH',
+        table: 'Invoices',
+        recordId: wrapperId,
+        body: { fields: { 'Status': 'Paid', 'Paid Date': today } }
+      })
+    });
+
+    // Cascade to every linked individual invoice
+    const includedIds = wrapper.includedInvoices || [];
+    for (const includedId of includedIds) {
+      await fetch('/.netlify/functions/airtable-proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          method: 'PATCH',
+          table: 'Invoices',
+          recordId: includedId,
+          body: { fields: { 'Status': 'Paid', 'Paid Date': today } }
+        })
+      });
+    }
+
+    showAdminToast(`✅ ${wrapper.invoiceNum} and ${includedIds.length} linked invoice${includedIds.length !== 1 ? 's' : ''} marked paid`);
+    closeInvoicePanel();
+    await loadInvoices();
+
+  } catch (err) {
+    console.error('Failed to mark bulk invoice paid:', err);
+    alert('❌ Failed to update: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Mark Paid'; }
+  }
+}
+
+// Find-or-create the individual invoice record for one booking being folded
+// into a bulk send. Mirrors recordInvoiceToAirtable's upsert-by-Booking-Reference
+// logic, but marks the record as Included In Bulk instead of Sent — the wrapper
+// invoice is what gets sent, chased, and synced to Xero, not this one.
+async function upsertBulkLinkedInvoice(booking) {
+  const f = booking.fields;
+  const bookingRef = f['Booking Reference'] || booking.id.slice(-6).toUpperCase();
+  const lineItems = getBookingLineItems(booking);
+
+  const checkRes = await fetch('/.netlify/functions/airtable-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      method: 'GET',
+      table: 'Invoices',
+      filterFormula: `{Booking Reference} = "${bookingRef}"`
+    })
+  });
+  const checkData = await checkRes.json();
+  const existing = checkData.records?.[0];
+
+  const sharedFields = {
+    'Service': f['Service'] || '',
+    'Shoot Date': f['Date'] || '',
+    'Line Items JSON': JSON.stringify(lineItems),
+    'Included In Bulk': true
+  };
+
+  if (existing) {
+    await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'PATCH',
+        table: 'Invoices',
+        recordId: existing.id,
+        body: { fields: sharedFields }
+      })
+    });
+    return existing.id;
+  } else {
+    const createRes = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: 'POST',
+        table: 'Invoices',
+        body: {
+          fields: {
+            'Invoice Number': `INV-MM${bookingRef}`,
+            'Booking ID': booking.id,
+            'Booking Reference': bookingRef,
+            'Client Name': f['Client Name'] || '',
+            'Client Email': f['Client Email'] || '',
+            'Amount': parseFloat(f['Final Price'] || 0),
+            'Status': 'Unpaid',
+            'Sent': false,
+            'Issued Date': toLocalDateString(new Date()),
+            ...sharedFields
+          }
+        }
+      })
+    });
+    const createData = await createRes.json();
+    return createData.id || null;
+  }
 }
 
 async function loadBulkInvoiceBookings() {
@@ -13704,9 +13959,28 @@ function toggleAllBulkInvoiceBookings(state) {
 
 // Reuses your existing Manual Invoice modal — same branding, same send-invoice
 // call, same Airtable recording — just pre-filled with the combined lines.
-function generateBulkInvoiceFromSelected(clientName, clientEmail) {
+async function generateBulkInvoiceFromSelected(clientName, clientEmail) {
   const selected = bulkInvoiceBookingsData.filter(b => b.selected);
   if (selected.length === 0) { alert('Please select at least one booking'); return; }
+
+  showAdminToast(`Linking ${selected.length} booking${selected.length !== 1 ? 's' : ''}...`);
+
+  // Upsert each selected booking's individual invoice record first, marking
+  // it Included In Bulk. This never skips a booking for lacking a prior
+  // record — it creates one on the fly (e.g. for bookings made before
+  // create-booking.js started auto-creating invoices).
+  const linkedIds = [];
+  for (const b of selected) {
+    const booking = allBookings.find(x => x.id === b.id);
+    if (!booking) continue;
+    try {
+      const recId = await upsertBulkLinkedInvoice(booking);
+      if (recId) linkedIds.push(recId);
+    } catch (err) {
+      console.error(`Failed to link invoice for booking ${b.ref}:`, err);
+    }
+  }
+  bulkInvoiceLinkedRecordIds = linkedIds;
 
   document.getElementById('manualInvoiceForm').reset();
   document.getElementById('manInvLineItems').innerHTML = '';
@@ -14480,7 +14754,7 @@ async function emailInvoice(bookingId, btn, overrides = {}) {
       await recordInvoiceToAirtable(booking, invoiceNum, isPaid, {
   name: overrides.overrideName || f['Client Name'],
   email: overrides.primaryEmail || f['Client Email']
-}, overrides.billingAddress || '');
+}, overrides.billingAddress || '', lineItems);
       closeInvoiceModal();
     } else {
       alert(`❌ Failed to send: ${data.error || 'Unknown error'}`);
