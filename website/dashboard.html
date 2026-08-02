@@ -5727,34 +5727,50 @@ function ghDeliveryCardHTML(c) {
     : null;
 
   const isComplete  = c.bookingStatus === 'Complete';
-  const ribbonStyle = isComplete
-    ? 'background: linear-gradient(90deg, #10b981, #34d399);'
-    : 'background: linear-gradient(90deg, #B46100, #e07b00);';
+  const isLocked    = !!c.locked;
 
-  const badgeHTML = isComplete
-    ? `<span class="gh-badge gh-badge-delivered">● Complete</span>`
-    : `<span class="gh-badge" style="background:#fff3e0;color:#7a3e00;border:1.5px solid #B46100;">● Ready for Delivery</span>`;
+  const ribbonStyle = isLocked
+    ? 'background: linear-gradient(90deg, #94a3b8, #cbd5e1);'
+    : isComplete
+      ? 'background: linear-gradient(90deg, #10b981, #34d399);'
+      : 'background: linear-gradient(90deg, #B46100, #e07b00);';
+
+  const badgeHTML = isLocked
+    ? `<span class="gh-badge" style="background:#f1f5f9;color:#64748b;border:1.5px solid #cbd5e1;"><i data-lucide="lock" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:4px;"></i>Payment Required</span>`
+    : isComplete
+      ? `<span class="gh-badge gh-badge-delivered">● Complete</span>`
+      : `<span class="gh-badge" style="background:#fff3e0;color:#7a3e00;border:1.5px solid #B46100;">● Ready for Delivery</span>`;
 
   // Also show review info if this delivery card has a review record
   const reviewPanel = (c.hasReview && c.reviewStatus === 'Sent to Editors')
     ? `<div class="gh-sent-banner" style="margin:0 20px 16px;">${ghCheckIcon()} Content was reviewed and sent to our editors</div>`
     : '';
 
-  const downloadSection = c.deliveryLink
+  const downloadSection = isLocked
     ? `<div style="padding: 0 20px 20px;">
-         <p style="font-size:13px;color:#64748b;margin-bottom:14px;line-height:1.6;">
-           Your edited content is ready. Click below to access your files.
-         </p>
-         <a href="${ghEsc(c.deliveryLink)}" target="_blank" rel="noopener" class="gh-download-btn">
-           ${ghDownloadIcon()} Download Your Files
+         <div style="background:#fff8ee;border:1.5px solid #fcd34d;border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:13px;color:#92400e;line-height:1.6;">
+           <strong style="display:flex;align-items:center;gap:6px;margin-bottom:4px;"><i data-lucide="alert-circle" style="width:14px;height:14px;"></i> Invoice outstanding</strong>
+           ${ghEsc(c.lockReason || 'Your content is ready, but your invoice is still outstanding. Please settle your invoice to unlock your download link.')}
+         </div>
+         <a href="#" onclick="showSection('payments'); return false;" class="gh-download-btn" style="background:linear-gradient(135deg,#B46100,#8a4a00);">
+           <i data-lucide="credit-card" style="width:16px;height:16px;"></i> View &amp; Pay Invoice
          </a>
        </div>`
-    : `<div style="padding: 0 20px 20px;">
-         <div class="gh-delivery-locked"><i data-lucide="lock" style="width:14px;height:14px;"></i> Delivery link will appear here shortly</div>
-       </div>`;
+    : c.deliveryLink
+      ? `<div style="padding: 0 20px 20px;">
+           <p style="font-size:13px;color:#64748b;margin-bottom:14px;line-height:1.6;">
+             Your edited content is ready. Click below to access your files.
+           </p>
+           <a href="${ghEsc(c.deliveryLink)}" target="_blank" rel="noopener" class="gh-download-btn">
+             ${ghDownloadIcon()} Download Your Files
+           </a>
+         </div>`
+      : `<div style="padding: 0 20px 20px;">
+           <div class="gh-delivery-locked"><i data-lucide="lock" style="width:14px;height:14px;"></i> Delivery link will appear here shortly</div>
+         </div>`;
 
   return `
-    <div class="gh-card gh-card-delivered" id="gh-card-${c.id}">
+    <div class="gh-card gh-card-delivered" id="gh-card-${c.id}" style="${isLocked ? 'opacity:0.92;' : ''}">
       <div class="gh-card-ribbon" style="${ribbonStyle}"></div>
       <div class="gh-card-top">
         <div class="gh-card-address">${ghEsc(c.projectAddress)}</div>

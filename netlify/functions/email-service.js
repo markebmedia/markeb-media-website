@@ -30,6 +30,25 @@ async function getCreatorEmailByName(specialistName) {
   }
 }
 
+// Checks the "Bulk Invoice Client" toggle on Markeb Media Users — this is
+// the end-of-month client flag. EOM clients get content unlocked immediately
+// regardless of invoice status.
+async function isEOMClientByEmail(email) {
+  if (!email) return false;
+  try {
+    const records = await airtableBase('Markeb Media Users')
+      .select({
+        filterByFormula: `LOWER({Email}) = '${email.toLowerCase().replace(/'/g, "\\'")}'`,
+        maxRecords: 1
+      })
+      .firstPage();
+    return !!(records.length && records[0].fields['Bulk Invoice Client'] === true);
+  } catch (err) {
+    console.error('Error checking EOM/Bulk Invoice client status:', err);
+    return false;
+  }
+}
+
 const FROM_EMAIL = 'Markeb Media <commercial@markebmedia.com>';
 const BCC_EMAIL = 'commercial@markebmedia.com';
 const SEQUENCE_CC_EMAIL = 'christian.worrell@markebmedia.com';
@@ -1430,6 +1449,80 @@ async function sendAbandonedBasketEmail(session) {
   });
 }
 
+// 12b. Content Ready Notification — gated by payment status unless the
+// client is flagged Bulk Invoice / end-of-month.
+async function sendContentReadyEmail(booking) {
+  const manageUrl = `${SITE_URL}${MANAGE_BOOKING_PATH}?ref=${booking.bookingRef}&email=${encodeURIComponent(booking.clientEmail)}`;
+  const isPaid = (booking.paymentStatus || '').toLowerCase() === 'paid';
+  const isEOM = isPaid ? false : await isEOMClientByEmail(booking.clientEmail);
+  const unlocked = isPaid || isEOM;
+
+  const content = unlocked ? `
+    <h2>🎉 Your Content is Ready!</h2>
+    <p>Hi ${booking.clientName},</p>
+    <p>Great news — your content for <strong>${booking.propertyAddress || booking.bookingRef}</strong> has been edited and is ready to download.</p>
+
+    <div class="booking-details">
+      <div class="detail-row">
+        <span class="detail-label">Booking Reference</span>
+        <span class="detail-value">${booking.bookingRef}</span>
+      </div>
+      ${booking.service ? `
+      <div class="detail-row">
+        <span class="detail-label">Service</span>
+        <span class="detail-value">${booking.service}</span>
+      </div>` : ''}
+    </div>
+
+    <center>
+      ${getButtonHtml(booking.deliveryLink, 'Download Your Content', 280)}
+    </center>
+
+    <p>You can also access all your content anytime from your dashboard.</p>
+    <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+  ` : `
+    <h2>🎉 Your Content is Ready!</h2>
+    <p>Hi ${booking.clientName},</p>
+    <p>Your content for <strong>${booking.propertyAddress || booking.bookingRef}</strong> has been edited and is waiting for you.</p>
+
+    <div class="alert alert-warning">
+      <strong>💳 Payment Required to Unlock</strong><br>
+      Your invoice for this booking is still outstanding${booking.totalPrice ? ` (£${booking.totalPrice.toFixed(2)})` : ''}. Your download link will unlock automatically once payment is received.
+    </div>
+
+    <div class="booking-details">
+      <div class="detail-row">
+        <span class="detail-label">Booking Reference</span>
+        <span class="detail-value">${booking.bookingRef}</span>
+      </div>
+      ${booking.service ? `
+      <div class="detail-row">
+        <span class="detail-label">Service</span>
+        <span class="detail-value">${booking.service}</span>
+      </div>` : ''}
+    </div>
+
+    <center>
+      ${getButtonHtml(manageUrl, 'View & Pay Invoice', 280)}
+    </center>
+
+    <p>If you believe this is a mistake or have already paid, just reply to this email and we'll sort it straight away.</p>
+    <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+  `;
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: booking.clientEmail,
+    bcc: BCC_EMAIL,
+    subject: unlocked
+      ? `Your Content is Ready — ${booking.bookingRef}`
+      : `Your Content is Ready — Payment Required — ${booking.bookingRef}`,
+    html: getEmailLayout(content)
+  });
+
+  return { unlocked };
+}
+
 // 12. Generic Email (used by the drip sequence sender — subject/body already merged)
 async function sendGenericEmail({ to, subject, html }) {
   const wrappedHtml = html.includes('<html') ? html : getEmailLayout(html);
@@ -1458,5 +1551,7 @@ module.exports = {
   sendTimeRequestDecline,
   sendEpcPartnerNotification,
   sendGenericEmail,
-  sendAbandonedBasketEmail
+  sendAbandonedBasketEmail,
+  isEOMClientByEmail,
+  sendContentReadyEmail
 };

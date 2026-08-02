@@ -35,6 +35,51 @@ function normaliseAddress(str) {
 // Statuses that mean content is ready or complete
 const DELIVERY_STATUSES = ['Ready for Delivery', 'Complete'];
 
+// Checks the "Bulk Invoice Client" toggle on Markeb Media Users — this is
+// the end-of-month client flag. EOM clients get delivery links unlocked
+// immediately regardless of invoice status.
+async function isEOMClientByEmail(email) {
+  if (!email) return false;
+  try {
+    const formula = encodeURIComponent(`LOWER({Email}) = "${email.toLowerCase().trim()}"`);
+    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent('Markeb Media Users')}?filterByFormula=${formula}&maxRecords=1`;
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${AIRTABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    const rec = data.records && data.records[0];
+    return !!(rec && rec.fields && rec.fields['Bulk Invoice Client'] === true);
+  } catch (err) {
+    console.error('Error checking EOM/Bulk Invoice client status:', err);
+    return false;
+  }
+}
+
+// "Active Bookings" own Payment Status field is only a snapshot written at
+// creation time — it never gets updated when admin later marks a booking
+// as Paid (that only writes to the main "Bookings" table). So instead of
+// trusting the stale field, we fetch live Payment Status from "Bookings"
+// for this client, keyed by Booking Reference, and use that as truth.
+async function fetchLivePaymentStatuses(emailLower) {
+  const map = {}; // Booking Reference -> live Payment Status
+  try {
+    const formula = encodeURIComponent(`LOWER({Client Email}) = "${emailLower}"`);
+    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent('Bookings')}?filterByFormula=${formula}`;
+    const records = await fetchAllRecords(url);
+    records.forEach((r) => {
+      const ref = r.fields['Booking Reference'];
+      if (ref) map[ref] = r.fields['Payment Status'] || null;
+    });
+  } catch (err) {
+    console.error('Error fetching live payment statuses from Bookings:', err);
+  }
+  return map;
+}
+
 exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -58,6 +103,13 @@ exports.handler = async (event) => {
     }
 
     const emailLower = userEmail.toLowerCase().trim();
+
+    // Check EOM status once per request — applies to all bookings for this client
+    const isEOMClient = await isEOMClientByEmail(emailLower);
+
+    // Live Payment Status from the main Bookings table, keyed by Booking Reference —
+    // this is the source of truth, not the stale snapshot on Active Bookings
+    const livePaymentStatuses = await fetchLivePaymentStatuses(emailLower);
 
     // ── 1. Fetch ALL bookings for this client (primary source) ─────────
     const bookingsFormula = encodeURIComponent(
@@ -96,6 +148,17 @@ exports.handler = async (event) => {
       const review     = reviewsByAddress[addressKey] || null;
       const status     = f['Status'] || 'Booked';
 
+      // ── PAYMENT GATE ──
+      // Prefer the live status from Bookings (matched via Booking ID ->
+      // Booking Reference). Fall back to the Active Bookings snapshot
+      // only if no live match was found (e.g. legacy/manual records).
+      const bookingRef = f['Booking ID'] || null;
+      const livePaymentStatus = bookingRef && Object.prototype.hasOwnProperty.call(livePaymentStatuses, bookingRef)
+        ? livePaymentStatuses[bookingRef]
+        : undefined;
+      const paymentStatus = livePaymentStatus !== undefined ? livePaymentStatus : (f['Payment Status'] || null);
+      const unlocked = !paymentStatus || String(paymentStatus).trim().toLowerCase() === 'paid' || isEOMClient;
+
       const card = {
         id:             record.id,
         projectAddress: f['Project Address']  || 'Unnamed Project',
@@ -103,8 +166,10 @@ exports.handler = async (event) => {
         serviceType:    f['Service Type']     || '',
         shootDate:      f['Shoot Date']       || null,
         bookingStatus:  status,
-        deliveryLink:   f['Delivery Link']    || null,
+        deliveryLink:   unlocked ? (f['Delivery Link'] || null) : null,
         trackingCode:   f['Tracking Code']    || null,
+        locked:         !unlocked,
+        lockReason:     !unlocked ? 'Your content is ready, but your invoice is still outstanding. Please settle your invoice to unlock your download link.' : null,
         // Review panel — only populated when a Client Reviews record exists
         hasReview:      !!review,
         reviewId:       review ? review.id              : null,

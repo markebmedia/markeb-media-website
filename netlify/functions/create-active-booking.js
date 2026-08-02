@@ -74,6 +74,19 @@ async function createActiveBooking(bookingData) {
     // Step 3: Create Active Bookings record in Airtable
     console.log('Creating Active Bookings record...');
 
+    // Normalise Payment Status to match the exact Single Select options on
+    // both "Bookings" and "Active Bookings" (Pending, Processing, Paid,
+    // Refunded) — anything unrecognised falls back to "Pending" so it never
+    // silently unlocks content or creates a stray option in Airtable.
+    const VALID_PAYMENT_STATUSES = ['Pending', 'Processing', 'Paid', 'Refunded'];
+    const normalisedPaymentStatus = (() => {
+      const raw = String(bookingData.paymentStatus || '').trim();
+      const match = VALID_PAYMENT_STATUSES.find(
+        (opt) => opt.toLowerCase() === raw.toLowerCase()
+      );
+      return match || 'Pending';
+    })();
+
     const activeBookingRecord = {
       fields: {
         'Project Address': `${sanitizedAddress}, ${bookingData.postcode}`,
@@ -88,7 +101,7 @@ async function createActiveBooking(bookingData) {
         'Phone Number': bookingData.clientPhone || '',
         'Booking ID': bookingData.bookingRef,
         // Optional additional fields if they exist in Active Bookings:
-        'Payment Status': bookingData.paymentStatus,
+        'Payment Status': normalisedPaymentStatus,
         'Region': bookingData.region,
         'Media Specialist': bookingData.mediaSpecialist,
       }
