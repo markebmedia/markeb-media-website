@@ -109,19 +109,28 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // 3. Get booking points from Acuity
-    const acuityResponse = await fetch(`${process.env.URL || 'http://localhost:8888'}/.netlify/functions/acuity-data`, {
+    // 3. Get booking points from our own Bookings table — Acuity was
+    // migrated away from; this mirrors the same calculation already used
+    // in admin.html's redeemPoints() and dashboard.html's loadAcuityMetrics()
+    const bookingsResponse = await fetch(`${process.env.URL || 'http://localhost:8888'}/.netlify/functions/admin-bookings`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userEmail: userEmail })
+      body: JSON.stringify({ search: userEmail })
     });
 
-    if (!acuityResponse.ok) {
-      throw new Error('Failed to fetch Acuity data');
+    if (!bookingsResponse.ok) {
+      throw new Error('Failed to fetch bookings data');
     }
 
-    const acuityData = await acuityResponse.json();
-    const bookingPoints = Math.floor(acuityData.totalInvestment ?? 0);
+    const bookingsResult = await bookingsResponse.json();
+    let totalInvestment = 0;
+    if (bookingsResult.success && bookingsResult.bookings) {
+      totalInvestment = bookingsResult.bookings
+        .filter(b => b.fields['Client Email']?.toLowerCase() === userEmail.toLowerCase())
+        .filter(b => b.fields['Payment Status'] === 'Paid' && b.fields['Booking Status'] !== 'Cancelled')
+        .reduce((sum, booking) => sum + (booking.fields['Final Price'] || 0), 0);
+    }
+    const bookingPoints = Math.floor(totalInvestment);
 
     // 4. Get manual points AND last redemption baseline from Airtable
     const pointsData = await fetch(`${process.env.URL || 'http://localhost:8888'}/.netlify/functions/get-manual-points`, {
