@@ -73,6 +73,36 @@ async function sendFailedPaymentInvoice(fields, reason) {
   console.log('✅ Failed payment invoice email sent to', fields['Client Email']);
 }
 
+// Active Bookings keeps its own Payment Status snapshot that never
+// auto-syncs from Bookings — this mirrors the fix already applied in
+// track-content.js / get-client-gallery.js (read side) and admin.html's
+// markAsPaid() (write side), so charge-card.js doesn't leave the
+// snapshot stale after a successful or failed card charge.
+async function syncActiveBookingPaymentStatus(bookingRef, status) {
+  if (!bookingRef) return;
+  try {
+    const safeRef = String(bookingRef).trim().toLowerCase();
+    const records = await base('Active Bookings')
+      .select({
+        filterByFormula: `LOWER(TRIM({Booking ID}))='${safeRef.replace(/'/g, "\\'")}'`,
+        maxRecords: 1
+      })
+      .firstPage();
+
+    if (records && records[0]) {
+      await base('Active Bookings').update(records[0].id, { 'Payment Status': status });
+      console.log(`✅ Active Bookings synced to "${status}" for ${bookingRef}`);
+    } else {
+      console.warn(`⚠️ No matching Active Bookings record found for "${bookingRef}" — snapshot not synced`);
+    }
+  } catch (syncErr) {
+    // Non-blocking — Bookings is the source of truth read by
+    // track-content.js / get-client-gallery.js, so a sync failure here
+    // doesn't break the payment gate, just leaves the snapshot stale.
+    console.warn('Active Bookings sync failed (non-blocking):', syncErr.message);
+  }
+}
+
 exports.handler = async (event, context) => {
   console.log('=== Charge Card Function ===');
   
@@ -276,6 +306,7 @@ exports.handler = async (event, context) => {
       'Stripe Payment Intent ID': paymentIntent.id,
       'Payment Status': 'Processing'
     });
+    await syncActiveBookingPaymentStatus(fields['Booking Reference'], 'Processing');
 
     console.log('✅ Intent ID saved to Airtable - now confirming payment...');
 
@@ -300,6 +331,7 @@ exports.handler = async (event, context) => {
       'Price Ex VAT': parseFloat((finalPrice / 1.2).toFixed(2)),
       'VAT Amount': parseFloat((finalPrice - finalPrice / 1.2).toFixed(2))
     });
+    await syncActiveBookingPaymentStatus(fields['Booking Reference'], 'Paid');
 
     console.log('✅ Booking updated - Payment Status: Paid');
 
@@ -446,6 +478,7 @@ if (process.env.RESEND_API_KEY) {
         });
         const failedBooking = await base('Bookings').find(parsedBody.bookingId).catch(() => null);
         if (failedBooking) {
+          await syncActiveBookingPaymentStatus(failedBooking.fields['Booking Reference'], 'Pending');
           await sendFailedPaymentInvoice(failedBooking.fields, error.message);
         }
       } catch (emailErr) {
@@ -472,6 +505,7 @@ if (process.env.RESEND_API_KEY) {
         });
         const failedBooking = await base('Bookings').find(parsedBody.bookingId).catch(() => null);
         if (failedBooking) {
+          await syncActiveBookingPaymentStatus(failedBooking.fields['Booking Reference'], 'Pending');
           await sendFailedPaymentInvoice(failedBooking.fields, 'Your card requires additional verification to complete payment.');
         }
       } catch (emailErr) {

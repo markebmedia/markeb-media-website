@@ -11,6 +11,66 @@ const SITE_URL = 'https://markebmedia.com';
 const LOGO_URL = 'https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png';
 const DASHBOARD_URL = 'https://markebmedia.com/login';
 
+// ===== PAYMENT GATE =====
+// This webhook (fired by the Airtable "Ready for Delivery" automation) was
+// never checking payment status at all before sending the delivery links —
+// unlike the dashboard/tracking-page paths, which do. This closes that gap:
+// look up the Active Bookings record by Tracking Code to get its Booking ID,
+// then check the live Payment Status on Bookings (source of truth), falling
+// back to an EOM/Bulk Invoice client check before deciding to lock.
+async function fetchLivePaymentGateStatus(trackingCode, clientEmail) {
+  const token = process.env.AIRTABLE_API_KEY;
+  const baseId = process.env.AIRTABLE_BASE_ID;
+  if (!token || !baseId || !trackingCode) {
+    // Fail closed on config errors — better to under-deliver than leak
+    // unpaid content because env vars were missing.
+    return { unlocked: false, reason: 'config' };
+  }
+
+  try {
+    const safeCode = String(trackingCode).trim().replace(/'/g, "\\'");
+    const activeUrl = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent('Active Bookings')}?maxRecords=1&filterByFormula=${encodeURIComponent(`LOWER(TRIM({Tracking Code}))='${safeCode.toLowerCase()}'`)}`;
+    const activeRes = await fetch(activeUrl, { headers: { Authorization: `Bearer ${token}` } });
+    const activeData = activeRes.ok ? await activeRes.json() : null;
+    const activeRecord = activeData?.records?.[0];
+    const bookingRef = activeRecord?.fields?.['Booking ID'] || null;
+
+    let paymentStatus = activeRecord?.fields?.['Payment Status'] || null;
+
+    if (bookingRef) {
+      const safeRef = String(bookingRef).trim().replace(/'/g, "\\'");
+      const formula = `OR(LOWER(TRIM({Booking Reference}))='${safeRef.toLowerCase()}', LOWER(TRIM({Booking ID}))='${safeRef.toLowerCase()}')`;
+      const bookingsUrl = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent('Bookings')}?maxRecords=1&filterByFormula=${encodeURIComponent(formula)}`;
+      const bookingsRes = await fetch(bookingsUrl, { headers: { Authorization: `Bearer ${token}` } });
+      if (bookingsRes.ok) {
+        const bookingsData = await bookingsRes.json();
+        const liveRec = bookingsData?.records?.[0];
+        if (liveRec) paymentStatus = liveRec.fields?.['Payment Status'] || null;
+      }
+    }
+
+    const isPaid = !!paymentStatus && String(paymentStatus).trim().toLowerCase() === 'paid';
+
+    let isEOM = false;
+    if (!isPaid && clientEmail) {
+      const safeEmail = String(clientEmail).trim().replace(/'/g, "\\'");
+      const usersUrl = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent('Markeb Media Users')}?maxRecords=1&filterByFormula=${encodeURIComponent(`LOWER(TRIM({Email}))='${safeEmail.toLowerCase()}'`)}`;
+      const usersRes = await fetch(usersUrl, { headers: { Authorization: `Bearer ${token}` } });
+      if (usersRes.ok) {
+        const usersData = await usersRes.json();
+        const userRec = usersData?.records?.[0];
+        isEOM = !!(userRec && userRec.fields?.['Bulk Invoice Client'] === true);
+      }
+    }
+
+    return { unlocked: isPaid || isEOM, paymentStatus };
+  } catch (err) {
+    console.error('Payment gate lookup failed in send-progress-update:', err);
+    // Fail closed — a lookup error should never accidentally unlock content.
+    return { unlocked: false, reason: 'error' };
+  }
+}
+
 exports.handler = async (event, context) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -71,7 +131,18 @@ exports.handler = async (event, context) => {
     body: JSON.stringify({ error: 'Delivery link or Vimeo link required for Ready for Delivery status' })
   };
 }
-        await sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, vimeoLink, projectAddress, email);
+        {
+          const gate = await fetchLivePaymentGateStatus(trackingCode, email);
+          await sendReadyForDeliveryEmail(
+            customerName,
+            trackingCode,
+            gate.unlocked ? deliveryLink : null,
+            gate.unlocked ? vimeoLink : null,
+            projectAddress,
+            email,
+            gate.unlocked
+          );
+        }
         emailSent = true;
         break;
 
@@ -335,7 +406,7 @@ async function sendQualityControlEmail(customerName, trackingCode, projectAddres
 }
 
 // 3. Ready for Delivery Status Email
-async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, vimeoLink, projectAddress, email) {
+async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, vimeoLink, projectAddress, email, unlocked = true) {
   const videoBlock = vimeoLink ? `
     <div class="alert alert-success">
       <strong>🎬 Your Video Link:</strong><br>
@@ -349,12 +420,19 @@ async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLin
       <a href="${deliveryLink}" style="color: #3F4D1B; font-weight: 700; font-size: 15px; word-break: break-all;">${deliveryLink}</a>
     </div>` : '';
 
+  const paymentRequiredBlock = !unlocked ? `
+    <div class="alert alert-warning">
+      <strong>💳 Payment Required to Unlock</strong><br>
+      Your content is ready, but your invoice is still outstanding. Please settle your invoice to unlock your download link — you can do this from your dashboard.
+    </div>` : '';
+
   const content = `
-    <h2>🎉 Your Content is Now Ready!</h2>
+    <h2>🎉 Your Content is ${unlocked ? 'Now Ready!' : 'Ready — Payment Required'}</h2>
     <p>Hi ${customerName},</p>
 
     <p>Your content for <strong>${projectAddress}</strong> is now ready! 🎉</p>
 
+    ${paymentRequiredBlock}
     ${videoBlock}
     ${downloadBlock}
 
@@ -382,7 +460,9 @@ async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLin
     from: FROM_EMAIL,
     to: email,
     bcc: BCC_EMAIL,
-    subject: `Your Content is Ready! - ${projectAddress}`,
+    subject: unlocked
+      ? `Your Content is Ready! - ${projectAddress}`
+      : `Your Content is Ready — Payment Required — ${projectAddress}`,
     html: emailHtml
   });
 }

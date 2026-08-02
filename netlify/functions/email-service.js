@@ -1449,11 +1449,39 @@ async function sendAbandonedBasketEmail(session) {
   });
 }
 
+// Live Payment Status lookup against Bookings — the table's own snapshot
+// (whatever gets passed in as booking.paymentStatus) can be stale if the
+// caller sourced it from Active Bookings, same issue fixed in
+// track-content.js / get-client-gallery.js. This makes the email gate
+// self-sufficient rather than trusting the caller's value.
+async function fetchLiveBookingPaymentStatusByRef(bookingRef) {
+  if (!bookingRef) return null;
+  try {
+    const safeRef = String(bookingRef).trim().toLowerCase();
+    const records = await airtableBase('Bookings')
+      .select({
+        filterByFormula: `OR(LOWER(TRIM({Booking Reference}))='${safeRef.replace(/'/g, "\\'")}', LOWER(TRIM({Booking ID}))='${safeRef.replace(/'/g, "\\'")}')`,
+        maxRecords: 1
+      })
+      .firstPage();
+    return records.length ? (records[0].fields['Payment Status'] || null) : null;
+  } catch (err) {
+    console.error('Error fetching live Payment Status for content-ready email:', err);
+    return null;
+  }
+}
+
 // 12b. Content Ready Notification — gated by payment status unless the
 // client is flagged Bulk Invoice / end-of-month.
 async function sendContentReadyEmail(booking) {
   const manageUrl = `${SITE_URL}${MANAGE_BOOKING_PATH}?ref=${booking.bookingRef}&email=${encodeURIComponent(booking.clientEmail)}`;
-  const isPaid = (booking.paymentStatus || '').toLowerCase() === 'paid';
+
+  // Prefer a live lookup against Bookings over whatever the caller passed in —
+  // don't trust booking.paymentStatus if it was sourced from a stale snapshot.
+  const livePaymentStatus = await fetchLiveBookingPaymentStatusByRef(booking.bookingRef);
+  const effectivePaymentStatus = livePaymentStatus !== null ? livePaymentStatus : booking.paymentStatus;
+
+  const isPaid = (effectivePaymentStatus || '').toLowerCase() === 'paid';
   const isEOM = isPaid ? false : await isEOMClientByEmail(booking.clientEmail);
   const unlocked = isPaid || isEOM;
 

@@ -6930,6 +6930,51 @@ async function markAsPaid(bookingId) {
       console.error('Airtable error:', data);
       throw new Error(data.error?.message || 'Failed to update payment status');
     }
+
+    // ✅ Bookings.Payment Status is the source of truth, but Active Bookings
+    // keeps its own snapshot that never auto-syncs. Find the matching
+    // Active Bookings record (Booking ID == this booking's Booking Reference,
+    // normalised the same way as the read-side fix in get-client-gallery.js
+    // and track-content.js) and patch it too, so both tables agree
+    // immediately instead of relying on a manual backfill later.
+    try {
+      const bookingRef = booking.fields['Booking Reference'];
+      if (bookingRef) {
+        const safeRef = String(bookingRef).trim().replace(/'/g, "\\'");
+        const lookupRes = await fetch('/.netlify/functions/airtable-proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            method: 'GET',
+            table: 'Active Bookings',
+            filterFormula: `LOWER(TRIM({Booking ID}))='${safeRef.toLowerCase()}'`
+          })
+        });
+        const lookupData = await lookupRes.json();
+        const activeRecord = lookupData.records && lookupData.records[0];
+
+        if (activeRecord) {
+          await fetch('/.netlify/functions/airtable-proxy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              method: 'PATCH',
+              table: 'Active Bookings',
+              recordId: activeRecord.id,
+              body: { fields: { 'Payment Status': 'Paid' } }
+            })
+          });
+        } else {
+          console.warn(`No matching Active Bookings record found for Booking Reference "${bookingRef}" — snapshot not synced.`);
+        }
+      }
+    } catch (syncErr) {
+      // Non-blocking — Bookings is already updated and is the source of
+      // truth read by track-content.js / get-client-gallery.js, so a
+      // failure here doesn't break the payment gate, just leaves the
+      // Active Bookings snapshot stale until next backfill.
+      console.warn('Active Bookings sync failed (non-blocking):', syncErr);
+    }
     
     alert('✅ Booking marked as paid!');
 
