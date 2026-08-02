@@ -361,7 +361,7 @@ async function sendEditingEmail(customerName, trackingCode, projectAddress, emai
     <p>As an added benefit, you can track every stage of your marketing through your personalised dashboard giving you complete visibility from shoot to delivery:</p>
 
     <center>
-      <a href="${DASHBOARD_URL}" class="button">Track Your Project</a>
+      ${getButtonHtml(DASHBOARD_URL, 'Track Your Project', 280)}
     </center>
 
     <div class="alert alert-info">
@@ -400,7 +400,7 @@ async function sendQualityControlEmail(customerName, trackingCode, projectAddres
     <p>You have exclusive access to your personalised dashboard where you can track your marketing progress, request revisions, and view your content calendar:</p>
 
     <center>
-      <a href="${DASHBOARD_URL}" class="button">Track Your Project</a>
+      ${getButtonHtml(DASHBOARD_URL, 'Track Your Project', 280)}
     </center>
 
     <div class="alert alert-info">
