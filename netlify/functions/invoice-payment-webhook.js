@@ -59,6 +59,39 @@ exports.handler = async (event) => {
 
   console.log(`Processing invoice payment: ${invoiceNum} — £${amountPaid} — ${clientEmail}`);
 
+  // If the shoot is already at "Ready for Delivery" (or Complete) in Active
+  // Bookings, and payment has just cleared, pull the actual delivery/vimeo
+  // link so the payment confirmation email can hand it straight over —
+  // rather than the client having to separately check their dashboard.
+  async function fetchDeliveryInfoIfReady(bookingReference) {
+    if (!bookingReference) return null;
+    try {
+      const safeRef = String(bookingReference).trim().toLowerCase();
+      const records = await base('Active Bookings')
+        .select({
+          filterByFormula: `LOWER(TRIM({Booking ID}))='${safeRef.replace(/'/g, "\\'")}'`,
+          maxRecords: 1
+        })
+        .firstPage();
+
+      const rec = records && records[0];
+      if (!rec) return null;
+
+      const status = rec.fields['Status'];
+      const isReady = status === 'Ready for Delivery' || status === 'Complete';
+      if (!isReady) return null;
+
+      const deliveryLink = rec.fields['Delivery Link'] || null;
+      const vimeoLink = rec.fields['Vimeo Link'] || null;
+      if (!deliveryLink && !vimeoLink) return null;
+
+      return { deliveryLink, vimeoLink, trackingCode: rec.fields['Tracking Code'] || null };
+    } catch (err) {
+      console.warn('Could not check Active Bookings delivery status (non-blocking):', err.message);
+      return null;
+    }
+  }
+
   // Active Bookings keeps its own Payment Status snapshot that never
   // auto-syncs from Bookings — same fix already applied in admin.html's
   // markAsPaid() and charge-card.js. Without this, a booking paid via
@@ -87,6 +120,8 @@ exports.handler = async (event) => {
 
   try {
     // ── 1. Update Booking to Paid ────────────────────────────────────────────
+    let deliveryInfo = null; // populated below if content is already sitting ready
+
     if (bookingId) {
       const paidBooking = await base('Bookings').update(bookingId, {
         'Payment Status': 'Paid',
@@ -98,7 +133,13 @@ exports.handler = async (event) => {
         'Stripe Payment Intent ID': paymentIntent.id
       });
       console.log('✅ Booking marked as Paid:', bookingId);
-      await syncActiveBookingPaymentStatus(paidBooking.fields['Booking Reference'] || bookingRef, 'Paid');
+      const resolvedRef = paidBooking.fields['Booking Reference'] || bookingRef;
+      await syncActiveBookingPaymentStatus(resolvedRef, 'Paid');
+
+      // Check whether content is already sitting ready — if so, unlock and
+      // hand the client the actual download link in the same email rather
+      // than making them dig for it separately once payment clears.
+      deliveryInfo = await fetchDeliveryInfoIfReady(resolvedRef);
     }
 
     // ── 2. Update Invoices table to Paid ────────────────────────────────────
@@ -288,6 +329,16 @@ exports.handler = async (event) => {
         <div class="vat-row"><span>VAT @ 20%</span><span style="font-family:monospace;">£${vatAmt.toFixed(2)}</span></div>
         <div class="vat-row total"><span>Total paid</span><span style="font-family:monospace;color:#B46100;">£${amountPaid.toFixed(2)}</span></div>
       </div>
+
+      ${deliveryInfo ? `
+      <div class="amount-box" style="background:#ecfdf5;border-color:#6ee7b7;">
+        <div class="label" style="color:#065f46;">🎉 Your Content is Ready!</div>
+        <div style="font-size:14px;color:#065f46;margin-top:8px;line-height:1.7;">
+          ${deliveryInfo.vimeoLink ? `<a href="${deliveryInfo.vimeoLink}" style="color:#065f46;font-weight:700;word-break:break-all;">🎬 Watch your video</a><br>` : ''}
+          ${deliveryInfo.deliveryLink ? `<a href="${deliveryInfo.deliveryLink}" style="color:#065f46;font-weight:700;word-break:break-all;">📥 Download your files</a>` : ''}
+        </div>
+      </div>
+      ` : ''}
 
       <div class="invoice-link">
         <a href="https://markebmedia.com/invoice/${invoiceNum}">View & Print Paid Invoice</a>

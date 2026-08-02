@@ -11,6 +11,23 @@ const SITE_URL = 'https://markebmedia.com';
 const LOGO_URL = 'https://markebmedia.com/public/images/Markeb%20Media%20Logo%20(2).png';
 const DASHBOARD_URL = 'https://markebmedia.com/login';
 
+// Bulletproof CTA button — renders correctly in Outlook desktop (VML fallback,
+// since Outlook's Word rendering engine ignores CSS gradients/border-radius on
+// <a> tags, leaving button text invisible: cream text on transparent/white
+// background). Mirrors the same fix already applied in email-service.js.
+function getButtonHtml(url, text, width = 260) {
+  return `
+<!--[if mso]>
+<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${url}" style="height:48px;v-text-anchor:middle;width:${width}px;" arcsize="18%" strokecolor="#B46100" fillcolor="#B46100">
+<w:anchorlock/>
+<center style="color:#FDF3E2;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;">${text}</center>
+</v:roundrect>
+<![endif]-->
+<!--[if !mso]><!-->
+<a href="${url}" target="_blank" style="background-color:#B46100;border-radius:10px;color:#FDF3E2;display:inline-block;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;line-height:48px;text-align:center;text-decoration:none;width:${width}px;letter-spacing:0.01em;-webkit-text-size-adjust:none;mso-hide:all;">${text}</a>
+<!--<![endif]-->`;
+}
+
 // ===== PAYMENT GATE =====
 // This webhook (fired by the Airtable "Ready for Delivery" automation) was
 // never checking payment status at all before sending the delivery links —
@@ -36,6 +53,7 @@ async function fetchLivePaymentGateStatus(trackingCode, clientEmail) {
     const bookingRef = activeRecord?.fields?.['Booking ID'] || null;
 
     let paymentStatus = activeRecord?.fields?.['Payment Status'] || null;
+    let liveBookingRef = bookingRef;
 
     if (bookingRef) {
       const safeRef = String(bookingRef).trim().replace(/'/g, "\\'");
@@ -63,11 +81,11 @@ async function fetchLivePaymentGateStatus(trackingCode, clientEmail) {
       }
     }
 
-    return { unlocked: isPaid || isEOM, paymentStatus };
+    return { unlocked: isPaid || isEOM, paymentStatus, bookingRef: liveBookingRef };
   } catch (err) {
     console.error('Payment gate lookup failed in send-progress-update:', err);
     // Fail closed — a lookup error should never accidentally unlock content.
-    return { unlocked: false, reason: 'error' };
+    return { unlocked: false, reason: 'error', bookingRef: null };
   }
 }
 
@@ -140,7 +158,8 @@ exports.handler = async (event, context) => {
             gate.unlocked ? vimeoLink : null,
             projectAddress,
             email,
-            gate.unlocked
+            gate.unlocked,
+            gate.bookingRef
           );
         }
         emailSent = true;
@@ -406,7 +425,7 @@ async function sendQualityControlEmail(customerName, trackingCode, projectAddres
 }
 
 // 3. Ready for Delivery Status Email
-async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, vimeoLink, projectAddress, email, unlocked = true) {
+async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLink, vimeoLink, projectAddress, email, unlocked = true, bookingRef = null) {
   const videoBlock = vimeoLink ? `
     <div class="alert alert-success">
       <strong>🎬 Your Video Link:</strong><br>
@@ -420,11 +439,19 @@ async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLin
       <a href="${deliveryLink}" style="color: #3F4D1B; font-weight: 700; font-size: 15px; word-break: break-all;">${deliveryLink}</a>
     </div>` : '';
 
+  // Build a real, working invoice link (same /invoice/{ref} page used
+  // everywhere else — Stripe Payment Element, Apple Pay, Google Pay, card)
+  // rather than just telling the client to "use your dashboard" with no link.
+  const invoiceUrl = bookingRef ? `${SITE_URL}/invoice/INV-MM${bookingRef}` : `${DASHBOARD_URL}`;
+
   const paymentRequiredBlock = !unlocked ? `
     <div class="alert alert-warning">
       <strong>💳 Payment Required to Unlock</strong><br>
-      Your content is ready, but your invoice is still outstanding. Please settle your invoice to unlock your download link — you can do this from your dashboard.
-    </div>` : '';
+      Your content is ready, but your invoice is still outstanding. Please settle your invoice below to unlock your download link.
+    </div>
+    <center>
+      ${getButtonHtml(invoiceUrl, 'View & Pay Invoice', 280)}
+    </center>` : '';
 
   const content = `
     <h2>🎉 Your Content is ${unlocked ? 'Now Ready!' : 'Ready — Payment Required'}</h2>
@@ -444,7 +471,7 @@ async function sendReadyForDeliveryEmail(customerName, trackingCode, deliveryLin
     <p><strong>✏️ Need tweaks?</strong> You have exclusive access to your client dashboard where you can request revisions, track your project live, and manage your content.</p>
 
     <center>
-      <a href="${DASHBOARD_URL}" class="button">Access Your Dashboard</a>
+      ${getButtonHtml(DASHBOARD_URL, 'Access Your Dashboard', 280)}
     </center>
 
     <p>We're happy to help.</p>
