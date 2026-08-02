@@ -65,14 +65,14 @@ async function isEOMClientByEmail(email) {
 // trusting the stale field, we fetch live Payment Status from "Bookings"
 // for this client, keyed by Booking Reference, and use that as truth.
 async function fetchLivePaymentStatuses(emailLower) {
-  const map = {}; // Booking Reference -> live Payment Status
+  const map = {}; // normalised Booking Reference -> live Payment Status
   try {
     const formula = encodeURIComponent(`LOWER({Client Email}) = "${emailLower}"`);
     const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent('Bookings')}?filterByFormula=${formula}`;
     const records = await fetchAllRecords(url);
     records.forEach((r) => {
       const ref = r.fields['Booking Reference'];
-      if (ref) map[ref] = r.fields['Payment Status'] || null;
+      if (ref) map[String(ref).trim().toLowerCase()] = r.fields['Payment Status'] || null;
     });
   } catch (err) {
     console.error('Error fetching live payment statuses from Bookings:', err);
@@ -153,8 +153,9 @@ exports.handler = async (event) => {
       // Booking Reference). Fall back to the Active Bookings snapshot
       // only if no live match was found (e.g. legacy/manual records).
       const bookingRef = f['Booking ID'] || null;
-      const livePaymentStatus = bookingRef && Object.prototype.hasOwnProperty.call(livePaymentStatuses, bookingRef)
-        ? livePaymentStatuses[bookingRef]
+      const normalisedRef = bookingRef ? String(bookingRef).trim().toLowerCase() : null;
+      const livePaymentStatus = normalisedRef && Object.prototype.hasOwnProperty.call(livePaymentStatuses, normalisedRef)
+        ? livePaymentStatuses[normalisedRef]
         : undefined;
       const paymentStatus = livePaymentStatus !== undefined ? livePaymentStatus : (f['Payment Status'] || null);
       const unlocked = !paymentStatus || String(paymentStatus).trim().toLowerCase() === 'paid' || isEOMClient;

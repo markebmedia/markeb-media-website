@@ -91,7 +91,10 @@ return json(500, { message: 'Server error', error: String(e) });
 async function fetchLiveBookingPaymentStatus(token, baseId, bookingRef) {
   try {
     const safeRef = String(bookingRef).trim().replace(/'/g, "\\'");
-    const formula = `{Booking Reference}='${safeRef}'`;
+    // Bookings table may key this field as either "Booking Reference" or
+    // "Booking ID" — try both rather than assuming, so a naming mismatch
+    // doesn't cause a silent fallback to the stale snapshot.
+    const formula = `OR({Booking Reference}='${safeRef}', {Booking ID}='${safeRef}')`;
     const url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent('Bookings')}?maxRecords=1&filterByFormula=${encodeURIComponent(formula)}`;
     const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
     if (!res.ok) return undefined;
