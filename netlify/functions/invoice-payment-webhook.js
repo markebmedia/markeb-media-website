@@ -59,10 +59,36 @@ exports.handler = async (event) => {
 
   console.log(`Processing invoice payment: ${invoiceNum} — £${amountPaid} — ${clientEmail}`);
 
+  // Active Bookings keeps its own Payment Status snapshot that never
+  // auto-syncs from Bookings — same fix already applied in admin.html's
+  // markAsPaid() and charge-card.js. Without this, a booking paid via
+  // an online invoice link would show Paid in Bookings but stay stale
+  // (Pending) in Active Bookings, silently keeping content locked.
+  async function syncActiveBookingPaymentStatus(bookingReference, status) {
+    if (!bookingReference) return;
+    try {
+      const safeRef = String(bookingReference).trim().toLowerCase();
+      const records = await base('Active Bookings')
+        .select({
+          filterByFormula: `LOWER(TRIM({Booking ID}))='${safeRef.replace(/'/g, "\\'")}'`,
+          maxRecords: 1
+        })
+        .firstPage();
+      if (records && records[0]) {
+        await base('Active Bookings').update(records[0].id, { 'Payment Status': status });
+        console.log(`✅ Active Bookings synced to "${status}" for ${bookingReference}`);
+      } else {
+        console.warn(`⚠️ No matching Active Bookings record for "${bookingReference}" — snapshot not synced`);
+      }
+    } catch (syncErr) {
+      console.warn('Active Bookings sync failed (non-blocking):', syncErr.message);
+    }
+  }
+
   try {
     // ── 1. Update Booking to Paid ────────────────────────────────────────────
     if (bookingId) {
-      await base('Bookings').update(bookingId, {
+      const paidBooking = await base('Bookings').update(bookingId, {
         'Payment Status': 'Paid',
         'Booking Status': 'Confirmed',
         'Payment Date': new Date().toISOString(),
@@ -72,6 +98,7 @@ exports.handler = async (event) => {
         'Stripe Payment Intent ID': paymentIntent.id
       });
       console.log('✅ Booking marked as Paid:', bookingId);
+      await syncActiveBookingPaymentStatus(paidBooking.fields['Booking Reference'] || bookingRef, 'Paid');
     }
 
     // ── 2. Update Invoices table to Paid ────────────────────────────────────
@@ -80,12 +107,50 @@ exports.handler = async (event) => {
       .firstPage();
 
     if (invoiceRecords && invoiceRecords.length > 0) {
-      await base('Invoices').update(invoiceRecords[0].id, {
+      const paidInvoiceRecord = invoiceRecords[0];
+      await base('Invoices').update(paidInvoiceRecord.id, {
         'Status': 'Paid',
         'Paid Date': new Date().toISOString().split('T')[0],
         'Auto Chase Sent': true // prevent any pending chase from firing
       });
       console.log('✅ Invoice record marked as Paid:', invoiceNum);
+
+      // ── 2b. Cascade to linked invoices if this is a BULK invoice wrapper ──
+      // Mirrors admin.html's markBulkInvoicePaid() — but that only runs when
+      // an admin manually clicks "Mark Paid". This webhook is the ACTUAL
+      // online payment path, and previously never cascaded at all: a client
+      // paying a bulk invoice online would settle the wrapper but leave every
+      // individual shoot's Invoices record — and its underlying Booking, and
+      // THAT booking's Active Bookings snapshot — stuck Unpaid.
+      const includedInvoiceIds = paidInvoiceRecord.fields['Included Invoices'] || [];
+      if (paidInvoiceRecord.fields['Is Bulk'] && includedInvoiceIds.length > 0) {
+        console.log(`Cascading payment to ${includedInvoiceIds.length} linked invoice(s)...`);
+        for (const includedId of includedInvoiceIds) {
+          try {
+            const includedRecord = await base('Invoices').find(includedId);
+            await base('Invoices').update(includedId, {
+              'Status': 'Paid',
+              'Paid Date': new Date().toISOString().split('T')[0]
+            });
+
+            const linkedBookingId = includedRecord.fields['Booking ID'];
+            if (linkedBookingId) {
+              const linkedBooking = await base('Bookings').update(linkedBookingId, {
+                'Payment Status': 'Paid',
+                'Booking Status': 'Confirmed',
+                'Payment Date': new Date().toISOString()
+              });
+              await syncActiveBookingPaymentStatus(
+                linkedBooking.fields['Booking Reference'] || includedRecord.fields['Booking Reference'],
+                'Paid'
+              );
+            }
+            console.log(`✅ Cascaded paid status to linked invoice ${includedId}`);
+          } catch (cascadeErr) {
+            console.error(`⚠️ Failed to cascade payment to linked invoice ${includedId}:`, cascadeErr.message);
+          }
+        }
+      }
     } else {
       // Invoice record doesn't exist yet — create it as Paid
       await base('Invoices').create({

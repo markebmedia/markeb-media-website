@@ -171,6 +171,9 @@ exports.handler = async (event) => {
         trackingCode:   f['Tracking Code']    || null,
         locked:         !unlocked,
         lockReason:     !unlocked ? 'Your content is ready, but your invoice is still outstanding. Please settle your invoice to unlock your download link.' : null,
+        // Needed so the locked delivery card can deep-link straight to
+        // /invoice/{bookingRef} instead of just switching dashboard tabs
+        bookingRef:     bookingRef || null,
         // Review panel — only populated when a Client Reviews record exists
         hasReview:      !!review,
         reviewId:       review ? review.id              : null,
