@@ -1060,7 +1060,8 @@ body {
         <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Growth Assumption</div>
         <div style="display:flex;gap:8px;">
           <button class="rr-btn active" id="projScenarioFlat" onclick="setProjectionScenario('flat')">Current Pace</button>
-          <button class="rr-btn" id="projScenarioGrowth" onclick="setProjectionScenario('growth')">Recent Growth Trend</button>
+          <button class="rr-btn" id="projScenarioGrowthCapped" onclick="setProjectionScenario('growth_capped')">Recent Growth Trend (Capped)</button>
+          <button class="rr-btn" id="projScenarioGrowthUncapped" onclick="setProjectionScenario('growth_uncapped')">Recent Growth Trend (Uncapped)</button>
           <button class="rr-btn" id="projScenarioTarget" onclick="setProjectionScenario('target')">Target Trajectory</button>
         </div>
         <div style="font-size:11px;color:#94a3b8;margin-top:6px;" id="projScenarioNote">Assumes new and existing client bookings continue at your actual pace over the last 3 months, for all 6 months.</div>
@@ -4717,11 +4718,13 @@ let projectionChartInstance = null;
 function setProjectionScenario(mode) {
   projScenario = mode;
   document.getElementById('projScenarioFlat').classList.toggle('active', mode === 'flat');
-  document.getElementById('projScenarioGrowth').classList.toggle('active', mode === 'growth');
+  document.getElementById('projScenarioGrowthCapped').classList.toggle('active', mode === 'growth_capped');
+  document.getElementById('projScenarioGrowthUncapped').classList.toggle('active', mode === 'growth_uncapped');
   document.getElementById('projScenarioTarget').classList.toggle('active', mode === 'target');
   const notes = {
     flat: 'Assumes new and existing client bookings continue at your actual pace over the last 3 months, for all 6 months.',
-    growth: 'Compounds your own measured month-over-month growth rate from the last 6 months of actual bookings forward — data-driven, not a fixed target.',
+    growth_capped: 'Compounds your measured month-over-month growth rate, clamped to a sane ±25%/40% range so one noisy month cannot produce a runaway forecast.',
+    growth_uncapped: 'Compounds your measured month-over-month growth rate exactly as calculated, with no ceiling — this can produce very large numbers if any of the last 6 months were volatile.',
     target: 'Assumes new and existing client bookings ramp linearly from your last-3-months pace toward your Year 1 (£30,000/mo) monthly target by month 6.'
   };
   document.getElementById('projScenarioNote').textContent = notes[mode] || notes.flat;
@@ -4865,8 +4868,12 @@ function computeProjection() {
     if (projScenario === 'target') {
       newClientBookings = baseNewBookings + (targetNewBookings - baseNewBookings) * rampFrac;
       existingClientBookings = baseExistingBookings + (targetExistingBookings - baseExistingBookings) * rampFrac;
-    } else if (projScenario === 'growth') {
+    } else if (projScenario === 'growth_capped') {
       const compound = Math.pow(1 + hist.growthRate, m);
+      newClientBookings = baseNewBookings * compound;
+      existingClientBookings = baseExistingBookings * compound;
+    } else if (projScenario === 'growth_uncapped') {
+      const compound = Math.pow(1 + hist.rawGrowthRate, m);
       newClientBookings = baseNewBookings * compound;
       existingClientBookings = baseExistingBookings * compound;
     } else {
@@ -4968,20 +4975,35 @@ function renderProjectionSection() {
 
   const scenarioNotes = {
     target: `<div style="font-size:13px;color:#475569;line-height:1.7;">This run ramps new and existing client bookings from your actual pace over the last 3 months toward the ${proj.targetNewBookings.toFixed(1)} new + ${proj.targetExistingBookings.toFixed(1)} existing bookings/mo needed to hit your Year 1 target — a linear ramp over 6 months, not a step change.</div>`,
-    growth: `<div style="font-size:13px;color:#475569;line-height:1.7;">This run compounds your own measured growth rate forward from your last-3-months baseline — the only scenario driven purely by your recent trajectory rather than an external target.
+    growth_capped: `<div style="font-size:13px;color:#475569;line-height:1.7;">This run compounds your measured growth rate forward from your last-3-months baseline, <strong>clamped to a sane ±25%/40% range</strong> so one noisy month can't produce a runaway forecast.
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;">
           <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;">
             <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">Raw Measured Rate (uncapped)</div>
             <div style="font-size:18px;font-weight:800;color:#0f172a;margin-top:2px;">${(proj.rawHistoricalGrowthRate * 100).toFixed(1)}% / mo</div>
           </div>
           <div style="background:${proj.growthRateWasClamped ? 'rgba(245,158,11,0.08)' : '#f8fafc'};border:1px solid ${proj.growthRateWasClamped ? '#f59e0b44' : '#e2e8f0'};border-radius:8px;padding:10px 14px;">
-            <div style="font-size:10px;font-weight:700;color:${proj.growthRateWasClamped ? '#b45309' : '#94a3b8'};text-transform:uppercase;letter-spacing:0.5px;">Rate Actually Used ${proj.growthRateWasClamped ? '(capped)' : ''}</div>
+            <div style="font-size:10px;font-weight:700;color:${proj.growthRateWasClamped ? '#b45309' : '#94a3b8'};text-transform:uppercase;letter-spacing:0.5px;">Rate Used In This Run ${proj.growthRateWasClamped ? '(capped)' : ''}</div>
             <div style="font-size:18px;font-weight:800;color:${proj.growthRateWasClamped ? '#b45309' : '#0f172a'};margin-top:2px;">${(proj.historicalGrowthRate * 100).toFixed(1)}% / mo</div>
           </div>
         </div>
         ${proj.growthRateWasClamped
-          ? `<div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border-left:3px solid #f59e0b;border-radius:0 6px 6px 0;font-size:12px;color:#92400e;">⚠ Your actual measured rate (${(proj.rawHistoricalGrowthRate * 100).toFixed(1)}%/mo) was outside the ±25%/−40% sane range, so the projection uses the capped figure above instead — this prevents a single unusually quiet or busy month from producing a runaway forecast, but check whether one of the last 6 months was an outlier (e.g. a holiday lull or a one-off large client) before trusting the raw number at face value.</div>`
-          : ''}
+          ? `<div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border-left:3px solid #f59e0b;border-radius:0 6px 6px 0;font-size:12px;color:#92400e;">⚠ Your actual measured rate (${(proj.rawHistoricalGrowthRate * 100).toFixed(1)}%/mo) was outside the sane range, so this run uses the capped figure. Switch to "Recent Growth Trend (Uncapped)" to see the projection using the full raw rate instead.</div>`
+          : `<div style="margin-top:8px;font-size:12px;color:#94a3b8;">Your raw and capped rates match — no clamping applied here.</div>`}
+      </div>`,
+    growth_uncapped: `<div style="font-size:13px;color:#475569;line-height:1.7;">This run compounds your measured growth rate forward from your last-3-months baseline <strong>exactly as calculated, with no ceiling</strong>.
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;">
+          <div style="background:${proj.growthRateWasClamped ? 'rgba(239,68,68,0.08)' : '#f8fafc'};border:1px solid ${proj.growthRateWasClamped ? '#ef444444' : '#e2e8f0'};border-radius:8px;padding:10px 14px;">
+            <div style="font-size:10px;font-weight:700;color:${proj.growthRateWasClamped ? '#991b1b' : '#94a3b8'};text-transform:uppercase;letter-spacing:0.5px;">Raw Measured Rate — Used In This Run</div>
+            <div style="font-size:18px;font-weight:800;color:${proj.growthRateWasClamped ? '#991b1b' : '#0f172a'};margin-top:2px;">${(proj.rawHistoricalGrowthRate * 100).toFixed(1)}% / mo</div>
+          </div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;">
+            <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">Capped Equivalent (for comparison)</div>
+            <div style="font-size:18px;font-weight:800;color:#0f172a;margin-top:2px;">${(proj.historicalGrowthRate * 100).toFixed(1)}% / mo</div>
+          </div>
+        </div>
+        ${proj.growthRateWasClamped
+          ? `<div style="margin-top:8px;padding:8px 10px;background:#fef2f2;border-left:3px solid #ef4444;border-radius:0 6px 6px 0;font-size:12px;color:#7f1d1d;">⚠ This rate sits outside the sane ±25%/40% range used elsewhere on this dashboard, and compounds over 6 months — treat the numbers below as an upper-bound stress test, not a realistic forecast, unless you've confirmed the last 6 months genuinely reflect sustainable growth rather than one outlier month.</div>`
+          : `<div style="margin-top:8px;font-size:12px;color:#94a3b8;">Your raw and capped rates match — this run is identical to "Recent Growth Trend (Capped)".</div>`}
       </div>`,
     flat: `<div style="font-size:13px;color:#475569;line-height:1.7;">This run holds new and existing client booking counts at their actual average pace over the last 3 months for all 6 months — i.e. "if nothing changes from recent momentum." Retainer revenue is deterministic (based on actual contract end dates), so it's the only part of this projection that isn't an estimate.</div>`
   };
