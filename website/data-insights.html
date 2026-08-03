@@ -4818,9 +4818,11 @@ function calcHistoricalGrowthRate(monthsBack) {
     if (monthlyTotals[i - 1] > 0) ratios.push(monthlyTotals[i] / monthlyTotals[i - 1]);
   }
   const avgRatio = ratios.length > 0 ? ratios.reduce((s, v) => s + v, 0) / ratios.length : 1;
+  const rawGrowthRate = avgRatio - 1;
   // Clamp to a sane range so one noisy month can't produce a runaway compounding curve
-  const growthRate = Math.max(-0.25, Math.min(0.4, avgRatio - 1));
-  return { monthlyTotals, growthRate };
+  const growthRate = Math.max(-0.25, Math.min(0.4, rawGrowthRate));
+  const wasClamped = Math.abs(growthRate - rawGrowthRate) > 0.0001;
+  return { monthlyTotals, growthRate, rawGrowthRate, wasClamped };
 }
 
 function computeProjection() {
@@ -4906,7 +4908,7 @@ function computeProjection() {
     prevTotalRevenue = totalRevenue;
   }
 
-  return { months, baseCapacity, atv, windowMonths: recent.windowMonths, historicalGrowthRate: hist.growthRate, targetNewBookings, targetExistingBookings };
+  return { months, baseCapacity, atv, windowMonths: recent.windowMonths, historicalGrowthRate: hist.growthRate, rawHistoricalGrowthRate: hist.rawGrowthRate, growthRateWasClamped: hist.wasClamped, targetNewBookings, targetExistingBookings };
 }
 
 function renderProjectionSection() {
@@ -4966,7 +4968,21 @@ function renderProjectionSection() {
 
   const scenarioNotes = {
     target: `<div style="font-size:13px;color:#475569;line-height:1.7;">This run ramps new and existing client bookings from your actual pace over the last 3 months toward the ${proj.targetNewBookings.toFixed(1)} new + ${proj.targetExistingBookings.toFixed(1)} existing bookings/mo needed to hit your Year 1 target — a linear ramp over 6 months, not a step change.</div>`,
-    growth: `<div style="font-size:13px;color:#475569;line-height:1.7;">This run compounds your own measured growth rate — <strong>${(proj.historicalGrowthRate * 100).toFixed(1)}% month-over-month</strong>, averaged from your last 6 completed months of actual bookings — forward from your last-3-months baseline. This is the only scenario driven purely by your recent trajectory rather than an external target.</div>`,
+    growth: `<div style="font-size:13px;color:#475569;line-height:1.7;">This run compounds your own measured growth rate forward from your last-3-months baseline — the only scenario driven purely by your recent trajectory rather than an external target.
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;">
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;">
+            <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">Raw Measured Rate (uncapped)</div>
+            <div style="font-size:18px;font-weight:800;color:#0f172a;margin-top:2px;">${(proj.rawHistoricalGrowthRate * 100).toFixed(1)}% / mo</div>
+          </div>
+          <div style="background:${proj.growthRateWasClamped ? 'rgba(245,158,11,0.08)' : '#f8fafc'};border:1px solid ${proj.growthRateWasClamped ? '#f59e0b44' : '#e2e8f0'};border-radius:8px;padding:10px 14px;">
+            <div style="font-size:10px;font-weight:700;color:${proj.growthRateWasClamped ? '#b45309' : '#94a3b8'};text-transform:uppercase;letter-spacing:0.5px;">Rate Actually Used ${proj.growthRateWasClamped ? '(capped)' : ''}</div>
+            <div style="font-size:18px;font-weight:800;color:${proj.growthRateWasClamped ? '#b45309' : '#0f172a'};margin-top:2px;">${(proj.historicalGrowthRate * 100).toFixed(1)}% / mo</div>
+          </div>
+        </div>
+        ${proj.growthRateWasClamped
+          ? `<div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border-left:3px solid #f59e0b;border-radius:0 6px 6px 0;font-size:12px;color:#92400e;">⚠ Your actual measured rate (${(proj.rawHistoricalGrowthRate * 100).toFixed(1)}%/mo) was outside the ±25%/−40% sane range, so the projection uses the capped figure above instead — this prevents a single unusually quiet or busy month from producing a runaway forecast, but check whether one of the last 6 months was an outlier (e.g. a holiday lull or a one-off large client) before trusting the raw number at face value.</div>`
+          : ''}
+      </div>`,
     flat: `<div style="font-size:13px;color:#475569;line-height:1.7;">This run holds new and existing client booking counts at their actual average pace over the last 3 months for all 6 months — i.e. "if nothing changes from recent momentum." Retainer revenue is deterministic (based on actual contract end dates), so it's the only part of this projection that isn't an estimate.</div>`
   };
   const scenarioNote = scenarioNotes[projScenario] || scenarioNotes.flat;
