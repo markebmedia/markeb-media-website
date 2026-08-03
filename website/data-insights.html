@@ -1060,6 +1060,7 @@ body {
         <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Growth Assumption</div>
         <div style="display:flex;gap:8px;">
           <button class="rr-btn active" id="projScenarioFlat" onclick="setProjectionScenario('flat')">Current Pace</button>
+          <button class="rr-btn" id="projScenarioGrowth" onclick="setProjectionScenario('growth')">Recent Growth Trend</button>
           <button class="rr-btn" id="projScenarioTarget" onclick="setProjectionScenario('target')">Target Trajectory</button>
         </div>
         <div style="font-size:11px;color:#94a3b8;margin-top:6px;" id="projScenarioNote">Assumes new and existing client bookings continue at your actual pace over the last 3 months, for all 6 months.</div>
@@ -1095,10 +1096,12 @@ body {
             <th>Existing Client Bookings</th>
             <th>New Client Bookings</th>
             <th>Total Bookings</th>
+            <th>Bookings Growth</th>
             <th>Capacity Ceiling</th>
             <th>Retainer Revenue</th>
             <th>Booking Revenue</th>
             <th>Total Revenue</th>
+            <th>Revenue Growth</th>
           </tr>
         </thead>
         <tbody id="projectionTableBody"></tbody>
@@ -4714,10 +4717,14 @@ let projectionChartInstance = null;
 function setProjectionScenario(mode) {
   projScenario = mode;
   document.getElementById('projScenarioFlat').classList.toggle('active', mode === 'flat');
+  document.getElementById('projScenarioGrowth').classList.toggle('active', mode === 'growth');
   document.getElementById('projScenarioTarget').classList.toggle('active', mode === 'target');
-  document.getElementById('projScenarioNote').textContent = mode === 'flat'
-    ? 'Assumes new and existing client bookings continue at your actual pace over the last 3 months, for all 6 months.'
-    : 'Assumes new and existing client bookings ramp linearly from your last-3-months pace toward your Year 1 (£30,000/mo) monthly target by month 6.';
+  const notes = {
+    flat: 'Assumes new and existing client bookings continue at your actual pace over the last 3 months, for all 6 months.',
+    growth: 'Compounds your own measured month-over-month growth rate from the last 6 months of actual bookings forward — data-driven, not a fixed target.',
+    target: 'Assumes new and existing client bookings ramp linearly from your last-3-months pace toward your Year 1 (£30,000/mo) monthly target by month 6.'
+  };
+  document.getElementById('projScenarioNote').textContent = notes[mode] || notes.flat;
   renderProjectionSection();
 }
 
@@ -4787,11 +4794,41 @@ function calcRecentPaceMetrics(windowMonths) {
   return { recentATV, avgNewBookingsPerMonth, avgExistingBookingsPerMonth, avgSignupsPerMonth, windowMonths };
 }
 
+// Looks at actual completed calendar months of booking history (not the
+// current partial month) and derives an average month-over-month growth
+// rate for total bookings. Used to drive the "Recent Growth Trend"
+// scenario — compounding your own measured trajectory forward, rather than
+// aiming at a fixed external target.
+function calcHistoricalGrowthRate(monthsBack) {
+  const now = new Date();
+  const monthlyTotals = [];
+  for (let i = monthsBack; i >= 1; i--) {
+    const mStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const mEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
+    const total = bookingData.filter(b => {
+      if (!b.date || b.bookingStatus === 'Cancelled') return false;
+      const [y, mo, d] = b.date.slice(0, 10).split('-').map(Number);
+      const dt = new Date(y, mo - 1, d);
+      return dt >= mStart && dt <= mEnd;
+    }).length;
+    monthlyTotals.push(total);
+  }
+  const ratios = [];
+  for (let i = 1; i < monthlyTotals.length; i++) {
+    if (monthlyTotals[i - 1] > 0) ratios.push(monthlyTotals[i] / monthlyTotals[i - 1]);
+  }
+  const avgRatio = ratios.length > 0 ? ratios.reduce((s, v) => s + v, 0) / ratios.length : 1;
+  // Clamp to a sane range so one noisy month can't produce a runaway compounding curve
+  const growthRate = Math.max(-0.25, Math.min(0.4, avgRatio - 1));
+  return { monthlyTotals, growthRate };
+}
+
 function computeProjection() {
   const recent = calcRecentPaceMetrics(3); // last 3 calendar months, not all-time
   const atv = recent.recentATV;
   const T = buildTargets();
   const yearKey = 'y' + getCurrentYear();
+  const hist = calcHistoricalGrowthRate(6);
 
   const now = new Date();
   const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -4807,6 +4844,12 @@ function computeProjection() {
   const hireMonth = projCrewHireOn ? parseInt(document.getElementById('projHireMonth')?.value || '3', 10) : null;
   const hireCapacity = projCrewHireOn ? parseFloat(document.getElementById('projHireCapacity')?.value || '40') : 0;
 
+  // Baseline (month 0) used purely to compute month-1's growth % against —
+  // this is what "recent pace" looked like before the projection starts.
+  let prevTotalBookings = baseNewBookings + baseExistingBookings;
+  let prevTotalRevenue = prevTotalBookings * atv
+    + (getRetainerRevenueForMonth(currentMonthStart.getFullYear(), currentMonthStart.getMonth()) / 1.2);
+
   const months = [];
   for (let m = 1; m <= 6; m++) {
     const monthDate = new Date(currentMonthStart.getFullYear(), currentMonthStart.getMonth() + m, 1);
@@ -4816,13 +4859,18 @@ function computeProjection() {
     // Linear ramp fraction for target scenario (0 at month 0, 1 at month 6)
     const rampFrac = m / 6;
 
-    const newClientBookings = projScenario === 'target'
-      ? baseNewBookings + (targetNewBookings - baseNewBookings) * rampFrac
-      : baseNewBookings;
-
-    const existingClientBookings = projScenario === 'target'
-      ? baseExistingBookings + (targetExistingBookings - baseExistingBookings) * rampFrac
-      : baseExistingBookings;
+    let newClientBookings, existingClientBookings;
+    if (projScenario === 'target') {
+      newClientBookings = baseNewBookings + (targetNewBookings - baseNewBookings) * rampFrac;
+      existingClientBookings = baseExistingBookings + (targetExistingBookings - baseExistingBookings) * rampFrac;
+    } else if (projScenario === 'growth') {
+      const compound = Math.pow(1 + hist.growthRate, m);
+      newClientBookings = baseNewBookings * compound;
+      existingClientBookings = baseExistingBookings * compound;
+    } else {
+      newClientBookings = baseNewBookings;
+      existingClientBookings = baseExistingBookings;
+    }
 
     let totalBookingsWanted = newClientBookings + existingClientBookings;
 
@@ -4830,8 +4878,10 @@ function computeProjection() {
     let capacity = baseCapacity;
     if (projCrewHireOn && hireMonth !== null && m >= hireMonth) capacity += hireCapacity;
 
+    // Small epsilon avoids a booking total that rounds to exactly the
+    // ceiling from flickering between "capped" and "not capped".
+    const cappedByCapacity = totalBookingsWanted > capacity + 0.01;
     const totalBookingsDelivered = Math.min(totalBookingsWanted, capacity);
-    const cappedByCapacity = totalBookingsWanted > capacity;
     // Scale new/existing proportionally if capped
     const scaleFactor = totalBookingsWanted > 0 ? totalBookingsDelivered / totalBookingsWanted : 1;
     const existingDelivered = existingClientBookings * scaleFactor;
@@ -4841,20 +4891,29 @@ function computeProjection() {
     const bookingRevenue = totalBookingsDelivered * atv;
     const totalRevenue = bookingRevenue + retainerRevExVat;
 
+    const bookingsGrowthPct = prevTotalBookings > 0 ? ((totalBookingsDelivered - prevTotalBookings) / prevTotalBookings) * 100 : null;
+    const revenueGrowthPct = prevTotalRevenue > 0 ? ((totalRevenue - prevTotalRevenue) / prevTotalRevenue) * 100 : null;
+
     months.push({
       m, label: monthDate.toLocaleString('en-GB', { month: 'short', year: 'numeric' }),
       existingDelivered, newDelivered, totalBookingsDelivered,
       capacity, cappedByCapacity,
-      retainerRevExVat, bookingRevenue, totalRevenue
+      retainerRevExVat, bookingRevenue, totalRevenue,
+      bookingsGrowthPct, revenueGrowthPct
     });
+
+    prevTotalBookings = totalBookingsDelivered;
+    prevTotalRevenue = totalRevenue;
   }
 
-  return { months, baseCapacity, atv, windowMonths: recent.windowMonths };
+  return { months, baseCapacity, atv, windowMonths: recent.windowMonths, historicalGrowthRate: hist.growthRate, targetNewBookings, targetExistingBookings };
 }
 
 function renderProjectionSection() {
   const proj = computeProjection();
   const fmtMoney = v => '£' + Math.round(v).toLocaleString();
+  const fmtPct = v => (v === null || v === undefined) ? '—' : (v > 0 ? '↑ ' : v < 0 ? '↓ ' : '— ') + Math.abs(v).toFixed(1) + '%';
+  const pctClass = v => (v === null || v === undefined) ? 'flat' : (v > 0 ? 'up' : v < 0 ? 'down' : 'flat');
 
   const totalRevenue6mo = proj.months.reduce((s, mo) => s + mo.totalRevenue, 0);
   const totalBookings6mo = proj.months.reduce((s, mo) => s + mo.totalBookingsDelivered, 0);
@@ -4885,37 +4944,18 @@ function renderProjectionSection() {
       <td>${mo.existingDelivered.toFixed(1)}</td>
       <td>${mo.newDelivered.toFixed(1)}</td>
       <td class="current-val">${mo.totalBookingsDelivered.toFixed(1)}</td>
+      <td><span class="micro-delta ${pctClass(mo.bookingsGrowthPct)}">${fmtPct(mo.bookingsGrowthPct)}</span></td>
       <td style="${mo.cappedByCapacity ? 'color:#ef4444;font-weight:700;' : 'color:#475569;'}">${mo.capacity.toFixed(0)}${mo.cappedByCapacity ? ' ⚠ capped' : ''}</td>
       <td>${fmtMoney(mo.retainerRevExVat)}</td>
       <td>${fmtMoney(mo.bookingRevenue)}</td>
       <td class="current-val">${fmtMoney(mo.totalRevenue)}</td>
+      <td><span class="micro-delta ${pctClass(mo.revenueGrowthPct)}">${fmtPct(mo.revenueGrowthPct)}</span></td>
     </tr>`).join('');
 
-  const ctx = document.getElementById('projectionChart').getContext('2d');
-  if (projectionChartInstance) projectionChartInstance.destroy();
-  projectionChartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: proj.months.map(mo => mo.label),
-      datasets: [
-        { label: 'Existing Client Revenue', data: proj.months.map(mo => mo.existingDelivered * proj.atv), backgroundColor: '#10b98188', borderColor: '#10b981', borderWidth: 2, borderRadius: 6, stack: 's' },
-        { label: 'New Client Revenue', data: proj.months.map(mo => mo.newDelivered * proj.atv), backgroundColor: '#3b82f688', borderColor: '#3b82f6', borderWidth: 2, borderRadius: 6, stack: 's' },
-        { label: 'Retainer Revenue', data: proj.months.map(mo => mo.retainerRevExVat), backgroundColor: '#8b5cf688', borderColor: '#8b5cf6', borderWidth: 2, borderRadius: 6, stack: 's' },
-        { label: 'Capacity Ceiling (Revenue Equivalent)', data: proj.months.map(mo => mo.capacity * proj.atv), type: 'line', borderColor: '#ef4444', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5, 4], pointRadius: 3, fill: false }
-      ]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: true, position: 'top', labels: { font: { family: 'Inter', size: 12 }, color: '#475569', boxWidth: 18, padding: 16 } }
-      },
-      scales: {
-        x: { stacked: true, grid: { display: false }, ticks: { font: { family: 'Inter', size: 12, weight: '600' }, color: '#0f172a' } },
-        y: { stacked: true, grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Inter', size: 11 }, color: '#94a3b8', callback: v => '£' + v.toLocaleString() }, beginAtZero: true }
-      }
-    }
-  });
-
+  // Narrative is built and rendered BEFORE the chart. If chart creation ever
+  // throws (canvas reuse errors, etc.), the narrative below has already been
+  // written and won't get stuck showing a stale message from a previous
+  // scenario — this was the root cause of the callout/narrative mismatch.
   const capacityNote = monthsAtCapacity > 0
     ? `<div style="background:rgba(239,68,68,0.08);border:1px solid #ef444444;border-radius:10px;padding:14px 16px;margin-bottom:12px;font-size:13px;color:#7f1d1d;line-height:1.6;">
         ⚠ <strong>${monthsAtCapacity} of 6 months</strong> hit the specialist capacity ceiling (${proj.baseCapacity.toFixed(0)} shoots/mo with the current crew${projCrewHireOn ? `, rising to ${(proj.baseCapacity + parseFloat(document.getElementById('projHireCapacity')?.value || 0)).toFixed(0)}/mo once the 4th hire starts` : ''}). Demand exceeds what the crew can physically deliver — either bring capacity forward, or the projected revenue above is the realistic ceiling regardless of how much pipeline you generate.
@@ -4924,13 +4964,46 @@ function renderProjectionSection() {
         ✓ Projected demand stays within current crew capacity across all 6 months — no staffing bottleneck under this scenario.
       </div>`;
 
-  const scenarioNote = projScenario === 'target'
-    ? `<div style="font-size:13px;color:#475569;line-height:1.7;">This run ramps new and existing client bookings from your actual pace over the last 3 months toward the ${T.monthly.newBookings[yearKey]} new + ${T.monthly.existBookings[yearKey]} existing bookings/mo needed to hit your Year 1 target — a linear ramp over 6 months, not a step change.</div>`
-    : `<div style="font-size:13px;color:#475569;line-height:1.7;">This run holds new and existing client booking counts at their actual average pace over the last 3 months for all 6 months — i.e. "if nothing changes from recent momentum." Retainer revenue is deterministic (based on actual contract end dates), so it's the only part of this projection that isn't an estimate.</div>`;
+  const scenarioNotes = {
+    target: `<div style="font-size:13px;color:#475569;line-height:1.7;">This run ramps new and existing client bookings from your actual pace over the last 3 months toward the ${proj.targetNewBookings.toFixed(1)} new + ${proj.targetExistingBookings.toFixed(1)} existing bookings/mo needed to hit your Year 1 target — a linear ramp over 6 months, not a step change.</div>`,
+    growth: `<div style="font-size:13px;color:#475569;line-height:1.7;">This run compounds your own measured growth rate — <strong>${(proj.historicalGrowthRate * 100).toFixed(1)}% month-over-month</strong>, averaged from your last 6 completed months of actual bookings — forward from your last-3-months baseline. This is the only scenario driven purely by your recent trajectory rather than an external target.</div>`,
+    flat: `<div style="font-size:13px;color:#475569;line-height:1.7;">This run holds new and existing client booking counts at their actual average pace over the last 3 months for all 6 months — i.e. "if nothing changes from recent momentum." Retainer revenue is deterministic (based on actual contract end dates), so it's the only part of this projection that isn't an estimate.</div>`
+  };
+  const scenarioNote = scenarioNotes[projScenario] || scenarioNotes.flat;
 
   document.getElementById('projectionNarrative').innerHTML = capacityNote + scenarioNote;
-
   lucide.createIcons();
+
+  // Chart rendered last and defensively wrapped — an error here should
+  // never prevent the callout, table, or narrative above from being current.
+  try {
+    const ctx = document.getElementById('projectionChart').getContext('2d');
+    if (projectionChartInstance) projectionChartInstance.destroy();
+    projectionChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: proj.months.map(mo => mo.label),
+        datasets: [
+          { label: 'Existing Client Revenue', data: proj.months.map(mo => mo.existingDelivered * proj.atv), backgroundColor: '#10b98188', borderColor: '#10b981', borderWidth: 2, borderRadius: 6, stack: 's' },
+          { label: 'New Client Revenue', data: proj.months.map(mo => mo.newDelivered * proj.atv), backgroundColor: '#3b82f688', borderColor: '#3b82f6', borderWidth: 2, borderRadius: 6, stack: 's' },
+          { label: 'Retainer Revenue', data: proj.months.map(mo => mo.retainerRevExVat), backgroundColor: '#8b5cf688', borderColor: '#8b5cf6', borderWidth: 2, borderRadius: 6, stack: 's' },
+          { label: 'Capacity Ceiling (Revenue Equivalent)', data: proj.months.map(mo => mo.capacity * proj.atv), type: 'line', borderColor: '#ef4444', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5, 4], pointRadius: 3, fill: false }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true, position: 'top', labels: { font: { family: 'Inter', size: 12 }, color: '#475569', boxWidth: 18, padding: 16 } }
+        },
+        scales: {
+          x: { stacked: true, grid: { display: false }, ticks: { font: { family: 'Inter', size: 12, weight: '600' }, color: '#0f172a' } },
+          y: { stacked: true, grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Inter', size: 11 }, color: '#94a3b8', callback: v => '£' + v.toLocaleString() }, beginAtZero: true }
+        }
+      }
+    });
+  } catch (err) {
+    console.error('Projection chart failed to render:', err);
+  }
 }
 
 const _origShowSectionFunnel = setMainTab;
