@@ -589,6 +589,9 @@ body {
 <button class="main-tab-btn" id="tabSpecialists" onclick="setMainTab('specialists')">
   <i data-lucide="user-check" style="width:16px;height:16px;"></i> Media Specialists
 </button>
+<button class="main-tab-btn" id="tabProjection" onclick="setMainTab('projection')">
+  <i data-lucide="rocket" style="width:16px;height:16px;"></i> 6-Month Projection
+</button>
 </div>
 
   <!-- MAP VIEW -->
@@ -1041,6 +1044,72 @@ body {
   </div>
 
 </div><!-- end #specialistsSection -->
+
+<div id="projectionSection" style="display:none;">
+
+  <div class="map-section" style="margin-bottom:24px;">
+    <h3 style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+      <i data-lucide="rocket" style="width:18px;height:18px;"></i> 6-Month Forward Projection
+    </h3>
+    <p style="font-size:13px;color:#64748b;margin-bottom:20px;">
+      Built entirely from your live data — current ATV, booking rates, retainer contracts, and specialist capacity — projected forward month by month. Not a guess; a model.
+    </p>
+
+    <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;">
+      <div style="flex:1;min-width:260px;">
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Growth Assumption</div>
+        <div style="display:flex;gap:8px;">
+          <button class="rr-btn active" id="projScenarioFlat" onclick="setProjectionScenario('flat')">Current Pace</button>
+          <button class="rr-btn" id="projScenarioTarget" onclick="setProjectionScenario('target')">Target Trajectory</button>
+        </div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:6px;" id="projScenarioNote">Assumes sign-ups, conversion rates and repeat rate stay at their current live average for all 6 months.</div>
+      </div>
+      <div style="flex:1;min-width:260px;">
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Crew Capacity</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <button class="rr-btn active" id="projCrewFixed" onclick="setProjectionCrew(false)">Current Crew (3)</button>
+          <button class="rr-btn" id="projCrewHire" onclick="setProjectionCrew(true)">Add a 4th Hire</button>
+          <select id="projHireMonth" onchange="renderProjectionSection()" style="display:none;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:'Inter',sans-serif;font-size:12px;">
+            <option value="1">Starting Month 1</option>
+            <option value="2">Starting Month 2</option>
+            <option value="3" selected>Starting Month 3</option>
+            <option value="4">Starting Month 4</option>
+            <option value="5">Starting Month 5</option>
+            <option value="6">Starting Month 6</option>
+          </select>
+          <input type="number" id="projHireCapacity" value="40" min="10" max="80" step="1" style="display:none;width:80px;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-family:'Inter',sans-serif;font-size:12px;" onchange="renderProjectionSection()" title="New hire's monthly shoot capacity">
+        </div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:6px;" id="projCrewNote">Total bookings each month are capped at your current specialists' combined monthly targets — the model won't project delivery you cannot physically staff.</div>
+      </div>
+    </div>
+
+    <div id="projectionCallout" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;"></div>
+
+    <canvas id="projectionChart" style="max-height:340px;margin-bottom:24px;"></canvas>
+
+    <div style="overflow-x:auto;">
+      <table class="comp-table" id="projectionTable">
+        <thead>
+          <tr>
+            <th>Month</th>
+            <th>Existing Client Bookings</th>
+            <th>New Client Bookings</th>
+            <th>Total Bookings</th>
+            <th>Capacity Ceiling</th>
+            <th>Retainer Revenue</th>
+            <th>Booking Revenue</th>
+            <th>Total Revenue</th>
+          </tr>
+        </thead>
+        <tbody id="projectionTableBody"></tbody>
+      </table>
+    </div>
+
+    <div id="projectionNarrative" style="margin-top:20px;"></div>
+
+  </div>
+
+</div><!-- end #projectionSection -->
 
 </div>
 
@@ -4634,12 +4703,210 @@ function renderSpecialistsSection() {
   lucide.createIcons();
 }
 
+// ══════════════════════════════════════════════════════════════
+//  6-MONTH PROJECTION
+// ══════════════════════════════════════════════════════════════
+
+let projScenario = 'flat';       // 'flat' | 'target'
+let projCrewHireOn = false;      // whether the 4th-hire toggle is on
+let projectionChartInstance = null;
+
+function setProjectionScenario(mode) {
+  projScenario = mode;
+  document.getElementById('projScenarioFlat').classList.toggle('active', mode === 'flat');
+  document.getElementById('projScenarioTarget').classList.toggle('active', mode === 'target');
+  document.getElementById('projScenarioNote').textContent = mode === 'flat'
+    ? 'Assumes sign-ups, conversion rates and repeat rate stay at their current live average for all 6 months.'
+    : 'Assumes sign-ups and bookings ramp linearly from current pace toward your Year 1 (£30,000/mo) monthly target by month 6.';
+  renderProjectionSection();
+}
+
+function setProjectionCrew(hireOn) {
+  projCrewHireOn = hireOn;
+  document.getElementById('projCrewFixed').classList.toggle('active', !hireOn);
+  document.getElementById('projCrewHire').classList.toggle('active', hireOn);
+  document.getElementById('projHireMonth').style.display = hireOn ? 'inline-block' : 'none';
+  document.getElementById('projHireCapacity').style.display = hireOn ? 'inline-block' : 'none';
+  document.getElementById('projCrewNote').textContent = hireOn
+    ? 'From the selected month onward, the new hire\'s monthly capacity is added to the ceiling below.'
+    : 'Total bookings each month are capped at your current specialists\' combined monthly targets — the model won\'t project delivery you cannot physically staff.';
+  renderProjectionSection();
+}
+
+// Builds the 6-month forward model from live data only. month index 1..6,
+// where month 1 is the calendar month immediately after the current one.
+function computeProjection() {
+  const live = calcLiveMonthlyAverages();
+  const atv = calcLiveATV();
+  const T = buildTargets();
+  const yearKey = 'y' + getCurrentYear();
+
+  const now = new Date();
+  const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  // Starting pools — these evolve month to month as first-timers graduate
+  // into the existing pool, exactly like the "How the two pools connect"
+  // logic already on the Performance tab.
+  let neverBookedPool = live.neverBookedPool.size;
+  let everBookedPool = live.everBookedPool.size;
+
+  const existingRate0 = live.existingClientBookingRate || 0;
+  const newRate0 = live.newClientBookingRate || 0;
+  const signups0 = live.avgMonthlySignups || 0;
+  const conversionRate = live.lifetimeBookingRate > 0 ? live.lifetimeBookingRate : 0.5;
+
+  const targetSignups = T.monthly.signups[yearKey] || signups0;
+  const targetExistingRate = existingRate0; // repeat rate assumed stable even in target scenario
+  const targetNewRate = newRate0;
+
+  // Fixed crew capacity ceiling (per month), from live Specialist Targets
+  const baseCapacity = ACTIVE_MEDIA_SPECIALISTS.reduce((s, name) => s + getMonthlyTarget(name), 0);
+  const hireMonth = projCrewHireOn ? parseInt(document.getElementById('projHireMonth')?.value || '3', 10) : null;
+  const hireCapacity = projCrewHireOn ? parseFloat(document.getElementById('projHireCapacity')?.value || '40') : 0;
+
+  const months = [];
+  for (let m = 1; m <= 6; m++) {
+    const monthDate = new Date(currentMonthStart.getFullYear(), currentMonthStart.getMonth() + m, 1);
+    const y = monthDate.getFullYear();
+    const mi = monthDate.getMonth();
+
+    // Linear ramp fraction for target scenario (0 at month 0, 1 at month 6)
+    const rampFrac = m / 6;
+
+    const monthSignups = projScenario === 'target'
+      ? signups0 + (targetSignups - signups0) * rampFrac
+      : signups0;
+
+    // New-client bookings landing this month = sign-ups from ~lag days ago × conversion rate.
+    // We don't have literal future sign-up records, so we treat the sign-up
+    // rate as steady (or ramping) and apply the same conversion rate measured historically.
+    const newClientBookings = monthSignups * conversionRate;
+
+    // Existing pool repeat bookings this month
+    const existingRate = projScenario === 'target'
+      ? existingRate0 + (targetExistingRate - existingRate0) * rampFrac
+      : existingRate0;
+    const existingClientBookings = everBookedPool * existingRate;
+
+    let totalBookingsWanted = newClientBookings + existingClientBookings;
+
+    // Capacity ceiling for this month
+    let capacity = baseCapacity;
+    if (projCrewHireOn && hireMonth !== null && m >= hireMonth) capacity += hireCapacity;
+
+    const totalBookingsDelivered = Math.min(totalBookingsWanted, capacity);
+    const cappedByCapacity = totalBookingsWanted > capacity;
+    // Scale new/existing proportionally if capped
+    const scaleFactor = totalBookingsWanted > 0 ? totalBookingsDelivered / totalBookingsWanted : 1;
+    const existingDelivered = existingClientBookings * scaleFactor;
+    const newDelivered = newClientBookings * scaleFactor;
+
+    const retainerRevExVat = getRetainerRevenueForMonth(y, mi) / 1.2;
+    const bookingRevenue = totalBookingsDelivered * atv;
+    const totalRevenue = bookingRevenue + retainerRevExVat;
+
+    months.push({
+      m, label: monthDate.toLocaleString('en-GB', { month: 'short', year: 'numeric' }),
+      existingDelivered, newDelivered, totalBookingsDelivered,
+      capacity, cappedByCapacity,
+      retainerRevExVat, bookingRevenue, totalRevenue
+    });
+
+    // Graduate this month's first-timers into the existing pool for next month
+    neverBookedPool = Math.max(0, neverBookedPool - newDelivered);
+    everBookedPool = everBookedPool + newDelivered;
+  }
+
+  return { months, baseCapacity, atv, conversionRate };
+}
+
+function renderProjectionSection() {
+  const proj = computeProjection();
+  const fmtMoney = v => '£' + Math.round(v).toLocaleString();
+
+  const totalRevenue6mo = proj.months.reduce((s, mo) => s + mo.totalRevenue, 0);
+  const totalBookings6mo = proj.months.reduce((s, mo) => s + mo.totalBookingsDelivered, 0);
+  const monthsAtCapacity = proj.months.filter(mo => mo.cappedByCapacity).length;
+  const finalMonthRevenue = proj.months[proj.months.length - 1].totalRevenue;
+
+  document.getElementById('projectionCallout').innerHTML = `
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Total Projected Revenue (6mo)</div>
+      <div style="font-size:24px;font-weight:800;color:#10b981;">${fmtMoney(totalRevenue6mo)}</div>
+    </div>
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Total Projected Bookings (6mo)</div>
+      <div style="font-size:24px;font-weight:800;color:#8b5cf6;">${Math.round(totalBookings6mo)}</div>
+    </div>
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Month 6 Revenue</div>
+      <div style="font-size:24px;font-weight:800;color:#0f172a;">${fmtMoney(finalMonthRevenue)}</div>
+    </div>
+    <div style="background:${monthsAtCapacity > 0 ? 'rgba(239,68,68,0.08)' : 'rgba(16,185,129,0.08)'};border:1px solid ${monthsAtCapacity > 0 ? '#ef4444' : '#10b981'}44;border-radius:12px;padding:14px 16px;">
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Months Hitting Capacity Ceiling</div>
+      <div style="font-size:24px;font-weight:800;color:${monthsAtCapacity > 0 ? '#ef4444' : '#10b981'};">${monthsAtCapacity} / 6</div>
+    </div>`;
+
+  document.getElementById('projectionTableBody').innerHTML = proj.months.map(mo => `
+    <tr>
+      <td class="metric-name">${mo.label}</td>
+      <td>${mo.existingDelivered.toFixed(1)}</td>
+      <td>${mo.newDelivered.toFixed(1)}</td>
+      <td class="current-val">${mo.totalBookingsDelivered.toFixed(1)}</td>
+      <td style="${mo.cappedByCapacity ? 'color:#ef4444;font-weight:700;' : 'color:#475569;'}">${mo.capacity.toFixed(0)}${mo.cappedByCapacity ? ' ⚠ capped' : ''}</td>
+      <td>${fmtMoney(mo.retainerRevExVat)}</td>
+      <td>${fmtMoney(mo.bookingRevenue)}</td>
+      <td class="current-val">${fmtMoney(mo.totalRevenue)}</td>
+    </tr>`).join('');
+
+  const ctx = document.getElementById('projectionChart').getContext('2d');
+  if (projectionChartInstance) projectionChartInstance.destroy();
+  projectionChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: proj.months.map(mo => mo.label),
+      datasets: [
+        { label: 'Existing Client Revenue', data: proj.months.map(mo => mo.existingDelivered * proj.atv), backgroundColor: '#10b98188', borderColor: '#10b981', borderWidth: 2, borderRadius: 6, stack: 's' },
+        { label: 'New Client Revenue', data: proj.months.map(mo => mo.newDelivered * proj.atv), backgroundColor: '#3b82f688', borderColor: '#3b82f6', borderWidth: 2, borderRadius: 6, stack: 's' },
+        { label: 'Retainer Revenue', data: proj.months.map(mo => mo.retainerRevExVat), backgroundColor: '#8b5cf688', borderColor: '#8b5cf6', borderWidth: 2, borderRadius: 6, stack: 's' },
+        { label: 'Capacity Ceiling (Revenue Equivalent)', data: proj.months.map(mo => mo.capacity * proj.atv), type: 'line', borderColor: '#ef4444', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5, 4], pointRadius: 3, fill: false }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true, position: 'top', labels: { font: { family: 'Inter', size: 12 }, color: '#475569', boxWidth: 18, padding: 16 } }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { family: 'Inter', size: 12, weight: '600' }, color: '#0f172a' } },
+        y: { stacked: true, grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Inter', size: 11 }, color: '#94a3b8', callback: v => '£' + v.toLocaleString() }, beginAtZero: true }
+      }
+    }
+  });
+
+  const capacityNote = monthsAtCapacity > 0
+    ? `<div style="background:rgba(239,68,68,0.08);border:1px solid #ef444444;border-radius:10px;padding:14px 16px;margin-bottom:12px;font-size:13px;color:#7f1d1d;line-height:1.6;">
+        ⚠ <strong>${monthsAtCapacity} of 6 months</strong> hit the specialist capacity ceiling (${proj.baseCapacity.toFixed(0)} shoots/mo with the current crew${projCrewHireOn ? `, rising to ${(proj.baseCapacity + parseFloat(document.getElementById('projHireCapacity')?.value || 0)).toFixed(0)}/mo once the 4th hire starts` : ''}). Demand exceeds what the crew can physically deliver — either bring capacity forward, or the projected revenue above is the realistic ceiling regardless of how much pipeline you generate.
+      </div>`
+    : `<div style="background:rgba(16,185,129,0.08);border:1px solid #10b98144;border-radius:10px;padding:14px 16px;margin-bottom:12px;font-size:13px;color:#065f46;line-height:1.6;">
+        ✓ Projected demand stays within current crew capacity across all 6 months — no staffing bottleneck under this scenario.
+      </div>`;
+
+  const scenarioNote = projScenario === 'target'
+    ? `<div style="font-size:13px;color:#475569;line-height:1.7;">This run assumes sign-ups ramp from your current live average toward the ${T.monthly.signups[yearKey]}/mo needed to hit your Year 1 target — a linear ramp over 6 months, not a step change. Existing-client repeat rate is held at its current measured level since retention behaviour tends to move slower than acquisition.</div>`
+    : `<div style="font-size:13px;color:#475569;line-height:1.7;">This run holds sign-ups, conversion rate and repeat rate at their current live average for all 6 months — i.e. "if nothing changes." Retainer revenue is deterministic (based on actual contract end dates), so it's the only part of this projection that isn't an estimate.</div>`;
+
+  document.getElementById('projectionNarrative').innerHTML = capacityNote + scenarioNote;
+
+  lucide.createIcons();
+}
+
 const _origShowSectionFunnel = setMainTab;
 setMainTab = function(tab) {
-  const extraSections = ['funnelSection', 'specialistsSection'];
-  const extraTabs = ['tabFunnel', 'tabSpecialists'];
+  const extraSections = ['funnelSection', 'specialistsSection', 'projectionSection'];
+  const extraTabs = ['tabFunnel', 'tabSpecialists', 'tabProjection'];
 
-  if (tab === 'funnel' || tab === 'specialists') {
+  if (tab === 'funnel' || tab === 'specialists' || tab === 'projection') {
     document.getElementById('mapView').style.display = 'none';
     document.getElementById('performanceSection').style.display = 'none';
     document.getElementById('pipelineSection').style.display = 'none';
@@ -4648,18 +4915,19 @@ setMainTab = function(tab) {
       if (el) el.style.display = 'none';
     });
 
-    const activeSectionId = tab === 'funnel' ? 'funnelSection' : 'specialistsSection';
+    const activeSectionId = tab === 'funnel' ? 'funnelSection' : tab === 'specialists' ? 'specialistsSection' : 'projectionSection';
     document.getElementById(activeSectionId).style.display = 'block';
 
     ['tabClients', 'tabBookings', 'tabPerformance', 'tabPipeline', ...extraTabs].forEach(id => {
       const btn = document.getElementById(id);
       if (!btn) return;
-      const isActive = (tab === 'funnel' && id === 'tabFunnel') || (tab === 'specialists' && id === 'tabSpecialists');
+      const isActive = (tab === 'funnel' && id === 'tabFunnel') || (tab === 'specialists' && id === 'tabSpecialists') || (tab === 'projection' && id === 'tabProjection');
       btn.className = 'main-tab-btn' + (isActive ? ' active clients' : '');
     });
 
     if (tab === 'funnel') loadFunnelData();
-    else renderSpecialistsSection();
+    else if (tab === 'specialists') renderSpecialistsSection();
+    else renderProjectionSection();
 
     lucide.createIcons();
   } else {
