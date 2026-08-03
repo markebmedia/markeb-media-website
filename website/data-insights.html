@@ -1062,7 +1062,7 @@ body {
           <button class="rr-btn active" id="projScenarioFlat" onclick="setProjectionScenario('flat')">Current Pace</button>
           <button class="rr-btn" id="projScenarioTarget" onclick="setProjectionScenario('target')">Target Trajectory</button>
         </div>
-        <div style="font-size:11px;color:#94a3b8;margin-top:6px;" id="projScenarioNote">Assumes sign-ups, conversion rates and repeat rate stay at their current live average for all 6 months.</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:6px;" id="projScenarioNote">Assumes new and existing client bookings continue at your actual pace over the last 3 months, for all 6 months.</div>
       </div>
       <div style="flex:1;min-width:260px;">
         <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Crew Capacity</div>
@@ -4716,8 +4716,8 @@ function setProjectionScenario(mode) {
   document.getElementById('projScenarioFlat').classList.toggle('active', mode === 'flat');
   document.getElementById('projScenarioTarget').classList.toggle('active', mode === 'target');
   document.getElementById('projScenarioNote').textContent = mode === 'flat'
-    ? 'Assumes sign-ups, conversion rates and repeat rate stay at their current live average for all 6 months.'
-    : 'Assumes sign-ups and bookings ramp linearly from current pace toward your Year 1 (£30,000/mo) monthly target by month 6.';
+    ? 'Assumes new and existing client bookings continue at your actual pace over the last 3 months, for all 6 months.'
+    : 'Assumes new and existing client bookings ramp linearly from your last-3-months pace toward your Year 1 (£30,000/mo) monthly target by month 6.';
   renderProjectionSection();
 }
 
@@ -4735,29 +4735,72 @@ function setProjectionCrew(hireOn) {
 
 // Builds the 6-month forward model from live data only. month index 1..6,
 // where month 1 is the calendar month immediately after the current one.
+// Computes actual recent pace (default: last 3 calendar months) instead of
+// an all-time average, so the projection reflects current momentum rather
+// than being diluted by early, slower months from the company's history.
+// A booking counts as "new client" if that client's first-ever non-cancelled
+// booking (checked across all history) falls within this window; otherwise
+// it's an "existing client" booking.
+function calcRecentPaceMetrics(windowMonths) {
+  const now = new Date();
+  const windowStart = new Date(now.getFullYear(), now.getMonth() - windowMonths, 1);
+
+  const firstBookingByEmail = {};
+  bookingData
+    .filter(b => b.date && b.bookingStatus !== 'Cancelled' && b.clientEmail)
+    .forEach(b => {
+      const email = (b.clientEmail || '').toLowerCase();
+      const d = new Date(b.date);
+      if (!firstBookingByEmail[email] || d < firstBookingByEmail[email]) firstBookingByEmail[email] = d;
+    });
+
+  const windowBookings = bookingData.filter(b => {
+    if (!b.date || b.bookingStatus === 'Cancelled') return false;
+    const d = new Date(b.date);
+    return d >= windowStart && d <= now;
+  });
+
+  let newCount = 0, existCount = 0, totalRevenue = 0, paidCount = 0;
+  windowBookings.forEach(b => {
+    const email = (b.clientEmail || '').toLowerCase();
+    const val = parseFloat(b.priceExVAT) || 0;
+    if (val > 0) { totalRevenue += val; paidCount++; }
+    const firstDate = firstBookingByEmail[email];
+    const isFirstBookingInWindow = firstDate && firstDate >= windowStart;
+    if (isFirstBookingInWindow) newCount++; else existCount++;
+  });
+
+  const recentATV = paidCount > 0 ? (totalRevenue / paidCount) : calcLiveATV();
+
+  // Actual elapsed time in the window (handles a partial current month cleanly)
+  const monthsElapsed = Math.max(1, (now - windowStart) / (1000 * 60 * 60 * 24 * 30.44));
+
+  const avgNewBookingsPerMonth = newCount / monthsElapsed;
+  const avgExistingBookingsPerMonth = existCount / monthsElapsed;
+
+  const windowSignups = clientData.filter(u => {
+    const d = new Date(u.fields['Created Date']);
+    return d >= windowStart && d <= now;
+  }).length;
+  const avgSignupsPerMonth = windowSignups / monthsElapsed;
+
+  return { recentATV, avgNewBookingsPerMonth, avgExistingBookingsPerMonth, avgSignupsPerMonth, windowMonths };
+}
+
 function computeProjection() {
-  const live = calcLiveMonthlyAverages();
-  const atv = calcLiveATV();
+  const recent = calcRecentPaceMetrics(3); // last 3 calendar months, not all-time
+  const atv = recent.recentATV;
   const T = buildTargets();
   const yearKey = 'y' + getCurrentYear();
 
   const now = new Date();
   const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  // Starting pools — these evolve month to month as first-timers graduate
-  // into the existing pool, exactly like the "How the two pools connect"
-  // logic already on the Performance tab.
-  let neverBookedPool = live.neverBookedPool.size;
-  let everBookedPool = live.everBookedPool.size;
+  const baseNewBookings = recent.avgNewBookingsPerMonth;
+  const baseExistingBookings = recent.avgExistingBookingsPerMonth;
 
-  const existingRate0 = live.existingClientBookingRate || 0;
-  const newRate0 = live.newClientBookingRate || 0;
-  const signups0 = live.avgMonthlySignups || 0;
-  const conversionRate = live.lifetimeBookingRate > 0 ? live.lifetimeBookingRate : 0.5;
-
-  const targetSignups = T.monthly.signups[yearKey] || signups0;
-  const targetExistingRate = existingRate0; // repeat rate assumed stable even in target scenario
-  const targetNewRate = newRate0;
+  const targetNewBookings = T.monthly.newBookings[yearKey] || baseNewBookings;
+  const targetExistingBookings = T.monthly.existBookings[yearKey] || baseExistingBookings;
 
   // Fixed crew capacity ceiling (per month), from live Specialist Targets
   const baseCapacity = ACTIVE_MEDIA_SPECIALISTS.reduce((s, name) => s + getMonthlyTarget(name), 0);
@@ -4773,20 +4816,13 @@ function computeProjection() {
     // Linear ramp fraction for target scenario (0 at month 0, 1 at month 6)
     const rampFrac = m / 6;
 
-    const monthSignups = projScenario === 'target'
-      ? signups0 + (targetSignups - signups0) * rampFrac
-      : signups0;
+    const newClientBookings = projScenario === 'target'
+      ? baseNewBookings + (targetNewBookings - baseNewBookings) * rampFrac
+      : baseNewBookings;
 
-    // New-client bookings landing this month = sign-ups from ~lag days ago × conversion rate.
-    // We don't have literal future sign-up records, so we treat the sign-up
-    // rate as steady (or ramping) and apply the same conversion rate measured historically.
-    const newClientBookings = monthSignups * conversionRate;
-
-    // Existing pool repeat bookings this month
-    const existingRate = projScenario === 'target'
-      ? existingRate0 + (targetExistingRate - existingRate0) * rampFrac
-      : existingRate0;
-    const existingClientBookings = everBookedPool * existingRate;
+    const existingClientBookings = projScenario === 'target'
+      ? baseExistingBookings + (targetExistingBookings - baseExistingBookings) * rampFrac
+      : baseExistingBookings;
 
     let totalBookingsWanted = newClientBookings + existingClientBookings;
 
@@ -4811,13 +4847,9 @@ function computeProjection() {
       capacity, cappedByCapacity,
       retainerRevExVat, bookingRevenue, totalRevenue
     });
-
-    // Graduate this month's first-timers into the existing pool for next month
-    neverBookedPool = Math.max(0, neverBookedPool - newDelivered);
-    everBookedPool = everBookedPool + newDelivered;
   }
 
-  return { months, baseCapacity, atv, conversionRate };
+  return { months, baseCapacity, atv, windowMonths: recent.windowMonths };
 }
 
 function renderProjectionSection() {
@@ -4893,8 +4925,8 @@ function renderProjectionSection() {
       </div>`;
 
   const scenarioNote = projScenario === 'target'
-    ? `<div style="font-size:13px;color:#475569;line-height:1.7;">This run assumes sign-ups ramp from your current live average toward the ${T.monthly.signups[yearKey]}/mo needed to hit your Year 1 target — a linear ramp over 6 months, not a step change. Existing-client repeat rate is held at its current measured level since retention behaviour tends to move slower than acquisition.</div>`
-    : `<div style="font-size:13px;color:#475569;line-height:1.7;">This run holds sign-ups, conversion rate and repeat rate at their current live average for all 6 months — i.e. "if nothing changes." Retainer revenue is deterministic (based on actual contract end dates), so it's the only part of this projection that isn't an estimate.</div>`;
+    ? `<div style="font-size:13px;color:#475569;line-height:1.7;">This run ramps new and existing client bookings from your actual pace over the last 3 months toward the ${T.monthly.newBookings[yearKey]} new + ${T.monthly.existBookings[yearKey]} existing bookings/mo needed to hit your Year 1 target — a linear ramp over 6 months, not a step change.</div>`
+    : `<div style="font-size:13px;color:#475569;line-height:1.7;">This run holds new and existing client booking counts at their actual average pace over the last 3 months for all 6 months — i.e. "if nothing changes from recent momentum." Retainer revenue is deterministic (based on actual contract end dates), so it's the only part of this projection that isn't an estimate.</div>`;
 
   document.getElementById('projectionNarrative').innerHTML = capacityNote + scenarioNote;
 
