@@ -6154,6 +6154,10 @@ const confirmMsg = `Create booking for ${formData.clientName}?\n\nService: ${for
     loadDiscountCodes();
   }
 
+  if (sectionId === 'team-access') {
+    loadTeamAccess();
+  }
+
   if (window.innerWidth <= 1024) {
     document.getElementById('adminSidebar').classList.remove('open');
   }
