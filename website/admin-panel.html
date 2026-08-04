@@ -2654,6 +2654,46 @@ body {
   </div>
 </div>
 
+<!-- Team Access Section -->
+<div class="admin-section" id="team-access">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h2 style="font-size:24px;font-weight:700;margin-bottom:4px;">Team Access</h2>
+      <p style="color:#64748b;font-size:14px;">Invite people to the admin panel and control which sections each account can see</p>
+    </div>
+    <button class="btn btn-primary" onclick="showInviteModal()">
+      <i data-lucide="user-plus" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Invite Person
+    </button>
+  </div>
+
+  <div class="calendar-container" id="teamAccessContainer">
+    <div style="text-align:center;padding:40px;"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- Invite Person Modal -->
+<div class="password-modal" id="inviteModal" style="display:none;">
+  <div class="password-dialog" style="max-width:480px;">
+    <div class="password-header" style="padding:24px;">
+      <h2 style="font-size:18px;">Invite Person</h2>
+      <p>They will receive an email to set their own password</p>
+    </div>
+    <div class="password-body" style="padding:24px;">
+      <label style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">Name</label>
+      <input type="text" id="inviteName" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;margin-bottom:14px;">
+      <label style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;display:block;margin-bottom:4px;">Email</label>
+      <input type="email" id="inviteEmail" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;margin-bottom:14px;">
+      <label style="font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;display:block;margin-bottom:8px;">Sections they can access</label>
+      <div id="invitePermissionsList" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:240px;overflow-y:auto;margin-bottom:16px;padding:4px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="closeInviteModal()">Cancel</button>
+        <button class="btn btn-primary" style="flex:1;" id="sendInviteBtn" onclick="sendInvite()">Send Invite</button>
+      </div>
+      <div id="inviteStatus" style="font-size:12px;color:#64748b;margin-top:10px;"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Retainer Clients Section -->
 <div class="admin-section" id="retainer-clients">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
