@@ -1773,37 +1773,49 @@ body {
 <body>
 
   <body>
-  <!-- Password Protection Modal -->
+  <!-- Admin Login Modal -->
 <div class="password-modal" id="passwordModal">
   <div class="password-dialog">
     <div class="password-header">
       <div class="password-logo">
         <img src="/public/images/Markeb Media Logo (2).png" alt="Markeb Media" style="width: 80px; height: auto;">
       </div>
-      <h2>Admin Access Required</h2>
-      <p>Enter the admin code to continue</p>
+      <h2>Admin Login</h2>
+      <p>Sign in with your admin account</p>
     </div>
       
       <div class="password-body">
         <form id="passwordForm" onsubmit="checkPassword(event)">
           <div class="password-input-group">
             <input 
+              type="email" 
+              id="adminEmail" 
+              class="password-input"
+              placeholder="Email address"
+              autocomplete="username"
+              autofocus
+              style="margin-bottom: 12px;"
+            />
+            <input 
               type="password" 
               id="adminPassword" 
               class="password-input"
-              placeholder="Enter admin code"
-              autocomplete="off"
-              autofocus
+              placeholder="Password"
+              autocomplete="current-password"
             />
             <div class="password-error" id="passwordError">
-              ❌ Incorrect code. Please try again.
+              ❌ Incorrect email or password.
             </div>
           </div>
           
           <button type="submit" class="password-submit">
-            <span>Unlock Admin Panel</span>
+            <span>Log In</span>
           </button>
         </form>
+
+        <div style="text-align:center;margin-top:12px;">
+          <a href="#" onclick="showForgotPassword(event)" style="font-size:12px;color:#64748b;text-decoration:underline;">Forgot password?</a>
+        </div>
         
         <div class="password-footer">
           <p>⚠️ Authorised Staff Only</p>
@@ -1811,6 +1823,24 @@ body {
       </div>
     </div>
   </div>
+
+  <!-- Forgot Password Modal -->
+<div class="password-modal" id="forgotPasswordModal" style="display:none;">
+  <div class="password-dialog" style="max-width:400px;">
+    <div class="password-header" style="padding:24px;">
+      <h2 style="font-size:18px;">Reset Password</h2>
+      <p>We will email you a link to set a new password</p>
+    </div>
+    <div class="password-body" style="padding:24px;">
+      <input type="email" id="forgotEmail" placeholder="Your email address" style="width:100%;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;margin-bottom:14px;">
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-secondary" style="flex:1;" onclick="closeForgotPassword()">Cancel</button>
+        <button class="btn btn-primary" style="flex:1;" id="sendResetBtn" onclick="sendPasswordReset()">Send Link</button>
+      </div>
+      <div id="forgotStatus" style="font-size:12px;color:#64748b;margin-top:10px;"></div>
+    </div>
+  </div>
+</div>
 
   <!-- Mobile Menu Button -->
   <button class="mobile-menu-btn" onclick="toggleSidebar()">☰ Menu</button>
@@ -1927,6 +1957,10 @@ body {
     <div class="nav-item" onclick="showSection('creator-network')">
       <i data-lucide="users-round" class="nav-icon"></i>
       Creator Network
+    </div>
+    <div class="nav-item" onclick="showSection('team-access')">
+      <i data-lucide="shield" class="nav-icon"></i>
+      Team Access
     </div>
   </div>
 
@@ -4498,30 +4532,75 @@ function generateSpecialistOptions() {
   return html;
 }
 
-    // ===== PASSWORD PROTECTION =====
-const SESSION_KEY = 'admin_authenticated';
-const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
+    // ===== ADMIN SESSION & PERMISSIONS =====
+const SESSION_KEY = 'admin_session';
+let currentAdminUser = null; // { name, email, permissions }
 
     // ===== GLOBAL VARIABLES ===== 
     let currentMarketData = null;  // ✅ ADD THIS LINE HERE
 
-    // Check if already authenticated
-    function isAuthenticated() {
-      const authData = localStorage.getItem(SESSION_KEY);
-      if (!authData) return false;
-      
+const ADMIN_SECTIONS = [
+  { key: 'create-booking',    label: 'Create Booking' },
+  { key: 'calendar',          label: 'Calendar' },
+  { key: 'pending',           label: 'Pending (Need Payment)' },
+  { key: 'offers',            label: 'Offers' },
+  { key: 'discount-codes',    label: 'Discount Codes' },
+  { key: 'review-rewards',    label: 'Review Rewards' },
+  { key: 'customers',         label: 'All Clients' },
+  { key: 'retainer-clients',  label: 'Retainer Clients' },
+  { key: 'invoices',          label: 'Invoices' },
+  { key: 'bulk-invoicing',    label: 'Bulk Invoicing' },
+  { key: 'xero-connection',   label: 'Xero' },
+  { key: 'market-updates',    label: 'Market Updates' },
+  { key: 'email-broadcast',   label: 'Email Broadcast' },
+  { key: 'blocked-times',     label: 'Block Times' },
+  { key: 'time-requests',     label: 'Time Requests' },
+  { key: 'creator-network',   label: 'Creator Network' },
+  { key: 'team-access',       label: 'Team Access' },
+  { key: 'prospect-finder',   label: 'Prospect Finder' },
+  { key: 'pipeline',          label: 'Pipeline' },
+  { key: 'sequences',         label: 'Sequences' }
+];
+
+    // Show only nav items (and gate showSection) the current user has permission for
+    function applyPermissions(permissions) {
+      const fullAccess = permissions.includes('*');
+      document.querySelectorAll('.nav-item[onclick*="showSection"]').forEach(item => {
+        const match = item.getAttribute('onclick').match(/showSection\('([^']+)'\)/);
+        if (!match) return;
+        const section = match[1];
+        item.style.display = (fullAccess || permissions.includes(section)) ? '' : 'none';
+      });
+      // hide now-empty nav-section headers
+      document.querySelectorAll('.nav-section').forEach(sec => {
+        const visibleItems = sec.querySelectorAll('.nav-item[onclick*="showSection"]');
+        const anyVisible = Array.from(visibleItems).some(i => i.style.display !== 'none');
+        sec.style.display = anyVisible ? '' : 'none';
+      });
+    }
+
+    // Verify a stored session token against the server
+    async function isAuthenticated() {
+      const raw = localStorage.getItem(SESSION_KEY);
+      if (!raw) return false;
+
+      let stored;
+      try { stored = JSON.parse(raw); } catch (e) { return false; }
+      if (!stored.token) return false;
+
       try {
-        const { timestamp } = JSON.parse(authData);
-        const now = Date.now();
-        
-        // Check if session is still valid
-        if (now - timestamp < SESSION_DURATION) {
-          return true;
-        } else {
-          // Session expired
+        const res = await fetch('/.netlify/functions/admin-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: stored.token })
+        });
+        const data = await res.json();
+        if (!data.success) {
           localStorage.removeItem(SESSION_KEY);
           return false;
         }
+        currentAdminUser = { name: data.name, email: data.email, permissions: data.permissions || [] };
+        return true;
       } catch (e) {
         return false;
       }
@@ -4530,30 +4609,33 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
    async function checkPassword(event) {
   event.preventDefault();
   
-  const input = document.getElementById('adminPassword');
+  const emailInput = document.getElementById('adminEmail');
+  const passInput = document.getElementById('adminPassword');
   const error = document.getElementById('passwordError');
   const modal = document.getElementById('passwordModal');
   
-  const res = await fetch('/.netlify/functions/admin-auth', {
+  const res = await fetch('/.netlify/functions/admin-login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code: input.value })
+    body: JSON.stringify({ email: emailInput.value, password: passInput.value })
   });
   const data = await res.json();
   
   if (data.success) {
-    localStorage.setItem(SESSION_KEY, JSON.stringify({ timestamp: Date.now() }));
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ token: data.token }));
+    currentAdminUser = { name: data.name, permissions: data.permissions || [] };
+    applyPermissions(currentAdminUser.permissions);
     modal.style.opacity = '0';
     modal.style.transform = 'scale(0.95)';
     modal.style.transition = 'all 0.3s ease';
     setTimeout(() => { modal.classList.add('unlocked'); }, 300);
   } else {
     error.classList.add('show');
-    input.value = '';
-    input.classList.add('error');
+    passInput.value = '';
+    passInput.classList.add('error');
     setTimeout(() => {
       error.classList.remove('show');
-      input.classList.remove('error');
+      passInput.classList.remove('error');
     }, 3000);
   }
 }
@@ -4566,10 +4648,193 @@ const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
       }
     }
 
+    // ===== FORGOT PASSWORD =====
+    function showForgotPassword(event) {
+      if (event) event.preventDefault();
+      document.getElementById('forgotEmail').value = '';
+      document.getElementById('forgotStatus').textContent = '';
+      document.getElementById('forgotPasswordModal').style.display = 'flex';
+    }
+
+    function closeForgotPassword() {
+      document.getElementById('forgotPasswordModal').style.display = 'none';
+    }
+
+    async function sendPasswordReset() {
+      const email = document.getElementById('forgotEmail').value.trim();
+      const status = document.getElementById('forgotStatus');
+      const btn = document.getElementById('sendResetBtn');
+
+      if (!email) {
+        status.textContent = 'Enter your email address.';
+        status.style.color = '#ef4444';
+        return;
+      }
+
+      btn.disabled = true;
+      status.textContent = 'Sending...';
+      status.style.color = '#64748b';
+
+      try {
+        await fetch('/.netlify/functions/admin-forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        status.textContent = 'If that email has an account, a reset link is on its way.';
+        status.style.color = '#10b981';
+      } catch (e) {
+        status.textContent = 'Network error — please try again.';
+        status.style.color = '#ef4444';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // ===== TEAM ACCESS =====
+    let teamAccessUsers = [];
+
+    async function loadTeamAccess() {
+      const container = document.getElementById('teamAccessContainer');
+      try {
+        const res = await fetch('/.netlify/functions/admin-users-list');
+        const data = await res.json();
+        teamAccessUsers = data.users || [];
+        renderTeamAccess();
+      } catch (e) {
+        container.innerHTML = '<div style="padding:24px;color:#ef4444;">Failed to load team access.</div>';
+      }
+    }
+
+    function renderTeamAccess() {
+      const container = document.getElementById('teamAccessContainer');
+      if (!teamAccessUsers.length) {
+        container.innerHTML = '<div style="padding:40px;text-align:center;color:#64748b;">No accounts yet — click Invite Person to add your first team member.</div>';
+        return;
+      }
+
+      container.innerHTML = teamAccessUsers.map(u => {
+        const statusColor = u.status === 'Active' ? '#10b981' : '#f59e0b';
+        const checkboxes = ADMIN_SECTIONS.map(s => `
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#334155;">
+            <input type="checkbox" data-user="${u.id}" data-key="${s.key}" ${u.permissions.includes(s.key) ? 'checked' : ''}>
+            ${s.label}
+          </label>
+        `).join('');
+
+        return `
+        <div style="border:1px solid #e2e8f0;border-radius:10px;padding:16px;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+            <div>
+              <div style="font-weight:700;font-size:14px;color:#0f172a;">${u.name}</div>
+              <div style="font-size:12px;color:#64748b;">${u.email}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:11px;font-weight:700;color:${statusColor};text-transform:uppercase;">${u.status}</span>
+              <button class="btn btn-secondary" style="padding:6px 10px;font-size:12px;" onclick="saveTeamPermissions('${u.id}')">Save</button>
+              <button class="btn btn-secondary" style="padding:6px 10px;font-size:12px;color:#ef4444;" onclick="removeTeamUser('${u.id}','${u.name.replace(/'/g,"\\'")}')">Remove</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:6px;">
+            ${checkboxes}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    async function saveTeamPermissions(userId) {
+      const checked = document.querySelectorAll(`input[data-user="${userId}"]:checked`);
+      const permissions = Array.from(checked).map(c => c.getAttribute('data-key'));
+      try {
+        await fetch('/.netlify/functions/admin-users-update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ recordId: userId, permissions })
+        });
+        await loadTeamAccess();
+      } catch (e) {
+        alert('Failed to save permissions.');
+      }
+    }
+
+    async function removeTeamUser(userId, name) {
+      if (!confirm(`Remove access for ${name}? They will no longer be able to log in.`)) return;
+      try {
+        await fetch('/.netlify/functions/admin-users-update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ recordId: userId, remove: true })
+        });
+        await loadTeamAccess();
+      } catch (e) {
+        alert('Failed to remove user.');
+      }
+    }
+
+    function showInviteModal() {
+      document.getElementById('invitePermissionsList').innerHTML = ADMIN_SECTIONS.map(s => `
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#334155;">
+          <input type="checkbox" class="invitePermCheck" value="${s.key}">
+          ${s.label}
+        </label>
+      `).join('');
+      document.getElementById('inviteName').value = '';
+      document.getElementById('inviteEmail').value = '';
+      document.getElementById('inviteStatus').textContent = '';
+      document.getElementById('inviteModal').style.display = 'flex';
+    }
+
+    function closeInviteModal() {
+      document.getElementById('inviteModal').style.display = 'none';
+    }
+
+    async function sendInvite() {
+      const name = document.getElementById('inviteName').value.trim();
+      const email = document.getElementById('inviteEmail').value.trim();
+      const permissions = Array.from(document.querySelectorAll('.invitePermCheck:checked')).map(c => c.value);
+      const status = document.getElementById('inviteStatus');
+      const btn = document.getElementById('sendInviteBtn');
+
+      if (!name || !email) {
+        status.textContent = 'Name and email are required.';
+        status.style.color = '#ef4444';
+        return;
+      }
+
+      btn.disabled = true;
+      status.textContent = 'Sending invite...';
+      status.style.color = '#64748b';
+
+      try {
+        const res = await fetch('/.netlify/functions/admin-invite', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, permissions })
+        });
+        const data = await res.json();
+        if (data.success) {
+          status.textContent = '✓ Invite sent';
+          status.style.color = '#10b981';
+          await loadTeamAccess();
+          setTimeout(closeInviteModal, 1000);
+        } else {
+          status.textContent = data.message || 'Failed to send invite.';
+          status.style.color = '#ef4444';
+        }
+      } catch (e) {
+        status.textContent = 'Network error — please try again.';
+        status.style.color = '#ef4444';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
     // Check authentication on page load
-    window.addEventListener('DOMContentLoaded', function() {
-      if (isAuthenticated()) {
+    window.addEventListener('DOMContentLoaded', async function() {
+      const ok = await isAuthenticated();
+      if (ok) {
         document.getElementById('passwordModal').classList.add('unlocked');
+        applyPermissions(currentAdminUser.permissions);
       }
     });
 
@@ -6072,7 +6337,7 @@ let html = `
           <div style="background: ${monthProgressColor}; height: 100%; width: ${monthProgress}%; transition: width 0.4s ease; border-radius: 5px;"></div>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; margin-top: 6px;">
-          <span>James Jago: 15/wk &nbsp;|&nbsp; Andrii: 15/wk</span>
+          <span>Jodie: 15/wk &nbsp;|&nbsp; James Jago: 15/wk &nbsp;|&nbsp; Andrii: 15/wk</span>
           <span>${monthlyTarget - activeBookings > 0 ? `${monthlyTarget - activeBookings} to go` : '🎉 Target hit!'}</span>
         </div>
       </div>
@@ -6158,6 +6423,7 @@ function renderWeekView(bookings, blockedTimes) {
   const weekProgressColor = weekProgress >= 100 ? '#10b981' : weekProgress >= 66 ? '#f59e0b' : '#ef4444';
   const jamesB = bookings.filter(b => (b.fields['Media Specialist']||'').includes('James') && b.fields['Booking Status'] !== 'Cancelled').length;
   const andriiB = bookings.filter(b => (b.fields['Media Specialist']||'').includes('Andrii') && b.fields['Booking Status'] !== 'Cancelled').length;
+  const jodieB = bookings.filter(b => (b.fields['Media Specialist']||'').includes('Jodie') && b.fields['Booking Status'] !== 'Cancelled').length;
 
   const tempDate = new Date(currentDate);
   const day = tempDate.getDay();
@@ -6187,7 +6453,12 @@ function renderWeekView(bookings, blockedTimes) {
       <div style="background:#e2e8f0;height:10px;border-radius:5px;overflow:hidden;">
         <div style="background:${weekProgressColor};height:100%;width:${weekProgress}%;border-radius:5px;"></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div style="padding:10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;">
+          <div style="font-size:12px;color:#64748b;margin-bottom:4px;">Jodie</div>
+          <div style="font-size:20px;font-weight:700;color:#B46100;">${jodieB} <span style="font-size:12px;font-weight:400;color:#94a3b8;">/ 15</span></div>
+          <div style="background:#e2e8f0;height:6px;border-radius:3px;margin-top:6px;overflow:hidden;"><div style="background:${jodieB>=15?'#10b981':jodieB>=10?'#f59e0b':'#ef4444'};height:100%;width:${Math.min(100,jodieB/15*100)}%;"></div></div>
+        </div>
         <div style="padding:10px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;">
           <div style="font-size:12px;color:#64748b;margin-bottom:4px;">James Jago</div>
           <div style="font-size:20px;font-weight:700;color:#B46100;">${jamesB} <span style="font-size:12px;font-weight:400;color:#94a3b8;">/ 15</span></div>
