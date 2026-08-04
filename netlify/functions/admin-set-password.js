@@ -27,8 +27,8 @@ exports.handler = async (event) => {
   try {
     const { token, password } = JSON.parse(event.body);
 
-    if (!token || !password || password.length < 8) {
-      return { statusCode: 400, headers, body: JSON.stringify({ success: false, message: 'Invalid token or password too short (min 8 characters)' }) };
+    if (!token || !password || password.length < 12) {
+      return { statusCode: 400, headers, body: JSON.stringify({ success: false, message: 'Invalid token or password too short (min 12 characters)' }) };
     }
 
     const tableUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_ADMIN_USERS_TABLE}`;

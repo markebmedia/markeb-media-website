@@ -41,7 +41,7 @@ exports.handler = async (event) => {
     // Small artificial delay to reduce timing-based email enumeration.
     await new Promise(r => setTimeout(r, 300));
 
-    const tableUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_ADMIN_USERS_TABLE}`;
+    let tableUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_ADMIN_USERS_TABLE}`;
     const filterFormula = encodeURIComponent(`LOWER({Email}) = "${email.toLowerCase().trim()}"`);
 
     const lookupRes = await fetch(`${tableUrl}?filterByFormula=${filterFormula}`, {
@@ -53,9 +53,38 @@ exports.handler = async (event) => {
     const lookupData = await lookupRes.json();
     const record = (lookupData.records || [])[0];
 
-    if (!record || record.fields['Status'] !== 'Active' || !verifyPassword(password, record.fields['Password Hash'])) {
+    if (!record || record.fields['Status'] !== 'Active') {
       return { statusCode: 401, headers, body: JSON.stringify({ success: false, message: 'Incorrect email or password' }) };
     }
+
+    const lockedUntil = record.fields['Locked Until'];
+    if (lockedUntil && new Date(lockedUntil).getTime() > Date.now()) {
+      return { statusCode: 401, headers, body: JSON.stringify({ success: false, message: 'Too many failed attempts. Try again in a few minutes.' }) };
+    }
+
+    tableUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_ADMIN_USERS_TABLE}`;
+
+    if (!verifyPassword(password, record.fields['Password Hash'])) {
+      const attempts = (record.fields['Failed Attempts'] || 0) + 1;
+      const patchFields = { 'Failed Attempts': attempts };
+      if (attempts >= 5) {
+        patchFields['Locked Until'] = new Date(Date.now() + 1000 * 60 * 15).toISOString(); // 15 min lockout
+        patchFields['Failed Attempts'] = 0;
+      }
+      await fetch(`${tableUrl}/${record.id}`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fields: patchFields })
+      });
+      return { statusCode: 401, headers, body: JSON.stringify({ success: false, message: 'Incorrect email or password' }) };
+    }
+
+    // Successful login — reset the counter
+    await fetch(`${tableUrl}/${record.id}`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields: { 'Failed Attempts': 0, 'Locked Until': null } })
+    });
 
     let permissions = [];
     try { permissions = JSON.parse(record.fields['Permissions'] || '[]'); } catch (e) { permissions = []; }

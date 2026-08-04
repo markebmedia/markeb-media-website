@@ -1,7 +1,28 @@
 // netlify/functions/auth.js - Netlify serverless function for authentication
 // UPDATED: Now creates Dropbox company folder on user registration
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const { Resend } = require('resend');
+
+function signToken(payload) {
+    const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
+    const sig = crypto.createHmac('sha256', process.env.CLIENT_SESSION_SECRET).update(body).digest('base64url');
+    return `${body}.${sig}`;
+}
+
+function verifyToken(token) {
+    if (!token || !token.includes('.')) return null;
+    const [body, sig] = token.split('.');
+    const expectedSig = crypto.createHmac('sha256', process.env.CLIENT_SESSION_SECRET).update(body).digest('base64url');
+    const sigBuf = Buffer.from(sig || '');
+    const expectedBuf = Buffer.from(expectedSig);
+    if (sigBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(sigBuf, expectedBuf)) return null;
+    try {
+        return JSON.parse(Buffer.from(body, 'base64url').toString());
+    } catch (e) {
+        return null;
+    }
+}
 
 // Initialize Resend
 let resend;
@@ -62,6 +83,8 @@ exports.handler = async (event, context) => {
                 return await handleGetUserData(event, headers);
             case 'validateToken':
                 return await handleValidateToken(event, headers);
+            case 'adminImpersonate':
+                return await handleAdminImpersonate(event, headers);
             default:
                 return {
                     statusCode: 400,
@@ -294,6 +317,18 @@ async function handleLogin(event, headers) {
         const user = result.records[0];
         const storedHash = user.fields['Password Hash'];
 
+        const lockedUntil = user.fields['Locked Until'];
+        if (lockedUntil && new Date(lockedUntil).getTime() > Date.now()) {
+            return {
+                statusCode: 401,
+                headers,
+                body: JSON.stringify({ 
+                    success: false, 
+                    message: 'Too many failed attempts. Please try again in a few minutes.' 
+                })
+            };
+        }
+
         if (!storedHash) {
             return {
                 statusCode: 401,
@@ -308,6 +343,21 @@ async function handleLogin(event, headers) {
         const passwordValid = await verifyPassword(password, storedHash);
 
         if (!passwordValid) {
+            const attempts = (user.fields['Failed Attempts'] || 0) + 1;
+            const patchFields = { 'Failed Attempts': attempts };
+            if (attempts >= 5) {
+                patchFields['Locked Until'] = new Date(Date.now() + 1000 * 60 * 15).toISOString();
+                patchFields['Failed Attempts'] = 0;
+            }
+            fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}/${user.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ fields: patchFields })
+            }).catch(err => console.warn('Failed attempt tracking failed:', err));
+
             return {
                 statusCode: 401,
                 headers,
@@ -317,6 +367,16 @@ async function handleLogin(event, headers) {
                 })
             };
         }
+
+        // Successful login — reset the counter
+        fetch(`https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}/${user.id}`, {
+            method: 'PATCH',
+            headers: {
+                'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ fields: { 'Failed Attempts': 0, 'Locked Until': null } })
+        }).catch(err => console.warn('Failed attempt reset failed:', err));
 
         if (user.fields['Account Status'] !== 'Active') {
             return {
@@ -349,7 +409,7 @@ async function handleLogin(event, headers) {
             expires: Date.now() + (24 * 60 * 60 * 1000)
         };
 
-        const token = Buffer.from(JSON.stringify(sessionData)).toString('base64');
+        const token = signToken(sessionData);
 
         return {
             statusCode: 200,
@@ -539,6 +599,103 @@ try {
     }
 }
 
+async function handleAdminImpersonate(event, headers) {
+    if (event.httpMethod !== 'POST') {
+        return {
+            statusCode: 405,
+            headers,
+            body: JSON.stringify({ success: false, error: 'Method not allowed' })
+        };
+    }
+
+    // Verify the caller is a logged-in, active admin (not the client we're about to impersonate).
+    const authHeader = event.headers.authorization || event.headers.Authorization || '';
+    const adminToken = authHeader.replace(/^Bearer\s+/i, '');
+
+    if (!adminToken || !adminToken.includes('.')) {
+        return { statusCode: 401, headers, body: JSON.stringify({ success: false, message: 'Not authorised' }) };
+    }
+
+    const [body, sig] = adminToken.split('.');
+    const expectedSig = crypto.createHmac('sha256', process.env.ADMIN_SESSION_SECRET).update(body).digest('base64url');
+    const sigBuf = Buffer.from(sig || '');
+    const expectedBuf = Buffer.from(expectedSig);
+    if (sigBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(sigBuf, expectedBuf)) {
+        return { statusCode: 401, headers, body: JSON.stringify({ success: false, message: 'Not authorised' }) };
+    }
+
+    let adminSession;
+    try { adminSession = JSON.parse(Buffer.from(body, 'base64url').toString()); } catch (e) {
+        return { statusCode: 401, headers, body: JSON.stringify({ success: false, message: 'Not authorised' }) };
+    }
+    if (!adminSession.exp || adminSession.exp < Date.now()) {
+        return { statusCode: 401, headers, body: JSON.stringify({ success: false, message: 'Session expired' }) };
+    }
+
+    // Re-check the admin account is still Active.
+    try {
+        const adminUrl = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_ADMIN_USERS_TABLE}/${adminSession.id}`;
+        const adminRes = await fetch(adminUrl, { headers: { 'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}` } });
+        if (!adminRes.ok) {
+            return { statusCode: 401, headers, body: JSON.stringify({ success: false, message: 'Not authorised' }) };
+        }
+        const adminRecord = await adminRes.json();
+        if (adminRecord.fields['Status'] !== 'Active') {
+            return { statusCode: 401, headers, body: JSON.stringify({ success: false, message: 'Not authorised' }) };
+        }
+        // No specific section permission required here — any Active admin account can log in as a client.
+    } catch (error) {
+        console.error('Admin verification error:', error);
+        return { statusCode: 401, headers, body: JSON.stringify({ success: false, message: 'Not authorised' }) };
+    }
+
+    // Look up the target client and issue a properly signed session token for them.
+    const { email } = JSON.parse(event.body);
+    if (!email) {
+        return { statusCode: 400, headers, body: JSON.stringify({ success: false, message: 'Email required' }) };
+    }
+
+    try {
+        const filterFormula = `LOWER({Email}) = "${email.toLowerCase()}"`;
+        const url = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}/${process.env.AIRTABLE_USER_TABLE}?filterByFormula=${encodeURIComponent(filterFormula)}`;
+
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}` }
+        });
+        const result = await response.json();
+
+        if (!result.records || result.records.length === 0) {
+            return { statusCode: 404, headers, body: JSON.stringify({ success: false, message: 'Client not found' }) };
+        }
+
+        const user = result.records[0];
+
+        const sessionData = {
+            email: user.fields['Email'],
+            name: user.fields['Name'],
+            company: user.fields['Company'] || '',
+            timestamp: Date.now(),
+            expires: Date.now() + (2 * 60 * 60 * 1000), // shorter-lived than a normal login: 2 hours
+            adminImpersonation: true
+        };
+
+        const token = signToken(sessionData);
+
+        return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({
+                success: true,
+                token,
+                user: { name: user.fields['Name'], email: user.fields['Email'], company: user.fields['Company'] || '' }
+            })
+        };
+    } catch (error) {
+        console.error('Admin impersonation error:', error);
+        return { statusCode: 500, headers, body: JSON.stringify({ success: false, message: 'Failed to create session' }) };
+    }
+}
+
 async function handleGetUserData(event, headers) {
     if (event.httpMethod !== 'POST') {
         return {
@@ -643,8 +800,19 @@ async function handleValidateToken(event, headers) {
     }
 
     try {
-        const sessionData = JSON.parse(Buffer.from(token, 'base64').toString());
-        
+        const sessionData = verifyToken(token);
+
+        if (!sessionData) {
+            return {
+                statusCode: 401,
+                headers,
+                body: JSON.stringify({ 
+                    success: false, 
+                    message: 'Invalid token' 
+                })
+            };
+        }
+
         if (sessionData.expires && Date.now() > sessionData.expires) {
             return {
                 statusCode: 401,
