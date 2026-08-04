@@ -154,7 +154,12 @@ async function validateTokenWithBackend(token) {
 // Session management functions
 function validateSessionToken(token) {
     try {
-        const tokenData = JSON.parse(atob(token));
+        // New tokens are "base64url-body.signature" — take just the body part.
+        // (Signature verification happens server-side; this is a quick local check.)
+        const bodyPart = token.includes('.') ? token.split('.')[0] : token;
+        const base64 = bodyPart.replace(/-/g, '+').replace(/_/g, '/');
+        const padded = base64 + '='.repeat((4 - base64.length % 4) % 4);
+        const tokenData = JSON.parse(atob(padded));
         const now = Date.now();
 
         if (tokenData.expires && now > tokenData.expires) {
