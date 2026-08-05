@@ -435,15 +435,19 @@
 
   /* ===== PROPERTY PHOTO BANNER ===== */
   .property-photo-banner {
-    background: linear-gradient(135deg, rgba(63,77,27,0.75) 0%, rgba(46,56,18,0.75) 100%),
-                url('../public/images/property-background.JPG') center/cover no-repeat;
+    background: linear-gradient(135deg, rgba(63,77,27,0.45) 0%, rgba(46,56,18,0.5) 100%),
+                url('../public/images/property-background.JPG') center 30%/cover no-repeat;
     border-radius: 16px;
-    padding: 48px 32px;
+    padding: 64px 32px;
     margin-top: 32px;
     margin-bottom: 0;
     color: #fff;
     text-align: center;
     box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .property-photo-banner-content h2 {
