@@ -433,7 +433,35 @@
     z-index: 0;
   }
 
-  /* ===== BRANDING SESSIONS PROMO ===== */
+  /* ===== PROPERTY PHOTO BANNER ===== */
+  .property-photo-banner {
+    background: linear-gradient(135deg, rgba(63,77,27,0.75) 0%, rgba(46,56,18,0.75) 100%),
+                url('../public/images/external/property-background.jpg') center/cover no-repeat;
+    border-radius: 16px;
+    padding: 48px 32px;
+    margin-top: 32px;
+    margin-bottom: 0;
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  }
+
+  .property-photo-banner-content h2 {
+    font-size: clamp(24px, 4vw, 32px);
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    font-family: 'Inter', sans-serif;
+  }
+
+  .property-photo-banner-content p {
+    font-size: 16px;
+    margin-bottom: 20px;
+    opacity: 0.95;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* ===== BRANDING SESSIONS PROMO (legacy, kept for button style) ===== */
   .branding-promo {
     background: linear-gradient(135deg, #3F4D1B 0%, #2e3812 100%);
 border-radius: 16px;
@@ -2870,29 +2898,14 @@ box-shadow: 0 10px 40px rgba(63, 77, 27, 0.4);
 </div>
 </div>
 
-        <!-- BRANDING SESSIONS PROMO BANNER -->
-        <div class="branding-promo">
-          <div class="branding-promo-content">
-            <div class="branding-promo-text">
-              <h2>Personal Branding Sessions</h2>
-              <p>Personal branding for estate agents. Professional photography and video content to elevate your presence.</p>
-              
-              <div class="branding-promo-features">
-                <span class="feature-badge">10 Signature Shots</span>
-                <span class="feature-badge">Social Media Video</span>
-                <span class="feature-badge">Complete Package</span>
-                <span class="feature-badge">2-7 Day Delivery</span>
-              </div>
-              
-              <div class="branding-promo-cta">
-                <button class="btn-branding-primary" onclick="window.location.href='./booking.html?source=dashboard'">
-  Book Your Session →
-</button>
-                <button class="btn-branding-secondary" onclick="showBrandingInfo()">
-                  Learn More
-                </button>
-              </div>
-            </div>
+        <!-- PROPERTY PHOTO BANNER -->
+        <div class="property-photo-banner">
+          <div class="property-photo-banner-content">
+            <h2>Ready for Your Next Shoot?</h2>
+            <p>Book professional photography, videography and drone content for your next listing.</p>
+            <button class="btn-branding-primary" onclick="window.location.href='./booking.html?source=dashboard'">
+              Book Now →
+            </button>
           </div>
         </div>
 
@@ -4246,76 +4259,6 @@ async function loadAcuityMetrics(email){
       }
       btn.disabled=false; btn.textContent='📤 Submit Amendment Request'; msg.scrollIntoView({behavior:'smooth',block:'center'});
     });
-
-    /* Branding Info Modal */
-    function showBrandingInfo() {
-      const info = `
-PERSONAL BRANDING SESSIONS FOR ESTATE AGENTS
-
-Personal branding for estate agents. You're in every shot.
-
-Choose Your Style:
-On-location, studio (we source), or hybrid.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-BRANDING PHOTOGRAPHY SESSION - 10 Signature Shots
-2 hours @ £414.00
-
-10 Essential Shots:
-• Professional (4): High street with coffee, café with phone, with business owner, neighbourhood portrait
-• Property Action (4): Outside property with tablet, at car with keys, garden path, street view
-• Local Expert (2): Local landmark, community spot
-
-Includes:
-• 2-hour session
-• 10 edited images
-• 2-day delivery
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-BRANDING VIDEOGRAPHY SESSION (For Social Media)
-3 hours @ £534.00
-
-15 Social Media Clips:
-• Professional: High street walks, café with phone, business chat, intros
-• Property Action: Outside property with tablet, car with keys, garden paths, views
-• Local Expert: Landmark moments, community spots
-
-Includes:
-• 3-hour session
-• 5 sequences
-• 15 vertical clips (15-30 sec)
-• 3-day delivery
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-COMPLETE BRANDING PACKAGE - Photo & Video
-5 hours @ £894.00
-
-Full personal branding suite for estate agents. Photography and video content.
-
-What You Get:
-• 10 Lifestyle Photos: Professional lifestyle, property action, local expert images
-• 15 Social Media Video Clips: 5 sequences edited into 15 vertical clips (15-30 sec)
-
-Includes:
-• 5-hour session (or 2 separate)
-• All images and clips edited
-• 5-7 day delivery
-• Commercial rights
-
-Save £54 vs booking separately
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Ready to boost your personal brand?
-Click "Book Your Session" to schedule your branding session.
-      `;
-      
-      alert(info);
-      // Or you could create a modal popup instead of alert for a better UX
-    }
 
 /* ===== CONTENT CALENDAR ===== */
 let calendarData = [];

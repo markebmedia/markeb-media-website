@@ -616,43 +616,7 @@ body {
       <p>Professional property marketing solutions designed to elevate your brand and listings</p>
     </div>
 
-    <!-- Individual Services Section -->
     <div class="section-header">
-      <h2>Personal Branding Sessions</h2>
-      <p>Elevate your personal brand as an estate agent with professional photography and video content</p>
-    </div>
-
-    <div class="services-grid" id="brandingServicesGrid">
-      <!-- Branding services will be populated by JavaScript -->
-    </div>
-
-    <!-- Branding Promotional Banner -->
-    <div class="branding-banner">
-      <div class="branding-banner-content">
-        <h3>Why Personal Branding Matters</h3>
-        <p>In today's competitive market, estate agents need more than great properties—they need a memorable personal brand. Stand out from the crowd with professional content that showcases you as the trusted expert.</p>
-        <div class="banner-features">
-          <span class="banner-feature">
-            <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i>
-            Professional Image
-          </span>
-          <span class="banner-feature">
-            <i data-lucide="smartphone" style="width: 16px; height: 16px;"></i>
-            Social Media Ready
-          </span>
-          <span class="banner-feature">
-            <i data-lucide="shield-check" style="width: 16px; height: 16px;"></i>
-            Build Trust
-          </span>
-          <span class="banner-feature">
-            <i data-lucide="zap" style="width: 16px; height: 16px;"></i>
-            Quick Delivery
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-header" style="margin-top: 80px;">
       <h2>Property Marketing Services</h2>
       <p>Book one-off shoots for your properties with our premium media services</p>
     </div>
@@ -920,34 +884,6 @@ body {
   <script>
     // Services data — prices ex-VAT, matching booking.html
     const SERVICES = [
-      // Branding Services
-      {
-        name: 'Complete Branding Package - Photo & Video',
-        price: 745.00,
-        duration: 300,
-        description: 'Up to a 60-minute planning session with a branding specialist. Multimedia branding package complete with Photography + Videography content. Saves £45 vs booking separately. One creative direction across all content — consistent style and tone to ensure your brand is positioned correctly.',
-        icon: 'star',
-        popular: false,
-        category: 'branding'
-      },
-      {
-        name: 'Branding Videography Session',
-        price: 445.00,
-        duration: 180,
-        description: 'Up to a 45-minute planning session with a branding specialist. 10 short-form videos across 3 content styles — including talking head (speaking straight to camera), local spaces (cafes, green spaces, rivers, etc.), and styles such as market updates or about the estate agent. Every video is fully branded with colour-matched graphics, lower thirds, animated intro and branded outro.',
-        icon: 'video',
-        popular: false,
-        category: 'branding'
-      },
-      {
-        name: 'Branding Photography Session - 10 Signature Shots',
-        price: 345.00,
-        duration: 120,
-        description: 'Up to a 30-minute planning session with a branding specialist. 10 directed signature photos — perfect for professional headshots and personal branding photography. Usage across social media, website, email signatures, and print.',
-        icon: 'camera',
-        popular: false,
-        category: 'branding'
-      },
       // Property Packages
       {
         name: 'Platinum Package',
@@ -1043,28 +979,9 @@ body {
 
     // Populate services grid
     function populateServices() {
-      const brandingGrid = document.getElementById('brandingServicesGrid');
       const propertyGrid = document.getElementById('propertyServicesGrid');
       
-      const brandingServices = SERVICES.filter(s => s.category === 'branding');
       const propertyServices = SERVICES.filter(s => s.category === 'property');
-      
-      const brandingHTML = brandingServices.map(service => `
-        <div class="service-card">
-          ${service.popular ? '<div class="popular-badge">Popular</div>' : ''}
-          <h3>${service.name}</h3>
-          <p class="description">${service.description}</p>
-          <div class="service-meta">
-            <span class="service-duration">
-              <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
-              ${Math.floor(service.duration / 60)}h ${service.duration % 60}m
-            </span>
-            <span class="service-price">
-              £${service.price.toFixed(2)} <span class="vat-label">+ VAT</span>
-            </span>
-          </div>
-        </div>
-      `).join('');
       
       const propertyHTML = propertyServices.map(service => `
         <div class="service-card">
@@ -1083,7 +1000,6 @@ body {
         </div>
       `).join('');
       
-      brandingGrid.innerHTML = brandingHTML;
       propertyGrid.innerHTML = propertyHTML;
       
       // Initialize Lucide icons after DOM is populated
