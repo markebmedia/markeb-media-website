@@ -224,6 +224,20 @@ exports.handler = async (event) => {
     const postcode = bookingFields['Postcode'] || '';
     const ref = bookingFields['Booking Reference'] || bookingRef || '';
 
+    // The actual client on the job — separate from whoever paid the invoice
+    // (clientEmail/clientName below, which come from Sent To Email/Name on
+    // the invoice and could be a vendor, solicitor, or other third party).
+    // Only treated as a distinct recipient if their email actually differs
+    // from the payer's — clients who pay for themselves get no second email.
+    const actualClientEmail = bookingFields['Client Email'] || '';
+    const actualClientName = bookingFields['Client Name'] || clientName;
+
+    const payerIsClient = !!(
+      actualClientEmail &&
+      clientEmail &&
+      actualClientEmail.trim().toLowerCase() === clientEmail.trim().toLowerCase()
+    );
+
     let shootDate = '';
     if (date) {
       const [y, m, d2] = date.split('-').map(Number);
@@ -330,7 +344,7 @@ exports.handler = async (event) => {
         <div class="vat-row total"><span>Total paid</span><span style="font-family:monospace;color:#B46100;">£${amountPaid.toFixed(2)}</span></div>
       </div>
 
-      ${deliveryInfo ? `
+      ${deliveryInfo && payerIsClient ? `
       <div class="amount-box" style="background:#ecfdf5;border-color:#6ee7b7;">
         <div class="label" style="color:#065f46;">🎉 Your Content is Ready!</div>
         <div style="font-size:14px;color:#065f46;margin-top:8px;line-height:1.7;">
@@ -338,6 +352,9 @@ exports.handler = async (event) => {
           ${deliveryInfo.deliveryLink ? `<a href="${deliveryInfo.deliveryLink}" style="color:#065f46;font-weight:700;word-break:break-all;">📥 Download your files</a>` : ''}
         </div>
       </div>
+      ` : ''}
+      ${deliveryInfo && !payerIsClient ? `
+      <p style="font-size:14px;color:#6b4f2a;">The client on this booking has been notified separately that their content is now available to view.</p>
       ` : ''}
 
       <div class="invoice-link">
@@ -369,6 +386,113 @@ exports.handler = async (event) => {
     });
 
     console.log('✅ Payment confirmation email sent to', clientEmail);
+
+    // ── 5. Only if a DIFFERENT client email was detected: notify the client ──
+    // ──    directly that their content is ready. Skipped entirely when the ──
+    // ──    client paid for themselves (payerIsClient === true).            ──
+    if (deliveryInfo && actualClientEmail && !payerIsClient) {
+      const contentReadyHtml = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Content is Ready — ${ref || invoiceNum}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #3F4D1B; background-color: #f7ead5; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #FDF3E2; }
+    .header { background: linear-gradient(135deg, #3F4D1B 0%, #2d3813 100%); padding: 40px 20px; text-align: center; }
+    .header img { max-width: 180px; width: 100%; height: auto; margin-bottom: 16px; }
+    .header h1 { color: #FDF3E2; margin: 0; font-size: 26px; font-weight: 700; }
+    .header-accent { width: 40px; height: 3px; background: #B46100; margin: 14px auto 0; border-radius: 2px; }
+    .ready-banner { background: #10b981; padding: 20px; text-align: center; }
+    .ready-banner .icon { font-size: 36px; display: block; margin-bottom: 8px; }
+    .ready-banner h2 { color: #fff; margin: 0; font-size: 20px; font-weight: 700; }
+    .content { padding: 32px 24px; }
+    .content p { color: #3F4D1B; margin: 0 0 14px; font-size: 15px; }
+    .detail-box { background: #f7ead5; border: 2px solid #e8d9be; border-radius: 12px; padding: 20px; margin: 20px 0; }
+    .detail-box h3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7c2e; margin: 0 0 14px; }
+    .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e8d9be; font-size: 14px; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { color: #6b4f2a; }
+    .detail-value { color: #3F4D1B; font-weight: 600; text-align: right; }
+    .links-box { background: #ecfdf5; border: 2px solid #6ee7b7; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center; }
+    .links-box .label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #065f46; margin-bottom: 10px; }
+    .links-box a { display: block; color: #065f46; font-weight: 700; font-size: 15px; word-break: break-all; margin: 6px 0; }
+    .footer { background-color: #3F4D1B; padding: 24px 20px; text-align: center; color: rgba(253,243,226,0.7); font-size: 13px; }
+    .footer strong { color: #FDF3E2; }
+    .footer a { color: #B46100; text-decoration: none; }
+    .footer-divider { width: 32px; height: 2px; background: #B46100; margin: 14px auto; border-radius: 1px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="${LOGO_URL}" alt="Markeb Media">
+      <h1>Markeb Media</h1>
+      <div class="header-accent"></div>
+    </div>
+
+    <div class="ready-banner">
+      <span class="icon">🎉</span>
+      <h2>Your Content is Ready</h2>
+    </div>
+
+    <div class="content">
+      <p>Hi <strong>${actualClientName || 'there'}</strong>,</p>
+      <p>Payment for your shoot has now been confirmed, and your content is ready to view and download.</p>
+
+      <div class="detail-box">
+        <h3>Booking Details</h3>
+        ${ref ? `<div class="detail-row">
+          <span class="detail-label">Booking reference</span>
+          <span class="detail-value" style="font-family:monospace;">${ref}</span>
+        </div>` : ''}
+        ${service ? `<div class="detail-row">
+          <span class="detail-label">Service</span>
+          <span class="detail-value">${service}</span>
+        </div>` : ''}
+        ${address ? `<div class="detail-row">
+          <span class="detail-label">Property</span>
+          <span class="detail-value">${address}${postcode ? ', ' + postcode : ''}</span>
+        </div>` : ''}
+      </div>
+
+      <div class="links-box">
+        <div class="label">Access Your Content</div>
+        ${deliveryInfo.vimeoLink ? `<a href="${deliveryInfo.vimeoLink}">🎬 Watch your video</a>` : ''}
+        ${deliveryInfo.deliveryLink ? `<a href="${deliveryInfo.deliveryLink}">📥 Download your files</a>` : ''}
+      </div>
+
+      <p>If you have any questions, reply to this email or contact us at <a href="mailto:commercial@markebmedia.com" style="color:#B46100;">commercial@markebmedia.com</a>.</p>
+      <p>Best regards,<br><strong>The Markeb Media Team</strong></p>
+    </div>
+
+    <div class="footer">
+      <strong>Markeb Media Ltd</strong>
+      <div class="footer-divider"></div>
+      <p style="margin:0 0 6px;">Spaces Pennine 5, 20-22 Hawley Street, Sheffield, S1 2EA</p>
+      <a href="mailto:commercial@markebmedia.com">commercial@markebmedia.com</a>
+      <p style="margin-top:12px;font-size:12px;color:rgba(253,243,226,0.5);">Company No. 15919272 &nbsp;·&nbsp; VAT No. 498 4447 31</p>
+    </div>
+  </div>
+</body>
+</html>`;
+
+      try {
+        await resend.emails.send({
+          from: FROM_EMAIL,
+          to: actualClientEmail,
+          bcc: BCC_EMAIL,
+          subject: `🎉 Your Content is Ready — ${ref || invoiceNum} — Markeb Media`,
+          html: contentReadyHtml
+        });
+        console.log('✅ Content-ready notification sent to client:', actualClientEmail);
+      } catch (clientEmailErr) {
+        // Non-blocking — payment has already been processed successfully;
+        // don't fail the whole webhook over this secondary notification.
+        console.error('⚠️ Failed to send content-ready email to client (non-blocking):', clientEmailErr.message);
+      }
+    }
 
     return {
       statusCode: 200,
