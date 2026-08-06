@@ -302,13 +302,26 @@ exports.handler = async (event) => {
     </div>
 
     <div class="content">
-      <p>Hi <strong>${clientName}</strong>,</p>
-      <p>Your payment has been successfully received. Your invoice is now settled — thank you.</p>
-
       <div class="amount-box">
         <div class="label">Amount Paid</div>
         <div class="amount">£${amountPaid.toFixed(2)}</div>
       </div>
+
+      <p>Hi <strong>${clientName}</strong>,</p>
+      <p>Your payment has been successfully received. Your invoice is now settled — thank you.</p>
+
+      ${deliveryInfo && payerIsClient ? `
+      <div class="amount-box" style="background:#ecfdf5;border-color:#6ee7b7;">
+        <div class="label" style="color:#065f46;">🎉 Your Content is Ready!</div>
+        <div style="font-size:14px;color:#065f46;margin-top:8px;line-height:1.7;">
+          ${deliveryInfo.vimeoLink ? `<a href="${deliveryInfo.vimeoLink}" style="color:#065f46;font-weight:700;word-break:break-all;">🎬 Watch your video</a><br>` : ''}
+          ${deliveryInfo.deliveryLink ? `<a href="${deliveryInfo.deliveryLink}" style="color:#065f46;font-weight:700;word-break:break-all;">📥 Download your files</a>` : ''}
+        </div>
+      </div>
+      ` : ''}
+      ${deliveryInfo && !payerIsClient ? `
+      <p style="font-size:14px;color:#6b4f2a;">The client on this booking has been notified separately that their content is now available to view.</p>
+      ` : ''}
 
       <div class="detail-box">
         <h3>Invoice & Booking Details</h3>
@@ -343,19 +356,6 @@ exports.handler = async (event) => {
         <div class="vat-row"><span>VAT @ 20%</span><span style="font-family:monospace;">£${vatAmt.toFixed(2)}</span></div>
         <div class="vat-row total"><span>Total paid</span><span style="font-family:monospace;color:#B46100;">£${amountPaid.toFixed(2)}</span></div>
       </div>
-
-      ${deliveryInfo && payerIsClient ? `
-      <div class="amount-box" style="background:#ecfdf5;border-color:#6ee7b7;">
-        <div class="label" style="color:#065f46;">🎉 Your Content is Ready!</div>
-        <div style="font-size:14px;color:#065f46;margin-top:8px;line-height:1.7;">
-          ${deliveryInfo.vimeoLink ? `<a href="${deliveryInfo.vimeoLink}" style="color:#065f46;font-weight:700;word-break:break-all;">🎬 Watch your video</a><br>` : ''}
-          ${deliveryInfo.deliveryLink ? `<a href="${deliveryInfo.deliveryLink}" style="color:#065f46;font-weight:700;word-break:break-all;">📥 Download your files</a>` : ''}
-        </div>
-      </div>
-      ` : ''}
-      ${deliveryInfo && !payerIsClient ? `
-      <p style="font-size:14px;color:#6b4f2a;">The client on this booking has been notified separately that their content is now available to view.</p>
-      ` : ''}
 
       <div class="invoice-link">
         <a href="https://markebmedia.com/invoice/${invoiceNum}">View & Print Paid Invoice</a>
