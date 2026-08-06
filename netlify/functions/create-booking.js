@@ -308,6 +308,11 @@ exports.handler = async (event, context) => {
         'Client Email': bookingData.clientEmail,
         'Client Phone': bookingData.clientPhone || '',
         'Client Notes': bookingData.clientNotes || '',
+
+        // ✅ Custom / Pick & Mix line items (only set when serviceId === 'custom')
+        ...(bookingData.customLineItems && bookingData.customLineItems.length > 0 && {
+          'Custom Line Items JSON': JSON.stringify(bookingData.customLineItems)
+        }),
         
         // ✅ NEW: Access Type fields
         'Access Type': bookingData.accessType || undefined,
@@ -400,12 +405,16 @@ exports.handler = async (event, context) => {
             'Sent': false,
             'Service': bookingData.service || '',
             'Shoot Date': bookingData.date || '',
-            'Line Items JSON': JSON.stringify([
-              { desc: bookingData.service || '', amount: bookingData.basePrice || 0 },
-              ...(bookingData.extraBedroomFee > 0 ? [{ desc: 'Extra bedrooms', amount: bookingData.extraBedroomFee }] : []),
-              ...(bookingData.squareFootageFee > 0 ? [{ desc: 'Large property fee', amount: bookingData.squareFootageFee }] : []),
-              ...(bookingData.addons || []).map(a => ({ desc: a.name, amount: a.price }))
-            ])
+            'Line Items JSON': JSON.stringify(
+              (bookingData.customLineItems && bookingData.customLineItems.length > 0)
+                ? bookingData.customLineItems.map(l => ({ desc: l.name, amount: l.price }))
+                : [
+                    { desc: bookingData.service || '', amount: bookingData.basePrice || 0 },
+                    ...(bookingData.extraBedroomFee > 0 ? [{ desc: 'Extra bedrooms', amount: bookingData.extraBedroomFee }] : []),
+                    ...(bookingData.squareFootageFee > 0 ? [{ desc: 'Large property fee', amount: bookingData.squareFootageFee }] : []),
+                    ...(bookingData.addons || []).map(a => ({ desc: a.name, amount: a.price }))
+                  ]
+            )
           }
         })
       });
@@ -520,7 +529,8 @@ exports.handler = async (event, context) => {
   localPlaces: safeLocalPlaces,
   brandingAnswers: bookingData.brandingAnswers || {},
   epcAnswers: bookingData.epcAnswers || {},
-  addons: bookingData.addons || []
+  addons: bookingData.addons || [],
+  customLineItems: bookingData.customLineItems || []
 };
 
         await sendBookingConfirmation(emailData);

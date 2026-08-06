@@ -1868,6 +1868,10 @@ body {
       <i data-lucide="plus-circle" class="nav-icon" style="width: 20px; height: 20px;"></i>
       Create Booking
     </div>
+    <div class="nav-item" onclick="showSection('custom-services')">
+      <i data-lucide="package-plus" class="nav-icon" style="width: 20px; height: 20px;"></i>
+      Custom Services
+    </div>
     <div class="nav-item" onclick="showSection('calendar')">
       <i data-lucide="calendar" class="nav-icon" style="width: 20px; height: 20px;"></i>
       Calendar
@@ -2092,6 +2096,21 @@ body {
         <select id="bookingService" class="form-input" required onchange="updateBookingPrice()">
           <option value="">-- Select Service --</option>
         </select>
+      </div>
+
+      <div id="customServiceBuilderSection" style="display:none; margin-top:16px;">
+        <div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <label class="form-label" style="margin:0;">Pick &amp; Mix Line Items</label>
+            <button type="button" class="btn btn-secondary btn-small" onclick="addCustomLineItem()">
+              <i data-lucide="plus" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Add Line
+            </button>
+          </div>
+          <div id="customLineItemsList" style="display:flex;flex-direction:column;gap:10px;"></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:16px;padding-top:16px;border-top:2px solid #e2e8f0;font-weight:700;">
+            <span>Total (ex VAT): <span id="customServiceTotal" style="color:#3b82f6;">£0.00</span></span>
+          </div>
+        </div>
       </div>
 
       <!-- Bedrooms (conditional) -->
@@ -2454,6 +2473,30 @@ body {
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Custom Services Section -->
+<div class="admin-section" id="custom-services">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+    <div>
+      <h2 style="font-size:24px;font-weight:700;margin-bottom:4px;">Custom Services</h2>
+      <p style="color:#64748b;font-size:14px;">Save reusable one-off services to reuse in the Custom / Pick &amp; Mix booking builder</p>
+    </div>
+    <button class="btn btn-primary" onclick="showCustomServiceModal()">
+      <i data-lucide="plus-circle" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Add Custom Service
+    </button>
+  </div>
+
+  <div class="filters-bar">
+    <input type="text" class="filter-input" id="customServiceSearch" placeholder="Search custom services..." oninput="renderCustomServices()">
+    <button class="btn btn-primary" onclick="loadCustomServices()">
+      <i data-lucide="refresh-cw" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Refresh
+    </button>
+  </div>
+
+  <div class="calendar-container" id="customServicesContainer">
+    <div style="text-align:center;padding:40px;"><div class="spinner"></div></div>
   </div>
 </div>
 
@@ -4273,6 +4316,48 @@ We wanted to reach out..." required></textarea>
   </div> <!-- ✅ Close discount modal-dialog -->
 </div> <!-- ✅ Close discountModal -->
 
+<!-- Custom Service Modal -->
+<div class="modal" id="customServiceModal" onclick="closeModal('customServiceModal')">
+  <div class="modal-dialog" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <h3 id="customServiceModalTitle">Add Custom Service</h3>
+      <button class="modal-close" onclick="closeModal('customServiceModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="customServiceForm" onsubmit="saveCustomService(event)">
+        <div class="form-group">
+          <label class="form-label">Service Name *</label>
+          <input type="text" id="csName" class="form-input" required placeholder="e.g. Aerial Survey Add-On">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Price (ex VAT) *</label>
+            <input type="number" id="csPrice" class="form-input" min="0" step="0.01" required placeholder="e.g. 75.00">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duration (mins)</label>
+            <input type="number" id="csDuration" class="form-input" min="0" step="1" placeholder="e.g. 15">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description <span style="font-weight:400;color:#94a3b8;">— optional</span></label>
+          <textarea id="csDescription" class="form-input" rows="2" style="resize:vertical;" placeholder="Shown next to the service when picking it"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Region <span style="font-weight:400;color:#94a3b8;">— optional, leave blank for all regions</span></label>
+          <select id="csRegionScope" class="form-input">
+            <option value="">Available in all regions</option>
+          </select>
+        </div>
+        <div class="button-group" style="margin-top:24px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('customServiceModal')" style="flex:1;">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveCustomServiceBtn" style="flex:2;">Save Custom Service</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Suspend Account Modal -->
 <div class="modal" id="suspendModal" onclick="closeModal('suspendModal')">
   <div class="modal-dialog" style="max-width: 480px;" onclick="event.stopPropagation()">
@@ -4581,6 +4666,7 @@ let currentAdminUser = null; // { name, email, permissions }
 
 const ADMIN_SECTIONS = [
   { key: 'create-booking',    label: 'Create Booking' },
+  { key: 'custom-services',   label: 'Custom Services' },
   { key: 'calendar',          label: 'Calendar' },
   { key: 'pending',           label: 'Pending (Need Payment)' },
   { key: 'offers',            label: 'Offers' },
@@ -5384,6 +5470,7 @@ const UK_REGIONS = [
       loadBlockedTimes();
       loadTimeRequests();
       loadProspects();
+      loadCustomServices();
 
       // Populate time options
       const timeSelect = document.getElementById('bookingTime');
@@ -5540,6 +5627,10 @@ function handleAdminAccessTypeChange() {
       </option>
     `;
   });
+  serviceSelect.innerHTML += `<option value="__custom__" data-name="Custom / Pick & Mix">— Custom / Pick &amp; Mix —</option>`;
+
+  document.getElementById('customServiceBuilderSection').style.display = 'none';
+  customLineItems = [];
 }
 
     // Update price and show/hide sections
@@ -5551,7 +5642,18 @@ function handleAdminAccessTypeChange() {
         document.getElementById('bookingPriceBreakdown').style.display = 'none';
         document.getElementById('bookingBedroomsSection').style.display = 'none';
         document.getElementById('bookingAddonsSection').style.display = 'none';
+        document.getElementById('customServiceBuilderSection').style.display = 'none';
         return;
+      }
+
+      if (selectedOption.value === '__custom__') {
+        document.getElementById('bookingBedroomsSection').style.display = 'none';
+        document.getElementById('adminSqftSection').style.display = 'none';
+        document.getElementById('bookingAddonsSection').style.display = 'none';
+        renderCustomServiceBuilder();
+        return;
+      } else {
+        document.getElementById('customServiceBuilderSection').style.display = 'none';
       }
 
       const servicePrice = parseFloat(selectedOption.dataset.price);
@@ -5957,6 +6059,8 @@ function resetBookingForm() {
   if (discountMsg) discountMsg.innerHTML = '';
   const discountRow = document.getElementById('bookingDiscountRow');
   if (discountRow) discountRow.style.display = 'none';
+  document.getElementById('customServiceBuilderSection').style.display = 'none';
+  customLineItems = [];
 }
 
     // Check availability
@@ -6028,6 +6132,15 @@ document.getElementById('adminBookingForm')?.addEventListener('submit', async (e
     return;
   }
 
+  const isCustomService = selectedOption.value === '__custom__';
+  if (isCustomService) {
+    const validLines = customLineItems.filter(l => l.name && l.name.trim() && l.price >= 0);
+    if (validLines.length === 0) {
+      alert('Please add at least one line item with a description and price');
+      return;
+    }
+  }
+
   const region = document.getElementById('bookingRegion').value;
   const specialistSelect = document.getElementById('bookingSpecialist');
 const mediaSpecialist = specialistSelect.value === 'other'
@@ -6062,10 +6175,11 @@ if (!mediaSpecialist) {
     region: region,
     mediaSpecialist: mediaSpecialist,
     
-    service: selectedOption.dataset.name,
-    serviceId: selectedOption.value,
-    basePrice: servicePrice,
-    duration: parseInt(selectedOption.dataset.duration) + (bookingFormData.addonsDuration || 0) + (bookingFormData.extraDuration || 0),
+    service: isCustomService ? 'Custom / Pick & Mix' : selectedOption.dataset.name,
+    serviceId: isCustomService ? 'custom' : selectedOption.value,
+    basePrice: isCustomService ? (bookingFormData.priceExVat || 0) : servicePrice,
+    duration: isCustomService ? 0 : (parseInt(selectedOption.dataset.duration) + (bookingFormData.addonsDuration || 0) + (bookingFormData.extraDuration || 0)),
+    customLineItems: isCustomService ? customLineItems.filter(l => l.name && l.name.trim()).map(l => ({ name: l.name, price: l.price || 0 })) : undefined,
     
     bedrooms: bookingFormData.bedrooms,
     extraBedroomFee: extraBedroomFee,
@@ -6139,6 +6253,7 @@ const confirmMsg = `Create booking for ${formData.clientName}?\n\nService: ${for
 
     if (data.success) {
       alert(`✅ Booking created successfully!\n\nReference: ${data.bookingRef}\nMedia Specialist: ${formData.mediaSpecialist}\nTotal: £${totalPrice.toFixed(2)}\nPayment Status: ${paymentStatus}`);
+      customLineItems = [];
       resetBookingForm();
       loadBookings();
       loadCalendar();
@@ -6902,6 +7017,30 @@ function viewBookingById(bookingId) {
       <span class="detail-label">Service</span>
       <span class="detail-value">${fields['Service']}</span>
     </div>
+
+    ${(() => {
+      if (fields['Service ID'] !== 'custom') return '';
+      let customLines = [];
+      try { customLines = JSON.parse(fields['Custom Line Items JSON'] || '[]'); } catch { customLines = []; }
+      if (customLines.length === 0) return '';
+      const rows = customLines.map(l => `
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px;">
+          <span style="color:#334155;">${l.name}</span>
+          <span style="font-family:monospace;color:#0f172a;font-weight:600;">£${parseFloat(l.price || 0).toFixed(2)}</span>
+        </div>`).join('');
+      const total = customLines.reduce((sum, l) => sum + (parseFloat(l.price) || 0), 0);
+      return `
+      <div class="detail-item">
+        <span class="detail-label">Pick &amp; Mix Line Items</span>
+        <span class="detail-value" style="text-align:left;">
+          ${rows}
+          <div style="margin-top:8px;padding-top:8px;border-top:2px solid #e2e8f0;display:flex;justify-content:space-between;font-size:13px;font-weight:700;">
+            <span>Total (ex VAT)</span>
+            <span style="color:#B46100;font-family:monospace;">£${total.toFixed(2)}</span>
+          </div>
+        </span>
+      </div>`;
+    })()}
 
     ${(() => {
       const addons = fields['Add-Ons'] || fields['Add-ons'] || fields['Addons'] || '';
@@ -14013,6 +14152,19 @@ function getBookingLineItems(booking) {
   const addonsRaw = f['Add-Ons'] || f['Add-ons'] || '';
   const discountAmount = parseFloat(f['Discount Amount'] || 0);
 
+  // Custom / Pick & Mix bookings — use their own saved line items
+  const serviceId = f['Service ID'] || '';
+  if (serviceId === 'custom') {
+    let customLines = [];
+    try { customLines = JSON.parse(f['Custom Line Items JSON'] || '[]'); } catch { customLines = []; }
+    if (customLines.length > 0) {
+      return customLines.map(l => ({
+        desc: `${l.name || l.desc || ''} — ${fullAddress || 'no address on file'}`,
+        amount: parseFloat(l.price ?? l.amount ?? 0)
+      }));
+    }
+  }
+
   const lines = [];
   const otherFeesTotal = bedroomFee + sqftFee + addonsPrice;
   let serviceAmount = basePrice > 0 && Math.abs(basePrice - finalPrice) > 0.5
@@ -14624,6 +14776,15 @@ function buildInvoiceHTML(booking) {
   // If fetched via airtable-proxy GET, addons come back as structured array
   const structuredAddonsFromGet = Array.isArray(f.addons) ? f.addons : null;
 
+  // Custom / Pick & Mix bookings store their own line items instead of using
+  // base price + bedroom fee + sq ft fee + add-ons
+  const serviceId = f['Service ID'] || f.serviceId || '';
+  const customLineItemsRaw = f['Custom Line Items JSON'] || f.customLineItemsJson || '';
+  let customLines = [];
+  if (serviceId === 'custom' && customLineItemsRaw) {
+    try { customLines = JSON.parse(customLineItemsRaw); } catch { customLines = []; }
+  }
+
   let shootDate = '';
   if (date) {
     const [y, m, d2] = date.split('-').map(Number);
@@ -14636,6 +14797,19 @@ function buildInvoiceHTML(booking) {
   const statusLabel = isPaid ? '✅ Paid' : '⏳ Awaiting Payment';
 
   const lines = [];
+
+  if (serviceId === 'custom' && customLines.length > 0) {
+    // Custom / Pick & Mix — use the saved line items directly, no base/bedroom/sqft/addon logic
+    customLines.forEach((l, i) => {
+      lines.push({
+        desc: l.name || l.desc || '',
+        sub: i === 0 ? `Shoot date: ${shootDate}${time ? ' at ' + time : ''}` : '',
+        sub2: i === 0 && address ? `${address}${postcode ? ', ' + postcode : ''}` : '',
+        ref: i === 0 ? ref : '',
+        amount: parseFloat(l.price ?? l.amount ?? 0)
+      });
+    });
+  } else {
 
   lines.push({
     desc: service,
@@ -14698,6 +14872,8 @@ function buildInvoiceHTML(booking) {
       });
     }
   }
+
+  } // end else (non-custom)
 
   const linesHTML = lines.map(l => `
     <tr>
@@ -16343,6 +16519,226 @@ async function findInvoiceRecordForBooking(bookingId) {
   } catch {
     return null;
   }
+}
+
+// ===== CUSTOM SERVICES CATALOG =====
+let allCustomServices = [];
+let currentCustomServiceId = null;
+let customLineItems = []; // { id, name, price, fromCatalog }
+
+async function loadCustomServices() {
+  const container = document.getElementById('customServicesContainer');
+  if (container) container.innerHTML = '<div style="text-align:center;padding:40px;"><div class="spinner"></div></div>';
+  try {
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ method: 'GET', table: 'Custom Services', sort: [{ field: 'Name', direction: 'asc' }] })
+    });
+    const data = await response.json();
+    allCustomServices = data.records || [];
+    renderCustomServices();
+  } catch (error) {
+    console.error('Error loading custom services:', error);
+    if (container) container.innerHTML = '<div style="text-align:center;padding:40px;color:#ef4444;">Error loading custom services — check the "Custom Services" table exists in Airtable</div>';
+  }
+}
+
+function renderCustomServices() {
+  const container = document.getElementById('customServicesContainer');
+  if (!container) return;
+  const search = (document.getElementById('customServiceSearch')?.value || '').toLowerCase();
+  let filtered = allCustomServices;
+  if (search) filtered = filtered.filter(s => (s.fields['Name']||'').toLowerCase().includes(search));
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:60px;color:#94a3b8;">No custom services saved yet. Click "Add Custom Service" to create one, or just add one-off lines directly in the booking builder.</div>';
+    return;
+  }
+
+  let html = `<table class="data-table"><thead><tr><th>Name</th><th>Price (ex VAT)</th><th>Duration</th><th>Region</th><th>Actions</th></tr></thead><tbody>`;
+  filtered.forEach(s => {
+    const f = s.fields;
+    html += `
+      <tr>
+        <td data-label="Name"><strong>${f['Name']}</strong>${f['Description'] ? `<div style="font-size:12px;color:#64748b;margin-top:2px;">${f['Description']}</div>` : ''}</td>
+        <td data-label="Price">£${parseFloat(f['Price']||0).toFixed(2)}</td>
+        <td data-label="Duration">${f['Duration']||0} min</td>
+        <td data-label="Region">${f['Region Scope'] ? `<span class="region-badge">${REGION_DISPLAY[f['Region Scope']] || f['Region Scope']}</span>` : '<span class="region-badge empty">All regions</span>'}</td>
+        <td data-label="Actions">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn btn-primary btn-small" onclick="editCustomService('${s.id}')">Edit</button>
+            <button class="btn btn-danger btn-small" onclick="deleteCustomService('${s.id}', '${(f['Name']||'').replace(/'/g,"&#39;")}')">Delete</button>
+          </div>
+        </td>
+      </tr>`;
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+  lucide.createIcons();
+}
+
+function populateCustomServiceRegionDropdown() {
+  const select = document.getElementById('csRegionScope');
+  if (!select) return;
+  const current = select.value;
+  select.innerHTML = '<option value="">Available in all regions</option>' +
+    Object.keys(REGION_DISPLAY).map(key => `<option value="${key}">${REGION_DISPLAY[key]} only</option>`).join('');
+  if (current) select.value = current;
+}
+
+function showCustomServiceModal() {
+  currentCustomServiceId = null;
+  document.getElementById('customServiceModalTitle').textContent = 'Add Custom Service';
+  document.getElementById('customServiceForm').reset();
+  populateCustomServiceRegionDropdown();
+  document.getElementById('customServiceModal').classList.add('active');
+}
+
+function editCustomService(id) {
+  const s = allCustomServices.find(x => x.id === id);
+  if (!s) return;
+  currentCustomServiceId = id;
+  const f = s.fields;
+  document.getElementById('customServiceModalTitle').textContent = 'Edit Custom Service';
+  document.getElementById('csName').value = f['Name'] || '';
+  document.getElementById('csPrice').value = f['Price'] || '';
+  document.getElementById('csDuration').value = f['Duration'] || '';
+  document.getElementById('csDescription').value = f['Description'] || '';
+  populateCustomServiceRegionDropdown();
+  document.getElementById('csRegionScope').value = f['Region Scope'] || '';
+  document.getElementById('customServiceModal').classList.add('active');
+}
+
+async function saveCustomService(event) {
+  event.preventDefault();
+  const fields = {
+    'Name': document.getElementById('csName').value.trim(),
+    'Price': parseFloat(document.getElementById('csPrice').value) || 0,
+    'Duration': parseInt(document.getElementById('csDuration').value) || 0,
+    'Description': document.getElementById('csDescription').value.trim(),
+    'Region Scope': document.getElementById('csRegionScope').value || ''
+  };
+
+  const btn = document.getElementById('saveCustomServiceBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  try {
+    const response = await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        method: currentCustomServiceId ? 'PATCH' : 'POST',
+        table: 'Custom Services',
+        recordId: currentCustomServiceId || undefined,
+        body: { fields }
+      })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error?.message || 'Failed to save');
+
+    showAdminToast(`✅ Custom service "${fields['Name']}" saved`);
+    closeModal('customServiceModal');
+    loadCustomServices();
+  } catch (error) {
+    alert('❌ Failed to save custom service: ' + error.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Custom Service';
+  }
+}
+
+async function deleteCustomService(id, name) {
+  if (!confirm(`Delete custom service "${name}"? This won't affect any bookings already created with it.`)) return;
+  try {
+    await fetch('/.netlify/functions/airtable-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ method: 'DELETE', table: 'Custom Services', recordId: id })
+    });
+    showAdminToast(`✅ "${name}" deleted`);
+    loadCustomServices();
+  } catch (error) {
+    alert('❌ Failed to delete: ' + error.message);
+  }
+}
+
+const _origShowSectionCustomServices = showSection;
+showSection = function(sectionId) {
+  _origShowSectionCustomServices(sectionId);
+  if (sectionId === 'custom-services') loadCustomServices();
+};
+
+// ===== PICK & MIX BUILDER (used inside Create Booking) =====
+
+function renderCustomServiceBuilder() {
+  document.getElementById('bookingPriceBreakdown').style.display = 'none';
+  document.getElementById('customServiceBuilderSection').style.display = 'block';
+  if (customLineItems.length === 0) addCustomLineItem();
+  else renderCustomLineItemsList();
+}
+
+function addCustomLineItem() {
+  customLineItems.push({ id: 'line_' + Date.now() + Math.random().toString(36).slice(2,6), name: '', price: 0, fromCatalog: '' });
+  renderCustomLineItemsList();
+}
+
+function removeCustomLineItem(id) {
+  customLineItems = customLineItems.filter(l => l.id !== id);
+  renderCustomLineItemsList();
+}
+
+function renderCustomLineItemsList() {
+  const container = document.getElementById('customLineItemsList');
+  const region = (document.getElementById('bookingRegion').value || '').toLowerCase();
+  const catalogOptions = allCustomServices
+    .filter(s => !s.fields['Region Scope'] || (s.fields['Region Scope'] || '').toLowerCase() === region)
+    .map(s => `<option value="${s.id}">${s.fields['Name']} — £${parseFloat(s.fields['Price']||0).toFixed(2)}</option>`).join('');
+
+  container.innerHTML = customLineItems.map(line => `
+    <div style="display:flex;gap:10px;align-items:flex-start;background:#fff;border:2px solid #e2e8f0;border-radius:8px;padding:12px;flex-wrap:wrap;">
+      <select onchange="applyCatalogLine('${line.id}', this.value)" style="flex:1;min-width:180px;max-width:220px;padding:8px 10px;border:2px solid #e2e8f0;border-radius:6px;font-size:13px;">
+        <option value="">-- From catalog (optional) --</option>
+        ${catalogOptions}
+      </select>
+      <input type="text" placeholder="Description *" value="${(line.name||'').replace(/"/g,'&quot;')}" oninput="updateCustomLine('${line.id}','name',this.value)" style="flex:2;min-width:180px;padding:8px 10px;border:2px solid #e2e8f0;border-radius:6px;font-size:13px;">
+      <input type="number" placeholder="Price ex VAT" min="0" step="0.01" value="${line.price||''}" oninput="updateCustomLine('${line.id}','price',this.value)" style="flex:1;max-width:130px;padding:8px 10px;border:2px solid #e2e8f0;border-radius:6px;font-size:13px;">
+      <button type="button" onclick="removeCustomLineItem('${line.id}')" style="background:#fee2e2;color:#991b1b;border:none;border-radius:6px;width:34px;height:34px;flex-shrink:0;cursor:pointer;font-weight:700;">✕</button>
+    </div>
+  `).join('');
+
+  const total = customLineItems.reduce((sum, l) => sum + (parseFloat(l.price) || 0), 0);
+  const totalEl = document.getElementById('customServiceTotal');
+  if (totalEl) totalEl.textContent = `£${total.toFixed(2)}`;
+
+  bookingFormData.totalPrice = parseFloat((total * 1.2).toFixed(2));
+  bookingFormData.priceExVat = total;
+  bookingFormData.vatAmount = parseFloat((total * 0.2).toFixed(2));
+}
+
+function applyCatalogLine(lineId, catalogId) {
+  if (!catalogId) return;
+  const svc = allCustomServices.find(s => s.id === catalogId);
+  if (!svc) return;
+  const line = customLineItems.find(l => l.id === lineId);
+  if (!line) return;
+  line.name = svc.fields['Name'];
+  line.price = parseFloat(svc.fields['Price'] || 0);
+  line.fromCatalog = catalogId;
+  renderCustomLineItemsList();
+}
+
+function updateCustomLine(lineId, field, value) {
+  const line = customLineItems.find(l => l.id === lineId);
+  if (!line) return;
+  line[field] = field === 'price' ? parseFloat(value) || 0 : value;
+  const total = customLineItems.reduce((sum, l) => sum + (parseFloat(l.price) || 0), 0);
+  const totalEl = document.getElementById('customServiceTotal');
+  if (totalEl) totalEl.textContent = `£${total.toFixed(2)}`;
+  bookingFormData.totalPrice = parseFloat((total * 1.2).toFixed(2));
+  bookingFormData.priceExVat = total;
+  bookingFormData.vatAmount = parseFloat((total * 0.2).toFixed(2));
 }
 
 </script>

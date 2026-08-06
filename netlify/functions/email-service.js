@@ -159,6 +159,25 @@ function getLocalAreaPlacesSection(booking) {
   `;
 }
 
+// ✅ Format Custom / Pick & Mix Line Items
+function getCustomLineItemsSection(booking) {
+  if (!booking.customLineItems || booking.customLineItems.length === 0) return '';
+
+  const rows = booking.customLineItems.map(item => `
+    <div class="detail-row">
+      <span class="detail-label">${item.name}</span>
+      <span class="detail-value">£${parseFloat(item.price || 0).toFixed(2)}</span>
+    </div>
+  `).join('');
+
+  return `
+    <h3>🧩 Custom / Pick &amp; Mix Line Items</h3>
+    <div class="booking-details">
+      ${rows}
+    </div>
+  `;
+}
+
 // ✅ Format Square Footage Information
 function getSquareFootageSection(booking) {
   if (!booking.squareFootage) return '';
@@ -507,6 +526,8 @@ async function sendBookingConfirmation(booking) {
       </div>
     </div>
 
+    ${getCustomLineItemsSection(booking)}
+
     ${isPaid ? `
       <div class="alert alert-success">
         <strong>✅ Payment Complete</strong><br>
@@ -670,6 +691,7 @@ async function sendBookingConfirmation(booking) {
       ${getEpcAnswersSection(booking)}
       ${getBrandingAnswersSection(booking)}
       ${getLocalAreaPlacesSection(booking)}
+      ${getCustomLineItemsSection(booking)}
 
       <div class="alert alert-info">
         <strong>📧 Customer email sent:</strong> Yes<br>
