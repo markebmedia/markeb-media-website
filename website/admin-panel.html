@@ -2107,8 +2107,16 @@ body {
             </button>
           </div>
           <div id="customLineItemsList" style="display:flex;flex-direction:column;gap:10px;"></div>
-          <div style="display:flex;justify-content:flex-end;margin-top:16px;padding-top:16px;border-top:2px solid #e2e8f0;font-weight:700;">
-            <span>Total (ex VAT): <span id="customServiceTotal" style="color:#3b82f6;">£0.00</span></span>
+          <div style="margin-top:16px;padding-top:16px;border-top:2px solid #e2e8f0;">
+            <div style="display:flex;justify-content:flex-end;gap:8px;font-size:13px;color:#64748b;margin-bottom:4px;">
+              <span>Subtotal (ex VAT): <strong id="customServiceExVat" style="color:#0f172a;">£0.00</strong></span>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:8px;font-size:13px;color:#64748b;margin-bottom:8px;">
+              <span>VAT (20%): <strong id="customServiceVat" style="color:#0f172a;">£0.00</strong></span>
+            </div>
+            <div style="display:flex;justify-content:flex-end;font-weight:700;font-size:16px;">
+              <span>Total (inc. VAT): <span id="customServiceTotal" style="color:#B46100;">£0.00</span></span>
+            </div>
           </div>
         </div>
       </div>
@@ -16709,12 +16717,19 @@ function renderCustomLineItemsList() {
   `).join('');
 
   const total = customLineItems.reduce((sum, l) => sum + (parseFloat(l.price) || 0), 0);
-  const totalEl = document.getElementById('customServiceTotal');
-  if (totalEl) totalEl.textContent = `£${total.toFixed(2)}`;
+  const incVat = parseFloat((total * 1.2).toFixed(2));
+  const vatAmount = parseFloat((total * 0.2).toFixed(2));
 
-  bookingFormData.totalPrice = parseFloat((total * 1.2).toFixed(2));
+  const exVatEl = document.getElementById('customServiceExVat');
+  const vatEl = document.getElementById('customServiceVat');
+  const totalEl = document.getElementById('customServiceTotal');
+  if (exVatEl) exVatEl.textContent = `£${total.toFixed(2)}`;
+  if (vatEl) vatEl.textContent = `£${vatAmount.toFixed(2)}`;
+  if (totalEl) totalEl.textContent = `£${incVat.toFixed(2)}`;
+
+  bookingFormData.totalPrice = incVat;
   bookingFormData.priceExVat = total;
-  bookingFormData.vatAmount = parseFloat((total * 0.2).toFixed(2));
+  bookingFormData.vatAmount = vatAmount;
 }
 
 function applyCatalogLine(lineId, catalogId) {
@@ -16733,12 +16748,21 @@ function updateCustomLine(lineId, field, value) {
   const line = customLineItems.find(l => l.id === lineId);
   if (!line) return;
   line[field] = field === 'price' ? parseFloat(value) || 0 : value;
+
   const total = customLineItems.reduce((sum, l) => sum + (parseFloat(l.price) || 0), 0);
+  const incVat = parseFloat((total * 1.2).toFixed(2));
+  const vatAmount = parseFloat((total * 0.2).toFixed(2));
+
+  const exVatEl = document.getElementById('customServiceExVat');
+  const vatEl = document.getElementById('customServiceVat');
   const totalEl = document.getElementById('customServiceTotal');
-  if (totalEl) totalEl.textContent = `£${total.toFixed(2)}`;
-  bookingFormData.totalPrice = parseFloat((total * 1.2).toFixed(2));
+  if (exVatEl) exVatEl.textContent = `£${total.toFixed(2)}`;
+  if (vatEl) vatEl.textContent = `£${vatAmount.toFixed(2)}`;
+  if (totalEl) totalEl.textContent = `£${incVat.toFixed(2)}`;
+
+  bookingFormData.totalPrice = incVat;
   bookingFormData.priceExVat = total;
-  bookingFormData.vatAmount = parseFloat((total * 0.2).toFixed(2));
+  bookingFormData.vatAmount = vatAmount;
 }
 
 </script>
